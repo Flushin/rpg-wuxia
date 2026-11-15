@@ -3,6 +3,7 @@ import { PROGRESSION } from '../core/data';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
 import { CLASSES } from '../core/data';
+import { attrBreakdown } from '../core/stats';
 import { audio } from '../render/audio';
 import { Hotbar } from './hotbar';
 import { SkillsPanel } from './skillsPanel';
@@ -136,15 +137,16 @@ export class Hud {
 
   private renderPanel() {
     const w = this.world, p = w.player, d = p.derived;
-    const sig = JSON.stringify([p.attrs, w.freePoints, p.elemAtk, p.elemRes, p.level]);
+    const sig = JSON.stringify([p.attrs, w.gearStats(), w.freePoints, p.elemAtk, p.elemRes, p.level]);
     if (sig === this.panelSig) return;
     this.panelSig = sig;
     const cls = CLASSES[w.classId];
+    const parts = attrBreakdown(p.attrs, cls.baseAttributes, w.gearStats());
     const rows = ATTR_KEYS.map((k) => {
       const rec = cls.recommended?.find((r) => r.attr === k), opt = cls.optional?.find((r) => r.attr === k);
       const badge = rec ? `<span class="badge rec">${L('Recomendado', 'Recommended')}</span>` : opt ? `<span class="badge opt">${L('Opcional', 'Optional')}</span>` : '';
       const why = rec ?? opt;
-      return `<tr class="${rec ? 'rec' : opt ? 'opt' : ''}"><td><b>${ATTR_LABELS[k]}</b> ${badge}<small>${ATTR_HINTS[k]}</small>${why ? `<small class="why">${why.reason}</small>` : ''}</td><td class="num">${p.attrs[k]}</td>
+      return `<tr class="${rec ? 'rec' : opt ? 'opt' : ''}"><td><b>${ATTR_LABELS[k]}</b> ${badge}<small>${ATTR_HINTS[k]}</small>${why ? `<small class="why">${why.reason}</small>` : ''}</td><td class="num">${parts[k].total}<small class="parts">${parts[k].base} ${L('base', 'base')} + ${parts[k].levels} ${L('níveis', 'levels')} + ${parts[k].equip} ${L('equip.', 'equip.')}</small></td>
       <td class="plus">${w.freePoints > 0 ? `<button data-attr="${k}">+</button>` : ''}</td></tr>`;
     }).join('');
     const der: [string, string][] = [
