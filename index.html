@@ -95,8 +95,57 @@ label{display:block;margin-bottom:6px;color:#ccd}
 .sk-row.locked{opacity:.55}.sk-row.locked .ic{filter:grayscale(1)}
 .sk-row small{display:block;color:#99a;font-size:12px}.sk-row .d{font-size:13px;margin:2px 0}
 .sk-row .passive{background:#6a4a9a;color:#fff}
-@media (max-width:420px){#joystick{width:110px;height:110px;left:14px;bottom:14px}}
-@media (max-width:340px){#joystick{width:96px;height:96px}}
+#btn-bag,#dur-warn{min-height:44px}
+#dur-warn{background:#7a1f1f;border-color:#f66;font-weight:700;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{background:#a52a2a}}
+#potion-bar{position:absolute;left:14px;bottom:14px;display:flex;gap:8px}
+#potion-bar.touch{left:20px;bottom:160px}
+.pot{position:relative;width:52px;height:52px;padding:0;border-radius:10px;border:2px solid #778;background:#1a1f2e;overflow:hidden;touch-action:none;color:#fff}
+.pot.hp{--c:#c0392b}.pot.mp{--c:#2e86de}
+.pot .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--c);opacity:.6}
+.pot .lb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--c);text-shadow:0 0 3px #000,0 0 3px #000;filter:brightness(1.6)}
+.pot .cnt{position:absolute;right:4px;bottom:2px;font-size:12px;font-weight:700;text-shadow:0 0 3px #000}
+.pot .hk{position:absolute;left:4px;top:1px;font-size:11px;font-weight:700;text-shadow:0 0 3px #000}
+.pot .rem{position:absolute;left:0;right:0;top:2px;text-align:center;font-size:10px;text-shadow:0 0 3px #000}
+.pot.empty{opacity:.45}.pot.active{border-color:var(--c)}
+#inv-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto;touch-action:pan-y}
+.inv-card{width:min(440px,100%);display:block;position:relative;-webkit-overflow-scrolling:touch}
+.inv-card h2{display:flex;justify-content:space-between;align-items:baseline}
+.gold{color:#ffd23f;font-weight:700;font-size:14px}
+.eq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;justify-items:center}
+.eqs{display:flex;flex-direction:column;align-items:center}.eqs small{color:#99a;font-size:11px}
+.bag-grid{display:grid;grid-template-columns:repeat(5,48px);gap:4px;justify-content:center}
+.cell{position:relative;width:48px;height:48px;min-height:48px;padding:0;border-radius:8px;border:2px solid #445;background:#10141c;overflow:hidden;touch-action:manipulation}
+.cell.sel{outline:2px solid #d4a017;outline-offset:1px}
+.cell .ic{position:absolute;inset:3px 3px 8px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;text-shadow:0 1px 2px #000;background:linear-gradient(135deg,color-mix(in srgb,var(--rc) 55%,#000),color-mix(in srgb,var(--rc) 25%,#000))}
+.cell .qty{position:absolute;right:3px;bottom:1px;font-style:normal;font-size:11px;font-weight:700;text-shadow:0 0 3px #000}
+.cell .dur{position:absolute;left:3px;right:3px;bottom:2px;height:4px;background:#222;border-radius:2px;overflow:hidden}
+.cell .dur u,.dbar u{display:block;height:100%;background:#4cd964}
+.cell .dur.low u,.dbar.low u{background:#f1a02e}.cell .dur.zero u,.dbar.zero u{background:#e04848}
+.inv-detail{margin-top:12px;font-size:13px;position:sticky;bottom:-16px;background:#1a1f2e;border-top:1px solid #445;padding:8px 0;max-height:46vh;overflow:auto}
+.inv-detail .tipbody>div{margin:1px 0}.inv-detail small{color:#99a}.tip-sell{color:#ffd23f}.tip-cmp{margin-top:6px;border-top:1px dashed #445;padding-top:4px}
+.inv-detail .primary{margin-top:8px;min-height:44px}
+.close-btn{width:100%;margin-top:12px;min-height:44px}
+@media (min-width:600px){.inv-card{width:min(720px,100%);display:grid;grid-template-columns:1fr 250px;gap:16px}.inv-detail{margin:0;position:sticky;top:0;bottom:auto;align-self:start;border-top:0;border-left:1px solid #445;padding:0 0 0 14px;max-height:none}}
+#item-tip{position:fixed;z-index:30;width:230px;background:rgba(14,18,30,.97);border:1px solid #d4a017;border-radius:10px;padding:8px 10px;pointer-events:none;font-size:12px}
+#item-tip>div{margin:1px 0}#item-tip small{color:#99a}
+#npc-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;pointer-events:none!important}
+#npc-panel .card{pointer-events:auto;width:min(380px,100%);max-height:calc(100% - 24px);border-color:#d4a017}
+@media (pointer:coarse){#npc-panel .card{width:min(320px,100%)}}
+.npc-head{display:flex;justify-content:space-between;align-items:center}.npc-head h2{margin:0}
+.npc-head .x{min-width:44px;min-height:44px;padding:0;font-size:18px}
+.srow{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #334}
+.srow .si{flex:1;min-width:0}.srow .si small{display:block;color:#99a;font-size:11px}
+.srow button{min-width:64px;min-height:44px;padding:4px 8px}
+.srow button.danger{background:#8a2a2a;border-color:#f66}
+.dbar{height:6px;background:#222;border-radius:3px;overflow:hidden;margin:3px 0}
+.tabs,.qty{display:flex;gap:6px;align-items:center;margin:8px 0}.tabs button{flex:1;min-height:44px}
+.qty button{min-width:44px;min-height:44px}
+.tabs button.on,.qty button.on{background:#8a3b2a;border-color:#c66}
+.lore{font-style:italic;color:#cdb;line-height:1.5}
+#npc-panel .card .primary{min-height:44px}
+@media (max-width:420px){#joystick{width:110px;height:110px;left:14px;bottom:14px}#potion-bar.touch{bottom:136px;left:14px}}
+@media (max-width:340px){#joystick{width:96px;height:96px}#potion-bar.touch{bottom:122px}}
 @media (max-width:640px){
  #player-frame{width:150px}
  #target-frame{top:78px;width:200px}
@@ -123,15 +172,24 @@ label{display:block;margin-bottom:6px;color:#ccd}
     <button id="btn-settings" aria-label="Configurações">&#9881;</button>
     <button id="btn-skills">Skills (K)</button>
     <button id="btn-attrs">Atributos (C)<span id="pts-badge" class="hidden"></span></button>
+    <button id="btn-bag">Mochila (I)</button>
+    <button id="dur-warn" class="hidden" aria-label="Equipamento com pouca durabilidade">&#9888; Reparar</button>
   </div>
   <div id="toast"></div>
   <div id="hotbar"></div>
   <div id="skill-tip" class="hidden"></div>
+  <div id="potion-bar">
+    <button id="pot-hp" class="pot hp" aria-label="Poção de vida"><i class="fill"></i><span class="lb">HP</span><span class="hk"></span><span class="rem"></span><span class="cnt">0</span></button>
+    <button id="pot-mp" class="pot mp" aria-label="Poção de mana"><i class="fill"></i><span class="lb">MP</span><span class="hk"></span><span class="rem"></span><span class="cnt">0</span></button>
+  </div>
   <div id="joystick" class="hidden"><div id="knob"></div></div>
   <button id="btn-attack" class="hidden">Atacar</button>
   <div id="tip-card" class="hidden"><b id="tip-title"></b><p id="tip-text"></p><button id="tip-ok">Entendi</button></div>
   <div id="attrs-panel" class="hidden"></div>
   <div id="skills-panel" class="hidden"></div>
+  <div id="inv-panel" class="hidden"></div>
+  <div id="npc-panel" class="hidden"></div>
+  <div id="item-tip" class="hidden"></div>
   <div id="settings-panel" class="hidden"></div>
 </div>
 <div id="create" class="hidden">

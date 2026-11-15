@@ -19,7 +19,7 @@
   },
   "primeira_morte": {
     "title": "De volta à vila",
-    "text": "Ao morrer você volta à vila. No futuro, seus itens perderão durabilidade a cada morte, então tome cuidado."
+    "text": "Ao morrer você volta à vila e cada item equipado perde 10% da durabilidade máxima. Itens com durabilidade 0 param de dar bônus: conserte-os com o Ferreiro."
   },
   "primeira_skill": {
     "title": "Nova skill!",
@@ -29,5 +29,32 @@
   "skill_nivel": {
     "title": "Skill subiu de nível!",
     "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 10). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K)."
+  },
+  "primeiro_item": {
+    "title": "Você achou um equipamento!",
+    "text": "Abra a mochila com a tecla I (ou botão Mochila). A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Clique duas vezes em um item para equipá-lo; passe o mouse para ver os detalhes e comparar com o que você usa.",
+    "textTouch": "Abra a mochila no botão Mochila. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar."
+  },
+  "primeira_pocao": {
+    "title": "Poções",
+    "text": "Use a tecla Q para poção de vida e E para poção de mana. Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila.",
+    "textTouch": "Use os botões de poção acima do joystick: vida (HP) e mana (MP). Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila."
+  },
+  "primeiro_npc": {
+    "title": "Moradores da vila",
+    "text": "Clique em um morador para o personagem andar até ele e abrir a janela. O Ferreiro conserta equipamentos e o Vendedor de Poções compra e vende itens.",
+    "textTouch": "Toque em um morador para o personagem andar até ele e abrir a janela. O Ferreiro conserta equipamentos e o Vendedor de Poções compra e vende itens."
+  },
+  "durabilidade_baixa": {
+    "title": "Equipamento gastando",
+    "text": "Algum item equipado está com pouca durabilidade. Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some)."
+  },
+  "mochila_cheia": {
+    "title": "Mochila cheia",
+    "text": "A mochila tem 30 espaços. O item fica no chão por 60 segundos: abra espaço (venda itens ao Vendedor de Poções) e ande por cima dele para pegar."
+  },
+  "primeiro_ouro": {
+    "title": "Ouro",
+    "text": "Monstros deixam ouro. Use-o para consertar equipamentos e comprar poções. Itens que você não usa podem ser vendidos ao Vendedor de Poções."
   }
 }

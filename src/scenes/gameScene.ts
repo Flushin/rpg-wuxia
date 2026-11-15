@@ -12,6 +12,7 @@ import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
 import { TipManager } from '../ui/tips';
 import { MONSTERS } from '../core/data';
+import { itemColor } from '../core/items';
 
 export class GameScene extends Phaser.Scene {
   private world!: World;
@@ -20,6 +21,7 @@ export class GameScene extends Phaser.Scene {
   private fx!: SkillFx;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
   private views = new Map<number, EntityView>();
+  private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
 
   constructor() { super('Game'); }
   init(data: { world: World }) { this.world = data.world; }
@@ -82,6 +84,12 @@ export class GameScene extends Phaser.Scene {
       if (Math.abs(dx) < 26 && Math.abs(dy) < 26 && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); best = m; }
     }
     if (best) { this.world.setTarget(best.id); return; }
+    let npc: Entity | null = null; bd = Infinity;
+    for (const n of this.world.npcs) {
+      const s = tileToScreen(n.x, n.y), dx = p.worldX - s.x, dy = p.worldY - (s.y - 20);
+      if (Math.abs(dx) < 28 && Math.abs(dy) < 36 && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); npc = n; }
+    }
+    if (npc) { this.world.interactNpc(npc.id); return; }
     if (p.wasTouch) return; // toque usa o joystick; mouse continua com clique-para-mover
     const t = screenToTile(p.worldX, p.worldY);
     this.world.moveTo(t.x, t.y);
@@ -98,8 +106,41 @@ export class GameScene extends Phaser.Scene {
     w.npcs.forEach((n, i) => { live.add(n.id); this.viewFor(n, i).sync(n, false); });
     for (const m of w.monsters) { live.add(m.id); this.viewFor(m).sync(m, m.id === w.targetId); }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
+    this.syncGround();
     this.tips.update();
     this.hud.update();
+  }
+
+  private syncGround() {
+    const live = new Set<number>();
+    for (const g of this.world.ground) {
+      live.add(g.id);
+      let v = this.groundViews.get(g.id);
+      if (!v) {
+        const col = Phaser.Display.Color.HexStringToColor(itemColor(g.item!)).color;
+        v = this.add.graphics();
+        v.fillStyle(col, 0.35); v.fillEllipse(0, 0, 30, 15);
+        v.fillStyle(col, 1); v.fillPoints([{ x: 0, y: -14 }, { x: 7, y: -7 }, { x: 0, y: 0 }, { x: -7, y: -7 }], true);
+        v.lineStyle(1, 0xffffff, 0.9); v.strokePoints([{ x: 0, y: -14 }, { x: 7, y: -7 }, { x: 0, y: 0 }, { x: -7, y: -7 }], true);
+        this.groundViews.set(g.id, v);
+      }
+      const s = tileToScreen(g.x, g.y);
+      v.setPosition(s.x, s.y + Math.sin(this.time.now / 250 + g.id) * 2).setDepth(g.x + g.y);
+      v.setAlpha(g.expires - this.world.time < 10 ? 0.4 + 0.6 * Math.abs(Math.sin(this.time.now / 150)) : 1);
+    }
+    for (const [id, v] of this.groundViews) if (!live.has(id)) { v.destroy(); this.groundViews.delete(id); }
+  }
+
+  // drop coletado: brilho que voa até o jogador
+  private dropFx(x: number, y: number, color: string) {
+    const col = Phaser.Display.Color.HexStringToColor(color).color;
+    const a = tileToScreen(x, y), b = tileToScreen(this.world.player.x, this.world.player.y);
+    const g = this.add.graphics().setDepth(99999);
+    g.fillStyle(col, 1); g.fillCircle(0, 0, 5); g.lineStyle(1, 0xffffff, 1); g.strokeCircle(0, 0, 5);
+    g.setPosition(a.x, a.y - 10);
+    this.tweens.add({ targets: g, y: a.y - 34, duration: 250, ease: 'Cubic.easeOut', onComplete: () => {
+      this.tweens.add({ targets: g, x: b.x, y: b.y - 24, alpha: 0, duration: 300, ease: 'Cubic.easeIn', onComplete: () => g.destroy() });
+    } });
   }
 
   private handle(ev: GameEvent) {
@@ -136,6 +177,17 @@ export class GameScene extends Phaser.Scene {
         if (ev.kind === 'shield' && ev.targetId === this.world.player.id) { const s = tileToScreen(this.world.player.x, this.world.player.y); this.floatText(s.x, s.y - 64, 'Escudo', '#bfe0ff', 15); }
         break;
       case 'shieldAbsorb': { const s = tileToScreen(ev.x, ev.y); this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, '#9fd0ff', 14); break; }
+      case 'drop': this.dropFx(ev.x, ev.y, ev.color); break;
+      case 'itemPickup': this.hud.toast(`+ ${ev.name}${ev.qty > 1 ? ` x${ev.qty}` : ''}`, ev.color); break;
+      case 'goldPickup': this.hud.toast(`+ ${ev.amount} ouro`, '#ffd23f'); break;
+      case 'bagFull': this.hud.toast('Mochila cheia', '#ff8a80'); break;
+      case 'durabilityLost': this.hud.toast('Seus equipamentos perderam durabilidade', '#f1a02e'); break;
+      case 'potionFail': {
+        const msg = { none: 'Sem poção', cooldown: 'Recarregando', full: ev.kind === 'hp' ? 'Vida cheia' : 'Mana cheia' }[ev.reason];
+        const s = tileToScreen(this.world.player.x, this.world.player.y);
+        this.floatText(s.x, s.y - 64, msg, '#dddddd', 15);
+        break;
+      }
       case 'levelup': this.hud.toast(`Nível ${ev.level}! +3 pontos de atributo`); break;
       case 'playerDeath': this.hud.toast('Você morreu... Renascendo na vila'); break;
       default: break;

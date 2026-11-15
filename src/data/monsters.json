@@ -5,8 +5,20 @@
     "sprite": "wolf",
     "minLevel": 1,
     "maxLevel": 3,
-    "baseAttributes": { "strength": 4, "intelligence": 0, "stamina": 5, "agility": 4, "willpower": 1 },
-    "perLevel": { "strength": 1.5, "intelligence": 0, "stamina": 2, "agility": 1, "willpower": 0.5 },
+    "baseAttributes": {
+      "strength": 4,
+      "intelligence": 0,
+      "stamina": 5,
+      "agility": 4,
+      "willpower": 1
+    },
+    "perLevel": {
+      "strength": 1.5,
+      "intelligence": 0,
+      "stamina": 2,
+      "agility": 1,
+      "willpower": 0.5
+    },
     "damageType": "physical",
     "aggroRange": 3,
     "leashRange": 13,
@@ -15,6 +27,36 @@
     "moveSpeed": 3.6,
     "xpBase": 10,
     "xpPerLevel": 6,
-    "respawnSeconds": 15
+    "respawnSeconds": 15,
+    "loot": {
+      "gold": {
+        "min": 2,
+        "max": 6
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.12
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.08
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.1,
+          "minMonsterLevel": 5
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.06,
+          "minMonsterLevel": 5
+        }
+      ],
+      "equipment": {
+        "chance": 0.08,
+        "maxReqLevel": 1
+      }
+    }
   }
 }

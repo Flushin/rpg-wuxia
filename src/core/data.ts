@@ -18,6 +18,11 @@ export interface MonsterDef {
   baseAttributes: Attributes; perLevel: Attributes; damageType: DamageType;
   aggroRange: number; leashRange: number; attackRange: number; attackInterval: number;
   moveSpeed: number; xpBase: number; xpPerLevel: number; respawnSeconds: number;
+  loot?: {
+    gold?: { min: number; max: number };
+    potions?: { id: string; chance: number; minMonsterLevel?: number }[];
+    equipment?: { chance: number; maxReqLevel: number };
+  };
 }
 export interface Progression { levelCap: number; xpToNext: number[]; freePointsPerLevel: number }
 

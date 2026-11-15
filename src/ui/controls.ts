@@ -10,12 +10,16 @@ export function setupControls(world: World, hud: Hud) {
     if (e.key === 'Tab') { e.preventDefault(); world.cycleTarget(); }
     else if (e.key === 'c' || e.key === 'C') hud.togglePanel();
     else if (e.key === 'k' || e.key === 'K') hud.toggleSkills();
+    else if (e.key === 'i' || e.key === 'I') hud.toggleInventory();
+    else if ((e.key === 'q' || e.key === 'Q') && !e.repeat) world.usePotion('hp');
+    else if ((e.key === 'e' || e.key === 'E') && !e.repeat) world.usePotion('mp');
     else if (e.key === 'Escape') hud.closeAll();
     else if (e.key >= '1' && e.key <= '4' && !e.repeat) world.useSkill(Number(e.key) - 1);
     else if (e.key === ' ') { e.preventDefault(); world.attackNearest(); }
   });
   $('btn-attrs').addEventListener('click', () => hud.togglePanel());
   $('btn-skills').addEventListener('click', () => hud.toggleSkills());
+  $('btn-bag').addEventListener('click', () => hud.toggleInventory());
 
   if (!isTouch) return;
   const joy = $('joystick'), knob = $('knob'), atk = $('btn-attack');

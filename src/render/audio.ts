@@ -50,7 +50,7 @@ class AudioManager {
     if (!snd.play()) done();
   }
 
-  ui(key: 'ui_click' | 'ui_open' | 'ui_close' | 'tip' | 'point_spent') { this.sfx(key); }
+  ui(key: string) { this.sfx(key); }
 
   setSettings(p: Partial<AudioSettings>) {
     Object.assign(this.settings, p);
@@ -78,6 +78,16 @@ class AudioManager {
       case 'skillLevelUp': this.sfx('level_up'); break;
       case 'skillCast': this.lastRanged = ev.ranged; if (ev.ranged) this.sfx('spell', 300); break;
       case 'skillFail': this.sfx('ui_click'); break;
+      case 'itemPickup': this.sfx('pickup', 200); break;
+      case 'goldPickup': this.sfx('coin', 200); break;
+      case 'bagFull': this.sfx('bag_full'); break;
+      case 'equipChange': this.sfx('equip'); break;
+      case 'potionUsed': this.sfx('potion'); break;
+      case 'potionFail': this.sfx('ui_click'); break;
+      case 'npcOpen': this.sfx('ui_open'); break;
+      case 'npcClose': this.sfx('ui_close'); break;
+      case 'trade': this.sfx('coin'); break;
+      case 'repair': this.sfx('repair'); break;
       case 'mapChange': this.sfx('portal'); this.playMusicForMap(ev.mapId); break;
       default: break;
     }

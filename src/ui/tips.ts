@@ -94,6 +94,10 @@ export class TipManager {
     if (ev.type === 'kill' && ++this.kills === 1) this.trigger('primeiro_abate');
     else if (ev.type === 'levelup' && ++this.levelUps === 1) this.trigger('primeiro_nivel');
     else if (ev.type === 'skillLevelUp') this.trigger('skill_nivel');
+    else if (ev.type === 'itemPickup' && !ev.potion) this.trigger('primeiro_item');
+    else if (ev.type === 'itemPickup' && ev.potion) this.trigger('primeira_pocao');
+    else if (ev.type === 'goldPickup') this.trigger('primeiro_ouro');
+    else if (ev.type === 'bagFull') this.trigger('mochila_cheia');
     else if (ev.type === 'playerDeath') this.diedPending = true;
     else if (ev.type === 'mapChange' && this.diedPending) { this.diedPending = false; this.trigger('primeira_morte'); }
   }
@@ -101,7 +105,11 @@ export class TipManager {
   update() {
     const w = this.world;
     if (!w.seenTips.includes('primeira_skill') && w.activeSkills().some((d) => w.isUnlocked(d))) this.trigger('primeira_skill');
-    if (w.player.dead || w.mapId !== 'cidade' || w.seenTips.includes('portal')) return;
+    if (!w.player.dead && w.lowDurability()) this.trigger('durabilidade_baixa');
+    if (w.mapId !== 'cidade' && w.kindCount('hp') + w.kindCount('mp') > 0) this.trigger('primeira_pocao');
+    if (w.player.dead || w.mapId !== 'cidade') return;
+    if (!w.seenTips.includes('primeiro_npc') && w.npcs.some((n) => Math.hypot(w.player.x - n.x, w.player.y - n.y) < 7)) { this.trigger('primeiro_npc'); return; }
+    if (w.seenTips.includes('portal')) return;
     for (const o of w.map.objects) {
       if (o.type !== 'portal') continue;
       if (Math.hypot(w.player.x - (o.x + o.w / 2), w.player.y - (o.y + o.h / 2)) < 6) { this.trigger('portal'); return; }

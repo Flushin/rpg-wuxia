@@ -7,6 +7,16 @@ export type ElementMap = Record<Element, number>;
 export type DamageType = 'physical' | 'spiritual';
 export interface Point { x: number; y: number }
 
+export type Slot = 'colar' | 'tronco' | 'arma' | 'cabeca' | 'calca' | 'bota';
+export type Rarity = 'comum' | 'incomum' | 'raro';
+export interface Bonus { stat: string; value: number }
+// Instância de item. Poções usam qty (empilham); equipamentos usam rarity/bonuses/durability.
+export interface ItemInstance {
+  uid: string; baseId: string; rarity: Rarity; bonuses: Bonus[]; ilvl: number; durability: number; qty?: number;
+}
+export interface GroundItem { id: number; x: number; y: number; item?: ItemInstance; gold?: number; expires: number }
+export type PotionKind = 'hp' | 'mp';
+
 export interface Derived {
   maxHp: number; maxMana: number;
   physAtk: number; spiritAtk: number;
@@ -69,7 +79,20 @@ export type GameEvent =
   | { type: 'dash'; fromX: number; fromY: number; toX: number; toY: number }
   | { type: 'buffApplied'; targetId: number; id: string; kind: BuffKind; duration: number }
   | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind }
-  | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number };
+  | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number }
+  | { type: 'drop'; x: number; y: number; color: string }
+  | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean }
+  | { type: 'goldPickup'; amount: number }
+  | { type: 'bagFull' }
+  | { type: 'groundGone'; id: number }
+  | { type: 'equipChange' }
+  | { type: 'potionUsed'; id: string; kind: PotionKind }
+  | { type: 'potionFail'; kind: PotionKind; reason: 'none' | 'cooldown' | 'full' }
+  | { type: 'npcOpen'; npcId: string; entityId: number }
+  | { type: 'npcClose' }
+  | { type: 'trade'; kind: 'buy' | 'sell'; gold: number }
+  | { type: 'repair'; gold: number }
+  | { type: 'durabilityLost' };
 
 export interface SaveData {
   version: 1;
@@ -86,4 +109,7 @@ export interface SaveData {
   tipsEnabled?: boolean;
   skills?: Record<string, { level: number; xp: number }>;
   audio?: { sfx: number; music: number; muted: boolean };
+  gold?: number;
+  bag?: (ItemInstance | null)[];
+  equipment?: Partial<Record<Slot, ItemInstance>>;
 }

@@ -5,6 +5,9 @@ import { CLASSES } from '../core/data';
 import { audio } from '../render/audio';
 import { Hotbar } from './hotbar';
 import { SkillsPanel } from './skillsPanel';
+import { InventoryPanel } from './inventory';
+import { NpcWindow } from './npcWindow';
+import { PotionBar } from './potions';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -13,12 +16,20 @@ const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) *
 export class Hud {
   private panelSig = '';
   private toastTimer = 0;
-  private toastLines: string[] = [];
+  private toastLines: { msg: string; color?: string }[] = [];
   private hotbar: Hotbar;
   private skills: SkillsPanel;
+  private inv: InventoryPanel;
+  private npc: NpcWindow;
+  private potions: PotionBar;
+  private goldSig = -1;
   constructor(private world: World) {
     this.hotbar = new Hotbar(world);
     this.skills = new SkillsPanel(world, () => this.toggleSkills(false));
+    this.inv = new InventoryPanel(world, (m, c) => this.toast(m, c), () => this.toggleInventory(false));
+    this.npc = new NpcWindow(world, (m, c) => this.toast(m, c));
+    this.potions = new PotionBar(world);
+    $('dur-warn').addEventListener('click', () => this.toggleInventory(true));
     $('hud').classList.remove('hidden');
     $('attrs-panel').addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest('[data-attr],[data-close],[data-dist]') as HTMLElement | null;
@@ -43,12 +54,22 @@ export class Hud {
     this.skills.set(show);
   }
 
-  closeAll() { this.togglePanel(false); this.toggleSkills(false); }
+  toggleInventory(open?: boolean) {
+    const show = open ?? !this.inv.open;
+    if (show !== this.inv.open) audio.ui(show ? 'ui_open' : 'ui_close');
+    this.inv.set(show);
+  }
 
-  toast(msg: string) {
+  closeAll() {
+    this.togglePanel(false); this.toggleSkills(false); this.toggleInventory(false);
+    this.world.closeNpc();
+  }
+
+  toast(msg: string, color?: string) {
     const t = $('toast');
-    this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), msg] : [msg];
-    t.textContent = this.toastLines.join('\n'); t.classList.add('show');
+    const line = { msg, color };
+    this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), line] : [line];
+    t.innerHTML = this.toastLines.map((l) => `<div${l.color ? ` style="color:${l.color}"` : ''}>${l.msg.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</div>`).join(''); t.classList.add('show');
     clearTimeout(this.toastTimer);
     this.toastTimer = window.setTimeout(() => { t.classList.remove('show'); this.toastLines = []; }, 2800);
   }
@@ -80,6 +101,10 @@ export class Hud {
     if (!$('attrs-panel').classList.contains('hidden')) this.renderPanel();
     this.hotbar.update();
     this.skills.update();
+    this.inv.update();
+    this.npc.update();
+    this.potions.update();
+    $('dur-warn').classList.toggle('hidden', !w.lowDurability());
   }
 
   private renderPanel() {
