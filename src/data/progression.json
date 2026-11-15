@@ -1,0 +1,5 @@
+{
+  "levelCap": 10,
+  "xpToNext": [30, 60, 100, 150, 220, 300, 400, 520, 700],
+  "freePointsPerLevel": 3
+}

@@ -1,0 +1,32 @@
+{
+  "lamina": {
+    "id": "lamina",
+    "name": "Lâmina Errante",
+    "description": "Espadachins viajantes que lutam de perto com a fúria do trovão.",
+    "rangeLabel": "Corpo a corpo",
+    "damageType": "physical",
+    "element": "thunder",
+    "attackRange": 1.6,
+    "attackInterval": 1.0,
+    "moveSpeed": 4.6,
+    "color": "#c0623a",
+    "baseAttributes": { "strength": 8, "intelligence": 3, "stamina": 8, "agility": 5, "willpower": 3 },
+    "levelUpAttributes": { "strength": 1, "intelligence": 0, "stamina": 1, "agility": 0, "willpower": 0 },
+    "elementAttack": { "thunder": 4 }
+  },
+  "pavilhao": {
+    "id": "pavilhao",
+    "name": "Pavilhão das Nuvens",
+    "description": "Mestres da energia espiritual que atacam à distância com o gelo das montanhas.",
+    "rangeLabel": "À distância",
+    "damageType": "spiritual",
+    "element": "ice",
+    "attackRange": 7,
+    "attackInterval": 1.3,
+    "moveSpeed": 4.4,
+    "color": "#4a8fd0",
+    "baseAttributes": { "strength": 3, "intelligence": 8, "stamina": 5, "agility": 6, "willpower": 7 },
+    "levelUpAttributes": { "strength": 0, "intelligence": 1, "stamina": 0, "agility": 0, "willpower": 1 },
+    "elementAttack": { "ice": 4 }
+  }
+}
