@@ -1,4 +1,5 @@
 import { CLASSES } from '../core/data';
+import { PORTRAITS } from '../render/sprites';
 import { L } from '../core/i18n';
 import { BASES, POTIONS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
@@ -14,7 +15,12 @@ const tabOf = (it: ItemInstance): Tab => (POTIONS[it.baseId] ? 'pot' : 'equip');
 // slots em volta do corpo: esquerda de cima para baixo (cabeça, colar, tronco), direita (arma, calça, bota)
 const BODY_LEFT: Slot[] = ['cabeca', 'colar', 'tronco'], BODY_RIGHT: Slot[] = ['arma', 'calca', 'bota'];
 
-// silhueta enquanto a arte é placeholder (trocar pelo sprite do personagem quando a arte definitiva chegar)
+// retrato do personagem (sprite do marco 6); seitas ainda sem arte usam a silhueta na cor da seita
+function bodyFigure(classId: string, color: string): string {
+  const src = PORTRAITS[classId];
+  return src ? `<img class="body-fig body-img" src="${src}" alt="" aria-hidden="true">` : silhouette(color);
+}
+
 function silhouette(color: string): string {
   return `<svg class="body-fig" viewBox="0 0 100 200" aria-hidden="true"><defs><linearGradient id="bodyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".85"/><stop offset="1" stop-color="${color}" stop-opacity=".35"/></linearGradient></defs>
     <g fill="url(#bodyg)" stroke="${color}" stroke-width="1.5">
@@ -118,7 +124,7 @@ export class InventoryPanel {
       const it = w.equipment[sl];
       return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty">${SLOT_ICON[sl]}</span>`}</button></div>`;
     };
-    const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${silhouette(CLASSES[w.classId]?.color ?? '#889')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
+    const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${bodyFigure(w.classId, CLASSES[w.classId]?.color ?? '#889')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
     const bagCell = (i: number) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i])}</button>`;
     const idx = w.bag.map((_, i) => i);
     const inTab = idx.filter((i) => w.bag[i] && tabOf(w.bag[i]!) === this.tab), free = idx.filter((i) => !w.bag[i]);

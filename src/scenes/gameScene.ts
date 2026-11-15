@@ -4,7 +4,7 @@ import { screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
-import { buildMapView } from '../render/mapView';
+import { buildMapView, fadeTreesNear } from '../render/mapView';
 import { audio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { SKILLS } from '../core/skills';
@@ -27,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   private tips!: TipManager;
   private fx!: SkillFx;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
+  private trees: Phaser.GameObjects.Image[] | null = null;
   private views = new Map<number, EntityView>();
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
   private autoText!: Phaser.GameObjects.Text;
@@ -99,6 +100,7 @@ export class GameScene extends Phaser.Scene {
     this.views.forEach((v) => v.destroy());
     this.views.clear();
     this.mapObjs = buildMapView(this, this.world.map);
+    this.trees = null;
     const pv = this.viewFor(this.world.player);
     this.cameras.main.startFollow(pv.container, true, 0.12, 0.12);
     const s = tileToScreen(this.world.player.x, this.world.player.y);
@@ -146,10 +148,23 @@ export class GameScene extends Phaser.Scene {
     for (const ev of evs) this.handle(ev);
 
     const live = new Set<number>([w.player.id]);
+    const tgt = w.monsters.find((m) => m.id === w.targetId && !m.dead);
+    if (tgt && Math.hypot(tgt.x - w.player.x, tgt.y - w.player.y) <= w.player.attackRange + 1) this.viewFor(w.player).face(tgt.x, tgt.y, w.player.x, w.player.y);
     this.viewFor(w.player).sync(w.player, false);
     w.npcs.forEach((n, i) => { live.add(n.id); this.viewFor(n, i).sync(n, false); });
-    for (const m of w.monsters) { live.add(m.id); this.viewFor(m).sync(m, m.id === w.targetId); }
+    for (const m of w.monsters) {
+      live.add(m.id);
+      const v = this.viewFor(m);
+      if (m.ai === 'chase' && !w.player.dead) v.face(w.player.x, w.player.y, m.x, m.y);
+      v.sync(m, m.id === w.targetId);
+    }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
+    if (!this.trees) this.trees = this.mapObjs.filter((o) => o.name === 'tree') as Phaser.GameObjects.Image[];
+    {
+      const who: { x: number; y: number; depth: number }[] = [];
+      for (const e of [w.player, tgt]) { const v = e && this.views.get(e.id); if (e && v) who.push({ x: v.container.x, y: v.container.y, depth: e.x + e.y }); }
+      fadeTreesNear(this.trees, who);
+    }
     this.syncGround();
     this.syncTelegraphs();
     this.syncAutoText();
@@ -241,12 +256,17 @@ export class GameScene extends Phaser.Scene {
         this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), '#aaaaaa', 13);
         break;
       }
-      case 'attack': if (!this.isArcher(ev.fromId)) this.beam(ev); break;
+      case 'attack': this.swing(ev.fromId, ev.toId); if (!this.isArcher(ev.fromId)) this.beam(ev); break;
       case 'projectile': this.arrowFx(ev); break;
       case 'bossSummon': this.hud.toast(L('O General invoca guerreiros!', 'The General summons warriors!'), '#ff8a60'); break;
       case 'bossDefeated': this.hud.toast(L('General de Terracota derrotado!', 'Terracotta General defeated!'), '#ffd23f'); break;
       case 'telegraphResolved': if (ev.hit) { const s = tileToScreen(ev.x, ev.y); this.cameras.main.shake(180, 0.006); this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), '#ff6a50', 15); } break;
-      case 'skillCast': case 'dash': this.fx.onEvent(ev); break;
+      case 'skillCast': {
+        const c = this.entityById(ev.casterId);
+        if (c) this.views.get(c.id)?.attack(ev.tx, ev.ty, c.x, c.y); // sem alvo: tx,ty = posição dele (mantém a direção)
+        this.fx.onEvent(ev); break;
+      }
+      case 'dash': this.fx.onEvent(ev); break;
       case 'skillFail': {
         const msg = { mana: L('Sem mana', 'No mana'), cooldown: L('Recarregando', 'On cooldown'), notarget: L('Sem alvo', 'No target'), blocked: L('Caminho bloqueado', 'Path blocked'), locked: L('Bloqueada', 'Locked') }[ev.reason];
         const s = tileToScreen(this.world.player.x, this.world.player.y);
@@ -279,6 +299,17 @@ export class GameScene extends Phaser.Scene {
       case 'playerDeath': this.hud.toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village')); break;
       default: break;
     }
+  }
+
+  private entityById(id: number): Entity | undefined {
+    const w = this.world;
+    return id === w.player.id ? w.player : w.monsters.find((m) => m.id === id) ?? w.npcs.find((n) => n.id === id);
+  }
+
+  /** Animação de golpe virada para o alvo (sprites do marco 6). */
+  private swing(fromId: number, toId: number) {
+    const a = this.entityById(fromId), t = this.entityById(toId);
+    if (a && t) this.views.get(fromId)?.attack(t.x, t.y, a.x, a.y);
   }
 
   private isArcher(id: number) { const m = this.world.monsters.find((e) => e.id === id); return !!m && !!MONSTERS[m.monsterId]?.projectile; }

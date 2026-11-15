@@ -1,0 +1,122 @@
+{
+ "name": "floresta",
+ "dir": ".cache/kenney-nature",
+ "out": "../../public/sprites",
+ "samples": 6,
+ "props": {
+  "tree_oak": {
+   "scale": 2.0
+  },
+  "tree_default": {
+   "scale": 2.0
+  },
+  "tree_fat": {
+   "scale": 2.0
+  },
+  "tree_pineRoundA": {
+   "scale": 2.0
+  },
+  "rock_largeA": {
+   "scale": 1.2,
+   "recolor": {
+    "dirt": [
+     128,
+     126,
+     120
+    ],
+    "dirtDark": [
+     104,
+     102,
+     98
+    ]
+   }
+  },
+  "rock_smallA": {
+   "recolor": {
+    "dirt": [
+     128,
+     126,
+     120
+    ],
+    "dirtDark": [
+     104,
+     102,
+     98
+    ]
+   }
+  },
+  "plant_bush": {
+   "scale": 1.2
+  },
+  "plant_bushLarge": {
+   "scale": 1.2
+  },
+  "grass": {},
+  "grass_large": {},
+  "flower_redA": {},
+  "flower_yellowA": {},
+  "mushroom_red": {},
+  "stump_round": {},
+  "log": {
+   "scale": 1.4
+  }
+ },
+ "recolor": {
+  "leafsGreen": [
+   78,
+   138,
+   64
+  ],
+  "leafsDark": [
+   46,
+   96,
+   62
+  ],
+  "grass": [
+   96,
+   152,
+   72
+  ],
+  "woodBark": [
+   112,
+   78,
+   54
+  ],
+  "woodBarkDark": [
+   84,
+   60,
+   46
+  ],
+  "woodInner": [
+   196,
+   160,
+   112
+  ],
+  "dirt": [
+   158,
+   128,
+   92
+  ],
+  "dirtDark": [
+   132,
+   106,
+   76
+  ],
+  "colorRed": [
+   200,
+   60,
+   55
+  ],
+  "colorYellow": [
+   235,
+   200,
+   90
+  ],
+  "colorTan": [
+   205,
+   170,
+   120
+  ]
+ },
+ "out_json": "../../public/sprites"
+}

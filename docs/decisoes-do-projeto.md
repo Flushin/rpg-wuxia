@@ -22,14 +22,23 @@
   - Tela inicial com **4 espaços**; cada um mostra nome, seita, nível, mapa e último acesso, com botões Jogar e Apagar (apagar pede para digitar o nome). O personagem atual vira o primeiro espaço.
   - Ganho offline vale só para o **último personagem jogado**.
   - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois).
-- **Marco 6 (próximo, decidido em 15/11/2026): gráficos — fatia pequena.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Fixar tamanho dos sprites, direções e animações (andar, atacar, morrer). Só depois estender para Geada, outros monstros, cidade e ruínas.
-  - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos registrados no repositório.
-  - **Personagens e monstros:** modelos **3D CC0** (ex.: Quaternius) renderizados em sprites isométricos de **8 direções** por um script do Blender. Motivo: quase não existem sprites 2D CC0 isométricos com cara de wuxia, e misturar pacotes de autores diferentes quebra o estilo. Recolorir/trocar armas para dar cara wuxia.
-  - **Cenário (tiles e objetos):** pacotes 2D isométricos CC0 (ex.: Screaming Brain Studios — objetos, templo, pisos, paredes; Kenney).
-  - **Pendências das melhorias de 15/11:** gerar os sprites em resolução maior (2×) para aproveitar a nitidez nova no celular e no zoom; trocar a silhueta da mochila pelo sprite do personagem.
+- **Marco 6 (em andamento): gráficos — fatia pequena.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Só depois estender para Geada, outros monstros, cidade e ruínas.
+  - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos em `public/sprites/CREDITS.txt`.
+  - **Primeira fatia (15/11/2026, feita):** Tormenta, lobo, árvores e piso da floresta já no jogo; retrato da Tormenta na mochila (fim da silhueta para ela). Detalhes em "Gráficos (marco 6)" abaixo.
+  - **Próximos passos:** Geada (Mage do KayKit, mesmo esqueleto), bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), NPCs, cidade (casas, praça), ruínas, água e portais.
 
 
 ## Decididas
+
+### Gráficos (marco 6, 15/11/2026)
+- **Método:** modelos **3D CC0** renderizados em sprites isométricos por um script do Blender. Motivo: quase não existem sprites 2D CC0 isométricos com cara de wuxia, e misturar pacotes 2D de autores diferentes quebra o estilo; renderizando tudo com a mesma câmera e luz, o estilo fica coeso.
+- **Personagens:** linha **KayKit** (Kay Lousberg, CC0), estilo "cabeçudo" — escolhida no lugar da Quaternius porque já traz ataque com duas lâminas, mago (Geada) e esqueletos (base para os guerreiros de terracota), todos com o mesmo esqueleto e animações. **Tormenta = Rogue** recolorido (cabelo preto, túnica carmim, capa escura, cinto dourado).
+- **Monstros:** lobo da Quaternius (Ultimate Animated Animals, CC0). Outros monstros: preferir KayKit recolorido.
+- **Cenário:** **Nature Kit 3D da Kenney** (CC0) renderizado com a mesma câmera e luz dos personagens (em vez de pacotes 2D), com as cores trocadas para uma paleta de floresta. Piso (grama, caminho) em 2D gerado por script, sem frestas.
+- **Estilo aprovado pelo Lucas:** personagem com **~48 px** de altura no zoom 100%; **sem contorno**; árvores do tamanho da prévia (bem mais altas que o personagem).
+- **Padrões técnicos:** câmera isométrica 2:1 ortográfica; **8 direções**; animações **parado, andar, atacar, morrer**; render em **2×** mostrado em 0,5 (nitidez no celular/zoom); atlas recortado (máx. 2048×4096) com paleta de 256 cores. Render no Blender (Cycles na CPU, < 1 min no total). Como gerar: `tools/sprites/README.md`.
+- **No jogo (só visual, sem mudar regras):** o personagem vira para onde anda e para o alvo em combate; golpe e skills tocam a animação de ataque; monstro morto mostra a queda (~1,4 s) antes de sumir; árvores na frente do jogador e do alvo ficam transparentes; alguns enfeites (grama, flores, cogumelos, pedrinhas) na grama da floresta, sem bloquear caminho.
+
 
 ### Base (15/11/2026)
 - **Escala:** single-player primeiro. Multiplayer fica para uma fase futura, então a lógica do jogo (combate, status, IA) fica separada da renderização.
@@ -227,13 +236,13 @@ Implementadas a pedido do Lucas e publicadas no site.
 - **Ícones nos slots de equipamento** *(PR #1)*: emoji no lugar das siglas — ⛑️ cabeça, 📿 colar, 👘 tronco, ⚔️ arma, 👖 calça, 👢 bota; esmaecidos nos slots vazios; o nome do slot continua no title/aria-label. Equipamentos na mochila também mostram o emoji (poções seguem HP/MP). Conferir como ficam no celular.
 - **Atributos detalhados** *(PR #2)*: no painel C, cada atributo mostra o total e, embaixo, uma linha pequena "5 base + 14 níveis + 6 equip." (EN: base / levels / equip.). Níveis = pontos automáticos + livres; equipamento ignora itens com durabilidade 0. Função `attrBreakdown` em `src/core/stats.ts`. Conferir a largura em telas estreitas.
 - **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O contador (x/30) e o "Organizar" continuam valendo para a mochila toda. Craft e Gemas entram quando esses sistemas existirem.
-- **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. Trocar a silhueta pelo sprite do personagem no marco 6.
+- **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. **Marco 6:** a Tormenta já mostra o retrato (sprite); a Geada troca quando ganhar arte.
 
 ### Câmera (15/11/2026)
 - **Zoom** *(PR #3)*: roda do mouse no PC e pinça com dois dedos no celular. Só aproxima: 100% a 200% (gruda em 100%). Fica salvo no aparelho (`localStorage`, vale para todos os personagens).
 
 ### Gráficos (15/11/2026)
-- **Nitidez no celular** *(PR #3)*: causa confirmada — o canvas era desenhado no tamanho CSS (modo `RESIZE` do Phaser) e o celular ampliava 2–3×. Agora o canvas é desenhado em tamanho × `devicePixelRatio` (limitado a 2×) e mostrado no tamanho CSS; a câmera compensa com zoom × DPR. Textos, nomes e efeitos ficam nítidos; as texturas placeholder ainda são geradas em 1× e só ficam totalmente nítidas com os sprites do marco 6 em resolução maior. Código em `src/render/display.ts`.
+- **Nitidez no celular** *(PR #3)*: causa confirmada — o canvas era desenhado no tamanho CSS (modo `RESIZE` do Phaser) e o celular ampliava 2–3×. Agora o canvas é desenhado em tamanho × `devicePixelRatio` (limitado a 2×) e mostrado no tamanho CSS; a câmera compensa com zoom × DPR. Textos, nomes e efeitos ficam nítidos. Código em `src/render/display.ts`. **Marco 6:** os sprites novos são gerados em 2×, então ficam nítidos também; o que ainda é placeholder segue em 1×.
 
 ### Monstros (15/11/2026)
 - **Renascimento com tempo** *(PR #3)*: corrigido o exploit de trocar de mapa para renascer todos. Cada monstro comum morto guarda o horário de renascimento (relógio real) pelo ponto de spawn (`mapa#índice`); o tempo continua fora do mapa e vai no save (`respawns`). Comuns: **30 s** (lobos eram 15 s; bandidos e terracota 35–40 s). General: 10 min, como já era. Simulação de balanceamento quase igual (Tormenta ~72 min, Geada ~52 min até o nível 10). Teste: `npm run check:respawn`.
