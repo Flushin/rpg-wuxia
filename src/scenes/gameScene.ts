@@ -119,24 +119,43 @@ export class GameScene extends Phaser.Scene {
     return v;
   }
 
+  /** Posição do toque/clique no mundo, medida na hora com a posição real do canvas.
+   *  No celular a barra do navegador aparece/some e desloca a página; a posição que o Phaser
+   *  guardou fica velha e o toque caía fora do NPC/monstro. */
+  private pointerWorld(p: Phaser.Input.Pointer): { x: number; y: number } {
+    const ev = p.event as (TouchEvent | MouseEvent | undefined);
+    let cx: number | undefined, cy: number | undefined;
+    if (ev && 'changedTouches' in ev && ev.changedTouches.length) {
+      const t = [...ev.changedTouches].find((q) => q.identifier === p.identifier) ?? ev.changedTouches[0];
+      cx = t.clientX; cy = t.clientY;
+    } else if (ev && 'clientX' in ev) { cx = ev.clientX; cy = ev.clientY; }
+    const canvas = this.game.canvas, r = canvas.getBoundingClientRect();
+    if (cx === undefined || cy === undefined || !r.width || !r.height) return { x: p.worldX, y: p.worldY };
+    const wp = this.cameras.main.getWorldPoint((cx - r.left) * (canvas.width / r.width), (cy - r.top) * (canvas.height / r.height));
+    return { x: wp.x, y: wp.y };
+  }
+
   private onPointer(p: Phaser.Input.Pointer) {
     if (this.world.player.dead || p.button !== 0) return;
-    if (p.wasTouch && this.touchPointers().length > 1) return; // segundo dedo = pinça
+    const fingers = p.event && 'touches' in p.event ? (p.event as TouchEvent).touches.length : this.touchPointers().length;
+    if (p.wasTouch && fingers > 1) return; // segundo dedo = pinça
+    const { x: wx, y: wy } = this.pointerWorld(p);
+    const k = p.wasTouch ? 1.5 : 1; // dedo é menos preciso que o mouse: área de toque maior
     let best: Entity | null = null, bd = Infinity;
     for (const m of this.world.monsters) {
       if (m.dead) continue;
-      const s = tileToScreen(m.x, m.y), dx = p.worldX - s.x, dy = p.worldY - (s.y - 14);
-      if (Math.abs(dx) < 26 && Math.abs(dy) < 26 && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); best = m; }
+      const s = tileToScreen(m.x, m.y), dx = wx - s.x, dy = wy - (s.y - 14);
+      if (Math.abs(dx) < 26 * k && Math.abs(dy) < 26 * k && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); best = m; }
     }
     if (best) { this.world.setTarget(best.id); return; }
     let npc: Entity | null = null; bd = Infinity;
     for (const n of this.world.npcs) {
-      const s = tileToScreen(n.x, n.y), dx = p.worldX - s.x, dy = p.worldY - (s.y - 20);
-      if (Math.abs(dx) < 28 && Math.abs(dy) < 36 && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); npc = n; }
+      const s = tileToScreen(n.x, n.y), dx = wx - s.x, dy = wy - (s.y - 24);
+      if (Math.abs(dx) < 28 * k && Math.abs(dy) < 40 * k && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); npc = n; }
     }
     if (npc) { this.world.interactNpc(npc.id); return; }
     if (p.wasTouch) return; // toque usa o joystick; mouse continua com clique-para-mover
-    const t = screenToTile(p.worldX, p.worldY);
+    const t = screenToTile(wx, wy);
     this.world.moveTo(t.x, t.y);
   }
 
