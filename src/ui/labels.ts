@@ -9,3 +9,6 @@ export const ATTR_HINTS: Record<AttrKey, string> = {
 };
 export const ELEMENT_LABELS: Record<Element, string> = { fire: L('Fogo', 'Fire'), ice: L('Gelo', 'Ice'), thunder: L('Trovão', 'Thunder'), poison: L('Veneno', 'Poison') };
 export const DAMAGE_LABELS = { physical: L('Físico', 'Physical'), spiritual: L('Espiritual', 'Spiritual') } as const;
+
+// Botão X no canto superior direito das janelas (fica visível ao rolar). `attr` é o atributo que o painel já escuta para fechar.
+export const closeX = (attr: string) => `<button class="win-x" ${attr} aria-label="${L('Fechar', 'Close')}" title="${L('Fechar', 'Close')}">✕</button>`;

@@ -111,3 +111,26 @@ export function sanitizeItem(raw: unknown): ItemInstance | null {
   const dur = Number.isFinite(r.durability) ? Math.max(0, Math.min(b.durability, Number(r.durability))) : b.durability;
   return { uid: String(r.uid ?? newUid()), baseId: r.baseId, rarity, bonuses, ilvl: Math.max(b.reqLevel, Math.floor(Number(r.ilvl) || 1)), durability: dur };
 }
+
+// ordem da mochila: equipamentos (ordem dos slots), depois poções; raridade (raro primeiro) e nível (maior primeiro)
+export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[] {
+  const items: ItemInstance[] = [];
+  const stacks = new Map<string, ItemInstance>();
+  for (const it of bag) {
+    if (!it) continue;
+    if (!isPotionId(it.baseId)) { items.push(it); continue; }
+    // junta poções do mesmo tipo em pilhas de até STACK_MAX
+    let left = it.qty ?? 1;
+    for (let n = 0; left > 0; n++) {
+      const k = `${it.baseId}#${n}`, cur = stacks.get(k);
+      if (!cur) { stacks.set(k, { ...it, qty: Math.min(left, STACK_MAX) }); left -= STACK_MAX; break; }
+      const add = Math.min(left, STACK_MAX - (cur.qty ?? 1));
+      if (add > 0) { cur.qty = (cur.qty ?? 1) + add; left -= add; }
+    }
+  }
+  const potKeys = Object.keys(POTIONS);
+  const rank = (it: ItemInstance) => (isPotionId(it.baseId) ? 100 + potKeys.indexOf(it.baseId) : SLOTS.indexOf(BASES[it.baseId].slot));
+  const all = [...items, ...stacks.values()].sort((a, b) =>
+    rank(a) - rank(b) || RARITY_ORDER.indexOf(b.rarity) - RARITY_ORDER.indexOf(a.rarity) || b.ilvl - a.ilvl || (BASES[a.baseId]?.name ?? '').localeCompare(BASES[b.baseId]?.name ?? ''));
+  return [...all, ...Array(Math.max(0, bag.length - all.length)).fill(null)];
+}

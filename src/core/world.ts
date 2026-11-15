@@ -7,7 +7,7 @@ import type { GameMap } from './map';
 import { findPath, isWalkable, type Avoid } from './pathfinding';
 import { GLOBAL_COOLDOWN, SKILLS, SKILL_MAX_LEVEL, classActives, skillScale, skillXpToNext, type SkillDef, type SkillState } from './skills';
 import { BAG_SIZE, BASES, GROUND_SECONDS, POTIONS, SLOTS, STACK_MAX, STARTING_KIT, STARTING_WEAPON, baseOf, buyPrice, equipmentBaseIds, isBroken, isPotionId, itemColor, itemName,
-  itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue, WEAR_PER_HIT } from './items';
+  itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue, sortedBag, WEAR_PER_HIT } from './items';
 import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
@@ -737,6 +737,8 @@ export class World {
 
   // ---------- inventário ----------
   private bumpInv() { this.invVersion++; }
+
+  sortBag() { this.bag = sortedBag(this.bag); this.bumpInv(); }
 
   freeSlots(): number { return this.bag.filter((b) => !b).length; }
   canFit(baseId: string, qty = 1): boolean {

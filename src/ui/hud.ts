@@ -12,7 +12,7 @@ import { AutoPanel, showOfflineReport } from './autoPanel';
 import { isTouch } from './controls';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
-import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
+import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
@@ -155,7 +155,7 @@ export class Hud {
       [L('Chance de crítico', 'Crit chance'), `${(d.critChance * 100).toFixed(1)}%`], [L('Dano crítico', 'Crit damage'), `${Math.round(d.critDamage * 100)}%`],
     ];
     const els = ELEMENTS.map((e) => `<tr><td>${ELEMENT_LABELS[e]}</td><td class="num">${p.elemAtk[e]}</td><td class="num">${p.elemRes[e]}</td></tr>`).join('');
-    $('attrs-panel').innerHTML = `<div class="card"><h2>${p.name} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
+    $('attrs-panel').innerHTML = `<div class="card">${closeX('data-close="1"')}<h2>${p.name} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
       <div class="pts">${L('Pontos livres', 'Free points')}: <b>${w.freePoints}</b></div>
       <table>${rows}</table>
       <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>${L('Distribuir recomendado', 'Distribute recommended')}</button>

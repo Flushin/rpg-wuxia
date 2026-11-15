@@ -2,6 +2,7 @@ import { L, bindLangButtons, langButtons, localize } from '../core/i18n';
 import tipsJson from '../data/tips.json';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
+import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
@@ -57,7 +58,7 @@ export class TipManager {
   }
 
   private renderPanel() {
-    $('settings-panel').innerHTML = `<div class="card"><h2>${L('Configurações', 'Settings')}</h2>
+    $('settings-panel').innerHTML = `<div class="card">${closeX('data-act="close"')}<h2>${L('Configurações', 'Settings')}</h2>
       <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
