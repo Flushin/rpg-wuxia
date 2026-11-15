@@ -58,12 +58,15 @@ export class Hotbar {
 
   private layout() {
     if (!isTouch) return;
+    // celular deitado com pouca altura (ex.: Fold fechado): arco baixo e compacto, para não subir até os botões do topo
+    const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
-    const step = narrow ? 28 : 30, start = narrow ? 152 : 165;
+    const size = short ? 46 : SIZE, r = short ? 84 : R, cx = short ? 53 : 72, cy = short ? 51 : 78;
+    const step = short ? 28 : narrow ? 28 : 30, start = short ? 178 : narrow ? 152 : 165;
     this.slots.forEach((s, i) => {
       const a = ((start - i * step) * Math.PI) / 180;
-      s.btn.style.right = `${72 - R * Math.cos(a) - SIZE / 2}px`;
-      s.btn.style.bottom = `${78 + R * Math.sin(a) - SIZE / 2}px`;
+      s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
+      s.btn.style.bottom = `${cy + r * Math.sin(a) - size / 2}px`;
     });
   }
 
