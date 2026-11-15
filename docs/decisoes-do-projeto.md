@@ -197,6 +197,11 @@
 - **Guerreiros de Terracota:** defesa física ×2,4 e espiritual ×0,7 (ensina tipos de dano: Geada leva vantagem; Tormenta usa o Quebra-Guarda).
 - **Chefe — General de Terracota (nv 10):** lento e resistente; golpe em área marcado no chão com círculo vermelho 1,5 s antes (dá para sair). Com 50% de HP invoca 2 guerreiros. Renasce 10 min após morrer. Drop garantido de item Raro nível 5.
 - **Auto-combate ignora o chefe** e evita a área dele.
+- **Escolha de alvo do auto (refeita em 15/11/2026, aprovada):**
+  - **Revidar primeiro:** monstro que está atacando o personagem vira o alvo (o mais perto), mesmo acima do limite de nível; só depois procura monstros novos. Se o alvo atual já está na briga, termina ele.
+  - **Evita atrair vários:** prefere alvos cujo caminho (e o próprio alvo) não fica na visão de outros monstros; pode escolher um um pouco mais longe.
+  - **Perto primeiro:** prefere monstros até ~12 tiles de caminho; só atravessa o mapa se não houver nenhum perto.
+  - **Correção do "parar do nada":** confere o caminho de até 16 candidatos (antes 4) e larga o alvo que não fica mais perto em 4 s (ignora por 15 s). Simulação: ritmo igual (Tormenta ~72 min, Geada ~46 min até o nível 10) e menos mortes (Tormenta ~1,3, Geada ~4,7).
 - **Auto-combate (ajustes do marco 5, aprovados):** prefere monstros com nível ≥ (nível do personagem − 1), os mais fracos só se não houver outros; volta à cidade para descansar com HP < 35% e sem poção de vida; bebe poção mais cedo contra 2+ monstros.
 
 ### Balanceamento
@@ -250,4 +255,5 @@ Implementadas a pedido do Lucas e publicadas no site.
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
-*(nenhuma pendente)*
+### Interface (aprovada em 15/11/2026)
+- **Minimapa:** no **canto superior direito**. Mostra o personagem e **pontinhos minúsculos** para os monstros (para não atrapalhar a visão). Também mostra **portais** (saídas para outros mapas), **NPCs** e o **chefe destacado** (ponto maior/de outra cor). **Mapa grande:** tecla **M** (no celular, tocar no minimapa) abre o mapa inteiro em tamanho maior. Conferir se não briga com o que já fica no canto superior direito do HUD e com o tamanho da tela do celular.

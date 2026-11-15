@@ -159,6 +159,8 @@ export class World {
     return findPath(this.map, from, to, avoid.length ? avoid : undefined);
   }
   // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
+  /** Caminho do jogador até `to` (lista de pontos; vazia = sem caminho ou já está lá). */
+  pathFromPlayer(to: Point): Point[] { return this.pf(this.player, to); }
   pathLength(to: Point): number {
     const path = this.pf(this.player, to);
     if (!path.length) return dist(this.player, to) < 1 ? 0 : Infinity;
