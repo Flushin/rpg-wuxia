@@ -1,6 +1,7 @@
 import tipsJson from '../data/tips.json';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
+import { audio } from '../render/audio';
 import { isTouch } from './controls';
 
 interface TipDef { title: string; text: string; textTouch?: string }
@@ -21,11 +22,21 @@ export class TipManager {
     panel.onclick = (e) => {
       const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
       if (!t) { if (e.target === panel) this.togglePanel(false); return; }
+      audio.ui('ui_click');
       if (t.dataset.act === 'close') this.togglePanel(false);
       else if (t.dataset.act === 'reset') { this.world.seenTips = []; this.onChange(); this.renderPanel(); }
     };
+    panel.oninput = (e) => {
+      const el = e.target as HTMLInputElement;
+      if (el.id === 'opt-sfx' || el.id === 'opt-music') {
+        audio.setSettings(el.id === 'opt-sfx' ? { sfx: +el.value } : { music: +el.value });
+        const o = el.nextElementSibling as HTMLElement | null;
+        if (o) o.textContent = el.value;
+      }
+    };
     panel.onchange = (e) => {
       const el = e.target as HTMLInputElement;
+      if (el.id === 'opt-mute') { audio.setSettings({ muted: el.checked }); audio.ui('ui_click'); return; }
       if (el.id !== 'opt-tips') return;
       this.world.tipsEnabled = el.checked;
       if (!el.checked) { this.queue = []; this.hideCard(); }
@@ -37,6 +48,7 @@ export class TipManager {
   private togglePanel(open?: boolean) {
     const p = $('settings-panel');
     const show = open ?? p.classList.contains('hidden');
+    if (show !== !p.classList.contains('hidden')) audio.ui(show ? 'ui_open' : 'ui_close');
     p.classList.toggle('hidden', !show);
     if (show) this.renderPanel();
   }
@@ -44,6 +56,9 @@ export class TipManager {
   private renderPanel() {
     $('settings-panel').innerHTML = `<div class="card"><h2>Configurações</h2>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> Mostrar dicas</label>
+      <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> Mudo</label>
+      <label class="sld">Efeitos<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
+      <label class="sld">Música<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
       <button data-act="reset">Rever dicas</button>
       <small class="muted">${this.world.seenTips.length ? `${this.world.seenTips.length} dica(s) já vista(s)` : 'Nenhuma dica vista ainda'}</small>
       <button class="primary" data-act="close">Fechar</button></div>`;
@@ -63,6 +78,7 @@ export class TipManager {
     $('tip-title').textContent = t.title;
     $('tip-text').textContent = isTouch && t.textTouch ? t.textTouch : t.text;
     $('tip-card').classList.remove('hidden');
+    audio.ui('tip');
   }
 
   private hideCard() { this.current = null; $('tip-card').classList.add('hidden'); }

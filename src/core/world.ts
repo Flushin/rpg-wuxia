@@ -25,6 +25,7 @@ export class World {
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
+  audio = { sfx: 80, music: 50, muted: false };
   monsters: Entity[] = [];
   npcs: Entity[] = [];
   events: GameEvent[] = [];
@@ -56,6 +57,7 @@ export class World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
     w.xp = s.xp; w.freePoints = s.freePoints;
     w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
+    w.audio = { sfx: s.audio?.sfx ?? 80, music: s.audio?.music ?? 50, muted: s.audio?.muted ?? false };
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
     return w;
   }
@@ -64,7 +66,7 @@ export class World {
     return {
       version: 1, name: this.player.name, classId: this.classId, level: this.player.level, xp: this.xp,
       freePoints: this.freePoints, attributes: { ...this.player.attrs }, mapId: this.mapId, lastSeen: Date.now(),
-      ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled,
+      ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled, audio: { ...this.audio },
     };
   }
 

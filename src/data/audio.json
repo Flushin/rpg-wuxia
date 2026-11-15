@@ -1,0 +1,22 @@
+{
+  "sfx": {
+    "hit": { "file": "hit", "volume": 0.8 },
+    "crit": { "file": "crit", "volume": 1 },
+    "miss": { "file": "miss", "volume": 0.5 },
+    "spell": { "file": "spell", "volume": 0.7 },
+    "monster_attack": { "file": "monster_attack", "volume": 0.7 },
+    "monster_death": { "file": "monster_death", "volume": 0.8 },
+    "player_death": { "file": "player_death", "volume": 1 },
+    "level_up": { "file": "level_up", "volume": 0.9 },
+    "point_spent": { "file": "point_spent", "volume": 0.7 },
+    "ui_click": { "file": "ui_click", "volume": 0.6 },
+    "ui_open": { "file": "ui_open", "volume": 0.7 },
+    "ui_close": { "file": "ui_close", "volume": 0.7 },
+    "tip": { "file": "tip", "volume": 0.6 },
+    "portal": { "file": "portal", "volume": 0.8 }
+  },
+  "music": {
+    "music_cidade": { "file": "cidade", "volume": 0.6, "map": "cidade" },
+    "music_floresta": { "file": "floresta", "volume": 0.6, "map": "floresta" }
+  }
+}

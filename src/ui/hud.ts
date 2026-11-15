@@ -2,6 +2,7 @@ import { PROGRESSION } from '../core/data';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
 import { CLASSES } from '../core/data';
+import { audio } from '../render/audio';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -15,8 +16,8 @@ export class Hud {
     $('attrs-panel').addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest('[data-attr],[data-close],[data-dist]') as HTMLElement | null;
       if (!t) return;
-      if (t.dataset.dist) { world.distributeRecommended(); this.panelSig = ''; }
-      else if (t.dataset.attr) { world.spendPoint(t.dataset.attr as AttrKey); this.panelSig = ''; }
+      if (t.dataset.dist) { audio.ui('point_spent'); world.distributeRecommended(); this.panelSig = ''; }
+      else if (t.dataset.attr) { audio.ui('point_spent'); world.spendPoint(t.dataset.attr as AttrKey); this.panelSig = ''; }
       else this.togglePanel(false);
     });
   }
@@ -24,6 +25,7 @@ export class Hud {
   togglePanel(open?: boolean) {
     const p = $('attrs-panel');
     const show = open ?? p.classList.contains('hidden');
+    if (show !== !p.classList.contains('hidden')) audio.ui(show ? 'ui_open' : 'ui_close');
     p.classList.toggle('hidden', !show);
     this.panelSig = '';
   }

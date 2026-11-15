@@ -1,0 +1,2 @@
+Efeitos sonoros: Kenney (https://kenney.nl), licença CC0 (domínio público).
+Pacotes usados: RPG Audio, Impact Sounds, UI Audio.

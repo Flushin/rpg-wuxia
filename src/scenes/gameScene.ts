@@ -4,6 +4,7 @@ import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
 import { buildMapView } from '../render/mapView';
+import { audio } from '../render/audio';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
@@ -21,6 +22,8 @@ export class GameScene extends Phaser.Scene {
   init(data: { world: World }) { this.world = data.world; }
 
   create() {
+    audio.bind(this, this.world.audio, () => { void writeSave(this.world.serialize()); });
+    audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
     setupControls(this.world, this.hud);
     this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); });
@@ -97,6 +100,7 @@ export class GameScene extends Phaser.Scene {
 
   private handle(ev: GameEvent) {
     this.tips.onEvent(ev);
+    audio.onEvent(ev, this.world.player.id);
     switch (ev.type) {
       case 'mapChange': this.rebuildMap(); break;
       case 'hit': {

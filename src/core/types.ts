@@ -70,4 +70,5 @@ export interface SaveData {
   ratioCursor?: number;
   seenTips?: string[];
   tipsEnabled?: boolean;
+  audio?: { sfx: number; music: number; muted: boolean };
 }
