@@ -62,6 +62,7 @@ export interface Entity {
   buffs: Buff[];
   group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
   summoned: boolean;
+  spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
 }
 
 export type GameEvent =
@@ -142,4 +143,5 @@ export interface SaveData {
   equipment?: Partial<Record<Slot, ItemInstance>>;
   auto?: AutoSave;
   bossRespawnAt?: number; // ms (relógio real) em que o chefe renasce
+  respawns?: Record<string, number>; // "mapa#índice" → ms (relógio real) em que o monstro comum renasce
 }

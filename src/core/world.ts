@@ -63,6 +63,8 @@ export class World {
   telegraphs: Telegraph[] = [];
   arenas: Avoid[] = []; // áreas de chefe do mapa atual
   bossRespawnAtMs = 0; // relógio real (ms) em que o chefe renasce; 0 = vivo
+  // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
+  respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
   private bossSummoned = false;
   private arenaSeen = false;
@@ -123,6 +125,7 @@ export class World {
     w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
     w.clock = () => now;
     w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
+    for (const [k, v] of Object.entries(s.respawns ?? {})) if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
     w.clock = () => Date.now();
     w.auto.load(s.auto);
@@ -139,6 +142,7 @@ export class World {
       gold: this.gold, bag: JSON.parse(JSON.stringify(this.bag)),
       equipment: JSON.parse(JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])))),
       auto: this.auto.serialize(), bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
+      respawns: Object.fromEntries(Object.entries(this.respawnAtMs).filter(([, t]) => t > this.clock())),
     };
   }
 
@@ -657,6 +661,7 @@ export class World {
     const def = MONSTERS[m.monsterId];
     m.dead = true; m.hp = 0; m.path = []; m.buffs = [];
     m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
+    if (!m.summoned && !def.boss && m.spawnKey) this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
     if (def.boss) {
       this.bossRespawnAtMs = this.clock() + def.respawnSeconds * 1000;
       this.telegraphs = []; this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
@@ -1046,13 +1051,18 @@ export class World {
     this.monsters = []; this.npcs = []; this.ground = []; this.openNpc = null; this.npcGoal = null;
     this.telegraphs = []; this.arenas = []; this.bossSummoned = false; this.arenaSeen = false;
     if (this.bossRespawnAtMs && this.bossRespawnAtMs <= this.clock()) this.bossRespawnAtMs = 0;
-    for (const o of this.map.objects) {
+    const now = this.clock();
+    for (const [k, t] of Object.entries(this.respawnAtMs)) if (t <= now) delete this.respawnAtMs[k];
+    this.map.objects.forEach((o, idx) => {
       if (o.type === 'monsterSpawn') {
         const def = MONSTERS[String(o.props.monster)];
-        if (!def) continue;
+        if (!def) return;
         const m = this.makeMonster(def, { x: o.x, y: o.y });
         m.group = Number(o.props.group) || 0;
+        m.spawnKey = `${mapId}#${idx}`;
         this.monsters.push(m);
+        const until = this.respawnAtMs[m.spawnKey];
+        if (!def.boss && until > now) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (until - now) / 1000; }
         if (def.boss) {
           this.arenas.push({ x: o.x, y: o.y, r: def.boss.arenaRadius });
           if (this.bossRespawnAtMs > this.clock()) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000; }
@@ -1060,7 +1070,7 @@ export class World {
       } else if (o.type === 'npc') {
         this.npcs.push({ ...this.blank('npc', o.name, 1), x: o.x, y: o.y });
       }
-    }
+    });
     this.emit({ type: 'mapChange', mapId });
   }
 
@@ -1070,7 +1080,7 @@ export class World {
       id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
       derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
       damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
-      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false,
+      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false, spawnKey: '',
     };
   }
 
@@ -1105,6 +1115,7 @@ export class World {
   private respawn(m: Entity, def: MonsterDef) {
     this.applyMonsterLevel(m, def, this.rng.int(def.minLevel, def.maxLevel));
     if (def.boss) { this.bossRespawnAtMs = 0; this.resetBoss(m); }
+    if (m.spawnKey) delete this.respawnAtMs[m.spawnKey];
     m.buffs = []; m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
   }
 

@@ -14,6 +14,12 @@ import { Hud } from '../ui/hud';
 import { TipManager } from '../ui/tips';
 import { MONSTERS } from '../core/data';
 import { itemColor } from '../core/items';
+import { DPR, cssSize } from '../render/display';
+
+// zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
+const ZOOM_MIN = 1, ZOOM_MAX = 2, ZOOM_KEY = 'rpg-zoom';
+const TEXT_RES = DPR * 2;
+const loadZoom = () => { try { const v = Number(localStorage.getItem(ZOOM_KEY)); return v >= ZOOM_MIN && v <= ZOOM_MAX ? v : 1; } catch { return 1; } };
 
 export class GameScene extends Phaser.Scene {
   private world!: World;
@@ -25,6 +31,8 @@ export class GameScene extends Phaser.Scene {
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
   private autoText!: Phaser.GameObjects.Text;
   private teleViews = new Map<number, Phaser.GameObjects.Graphics>();
+  private userZoom = loadZoom();
+  private pinch: { d: number; z: number } | null = null;
 
   constructor() { super('Game'); }
   init(data: { world: World }) { this.world = data.world; }
@@ -40,15 +48,18 @@ export class GameScene extends Phaser.Scene {
       void writeSave(this.world.serialize()).finally(() => window.location.reload());
     });
     this.autoText = this.add.text(0, 0, '', { fontSize: '12px', color: '#9fe8a0', fontStyle: 'bold', align: 'center', stroke: '#000', strokeThickness: 3 })
-      .setOrigin(0.5, 1).setDepth(100001).setResolution(2).setVisible(false);
+      .setOrigin(0.5, 1).setDepth(100001).setResolution(TEXT_RES).setVisible(false);
     const rep = this.world.offlineReport;
     this.world.offlineReport = null;
     if (rep) this.hud.showOffline(rep, () => this.world.auto.resume()); else this.world.auto.resume();
     this.cameras.main.setBackgroundColor('#10141c');
     this.rebuildMap();
     this.applyZoom();
-    this.scale.on('resize', () => this.applyZoom());
+    const onResize = () => this.applyZoom();
+    this.scale.on('resize', onResize);
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.onPointer(p));
+    this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => this.setUserZoom(this.userZoom * (dy > 0 ? 1 / 1.1 : 1.1)));
+    this.events.once('shutdown', () => this.scale.off('resize', onResize));
 
     const save = () => { void writeSave(this.world.serialize()); };
     const timer = window.setInterval(save, 30000);
@@ -59,8 +70,28 @@ export class GameScene extends Phaser.Scene {
   }
 
   private applyZoom() {
-    const { width, height } = this.scale;
-    this.cameras.main.setZoom(Phaser.Math.Clamp(Math.min(width, height) / 520, 0.9, 1.6));
+    const { w, h } = cssSize();
+    const base = Phaser.Math.Clamp(Math.min(w, h) / 520, 0.9, 1.6);
+    this.cameras.main.setZoom(base * DPR * this.userZoom);
+  }
+
+  private setUserZoom(z: number) {
+    z = Phaser.Math.Clamp(z, ZOOM_MIN, ZOOM_MAX);
+    if (Math.abs(z - 1) < 0.03) z = 1; // gruda em 100%
+    if (z === this.userZoom) return;
+    this.userZoom = z;
+    try { localStorage.setItem(ZOOM_KEY, String(z)); } catch { /* sem armazenamento */ }
+    this.applyZoom();
+  }
+
+  // pinça com dois dedos no canvas (o joystick e os botões são HTML e não contam aqui)
+  private touchPointers() { return this.input.manager.pointers.filter((p) => p.isDown && p.wasTouch); }
+  private updatePinch() {
+    const ps = this.touchPointers();
+    if (ps.length < 2) { this.pinch = null; return; }
+    const d = Phaser.Math.Distance.Between(ps[0].x, ps[0].y, ps[1].x, ps[1].y);
+    if (!this.pinch) { this.pinch = { d: Math.max(1, d), z: this.userZoom }; return; }
+    this.setUserZoom(this.pinch.z * (d / this.pinch.d));
   }
 
   private rebuildMap() {
@@ -88,6 +119,7 @@ export class GameScene extends Phaser.Scene {
 
   private onPointer(p: Phaser.Input.Pointer) {
     if (this.world.player.dead || p.button !== 0) return;
+    if (p.wasTouch && this.touchPointers().length > 1) return; // segundo dedo = pinça
     let best: Entity | null = null, bd = Infinity;
     for (const m of this.world.monsters) {
       if (m.dead) continue;
@@ -108,6 +140,7 @@ export class GameScene extends Phaser.Scene {
 
   update(_t: number, delta: number) {
     const w = this.world;
+    this.updatePinch();
     w.advance(delta / 1000);
     const evs = w.events.splice(0);
     for (const ev of evs) this.handle(ev);
@@ -266,7 +299,7 @@ export class GameScene extends Phaser.Scene {
   private floatText(x: number, y: number, text: string, color: string, size: number) {
     x += Phaser.Math.Between(-8, 8);
     const t = this.add.text(x, y, text, { fontSize: `${size}px`, color, fontStyle: 'bold', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0.5).setDepth(100000).setResolution(2);
+      .setOrigin(0.5).setDepth(100000).setResolution(TEXT_RES);
     this.tweens.add({ targets: t, y: y - 36, alpha: 0, duration: 900, ease: 'Cubic.easeOut', onComplete: () => t.destroy() });
   }
 }

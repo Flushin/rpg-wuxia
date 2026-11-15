@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DPR } from './display';
 import { tileToScreen } from '../core/iso';
 import { MONSTERS } from '../core/data';
 import { L, tn } from '../core/i18n';
@@ -26,7 +27,7 @@ export class EntityView {
     const color = e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : '#f0d070';
     const text = labelOf(e);
     const label = scene.add.text(0, e.kind === 'monster' ? -36 * this.sc : -52, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
-      .setOrigin(0.5, 1).setResolution(2);
+      .setOrigin(0.5, 1).setResolution(DPR * 2);
     label.setName('label');
     this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar, label]);
     this.sync(e, false);

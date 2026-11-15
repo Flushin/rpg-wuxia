@@ -1,5 +1,6 @@
+import { CLASSES } from '../core/data';
 import { L } from '../core/i18n';
-import { BASES, POTIONS, SLOTS, SLOT_NAMES } from '../core/items';
+import { BASES, POTIONS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
 import { closeX } from './labels';
@@ -8,12 +9,31 @@ import { SLOT_ICON, cellHtml, cellStyle, itemTipHtml } from './itemTip';
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
 const selKey = (s: Sel | null) => (s ? (s.kind === 'bag' ? `b${s.i}` : `e${s.slot}`) : '');
+type Tab = 'equip' | 'pot'; // Craft e Gemas entram quando esses sistemas existirem
+const tabOf = (it: ItemInstance): Tab => (POTIONS[it.baseId] ? 'pot' : 'equip');
+// slots em volta do corpo: esquerda de cima para baixo (cabeça, colar, tronco), direita (arma, calça, bota)
+const BODY_LEFT: Slot[] = ['cabeca', 'colar', 'tronco'], BODY_RIGHT: Slot[] = ['arma', 'calca', 'bota'];
+
+// silhueta enquanto a arte é placeholder (trocar pelo sprite do personagem quando a arte definitiva chegar)
+function silhouette(color: string): string {
+  return `<svg class="body-fig" viewBox="0 0 100 200" aria-hidden="true"><defs><linearGradient id="bodyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".85"/><stop offset="1" stop-color="${color}" stop-opacity=".35"/></linearGradient></defs>
+    <g fill="url(#bodyg)" stroke="${color}" stroke-width="1.5">
+      <circle cx="50" cy="24" r="15"/>
+      <path d="M44 38h12v8H44z"/>
+      <path d="M28 48q22-8 44 0l6 56H22z"/>
+      <path d="M28 50l-12 50 8 2 12-44zM72 50l12 50-8 2-12-44z"/>
+      <path d="M24 104h52l-4 10H28z"/>
+      <path d="M30 114h18l-2 66H32zM52 114h18l-2 66H54z"/>
+      <path d="M28 180h20v10H24zM52 180h20l4 10H52z"/>
+    </g></svg>`;
+}
 
 // Painel de mochila (tecla I): 6 slots de equipamento, 30 espaços, ouro, detalhes e ações.
 export class InventoryPanel {
   private sig = '';
   private sel: Sel | null = null;
   private last = { key: '', t: 0 };
+  private tab: Tab = 'equip';
   constructor(private world: World, private toast: (m: string, c?: string) => void, private onClose: () => void) {
     const el = $('inv-panel'), tip = $('item-tip');
     el.addEventListener('click', (e) => this.click(e));
@@ -68,6 +88,7 @@ export class InventoryPanel {
     this.sig = '';
     if (a === 'close') { this.onClose(); return; }
     if (a === 'sort') { w.sortBag(); this.sel = null; return; }
+    if (a === 'tab-equip' || a === 'tab-pot') { this.tab = a === 'tab-pot' ? 'pot' : 'equip'; if (this.sel?.kind === 'bag') this.sel = null; return; }
     if (!s) return;
     let err: string | null = null;
     if (a === 'equip' && s.kind === 'bag') {
@@ -89,15 +110,22 @@ export class InventoryPanel {
   update() {
     if (!this.open) return;
     const w = this.world;
-    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}`;
+    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}`;
     if (sig === this.sig) return;
     this.sig = sig;
     if (this.sel && !this.selItem()) this.sel = null;
-    const eq = SLOTS.map((sl) => {
+    const eqCell = (sl: Slot) => {
       const it = w.equipment[sl];
-      return `<div class="eqs"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty">${SLOT_ICON[sl]}</span>`}</button></div>`;
-    }).join('');
-    const bag = w.bag.map((it, i) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(it)}">${cellHtml(it)}</button>`).join('');
+      return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty">${SLOT_ICON[sl]}</span>`}</button></div>`;
+    };
+    const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${silhouette(CLASSES[w.classId]?.color ?? '#889')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
+    const bagCell = (i: number) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i])}</button>`;
+    const idx = w.bag.map((_, i) => i);
+    const inTab = idx.filter((i) => w.bag[i] && tabOf(w.bag[i]!) === this.tab), free = idx.filter((i) => !w.bag[i]);
+    const bag = [...inTab, ...free].map(bagCell).join('');
+    const count = (t: Tab) => w.bag.filter((x) => x && tabOf(x) === t).length;
+    const tabBtn = (t: Tab, label: string) => `<button class="inv-tab ${this.tab === t ? 'on' : ''}" data-act="tab-${t}" role="tab" aria-selected="${this.tab === t}">${label} <small>${count(t)}</small></button>`;
+    const tabs = `<div class="inv-tabs" role="tablist">${tabBtn('equip', L('Equipamento', 'Equipment'))}${tabBtn('pot', L('Poções', 'Potions'))}</div>`;
     const it = this.selItem(), s = this.sel;
     let detail = `<div class="muted">${L('Toque em um item para ver os detalhes. Duplo toque equipa ou usa.', 'Tap an item to see details. Double tap equips or uses.')}</div>`;
     if (it && s) {
@@ -113,8 +141,8 @@ export class InventoryPanel {
     }
     $('inv-panel').innerHTML = `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
-      <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-grid">${eq}</div>
-      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3><div class="bag-grid">${bag}</div>
+      <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-body">${eq}</div>
+      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div>
       <div class="inv-detail">${detail}</div></div>`;
   }

@@ -3,6 +3,7 @@ import { L, LANG } from './core/i18n';
 import { BootScene } from './scenes/bootScene';
 import { CreateScene } from './scenes/createScene';
 import { GameScene } from './scenes/gameScene';
+import { DPR, cssSize } from './render/display';
 
 // Texto fixo do index.html (os ids ficam em português no HTML; aqui entra o idioma escolhido).
 function applyStaticText() {
@@ -33,12 +34,18 @@ function applyStaticText() {
 }
 applyStaticText();
 
-new Phaser.Game({
+const start = cssSize();
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#10141c',
-  scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
+  // canvas na resolução real (× DPR) e mostrado no tamanho CSS (zoom 1/DPR); a câmera compensa com zoom × DPR
+  scale: { mode: Phaser.Scale.NONE, width: start.w * DPR, height: start.h * DPR, zoom: 1 / DPR },
   input: { activePointers: 3 },
   disableContextMenu: true,
   scene: [BootScene, CreateScene, GameScene],
 });
+
+const fit = () => { const { w, h } = cssSize(); game.scale.resize(w * DPR, h * DPR); };
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', () => setTimeout(fit, 200));

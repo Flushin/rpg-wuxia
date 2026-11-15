@@ -27,7 +27,7 @@
     "moveSpeed": 3.6,
     "xpBase": 10,
     "xpPerLevel": 6,
-    "respawnSeconds": 15,
+    "respawnSeconds": 30,
     "loot": {
       "gold": {
         "min": 4,
@@ -88,7 +88,7 @@
     "groupAggro": true,
     "xpBase": 30,
     "xpPerLevel": 8,
-    "respawnSeconds": 35,
+    "respawnSeconds": 30,
     "loot": {
       "gold": {
         "min": 6,
@@ -160,7 +160,7 @@
     "groupAggro": true,
     "xpBase": 33,
     "xpPerLevel": 9,
-    "respawnSeconds": 35,
+    "respawnSeconds": 30,
     "loot": {
       "gold": {
         "min": 6,
@@ -233,7 +233,7 @@
     },
     "xpBase": 70,
     "xpPerLevel": 12,
-    "respawnSeconds": 40,
+    "respawnSeconds": 30,
     "loot": {
       "gold": {
         "min": 10,
