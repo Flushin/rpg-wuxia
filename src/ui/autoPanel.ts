@@ -3,6 +3,7 @@ import { RARITIES } from '../core/items';
 import { initials } from '../core/skills';
 import type { World, OfflineReport } from '../core/world';
 import { audio } from '../render/audio';
+import { closeX } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const fmtDur = (ms: number) => {
@@ -50,7 +51,7 @@ export class AutoPanel {
     }).join('');
     const sld = (label: string, k: string, min: number, max: number, v: number, pct: boolean) =>
       `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${v}${pct ? '%' : ''}</output></label>`;
-    $('auto-panel').innerHTML = `<div class="card"><h2>${L('Auto-combate', 'Auto-battle')}</h2>
+    $('auto-panel').innerHTML = `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
       <small class="muted">${L('O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de 70% em combate.', 'The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below 70% in combat.')}</small>
       <h3>${L('Poções', 'Potions')}</h3>

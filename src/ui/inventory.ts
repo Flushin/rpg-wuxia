@@ -2,7 +2,8 @@ import { L } from '../core/i18n';
 import { BASES, POTIONS, SLOTS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
-import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
+import { closeX } from './labels';
+import { SLOT_ICON, cellHtml, cellStyle, itemTipHtml } from './itemTip';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
@@ -66,6 +67,7 @@ export class InventoryPanel {
     const w = this.world, s = this.sel;
     this.sig = '';
     if (a === 'close') { this.onClose(); return; }
+    if (a === 'sort') { w.sortBag(); this.sel = null; return; }
     if (!s) return;
     let err: string | null = null;
     if (a === 'equip' && s.kind === 'bag') {
@@ -93,7 +95,7 @@ export class InventoryPanel {
     if (this.sel && !this.selItem()) this.sel = null;
     const eq = SLOTS.map((sl) => {
       const it = w.equipment[sl];
-      return `<div class="eqs"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}">${cellHtml(it)}</button></div>`;
+      return `<div class="eqs"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty">${SLOT_ICON[sl]}</span>`}</button></div>`;
     }).join('');
     const bag = w.bag.map((it, i) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(it)}">${cellHtml(it)}</button>`).join('');
     const it = this.selItem(), s = this.sel;
@@ -109,10 +111,10 @@ export class InventoryPanel {
       }
       detail = `<div class="tipbody">${itemTipHtml(w, it, s.kind === 'bag')}</div>${btn}`;
     }
-    $('inv-panel').innerHTML = `<div class="card inv-card"><div class="inv-main">
+    $('inv-panel').innerHTML = `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
       <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-grid">${eq}</div>
-      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length})</h3><div class="bag-grid">${bag}</div>
+      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3><div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div>
       <div class="inv-detail">${detail}</div></div>`;
   }

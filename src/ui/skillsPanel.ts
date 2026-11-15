@@ -1,6 +1,7 @@
 import { L } from '../core/i18n';
 import { initials, skillScale } from '../core/skills';
 import type { World } from '../core/world';
+import { closeX } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
@@ -36,7 +37,7 @@ export class SkillsPanel {
       return `<div class="sk-row ${unlocked ? '' : 'locked'}" style="--c:${d.color}"><div class="ic">${initials(d.name)}</div>
         <div><b>${d.name}</b>${key}<div class="d">${d.description}</div>${stats}${prog}</div></div>`;
     }).join('');
-    $('skills-panel').innerHTML = `<div class="card"><h2>Skills</h2>
+    $('skills-panel').innerHTML = `<div class="card">${closeX('data-close="1"')}<h2>Skills</h2>
       <small class="muted">${L('Skills ativas sobem de nível quando usadas. Passivas sobem com o nível do personagem. Cada nível dá +8% de efeito.', 'Active skills level up when used. Passives grow with your character level. Each level gives +8% effect.')}</small>${rows}
       <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`;
   }

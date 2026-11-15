@@ -46,11 +46,12 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
-export const SLOT_ABBR: Record<Slot, string> = { colar: L('Co', 'Ne'), tronco: L('Tr', 'Ch'), arma: L('Ar', 'We'), cabeca: L('Ca', 'He'), calca: L('Cl', 'Le'), bota: 'Bo' };
+// ícones provisórios (emoji) por peça; a arte final substitui depois
+export const SLOT_ICON: Record<Slot, string> = { colar: '📿', tronco: '👘', arma: '⚔️', cabeca: '⛑️', calca: '👖', bota: '👢' };
 export function cellHtml(it: ItemInstance | null): string {
   if (!it) return '';
   const b = BASES[it.baseId], pot = POTIONS[it.baseId];
-  const label = pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : SLOT_ABBR[b.slot];
+  const label = pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : SLOT_ICON[b.slot];
   const col = itemColor(it);
   let extra = '';
   if (pot) extra = `<i class="qty">${it.qty ?? 1}</i>`;
@@ -58,6 +59,6 @@ export function cellHtml(it: ItemInstance | null): string {
     const max = maxDurability(it), f = Math.max(0, Math.min(1, it.durability / max));
     extra = `<i class="dur ${f <= 0 ? 'zero' : f <= 0.2 ? 'low' : ''}"><u style="width:${f * 100}%"></u></i>`;
   }
-  return `<span class="ic" style="--rc:${col}">${label}</span>${extra}`;
+  return `<span class="ic${pot ? '' : ' sym'}" style="--rc:${col}">${label}</span>${extra}`;
 }
 export const cellStyle = (it: ItemInstance | null) => (it ? `border-color:${itemColor(it)}` : '');
