@@ -1,0 +1,45 @@
+{
+ "name": "lobo",
+ "model": ".cache/quaternius/Wolf.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "Icosphere"
+ ],
+ "samples": 24,
+ "frame": [
+  104,
+  84
+ ],
+ "anchor": [
+  52,
+  58
+ ],
+ "px_per_unit": 13,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "AnimalArmature|Idle",
+   "frames": 6,
+   "fps": 6
+  },
+  "walk": {
+   "action": "AnimalArmature|Gallop",
+   "frames": 8,
+   "fps": 14
+  },
+  "attack": {
+   "action": "AnimalArmature|Attack",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "AnimalArmature|Death",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle"
+}

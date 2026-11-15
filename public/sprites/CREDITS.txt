@@ -1,0 +1,13 @@
+Sprites gerados a partir de modelos 3D CC0 (domínio público), renderizados por tools/sprites.
+
+Personagens:
+- Tormenta: "Rogue" do KayKit Adventurers Character Pack 1.0 — Kay Lousberg (https://kaylousberg.com), CC0.
+  Recolorido (cabelo, túnica, capa e cinto) para a seita Tormenta.
+
+Monstros:
+- Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
+
+Cenário:
+- Árvores, pedras, plantas, flores, cogumelos, toco e tronco: Nature Kit — Kenney (https://kenney.nl), CC0.
+  Cores trocadas para a paleta da floresta.
+- Pisos (grama e caminho): gerados por tools/sprites/ground_tiles.py.

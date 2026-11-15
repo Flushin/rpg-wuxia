@@ -4,29 +4,54 @@ import { tileToScreen } from '../core/iso';
 import { MONSTERS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
+import { animKey, dirFromDelta, sheetFor, type AnimName, type SheetMeta } from './sprites';
+
+const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 
 const labelOf = (e: Entity) => (e.kind === 'monster' ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`) : e.kind === 'npc' ? tn(e.name) : e.name);
 
 export class EntityView {
   container: Phaser.GameObjects.Container;
-  sprite: Phaser.GameObjects.Image;
+  sprite: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
   private ring: Phaser.GameObjects.Graphics;
   private bar: Phaser.GameObjects.Graphics;
   private lastSx = 0;
   private flashTimer?: Phaser.Time.TimerEvent;
   private flashing = false;
   private sc = 1;
+  // sprites animados (marco 6)
+  private sheet: { key: string; meta: SheetMeta } | null;
+  private dir = 0;
+  private anim: AnimName | '' = '';
+  private lastX = 0;
+  private lastY = 0;
+  private attacking = false;
+  private deadAt = 0;
+  private top: number; // altura (px) do topo do personagem acima dos pés
 
   constructor(private scene: Phaser.Scene, e: Entity, texture: string) {
     const shadow = scene.add.image(0, 0, 'shadow');
     this.sc = e.kind === 'monster' ? MONSTERS[e.monsterId]?.scale ?? 1 : 1;
-    this.sprite = scene.add.image(0, 2, texture).setOrigin(0.5, e.kind === 'monster' ? 0.92 : 0.93).setScale(this.sc);
+    this.sheet = sheetFor(texture);
+    if (this.sheet) {
+      const m = this.sheet.meta;
+      const sp = scene.add.sprite(0, 0, 'sp-' + this.sheet.key, 'idle_0_0').setOrigin(m.anchor[0], m.anchor[1]).setScale(m.scale * this.sc);
+      sp.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => { if (this.anim === 'attack') { this.attacking = false; this.anim = ''; } });
+      this.sprite = sp;
+      this.top = m.top * this.sc;
+      this.dir = e.kind === 'monster' ? Phaser.Math.Between(0, 7) : 0;
+    } else {
+      this.sprite = scene.add.image(0, 2, texture).setOrigin(0.5, e.kind === 'monster' ? 0.92 : 0.93).setScale(this.sc);
+      this.top = e.kind === 'monster' ? 40 * this.sc : 48;
+    }
+    this.lastX = e.x; this.lastY = e.y;
     shadow.setScale(this.sc);
     this.ring = scene.add.graphics();
     this.bar = scene.add.graphics();
     const color = e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : '#f0d070';
     const text = labelOf(e);
-    const label = scene.add.text(0, e.kind === 'monster' ? -36 * this.sc : -52, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
+    const labelY = this.sheet ? -this.top - 4 : e.kind === 'monster' ? -36 * this.sc : -52;
+    const label = scene.add.text(0, labelY, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5, 1).setResolution(DPR * 2);
     label.setName('label');
     this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar, label]);
@@ -36,11 +61,15 @@ export class EntityView {
 
   sync(e: Entity, selected: boolean) {
     const s = tileToScreen(e.x, e.y);
-    if (Math.abs(s.x - this.lastSx) > 0.2) this.sprite.setFlipX(s.x < this.lastSx);
+    if (this.sheet) this.animate(e);
+    else if (Math.abs(s.x - this.lastSx) > 0.2) this.sprite.setFlipX(s.x < this.lastSx);
     this.lastSx = s.x;
     this.container.setPosition(s.x, s.y).setDepth(e.x + e.y);
-    this.container.setVisible(!(e.dead && e.kind === 'monster'));
-    this.sprite.setAlpha(e.dead ? 0.35 : 1);
+    const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
+    this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
+    this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
+    if (e.dead && this.sheet) { this.ring.clear(); this.bar.clear(); (this.container.getByName('label') as Phaser.GameObjects.Text).setVisible(false); return; }
+    (this.container.getByName('label') as Phaser.GameObjects.Text).setVisible(true);
     (this.container.getByName('label') as Phaser.GameObjects.Text).setText(labelOf(e));
     this.ring.clear(); this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha
@@ -52,10 +81,51 @@ export class EntityView {
     if (shield) { this.bar.lineStyle(3, 0xd8e8f8, 0.9); this.bar.fillStyle(0xaad0ff, 0.22); this.bar.fillCircle(0, -20, 30); this.bar.strokeCircle(0, -20, 30); }
     if (selected && e.kind === 'monster') {
       this.ring.lineStyle(2, 0xff5050, 1); this.ring.strokeEllipse(0, 0, 36, 18);
-      const w = 40 * Math.min(2, this.sc), top = -52 * this.sc;
+      const w = 40 * Math.min(2, this.sc), top = this.sheet ? -this.top - 22 : -52 * this.sc;
       this.bar.fillStyle(0x000000, 0.8); this.bar.fillRect(-w / 2 - 1, top - 1, w + 2, 6);
       this.bar.fillStyle(0xc0392b, 1); this.bar.fillRect(-w / 2, top, w * Math.max(0, e.hp / e.derived.maxHp), 4);
     }
+  }
+
+  /** Escolhe a animação: morte > ataque em andamento > andar > parado. */
+  private animate(e: Entity) {
+    const dx = e.x - this.lastX, dy = e.y - this.lastY;
+    this.lastX = e.x; this.lastY = e.y;
+    const moving = !e.dead && Math.hypot(dx, dy) > 0.002;
+    if (e.dead) {
+      if (this.anim !== 'death') { this.deadAt = this.scene.time.now; this.attacking = false; this.play('death'); }
+      return;
+    }
+    if (this.anim === 'death') this.anim = ''; // renasceu
+    if (moving) { this.dir = dirFromDelta(dx, dy); if (!this.attacking || !e.attackWhileMoving) { this.attacking = false; this.play('walk'); } return; }
+    if (this.attacking) return;
+    this.play('idle');
+  }
+
+  private play(anim: AnimName, restart = false) {
+    if (!this.sheet) return;
+    const sp = this.sprite as Phaser.GameObjects.Sprite;
+    const key = animKey(this.sheet.key, anim, this.dir);
+    if (!restart && sp.anims.currentAnim?.key === key && sp.anims.isPlaying) { this.anim = anim; return; }
+    // trocar só a direção do andar/parado mantém o passo (não volta ao quadro 0)
+    const progress = !restart && this.anim === anim && anim !== 'attack' && anim !== 'death' ? sp.anims.getProgress() : 0;
+    sp.play(key);
+    if (progress > 0) sp.anims.setProgress(progress);
+    this.anim = anim;
+  }
+
+  /** Em combate, parado: olha para o alvo (x, y em tiles). */
+  face(x: number, y: number, fromX: number, fromY: number) {
+    if (!this.sheet || this.attacking || this.anim === 'walk' || this.anim === 'death') return;
+    if (Math.hypot(x - fromX, y - fromY) > 0.05) this.dir = dirFromDelta(x - fromX, y - fromY);
+  }
+
+  /** Golpe (ataque básico ou skill): vira para o alvo e toca o ataque uma vez. */
+  attack(towardX: number, towardY: number, fromX: number, fromY: number) {
+    if (!this.sheet || this.anim === 'death') return;
+    if (Math.hypot(towardX - fromX, towardY - fromY) > 0.01) this.dir = dirFromDelta(towardX - fromX, towardY - fromY);
+    this.attacking = true;
+    this.play('attack', true);
   }
 
   flash() {

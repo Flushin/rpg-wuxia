@@ -26,7 +26,9 @@ src/scenes/   Boot, Create, Game (Phaser; só lê o estado do core e envia coman
 src/ui/       HUD, painel de atributos, criação de personagem, controles (DOM)
 src/save.ts   save em IndexedDB (idb-keyval)
 tools/        gen-maps.mjs: gera os mapas isométricos (JSON Tiled) e tiles.png
+tools/sprites/ renderiza os sprites a partir de modelos 3D CC0 (Blender) — veja o README de lá
 public/maps/  cidade.json, floresta.json
+public/sprites/ folhas de sprites (atlas) e créditos
 ```
 
 O core roda com passo fixo (1/60 s) via `World.advance(dt)`; a renderização consome `world.events`.

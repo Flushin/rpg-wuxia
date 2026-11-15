@@ -49,3 +49,6 @@ const game = new Phaser.Game({
 const fit = () => { const { w, h } = cssSize(); game.scale.resize(w * DPR, h * DPR); };
 window.addEventListener('resize', fit);
 window.addEventListener('orientationchange', () => setTimeout(fit, 200));
+
+// só no `npm run dev`: acesso ao jogo pelo console (testes de tela)
+if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
