@@ -1,4 +1,5 @@
 import { CLASSES, MONSTERS, PROGRESSION, type MonsterDef } from './data';
+import { distributeByRatio } from './distribute';
 import { rollAttack } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
@@ -18,6 +19,9 @@ export class World {
   classId: string;
   xp = 0;
   freePoints = 0;
+  ratioCursor = 0;
+  seenTips: string[] = [];
+  tipsEnabled = true;
   monsters: Entity[] = [];
   npcs: Entity[] = [];
   events: GameEvent[] = [];
@@ -47,6 +51,7 @@ export class World {
   static fromSave(maps: Record<string, GameMap>, s: SaveData): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
     w.xp = s.xp; w.freePoints = s.freePoints;
+    w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
     return w;
   }
@@ -55,6 +60,7 @@ export class World {
     return {
       version: 1, name: this.player.name, classId: this.classId, level: this.player.level, xp: this.xp,
       freePoints: this.freePoints, attributes: { ...this.player.attrs }, mapId: this.mapId, lastSeen: Date.now(),
+      ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled,
     };
   }
 
@@ -103,6 +109,15 @@ export class World {
   spendPoint(k: AttrKey) {
     if (this.freePoints <= 0) return;
     this.freePoints--; this.player.attrs[k]++;
+    this.recalc(this.player, true);
+  }
+
+  distributeRecommended() {
+    if (this.freePoints <= 0) return;
+    const r = distributeByRatio(this.freePoints, CLASSES[this.classId].recommendedRatio ?? {}, this.ratioCursor);
+    if (!r.spent) return;
+    for (const k of ATTR_KEYS) this.player.attrs[k] += r.added[k];
+    this.freePoints -= r.spent; this.ratioCursor = r.cursor;
     this.recalc(this.player, true);
   }
 
@@ -232,6 +247,7 @@ export class World {
     m.respawnAt = this.time + def.respawnSeconds;
     if (this.targetId === m.id) { this.targetId = null; this.autoAttack = false; }
     this.events.push({ type: 'death', id: m.id });
+    this.events.push({ type: 'kill', monsterId: m.monsterId });
     this.gainXp(def.xpBase + def.xpPerLevel * (m.level - 1));
   }
 

@@ -39,6 +39,21 @@ table{width:100%;border-collapse:collapse}td,th{padding:4px 2px;text-align:left}
 td small{display:block;color:#889;font-size:11px}.num{text-align:right;font-weight:600;width:60px}
 table.two td{padding:2px}
 td button{padding:2px 12px;font-size:16px;background:#2d6a3a}
+td.plus{width:64px;text-align:right}td.plus button{min-width:52px;min-height:44px;font-size:22px}
+tr.rec td{background:rgba(212,160,23,.1)}tr.rec td:first-child{border-left:3px solid #d4a017;padding-left:6px}
+td small.why{color:#cb9;font-style:italic}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;vertical-align:middle}
+.badge.rec{background:#d4a017;color:#000}.badge.opt{background:#2a3042;color:#aab;border:1px solid #556;font-weight:400}
+button[disabled]{opacity:.45;cursor:default}
+#attrs-panel .card{max-height:100%;-webkit-overflow-scrolling:touch}
+#attrs-panel,#settings-panel{touch-action:pan-y}
+#settings-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto}
+#settings-panel .card{display:flex;flex-direction:column;gap:10px;width:min(320px,100%)}
+.opt{display:flex;align-items:center;gap:10px;margin:0;font-size:16px}.opt input{width:22px;height:22px}
+.muted{color:#889}
+#btn-settings{padding:6px 10px;font-size:18px;line-height:1}
+#tip-card{position:absolute;left:50%;bottom:170px;transform:translateX(-50%);width:min(380px,calc(100% - 24px));background:rgba(20,26,40,.95);border:1px solid #d4a017;border-radius:10px;padding:10px 12px}
+#tip-card b{color:#d4a017}#tip-card p{margin:4px 0 8px;font-size:13px}#tip-card button{width:100%;padding:8px}
 .pts b{color:#d4a017;font-size:16px}
 .card .primary{width:100%;margin-top:14px}
 #create{background:radial-gradient(circle at 50% 30%,#2a3350,#0c0f18);z-index:10}
@@ -76,12 +91,15 @@ label{display:block;margin-bottom:6px;color:#ccd}
   </div>
   <div id="top-right">
     <div id="map-name"></div>
+    <button id="btn-settings" aria-label="Configurações">&#9881;</button>
     <button id="btn-attrs">Atributos (C)<span id="pts-badge" class="hidden"></span></button>
   </div>
   <div id="toast"></div>
   <div id="joystick" class="hidden"><div id="knob"></div></div>
   <button id="btn-attack" class="hidden">Atacar</button>
+  <div id="tip-card" class="hidden"><b id="tip-title"></b><p id="tip-text"></p><button id="tip-ok">Entendi</button></div>
   <div id="attrs-panel" class="hidden"></div>
+  <div id="settings-panel" class="hidden"></div>
 </div>
 <div id="create" class="hidden">
   <div class="card">

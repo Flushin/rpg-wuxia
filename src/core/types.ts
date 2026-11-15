@@ -50,6 +50,7 @@ export type GameEvent =
   | { type: 'hit'; targetId: number; targetKind: Entity['kind']; x: number; y: number; amount: number; crit: boolean }
   | { type: 'miss'; targetId: number; targetKind: Entity['kind']; x: number; y: number }
   | { type: 'death'; id: number }
+  | { type: 'kill'; monsterId: string }
   | { type: 'xp'; amount: number }
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
@@ -65,4 +66,7 @@ export interface SaveData {
   attributes: Attributes;
   mapId: string;
   lastSeen: number;
+  ratioCursor?: number;
+  seenTips?: string[];
+  tipsEnabled?: boolean;
 }

@@ -1,7 +1,7 @@
 import classesJson from '../data/classes.json';
 import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
-import type { Attributes, DamageType, Element, ElementMap } from './types';
+import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
 
 export interface ClassDef {
   id: string; name: string; description: string; rangeLabel: string;
@@ -9,6 +9,9 @@ export interface ClassDef {
   attackRange: number; attackInterval: number; moveSpeed: number; color: string;
   baseAttributes: Attributes; levelUpAttributes: Attributes;
   elementAttack: Partial<ElementMap>;
+  recommended: { attr: AttrKey; reason: string }[];
+  optional: { attr: AttrKey; reason: string }[];
+  recommendedRatio: Partial<Record<AttrKey, number>>;
 }
 export interface MonsterDef {
   id: string; name: string; sprite: string; minLevel: number; maxLevel: number;

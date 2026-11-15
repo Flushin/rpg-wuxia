@@ -10,9 +10,43 @@
     "attackInterval": 1.0,
     "moveSpeed": 4.6,
     "color": "#c0623a",
-    "baseAttributes": { "strength": 8, "intelligence": 3, "stamina": 8, "agility": 5, "willpower": 3 },
-    "levelUpAttributes": { "strength": 1, "intelligence": 0, "stamina": 1, "agility": 0, "willpower": 0 },
-    "elementAttack": { "thunder": 4 }
+    "baseAttributes": {
+      "strength": 8,
+      "intelligence": 3,
+      "stamina": 8,
+      "agility": 5,
+      "willpower": 3
+    },
+    "levelUpAttributes": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 1,
+      "agility": 0,
+      "willpower": 0
+    },
+    "elementAttack": {
+      "thunder": 4
+    },
+    "recommended": [
+      {
+        "attr": "strength",
+        "reason": "seu dano é físico"
+      },
+      {
+        "attr": "agility",
+        "reason": "acerto e crítico combinam com golpes rápidos"
+      }
+    ],
+    "optional": [
+      {
+        "attr": "stamina",
+        "reason": "se você está morrendo muito"
+      }
+    ],
+    "recommendedRatio": {
+      "strength": 2,
+      "agility": 1
+    }
   },
   "pavilhao": {
     "id": "pavilhao",
@@ -25,8 +59,42 @@
     "attackInterval": 1.3,
     "moveSpeed": 4.4,
     "color": "#4a8fd0",
-    "baseAttributes": { "strength": 3, "intelligence": 8, "stamina": 5, "agility": 6, "willpower": 7 },
-    "levelUpAttributes": { "strength": 0, "intelligence": 1, "stamina": 0, "agility": 0, "willpower": 1 },
-    "elementAttack": { "ice": 4 }
+    "baseAttributes": {
+      "strength": 3,
+      "intelligence": 8,
+      "stamina": 5,
+      "agility": 6,
+      "willpower": 7
+    },
+    "levelUpAttributes": {
+      "strength": 0,
+      "intelligence": 1,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 1
+    },
+    "elementAttack": {
+      "ice": 4
+    },
+    "recommended": [
+      {
+        "attr": "intelligence",
+        "reason": "seu dano é espiritual"
+      },
+      {
+        "attr": "willpower",
+        "reason": "mana para sustentar as skills de área"
+      }
+    ],
+    "optional": [
+      {
+        "attr": "stamina",
+        "reason": "se você está morrendo muito"
+      }
+    ],
+    "recommendedRatio": {
+      "intelligence": 2,
+      "willpower": 1
+    }
   }
 }

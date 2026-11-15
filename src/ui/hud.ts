@@ -1,6 +1,7 @@
 import { PROGRESSION } from '../core/data';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
+import { CLASSES } from '../core/data';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -12,9 +13,10 @@ export class Hud {
   constructor(private world: World) {
     $('hud').classList.remove('hidden');
     $('attrs-panel').addEventListener('click', (e) => {
-      const t = (e.target as HTMLElement).closest('[data-attr],[data-close]') as HTMLElement | null;
+      const t = (e.target as HTMLElement).closest('[data-attr],[data-close],[data-dist]') as HTMLElement | null;
       if (!t) return;
-      if (t.dataset.attr) { world.spendPoint(t.dataset.attr as AttrKey); this.panelSig = ''; }
+      if (t.dataset.dist) { world.distributeRecommended(); this.panelSig = ''; }
+      else if (t.dataset.attr) { world.spendPoint(t.dataset.attr as AttrKey); this.panelSig = ''; }
       else this.togglePanel(false);
     });
   }
@@ -65,8 +67,14 @@ export class Hud {
     const sig = JSON.stringify([p.attrs, w.freePoints, p.elemAtk, p.elemRes, p.level]);
     if (sig === this.panelSig) return;
     this.panelSig = sig;
-    const rows = ATTR_KEYS.map((k) => `<tr><td>${ATTR_LABELS[k]}<small>${ATTR_HINTS[k]}</small></td><td class="num">${p.attrs[k]}</td>
-      <td>${w.freePoints > 0 ? `<button data-attr="${k}">+</button>` : ''}</td></tr>`).join('');
+    const cls = CLASSES[w.classId];
+    const rows = ATTR_KEYS.map((k) => {
+      const rec = cls.recommended?.find((r) => r.attr === k), opt = cls.optional?.find((r) => r.attr === k);
+      const badge = rec ? `<span class="badge rec">Recomendado</span>` : opt ? `<span class="badge opt">Opcional</span>` : '';
+      const why = rec ?? opt;
+      return `<tr class="${rec ? 'rec' : opt ? 'opt' : ''}"><td><b>${ATTR_LABELS[k]}</b> ${badge}<small>${ATTR_HINTS[k]}</small>${why ? `<small class="why">${why.reason}</small>` : ''}</td><td class="num">${p.attrs[k]}</td>
+      <td class="plus">${w.freePoints > 0 ? `<button data-attr="${k}">+</button>` : ''}</td></tr>`;
+    }).join('');
     const der: [string, string][] = [
       ['Vida máxima', String(d.maxHp)], ['Mana máxima', String(d.maxMana)],
       ['Ataque físico', String(d.physAtk)], ['Ataque espiritual', String(d.spiritAtk)],
@@ -78,6 +86,7 @@ export class Hud {
     $('attrs-panel').innerHTML = `<div class="card"><h2>${p.name} - Nível ${p.level}</h2>
       <div class="pts">Pontos livres: <b>${w.freePoints}</b></div>
       <table>${rows}</table>
+      <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>Distribuir recomendado</button>
       <h3>Derivados</h3><table class="two">${der.map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
       <h3>Elementos</h3><table><tr><th></th><th>Ataque</th><th>Resist.</th></tr>${els}</table>
       <button class="primary" data-close="1">Fechar</button></div>`;

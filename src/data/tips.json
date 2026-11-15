@@ -1,0 +1,24 @@
+{
+  "inicio": {
+    "title": "Bem-vindo!",
+    "text": "Clique no chão para mover. Clique em um monstro para selecioná-lo e seu personagem ataca sozinho. Tab troca de alvo e Espaço ataca o mais próximo.",
+    "textTouch": "Use o joystick à esquerda para mover. Toque em um monstro para selecioná-lo e use o botão Atacar à direita."
+  },
+  "portal": {
+    "title": "Portal",
+    "text": "Este portal leva à floresta, onde há monstros para enfrentar. Caminhe até ele para atravessar. Se ficar difícil, você renasce na vila."
+  },
+  "primeiro_abate": {
+    "title": "Primeiro abate",
+    "text": "Derrotar monstros dá experiência (XP). Acompanhe a barra amarela no seu painel: ao enchê-la você sobe de nível."
+  },
+  "primeiro_nivel": {
+    "title": "Subiu de nível!",
+    "text": "Você ganhou pontos livres de atributo. Abra o painel com a tecla C (ou botão Atributos) e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
+    "textTouch": "Você ganhou pontos livres de atributo. Toque no botão Atributos e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez."
+  },
+  "primeira_morte": {
+    "title": "De volta à vila",
+    "text": "Ao morrer você volta à vila. No futuro, seus itens perderão durabilidade a cada morte, então tome cuidado."
+  }
+}

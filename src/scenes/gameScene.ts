@@ -7,11 +7,13 @@ import { buildMapView } from '../render/mapView';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
+import { TipManager } from '../ui/tips';
 import { MONSTERS } from '../core/data';
 
 export class GameScene extends Phaser.Scene {
   private world!: World;
   private hud!: Hud;
+  private tips!: TipManager;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
   private views = new Map<number, EntityView>();
 
@@ -21,6 +23,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.hud = new Hud(this.world);
     setupControls(this.world, this.hud);
+    this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); });
     this.cameras.main.setBackgroundColor('#10141c');
     this.rebuildMap();
     this.applyZoom();
@@ -88,10 +91,12 @@ export class GameScene extends Phaser.Scene {
     w.npcs.forEach((n, i) => { live.add(n.id); this.viewFor(n, i).sync(n, false); });
     for (const m of w.monsters) { live.add(m.id); this.viewFor(m).sync(m, m.id === w.targetId); }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
+    this.tips.update();
     this.hud.update();
   }
 
   private handle(ev: GameEvent) {
+    this.tips.onEvent(ev);
     switch (ev.type) {
       case 'mapChange': this.rebuildMap(); break;
       case 'hit': {

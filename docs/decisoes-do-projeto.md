@@ -60,6 +60,14 @@
 - **Willpower:** mana + defesa espiritual.
 - **Recurso das skills:** mana.
 - **Pontos por nível:** 5 — **2 automáticos** (conforme a seita) + **3 livres** para o jogador distribuir.
+- **Recomendação no painel:** cada atributo tem explicação; os recomendados da seita aparecem marcados com o porquê.
+  - Lâmina Errante: **Strength** (dano físico) e **Agility** (acerto e crítico, combina com golpes rápidos).
+  - Pavilhão das Nuvens: **Intelligence** (dano espiritual) e **Willpower** (mana para as skills de área).
+  - **Stamina** aparece como opcional para as duas, para quem morre muito.
+- **Botão "Distribuir recomendado":** gasta os pontos livres sozinho seguindo a proporção recomendada da seita (definida em `classes.json`).
+
+### Aprender jogando
+- **Dicas contextuais:** aparecem uma única vez, na primeira vez que a situação acontece (entrar no jogo, primeiro portal, primeiro abate, primeiro nível, primeira morte; depois primeiro item, primeira skill etc.). Podem ser desligadas nas configurações.
 
 ### Elementos
 - **Fire, Ice, Thunder, Poison** — cada um com ataque e resistência.
