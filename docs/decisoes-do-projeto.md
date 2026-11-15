@@ -13,8 +13,8 @@
 
 ## Plano de desenvolvimento
 - **Marco 1 (concluído):** estrutura do projeto, cidade e floresta com placeholders, criação de personagem (2 seitas), movimento PC/celular, seleção de alvo, ataque básico, lobos com IA, XP/nível até 10, pontos de atributo, morte → cidade, HUD, save no IndexedDB.
-- **Marco 2 (concluído, em teste):** skills das duas seitas + nível por uso, hotbar, painel de skills (K).
-- **Marco 3:** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
+- **Marco 2 (concluído):** skills das duas seitas + nível por uso, hotbar, painel de skills (K).
+- **Marco 3 (concluído, em teste):** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
 - **Marco 4:** auto-combate (menu de skills, poções) e ganho offline.
 - **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento.
 
@@ -130,6 +130,12 @@
 - **Durabilidade 0:** o item para de dar atributos, mas não some.
 - **Conserto:** ferreiro na cidade, por ouro — o ferreiro já funciona na v1.
 - **Origem na v1:** equipamentos só caem de monstros (drop); poções caem de monstros e também são vendidas por um NPC na cidade.
+- **Itens:** atributos fixos por base + raridade: **Comum** (branco), **Incomum** (verde, +1 bônus aleatório), **Raro** (azul, +2 bônus aleatórios). Nível mínimo para usar.
+- **Lista de teste:** 2 bases por slot (nível 1 e nível 5). Arma separada por seita (espadas duplas / leque de qi).
+- **Perda por morte:** −10% da durabilidade máxima em cada item equipado.
+- **Mochila:** 30 espaços; poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
+- **Ouro:** cai dos monstros. O **vendedor de poções também compra qualquer item**.
+- **Poções:** recuperam **ao longo de 8 s** (estilo Dragon Oath); não acumulam (usar outra do mesmo tipo reinicia o efeito). **Pequena:** 30%. **Grande:** 60%, mais cara, cai de monstros nível 5+ (até os bandidos existirem, só na loja). Atalhos no PC (Q = HP, E = mana) e botões no celular.
 
 ### Som
 - **Origem:** pacotes gratuitos CC0 (Kenney: RPG Audio, Impact Sounds, UI Audio). Créditos em `public/audio/CREDITS.txt`.
@@ -160,3 +166,9 @@
 - Lista de equipamentos de teste e taxas de drop
 - Taxa exata do idle/offline e limite de horas
 - Comportamento do chefe em detalhe (padrão de ataques, frequência de invocação/área)
+
+## Notas de implementação (marco 3)
+- Q/E usam a poção pequena primeiro, depois a grande. Um efeito ativo por tipo (HP/mana).
+- Equipamentos dropam no nível do monstro; armas só da seita do personagem.
+- Janela de NPC não bloqueia o movimento; fecha a mais de 3 tiles.
+- Conserto custa `durabilidade faltante × nível do item × 0,5` (placeholder; lobo dá 2–6 de ouro). Preços: poção de vida P 12, G 36; mana P 14, G 40.
