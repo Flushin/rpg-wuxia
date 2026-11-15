@@ -253,6 +253,10 @@ export class World {
     if (p.mana < (def.mana ?? 0)) return this.fail(def, 'mana');
     if (def.target === 'none') { this.castSkill(def, null); return; }
     const t = this.getTarget();
+    if (def.area) { // skill de área nunca exige alvo: no alvo se estiver no alcance, senão em volta do personagem
+      this.pendingSkill = null;
+      this.castSkill(def, t && dist(p, t) <= this.skillReach(def) ? t : null); return;
+    }
     if (!t) return this.fail(def, 'notarget');
     if (dist(p, t) <= this.skillReach(def)) { this.pendingSkill = null; this.castSkill(def, t); return; }
     this.pendingSkill = slot; // anda até o alvo e lança em seguida
@@ -288,12 +292,9 @@ export class World {
 
   private castSkill(def: SkillDef, t: Entity | null) {
     const p = this.player, st = this.skills[def.id], scale = skillScale(st.level);
-    const around = def.area === 'self' ? p : def.area === 'target' ? t : null;
+    const around = def.area === 'self' ? p : def.area === 'target' ? (t ?? p) : null;
     let victims: Entity[] = t ? [t] : [];
-    if (around) {
-      victims = this.monsters.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
-      if (!victims.length) return this.fail(def, 'notarget');
-    }
+    if (around) victims = this.monsters.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
     let dest: Point | null = null;
     if (def.dash && t) {
       const d = dist(p, t);
@@ -319,7 +320,7 @@ export class World {
       }
     }
     if (def.shield) this.addBuff(p, def.id, 'shield', p.derived.maxHp * def.shield.percent * scale, def.shield.duration);
-    this.gainSkillXp(def, st);
+    if (victims.length || def.shield) this.gainSkillXp(def, st); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
   }
 
   private gainSkillXp(def: SkillDef, st: SkillState) {
