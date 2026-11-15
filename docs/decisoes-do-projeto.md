@@ -6,6 +6,7 @@
 - Decisões são enviadas como perguntas de múltipla escolha ou confirmação, para o Lucas não precisar digitar.
 - Sempre avisar o Lucas quando houver dicas para economizar tokens.
 - Economia de tokens: tarefas que não precisam do Opus (código de rotina, scaffolding, conteúdo repetitivo) vão para um modelo mais leve (Sonnet/Haiku); o Opus fica com design, revisão e decisões.
+- **Melhorias sugeridas pelo Lucas:** cada sugestão é analisada e só entra na lista "Melhorias — Futuro" (fim deste documento) se o Lucas aprovar. Nada dessa lista é implementado até o Lucas pedir explicitamente.
 
 ## Repositório e publicação
 - **Código:** GitHub `Flushin/rpg-wuxia`, branch `main`. Cópia deste documento em `docs/decisoes-do-projeto.md`.
@@ -210,3 +211,14 @@
 - Viagem para comprar: só poções pequenas; dispara quando falta qualquer tipo e há ouro; intervalo mínimo de 120 s entre viagens.
 - Ligar o Auto na cidade leva o personagem até o mapa de caça.
 - Menu do auto-combate: botão ☰ ao lado do Auto (a engrenagem ⚙ é das configurações).
+
+## Melhorias — Futuro
+Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
+
+### Interface (aprovadas em 15/11/2026)
+- **Abas na mochila:** começar com **Equipamento** e **Poções**. As abas **Craft** e **Gemas** entram quando esses sistemas existirem.
+- **Organizar mochila:** botão que ordena os itens automaticamente.
+- **Botão fechar (X) no topo:** em todas as janelas, no canto superior direito (como no Windows), para não precisar rolar até o fim.
+- **Atributos detalhados:** cada atributo mostra a origem do valor: **base + níveis + equipamento** (ex.: Strength 25 = 5 base + 14 níveis + 6 equipamento).
+- **Ícones nos slots de equipamento:** símbolo de cada peça (capacete, colar, tronco, arma, calça, bota) no lugar das abreviações ("Ca" etc.).
+- **Corpo do personagem na mochila:** tela de equipamento com o personagem no centro e os 6 slots em volta, cada um perto da parte do corpo correspondente (estilo MMORPG). Usa uma silhueta enquanto a arte for placeholder e troca pelo sprite real quando a arte definitiva chegar.
