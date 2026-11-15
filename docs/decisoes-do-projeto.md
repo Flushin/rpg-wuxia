@@ -35,6 +35,19 @@
 - **Experiência do dev:** intermediário (já fez projetos web).
 - **Save:** local em cada aparelho (PC e celular têm progresso separado por enquanto).
 
+### Idioma e nomes (15/11/2026)
+- **Idioma:** o jogo terá **português e inglês**, escolhidos pelo jogador (textos separados por idioma).
+- **Seitas:** nome de **uma palavra**, forte e conciso (como no Dragon Oath).
+- **Skills:** nomes bonitos, mas curtos.
+- Os ids internos (`lamina`, `pavilhao`, `corte_duplo`…) continuam os mesmos para não quebrar saves; só os nomes exibidos mudaram.
+
+| Antes | PT | EN |
+|---|---|---|
+| Montanha de Ferro | Titã | Titan |
+| Lâmina Errante | Tormenta | Tempest |
+| Pavilhão das Nuvens | Geada | Frost |
+| Agulha Esmeralda | Víbora | Viper |
+
 ### Tecnologia (confirmada)
 - TypeScript + Vite
 - Phaser 3 para renderização/input (mouse e toque)
@@ -74,8 +87,8 @@
 - **Recurso das skills:** mana.
 - **Pontos por nível:** 5 — **2 automáticos** (conforme a seita) + **3 livres** para o jogador distribuir.
 - **Recomendação no painel:** cada atributo tem explicação; os recomendados da seita aparecem marcados com o porquê.
-  - Lâmina Errante: **Strength** (dano físico) e **Agility** (acerto e crítico, combina com golpes rápidos).
-  - Pavilhão das Nuvens: **Intelligence** (dano espiritual) e **Willpower** (mana para as skills de área).
+  - Tormenta: **Strength** (dano físico) e **Agility** (acerto e crítico, combina com golpes rápidos).
+  - Geada: **Intelligence** (dano espiritual) e **Willpower** (mana para as skills de área).
   - **Stamina** aparece como opcional para as duas, para quem morre muito.
 - **Botão "Distribuir recomendado":** gasta os pontos livres sozinho seguindo a proporção recomendada da seita (definida em `classes.json`).
 
@@ -87,10 +100,10 @@
 
 ### Classes (seitas)
 4 seitas: duas melee, duas ranged.
-- **Montanha de Ferro:** melee, tanque, bastão/punhos.
-- **Lâmina Errante:** melee, espadas duplas, dano rápido, dano físico, elemento **Thunder**. *(v1)*
-- **Pavilhão das Nuvens:** ranged, magia de qi, dano em área, dano espiritual, elemento **Ice**. *(v1)*
-- **Agulha Esmeralda:** ranged, agulhas e veneno, dano contínuo + cura leve.
+- **Titã (Titan):** melee, tanque, bastão/punhos.
+- **Tormenta (Tempest):** melee, espadas duplas, dano rápido, dano físico, elemento **Thunder**. *(v1)*
+- **Geada (Frost):** ranged, magia de qi, dano em área, dano espiritual, elemento **Ice**. *(v1)*
+- **Víbora (Viper):** ranged, agulhas e veneno, dano contínuo + cura leve.
 
 ### Combate e skills
 - **Ataque básico:** igual para todas as classes (hit básico, como no Dragon Oath).
@@ -100,33 +113,33 @@
 
 - **Nível máximo da skill:** 10; **+8% de efeito por nível**. Cada uso dá 1 de experiência; o nível 2 pede ~20 usos e os seguintes pedem cada vez mais.
 - **Uso:** skills de alvo único usam o alvo selecionado (tab-target); se o alvo estiver fora do alcance, o melee anda até ele antes de usar.
-- **Skills de área nunca exigem alvo:** saem na hora, gastando mana e cooldown mesmo sem monstro perto. Tempestade de Lâminas: em volta do personagem. Chuva de Qi: no alvo selecionado se estiver no alcance; senão, em volta do personagem. Só ganham experiência se acertarem algum monstro.
+- **Skills de área nunca exigem alvo:** saem na hora, gastando mana e cooldown mesmo sem monstro perto. Tempestade de Lâminas: em volta do personagem. Nevasca: no alvo selecionado se estiver no alcance; senão, em volta do personagem. Só ganham experiência se acertarem algum monstro.
 - **Hotbar:** PC — teclas 1–4 e clique; celular — 4 botões em arco ao redor do botão de ataque (canto inferior direito).
 - **Números iniciais (aprovados, ajustáveis no balanceamento):**
-  - Corte Duplo 2×80% · cd 4 s · 8 mana
-  - Passo Fantasma: avança até 8 tiles, 120% · cd 10 s · 12 mana
+  - Presas Gêmeas 2×80% · cd 4 s · 8 mana
+  - Passo do Raio: avança até 8 tiles, 120% · cd 10 s · 12 mana
   - Tempestade de Lâminas: 170% em volta, raio 2,5 · cd 12 s · 18 mana
-  - Golpe Rompe-Guarda: 220% e −30% defesa por 6 s · cd 15 s · 20 mana
+  - Quebra-Guarda: 220% e −30% defesa por 6 s · cd 15 s · 20 mana
   - Fluxo da Lâmina: +10% velocidade de ataque, +5% crítico
-  - Esfera de Qi: 130% · cd 3 s · 8 mana
-  - Lótus Congelante: 110% + lentidão 40% por 4 s · cd 10 s · 14 mana
-  - Chuva de Qi: 180% em área no alvo · cd 14 s · 22 mana
-  - Escudo de Nuvem: absorve 25% do HP máx. por 8 s · cd 20 s · 20 mana
-  - Meditação Celeste: regenera 1% de mana/s fora da cidade
+  - Orbe Gélido: 130% · cd 3 s · 8 mana
+  - Flor de Gelo: 110% + lentidão 40% por 4 s · cd 10 s · 14 mana
+  - Nevasca: 180% em área no alvo · cd 14 s · 22 mana
+  - Véu de Névoa: absorve 25% do HP máx. por 8 s · cd 20 s · 20 mana
+  - Mente Serena: regenera 1% de mana/s fora da cidade
 
-**Lâmina Errante**
-1. Corte Duplo (nv 1) — dois golpes rápidos
-2. Passo Fantasma (nv 3) — avança até o alvo e causa dano
-3. Tempestade de Lâminas (nv 5) — dano em área ao redor
-4. Golpe Rompe-Guarda (nv 7) — dano alto e reduz a defesa do alvo
-5. Fluxo da Lâmina (nv 9, passiva) — mais velocidade de ataque e crítico
+**Tormenta (Tempest)**
+1. Presas Gêmeas · Twin Fangs (nv 1) — dois golpes rápidos
+2. Passo do Raio · Lightning Step (nv 3) — avança até o alvo e causa dano
+3. Tempestade de Lâminas · Blade Storm (nv 5) — dano em área ao redor
+4. Quebra-Guarda · Guardbreak (nv 7) — dano alto e reduz a defesa do alvo
+5. Fluxo da Lâmina · Blade Flow (nv 9, passiva) — mais velocidade de ataque e crítico
 
-**Pavilhão das Nuvens**
-1. Esfera de Qi (nv 1) — projétil de magia
-2. Lótus Congelante (nv 3) — dano e lentidão
-3. Chuva de Qi (nv 5) — dano em área no alvo
-4. Escudo de Nuvem (nv 7) — absorve dano
-5. Meditação Celeste (nv 9, passiva) — regeneração de mana
+**Geada (Frost)**
+1. Orbe Gélido · Frost Orb (nv 1) — projétil de magia
+2. Flor de Gelo · Icebloom (nv 3) — dano e lentidão
+3. Nevasca · Blizzard (nv 5) — dano em área no alvo
+4. Véu de Névoa · Mist Veil (nv 7) — absorve dano
+5. Mente Serena · Serene Mind (nv 9, passiva) — regeneração de mana
 
 ### Progressão (v1)
 - Nível de personagem — **nível máximo 10** na v1.
@@ -163,19 +176,19 @@
 - **Floresta:** lobos (nv 1–3, visão de 3 tiles) e bandidos (nv 4–6).
 - **Bandidos:** mistura de espadachins (andam em grupos de 2–3) e arqueiros (atacam de longe).
 - **Novo mapa "Ruínas de Terracota"** (ligado à floresta): guerreiros de terracota (nv 7–9) e o General no fundo.
-- **Guerreiros de Terracota:** defesa física ×2,4 e espiritual ×0,7 (ensina tipos de dano: Pavilhão leva vantagem; Lâmina usa o Golpe Rompe-Guarda).
+- **Guerreiros de Terracota:** defesa física ×2,4 e espiritual ×0,7 (ensina tipos de dano: Geada leva vantagem; Tormenta usa o Quebra-Guarda).
 - **Chefe — General de Terracota (nv 10):** lento e resistente; golpe em área marcado no chão com círculo vermelho 1,5 s antes (dá para sair). Com 50% de HP invoca 2 guerreiros. Renasce 10 min após morrer. Drop garantido de item Raro nível 5.
 - **Auto-combate ignora o chefe** e evita a área dele.
 - **Auto-combate (ajustes do marco 5, aprovados):** prefere monstros com nível ≥ (nível do personagem − 1), os mais fracos só se não houver outros; volta à cidade para descansar com HP < 35% e sem poção de vida; bebe poção mais cedo contra 2+ monstros.
 
 ### Balanceamento
 - **Ritmo:** ~1 hora de jogo ativo para chegar ao nível 10.
-- **Resultado da simulação:** Lâmina ~69 min (~3 mortes), Pavilhão ~50 min (~7 mortes). Chefe: Lâmina vence 40% (Incomum) / 75% (Raro); Pavilhão vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
+- **Resultado da simulação:** Tormenta ~69 min (~3 mortes), Geada ~50 min (~7 mortes). Chefe: Tormenta vence 40% (Incomum) / 75% (Raro); Geada vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
 
 ### Escopo da primeira versão jogável
 - 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função.
 - Floresta (lobos + bandidos) e Ruínas de Terracota (guerreiros + General).
-- 2 classes: Lâmina Errante e Pavilhão das Nuvens.
+- 2 classes: Tormenta e Geada.
 
 ## Em aberto (detalhes para a fase de balanceamento)
 - Curva de XP até o nível 10

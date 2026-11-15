@@ -1,5 +1,7 @@
 # Balanceamento (marco 5)
 
+> Nomes antigos usados neste documento: Lâmina Errante = **Tormenta**, Pavilhão das Nuvens = **Geada**, Corte Duplo = Presas Gêmeas, Golpe Rompe-Guarda = Quebra-Guarda.
+
 Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do nível certo (auto-combate), com poucas mortes, ouro suficiente para poções e conserto custando ~10-15% do ouro ganho. Tudo é guiado por dados (`src/data/*.json`) e conferido por `npm run sim:balance`.
 
 ## Como medir

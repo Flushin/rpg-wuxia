@@ -19,7 +19,7 @@ const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const TOWN_MAPS = AUTO_TOWNS;
 const TOWN_REGEN = 0.03; // 3% por segundo
-const DASH_STOP = 1.0; // distância final do Passo Fantasma até o alvo
+const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 const DEATH_DURABILITY_LOSS = 0.1;

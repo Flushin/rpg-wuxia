@@ -51,7 +51,7 @@ export class AutoPanel {
       `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${v}${pct ? '%' : ''}</output></label>`;
     $('auto-panel').innerHTML = `<div class="card"><h2>Auto-combate</h2>
       <h3>Habilidades usadas</h3>${skills}
-      <small class="muted">O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Escudo de Nuvem sai quando a vida está abaixo de 70% em combate.</small>
+      <small class="muted">O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de 70% em combate.</small>
       <h3>Poções</h3>
       ${sld('Beber vida abaixo de', 'hpThreshold', 5, 95, c.hpThreshold, true)}
       ${sld('Beber mana abaixo de', 'mpThreshold', 0, 95, c.mpThreshold, true)}

@@ -66,11 +66,11 @@ console.log('\n== skills habilitadas ==');
   w.auto.toggle(); run(w, 60);
   const casts = drain(w).filter((e) => e.type === 'skillCast') as Extract<GameEvent, { type: 'skillCast' }>[];
   const ids = new Set(casts.map((c) => c.skillId));
-  ok(!ids.has('corte_duplo'), 'não usa skill desligada (Corte Duplo)');
+  ok(!ids.has('corte_duplo'), 'não usa skill desligada (Presas Gêmeas)');
   ok(ids.size >= 2, `usa as ligadas (${[...ids].join(', ')})`);
   const w2 = mk('lamina', 9); addPotions(w2, 5, 5); w2.player.derived.maxMana = 9999; w2.player.mana = 9999;
   w2.auto.toggle(); run(w2, 60);
-  ok(drain(w2).some((e) => e.type === 'skillCast' && e.skillId === 'corte_duplo'), 'com tudo ligado usa Corte Duplo');
+  ok(drain(w2).some((e) => e.type === 'skillCast' && e.skillId === 'corte_duplo'), 'com tudo ligado usa Presas Gêmeas');
   const w3 = mk('lamina', 9); w3.auto.cfg.skillsOff = w3.activeSkills().map((d) => d.id); addPotions(w3, 3, 3);
   w3.auto.toggle(); run(w3, 40);
   ok(count(drain(w3), 'skillCast') === 0 && w3.skills['corte_duplo'].xp === 0, 'tudo desligado: só ataque básico');
@@ -90,9 +90,9 @@ console.log('\n== skills de área e escudo ==');
   const p = mk('pavilhao', 9); addPotions(p, 3, 3); p.player.derived.maxMana = 9999; p.player.mana = 9999;
   const wolf = p.monsters[0]; wolf.ai = 'chase'; wolf.attackCd = 999; wolf.moveSpeed = 0; wolf.x = p.player.x + 4; wolf.y = p.player.y; wolf.hp = 99999; wolf.derived.maxHp = 99999;
   p.auto.toggle(); run(p, 2);
-  ok(!drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'), 'HP cheio: sem Escudo de Nuvem');
+  ok(!drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'), 'HP cheio: sem Véu de Névoa');
   p.player.hp = p.player.derived.maxHp * 0.5; run(p, 1);
-  ok(drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'), 'HP < 70% com monstro em combate: Escudo de Nuvem');
+  ok(drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'), 'HP < 70% com monstro em combate: Véu de Névoa');
 }
 
 console.log('\n== poções ==');

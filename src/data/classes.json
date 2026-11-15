@@ -1,7 +1,7 @@
 {
   "lamina": {
     "id": "lamina",
-    "name": "Lâmina Errante",
+    "name": "Tormenta",
     "description": "Espadachins viajantes que lutam de perto com a fúria do trovão.",
     "rangeLabel": "Corpo a corpo",
     "damageType": "physical",
@@ -50,7 +50,7 @@
   },
   "pavilhao": {
     "id": "pavilhao",
-    "name": "Pavilhão das Nuvens",
+    "name": "Geada",
     "description": "Mestres da energia espiritual que atacam à distância com o gelo das montanhas.",
     "rangeLabel": "À distância",
     "damageType": "spiritual",

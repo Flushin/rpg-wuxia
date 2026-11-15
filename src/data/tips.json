@@ -72,9 +72,9 @@
   },
   "terracota": {
     "title": "Defesa física e espiritual",
-    "text": "Guerreiros de Terracota têm muita defesa física e pouca defesa espiritual. Dano espiritual (Pavilhão das Nuvens) atravessa a armadura deles; dano físico rende bem menos.",
+    "text": "Guerreiros de Terracota têm muita defesa física e pouca defesa espiritual. Dano espiritual (seita Geada) atravessa a armadura deles; dano físico rende bem menos.",
     "byClass": {
-      "lamina": "Dica: o Golpe Rompe-Guarda reduz a defesa do alvo e deixa seus golpes físicos mais fortes. Use-o antes das outras skills.",
+      "lamina": "Dica: o Quebra-Guarda reduz a defesa do alvo e deixa seus golpes físicos mais fortes. Use-o antes das outras skills.",
       "pavilhao": "Dica: você é espiritual, então tem vantagem aqui."
     }
   },

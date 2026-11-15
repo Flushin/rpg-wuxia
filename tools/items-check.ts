@@ -77,7 +77,7 @@ console.log('\n== equipar / durabilidade ==');
   const w2 = mk('lamina', 1);
   w2.addItem(equipOf(w2, 'espadas_vento')); w2.addItem(equipOf(w2, 'leque_bambu'));
   ok(w2.equip(0) !== null && w2.equipment.arma === null, 'nível insuficiente bloqueia');
-  ok(w2.equip(1) !== null && /Pavilhão|Apenas/.test(w2.equip(1)!), 'arma de outra seita bloqueada');
+  ok(w2.equip(1) !== null && /Geada|Apenas/.test(w2.equip(1)!), 'arma de outra seita bloqueada');
   // atributos de equipamento afetam derivados
   const w3 = mk('lamina', 5); const hp0 = w3.player.derived.maxHp;
   w3.addItem(equipOf(w3, 'manto_seda')); w3.equip(0);
