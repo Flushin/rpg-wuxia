@@ -9,6 +9,12 @@ export const TOWN_MAPS = new Set(['cidade']);
 export const AUTO_MAX_LEVEL_GAP = 2; // ataca só monstros até 2 níveis acima do personagem
 export const AUTO_GRAY_GAP = 1; // monstro com nível < personagem - 2 é "cinza": só se não houver outro
 const GRAY_PENALTY = 60;
+// escolha de alvo (aprovado pelo Lucas em 15/11/2026):
+const NEAR_RANGE = 12;      // prefere monstros até 12 tiles de caminho
+const FAR_PENALTY = 100;    // além disso, só se não houver nenhum perto
+const CROWD_PENALTY = 10;   // por monstro que o caminho (ou o alvo) atrairia junto
+const MAX_PATH_CHECKS = 16; // candidatos com caminho conferido (antes eram 4: às vezes nenhum tinha caminho e o auto parava)
+const STUCK_SEC = 4, IGNORE_SEC = 15; // alvo que não fica mais perto em 4 s é ignorado por 15 s
 export const RATE_MIN_SEC = 120; // mínimo de dados para o ritmo valer
 const BUCKET_SEC = 60, MAX_BUCKETS = 30;
 const SHOP_COOLDOWN = 120; // s entre viagens à vila (evita laço se a compra falhar)
@@ -38,6 +44,8 @@ export class AutoCombat {
   private lastShop = -Infinity;
   private blocked: Record<string, number> = {};
   private walkCd = 0;
+  private ignore: Record<number, number> = {}; // monstro -> até quando ignorar (sem caminho / travado)
+  private chase = { id: -1, best: Infinity, since: 0 }; // progresso até o alvo atual
   private restSec = 0;
 
   constructor(private w: World, classId: string) { this.cfg = defaultAutoConfig(classId); }
@@ -218,24 +226,64 @@ export class AutoCombat {
     if (mp < c.mpThreshold && w.potionCd.mp <= 0 && w.kindCount('mp') > 0 && (!w.potionFx.mp || mp < c.mpThreshold / 2)) w.usePotion('mp');
   }
 
-  private pickTarget(): Entity | null {
+  private eligible(m: Entity): boolean {
+    const p = this.w.player;
+    return !m.dead && m.level <= p.level + AUTO_MAX_LEVEL_GAP && !this.forbidden(m) && (this.ignore[m.id] ?? 0) <= this.w.time;
+  }
+
+  /** Monstros que já estão atacando o personagem: revida primeiro (o mais perto). */
+  private nearestAggressor(): Entity | null {
     const w = this.w, p = w.player;
-    const cands: { m: Entity; d: number }[] = [];
-    for (const m of w.monsters) {
-      if (m.dead || m.level > p.level + AUTO_MAX_LEVEL_GAP || this.forbidden(m)) continue;
-      // monstros bem abaixo do nível (cinza) só entram se não houver nada melhor
-      cands.push({ m, d: dist(m, p) + (m.level < p.level - AUTO_GRAY_GAP ? GRAY_PENALTY : 0) });
-    }
-    cands.sort((a, b) => a.d - b.d);
-    // o mais perto em linha reta pode estar do outro lado de árvores/paredes: confere o caminho real dos 4 primeiros
     let best: Entity | null = null, bd = Infinity;
-    for (const c of cands.slice(0, 4)) {
-      const len = w.pathLength(c.m);
-      if (!Number.isFinite(len)) continue;
-      const d = len + (c.d - dist(c.m, p));
-      if (d < bd) { bd = d; best = c.m; }
+    for (const m of w.monsters) {
+      if (m.ai !== 'chase' || m.dead || this.forbidden(m)) continue;
+      const d = dist(m, p);
+      if (d < bd) { bd = d; best = m; }
     }
     return best;
+  }
+
+  /** Quantos outros monstros vivos seriam atraídos indo até `t` por `path` (visão de cada um + meio tile). */
+  private crowdOn(t: Entity, path: Point[]): number {
+    let n = 0;
+    for (const m of this.w.monsters) {
+      if (m === t || m.dead || m.ai === 'chase') continue;
+      const r = (MONSTERS[m.monsterId]?.aggroRange ?? 3) + 0.5;
+      if (dist(m, t) <= r || path.some((q) => dist(m, q) <= r)) n++;
+    }
+    return n;
+  }
+
+  /** Alvo novo: perto pelo caminho real, sem atrair outros monstros no caminho; cinzas e longe só em último caso. */
+  private pickTarget(): Entity | null {
+    const w = this.w, p = w.player;
+    const cands = w.monsters.filter((m) => this.eligible(m)).map((m) => ({ m, d: dist(m, p) })).sort((a, b) => a.d - b.d);
+    let best: Entity | null = null, bs = Infinity;
+    for (const c of cands.slice(0, MAX_PATH_CHECKS)) {
+      if (c.d >= bs) break; // linha reta já é pior que o melhor custo: os próximos também
+      const path = c.d < 1 ? [] : w.pathFromPlayer(c.m);
+      if (c.d >= 1 && !path.length) { this.ignore[c.m.id] = w.time + IGNORE_SEC; continue; } // sem caminho
+      let len = 0, a: Point = p;
+      for (const q of path) { len += dist(a, q); a = q; }
+      const score = len
+        + (c.m.level < p.level - AUTO_GRAY_GAP ? GRAY_PENALTY : 0)
+        + (len > NEAR_RANGE ? FAR_PENALTY : 0)
+        + this.crowdOn(c.m, path) * CROWD_PENALTY;
+      if (score < bs) { bs = score; best = c.m; }
+    }
+    return best;
+  }
+
+  /** Alvo que não fica mais perto (preso atrás de algo) é largado e ignorado por um tempo. */
+  private stuckOn(t: Entity): boolean {
+    const w = this.w, d = dist(w.player, t);
+    if (this.chase.id !== t.id) { this.chase = { id: t.id, best: d, since: w.time }; return false; }
+    if (t.ai === 'chase' || d <= w.player.attackRange + 0.5 || d < this.chase.best - 0.5) {
+      this.chase.best = Math.min(this.chase.best, d); this.chase.since = w.time; return false;
+    }
+    if (w.time - this.chase.since < STUCK_SEC) return false;
+    this.ignore[t.id] = w.time + IGNORE_SEC; this.chase.id = -1;
+    return true;
   }
 
   // o auto ignora o chefe e qualquer monstro dentro da arena dele (inclusive invocados)
@@ -244,8 +292,11 @@ export class AutoCombat {
   private combat() {
     const w = this.w, p = w.player;
     let t = w.getTarget();
-    if (t && this.forbidden(t)) { w.setTarget(null); t = null; }
-    if (!t) { t = this.pickTarget(); if (t) w.setTarget(t.id); }
+    if (t && (this.forbidden(t) || this.stuckOn(t))) { w.setTarget(null); t = null; }
+    // revidar primeiro: se alguém está atacando e o alvo atual ainda não entrou na briga, troca
+    const aggressor = this.nearestAggressor();
+    if (aggressor && (!t || t.ai !== 'chase')) { t = aggressor; w.setTarget(t.id); }
+    else if (!t) { t = this.pickTarget(); if (t) w.setTarget(t.id); }
     else if (!w.autoAttack) w.setTarget(t.id);
     if (w.gcd > 0) return;
     const defs = w.activeSkills();

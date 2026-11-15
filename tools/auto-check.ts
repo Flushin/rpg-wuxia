@@ -35,6 +35,18 @@ const addPotions = (w: World, hp: number, mp: number) => { if (hp) w.addItem(mak
 const clearPotions = (w: World) => { w.bag = w.bag.map((b) => (b && (b.baseId.startsWith('pocao')) ? null : b)); };
 const spawnAll = (w: World) => { for (const m of w.monsters) { m.attackCd = 999; m.moveSpeed = 0; } };
 
+// centro de uma clareira: todos os tiles num raio r andáveis
+const openSpot = (w: World, r: number) => {
+  const M = w.map, walk = (i: number, j: number) => i >= 0 && j >= 0 && i < M.width && j < M.height && M.walkable[j * M.width + i];
+  let best: { x: number; y: number } | null = null;
+  for (let j = 0; j < M.height; j++) for (let i = 0; i < M.width; i++) {
+    let all = true;
+    for (let y = -r; y <= r && all; y++) for (let x = -r; x <= r; x++) if (Math.hypot(x, y) <= r && !walk(i + x, j + y)) { all = false; break; }
+    if (all) { best = { x: i + 0.5, y: j + 0.5 }; return best; }
+  }
+  return best;
+};
+
 console.log('\n== caça: mata lobos ==');
 {
   const w = mk('lamina', 5); addPotions(w, 5, 5);
@@ -46,13 +58,77 @@ console.log('\n== caça: mata lobos ==');
   w.auto.toggle(); ok(w.auto.state === 'off', 'toggle desliga');
 }
 
+console.log('\n== escolha de alvo (15/11/2026) ==');
+{
+  // revida primeiro: monstro atacando vira o alvo, mesmo com outro alvo escolhido
+  const w = mk('lamina', 2); spawnAll(w);
+  const [a, b, ...rest] = w.monsters;
+  rest.forEach((m) => { m.dead = true; m.respawnAt = 1e9; });
+  const S = openSpot(w, 4)!;
+  w.player.x = S.x; w.player.y = S.y; w.player.path = [];
+  { const sm = (w as any).speedMul.bind(w); (w as any).speedMul = (e: unknown) => (e === w.player ? 0 : sm(e)); } // parado: a fica fora da visão
+  a.x = S.x; a.y = S.y + 3.8; a.home = { x: a.x, y: a.y }; b.x = 30; b.y = 30; b.home = { x: b.x, y: b.y };
+  w.auto.toggle(); run(w, 0.1);
+  ok(w.targetId === a.id, 'sem ninguém atacando, vai no monstro escolhido');
+  b.x = S.x + 1; b.y = S.y; b.home = { x: b.x, y: b.y }; b.ai = 'chase'; run(w, 0.1);
+  ok(w.targetId === b.id, 'monstro que ataca vira o alvo (revidar primeiro)');
+}
+{
+  // alvo que não dá para alcançar (personagem não sai do lugar): larga em ~4 s e escolhe outro.
+  // Antes o auto ficava parado com esse alvo até um monstro nascer perto.
+  const w = mk('lamina', 2); spawnAll(w);
+  const [a, b, ...rest] = w.monsters;
+  rest.forEach((m) => { m.dead = true; m.respawnAt = 1e9; });
+  const S = openSpot(w, 4)!;
+  w.player.x = S.x; w.player.y = S.y; w.player.path = []; { const sm = (w as any).speedMul.bind(w); (w as any).speedMul = (e: unknown) => (e === w.player ? 0 : sm(e)); }
+  a.x = S.x + 3.6; a.y = S.y; b.x = S.x - 3.9; b.y = S.y;
+  for (const m of [a, b]) { m.home = { x: m.x, y: m.y }; m.level = 2; }
+  w.auto.toggle(); run(w, 0.1);
+  const first = w.targetId;
+  run(w, 5);
+  ok(first === a.id && w.targetId === b.id, 'alvo que não fica mais perto é largado e troca por outro');
+}
+{
+  // evita caminho com monstros: dois alvos ~8 tiles; no caminho até o mais perto há 2 lobos
+  const w = mk('lamina', 5); spawnAll(w);
+  const ms = w.monsters;
+  ms.slice(4).forEach((m) => { m.dead = true; m.respawnAt = 1e9; });
+  const [a, b, c, d] = ms;
+  const P = openSpot(w, 3)!, M = w.map;
+  w.player.x = P.x; w.player.y = P.y; w.player.path = [];
+  const tiles: { x: number; y: number; path: { x: number; y: number }[]; len: number }[] = [];
+  for (let j = 0; j < M.height; j++) for (let i = 0; i < M.width; i++) {
+    const q = { x: i + 0.5, y: j + 0.5 }, dd = Math.hypot(q.x - P.x, q.y - P.y);
+    if (!M.walkable[j * M.width + i] || dd < 7 || dd > 10) continue;
+    const path = w.pathFromPlayer(q); if (!path.length) continue;
+    let len = 0, prev = P; for (const r of path) { len += Math.hypot(r.x - prev.x, r.y - prev.y); prev = r; }
+    if (len < 11) tiles.push({ ...q, path, len });
+  }
+  let ok2 = false;
+  outer: for (const A of tiles) {
+    const mid = A.path.find((q) => Math.hypot(q.x - P.x, q.y - P.y) > 4.5 && Math.hypot(q.x - A.x, q.y - A.y) > 2);
+    if (!mid) continue;
+    for (const B of tiles) {
+      if (B.len < A.len + 0.5 || B.len > A.len + 3) continue; // B um pouco mais longe
+      if (Math.min(...B.path.map((q) => Math.hypot(q.x - mid.x, q.y - mid.y)), Math.hypot(B.x - mid.x, B.y - mid.y)) < 5) continue;
+      a.x = A.x; a.y = A.y; b.x = B.x; b.y = B.y; c.x = mid.x; c.y = mid.y; d.x = mid.x; d.y = mid.y; ok2 = true; break outer;
+    }
+  }
+  for (const m of [a, b, c, d]) { m.home = { x: m.x, y: m.y }; m.level = 5; }
+  w.auto.toggle(); run(w, 0.1);
+  ok(ok2 && w.targetId === b.id, 'prefere o alvo sem monstros no caminho (não atrai vários)');
+}
+
 console.log('\n== filtro nível +2 ==');
 {
   const w = mk('lamina', 1); spawnAll(w);
   const [a, b, ...rest] = w.monsters;
   rest.forEach((m) => { m.level = 9; });
   a.level = 3; b.level = 4; // b (alto demais) fica mais perto
-  w.player.x = b.x - 1; w.player.y = b.y; a.x = b.x + 8; a.y = b.y; a.home = { x: a.x, y: a.y };
+  // b fora da visão (senão ele ataca e o auto revida, que é o certo); a mais longe
+  const S = openSpot(w, 4)!;
+  b.x = S.x - 3.6; b.y = S.y; b.home = { x: b.x, y: b.y }; a.x = S.x + 3.9; a.y = S.y; a.home = { x: a.x, y: a.y };
+  w.player.x = S.x; w.player.y = S.y; w.player.path = [];
   w.auto.toggle(); run(w, 0.2);
   ok(w.targetId === a.id, 'escolhe o nível 3 (≤ 1+2) mesmo mais longe, ignora o nível 4 mais perto');
   a.dead = true; a.respawnAt = 1e9; w.targetId = null; w.autoAttack = false; run(w, 0.3);
