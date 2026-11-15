@@ -67,7 +67,7 @@ export type GameEvent =
   | { type: 'hit'; targetId: number; targetKind: Entity['kind']; x: number; y: number; amount: number; crit: boolean }
   | { type: 'miss'; targetId: number; targetKind: Entity['kind']; x: number; y: number }
   | { type: 'death'; id: number }
-  | { type: 'kill'; monsterId: string }
+  | { type: 'kill'; monsterId: string; level?: number }
   | { type: 'xp'; amount: number }
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
@@ -81,7 +81,7 @@ export type GameEvent =
   | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind }
   | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number }
   | { type: 'drop'; x: number; y: number; color: string }
-  | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean }
+  | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
   | { type: 'goldPickup'; amount: number }
   | { type: 'bagFull' }
   | { type: 'groundGone'; id: number }
@@ -92,7 +92,24 @@ export type GameEvent =
   | { type: 'npcClose' }
   | { type: 'trade'; kind: 'buy' | 'sell'; gold: number }
   | { type: 'repair'; gold: number }
-  | { type: 'durabilityLost' };
+  | { type: 'durabilityLost' }
+  | { type: 'autoState'; state: AutoState }
+  | { type: 'autoStopped'; reason: 'broken' };
+
+export type AutoState = 'off' | 'on' | 'pausado';
+export interface AutoConfig {
+  skillsOff: string[]; // skills ativas desligadas no menu (o resto é usado)
+  hpThreshold: number; mpThreshold: number; // % abaixo da qual bebe poção
+  buyHp: number; buyMp: number; // quantidade comprada por viagem à vila
+  sellIncomum: boolean;
+}
+// Balde de ~60 s de auto-combate ativo em mapa de caça (janela móvel de ~30 min)
+export interface AutoBucket { sec: number; kills: number; xp: number; gold: number; potHp: number; potMp: number; levelSum: number; drops: Record<string, number> }
+export interface AutoRate {
+  killsPerMin: number; xpPerKill: number; goldPerKill: number; potHpPerKill: number; potMpPerKill: number; monLevel: number; sampleMin: number;
+  drops: { baseId: string; rarity: Rarity; perKill: number }[];
+}
+export interface AutoSave { active: boolean; mapId: string; config?: Partial<AutoConfig>; buckets?: AutoBucket[] }
 
 export interface SaveData {
   version: 1;
@@ -112,4 +129,5 @@ export interface SaveData {
   gold?: number;
   bag?: (ItemInstance | null)[];
   equipment?: Partial<Record<Slot, ItemInstance>>;
+  auto?: AutoSave;
 }

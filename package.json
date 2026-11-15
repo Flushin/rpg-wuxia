@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "maps": "node tools/gen-maps.mjs",
     "check:items": "esbuild tools/items-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/items-check.mjs && node /tmp/items-check.mjs",
+    "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
     "check:skills": "esbuild tools/skills-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/skills-check.mjs && node /tmp/skills-check.mjs"
   },
   "dependencies": {

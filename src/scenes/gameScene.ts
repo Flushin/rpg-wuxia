@@ -22,6 +22,7 @@ export class GameScene extends Phaser.Scene {
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
   private views = new Map<number, EntityView>();
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
+  private autoText!: Phaser.GameObjects.Text;
 
   constructor() { super('Game'); }
   init(data: { world: World }) { this.world = data.world; }
@@ -33,6 +34,11 @@ export class GameScene extends Phaser.Scene {
     this.fx = new SkillFx(this);
     setupControls(this.world, this.hud);
     this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); });
+    this.autoText = this.add.text(0, 0, '', { fontSize: '12px', color: '#9fe8a0', fontStyle: 'bold', align: 'center', stroke: '#000', strokeThickness: 3 })
+      .setOrigin(0.5, 1).setDepth(100001).setResolution(2).setVisible(false);
+    const rep = this.world.offlineReport;
+    this.world.offlineReport = null;
+    if (rep) this.hud.showOffline(rep, () => this.world.auto.resume()); else this.world.auto.resume();
     this.cameras.main.setBackgroundColor('#10141c');
     this.rebuildMap();
     this.applyZoom();
@@ -107,8 +113,18 @@ export class GameScene extends Phaser.Scene {
     for (const m of w.monsters) { live.add(m.id); this.viewFor(m).sync(m, m.id === w.targetId); }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
     this.syncGround();
+    this.syncAutoText();
     this.tips.update();
     this.hud.update();
+  }
+
+  private syncAutoText() {
+    const a = this.world.auto, p = this.world.player, show = a.state !== 'off' && !p.dead;
+    this.autoText.setVisible(show);
+    if (!show) return;
+    const s = tileToScreen(p.x, p.y);
+    this.autoText.setText(a.state === 'pausado' ? 'Auto pausado' : a.status ? `Auto\n${a.status}` : 'Auto')
+      .setColor(a.state === 'pausado' ? '#f0c060' : '#9fe8a0').setPosition(s.x, s.y - 70);
   }
 
   private syncGround() {
@@ -181,6 +197,7 @@ export class GameScene extends Phaser.Scene {
       case 'itemPickup': this.hud.toast(`+ ${ev.name}${ev.qty > 1 ? ` x${ev.qty}` : ''}`, ev.color); break;
       case 'goldPickup': this.hud.toast(`+ ${ev.amount} ouro`, '#ffd23f'); break;
       case 'bagFull': this.hud.toast('Mochila cheia', '#ff8a80'); break;
+      case 'autoStopped': this.hud.toast('Auto-combate parado: item quebrado. Conserte no Ferreiro.', '#ff8a80'); break;
       case 'durabilityLost': this.hud.toast('Seus equipamentos perderam durabilidade', '#f1a02e'); break;
       case 'potionFail': {
         const msg = { none: 'Sem poção', cooldown: 'Recarregando', full: ev.kind === 'hp' ? 'Vida cheia' : 'Mana cheia' }[ev.reason];

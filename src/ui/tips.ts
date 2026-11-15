@@ -98,6 +98,8 @@ export class TipManager {
     else if (ev.type === 'itemPickup' && ev.potion) this.trigger('primeira_pocao');
     else if (ev.type === 'goldPickup') this.trigger('primeiro_ouro');
     else if (ev.type === 'bagFull') this.trigger('mochila_cheia');
+    else if (ev.type === 'autoState' && ev.state === 'on') { this.trigger('auto_combate'); this.trigger('ganho_offline'); }
+    else if (ev.type === 'autoStopped') this.trigger('durabilidade_baixa');
     else if (ev.type === 'playerDeath') this.diedPending = true;
     else if (ev.type === 'mapChange' && this.diedPending) { this.diedPending = false; this.trigger('primeira_morte'); }
   }
@@ -105,6 +107,7 @@ export class TipManager {
   update() {
     const w = this.world;
     if (!w.seenTips.includes('primeira_skill') && w.activeSkills().some((d) => w.isUnlocked(d))) this.trigger('primeira_skill');
+    if (w.player.level >= 2) this.trigger('auto_combate');
     if (!w.player.dead && w.lowDurability()) this.trigger('durabilidade_baixa');
     if (w.mapId !== 'cidade' && w.kindCount('hp') + w.kindCount('mp') > 0) this.trigger('primeira_pocao');
     if (w.player.dead || w.mapId !== 'cidade') return;

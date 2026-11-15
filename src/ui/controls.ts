@@ -13,6 +13,7 @@ export function setupControls(world: World, hud: Hud) {
     else if (e.key === 'i' || e.key === 'I') hud.toggleInventory();
     else if ((e.key === 'q' || e.key === 'Q') && !e.repeat) world.usePotion('hp');
     else if ((e.key === 'e' || e.key === 'E') && !e.repeat) world.usePotion('mp');
+    else if ((e.key === 'z' || e.key === 'Z') && !e.repeat) { if (!hud.offlineOpen) world.auto.toggle(); }
     else if (e.key === 'Escape') hud.closeAll();
     else if (e.key >= '1' && e.key <= '4' && !e.repeat) world.useSkill(Number(e.key) - 1);
     else if (e.key === ' ') { e.preventDefault(); world.attackNearest(); }

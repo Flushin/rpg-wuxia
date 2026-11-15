@@ -56,5 +56,14 @@
   "primeiro_ouro": {
     "title": "Ouro",
     "text": "Monstros deixam ouro. Use-o para consertar equipamentos e comprar poções. Itens que você não usa podem ser vendidos ao Vendedor de Poções."
+  },
+  "auto_combate": {
+    "title": "Auto-combate",
+    "text": "O botão Auto (ou a tecla Z) faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pausa o auto; aperte Z de novo para retomar. A engrenagem ao lado do botão abre o menu: escolha as skills, os limites de poção e quanto comprar na vila.",
+    "textTouch": "O botão Auto faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pelo joystick pausa o auto; toque em Auto de novo para retomar. A engrenagem ao lado abre o menu: escolha as skills, os limites de poção e quanto comprar na vila."
+  },
+  "ganho_offline": {
+    "title": "Ganhos enquanto você está fora",
+    "text": "Deixe o Auto ligado num mapa de caça ao fechar o jogo e você recebe XP, ouro e itens pelo tempo fora, no ritmo que o auto media antes de você sair. Rende 60% até 12 h, 40% de 12 h a 18 h, 20% de 18 h a 24 h e nada depois disso. Sem mortes, e as poções são gastas no ritmo medido."
   }
 }

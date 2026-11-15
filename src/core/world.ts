@@ -7,15 +7,17 @@ import { findPath, isWalkable } from './pathfinding';
 import { GLOBAL_COOLDOWN, SKILLS, SKILL_MAX_LEVEL, classActives, skillScale, skillXpToNext, type SkillDef, type SkillState } from './skills';
 import { BAG_SIZE, BASES, GROUND_SECONDS, POTIONS, SLOTS, STACK_MAX, STARTING_KIT, STARTING_WEAPON, baseOf, buyPrice, equipmentBaseIds, isBroken, isPotionId, itemColor, itemName,
   itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue } from './items';
+import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
+import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
 import { computeDerived, emptyElements } from './stats';
-import { ATTR_KEYS, ELEMENTS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type GroundItem, type ItemInstance, type Point, type PotionKind, type SaveData, type SkillFailReason, type Slot } from './types';
+import { ATTR_KEYS, ELEMENTS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type GroundItem, type ItemInstance, type Point, type PotionKind, type Rarity, type SaveData, type SkillFailReason, type Slot } from './types';
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
-const TOWN_MAPS = new Set(['cidade']);
+const TOWN_MAPS = AUTO_TOWNS;
 const TOWN_REGEN = 0.03; // 3% por segundo
 const DASH_STOP = 1.0; // distância final do Passo Fantasma até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
@@ -23,6 +25,11 @@ const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 const DEATH_DURABILITY_LOSS = 0.1;
 const NPC_ROLES: Record<string, string> = { 'Ferreiro': 'ferreiro', 'Vendedor de Poções': 'vendedor', 'Ancião': 'anciao' };
 export interface PotionFx { id: string; remaining: number; rate: number }
+export interface OfflineReport {
+  elapsedMs: number; effMin: number; efficiency: number; kills: number; xp: number; levelsGained: number; newLevel: number; gold: number;
+  items: { name: string; color: string; rarity: Rarity; qty: number }[];
+  potionsUsed: Record<PotionKind, number>; soldCount: number; soldGold: number;
+}
 
 export class World {
   mapId = 'cidade';
@@ -50,6 +57,8 @@ export class World {
   potionFx: Record<PotionKind, PotionFx | null> = { hp: null, mp: null };
   potionCd: Record<PotionKind, number> = { hp: 0, mp: 0 };
   openNpc: Entity | null = null;
+  auto: AutoCombat;
+  offlineReport: OfflineReport | null = null;
   private npcGoal: number | null = null;
   private nextGround = 1;
   private pendingSkill: number | null = null;
@@ -65,6 +74,7 @@ export class World {
 
   private constructor(private maps: Record<string, GameMap>, name: string, classId: string, level: number, attrs: Attributes) {
     this.classId = classId;
+    this.auto = new AutoCombat(this, classId);
     this.map = maps[this.mapId];
     this.player = this.makePlayer(name, classId, level, attrs);
     for (const s of SKILLS[classId] ?? []) this.skills[s.id] = { level: 1, xp: 0, cd: 0 };
@@ -83,7 +93,7 @@ export class World {
     return w;
   }
 
-  static fromSave(maps: Record<string, GameMap>, s: SaveData): World {
+  static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now()): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
     w.xp = s.xp; w.freePoints = s.freePoints;
     w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
@@ -103,6 +113,8 @@ export class World {
     w.recalc(w.player, false);
     w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
+    w.auto.load(s.auto);
+    w.offlineReport = w.applyOffline(now, s.lastSeen, s.auto);
     return w;
   }
 
@@ -114,12 +126,19 @@ export class World {
       ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled, audio: { ...this.audio },
       gold: this.gold, bag: JSON.parse(JSON.stringify(this.bag)),
       equipment: JSON.parse(JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])))),
+      auto: this.auto.serialize(),
     };
   }
 
+  emit(ev: GameEvent) { this.events.push(ev); this.auto.observe(ev); }
+
   // ---------- comandos ----------
+  // andar do auto-combate (não pausa o auto)
+  autoMove(x: number, y: number) { if (!this.player.dead) this.player.path = findPath(this.map, this.player, { x, y }); }
+
   moveTo(x: number, y: number) {
     if (this.player.dead) return;
+    this.auto.manualMove();
     if (!this.player.attackWhileMoving) this.autoAttack = false;
     this.pendingSkill = null; this.npcGoal = null;
     this.chasing = false;
@@ -131,7 +150,7 @@ export class World {
   setMoveInput(sx: number, sy: number) {
     const t = screenToTile(sx, sy), l = Math.hypot(t.x, t.y);
     this.moveInput = l < 0.001 ? { x: 0, y: 0 } : { x: t.x / l, y: t.y / l };
-    if (l >= 0.001) this.npcGoal = null;
+    if (l >= 0.001) { this.npcGoal = null; this.auto.manualMove(); }
   }
 
   setTarget(id: number | null) {
@@ -208,7 +227,7 @@ export class World {
     const old = e.buffs.find((b) => b.id === id && b.kind === kind);
     if (old) { old.value = value; old.remaining = old.duration = duration; }
     else e.buffs.push({ id, kind, value, remaining: duration, duration });
-    this.events.push({ type: 'buffApplied', targetId: e.id, id, kind, duration });
+    this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration });
   }
   private tickBuffs(e: Entity, dt: number) {
     if (!e.buffs.length) return;
@@ -216,7 +235,7 @@ export class World {
     const gone = e.buffs.filter((b) => b.remaining <= 0 || (b.kind === 'shield' && b.value <= 0));
     if (!gone.length) return;
     e.buffs = e.buffs.filter((b) => !gone.includes(b));
-    for (const b of gone) this.events.push({ type: 'buffExpired', targetId: e.id, id: b.id, kind: b.kind });
+    for (const b of gone) this.emit({ type: 'buffExpired', targetId: e.id, id: b.id, kind: b.kind });
   }
   private speedMul(e: Entity) {
     let m = 1;
@@ -236,13 +255,13 @@ export class World {
       const a = Math.min(b.value, rem);
       b.value -= a; rem -= a;
     }
-    if (rem < amount) this.events.push({ type: 'shieldAbsorb', targetId: e.id, amount: amount - rem, x: e.x, y: e.y });
+    if (rem < amount) this.emit({ type: 'shieldAbsorb', targetId: e.id, amount: amount - rem, x: e.x, y: e.y });
     return rem;
   }
 
   skillReach(def: SkillDef): number { return def.range === 'melee' ? this.player.attackRange : (def.range ?? 0); }
 
-  private fail(def: SkillDef, reason: SkillFailReason) { this.events.push({ type: 'skillFail', skillId: def.id, reason }); }
+  private fail(def: SkillDef, reason: SkillFailReason) { this.emit({ type: 'skillFail', skillId: def.id, reason }); }
 
   useSkill(slot: number) {
     const p = this.player, def = this.activeSkills()[slot];
@@ -307,9 +326,9 @@ export class World {
     p.mana -= def.mana ?? 0;
     st.cd = def.cooldown ?? 0; this.gcd = GLOBAL_COOLDOWN;
     p.attackCd = Math.max(p.attackCd, 0.3);
-    this.events.push({ type: 'skillCast', skillId: def.id, casterId: p.id, x: p.x, y: p.y, targetId: t?.id ?? null, tx: (t ?? p).x, ty: (t ?? p).y, ranged: p.attackRange > 3 });
+    this.emit({ type: 'skillCast', skillId: def.id, casterId: p.id, x: p.x, y: p.y, targetId: t?.id ?? null, tx: (t ?? p).x, ty: (t ?? p).y, ranged: p.attackRange > 3 });
     if (dest) {
-      this.events.push({ type: 'dash', fromX: p.x, fromY: p.y, toX: dest.x, toY: dest.y });
+      this.emit({ type: 'dash', fromX: p.x, fromY: p.y, toX: dest.x, toY: dest.y });
       p.x = dest.x; p.y = dest.y; p.path = [];
     }
     for (const v of victims) {
@@ -328,7 +347,7 @@ export class World {
     st.xp++;
     for (let need = skillXpToNext(st.level); st.level < SKILL_MAX_LEVEL && st.xp >= need; need = skillXpToNext(st.level)) {
       st.xp -= need; st.level++;
-      this.events.push({ type: 'skillLevelUp', skillId: def.id, level: st.level });
+      this.emit({ type: 'skillLevelUp', skillId: def.id, level: st.level });
     }
     if (st.level >= SKILL_MAX_LEVEL) st.xp = 0;
   }
@@ -355,7 +374,7 @@ export class World {
     }
     this.potionFx = { hp: null, mp: null };
     this.closeNpc(); this.npcGoal = null;
-    if (lost) { this.recalc(this.player, false); this.invVersion++; this.events.push({ type: 'durabilityLost' }); }
+    if (lost) { this.recalc(this.player, false); this.invVersion++; this.emit({ type: 'durabilityLost' }); }
   }
 
   // ---------- simulação ----------
@@ -378,6 +397,7 @@ export class World {
       this.respawnTimer -= dt;
       if (this.respawnTimer <= 0) this.respawnPlayer();
     } else {
+      this.auto.tick(dt);
       this.tickPlayer(dt);
       this.checkPortals();
     }
@@ -493,13 +513,13 @@ export class World {
   private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
-    if (!skill) this.events.push({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
+    if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
     if (r.hit) {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
       t.hp -= dealt;
-      if (dealt > 0) this.events.push({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
+      if (dealt > 0) this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
     } else {
-      this.events.push({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
+      this.emit({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
     }
     if (t.kind === 'monster') {
       if (t.ai !== 'return') this.aggro(t);
@@ -516,8 +536,8 @@ export class World {
     m.dead = true; m.hp = 0; m.path = []; m.buffs = [];
     m.respawnAt = this.time + def.respawnSeconds;
     if (this.targetId === m.id) { this.targetId = null; this.autoAttack = false; }
-    this.events.push({ type: 'death', id: m.id });
-    this.events.push({ type: 'kill', monsterId: m.monsterId });
+    this.emit({ type: 'death', id: m.id });
+    this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.gainXp(def.xpBase + def.xpPerLevel * (m.level - 1));
     this.dropLoot(m, def);
   }
@@ -526,7 +546,7 @@ export class World {
     const p = this.player;
     p.dead = true; p.hp = 0; p.path = []; p.buffs = []; this.pendingSkill = null; this.moveInput = { x: 0, y: 0 };
     this.targetId = null; this.autoAttack = false; this.respawnTimer = 3;
-    this.events.push({ type: 'playerDeath' });
+    this.emit({ type: 'playerDeath' });
     this.onPlayerDeath();
   }
 
@@ -540,7 +560,7 @@ export class World {
     const p = this.player;
     if (p.level >= PROGRESSION.levelCap) return;
     this.xp += n;
-    this.events.push({ type: 'xp', amount: n });
+    this.emit({ type: 'xp', amount: n });
     for (let need = this.xpToNext(); need !== null && this.xp >= need; need = this.xpToNext()) {
       this.xp -= need; p.level++;
       const up = CLASSES[this.classId].levelUpAttributes;
@@ -548,8 +568,8 @@ export class World {
       this.freePoints += PROGRESSION.freePointsPerLevel;
       this.recalc(p, false);
       p.hp = p.derived.maxHp; p.mana = p.derived.maxMana;
-      this.events.push({ type: 'levelup', level: p.level });
-      for (const s of this.classSkills()) if (s.unlock === p.level) this.events.push({ type: 'skillUnlocked', skillId: s.id });
+      this.emit({ type: 'levelup', level: p.level });
+      for (const s of this.classSkills()) if (s.unlock === p.level) this.emit({ type: 'skillUnlocked', skillId: s.id });
     }
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
   }
@@ -626,11 +646,18 @@ export class World {
   }
 
   private collect(item: ItemInstance, x: number, y: number) {
-    if (this.addItem(item)) {
-      this.events.push({ type: 'itemPickup', baseId: item.baseId, name: itemName(item), color: itemColor(item), qty: item.qty ?? 1, potion: isPotionId(item.baseId) });
+    this.auto.recordDrop(item);
+    let placed = this.addItem(item);
+    if (!placed && this.auto.sellingActive) { // auto-combate: mochila cheia vende o que a regra permite
+      this.auto.makeRoom();
+      placed = this.addItem(item);
+      if (!placed && this.auto.sellable(item)) { this.sellValueNow(item); return; }
+    }
+    if (placed) {
+      this.emit({ type: 'itemPickup', baseId: item.baseId, name: itemName(item), color: itemColor(item), qty: item.qty ?? 1, potion: isPotionId(item.baseId), rarity: item.rarity });
     } else {
       this.ground.push({ id: this.nextGround++, x, y, item, expires: this.time + GROUND_SECONDS });
-      this.events.push({ type: 'bagFull' });
+      this.emit({ type: 'bagFull' });
     }
   }
 
@@ -638,12 +665,12 @@ export class World {
     if (!this.ground.length) return;
     const p = this.player;
     for (const g of [...this.ground]) {
-      if (this.time >= g.expires) { this.ground = this.ground.filter((x) => x !== g); this.events.push({ type: 'groundGone', id: g.id }); continue; }
+      if (this.time >= g.expires) { this.ground = this.ground.filter((x) => x !== g); this.emit({ type: 'groundGone', id: g.id }); continue; }
       if (g.item && dist(g, p) < 0.9 && this.addItem(g.item)) {
         const it = g.item;
         this.ground = this.ground.filter((x) => x !== g);
-        this.events.push({ type: 'groundGone', id: g.id });
-        this.events.push({ type: 'itemPickup', baseId: it.baseId, name: itemName(it), color: itemColor(it), qty: it.qty ?? 1, potion: isPotionId(it.baseId) });
+        this.emit({ type: 'groundGone', id: g.id });
+        this.emit({ type: 'itemPickup', baseId: it.baseId, name: itemName(it), color: itemColor(it), qty: it.qty ?? 1, potion: isPotionId(it.baseId), rarity: it.rarity });
       }
     }
   }
@@ -654,13 +681,13 @@ export class World {
     const spot = () => ({ x: m.x + this.rng.range(-0.4, 0.4), y: m.y + this.rng.range(-0.4, 0.4) });
     if (L.gold) {
       const g = this.rng.int(L.gold.min, L.gold.max);
-      if (g > 0) { this.gold += g; this.bumpInv(); this.events.push({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' }); this.events.push({ type: 'goldPickup', amount: g }); }
+      if (g > 0) { this.gold += g; this.bumpInv(); this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' }); this.emit({ type: 'goldPickup', amount: g }); }
     }
     for (const pd of L.potions ?? []) {
       if (pd.minMonsterLevel && m.level < pd.minMonsterLevel) continue;
       if (this.rng.next() >= pd.chance) continue;
       const s = spot();
-      this.events.push({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
+      this.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
       this.collect(makePotion(pd.id, 1), s.x, s.y);
     }
     const eq = L.equipment;
@@ -670,7 +697,7 @@ export class World {
         const id = ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))];
         const it = makeEquipment(id, rollRarity(this.rng), CLASSES[this.classId].element, this.rng, m.level);
         const s = spot();
-        this.events.push({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
+        this.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
         this.collect(it, s.x, s.y);
       }
     }
@@ -707,25 +734,25 @@ export class World {
   private afterEquip() {
     this.recalc(this.player, false);
     this.bumpInv();
-    this.events.push({ type: 'equipChange' });
+    this.emit({ type: 'equipChange' });
   }
 
   // ---------- poções ----------
   usePotion(kind: PotionKind, baseId?: string): boolean {
     const p = this.player;
     if (p.dead) return false;
-    if (this.potionCd[kind] > 0) { this.events.push({ type: 'potionFail', kind, reason: 'cooldown' }); return false; }
+    if (this.potionCd[kind] > 0) { this.emit({ type: 'potionFail', kind, reason: 'cooldown' }); return false; }
     const ids = baseId ? [baseId] : Object.keys(POTIONS).filter((id) => POTIONS[id].kind === kind);
     const id = ids.find((x) => POTIONS[x]?.kind === kind && this.potionCount(x) > 0);
-    if (!id) { this.events.push({ type: 'potionFail', kind, reason: 'none' }); return false; }
+    if (!id) { this.emit({ type: 'potionFail', kind, reason: 'none' }); return false; }
     const full = kind === 'hp' ? p.hp >= p.derived.maxHp - 0.01 : p.mana >= p.derived.maxMana - 0.01;
-    if (full) { this.events.push({ type: 'potionFail', kind, reason: 'full' }); return false; }
+    if (full) { this.emit({ type: 'potionFail', kind, reason: 'full' }); return false; }
     const d = POTIONS[id];
     this.removeFromBag(this.bag.findIndex((b) => b && b.baseId === id));
     const max = kind === 'hp' ? p.derived.maxHp : p.derived.maxMana;
     this.potionFx[kind] = { id, remaining: d.duration, rate: (max * d.percent) / d.duration }; // reinicia o efeito
     this.potionCd[kind] = d.cooldown;
-    this.events.push({ type: 'potionUsed', id, kind });
+    this.emit({ type: 'potionUsed', id, kind });
     return true;
   }
 
@@ -745,6 +772,7 @@ export class World {
   interactNpc(entityId: number) {
     const n = this.npcs.find((e) => e.id === entityId);
     if (!n || this.player.dead) return;
+    this.auto.manualMove();
     this.pendingSkill = null; this.chasing = false; this.autoAttack = false; this.targetId = null;
     this.moveInput = { x: 0, y: 0 }; this.player.path = [];
     this.npcGoal = entityId;
@@ -753,34 +781,92 @@ export class World {
   private openNpcWindow(n: Entity) {
     if (this.openNpc === n) return;
     this.openNpc = n;
-    this.events.push({ type: 'npcOpen', npcId: this.npcRole(n), entityId: n.id });
+    this.emit({ type: 'npcOpen', npcId: this.npcRole(n), entityId: n.id });
   }
   closeNpc() {
     if (!this.openNpc) return;
     this.openNpc = null;
-    this.events.push({ type: 'npcClose' });
+    this.emit({ type: 'npcClose' });
   }
 
   buy(potionId: string, qty: number): string | null {
     if (this.npcRole() !== 'vendedor') return 'Fale com o vendedor';
+    return this.purchase(potionId, qty);
+  }
+  // compra sem exigir a janela do NPC aberta (usado pelo auto-combate ao chegar no vendedor)
+  purchase(potionId: string, qty: number): string | null {
     if (!POTIONS[potionId] || qty < 1) return null;
     const cost = buyPrice(potionId) * qty;
     if (this.gold < cost) return 'Ouro insuficiente';
     if (!this.canFit(potionId, qty)) return 'Mochila cheia';
     this.gold -= cost;
     this.addItem(makePotion(potionId, qty));
-    this.events.push({ type: 'trade', kind: 'buy', gold: cost });
+    this.emit({ type: 'trade', kind: 'buy', gold: cost });
     return null;
   }
   sell(bagIndex: number, qty = 1): string | null {
     if (this.npcRole() !== 'vendedor') return 'Fale com o vendedor';
+    this.sellRaw(bagIndex, qty);
+    return null;
+  }
+  // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
+  sellRaw(bagIndex: number, qty = 1): number {
     const it = this.bag[bagIndex];
-    if (!it) return null;
+    if (!it) return 0;
     const n = Math.max(1, Math.min(qty, it.qty ?? 1)), gold = sellValue(it) * n;
     this.removeFromBag(bagIndex, n);
     this.gold += gold; this.bumpInv();
-    this.events.push({ type: 'trade', kind: 'sell', gold });
-    return null;
+    this.emit({ type: 'trade', kind: 'sell', gold });
+    return gold;
+  }
+  // vende um item que nem chegou a entrar na mochila
+  sellValueNow(it: ItemInstance): number {
+    const gold = sellValue(it) * (it.qty ?? 1);
+    this.gold += gold; this.bumpInv();
+    this.emit({ type: 'trade', kind: 'sell', gold });
+    return gold;
+  }
+
+  // ---------- ganho offline ----------
+  private applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
+    if (!saved?.active || !saved.mapId || TOWN_MAPS.has(saved.mapId) || !this.maps[saved.mapId]) return null;
+    const rate = this.auto.rate();
+    if (!rate) return null;
+    const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0
+    const res: OfflineResult = computeOffline({
+      elapsedMs, rate, level: this.player.level, xp: this.xp,
+      potions: { hp: this.kindCount('hp'), mp: this.kindCount('mp') }, seed: (now ^ Math.floor(this.xp * 7919)) >>> 0,
+    });
+    if (res.kills < 1) return null;
+    const lvl0 = this.player.level;
+    this.gold += res.gold;
+    this.gainXp(res.xp);
+    const items: OfflineReport['items'] = [];
+    let soldCount = 0, soldGold = 0;
+    const sell = (it: ItemInstance) => { soldCount += it.qty ?? 1; soldGold += this.sellValueNow(it); };
+    for (const d of res.drops) {
+      const isPot = isPotionId(d.baseId);
+      for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
+        const it = isPot ? makePotion(d.baseId, d.qty) : makeEquipment(d.baseId, d.rarity, CLASSES[this.classId].element, this.rng, rate.monLevel);
+        let placed = this.addItem(it);
+        if (!placed) { this.auto.makeRoom(); placed = this.addItem(it); }
+        if (!placed) { sell(it); continue; }
+        const e = items.find((x) => x.name === itemName(it) && x.rarity === it.rarity);
+        if (e) e.qty += it.qty ?? 1; else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
+      }
+    }
+    const used: Record<PotionKind, number> = { hp: 0, mp: 0 };
+    for (const k of ['hp', 'mp'] as PotionKind[]) {
+      for (let n = res.potionsUsed[k]; n > 0; n--) {
+        const i = this.bag.findIndex((b) => b && POTIONS[b.baseId]?.kind === k);
+        if (i < 0) break;
+        this.removeFromBag(i); used[k]++;
+      }
+    }
+    this.player.hp = this.player.derived.maxHp; this.player.mana = this.player.derived.maxMana;
+    this.events.length = 0; // sem toasts de nível/skill atrás do resumo
+    return { elapsedMs, effMin: res.effMin, efficiency: res.efficiency, kills: res.kills, xp: res.xp, levelsGained: this.player.level - lvl0, newLevel: this.player.level,
+      gold: res.gold, items, potionsUsed: used, soldCount, soldGold };
   }
   private repairTargets(): ItemInstance[] {
     return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter((i): i is ItemInstance => !!i && !!BASES[i.baseId]);
@@ -792,7 +878,7 @@ export class World {
     if (this.gold < cost) return 'Ouro insuficiente';
     this.gold -= cost; it.durability = maxDurability(it);
     this.recalc(this.player, false); this.bumpInv();
-    this.events.push({ type: 'repair', gold: cost });
+    this.emit({ type: 'repair', gold: cost });
     return null;
   }
   repairAllCost(): number { return this.repairTargets().reduce((a, i) => a + repairCost(i), 0); }
@@ -804,7 +890,7 @@ export class World {
     this.gold -= cost;
     for (const i of this.repairTargets()) i.durability = maxDurability(i);
     this.recalc(this.player, false); this.bumpInv();
-    this.events.push({ type: 'repair', gold: cost });
+    this.emit({ type: 'repair', gold: cost });
     return null;
   }
   lowDurability(): boolean {
@@ -828,7 +914,7 @@ export class World {
         this.npcs.push({ ...this.blank('npc', o.name, 1), x: o.x, y: o.y });
       }
     }
-    this.events.push({ type: 'mapChange', mapId });
+    this.emit({ type: 'mapChange', mapId });
   }
 
   private blank(kind: Entity['kind'], name: string, level: number): Entity {

@@ -7,6 +7,9 @@ import { Hotbar } from './hotbar';
 import { SkillsPanel } from './skillsPanel';
 import { InventoryPanel } from './inventory';
 import { NpcWindow } from './npcWindow';
+import { AutoPanel, showOfflineReport } from './autoPanel';
+import { isTouch } from './controls';
+import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
 
@@ -23,12 +26,18 @@ export class Hud {
   private npc: NpcWindow;
   private potions: PotionBar;
   private goldSig = -1;
+  private autoPanel: AutoPanel;
+  private autoSig = '';
   constructor(private world: World) {
     this.hotbar = new Hotbar(world);
     this.skills = new SkillsPanel(world, () => this.toggleSkills(false));
     this.inv = new InventoryPanel(world, (m, c) => this.toast(m, c), () => this.toggleInventory(false));
     this.npc = new NpcWindow(world, (m, c) => this.toast(m, c));
     this.potions = new PotionBar(world);
+    this.autoPanel = new AutoPanel(world);
+    for (const id of ['btn-auto', 'btn-auto-cfg']) $(id).addEventListener('focus', (e) => (e.target as HTMLElement).blur());
+    $('btn-auto').addEventListener('click', () => { audio.ui('ui_click'); world.auto.toggle(); });
+    $('btn-auto-cfg').addEventListener('click', () => this.autoPanel.set(!this.autoPanel.open));
     $('dur-warn').addEventListener('click', () => this.toggleInventory(true));
     $('hud').classList.remove('hidden');
     $('attrs-panel').addEventListener('click', (e) => {
@@ -61,9 +70,12 @@ export class Hud {
   }
 
   closeAll() {
-    this.togglePanel(false); this.toggleSkills(false); this.toggleInventory(false);
+    this.togglePanel(false); this.toggleSkills(false); this.toggleInventory(false); this.autoPanel.set(false);
     this.world.closeNpc();
   }
+
+  showOffline(rep: OfflineReport, onClose: () => void) { showOfflineReport(rep, onClose); }
+  get offlineOpen() { return !$('offline-panel').classList.contains('hidden'); }
 
   toast(msg: string, color?: string) {
     const t = $('toast');
@@ -105,6 +117,13 @@ export class Hud {
     this.npc.update();
     this.potions.update();
     $('dur-warn').classList.toggle('hidden', !w.lowDurability());
+    const as = w.auto.state, sig = `${as}|${isTouch}`;
+    if (sig !== this.autoSig) {
+      this.autoSig = sig;
+      const b = $('btn-auto');
+      b.classList.toggle('on', as === 'on'); b.classList.toggle('paused', as === 'pausado');
+      b.textContent = as === 'on' ? 'Auto ligado' : as === 'pausado' ? 'Auto pausado' : isTouch ? 'Auto' : 'Auto (Z)';
+    }
   }
 
   private renderPanel() {

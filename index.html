@@ -88,7 +88,8 @@ label{display:block;margin-bottom:6px;color:#ccd}
 #hotbar.touch .slot .key{display:none}
 #skill-tip{position:fixed;z-index:20;width:240px;background:rgba(14,18,30,.96);border:1px solid #d4a017;border-radius:10px;padding:8px 10px;pointer-events:none;font-size:12px}
 #hotbar{z-index:1}
-#attrs-panel,#skills-panel,#inv-panel,#npc-panel,#settings-panel{z-index:5}
+#attrs-panel,#skills-panel,#inv-panel,#npc-panel,#settings-panel,#auto-panel{z-index:5}
+#offline-panel{z-index:8}
 #skill-tip b{font-size:14px;color:#fc9}#skill-tip p{margin:4px 0}#skill-tip .st{color:#9bd}
 .sk-bar{height:8px;background:#222;border-radius:4px;overflow:hidden;margin-top:3px}.sk-bar i{display:block;height:100%;background:#4a8fd0}
 #skills-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto;touch-action:pan-y}
@@ -146,6 +147,21 @@ label{display:block;margin-bottom:6px;color:#ccd}
 .tabs button.on,.qty button.on{background:#8a3b2a;border-color:#c66}
 .lore{font-style:italic;color:#cdb;line-height:1.5}
 #npc-panel .card .primary{min-height:44px}
+#auto-row{display:flex;gap:6px}
+#btn-auto,#btn-auto-cfg{min-height:44px}
+#btn-auto{min-width:96px;font-weight:700}#btn-auto-cfg{min-width:44px;padding:0;font-size:20px}
+#btn-auto.on{background:#2d6a3a;border-color:#6c6;box-shadow:0 0 8px rgba(90,220,110,.55)}
+#btn-auto.paused{background:#8a6a1f;border-color:#e8b84a}
+#auto-panel,#offline-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto;touch-action:pan-y}
+#auto-panel .card,#offline-panel .card{width:min(440px,100%);-webkit-overflow-scrolling:touch}
+#auto-panel .opt{min-height:44px}#auto-panel .opt input{flex:none}
+#auto-panel .sld{grid-template-columns:118px 1fr 36px}
+#auto-panel h3{margin:12px 0 2px}
+#auto-panel .how{font-size:12px;color:#aab;line-height:1.45;background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;margin-top:10px}
+#auto-panel .how b{color:#d4a017}
+.rep-row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #334}.rep-row b{text-align:right}
+#offline-panel .card{border-color:#d4a017}#offline-panel .primary{min-height:44px}
+@media (max-height:520px){#top-right{flex-wrap:wrap-reverse;max-height:calc(100% - 196px);align-content:flex-start}}
 @media (max-width:420px){#joystick{width:110px;height:110px;left:14px;bottom:14px}#potion-bar.touch{bottom:136px;left:14px}}
 @media (max-width:340px){#joystick{width:96px;height:96px}#potion-bar.touch{bottom:122px}}
 @media (max-width:640px){
@@ -171,6 +187,7 @@ label{display:block;margin-bottom:6px;color:#ccd}
   </div>
   <div id="top-right">
     <div id="map-name"></div>
+    <div id="auto-row"><button id="btn-auto">Auto (Z)</button><button id="btn-auto-cfg" aria-label="Menu do auto-combate">&#9881;&#xFE0E;</button></div>
     <button id="btn-settings" aria-label="Configurações">&#9881;</button>
     <button id="btn-skills">Skills (K)</button>
     <button id="btn-attrs">Atributos (C)<span id="pts-badge" class="hidden"></span></button>
@@ -193,6 +210,8 @@ label{display:block;margin-bottom:6px;color:#ccd}
   <div id="npc-panel" class="hidden"></div>
   <div id="item-tip" class="hidden"></div>
   <div id="settings-panel" class="hidden"></div>
+  <div id="auto-panel" class="hidden"></div>
+  <div id="offline-panel" class="hidden"></div>
 </div>
 <div id="create" class="hidden">
   <div class="card">
