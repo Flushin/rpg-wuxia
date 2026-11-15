@@ -14,7 +14,8 @@
     "check:skills": "esbuild tools/skills-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/skills-check.mjs && node /tmp/skills-check.mjs",
     "sim:balance": "esbuild tools/balance-sim.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/balance-sim.mjs && node /tmp/balance-sim.mjs",
     "check:i18n": "esbuild tools/i18n-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/i18n-check.mjs && node /tmp/i18n-check.mjs",
-    "check:m5": "esbuild tools/m5-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m5-check.mjs && node /tmp/m5-check.mjs"
+    "check:m5": "esbuild tools/m5-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m5-check.mjs && node /tmp/m5-check.mjs",
+    "check:respawn": "esbuild tools/respawn-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/respawn-check.mjs && node /tmp/respawn-check.mjs"
   },
   "dependencies": {
     "idb-keyval": "^6.3.0",

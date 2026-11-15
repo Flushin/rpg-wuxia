@@ -6,7 +6,7 @@
 - Decisões são enviadas como perguntas de múltipla escolha ou confirmação, para o Lucas não precisar digitar.
 - Sempre avisar o Lucas quando houver dicas para economizar tokens.
 - Economia de tokens: tarefas que não precisam do Opus (código de rotina, scaffolding, conteúdo repetitivo) vão para um modelo mais leve (Sonnet/Haiku); o Opus fica com design, revisão e decisões.
-- **Melhorias sugeridas pelo Lucas:** cada sugestão é analisada e só entra na lista "Melhorias — Futuro" (fim deste documento) se o Lucas aprovar. Nada dessa lista é implementado até o Lucas pedir explicitamente.
+- **Melhorias sugeridas pelo Lucas:** cada sugestão é analisada e só entra na lista "Melhorias — Futuro" (fim deste documento) se o Lucas aprovar. Nada dessa lista é implementado até o Lucas pedir explicitamente. Quando implementada, a melhoria passa para "Melhorias — Feitas".
 
 ## Repositório e publicação
 - **Código:** GitHub `Flushin/rpg-wuxia`, branch `main`. Cópia deste documento em `docs/decisoes-do-projeto.md`.
@@ -22,6 +22,11 @@
   - Tela inicial com **4 espaços**; cada um mostra nome, seita, nível, mapa e último acesso, com botões Jogar e Apagar (apagar pede para digitar o nome). O personagem atual vira o primeiro espaço.
   - Ganho offline vale só para o **último personagem jogado**.
   - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois).
+- **Marco 6 (próximo, decidido em 15/11/2026): gráficos — fatia pequena.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Fixar tamanho dos sprites, direções e animações (andar, atacar, morrer). Só depois estender para Geada, outros monstros, cidade e ruínas.
+  - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos registrados no repositório.
+  - **Personagens e monstros:** modelos **3D CC0** (ex.: Quaternius) renderizados em sprites isométricos de **8 direções** por um script do Blender. Motivo: quase não existem sprites 2D CC0 isométricos com cara de wuxia, e misturar pacotes de autores diferentes quebra o estilo. Recolorir/trocar armas para dar cara wuxia.
+  - **Cenário (tiles e objetos):** pacotes 2D isométricos CC0 (ex.: Screaming Brain Studios — objetos, templo, pisos, paredes; Kenney).
+  - **Pendências das melhorias de 15/11:** gerar os sprites em resolução maior (2×) para aproveitar a nitidez nova no celular e no zoom; trocar a silhueta da mochila pelo sprite do personagem.
 
 
 ## Decididas
@@ -177,6 +182,7 @@
 
 ### Monstros (v1)
 - **Floresta:** lobos (nv 1–3, visão de 3 tiles) e bandidos (nv 4–6).
+- **Renascimento:** monstros comuns renascem **30 s** após morrer; o General, 10 min. O tempo continua contando fora do mapa e fica no save.
 - **Bandidos:** mistura de espadachins (andam em grupos de 2–3) e arqueiros (atacam de longe).
 - **Novo mapa "Ruínas de Terracota"** (ligado à floresta): guerreiros de terracota (nv 7–9) e o General no fundo.
 - **Guerreiros de Terracota:** defesa física ×2,4 e espiritual ×0,7 (ensina tipos de dano: Geada leva vantagem; Tormenta usa o Quebra-Guarda).
@@ -212,13 +218,27 @@
 - Ligar o Auto na cidade leva o personagem até o mapa de caça.
 - Menu do auto-combate: botão ☰ ao lado do Auto (a engrenagem ⚙ é das configurações).
 
+## Melhorias — Feitas
+Implementadas a pedido do Lucas e publicadas no site.
+
+### Interface (15/11/2026)
+- **Botão fechar (X) no topo** *(PR #1)*: X fixo no canto superior direito (continua visível ao rolar) na mochila, atributos (C), skills (K), auto-combate e configurações; o botão de baixo continua. A janela de NPC/loja/ferreiro já tinha X. **Ficaram sem X:** tela de ganho offline e tela de criação.
+- **Organizar mochila** *(PR #1)*: botão "Organizar" / "Sort". Ordem: equipamentos na ordem dos slots, depois poções; dentro disso, raridade (Raro > Incomum > Comum) e nível decrescente. Junta pilhas de poções iguais até 99.
+- **Ícones nos slots de equipamento** *(PR #1)*: emoji no lugar das siglas — ⛑️ cabeça, 📿 colar, 👘 tronco, ⚔️ arma, 👖 calça, 👢 bota; esmaecidos nos slots vazios; o nome do slot continua no title/aria-label. Equipamentos na mochila também mostram o emoji (poções seguem HP/MP). Conferir como ficam no celular.
+- **Atributos detalhados** *(PR #2)*: no painel C, cada atributo mostra o total e, embaixo, uma linha pequena "5 base + 14 níveis + 6 equip." (EN: base / levels / equip.). Níveis = pontos automáticos + livres; equipamento ignora itens com durabilidade 0. Função `attrBreakdown` em `src/core/stats.ts`. Conferir a largura em telas estreitas.
+- **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O contador (x/30) e o "Organizar" continuam valendo para a mochila toda. Craft e Gemas entram quando esses sistemas existirem.
+- **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. Trocar a silhueta pelo sprite do personagem no marco 6.
+
+### Câmera (15/11/2026)
+- **Zoom** *(PR #3)*: roda do mouse no PC e pinça com dois dedos no celular. Só aproxima: 100% a 200% (gruda em 100%). Fica salvo no aparelho (`localStorage`, vale para todos os personagens).
+
+### Gráficos (15/11/2026)
+- **Nitidez no celular** *(PR #3)*: causa confirmada — o canvas era desenhado no tamanho CSS (modo `RESIZE` do Phaser) e o celular ampliava 2–3×. Agora o canvas é desenhado em tamanho × `devicePixelRatio` (limitado a 2×) e mostrado no tamanho CSS; a câmera compensa com zoom × DPR. Textos, nomes e efeitos ficam nítidos; as texturas placeholder ainda são geradas em 1× e só ficam totalmente nítidas com os sprites do marco 6 em resolução maior. Código em `src/render/display.ts`.
+
+### Monstros (15/11/2026)
+- **Renascimento com tempo** *(PR #3)*: corrigido o exploit de trocar de mapa para renascer todos. Cada monstro comum morto guarda o horário de renascimento (relógio real) pelo ponto de spawn (`mapa#índice`); o tempo continua fora do mapa e vai no save (`respawns`). Comuns: **30 s** (lobos eram 15 s; bandidos e terracota 35–40 s). General: 10 min, como já era. Simulação de balanceamento quase igual (Tormenta ~72 min, Geada ~52 min até o nível 10). Teste: `npm run check:respawn`.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
-### Interface (aprovadas em 15/11/2026)
-- **Abas na mochila:** começar com **Equipamento** e **Poções**. As abas **Craft** e **Gemas** entram quando esses sistemas existirem.
-- **Organizar mochila:** botão que ordena os itens automaticamente.
-- **Botão fechar (X) no topo:** em todas as janelas, no canto superior direito (como no Windows), para não precisar rolar até o fim.
-- **Atributos detalhados:** cada atributo mostra a origem do valor: **base + níveis + equipamento** (ex.: Strength 25 = 5 base + 14 níveis + 6 equipamento).
-- **Ícones nos slots de equipamento:** símbolo de cada peça (capacete, colar, tronco, arma, calça, bota) no lugar das abreviações ("Ca" etc.).
-- **Corpo do personagem na mochila:** tela de equipamento com o personagem no centro e os 6 slots em volta, cada um perto da parte do corpo correspondente (estilo MMORPG). Usa uma silhueta enquanto a arte for placeholder e troca pelo sprite real quando a arte definitiva chegar.
+*(nenhuma pendente)*
