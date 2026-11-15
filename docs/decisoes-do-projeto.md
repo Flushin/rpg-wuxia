@@ -255,4 +255,5 @@ Implementadas a pedido do Lucas e publicadas no site.
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
-*(nenhuma pendente)*
+### Interface (aprovada em 15/11/2026)
+- **Minimapa:** no **canto superior direito**. Mostra o personagem e **pontinhos minúsculos** para os monstros (para não atrapalhar a visão). Também mostra **portais** (saídas para outros mapas), **NPCs** e o **chefe destacado** (ponto maior/de outra cor). **Mapa grande:** tecla **M** (no celular, tocar no minimapa) abre o mapa inteiro em tamanho maior. Conferir se não briga com o que já fica no canto superior direito do HUD e com o tamanho da tela do celular.
