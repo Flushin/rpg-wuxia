@@ -5,7 +5,7 @@ import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
 import { buildMapView } from '../render/mapView';
 import { writeSave } from '../save';
-import { isTouch, setupControls } from '../ui/controls';
+import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
 import { MONSTERS } from '../core/data';
 
@@ -72,7 +72,7 @@ export class GameScene extends Phaser.Scene {
       if (Math.abs(dx) < 26 && Math.abs(dy) < 26 && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); best = m; }
     }
     if (best) { this.world.setTarget(best.id); return; }
-    if (isTouch) return;
+    if (p.wasTouch) return; // toque usa o joystick; mouse continua com clique-para-mover
     const t = screenToTile(p.worldX, p.worldY);
     this.world.moveTo(t.x, t.y);
   }
