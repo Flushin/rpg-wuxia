@@ -18,6 +18,11 @@
 - **Marco 4:** auto-combate (menu de skills, poções) e ganho offline.
 - **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento.
 
+### Futuro (registrado, sem marco definido)
+- **Vários personagens:** tela inicial com **4 espaços**; o jogador escolhe qual personagem jogar.
+  - Ganho offline vale só para o **último personagem jogado**.
+  - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois de itens e loja).
+
 ## Decididas
 
 ### Base (15/11/2026)
@@ -84,6 +89,21 @@
 - **Skills por classe na v1:** 4 ativas + 1 passiva, além do ataque básico, liberadas nos níveis 1, 3, 5, 7 e 9.
 - **Nível das skills ativas:** sobe **pelo uso** — quanto mais a skill é usada, mais experiência ela acumula.
 - **Nível das skills passivas:** sobe **junto com o nível do personagem**.
+
+- **Nível máximo da skill:** 10; **+8% de efeito por nível**. Cada uso dá 1 de experiência; o nível 2 pede ~20 usos e os seguintes pedem cada vez mais.
+- **Uso:** skills usam o alvo selecionado (tab-target). Tempestade de Lâminas e Escudo de Nuvem não precisam de alvo. Se o alvo estiver fora do alcance, o melee anda até ele antes de usar.
+- **Hotbar:** PC — teclas 1–4 e clique; celular — 4 botões em arco ao redor do botão de ataque (canto inferior direito).
+- **Números iniciais (aprovados, ajustáveis no balanceamento):**
+  - Corte Duplo 2×70% · cd 4 s · 8 mana
+  - Passo Fantasma: avança até 8 tiles, 120% · cd 10 s · 12 mana
+  - Tempestade de Lâminas: 150% em volta, raio 2,5 · cd 12 s · 18 mana
+  - Golpe Rompe-Guarda: 200% e −30% defesa por 6 s · cd 15 s · 20 mana
+  - Fluxo da Lâmina: +10% velocidade de ataque, +5% crítico
+  - Esfera de Qi: 130% · cd 3 s · 8 mana
+  - Lótus Congelante: 110% + lentidão 40% por 4 s · cd 10 s · 14 mana
+  - Chuva de Qi: 180% em área no alvo · cd 14 s · 22 mana
+  - Escudo de Nuvem: absorve 25% do HP máx. por 8 s · cd 20 s · 20 mana
+  - Meditação Celeste: regenera 1% de mana/s fora da cidade
 
 **Lâmina Errante**
 1. Corte Duplo (nv 1) — dois golpes rápidos
