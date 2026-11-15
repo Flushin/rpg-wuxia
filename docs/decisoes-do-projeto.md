@@ -4,6 +4,7 @@
 - Toda decisão tomada é registrada neste documento.
 - Decisões que afetam a jogabilidade são sempre perguntadas ao Lucas antes de serem adotadas.
 - Decisões são enviadas como perguntas de múltipla escolha ou confirmação, para o Lucas não precisar digitar.
+- Sempre avisar o Lucas quando houver dicas para economizar tokens.
 - Economia de tokens: tarefas que não precisam do Opus (código de rotina, scaffolding, conteúdo repetitivo) vão para um modelo mais leve (Sonnet/Haiku); o Opus fica com design, revisão e decisões.
 
 ## Repositório e publicação
@@ -14,14 +15,13 @@
 ## Plano de desenvolvimento
 - **Marco 1 (concluído):** estrutura do projeto, cidade e floresta com placeholders, criação de personagem (2 seitas), movimento PC/celular, seleção de alvo, ataque básico, lobos com IA, XP/nível até 10, pontos de atributo, morte → cidade, HUD, save no IndexedDB.
 - **Marco 2 (concluído):** skills das duas seitas + nível por uso, hotbar, painel de skills (K).
-- **Marco 3 (concluído, em teste):** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
-- **Marco 4:** auto-combate (menu de skills, poções) e ganho offline.
-- **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento.
-
-### Futuro (registrado, sem marco definido)
-- **Vários personagens:** tela inicial com **4 espaços**; o jogador escolhe qual personagem jogar.
+- **Marco 3 (concluído):** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
+- **Marco 4 (concluído, em teste):** auto-combate (menu de skills, poções) e ganho offline.
+- **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento; **vários personagens**:
+  - Tela inicial com **4 espaços**; o jogador escolhe qual personagem jogar (o personagem atual vira o primeiro espaço).
   - Ganho offline vale só para o **último personagem jogado**.
-  - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois de itens e loja).
+  - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois).
+
 
 ## Decididas
 
@@ -53,8 +53,16 @@
 - **Menu do auto-combate:** o jogador escolhe quais habilidades o auto-combate usa.
 - **Poções no auto-combate:** usa poções de HP e mana sozinho, com limites configuráveis no menu (padrão sugerido: HP abaixo de 40%, mana abaixo de 30%).
 - **Morte no auto-combate:** o personagem volta para a cidade e retorna ao mapa para continuar caçando **somente se todos os itens equipados ainda tiverem durabilidade**. Se algum item chegar a 0, o auto-combate para e espera o jogador.
-- **Ganho offline:** ao voltar, o jogador recebe XP/itens calculados pelo tempo fora (o navegador não roda o jogo com a aba fechada).
-- **Eficiência:** idle/offline rende menos que jogar ativo (referência: ~50–70%), com limite de horas offline (referência: 8–12h). Valores exatos a definir no balanceamento.
+- **Área do auto-combate:** o mapa inteiro; ataca o monstro mais próximo **com nível até 2 acima do personagem**.
+- **Ligar:** botão "Auto" no HUD + tecla Z; botão de engrenagem ao lado abre o menu (skills usadas, limites de poção, quantidade de poções a comprar, vender Incomuns). Qualquer movimento manual pausa o auto.
+- **Sem poções (online):** volta à cidade, compra a quantidade definida no menu (se tiver ouro) e retorna a caçar; sem ouro, continua sem poção.
+- **Mochila cheia (online):** vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
+- **Ganho offline:** ao voltar, o jogador recebe XP, ouro e itens pelo tempo fora (o navegador não roda o jogo com a aba fechada), e gasta poções.
+  - Só conta se o jogador saiu com o auto-combate ligado num mapa de caça.
+  - **Cálculo pelo ritmo real:** mede monstros por minuto, XP/ouro/drops por abate e poções gastas por abate durante o auto-combate antes de sair.
+  - **Eficiência por faixa de tempo:** 60% até 12 h · 40% de 12 h a 18 h · 20% de 18 h a 24 h · 0 depois de 24 h.
+  - Sem morte e sem perda de durabilidade offline. Itens que não cabem na mochila são vendidos automaticamente. Se as poções acabarem offline, os ganhos continuam.
+  - Tela de resumo "Enquanto você esteve fora" ao voltar.
 - **Skills no idle:** ganham experiência de uso no auto-combate, mas **não** no ganho offline.
 
 ### Atributos
@@ -173,3 +181,9 @@
 - Equipamentos dropam no nível do monstro; armas só da seita do personagem.
 - Janela de NPC não bloqueia o movimento; fecha a mais de 3 tiles.
 - Conserto custa `durabilidade faltante × nível do item × 0,5` (placeholder; lobo dá 2–6 de ouro). Preços: poção de vida P 12, G 36; mana P 14, G 40.
+
+## Notas de implementação (marco 4)
+- Offline usa valores esperados por abate (não sorteio individual), a partir dos últimos ~30 min de auto-combate (mínimo 2 min de dados).
+- Viagem para comprar: só poções pequenas; dispara quando falta qualquer tipo e há ouro; intervalo mínimo de 120 s entre viagens.
+- Ligar o Auto na cidade leva o personagem até o mapa de caça.
+- Menu do auto-combate: botão ☰ ao lado do Auto (a engrenagem ⚙ é das configurações).
