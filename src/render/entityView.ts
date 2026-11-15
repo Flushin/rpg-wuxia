@@ -7,6 +7,7 @@ import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, type AnimName, type SheetMeta } from './sprites';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
+const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
 
 const labelOf = (e: Entity) => (e.kind === 'monster' ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`) : e.kind === 'npc' ? tn(e.name) : e.name);
 
@@ -27,6 +28,9 @@ export class EntityView {
   private lastY = 0;
   private attacking = false;
   private deadAt = 0;
+  private movedAt = -1e9; // último instante em que se moveu (ms)
+  private accX = 0; // deslocamento acumulado desde a última troca de direção
+  private accY = 0;
   private top: number; // altura (px) do topo do personagem acima dos pés
 
   constructor(private scene: Phaser.Scene, e: Entity, texture: string) {
@@ -87,17 +91,28 @@ export class EntityView {
     }
   }
 
-  /** Escolhe a animação: morte > ataque em andamento > andar > parado. */
+  /** Escolhe a animação: morte > ataque em andamento > andar > parado.
+   *  O mundo anda em passos fixos de 1/60 s: em telas de 120/144 Hz há quadros sem movimento,
+   *  então "parado" só vale depois de MOVE_HOLD_MS sem andar (senão pisca entre andar e parado). */
   private animate(e: Entity) {
+    const now = this.scene.time.now;
     const dx = e.x - this.lastX, dy = e.y - this.lastY;
     this.lastX = e.x; this.lastY = e.y;
-    const moving = !e.dead && Math.hypot(dx, dy) > 0.002;
     if (e.dead) {
-      if (this.anim !== 'death') { this.deadAt = this.scene.time.now; this.attacking = false; this.play('death'); }
+      if (this.anim !== 'death') { this.deadAt = now; this.attacking = false; this.play('death'); }
       return;
     }
     if (this.anim === 'death') this.anim = ''; // renasceu
-    if (moving) { this.dir = dirFromDelta(dx, dy); if (!this.attacking || !e.attackWhileMoving) { this.attacking = false; this.play('walk'); } return; }
+    const step = Math.hypot(dx, dy);
+    if (step > 1.5) { this.accX = this.accY = 0; } // teleporte/troca de mapa: não conta como andar
+    else if (step > 0.0005) {
+      this.movedAt = now;
+      this.accX += dx; this.accY += dy;
+      // direção só muda após um trecho mínimo: evita tremer entre direções vizinhas
+      if (Math.hypot(this.accX, this.accY) > 0.12) { this.dir = dirFromDelta(this.accX, this.accY); this.accX = this.accY = 0; }
+    }
+    const moving = now - this.movedAt < MOVE_HOLD_MS;
+    if (moving) { if (!this.attacking || !e.attackWhileMoving) { this.attacking = false; this.play('walk'); } return; }
     if (this.attacking) return;
     this.play('idle');
   }
