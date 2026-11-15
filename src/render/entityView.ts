@@ -9,6 +9,7 @@ export class EntityView {
   private bar: Phaser.GameObjects.Graphics;
   private lastSx = 0;
   private flashTimer?: Phaser.Time.TimerEvent;
+  private flashing = false;
 
   constructor(private scene: Phaser.Scene, e: Entity, texture: string) {
     const shadow = scene.add.image(0, 0, 'shadow');
@@ -34,6 +35,13 @@ export class EntityView {
     this.sprite.setAlpha(e.dead ? 0.35 : 1);
     (this.container.getByName('label') as Phaser.GameObjects.Text).setText(e.kind === 'monster' ? `Nv ${e.level} ${e.name}` : e.name);
     this.ring.clear(); this.bar.clear();
+    // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha
+    const slow = e.buffs.some((b) => b.kind === 'slow'), broken = e.buffs.some((b) => b.kind === 'defReduction'), shield = e.buffs.some((b) => b.kind === 'shield' && b.value > 0);
+    if (!this.flashing) { if (slow) this.sprite.setTint(0x8fc8ff); else this.sprite.clearTint(); }
+    let ix = -18;
+    if (slow) { this.bar.fillStyle(0x7fd0f0, 1); this.bar.fillPoints([{ x: ix, y: -46 }, { x: ix + 6, y: -40 }, { x: ix, y: -34 }, { x: ix - 6, y: -40 }], true); ix += 14; }
+    if (broken) { this.bar.fillStyle(0xe03030, 1); this.bar.fillPoints([{ x: ix - 6, y: -45 }, { x: ix + 6, y: -45 }, { x: ix, y: -34 }], true); }
+    if (shield) { this.bar.lineStyle(3, 0xd8e8f8, 0.9); this.bar.fillStyle(0xaad0ff, 0.22); this.bar.fillCircle(0, -20, 30); this.bar.strokeCircle(0, -20, 30); }
     if (selected && e.kind === 'monster') {
       this.ring.lineStyle(2, 0xff5050, 1); this.ring.strokeEllipse(0, 0, 36, 18);
       const w = 40, top = -52;
@@ -43,9 +51,9 @@ export class EntityView {
   }
 
   flash() {
-    this.sprite.setTintFill(0xffffff);
+    this.sprite.setTintFill(0xffffff); this.flashing = true;
     this.flashTimer?.remove();
-    this.flashTimer = this.scene.time.delayedCall(80, () => this.sprite.clearTint());
+    this.flashTimer = this.scene.time.delayedCall(80, () => { this.flashing = false; this.sprite.clearTint(); });
   }
 
   destroy() { this.flashTimer?.remove(); this.container.destroy(); }

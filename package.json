@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "maps": "node tools/gen-maps.mjs"
+    "maps": "node tools/gen-maps.mjs",
+    "check:skills": "esbuild tools/skills-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/skills-check.mjs && node /tmp/skills-check.mjs"
   },
   "dependencies": {
     "idb-keyval": "^6.3.0",

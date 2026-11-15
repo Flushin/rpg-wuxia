@@ -1,12 +1,13 @@
 import { CLASSES, MONSTERS, PROGRESSION, type MonsterDef } from './data';
 import { distributeByRatio } from './distribute';
-import { rollAttack } from './combat';
+import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
 import { findPath, isWalkable } from './pathfinding';
+import { GLOBAL_COOLDOWN, SKILLS, SKILL_MAX_LEVEL, classActives, skillScale, skillXpToNext, type SkillDef, type SkillState } from './skills';
 import { Rng } from './rng';
 import { computeDerived, emptyElements } from './stats';
-import { ATTR_KEYS, type AttrKey, type Attributes, type Entity, type GameEvent, type Point, type SaveData } from './types';
+import { ATTR_KEYS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type Point, type SaveData, type SkillFailReason } from './types';
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
@@ -14,6 +15,7 @@ const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const TOWN_MAPS = new Set(['cidade']);
 const TOWN_REGEN = 0.03; // 3% por segundo
+const DASH_STOP = 1.0; // distância final do Passo Fantasma até o alvo
 
 export class World {
   mapId = 'cidade';
@@ -31,6 +33,9 @@ export class World {
   events: GameEvent[] = [];
   time = 0;
   targetId: number | null = null;
+  skills: Record<string, SkillState> = {};
+  gcd = 0;
+  private pendingSkill: number | null = null;
   autoAttack = false;
   private chasing = false;
   private moveInput: Point = { x: 0, y: 0 };
@@ -45,11 +50,14 @@ export class World {
     this.classId = classId;
     this.map = maps[this.mapId];
     this.player = this.makePlayer(name, classId, level, attrs);
+    for (const s of SKILLS[classId] ?? []) this.skills[s.id] = { level: 1, xp: 0, cd: 0 };
+    this.recalc(this.player, false);
   }
 
   static create(maps: Record<string, GameMap>, name: string, classId: string): World {
     const w = new World(maps, name, classId, 1, { ...CLASSES[classId].baseAttributes });
     w.changeMap('cidade');
+    for (const s of SKILLS[classId] ?? []) if (s.unlock <= 1) w.events.push({ type: 'skillUnlocked', skillId: s.id });
     return w;
   }
 
@@ -58,6 +66,13 @@ export class World {
     w.xp = s.xp; w.freePoints = s.freePoints;
     w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
     w.audio = { sfx: s.audio?.sfx ?? 80, music: s.audio?.music ?? 50, muted: s.audio?.muted ?? false };
+    for (const [id, st] of Object.entries(s.skills ?? {})) {
+      const cur = w.skills[id];
+      if (!cur) continue;
+      cur.level = Math.max(1, Math.min(SKILL_MAX_LEVEL, Math.floor(Number(st.level) || 1)));
+      cur.xp = cur.level >= SKILL_MAX_LEVEL ? 0 : Math.max(0, Number(st.xp) || 0);
+    }
+    w.recalc(w.player, false);
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
     return w;
   }
@@ -66,6 +81,7 @@ export class World {
     return {
       version: 1, name: this.player.name, classId: this.classId, level: this.player.level, xp: this.xp,
       freePoints: this.freePoints, attributes: { ...this.player.attrs }, mapId: this.mapId, lastSeen: Date.now(),
+      skills: Object.fromEntries(Object.entries(this.skills).map(([id, st]) => [id, { level: st.level, xp: st.xp }])),
       ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled, audio: { ...this.audio },
     };
   }
@@ -74,6 +90,7 @@ export class World {
   moveTo(x: number, y: number) {
     if (this.player.dead) return;
     if (!this.player.attackWhileMoving) this.autoAttack = false;
+    this.pendingSkill = null;
     this.chasing = false;
     this.moveInput = { x: 0, y: 0 };
     this.player.path = findPath(this.map, this.player, { x, y });
@@ -86,9 +103,10 @@ export class World {
   }
 
   setTarget(id: number | null) {
-    if (id === null) { this.targetId = null; this.autoAttack = false; return; }
+    if (id === null) { this.targetId = null; this.autoAttack = false; this.pendingSkill = null; return; }
     const m = this.monsters.find((e) => e.id === id);
     if (!m || m.dead) return;
+    if (this.targetId !== id) this.pendingSkill = null;
     this.targetId = id; this.autoAttack = true;
   }
 
@@ -129,6 +147,164 @@ export class World {
     this.recalc(this.player, true);
   }
 
+  // ---------- skills ----------
+  classSkills(): SkillDef[] { return SKILLS[this.classId] ?? []; }
+  activeSkills(): SkillDef[] { return classActives(this.classId); }
+  isUnlocked(def: SkillDef) { return this.player.level >= def.unlock; }
+  // ativa: sobe pelo uso; passiva: acompanha o nível do personagem
+  skillLevel(def: SkillDef): number {
+    if (def.type === 'passive') return Math.max(1, Math.min(SKILL_MAX_LEVEL, this.player.level - def.unlock + 1));
+    return this.skills[def.id]?.level ?? 1;
+  }
+  skillXpNeed(def: SkillDef): number | null {
+    if (def.type === 'passive') return null;
+    const l = this.skillLevel(def);
+    return l >= SKILL_MAX_LEVEL ? null : skillXpToNext(l);
+  }
+  passiveValue(key: 'attackSpeed' | 'crit' | 'manaRegen'): number {
+    let v = 0;
+    for (const d of this.classSkills()) {
+      const base = d.type === 'passive' ? d.passive?.[key] : undefined;
+      if (base && this.isUnlocked(d)) v += base * skillScale(this.skillLevel(d));
+    }
+    return v;
+  }
+
+  hasBuff(e: Entity, kind: BuffKind) { return e.buffs.some((b) => b.kind === kind); }
+  addBuff(e: Entity, id: string, kind: BuffKind, value: number, duration: number) {
+    const old = e.buffs.find((b) => b.id === id && b.kind === kind);
+    if (old) { old.value = value; old.remaining = old.duration = duration; }
+    else e.buffs.push({ id, kind, value, remaining: duration, duration });
+    this.events.push({ type: 'buffApplied', targetId: e.id, id, kind, duration });
+  }
+  private tickBuffs(e: Entity, dt: number) {
+    if (!e.buffs.length) return;
+    for (const b of e.buffs) b.remaining -= dt;
+    const gone = e.buffs.filter((b) => b.remaining <= 0 || (b.kind === 'shield' && b.value <= 0));
+    if (!gone.length) return;
+    e.buffs = e.buffs.filter((b) => !gone.includes(b));
+    for (const b of gone) this.events.push({ type: 'buffExpired', targetId: e.id, id: b.id, kind: b.kind });
+  }
+  private speedMul(e: Entity) {
+    let m = 1;
+    for (const b of e.buffs) if (b.kind === 'slow') m *= 1 - b.value;
+    return m;
+  }
+  private defender(t: Entity) {
+    const red = t.buffs.filter((b) => b.kind === 'defReduction').reduce((a, b) => a + b.value, 0);
+    if (!red) return t;
+    const k = Math.max(0, 1 - red);
+    return { ...t, derived: { ...t.derived, physDef: t.derived.physDef * k, spiritDef: t.derived.spiritDef * k } };
+  }
+  private absorb(e: Entity, amount: number): number {
+    let rem = amount;
+    for (const b of e.buffs) {
+      if (b.kind !== 'shield' || rem <= 0) continue;
+      const a = Math.min(b.value, rem);
+      b.value -= a; rem -= a;
+    }
+    if (rem < amount) this.events.push({ type: 'shieldAbsorb', targetId: e.id, amount: amount - rem, x: e.x, y: e.y });
+    return rem;
+  }
+
+  skillReach(def: SkillDef): number { return def.range === 'melee' ? this.player.attackRange : (def.range ?? 0); }
+
+  private fail(def: SkillDef, reason: SkillFailReason) { this.events.push({ type: 'skillFail', skillId: def.id, reason }); }
+
+  useSkill(slot: number) {
+    const p = this.player, def = this.activeSkills()[slot];
+    if (!def || p.dead) return;
+    if (!this.isUnlocked(def)) return this.fail(def, 'locked');
+    const st = this.skills[def.id];
+    if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
+    if (p.mana < (def.mana ?? 0)) return this.fail(def, 'mana');
+    if (def.target === 'none') { this.castSkill(def, null); return; }
+    const t = this.getTarget();
+    if (!t) return this.fail(def, 'notarget');
+    if (dist(p, t) <= this.skillReach(def)) { this.pendingSkill = null; this.castSkill(def, t); return; }
+    this.pendingSkill = slot; // anda até o alvo e lança em seguida
+  }
+
+  // retorna true se está andando até o alvo (consome o movimento do tick)
+  private tickPending(dt: number, t: Entity | null, moving: boolean): boolean {
+    const p = this.player, def = this.pendingSkill === null ? undefined : this.activeSkills()[this.pendingSkill];
+    if (!def || !t) { this.pendingSkill = null; return false; }
+    if (dist(p, t) <= this.skillReach(def)) {
+      if (this.gcd > 0 || this.skills[def.id].cd > 0) return false;
+      this.pendingSkill = null;
+      if (p.mana < (def.mana ?? 0)) this.fail(def, 'mana');
+      else this.castSkill(def, t);
+      return false;
+    }
+    if (moving) { if (!p.attackWhileMoving) this.pendingSkill = null; return false; }
+    p.repathCd -= dt;
+    if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = findPath(this.map, p, t); }
+    this.chasing = true;
+    this.followPath(p, dt, 1);
+    return true;
+  }
+
+  private clearLine(a: Point, b: Point) {
+    const n = Math.ceil(dist(a, b) / 0.25);
+    for (let i = 1; i <= n; i++) {
+      const k = i / n;
+      if (!isWalkable(this.map, a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k)) return false;
+    }
+    return true;
+  }
+
+  private castSkill(def: SkillDef, t: Entity | null) {
+    const p = this.player, st = this.skills[def.id], scale = skillScale(st.level);
+    const around = def.area === 'self' ? p : def.area === 'target' ? t : null;
+    let victims: Entity[] = t ? [t] : [];
+    if (around) {
+      victims = this.monsters.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
+      if (!victims.length) return this.fail(def, 'notarget');
+    }
+    let dest: Point | null = null;
+    if (def.dash && t) {
+      const d = dist(p, t);
+      if (d > DASH_STOP) {
+        const k = (d - DASH_STOP) / d;
+        dest = { x: p.x + (t.x - p.x) * k, y: p.y + (t.y - p.y) * k };
+        if (!isWalkable(this.map, dest.x, dest.y) || !this.clearLine(p, dest)) return this.fail(def, 'blocked');
+      }
+    }
+    p.mana -= def.mana ?? 0;
+    st.cd = def.cooldown ?? 0; this.gcd = GLOBAL_COOLDOWN;
+    p.attackCd = Math.max(p.attackCd, 0.3);
+    this.events.push({ type: 'skillCast', skillId: def.id, casterId: p.id, x: p.x, y: p.y, targetId: t?.id ?? null, tx: (t ?? p).x, ty: (t ?? p).y, ranged: p.attackRange > 3 });
+    if (dest) {
+      this.events.push({ type: 'dash', fromX: p.x, fromY: p.y, toX: dest.x, toY: dest.y });
+      p.x = dest.x; p.y = dest.y; p.path = [];
+    }
+    for (const v of victims) {
+      for (const pct of def.hits ?? []) {
+        if (v.dead) break;
+        const r = this.attack(p, v, pct * scale, true);
+        if (r.hit && !v.dead && def.debuff) this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
+      }
+    }
+    if (def.shield) this.addBuff(p, def.id, 'shield', p.derived.maxHp * def.shield.percent * scale, def.shield.duration);
+    this.gainSkillXp(def, st);
+  }
+
+  private gainSkillXp(def: SkillDef, st: SkillState) {
+    if (st.level >= SKILL_MAX_LEVEL) return;
+    st.xp++;
+    for (let need = skillXpToNext(st.level); st.level < SKILL_MAX_LEVEL && st.xp >= need; need = skillXpToNext(st.level)) {
+      st.xp -= need; st.level++;
+      this.events.push({ type: 'skillLevelUp', skillId: def.id, level: st.level });
+    }
+    if (st.level >= SKILL_MAX_LEVEL) st.xp = 0;
+  }
+
+  private applyPassives() {
+    const p = this.player;
+    p.derived = { ...p.derived, critChance: Math.min(0.95, p.derived.critChance + this.passiveValue('crit')) };
+    p.attackInterval = CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed'));
+  }
+
   xpToNext(): number | null {
     const p = this.player;
     return p.level >= PROGRESSION.levelCap ? null : PROGRESSION.xpToNext[p.level - 1];
@@ -145,6 +321,10 @@ export class World {
 
   tick(dt: number) {
     this.time += dt;
+    this.gcd = Math.max(0, this.gcd - dt);
+    for (const st of Object.values(this.skills)) st.cd = Math.max(0, st.cd - dt);
+    this.tickBuffs(this.player, dt);
+    for (const m of this.monsters) this.tickBuffs(m, dt);
     this.portalCd = Math.max(0, this.portalCd - dt);
     if (this.player.dead) {
       this.respawnTimer -= dt;
@@ -163,13 +343,16 @@ export class World {
     if (TOWN_MAPS.has(this.mapId) && this.time - this.lastDamaged > 5) {
       p.hp = Math.min(d.maxHp, p.hp + d.maxHp * TOWN_REGEN * dt);
       p.mana = Math.min(d.maxMana, p.mana + d.maxMana * TOWN_REGEN * dt);
+    } else if (!TOWN_MAPS.has(this.mapId)) {
+      p.mana = Math.min(d.maxMana, p.mana + d.maxMana * this.passiveValue('manaRegen') * dt);
     }
     const t = this.getTarget();
     if (this.targetId !== null && !t) { this.targetId = null; this.autoAttack = false; }
-    const mi = this.moveInput;
-    if (mi.x || mi.y) {
+    const mi = this.moveInput, moving = !!(mi.x || mi.y);
+    if (this.pendingSkill !== null && this.tickPending(dt, t, moving || (p.attackWhileMoving && p.path.length > 0))) return;
+    if (moving) {
       p.path = [];
-      this.step(p, mi.x, mi.y, p.moveSpeed * dt);
+      this.step(p, mi.x, mi.y, p.moveSpeed * this.speedMul(p) * dt);
       if (p.attackWhileMoving && this.autoAttack && t) this.attackIfInRange(p, t);
       else this.autoAttack = false;
       return;
@@ -248,12 +431,14 @@ export class World {
 
   private aggro(m: Entity) { m.ai = 'chase'; m.repathCd = 0; m.path = []; }
 
-  private attack(a: Entity, t: Entity) {
-    const r = rollAttack(a, t, this.rng);
-    this.events.push({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
+  private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
+    const r = rollAttack(a, this.defender(t), this.rng);
+    if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
+    if (!skill) this.events.push({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
     if (r.hit) {
-      t.hp -= r.amount;
-      this.events.push({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: r.amount, crit: r.crit });
+      const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
+      t.hp -= dealt;
+      if (dealt > 0) this.events.push({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
     } else {
       this.events.push({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
     }
@@ -264,11 +449,12 @@ export class World {
       this.lastDamaged = this.time;
       if (t.hp <= 0) this.killPlayer();
     }
+    return r;
   }
 
   private killMonster(m: Entity) {
     const def = MONSTERS[m.monsterId];
-    m.dead = true; m.hp = 0; m.path = [];
+    m.dead = true; m.hp = 0; m.path = []; m.buffs = [];
     m.respawnAt = this.time + def.respawnSeconds;
     if (this.targetId === m.id) { this.targetId = null; this.autoAttack = false; }
     this.events.push({ type: 'death', id: m.id });
@@ -278,7 +464,7 @@ export class World {
 
   private killPlayer() {
     const p = this.player;
-    p.dead = true; p.hp = 0; p.path = []; this.moveInput = { x: 0, y: 0 };
+    p.dead = true; p.hp = 0; p.path = []; p.buffs = []; this.pendingSkill = null; this.moveInput = { x: 0, y: 0 };
     this.targetId = null; this.autoAttack = false; this.respawnTimer = 3;
     this.events.push({ type: 'playerDeath' });
     this.onPlayerDeath();
@@ -303,6 +489,7 @@ export class World {
       this.recalc(p, false);
       p.hp = p.derived.maxHp; p.mana = p.derived.maxMana;
       this.events.push({ type: 'levelup', level: p.level });
+      for (const s of this.classSkills()) if (s.unlock === p.level) this.events.push({ type: 'skillUnlocked', skillId: s.id });
     }
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
   }
@@ -315,6 +502,7 @@ export class World {
       e.mana += Math.max(0, e.derived.maxMana - old.maxMana);
     }
     e.hp = Math.min(e.hp, e.derived.maxHp); e.mana = Math.min(e.mana, e.derived.maxMana);
+    if (e.kind === 'player') this.applyPassives();
   }
 
   // ---------- mapa / entidades ----------
@@ -324,7 +512,7 @@ export class World {
     const p = this.player;
     p.x = x ?? sp?.x ?? 1.5; p.y = y ?? sp?.y ?? 1.5; p.path = [];
     this.moveInput = { x: 0, y: 0 };
-    this.targetId = null; this.autoAttack = false; this.portalCd = 1;
+    this.targetId = null; this.autoAttack = false; this.pendingSkill = null; this.portalCd = 1;
     this.monsters = []; this.npcs = [];
     for (const o of this.map.objects) {
       if (o.type === 'monsterSpawn') {
@@ -343,7 +531,7 @@ export class World {
       id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
       derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
       damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
-      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0,
+      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [],
     };
   }
 
@@ -376,12 +564,12 @@ export class World {
 
   private respawn(m: Entity, def: MonsterDef) {
     this.applyMonsterLevel(m, def, this.rng.int(def.minLevel, def.maxLevel));
-    m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
+    m.buffs = []; m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
   }
 
   // ---------- movimento ----------
   private followPath(e: Entity, dt: number, mul: number) {
-    let rem = e.moveSpeed * mul * dt;
+    let rem = e.moveSpeed * mul * this.speedMul(e) * dt;
     while (rem > 0 && e.path.length) {
       const w = e.path[0], dx = w.x - e.x, dy = w.y - e.y, d = Math.hypot(dx, dy);
       if (d <= rem) { e.x = w.x; e.y = w.y; rem -= d; e.path.shift(); }

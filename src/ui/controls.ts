@@ -9,10 +9,13 @@ export function setupControls(world: World, hud: Hud) {
     if (e.target instanceof HTMLInputElement) return;
     if (e.key === 'Tab') { e.preventDefault(); world.cycleTarget(); }
     else if (e.key === 'c' || e.key === 'C') hud.togglePanel();
-    else if (e.key === 'Escape') hud.togglePanel(false);
+    else if (e.key === 'k' || e.key === 'K') hud.toggleSkills();
+    else if (e.key === 'Escape') hud.closeAll();
+    else if (e.key >= '1' && e.key <= '4' && !e.repeat) world.useSkill(Number(e.key) - 1);
     else if (e.key === ' ') { e.preventDefault(); world.attackNearest(); }
   });
   $('btn-attrs').addEventListener('click', () => hud.togglePanel());
+  $('btn-skills').addEventListener('click', () => hud.toggleSkills());
 
   if (!isTouch) return;
   const joy = $('joystick'), knob = $('knob'), atk = $('btn-attack');

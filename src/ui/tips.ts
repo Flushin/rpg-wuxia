@@ -93,12 +93,14 @@ export class TipManager {
   onEvent(ev: GameEvent) {
     if (ev.type === 'kill' && ++this.kills === 1) this.trigger('primeiro_abate');
     else if (ev.type === 'levelup' && ++this.levelUps === 1) this.trigger('primeiro_nivel');
+    else if (ev.type === 'skillLevelUp') this.trigger('skill_nivel');
     else if (ev.type === 'playerDeath') this.diedPending = true;
     else if (ev.type === 'mapChange' && this.diedPending) { this.diedPending = false; this.trigger('primeira_morte'); }
   }
 
   update() {
     const w = this.world;
+    if (!w.seenTips.includes('primeira_skill') && w.activeSkills().some((d) => w.isUnlocked(d))) this.trigger('primeira_skill');
     if (w.player.dead || w.mapId !== 'cidade' || w.seenTips.includes('portal')) return;
     for (const o of w.map.objects) {
       if (o.type !== 'portal') continue;

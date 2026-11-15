@@ -20,5 +20,14 @@
   "primeira_morte": {
     "title": "De volta à vila",
     "text": "Ao morrer você volta à vila. No futuro, seus itens perderão durabilidade a cada morte, então tome cuidado."
+  },
+  "primeira_skill": {
+    "title": "Nova skill!",
+    "text": "Use suas skills com as teclas 1 a 4 ou clicando nos botões da barra embaixo. Cada skill gasta mana e tem um tempo de recarga. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. Abra o painel de skills com a tecla K (ou botão Skills) para ver todas.",
+    "textTouch": "Use suas skills nos botões em arco ao redor do botão Atacar. Cada skill gasta mana e tem um tempo de recarga. Segure um botão para ver os detalhes. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. O botão Skills mostra todas elas."
+  },
+  "skill_nivel": {
+    "title": "Skill subiu de nível!",
+    "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 10). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K)."
   }
 }

@@ -5,6 +5,8 @@ import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
 import { buildMapView } from '../render/mapView';
 import { audio } from '../render/audio';
+import { SkillFx } from '../render/skillFx';
+import { SKILLS } from '../core/skills';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
@@ -15,6 +17,7 @@ export class GameScene extends Phaser.Scene {
   private world!: World;
   private hud!: Hud;
   private tips!: TipManager;
+  private fx!: SkillFx;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
   private views = new Map<number, EntityView>();
 
@@ -25,6 +28,7 @@ export class GameScene extends Phaser.Scene {
     audio.bind(this, this.world.audio, () => { void writeSave(this.world.serialize()); });
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
+    this.fx = new SkillFx(this);
     setupControls(this.world, this.hud);
     this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); });
     this.cameras.main.setBackgroundColor('#10141c');
@@ -115,6 +119,23 @@ export class GameScene extends Phaser.Scene {
         break;
       }
       case 'attack': this.beam(ev); break;
+      case 'skillCast': case 'dash': this.fx.onEvent(ev); break;
+      case 'skillFail': {
+        const msg = { mana: 'Sem mana', cooldown: 'Recarregando', notarget: 'Sem alvo', blocked: 'Caminho bloqueado', locked: 'Bloqueada' }[ev.reason];
+        const s = tileToScreen(this.world.player.x, this.world.player.y);
+        this.floatText(s.x, s.y - 64, msg, ev.reason === 'mana' ? '#6aa8ff' : '#dddddd', 15);
+        break;
+      }
+      case 'skillUnlocked': this.hud.toast(`Nova skill desbloqueada: ${Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name ?? ''}`); break;
+      case 'skillLevelUp': {
+        const s = tileToScreen(this.world.player.x, this.world.player.y);
+        this.floatText(s.x, s.y - 80, `${Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name} nv ${ev.level}!`, '#ffd23f', 15);
+        break;
+      }
+      case 'buffApplied':
+        if (ev.kind === 'shield' && ev.targetId === this.world.player.id) { const s = tileToScreen(this.world.player.x, this.world.player.y); this.floatText(s.x, s.y - 64, 'Escudo', '#bfe0ff', 15); }
+        break;
+      case 'shieldAbsorb': { const s = tileToScreen(ev.x, ev.y); this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, '#9fd0ff', 14); break; }
       case 'levelup': this.hud.toast(`Nível ${ev.level}! +3 pontos de atributo`); break;
       case 'playerDeath': this.hud.toast('Você morreu... Renascendo na vila'); break;
       default: break;
@@ -135,6 +156,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private floatText(x: number, y: number, text: string, color: string, size: number) {
+    x += Phaser.Math.Between(-8, 8);
     const t = this.add.text(x, y, text, { fontSize: `${size}px`, color, fontStyle: 'bold', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0.5).setDepth(100000).setResolution(2);
     this.tweens.add({ targets: t, y: y - 36, alpha: 0, duration: 900, ease: 'Cubic.easeOut', onComplete: () => t.destroy() });

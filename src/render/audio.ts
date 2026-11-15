@@ -75,6 +75,9 @@ class AudioManager {
       case 'death': if (ev.id !== playerId) this.sfx('monster_death', 300); break;
       case 'playerDeath': this.sfx('player_death'); break;
       case 'levelup': this.sfx('level_up'); break;
+      case 'skillLevelUp': this.sfx('level_up'); break;
+      case 'skillCast': this.lastRanged = ev.ranged; if (ev.ranged) this.sfx('spell', 300); break;
+      case 'skillFail': this.sfx('ui_click'); break;
       case 'mapChange': this.sfx('portal'); this.playMusicForMap(ev.mapId); break;
       default: break;
     }

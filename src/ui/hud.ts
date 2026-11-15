@@ -3,6 +3,8 @@ import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
 import { CLASSES } from '../core/data';
 import { audio } from '../render/audio';
+import { Hotbar } from './hotbar';
+import { SkillsPanel } from './skillsPanel';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -11,7 +13,12 @@ const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) *
 export class Hud {
   private panelSig = '';
   private toastTimer = 0;
+  private toastLines: string[] = [];
+  private hotbar: Hotbar;
+  private skills: SkillsPanel;
   constructor(private world: World) {
+    this.hotbar = new Hotbar(world);
+    this.skills = new SkillsPanel(world, () => this.toggleSkills(false));
     $('hud').classList.remove('hidden');
     $('attrs-panel').addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest('[data-attr],[data-close],[data-dist]') as HTMLElement | null;
@@ -30,11 +37,20 @@ export class Hud {
     this.panelSig = '';
   }
 
+  toggleSkills(open?: boolean) {
+    const show = open ?? !this.skills.open;
+    if (show !== this.skills.open) audio.ui(show ? 'ui_open' : 'ui_close');
+    this.skills.set(show);
+  }
+
+  closeAll() { this.togglePanel(false); this.toggleSkills(false); }
+
   toast(msg: string) {
     const t = $('toast');
-    t.textContent = msg; t.classList.add('show');
+    this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), msg] : [msg];
+    t.textContent = this.toastLines.join('\n'); t.classList.add('show');
     clearTimeout(this.toastTimer);
-    this.toastTimer = window.setTimeout(() => t.classList.remove('show'), 2500);
+    this.toastTimer = window.setTimeout(() => { t.classList.remove('show'); this.toastLines = []; }, 2800);
   }
 
   update() {
@@ -62,6 +78,8 @@ export class Hud {
       $('t-hp-t').textContent = `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`;
     }
     if (!$('attrs-panel').classList.contains('hidden')) this.renderPanel();
+    this.hotbar.update();
+    this.skills.update();
   }
 
   private renderPanel() {

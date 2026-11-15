@@ -15,6 +15,11 @@ export interface Derived {
   critChance: number; critDamage: number;
 }
 
+export type BuffKind = 'defReduction' | 'slow' | 'shield';
+// value: fração (defReduction/slow) ou pontos de absorção restantes (shield)
+export interface Buff { id: string; kind: BuffKind; value: number; remaining: number; duration: number }
+export type SkillFailReason = 'mana' | 'cooldown' | 'notarget' | 'locked' | 'blocked';
+
 export type AiState = 'idle' | 'wander' | 'chase' | 'return';
 
 export interface Entity {
@@ -44,6 +49,7 @@ export interface Entity {
   ai: AiState;
   aiTimer: number;
   respawnAt: number;
+  buffs: Buff[];
 }
 
 export type GameEvent =
@@ -55,7 +61,15 @@ export type GameEvent =
   | { type: 'xp'; amount: number }
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
-  | { type: 'mapChange'; mapId: string };
+  | { type: 'mapChange'; mapId: string }
+  | { type: 'skillCast'; skillId: string; casterId: number; x: number; y: number; targetId: number | null; tx: number; ty: number; ranged: boolean }
+  | { type: 'skillFail'; skillId: string; reason: SkillFailReason }
+  | { type: 'skillLevelUp'; skillId: string; level: number }
+  | { type: 'skillUnlocked'; skillId: string }
+  | { type: 'dash'; fromX: number; fromY: number; toX: number; toY: number }
+  | { type: 'buffApplied'; targetId: number; id: string; kind: BuffKind; duration: number }
+  | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind }
+  | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number };
 
 export interface SaveData {
   version: 1;
@@ -70,5 +84,6 @@ export interface SaveData {
   ratioCursor?: number;
   seenTips?: string[];
   tipsEnabled?: boolean;
+  skills?: Record<string, { level: number; xp: number }>;
   audio?: { sfx: number; music: number; muted: boolean };
 }
