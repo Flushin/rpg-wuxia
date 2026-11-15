@@ -10,6 +10,7 @@ import { SkillsPanel } from './skillsPanel';
 import { InventoryPanel } from './inventory';
 import { NpcWindow } from './npcWindow';
 import { AutoPanel, showOfflineReport } from './autoPanel';
+import { Minimap } from './minimap';
 import { isTouch } from './controls';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
@@ -30,7 +31,9 @@ export class Hud {
   private goldSig = -1;
   private autoPanel: AutoPanel;
   private autoSig = '';
+  private minimap: Minimap;
   constructor(private world: World) {
+    this.minimap = new Minimap(world);
     this.hotbar = new Hotbar(world);
     this.skills = new SkillsPanel(world, () => this.toggleSkills(false));
     this.inv = new InventoryPanel(world, (m, c) => this.toast(m, c), () => this.toggleInventory(false));
@@ -71,7 +74,14 @@ export class Hud {
     this.inv.set(show);
   }
 
+  toggleMap(open?: boolean) {
+    const show = open ?? !this.minimap.open;
+    if (show !== this.minimap.open) audio.ui(show ? 'ui_open' : 'ui_close');
+    this.minimap.toggle(show);
+  }
+
   closeAll() {
+    this.toggleMap(false);
     this.togglePanel(false); this.toggleSkills(false); this.toggleInventory(false); this.autoPanel.set(false);
     this.world.closeNpc();
   }
@@ -89,6 +99,7 @@ export class Hud {
   }
 
   update() {
+    this.minimap.update();
     const w = this.world, p = w.player, d = p.derived;
     $('p-name').textContent = p.name;
     $('p-level').textContent = L(`Nv ${p.level}`, `Lv ${p.level}`);

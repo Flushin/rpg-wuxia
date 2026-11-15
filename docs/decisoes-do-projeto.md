@@ -243,6 +243,8 @@ Implementadas a pedido do Lucas e publicadas no site.
 - **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O contador (x/30) e o "Organizar" continuam valendo para a mochila toda. Craft e Gemas entram quando esses sistemas existirem.
 - **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. **Marco 6:** a Tormenta já mostra o retrato (sprite); a Geada troca quando ganhar arte.
 
+- **Minimapa** *(PR #8)*: no canto superior direito, acima do nome do mapa (os botões descem um pouco). Mapa em losango com as cores dos tiles; personagem (branco), monstros (pontinhos vermelhos minúsculos), chefe (laranja, maior), NPCs (amarelo) e portais (losango roxo). **Mapa grande:** tecla **M** ou toque/clique no minimapa; mostra também os nomes dos portais e NPCs e uma legenda; fecha com M, Esc, X ou tocando fora. Atualiza a cada 0,15 s. Código em `src/ui/minimap.ts`. Testado no PC e no celular (em pé e deitado).
+
 ### Câmera (15/11/2026)
 - **Zoom** *(PR #3)*: roda do mouse no PC e pinça com dois dedos no celular. Só aproxima: 100% a 200% (gruda em 100%). Fica salvo no aparelho (`localStorage`, vale para todos os personagens).
 
@@ -255,5 +257,4 @@ Implementadas a pedido do Lucas e publicadas no site.
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
-### Interface (aprovada em 15/11/2026)
-- **Minimapa:** no **canto superior direito**. Mostra o personagem e **pontinhos minúsculos** para os monstros (para não atrapalhar a visão). Também mostra **portais** (saídas para outros mapas), **NPCs** e o **chefe destacado** (ponto maior/de outra cor). **Mapa grande:** tecla **M** (no celular, tocar no minimapa) abre o mapa inteiro em tamanho maior. Conferir se não briga com o que já fica no canto superior direito do HUD e com o tamanho da tela do celular.
+*(nenhuma pendente)*

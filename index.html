@@ -192,6 +192,16 @@ button.danger{background:#8a2a2a;border-color:#f66}
  #map-name{font-size:12px;padding:4px 8px}
  #hud .frame .line{font-size:12px}
 }
+#minimap{display:block;width:176px;height:96px;padding:0;min-height:0;background:rgba(10,12,20,.72);border:1px solid #556;border-radius:10px;cursor:pointer;touch-action:manipulation;overflow:hidden}
+#minimap canvas{display:block;width:100%;height:100%}
+#bigmap{position:fixed;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px}
+#bigmap.hidden{display:none}
+#bigmap .bigmap-card{width:min(820px,100%);padding:12px 14px}
+.bigmap-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.bigmap-head h2{margin:0;font-size:18px}.bigmap-head .win-x{margin:0;position:static}
+#bigmap-canvas{display:block;width:100%;height:min(calc(100vh - 150px),calc((min(820px,100vw) - 52px) * .54));background:#0e1218;border-radius:8px}
+.bigmap-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:#ccd}.bigmap-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;border:1px solid #000;vertical-align:-1px}.bigmap-legend i.dia{border-radius:1px;transform:rotate(45deg)}
+@media (max-width:640px){#minimap{width:132px;height:72px}}
+@media (max-height:520px){#minimap{width:120px;height:66px}}
 </style>
 </head>
 <body>
@@ -209,6 +219,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
   </div>
   <div id="boss-bar" class="hidden"><b id="boss-name"></b><div class="bar hp"><i id="boss-hp"></i><span id="boss-hp-t"></span></div></div>
   <div id="top-right">
+    <button id="minimap" type="button"><canvas id="minimap-canvas"></canvas></button>
     <div id="map-name"></div>
     <div id="auto-row"><button id="btn-auto">Auto (Z)</button><button id="btn-auto-cfg" aria-label="Menu do auto-combate">&#9776;</button></div>
     <button id="btn-settings" aria-label="Configurações">&#9881;</button>
@@ -235,6 +246,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
   <div id="settings-panel" class="hidden"></div>
   <div id="auto-panel" class="hidden"></div>
   <div id="offline-panel" class="hidden"></div>
+  <div id="bigmap" class="hidden"></div>
 </div>
 <div id="create" class="hidden">
   <div class="card">
