@@ -6,18 +6,18 @@
     "minLevel": 1,
     "maxLevel": 3,
     "baseAttributes": {
-      "strength": 4,
+      "strength": 3,
       "intelligence": 0,
       "stamina": 5,
       "agility": 4,
-      "willpower": 1
+      "willpower": 3
     },
     "perLevel": {
-      "strength": 1.5,
+      "strength": 1,
       "intelligence": 0,
       "stamina": 2,
       "agility": 1,
-      "willpower": 0.5
+      "willpower": 1.5
     },
     "damageType": "physical",
     "aggroRange": 3,
@@ -30,8 +30,8 @@
     "respawnSeconds": 15,
     "loot": {
       "gold": {
-        "min": 2,
-        "max": 6
+        "min": 4,
+        "max": 9
       },
       "potions": [
         {
@@ -56,6 +56,282 @@
       "equipment": {
         "chance": 0.08,
         "maxReqLevel": 1
+      }
+    }
+  },
+  "bandido_espadachim": {
+    "id": "bandido_espadachim",
+    "name": "Bandido Espadachim",
+    "sprite": "bandit-sword",
+    "minLevel": 4,
+    "maxLevel": 6,
+    "baseAttributes": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 4,
+      "agility": 5,
+      "willpower": 3
+    },
+    "perLevel": {
+      "strength": 0.5,
+      "intelligence": 0,
+      "stamina": 1.5,
+      "agility": 0.5,
+      "willpower": 1.1
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 14,
+    "attackRange": 1.5,
+    "attackInterval": 1.6,
+    "moveSpeed": 3.8,
+    "groupAggro": true,
+    "xpBase": 30,
+    "xpPerLevel": 8,
+    "respawnSeconds": 35,
+    "loot": {
+      "gold": {
+        "min": 6,
+        "max": 10,
+        "perLevel": 1.5
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.12
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.08
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.1,
+          "minMonsterLevel": 5
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.06,
+          "minMonsterLevel": 5
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.06,
+          "maxReqLevel": 1
+        },
+        {
+          "chance": 0.08,
+          "minReqLevel": 5,
+          "maxReqLevel": 5,
+          "minMonsterLevel": 5
+        }
+      ]
+    }
+  },
+  "bandido_arqueiro": {
+    "id": "bandido_arqueiro",
+    "name": "Bandido Arqueiro",
+    "sprite": "bandit-archer",
+    "minLevel": 4,
+    "maxLevel": 6,
+    "baseAttributes": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 3,
+      "agility": 8,
+      "willpower": 2
+    },
+    "perLevel": {
+      "strength": 0.5,
+      "intelligence": 0,
+      "stamina": 1.0,
+      "agility": 1,
+      "willpower": 0.8
+    },
+    "damageType": "physical",
+    "aggroRange": 6,
+    "leashRange": 15,
+    "attackRange": 6,
+    "attackInterval": 2.2,
+    "moveSpeed": 3.4,
+    "keepDistance": 3.5,
+    "projectile": "arrow",
+    "groupAggro": true,
+    "xpBase": 33,
+    "xpPerLevel": 9,
+    "respawnSeconds": 35,
+    "loot": {
+      "gold": {
+        "min": 6,
+        "max": 10,
+        "perLevel": 1.5
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.12
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.08
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.1,
+          "minMonsterLevel": 5
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.06,
+          "minMonsterLevel": 5
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.06,
+          "maxReqLevel": 1
+        },
+        {
+          "chance": 0.08,
+          "minReqLevel": 5,
+          "maxReqLevel": 5,
+          "minMonsterLevel": 5
+        }
+      ]
+    }
+  },
+  "guerreiro_terracota": {
+    "id": "guerreiro_terracota",
+    "name": "Guerreiro de Terracota",
+    "sprite": "terracotta",
+    "minLevel": 7,
+    "maxLevel": 9,
+    "baseAttributes": {
+      "strength": 2,
+      "intelligence": 0,
+      "stamina": 6,
+      "agility": 5,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1.3,
+      "intelligence": 0,
+      "stamina": 2.5,
+      "agility": 0.5,
+      "willpower": 0.3
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 14,
+    "attackRange": 1.6,
+    "attackInterval": 2.2,
+    "moveSpeed": 2.4,
+    "defMul": {
+      "phys": 2.4,
+      "spirit": 0.7
+    },
+    "xpBase": 70,
+    "xpPerLevel": 12,
+    "respawnSeconds": 40,
+    "loot": {
+      "gold": {
+        "min": 10,
+        "max": 16,
+        "perLevel": 2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.12
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.08
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.1,
+          "minMonsterLevel": 5
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.06,
+          "minMonsterLevel": 5
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.05,
+          "maxReqLevel": 1
+        },
+        {
+          "chance": 0.12,
+          "minReqLevel": 5,
+          "maxReqLevel": 5,
+          "minMonsterLevel": 5
+        }
+      ]
+    }
+  },
+  "general_terracota": {
+    "id": "general_terracota",
+    "name": "General de Terracota",
+    "sprite": "general",
+    "minLevel": 10,
+    "maxLevel": 10,
+    "scale": 1.7,
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 0,
+      "stamina": 270,
+      "agility": 10,
+      "willpower": 100
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.8,
+    "moveSpeed": 1.8,
+    "defMul": {
+      "phys": 0.23,
+      "spirit": 1.0
+    },
+    "xpBase": 600,
+    "xpPerLevel": 0,
+    "respawnSeconds": 600,
+    "boss": {
+      "arenaRadius": 7,
+      "aoe": {
+        "radius": 2.5,
+        "delay": 1.5,
+        "mult": 1.6,
+        "interval": 7,
+        "intervalPhase2": 5
+      },
+      "summon": {
+        "monsterId": "guerreiro_terracota",
+        "count": 2,
+        "level": 7,
+        "atHpPct": 0.5
+      }
+    },
+    "loot": {
+      "gold": {
+        "min": 260,
+        "max": 340
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 5
       }
     }
   }

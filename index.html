@@ -20,6 +20,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#10141c;color:#eee;fon
 .hp i{background:#c0392b}.mp i{background:#2e86de}.xp i{background:#d4a017}.xp{height:10px}.xp span{line-height:10px;font-size:9px}
 #player-frame{top:8px;left:8px;width:170px}
 #target-frame{top:8px;left:50%;transform:translateX(-50%);width:230px;border-color:#a55;pointer-events:none}
+#boss-bar{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 400px));min-width:230px;background:rgba(40,8,8,.8);border:1px solid #d44;border-radius:8px;padding:6px 10px;pointer-events:none;text-align:center;z-index:1}
+#boss-bar b{font-size:15px;color:#ffb0a0;letter-spacing:1px}#boss-bar .bar{height:22px;margin-top:4px;border:1px solid #733}#boss-bar .bar span{line-height:22px;font-size:12px}
 #top-right{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 #map-name{background:rgba(10,12,20,.72);border:1px solid #556;border-radius:8px;padding:5px 10px;font-weight:600}
 button{font:inherit;color:#eee;background:#2a3042;border:1px solid #667;border-radius:8px;padding:8px 12px;cursor:pointer}
@@ -69,7 +71,16 @@ label{display:block;margin-bottom:6px;color:#ccd}
 .class-card{flex:1 1 220px;text-align:left;display:flex;flex-direction:column;gap:4px;border:2px solid #445;border-left:6px solid var(--c)}
 .class-card.sel{border-color:var(--c);background:#2f3550}
 .class-card b{font-size:16px}.class-card span{font-size:12px;color:#fc9}.class-card em{font-size:12px;color:#bbc;font-style:normal}.class-card small{font-size:11px;color:#889}
-#btn-start,#btn-continue{width:100%;margin-top:12px;padding:12px}
+#btn-start,button.wide{width:100%;margin-top:10px;padding:12px;min-height:44px}
+#del-name{width:100%;padding:10px;border-radius:8px;border:1px solid #667;background:#10141c;color:#fff;font:inherit;font-size:16px;margin-bottom:6px;user-select:text;-webkit-user-select:text}
+button.danger{background:#8a2a2a;border-color:#f66}
+.slot-card{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:2px solid #445;border-left:6px solid var(--c,#445);border-radius:10px;padding:10px;margin-bottom:8px;background:#222a3e}
+.slot-card.empty{border-style:dashed;background:transparent;color:#99a}
+.slot-info{flex:1 1 180px;min-width:0}.slot-info b{font-size:16px}.slot-info small{display:block;color:#aab;font-size:12px;margin-top:2px}
+.slot-btns{display:flex;gap:6px;flex:0 0 auto}.slot-btns button{min-height:44px;min-width:78px}
+.slot-card.last{box-shadow:0 0 0 1px #d4a017}
+@media (max-width:480px){.slot-btns{width:100%}.slot-btns button{flex:1}}
+#create{align-items:flex-start}#create .card{margin:auto}
 #toast{white-space:pre-line}
 #hotbar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px}
 .slot{position:relative;width:56px;height:56px;padding:0;border-radius:10px;border:2px solid #778;background:#1a1f2e;overflow:hidden;touch-action:none;color:#fff}
@@ -167,6 +178,7 @@ label{display:block;margin-bottom:6px;color:#ccd}
 @media (max-width:640px){
  #player-frame{width:150px}
  #target-frame{top:78px;width:200px}
+ #boss-bar{top:8px;left:164px;transform:none;width:calc(100% - 330px);min-width:150px;padding:4px 6px}#boss-bar b{font-size:12px}#boss-bar .bar{height:16px}#boss-bar .bar span{line-height:16px;font-size:10px}
  #map-name{font-size:12px;padding:4px 8px}
  #hud .frame .line{font-size:12px}
 }
@@ -185,6 +197,7 @@ label{display:block;margin-bottom:6px;color:#ccd}
     <div class="line"><b id="t-name"></b><span id="t-level"></span></div>
     <div class="bar hp"><i id="t-hp"></i><span id="t-hp-t"></span></div>
   </div>
+  <div id="boss-bar" class="hidden"><b id="boss-name"></b><div class="bar hp"><i id="boss-hp"></i><span id="boss-hp-t"></span></div></div>
   <div id="top-right">
     <div id="map-name"></div>
     <div id="auto-row"><button id="btn-auto">Auto (Z)</button><button id="btn-auto-cfg" aria-label="Menu do auto-combate">&#9776;</button></div>
@@ -216,13 +229,25 @@ label{display:block;margin-bottom:6px;color:#ccd}
 <div id="create" class="hidden">
   <div class="card">
     <h1>RPG WUXIA</h1>
-    <p class="sub">Crie seu personagem</p>
-    <button id="btn-continue" class="hidden"></button>
-    <label for="char-name">Nome</label>
-    <input id="char-name" maxlength="16" placeholder="Seu nome" autocomplete="off" />
-    <label>Seita</label>
-    <div id="class-cards"></div>
-    <button id="btn-start" class="primary">Começar jornada</button>
+    <div id="slots-view">
+      <p class="sub">Escolha seu personagem</p>
+      <div id="slot-list"></div>
+    </div>
+    <div id="create-view" class="hidden">
+      <p class="sub">Criar personagem</p>
+      <label for="char-name">Nome</label>
+      <input id="char-name" maxlength="16" placeholder="Seu nome" autocomplete="off" />
+      <label>Seita</label>
+      <div id="class-cards"></div>
+      <button id="btn-start" class="primary">Começar jornada</button>
+      <button id="btn-back" class="wide">Voltar</button>
+    </div>
+    <div id="del-view" class="hidden">
+      <p class="sub" id="del-msg"></p>
+      <input id="del-name" maxlength="16" placeholder="Digite o nome do personagem" autocomplete="off" />
+      <button id="btn-del-ok" class="danger wide" disabled>Apagar personagem</button>
+      <button id="btn-del-cancel" class="wide">Cancelar</button>
+    </div>
   </div>
 </div>
 <script type="module" src="/src/main.ts"></script>

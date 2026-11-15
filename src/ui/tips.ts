@@ -3,8 +3,9 @@ import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { isTouch } from './controls';
+import { MONSTERS } from '../core/data';
 
-interface TipDef { title: string; text: string; textTouch?: string }
+interface TipDef { title: string; text: string; textTouch?: string; byClass?: Record<string, string> }
 const TIPS = tipsJson as Record<string, TipDef>;
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
@@ -15,7 +16,7 @@ export class TipManager {
   private kills = 0;
   private levelUps = 0;
 
-  constructor(private world: World, private onChange: () => void) {
+  constructor(private world: World, private onChange: () => void, private onSwitch: () => void = () => {}) {
     $('tip-ok').onclick = () => this.dismiss();
     $('btn-settings').onclick = () => this.togglePanel();
     const panel = $('settings-panel');
@@ -24,6 +25,7 @@ export class TipManager {
       if (!t) { if (e.target === panel) this.togglePanel(false); return; }
       audio.ui('ui_click');
       if (t.dataset.act === 'close') this.togglePanel(false);
+      else if (t.dataset.act === 'switch') { this.togglePanel(false); this.onSwitch(); }
       else if (t.dataset.act === 'reset') { this.world.seenTips = []; this.onChange(); this.renderPanel(); }
     };
     panel.oninput = (e) => {
@@ -61,6 +63,7 @@ export class TipManager {
       <label class="sld">Música<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
       <button data-act="reset">Rever dicas</button>
       <small class="muted">${this.world.seenTips.length ? `${this.world.seenTips.length} dica(s) já vista(s)` : 'Nenhuma dica vista ainda'}</small>
+      <button data-act="switch">Trocar personagem</button>
       <button class="primary" data-act="close">Fechar</button></div>`;
   }
 
@@ -76,7 +79,7 @@ export class TipManager {
     this.current = this.queue.shift()!;
     const t = TIPS[this.current];
     $('tip-title').textContent = t.title;
-    $('tip-text').textContent = isTouch && t.textTouch ? t.textTouch : t.text;
+    $('tip-text').textContent = (isTouch && t.textTouch ? t.textTouch : t.text) + (t.byClass?.[this.world.classId] ? ` ${t.byClass[this.world.classId]}` : '');
     $('tip-card').classList.remove('hidden');
     audio.ui('tip');
   }
@@ -101,6 +104,11 @@ export class TipManager {
     else if (ev.type === 'autoState' && ev.state === 'on') { this.trigger('auto_combate'); this.trigger('ganho_offline'); }
     else if (ev.type === 'autoStopped') this.trigger('durabilidade_baixa');
     else if (ev.type === 'playerDeath') this.diedPending = true;
+    else if (ev.type === 'bossArena') this.trigger('chefe');
+    else if (ev.type === 'hit' && ev.targetKind === 'monster') {
+      const m = this.world.monsters.find((e) => e.id === ev.targetId);
+      if (m && MONSTERS[m.monsterId]?.defMul) this.trigger('terracota');
+    }
     else if (ev.type === 'mapChange' && this.diedPending) { this.diedPending = false; this.trigger('primeira_morte'); }
   }
 
@@ -110,6 +118,7 @@ export class TipManager {
     if (w.player.level >= 2) this.trigger('auto_combate');
     if (!w.player.dead && w.lowDurability()) this.trigger('durabilidade_baixa');
     if (w.mapId !== 'cidade' && w.kindCount('hp') + w.kindCount('mp') > 0) this.trigger('primeira_pocao');
+    if (!w.player.dead && !w.seenTips.includes('bandidos') && w.monsters.some((m) => !m.dead && MONSTERS[m.monsterId]?.keepDistance && Math.hypot(w.player.x - m.x, w.player.y - m.y) < 10)) this.trigger('bandidos');
     if (w.player.dead || w.mapId !== 'cidade') return;
     if (!w.seenTips.includes('primeiro_npc') && w.npcs.some((n) => Math.hypot(w.player.x - n.x, w.player.y - n.y) < 7)) { this.trigger('primeiro_npc'); return; }
     if (w.seenTips.includes('portal')) return;

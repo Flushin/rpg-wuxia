@@ -60,6 +60,8 @@ export interface Entity {
   aiTimer: number;
   respawnAt: number;
   buffs: Buff[];
+  group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
+  summoned: boolean;
 }
 
 export type GameEvent =
@@ -94,7 +96,16 @@ export type GameEvent =
   | { type: 'repair'; gold: number }
   | { type: 'durabilityLost' }
   | { type: 'autoState'; state: AutoState }
-  | { type: 'autoStopped'; reason: 'broken' };
+  | { type: 'autoStopped'; reason: 'broken' }
+  | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: 'arrow' }
+  | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number }
+  | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
+  | { type: 'bossArena' }
+  | { type: 'bossSummon'; ids: number[] }
+  | { type: 'bossDefeated'; respawnAt: number };
+
+// Círculo de aviso no chão (golpe em área do chefe)
+export interface Telegraph { id: number; x: number; y: number; radius: number; delay: number; remaining: number; ownerId: number; mult: number }
 
 export type AutoState = 'off' | 'on' | 'pausado';
 export interface AutoConfig {
@@ -130,4 +141,5 @@ export interface SaveData {
   bag?: (ItemInstance | null)[];
   equipment?: Partial<Record<Slot, ItemInstance>>;
   auto?: AutoSave;
+  bossRespawnAt?: number; // ms (relógio real) em que o chefe renasce
 }

@@ -2,9 +2,9 @@ import Phaser from 'phaser';
 import { parseTiledMap, type GameMap } from '../core/map';
 import { makeTextures } from '../render/textures';
 import { sfxFiles } from '../render/audio';
-import { loadSave } from '../save';
+import { loadAll } from '../save';
 
-export const MAP_IDS = ['cidade', 'floresta'];
+export const MAP_IDS = ['cidade', 'floresta', 'ruinas'];
 
 export class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
@@ -16,6 +16,6 @@ export class BootScene extends Phaser.Scene {
     const maps: Record<string, GameMap> = {};
     for (const id of MAP_IDS) maps[id] = parseTiledMap(id, this.cache.json.get('map-' + id));
     this.registry.set('maps', maps);
-    loadSave().then((save) => this.scene.start('Create', { save }), () => this.scene.start('Create', {}));
+    loadAll().then((file) => this.scene.start('Create', { file }), () => this.scene.start('Create', {}));
   }
 }

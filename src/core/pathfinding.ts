@@ -23,8 +23,13 @@ export function nearestWalkable(m: GameMap, x: number, y: number): Point | null 
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
 // A* em grade com 8 direções, sem cortar quinas. Retorna centros de tiles.
-export function findPath(m: GameMap, from: Point, to: Point): Point[] {
+export interface Avoid { x: number; y: number; r: number }
+
+// avoid: círculos proibidos (cada círculo que já contém o ponto de partida é ignorado, para dar para sair dele)
+export function findPath(m: GameMap, from: Point, to: Point, avoid?: Avoid[]): Point[] {
   const W = m.width;
+  if (avoid) avoid = avoid.filter((a) => Math.hypot(from.x - a.x, from.y - a.y) > a.r);
+  const blocked = (x: number, y: number) => !!avoid && avoid.some((a) => Math.hypot(x + 0.5 - a.x, y + 0.5 - a.y) <= a.r);
   const sx = Math.floor(from.x), sy = Math.floor(from.y);
   let gx = Math.floor(to.x), gy = Math.floor(to.y);
   if (!isWalkable(m, gx, gy)) {
@@ -49,7 +54,7 @@ export function findPath(m: GameMap, from: Point, to: Point): Point[] {
     const cx = cur % W, cy = (cur / W) | 0;
     for (const [dx, dy] of DIRS) {
       const nx = cx + dx, ny = cy + dy;
-      if (!isWalkable(m, nx, ny)) continue;
+      if (!isWalkable(m, nx, ny) || blocked(nx, ny)) continue;
       if (dx && dy && (!isWalkable(m, cx + dx, cy) || !isWalkable(m, cx, cy + dy))) continue;
       const ni = ny * W + nx;
       if (closed[ni]) continue;

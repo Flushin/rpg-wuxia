@@ -23,6 +23,7 @@ export class GameScene extends Phaser.Scene {
   private views = new Map<number, EntityView>();
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
   private autoText!: Phaser.GameObjects.Text;
+  private teleViews = new Map<number, Phaser.GameObjects.Graphics>();
 
   constructor() { super('Game'); }
   init(data: { world: World }) { this.world = data.world; }
@@ -33,7 +34,10 @@ export class GameScene extends Phaser.Scene {
     this.hud = new Hud(this.world);
     this.fx = new SkillFx(this);
     setupControls(this.world, this.hud);
-    this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); });
+    this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); }, () => {
+      // salva e recarrega a página: volta à tela inicial com tudo limpo (HUD, áudio e timers)
+      void writeSave(this.world.serialize()).finally(() => window.location.reload());
+    });
     this.autoText = this.add.text(0, 0, '', { fontSize: '12px', color: '#9fe8a0', fontStyle: 'bold', align: 'center', stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5, 1).setDepth(100001).setResolution(2).setVisible(false);
     const rep = this.world.offlineReport;
@@ -113,9 +117,37 @@ export class GameScene extends Phaser.Scene {
     for (const m of w.monsters) { live.add(m.id); this.viewFor(m).sync(m, m.id === w.targetId); }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
     this.syncGround();
+    this.syncTelegraphs();
     this.syncAutoText();
     this.tips.update();
     this.hud.update();
+  }
+
+  // círculo vermelho no chão: preenche até o impacto
+  private syncTelegraphs() {
+    const live = new Set<number>();
+    for (const t of this.world.telegraphs) {
+      live.add(t.id);
+      let g = this.teleViews.get(t.id);
+      if (!g) { g = this.add.graphics().setDepth(-80000); this.teleViews.set(t.id, g); }
+      const c = tileToScreen(t.x, t.y), rx = t.radius * 45.25, ry = t.radius * 22.63, k = Math.max(0, Math.min(1, 1 - t.remaining / t.delay));
+      g.clear().setPosition(c.x, c.y);
+      g.fillStyle(0xff2020, 0.14); g.fillEllipse(0, 0, rx * 2, ry * 2);
+      g.fillStyle(0xff3030, 0.28 + 0.25 * k); g.fillEllipse(0, 0, rx * 2 * k, ry * 2 * k);
+      g.lineStyle(3, 0xff5050, 0.95); g.strokeEllipse(0, 0, rx * 2, ry * 2);
+    }
+    for (const [id, g] of this.teleViews) if (!live.has(id)) { g.destroy(); this.teleViews.delete(id); }
+  }
+
+  private arrowFx(ev: Extract<GameEvent, { type: 'projectile' }>) {
+    const a = tileToScreen(ev.fromX, ev.fromY), b = tileToScreen(ev.toX, ev.toY);
+    const g = this.add.graphics().setDepth(99998);
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    g.lineStyle(2, 0xe8d8a8, 1); g.lineBetween(-9, 0, 9, 0);
+    g.fillStyle(0xcccccc, 1); g.fillTriangle(9, 0, 4, -3, 4, 3);
+    g.fillStyle(0xc02828, 1); g.fillTriangle(-9, 0, -12, -3, -12, 3);
+    g.setPosition(a.x, a.y - 20).setRotation(ang);
+    this.tweens.add({ targets: g, x: b.x, y: b.y - 20, duration: Math.max(120, Math.hypot(b.x - a.x, b.y - a.y) * 1.6), ease: 'Linear', onComplete: () => g.destroy() });
   }
 
   private syncAutoText() {
@@ -175,7 +207,11 @@ export class GameScene extends Phaser.Scene {
         this.floatText(s.x, s.y - 40, 'Errou', '#aaaaaa', 13);
         break;
       }
-      case 'attack': this.beam(ev); break;
+      case 'attack': if (!this.isArcher(ev.fromId)) this.beam(ev); break;
+      case 'projectile': this.arrowFx(ev); break;
+      case 'bossSummon': this.hud.toast('O General invoca guerreiros!', '#ff8a60'); break;
+      case 'bossDefeated': this.hud.toast('General de Terracota derrotado!', '#ffd23f'); break;
+      case 'telegraphResolved': if (ev.hit) { const s = tileToScreen(ev.x, ev.y); this.cameras.main.shake(180, 0.006); this.floatText(s.x, s.y - 20, 'Golpe em área!', '#ff6a50', 15); } break;
       case 'skillCast': case 'dash': this.fx.onEvent(ev); break;
       case 'skillFail': {
         const msg = { mana: 'Sem mana', cooldown: 'Recarregando', notarget: 'Sem alvo', blocked: 'Caminho bloqueado', locked: 'Bloqueada' }[ev.reason];
@@ -210,6 +246,8 @@ export class GameScene extends Phaser.Scene {
       default: break;
     }
   }
+
+  private isArcher(id: number) { const m = this.world.monsters.find((e) => e.id === id); return !!m && !!MONSTERS[m.monsterId]?.projectile; }
 
   private beam(ev: Extract<GameEvent, { type: 'attack' }>) {
     const a = this.views.get(ev.fromId), t = this.views.get(ev.toId);

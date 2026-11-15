@@ -11,7 +11,7 @@ import type { Entity, GameEvent, SaveData } from '../src/core/types';
 let fails = 0;
 const ok = (c: boolean, m: string) => { if (!c) { fails++; console.error('  FALHOU:', m); } else console.log('  ok:', m); };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
+for (const id of ['cidade', 'floresta', 'ruinas']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 
 // acha um ponto da floresta com ~12 tiles livres em volta e longe de portais
 function openSpot(w: World): [number, number] {

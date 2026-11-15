@@ -11,7 +11,7 @@ import type { Entity, GameEvent, SaveData } from '../src/core/types';
 let fails = 0;
 const ok = (c: boolean, m: string) => { if (!c) { fails++; console.error('  FALHOU:', m); } else console.log('  ok:', m); };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
+for (const id of ['cidade', 'floresta', 'ruinas']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const run = (w: World, s: number) => { for (let i = 0; i < s * 60; i++) w.tick(1 / 60); };
 const drain = (w: World) => w.events.splice(0);
 type Priv = { rng: Rng; killMonster: (m: Entity) => void; killPlayer: () => void };

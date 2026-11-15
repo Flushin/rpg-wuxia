@@ -15,6 +15,7 @@
   "sellRatio": 0.25,
   "repairCostPerPoint": 0.5,
   "groundSeconds": 60,
+  "wearPerHit": 0.3,
   "startingKit": { "pocao_hp_p": 3 },
   "startingWeapon": { "lamina": "espadas_ferro", "pavilhao": "leque_bambu" },
   "rarities": {

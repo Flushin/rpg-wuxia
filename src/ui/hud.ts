@@ -102,8 +102,15 @@ export class Hud {
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
     badge.classList.toggle('hidden', w.freePoints <= 0);
 
+    const boss = w.engagedBoss(), bb = $('boss-bar');
+    bb.classList.toggle('hidden', !boss);
+    if (boss) {
+      $('boss-name').textContent = `Nv ${boss.level} ${boss.name}`;
+      $('boss-hp').style.width = pct(boss.hp, boss.derived.maxHp);
+      $('boss-hp-t').textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`;
+    }
     const t = w.getTarget(), tf = $('target-frame');
-    tf.classList.toggle('hidden', !t);
+    tf.classList.toggle('hidden', !t || t === boss);
     if (t) {
       $('t-name').textContent = t.name;
       $('t-level').textContent = `Nv ${t.level}`;

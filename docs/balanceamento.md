@@ -1,0 +1,93 @@
+# Balanceamento (marco 5)
+
+Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do nível certo (auto-combate), com poucas mortes, ouro suficiente para poções e conserto custando ~10-15% do ouro ganho. Tudo é guiado por dados (`src/data/*.json`) e conferido por `npm run sim:balance`.
+
+## Como medir
+
+`tools/balance-sim.ts` roda o `World` real (core + `auto.ts`, sem Phaser) em passos de 1/30 s:
+
+- Cada seita cria o personagem, liga o Auto e caça sozinha. O "jogador médio" simulado só decide o que o auto não decide: gasta pontos com **Distribuir recomendado**, veste upgrades (pontuação simples por atributo útil), conserta e vende sobras na vila, e vai às Ruínas ao chegar no nível 7.
+- Mede minutos por nível, mortes, ouro ganho por hora, gasto em poções e conserto.
+- Depois simula o chefe no nível 10 com equipamento nível 5 Incomum ou Raro em todos os slots, 18 poções e um jogador ativo: esquiva dos círculos (reação de 0,45 s), bebe poção com vida baixa; a Lâmina luta de perto, o Pavilhão recua dando a volta na arena.
+- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe).
+
+## Curva de XP (`progression.json`)
+
+Calibrada por iteração até as duas seitas fecharem perto de 1 hora (tempo por nível alvo: 2,5 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 min, média das seitas).
+
+| Nível → próximo | 1→2 | 2→3 | 3→4 | 4→5 | 5→6 | 6→7 | 7→8 | 8→9 | 9→10 |
+|---|---|---|---|---|---|---|---|---|---|
+| XP necessário | 250 | 455 | 850 | 1800 | 4000 | 6200 | 12000 | 15500 | 20000 |
+
+XP por abate = `xpBase + xpPerLevel × (nível − 1)`: lobo 10+6, bandido espadachim 30+8, arqueiro 33+9, terracota 70+12, General 600. Os saltos na curva acompanham a troca de área (lobos → bandidos no nível ~4-5, bandidos → terracota no nível 7).
+
+## Monstros
+
+Atributos por nível = `base + perLevel × (nível − 1)`; HP = 50 + 10 × Vigor; defesa física = Vigor, espiritual = Vontade (depois do multiplicador `defMul`).
+
+| Monstro | Nv | HP | Ataque | Def. fís. | Def. esp. | Intervalo | XP | Ouro |
+|---|---|---|---|---|---|---|---|---|
+| Lobo | 1 | 100 | 8 | 5 | 3 | 1,6 s | 10 | 4-9 |
+| Lobo | 3 | 140 | 12 | 9 | 6 | 1,6 s | 22 | 4-9 |
+| Bandido Espadachim | 4 | 140 | 8 | 9 | 6 | 1,6 s | 54 | 11-15 |
+| Bandido Espadachim | 6 | 170 | 10 | 12 | 9 | 1,6 s | 70 | 14-18 |
+| Bandido Arqueiro (alcance 6, recua se chegar a 3,5) | 4 | 110 | 8 | 6 | 4 | 2,2 s | 60 | 11-15 |
+| Bandido Arqueiro | 6 | 130 | 10 | 8 | 6 | 2,2 s | 78 | 14-18 |
+| Guerreiro de Terracota (def. fís. ×2,4, esp. ×0,7; vel. 2,4) | 7 | 260 | 22 | 50 | 4 | 2,2 s | 142 | 22-28 |
+| Guerreiro de Terracota | 9 | 310 | 26 | 62 | 4 | 2,2 s | 166 | 26-32 |
+| General de Terracota (def. fís. ×0,2, esp. ×1; vel. 1,8) | 10 | 2750 | 14 | 62 | 100 | 2,8 s | 600 | 260-340 |
+
+Regra de projeto: um monstro do nível certo tira ~10-20% da vida do jogador por abate (o grupo de bandidos, ~60-70% se for enfrentado junto). A defesa de terracota é ×2,4 e ×0,7 (e não ×3 / ×0,5 do exemplo) para as seitas ficarem equilibradas; o dano espiritual causa ~1,45× o físico nelas.
+
+Respawn: lobo 15 s, bandido 35 s, terracota 40 s, General 600 s. O respawn mais lento dos bandidos/terracota limita o ritmo do Pavilhão, que mata mais rápido que a Lâmina.
+
+## Ouro, poções e conserto
+
+- Ouro por abate: lobo 4-9, bandido 11-18 (+1,5 por nível), terracota 22-32 (+2 por nível), General 260-340. Itens vendem por 25% do valor.
+- Poções (preço da vila): vida P 12, G 36; mana P 14, G 40. Gasto medido: Lâmina ~38% do ouro ganho, Pavilhão ~28% (acessível).
+- Conserto: `durabilidade faltante × nível do item × 0,5`. A durabilidade agora também cai em combate: **cada golpe recebido gasta 0,3 ponto** de um item equipado aleatório (`wearPerHit` em `items.json`), além dos −10% por morte. Resultado: conserto = 12% (Lâmina) e 6% (Pavilhão) do ouro ganho; o Pavilhão apanha menos.
+- Drops de nível 5+: monstros nível 5 ou mais soltam equipamento nível 5 (espadachim/arqueiro 8%, terracota 12%) e poções grandes (10% vida, 6% mana). Abaixo disso, equipamento nível 1 (5-6%).
+
+## O General de Terracota
+
+- 2750 HP, ataque corpo a corpo lento (2,8 s) e golpe em área: círculo de raio 2,5 no chão, 1,5 s de aviso, dano de 1,6× o ataque só se o jogador ainda estiver dentro no impacto (a cada 7 s; a cada 5 s abaixo de 50%).
+- Aos 50% de HP invoca 2 Guerreiros de Terracota nível 7 (uma vez por combate).
+- Leash: arena de raio 7; se o jogador sai, o General volta e cura tudo. Renasce 10 min depois (horário gravado no save).
+- Drop: 1 Raro nível 5 de slot aleatório (arma só da seita do jogador) + 260-340 de ouro.
+- Auto-combate ignora o General, os monstros dentro da arena e nunca cria caminho para dentro dela.
+
+## Resultados da simulação
+
+Média de 10 execuções por seita (`npm run sim:balance -- --seeds=10 --detail`). Minutos acumulados até cada nível.
+
+| Seita | Nível 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | Mortes | Ouro/h | Ouro/h (nv 7+) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Lâmina Errante | 2.6 | 5.9 | 10.6 | 15.9 | 25.0 | 37.1 | 45.9 | 56.1 | 68.7 | 3.3 | 12107 | 24243 |
+| Pavilhão das Nuvens | 2.0 | 4.7 | 7.2 | 10.9 | 16.4 | 23.9 | 30.9 | 39.3 | 49.5 | 7.5 | 16673 | 29650 |
+
+Mortes = total até ~5 min depois do nível 10. Ouro/h inclui venda de sobras; "nv 7+" é o ritmo nas Ruínas.
+
+| Seita | Gasto em poções | Gasto em conserto | Conserto / ouro ganho |
+|---|---|---|---|
+| Lâmina Errante | 5403 | 1843 | 12.4% |
+| Pavilhão das Nuvens | 3852 | 926 | 6.1% |
+
+| Seita | Equipamento nv 5 | Vitórias | Tempo médio (s) | Poções usadas | Mortes | Vida restante do chefe se perdeu |
+|---|---|---|---|---|---|---|
+| Lâmina Errante | incomum | 8/20 | 59 | 15.8 | 0.6 | 22% |
+| Lâmina Errante | raro | 15/20 | 51 | 11.8 | 0.3 | 17% |
+| Pavilhão das Nuvens | incomum | 20/20 | 45 | 0.4 | 0.0 | - |
+| Pavilhão das Nuvens | raro | 20/20 | 42 | 0.0 | 0.0 | - |
+
+Leitura:
+
+- **Lâmina: nível 10 em ~69 min; Pavilhão: ~50 min** (meta: 50-70). O Pavilhão é mais rápido porque ataca de longe e mata antes de apanhar; os respawns lentos e a defesa espiritual dos bandidos reduzem a diferença, mas não a eliminam (a razão fica em ~1,4).
+- **Mortes:** ~3 (Lâmina) e ~7-8 (Pavilhão, menos vida) por jogo completo, concentradas nos níveis 3-6, quando o auto encara acampamentos de bandidos com equipamento inicial.
+- **Chefe:** Lâmina com tudo Incomum vence 40% das vezes (~60 s, ~16 poções) e com tudo Raro 75% (~50 s, ~12 poções); o Pavilhão vence todas recuando e dando a volta na arena (quase sem poções). Quem fica parado no círculo vermelho perde ~30 de vida por golpe.
+
+## Mudanças para chegar nesses números
+
+- `AUTO_GRAY_GAP`: o auto prefere monstros com nível ≥ seu nível − 1 (os mais baixos só entram se não houver outros) e escolhe o alvo pelo caminho real, não pela linha reta.
+- O auto desce à vila para **descansar** (sem poção de vida e abaixo de 35% de vida, até 90%, no máximo 50 s) e bebe poção mais cedo (+15 pontos) contra 2+ monstros.
+- Skills da Lâmina: Corte Duplo 2×80%, Tempestade de Lâminas 170%, Golpe Rompe-Guarda 220% (antes 70% / 150% / 200%).
+- Lobos: dano menor (força 3 +1/nível) e ouro 4-9.

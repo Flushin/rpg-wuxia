@@ -10,8 +10,10 @@ const TILES = [
   { name: 'tree', walkable: false, color: [40, 95, 50] },
   { name: 'house', walkable: false, color: [150, 90, 70] },
   { name: 'plaza', walkable: true, color: [190, 185, 170] },
+  { name: 'ruin', walkable: true, color: [158, 124, 92] },
+  { name: 'pillar', walkable: false, color: [104, 80, 62] },
 ];
-const [G, P, WA, T, HS, PL] = [1, 2, 3, 4, 5, 6];
+const [G, P, WA, T, HS, PL, RU, PI] = [1, 2, 3, 4, 5, 6, 7, 8];
 const walkable = (id) => TILES[id - 1].walkable;
 
 function rngFn(seed) {
@@ -116,6 +118,7 @@ function cidade() {
 }
 
 // ---- floresta ----
+// lobos perto da entrada (nv 1-3); acampamentos de bandidos mais fundo (nv 4-6); portal das Ruínas no extremo leste
 function floresta() {
   const rnd = rngFn(77);
   const gr = makeGrid();
@@ -124,22 +127,95 @@ function floresta() {
   gr.disc(21, 9, 3, WA); gr.disc(10, 23, 2.5, WA);
   gr.disc(4, 16, 4, G);
   gr.rect(1, 15, 8, 2, P);
-  const seen = sealUnreachable(gr, 4, 16);
-  const cands = [];
-  for (let j = 2; j < H - 2; j++) for (let i = 2; i < W - 2; i++) if (seen.has(j * W + i) && walkable(gr.get(i, j)) && Math.hypot(i - 4, j - 16) >= 9) cands.push([i, j]);
-  const objs = [point('player', 'spawn', 5.5, 16.5), area('Vila', 'portal', 1, 14, 2, 4, { target: 'cidade', targetX: 27.5, targetY: 16.5 })];
-  const chosen = [];
-  while (chosen.length < 14 && cands.length) {
-    const [i, j] = cands.splice(Math.floor(rnd() * cands.length), 1)[0];
-    if (chosen.some(([a, b]) => Math.hypot(a - i, b - j) < 3.5)) continue;
-    chosen.push([i, j]);
-    objs.push(point('Lobo', 'monsterSpawn', i + 0.5, j + 0.5, { monster: 'lobo' }));
+  // estrada até o portal das Ruínas (a leste)
+  gr.rect(8, 15, 8, 2, P); gr.rect(14, 9, 2, 8, P); gr.rect(14, 9, 14, 2, P); gr.rect(26, 9, 2, 9, P); gr.rect(26, 15, 5, 3, P);
+  sealUnreachable(gr, 4, 16);
+  const dist = (a, b, c, d) => Math.hypot(a - c, b - d);
+  const reach = () => {
+    const seen = sealUnreachable(gr, 4, 16), out = [];
+    for (let j = 2; j < H - 2; j++) for (let i = 2; i < W - 2; i++) if (seen.has(j * W + i) && walkable(gr.get(i, j))) out.push([i, j]);
+    return out;
+  };
+  // distância de caminhada (BFS) a partir da entrada
+  const walkDist = (() => {
+    const d = new Map([[16 * W + 4, 0]]), q = [[4, 16]];
+    while (q.length) {
+      const [x, y] = q.shift();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy, k = ny * W + nx;
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H || d.has(k) || !walkable(gr.get(nx, ny))) continue;
+        d.set(k, d.get(y * W + x) + 1); q.push([nx, ny]);
+      }
+    }
+    return (i, j) => d.get(j * W + i) ?? Infinity;
+  })();
+  const reach0 = reach();
+  const wolves = [];
+  const wc = reach0.filter(([i, j]) => { const d = walkDist(i, j); return d >= 9 && d <= 17 && dist(i, j, 4, 16) >= 7; });
+  while (wolves.length < 8 && wc.length) {
+    const [i, j] = wc.splice(Math.floor(rnd() * wc.length), 1)[0];
+    if (wolves.some(([a, b]) => dist(a, b, i, j) < 3.5)) continue;
+    wolves.push([i, j]);
   }
+  // acampamentos: escolhe centros e abre uma clareira em volta (longe dos lobos)
+  const camps = [];
+  let c0 = reach().filter(([i, j]) => walkDist(i, j) >= 26 && dist(i, j, 30, 16.5) >= 8 && wolves.every(([a, b]) => dist(a, b, i, j) >= 9));
+  while (camps.length < 3 && c0.length) {
+    const [i, j] = c0.splice(Math.floor(rnd() * c0.length), 1)[0];
+    if (camps.some(([a, b]) => dist(a, b, i, j) < 9)) continue;
+    camps.push([i, j]);
+  }
+  for (const [i, j] of camps) for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (dist(x, y, i, j) <= 2.6 && x > 0 && y > 0 && x < W - 1 && y < H - 1 && gr.get(x, y) !== WA) gr.set(x, y, G);
+  const cands = reach();
+  const objs = [point('player', 'spawn', 5.5, 16.5), area('Vila', 'portal', 1, 14, 2, 4, { target: 'cidade', targetX: 27.5, targetY: 16.5 }),
+    area('Ruínas de Terracota', 'portal', 29, 15, 2, 3, { target: 'ruinas', targetX: 4.5, targetY: 16.5 })];
+  for (const [i, j] of wolves) objs.push(point('Lobo', 'monsterSpawn', i + 0.5, j + 0.5, { monster: 'lobo' }));
+  const kinds = [['e', 'e', 'a'], ['e', 'e', 'e'], ['e', 'e', 'a']];
+  camps.forEach(([ci, cj], n) => {
+    const placed = [];
+    const near = cands.filter(([i, j]) => dist(i, j, ci, cj) <= 2.4);
+    for (const k of kinds[n % kinds.length]) {
+      let tries = 0, pick = null;
+      while (tries++ < 40 && near.length) { const c = near[Math.floor(rnd() * near.length)]; if (placed.every(([a, b]) => dist(a, b, c[0], c[1]) >= 1.5)) { pick = c; break; } }
+      if (!pick) continue;
+      placed.push(pick);
+      objs.push(point(k === 'e' ? 'Bandido Espadachim' : 'Bandido Arqueiro', 'monsterSpawn', pick[0] + 0.5, pick[1] + 0.5, { monster: k === 'e' ? 'bandido_espadachim' : 'bandido_arqueiro', group: n + 1 }));
+    }
+  });
+  console.log(`floresta: ${wolves.length} lobos, ${camps.length} acampamentos, ${objs.filter((o) => String(o.name).startsWith('Bandido')).length} bandidos`);
   return tiled('Floresta Sombria', gr, objs);
+}
+
+// ---- ruínas de terracota ----
+// guerreiros a oeste (nv 7-9); arena do General a leste, com portão aberto na parede de pilares
+function ruinas() {
+  const rnd = rngFn(321);
+  const gr = makeGrid();
+  gr.rect(1, 1, W - 2, H - 2, RU);
+  for (let i = 0; i < W; i++) { gr.set(i, 0, PI); gr.set(i, H - 1, PI); gr.set(0, i, PI); gr.set(W - 1, i, PI); }
+  for (let n = 0; n < 16; n++) gr.disc(6 + rnd() * 10, 3 + rnd() * 26, 0.6 + rnd() * 1.1, PI);
+  gr.rect(15, 1, 2, 30, PI); gr.rect(15, 14, 2, 5, RU); // parede com portão
+  gr.disc(24.5, 16.5, 7.5, RU); gr.disc(5, 16, 4, RU); gr.rect(1, 15, 12, 2, RU);
+  for (let n = 0; n < 5; n++) { const a = (n / 5) * Math.PI * 2 + 0.3; gr.disc(24.5 + Math.cos(a) * 5.5, 16.5 + Math.sin(a) * 5.5, 0.5, PI); }
+  gr.disc(24.5, 16.5, 3.2, RU);
+  const seen = sealUnreachable(gr, 4, 16);
+  const objs = [point('player', 'spawn', 4.5, 16.5), area('Floresta', 'portal', 1, 14, 2, 4, { target: 'floresta', targetX: 27.5, targetY: 16.5 })];
+  const cands = [];
+  for (let j = 2; j < H - 2; j++) for (let i = 7; i <= 13; i++) if (seen.has(j * W + i) && walkable(gr.get(i, j))) cands.push([i, j]);
+  const chosen = [];
+  while (chosen.length < 9 && cands.length) {
+    const [i, j] = cands.splice(Math.floor(rnd() * cands.length), 1)[0];
+    if (chosen.some(([a, b]) => Math.hypot(a - i, b - j) < 3.2)) continue;
+    chosen.push([i, j]); objs.push(point('Guerreiro de Terracota', 'monsterSpawn', i + 0.5, j + 0.5, { monster: 'guerreiro_terracota' }));
+  }
+  objs.push(point('General de Terracota', 'monsterSpawn', 24.5, 16.5, { monster: 'general_terracota' }));
+  console.log(`ruinas: ${chosen.length} guerreiros + General`);
+  return tiled('Ruínas de Terracota', gr, objs);
 }
 
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
+writeFileSync('public/maps/ruinas.json', JSON.stringify(ruinas()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

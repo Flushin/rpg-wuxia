@@ -12,7 +12,7 @@ import type { AutoBucket, GameEvent, Rarity, SaveData } from '../src/core/types'
 let fails = 0;
 const ok = (c: boolean, m: string) => { if (!c) { fails++; console.error('  FALHOU:', m); } else console.log('  ok:', m); };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
+for (const id of ['cidade', 'floresta', 'ruinas']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const HOUR = 3.6e6;
 
 function mk(classId = 'lamina', level = 5, mapId = 'floresta', extra: Partial<SaveData> = {}, now?: number): World {
@@ -201,7 +201,7 @@ console.log('\n== offline: faixas de eficiência ==');
   ok(near(effectiveMinutes(20 * HOUR), (7.2 + 2.4 + 0.4) * 60), '20 h → 10 h');
   ok(near(effectiveMinutes(30 * HOUR), (7.2 + 2.4 + 1.2) * 60), '30 h → 10,8 h (nada depois de 24 h)');
   ok(effectiveMinutes(-5 * HOUR) === 0 && effectiveMinutes(NaN) === 0, 'tempo negativo/inválido → 0');
-  const rate = { killsPerMin: 2, xpPerKill: 10, goldPerKill: 4, potHpPerKill: 0.1, potMpPerKill: 0.05, monLevel: 2, sampleMin: 10, drops: [{ baseId: 'espadas_ferro', rarity: 'comum' as Rarity, perKill: 0.1 }, { baseId: 'pocao_hp_p', rarity: 'comum' as Rarity, perKill: 0.1 }] };
+  const rate = { killsPerMin: 2, xpPerKill: 100, goldPerKill: 4, potHpPerKill: 0.1, potMpPerKill: 0.05, monLevel: 2, sampleMin: 10, drops: [{ baseId: 'espadas_ferro', rarity: 'comum' as Rarity, perKill: 0.1 }, { baseId: 'pocao_hp_p', rarity: 'comum' as Rarity, perKill: 0.1 }] };
   const r6 = computeOffline({ elapsedMs: 6 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 3 }, seed: 1 });
   ok(r6.kills === 432 && r6.gold === 1728, `6 h: ${r6.kills} abates (2/min × 216 min) e ouro ${r6.gold}`);
   ok(r6.potionsUsed.mp === 3 && r6.potionsUsed.hp > 0, 'poções gastas limitadas ao que existe (+ drops); ganhos continuam');
@@ -217,7 +217,7 @@ console.log('\n== offline: faixas de eficiência ==');
 console.log('\n== offline: aplicando no jogo ==');
 {
   const NOW = 1_800_000_000_000;
-  const bucket = (): AutoBucket => ({ sec: 600, kills: 30, xp: 300, gold: 120, potHp: 15, potMp: 6, levelSum: 60, drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4 } });
+  const bucket = (): AutoBucket => ({ sec: 600, kills: 30, xp: 5000, gold: 120, potHp: 15, potMp: 6, levelSum: 60, drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4 } });
   const base = (over: Partial<SaveData> = {}): Partial<SaveData> => ({ auto: { active: true, mapId: 'floresta', buckets: [bucket()] }, lastSeen: NOW - 6 * HOUR, ...over });
   const w = mk('lamina', 1, 'floresta', base(), NOW);
   const rep = w.offlineReport;

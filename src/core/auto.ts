@@ -1,3 +1,4 @@
+import { MONSTERS } from './data';
 import { buyPrice, BASES, SLOTS } from './items';
 import { findPath } from './pathfinding';
 import type { AutoBucket, AutoConfig, AutoRate, AutoSave, AutoState, Entity, GameEvent, ItemInstance, Point } from './types';
@@ -5,10 +6,13 @@ import type { World } from './world';
 
 export const TOWN_MAPS = new Set(['cidade']);
 export const AUTO_MAX_LEVEL_GAP = 2; // ataca só monstros até 2 níveis acima do personagem
+export const AUTO_GRAY_GAP = 1; // monstro com nível < personagem - 2 é "cinza": só se não houver outro
+const GRAY_PENALTY = 60;
 export const RATE_MIN_SEC = 120; // mínimo de dados para o ritmo valer
 const BUCKET_SEC = 60, MAX_BUCKETS = 30;
 const SHOP_COOLDOWN = 120; // s entre viagens à vila (evita laço se a compra falhar)
 const SHIELD_HP = 0.7;
+const REST_HP = 0.35, REST_DONE = 0.9, REST_MAX_SEC = 50; // descanso na vila (regenera 3%/s após 5 s sem dano)
 const HP_POTION = 'pocao_hp_p', MP_POTION = 'pocao_mp_p';
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const emptyBucket = (): AutoBucket => ({ sec: 0, kills: 0, xp: 0, gold: 0, potHp: 0, potMp: 0, levelSum: 0, drops: {} });
@@ -33,6 +37,7 @@ export class AutoCombat {
   private lastShop = -Infinity;
   private blocked: Record<string, number> = {};
   private walkCd = 0;
+  private restSec = 0;
 
   constructor(private w: World, classId: string) { this.cfg = defaultAutoConfig(classId); }
 
@@ -126,17 +131,17 @@ export class AutoCombat {
     if (this.state !== 'on') return;
     const w = this.w;
     this.walkCd -= dt;
-    if (TOWN_MAPS.has(w.mapId)) { this.tickTown(); return; }
+    if (TOWN_MAPS.has(w.mapId)) { this.tickTown(dt); return; }
     this.huntMap = w.mapId;
     this.cur.sec += dt;
     if (this.cur.sec >= BUCKET_SEC) { this.buckets.push(this.cur); this.cur = emptyBucket(); if (this.buckets.length >= MAX_BUCKETS) this.buckets.shift(); }
     this.drinkPotions();
-    if (!this.leaving && this.shouldShop() && w.time - this.lastShop > SHOP_COOLDOWN && this.portalTo(TOWN_TARGET)) {
+    if (!this.leaving && ((this.shouldShop() && w.time - this.lastShop > SHOP_COOLDOWN) || this.needsRest()) && this.exitPortal()) {
       this.leaving = true; w.targetId = null; w.autoAttack = false;
     }
     if (this.leaving) {
       this.status = 'Indo comprar poções';
-      const p = this.portalTo(TOWN_TARGET);
+      const p = this.exitPortal();
       if (p) this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
       return;
     }
@@ -146,7 +151,12 @@ export class AutoCombat {
 
   private needsHp() { return this.cfg.buyHp > 0 && this.w.kindCount('hp') === 0 && this.w.gold >= buyPrice(HP_POTION); }
   private needsMp() { return this.cfg.buyMp > 0 && this.w.kindCount('mp') === 0 && this.w.gold >= buyPrice(MP_POTION); }
+  // sem poção de vida e com pouca vida: volta à vila (a vida regenera lá) em vez de morrer
+  private needsRest() { const p = this.w.player; return this.w.kindCount('hp') === 0 && p.hp < p.derived.maxHp * REST_HP; }
   private shouldShop() { return this.needsHp() || this.needsMp(); }
+
+  // saída para a vila; fora da floresta (ex.: ruínas) usa o portal de volta ao mapa anterior
+  private exitPortal() { return this.portalTo(TOWN_TARGET) ?? this.portalTo('floresta'); }
 
   private portalTo(target: string | null) {
     for (const o of this.w.map.objects) {
@@ -161,16 +171,16 @@ export class AutoCombat {
     const w = this.w, p = w.player;
     if (this.walkCd > 0 && p.path.length) return;
     this.walkCd = 0.5;
-    w.autoMove(pt.x, pt.y);
+    w.autoMove(pt.x, pt.y, true);
   }
 
-  private tickTown() {
+  private tickTown(dt: number) {
     const w = this.w;
     if (this.deathPending) {
       this.deathPending = false;
       if (SLOTS.some((s) => { const it = w.equipment[s]; return !!it && it.durability <= 0; })) { this.stop('broken'); return; }
     }
-    if (this.visit.shop === null) this.visit.shop = this.shouldShop();
+    if (this.visit.shop === null) { this.visit.shop = this.shouldShop(); this.restSec = 0; }
     if (this.visit.shop && !this.visit.shopped) {
       const v = w.npcs.find((n) => w.npcRole(n) === 'vendedor');
       if (v) {
@@ -180,6 +190,8 @@ export class AutoCombat {
       }
       this.visit.shopped = true;
     }
+    const pl = w.player;
+    if (pl.hp < pl.derived.maxHp * REST_DONE && this.restSec < REST_MAX_SEC) { this.restSec += dt; this.status = 'Descansando na vila'; return; }
     this.status = 'Voltando para caçar';
     const p = this.portalTo(this.huntMap || null) ?? this.portalTo(null);
     if (p) { this.huntMap = p.target; this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 }); }
@@ -199,24 +211,39 @@ export class AutoCombat {
   private drinkPotions() {
     const w = this.w, p = w.player, c = this.cfg;
     const hp = (p.hp / p.derived.maxHp) * 100, mp = p.derived.maxMana > 0 ? (p.mana / p.derived.maxMana) * 100 : 100;
-    if (hp < c.hpThreshold && w.potionCd.hp <= 0 && w.kindCount('hp') > 0 && (!w.potionFx.hp || hp < c.hpThreshold / 2)) w.usePotion('hp');
+    // contra 2+ monstros em combate bebe mais cedo (+15 pontos): a cura é lenta (8 s)
+    const th = c.hpThreshold + (w.monsters.filter((m) => !m.dead && m.ai === 'chase').length >= 2 ? 15 : 0);
+    if (hp < th && w.potionCd.hp <= 0 && w.kindCount('hp') > 0 && (!w.potionFx.hp || hp < th / 2)) w.usePotion('hp');
     if (mp < c.mpThreshold && w.potionCd.mp <= 0 && w.kindCount('mp') > 0 && (!w.potionFx.mp || mp < c.mpThreshold / 2)) w.usePotion('mp');
   }
 
   private pickTarget(): Entity | null {
     const w = this.w, p = w.player;
-    let best: Entity | null = null, bd = Infinity;
+    const cands: { m: Entity; d: number }[] = [];
     for (const m of w.monsters) {
-      if (m.dead || m.level > p.level + AUTO_MAX_LEVEL_GAP) continue;
-      const d = dist(m, p);
-      if (d < bd) { bd = d; best = m; }
+      if (m.dead || m.level > p.level + AUTO_MAX_LEVEL_GAP || this.forbidden(m)) continue;
+      // monstros bem abaixo do nível (cinza) só entram se não houver nada melhor
+      cands.push({ m, d: dist(m, p) + (m.level < p.level - AUTO_GRAY_GAP ? GRAY_PENALTY : 0) });
+    }
+    cands.sort((a, b) => a.d - b.d);
+    // o mais perto em linha reta pode estar do outro lado de árvores/paredes: confere o caminho real dos 4 primeiros
+    let best: Entity | null = null, bd = Infinity;
+    for (const c of cands.slice(0, 4)) {
+      const len = w.pathLength(c.m);
+      if (!Number.isFinite(len)) continue;
+      const d = len + (c.d - dist(c.m, p));
+      if (d < bd) { bd = d; best = c.m; }
     }
     return best;
   }
 
+  // o auto ignora o chefe e qualquer monstro dentro da arena dele (inclusive invocados)
+  private forbidden(m: Entity) { return !!MONSTERS[m.monsterId]?.boss || this.w.inArena(m); }
+
   private combat() {
     const w = this.w, p = w.player;
     let t = w.getTarget();
+    if (t && this.forbidden(t)) { w.setTarget(null); t = null; }
     if (!t) { t = this.pickTarget(); if (t) w.setTarget(t.id); }
     else if (!w.autoAttack) w.setTarget(t.id);
     if (w.gcd > 0) return;

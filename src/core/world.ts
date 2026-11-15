@@ -3,15 +3,15 @@ import { distributeByRatio } from './distribute';
 import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
-import { findPath, isWalkable } from './pathfinding';
+import { findPath, isWalkable, type Avoid } from './pathfinding';
 import { GLOBAL_COOLDOWN, SKILLS, SKILL_MAX_LEVEL, classActives, skillScale, skillXpToNext, type SkillDef, type SkillState } from './skills';
 import { BAG_SIZE, BASES, GROUND_SECONDS, POTIONS, SLOTS, STACK_MAX, STARTING_KIT, STARTING_WEAPON, baseOf, buyPrice, equipmentBaseIds, isBroken, isPotionId, itemColor, itemName,
-  itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue } from './items';
+  itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue, WEAR_PER_HIT } from './items';
 import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
 import { computeDerived, emptyElements } from './stats';
-import { ATTR_KEYS, ELEMENTS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type GroundItem, type ItemInstance, type Point, type PotionKind, type Rarity, type SaveData, type SkillFailReason, type Slot } from './types';
+import { ATTR_KEYS, ELEMENTS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type GroundItem, type ItemInstance, type Point, type PotionKind, type Rarity, type SaveData, type SkillFailReason, type Slot, type Telegraph } from './types';
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
@@ -59,6 +59,13 @@ export class World {
   openNpc: Entity | null = null;
   auto: AutoCombat;
   offlineReport: OfflineReport | null = null;
+  telegraphs: Telegraph[] = [];
+  arenas: Avoid[] = []; // áreas de chefe do mapa atual
+  bossRespawnAtMs = 0; // relógio real (ms) em que o chefe renasce; 0 = vivo
+  clock: () => number = () => Date.now();
+  private bossSummoned = false;
+  private arenaSeen = false;
+  private nextTelegraph = 1;
   private npcGoal: number | null = null;
   private nextGround = 1;
   private pendingSkill: number | null = null;
@@ -93,7 +100,8 @@ export class World {
     return w;
   }
 
-  static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now()): World {
+  // offline=false: não aplica ganho offline (só o último personagem jogado recebe)
+  static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now(), offline = true): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
     w.xp = s.xp; w.freePoints = s.freePoints;
     w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
@@ -112,9 +120,12 @@ export class World {
     }
     w.recalc(w.player, false);
     w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
+    w.clock = () => now;
+    w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
+    w.clock = () => Date.now();
     w.auto.load(s.auto);
-    w.offlineReport = w.applyOffline(now, s.lastSeen, s.auto);
+    w.offlineReport = offline ? w.applyOffline(now, s.lastSeen, s.auto) : null;
     return w;
   }
 
@@ -126,7 +137,7 @@ export class World {
       ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled, audio: { ...this.audio },
       gold: this.gold, bag: JSON.parse(JSON.stringify(this.bag)),
       equipment: JSON.parse(JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])))),
-      auto: this.auto.serialize(),
+      auto: this.auto.serialize(), bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
     };
   }
 
@@ -134,7 +145,23 @@ export class World {
 
   // ---------- comandos ----------
   // andar do auto-combate (não pausa o auto)
-  autoMove(x: number, y: number) { if (!this.player.dead) this.player.path = findPath(this.map, this.player, { x, y }); }
+  autoMove(x: number, y: number, viaPortal = false) { if (!this.player.dead) this.player.path = this.pf(this.player, { x, y }, viaPortal); }
+  // o auto-combate nunca entra na área do chefe e só atravessa portais de propósito (viaPortal)
+  private pf(from: Point, to: Point, viaPortal = false): Point[] {
+    if (this.auto.state !== 'on') return findPath(this.map, from, to);
+    const avoid: Avoid[] = this.arenas.map((a) => ({ ...a, r: a.r + 1.5 }));
+    if (!viaPortal) for (const o of this.map.objects) if (o.type === 'portal') avoid.push({ x: o.x + o.w / 2, y: o.y + o.h / 2, r: Math.max(o.w, o.h) / 2 + 0.6 });
+    return findPath(this.map, from, to, avoid.length ? avoid : undefined);
+  }
+  // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
+  pathLength(to: Point): number {
+    const path = this.pf(this.player, to);
+    if (!path.length) return dist(this.player, to) < 1 ? 0 : Infinity;
+    let len = 0, a: Point = this.player;
+    for (const q of path) { len += dist(a, q); a = q; }
+    return len;
+  }
+  inArena(pt: Point, margin = 0): boolean { return this.arenas.some((a) => dist(a, pt) <= a.r + margin); }
 
   moveTo(x: number, y: number) {
     if (this.player.dead) return;
@@ -294,7 +321,7 @@ export class World {
     }
     if (moving) { if (!p.attackWhileMoving) this.pendingSkill = null; return false; }
     p.repathCd -= dt;
-    if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = findPath(this.map, p, t); }
+    if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, t); }
     this.chasing = true;
     this.followPath(p, dt, 1);
     return true;
@@ -400,8 +427,10 @@ export class World {
       this.auto.tick(dt);
       this.tickPlayer(dt);
       this.checkPortals();
+      if (this.arenas.length && !this.arenaSeen && this.inArena(this.player)) { this.arenaSeen = true; this.emit({ type: 'bossArena' }); }
     }
     for (const m of this.monsters) this.tickMonster(m, dt);
+    this.tickTelegraphs(dt);
   }
 
   private tickPlayer(dt: number) {
@@ -424,7 +453,7 @@ export class World {
       else {
         if (dist(p, n) <= NPC_REACH) { p.path = []; this.npcGoal = null; this.openNpcWindow(n); return; }
         p.repathCd -= dt;
-        if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = findPath(this.map, p, n); }
+        if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, n); }
         this.followPath(p, dt, 1);
         return;
       }
@@ -450,7 +479,7 @@ export class World {
         return;
       }
       p.repathCd -= dt;
-      if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = findPath(this.map, p, t); }
+      if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, t); }
       this.chasing = true;
     }
     this.followPath(p, dt, 1);
@@ -475,10 +504,13 @@ export class World {
     if (m.dead) { if (this.time >= m.respawnAt) this.respawn(m, def); return; }
     m.attackCd = Math.max(0, m.attackCd - dt);
     const pd = p.dead ? Infinity : dist(m, p);
+    const boss = def.boss;
+    if (boss) this.tickBossExtras(m, def, dt);
+    const wake = !boss || (!p.dead && dist(p, m.home) <= boss.arenaRadius); // chefe só acorda com o jogador na arena
     if (m.ai === 'idle') {
-      if (pd < def.aggroRange) { this.aggro(m); return; }
+      if (pd < def.aggroRange && wake) { this.aggro(m); return; }
       m.aiTimer -= dt;
-      if (m.aiTimer <= 0) {
+      if (m.aiTimer <= 0 && !boss) {
         const a = this.rng.range(0, Math.PI * 2), r = this.rng.range(1, 3.5);
         const w = { x: m.home.x + Math.cos(a) * r, y: m.home.y + Math.sin(a) * r };
         if (isWalkable(this.map, w.x, w.y)) { m.path = [w]; m.ai = 'wander'; }
@@ -489,11 +521,16 @@ export class World {
       this.followPath(m, dt, 0.5);
       if (!m.path.length) { m.ai = 'idle'; m.aiTimer = this.rng.range(2, 5); }
     } else if (m.ai === 'chase') {
-      if (p.dead || dist(m, m.home) > def.leashRange) {
+      if (p.dead || dist(m, m.home) > def.leashRange || (boss && !wake)) {
         m.ai = 'return'; m.path = findPath(this.map, m, m.home);
         return;
       }
-      if (pd <= m.attackRange) {
+      if (def.keepDistance && pd < def.keepDistance && dist(m, m.home) < def.leashRange * 0.8) {
+        // arqueiro: recua um pouco mantendo distância e continua atirando
+        m.path = [];
+        this.step(m, (m.x - p.x) / Math.max(0.01, pd), (m.y - p.y) / Math.max(0.01, pd), m.moveSpeed * 0.9 * this.speedMul(m) * dt);
+        if (m.attackCd <= 0 && pd <= m.attackRange) { m.attackCd = m.attackInterval; this.attack(m, p); }
+      } else if (pd <= m.attackRange) {
         m.path = [];
         if (m.attackCd <= 0) { m.attackCd = m.attackInterval; this.attack(m, p); }
       } else {
@@ -504,16 +541,100 @@ export class World {
     } else {
       m.hp = Math.min(m.derived.maxHp, m.hp + m.derived.maxHp * 0.25 * dt);
       this.followPath(m, dt, 1.3);
-      if (!m.path.length || dist(m, m.home) < 0.3) { m.path = []; m.ai = 'idle'; m.aiTimer = 1; m.hp = m.derived.maxHp; }
+      if (!m.path.length || dist(m, m.home) < 0.3) {
+        m.path = []; m.ai = 'idle'; m.aiTimer = 1; m.hp = m.derived.maxHp;
+        if (boss) this.resetBoss(m);
+      }
     }
   }
 
-  private aggro(m: Entity) { m.ai = 'chase'; m.repathCd = 0; m.path = []; }
+  private aggro(m: Entity) {
+    if (m.ai !== 'chase' && MONSTERS[m.monsterId]?.boss) m.aiTimer = 3;
+    m.ai = 'chase'; m.repathCd = 0; m.path = [];
+    if (m.group && MONSTERS[m.monsterId]?.groupAggro) {
+      for (const o of this.monsters) if (o !== m && o.group === m.group && !o.dead && (o.ai === 'idle' || o.ai === 'wander')) { o.ai = 'chase'; o.repathCd = 0; o.path = []; }
+    }
+  }
+
+  // ---------- chefe ----------
+  private tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
+    const b = def.boss!, p = this.player;
+    if (m.ai === 'chase') {
+      m.aiTimer -= dt;
+      if (m.aiTimer <= 0 && !p.dead) {
+        m.aiTimer = m.hp <= m.derived.maxHp * b.summon.atHpPct ? b.aoe.intervalPhase2 : b.aoe.interval;
+        const t: Telegraph = { id: this.nextTelegraph++, x: p.x, y: p.y, radius: b.aoe.radius, delay: b.aoe.delay, remaining: b.aoe.delay, ownerId: m.id, mult: b.aoe.mult };
+        this.telegraphs.push(t);
+        this.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
+      }
+      if (!this.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) this.summonAdds(m, b.summon);
+    }
+  }
+  private summonAdds(boss: Entity, sm: { monsterId: string; count: number; level: number }) {
+    this.bossSummoned = true;
+    const sdef = MONSTERS[sm.monsterId], ids: number[] = [];
+    for (let i = 0; i < sm.count; i++) {
+      const a = (i / sm.count) * Math.PI * 2 + 0.7;
+      let pos: Point = { x: boss.x + Math.cos(a) * 2.2, y: boss.y + Math.sin(a) * 2.2 };
+      if (!isWalkable(this.map, pos.x, pos.y)) pos = { x: boss.x, y: boss.y };
+      const e = this.makeMonster(sdef, pos);
+      this.applyMonsterLevel(e, sdef, sm.level);
+      e.home = { ...boss.home }; e.summoned = true; e.ai = 'chase'; e.respawnAt = Infinity;
+      this.monsters.push(e); ids.push(e.id);
+    }
+    this.emit({ type: 'bossSummon', ids });
+  }
+  private resetBoss(m: Entity) {
+    this.bossSummoned = false;
+    this.telegraphs = this.telegraphs.filter((t) => t.ownerId !== m.id);
+    this.monsters = this.monsters.filter((x) => !x.summoned);
+    m.aiTimer = 0;
+  }
+  private tickTelegraphs(dt: number) {
+    if (!this.telegraphs.length) return;
+    const p = this.player;
+    for (const t of [...this.telegraphs]) {
+      t.remaining -= dt;
+      if (t.remaining > 0) continue;
+      this.telegraphs = this.telegraphs.filter((x) => x !== t);
+      const owner = this.monsters.find((e) => e.id === t.ownerId);
+      const hit = !!owner && !owner.dead && !p.dead && dist(p, t) <= t.radius;
+      this.emit({ type: 'telegraphResolved', id: t.id, x: t.x, y: t.y, radius: t.radius, hit });
+      if (hit && owner) this.directDamage(owner, p, t.mult);
+    }
+  }
+  // dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa
+  private directDamage(a: Entity, t: Entity, mult: number) {
+    const physical = a.damageType === 'physical';
+    const atk = physical ? a.derived.physAtk : a.derived.spiritAtk, df = physical ? t.derived.physDef : t.derived.spiritDef;
+    const amount = Math.max(1, Math.round(atk * mult * (1 - df / (df + 100))));
+    const dealt = this.absorb(t, amount);
+    t.hp -= dealt;
+    if (dealt > 0) this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
+    this.lastDamaged = this.time;
+    this.wearGear();
+    if (t.hp <= 0) this.killPlayer();
+  }
+  // chefe engajado (para a barra grande no topo)
+  engagedBoss(): Entity | null {
+    return this.monsters.find((m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && (m.ai === 'chase' || m.hp < m.derived.maxHp)) ?? null;
+  }
+  private wearGear() {
+    if (WEAR_PER_HIT <= 0) return;
+    const worn = SLOTS.map((sl) => this.equipment[sl]).filter((i): i is ItemInstance => !!i && i.durability > 0);
+    if (!worn.length) return;
+    const it = worn[Math.min(worn.length - 1, Math.floor(this.rng.next() * worn.length))];
+    it.durability = Math.max(0, it.durability - WEAR_PER_HIT);
+    if (it.durability <= 0) this.recalc(this.player, false);
+    this.bumpInv();
+  }
 
   private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
+    if (a.kind === 'monster' && MONSTERS[a.monsterId]?.projectile) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: 'arrow' });
+    if (r.hit && t.kind === 'player' && a.kind === 'monster') this.wearGear();
     if (r.hit) {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
       t.hp -= dealt;
@@ -534,12 +655,18 @@ export class World {
   private killMonster(m: Entity) {
     const def = MONSTERS[m.monsterId];
     m.dead = true; m.hp = 0; m.path = []; m.buffs = [];
-    m.respawnAt = this.time + def.respawnSeconds;
+    m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
+    if (def.boss) {
+      this.bossRespawnAtMs = this.clock() + def.respawnSeconds * 1000;
+      this.telegraphs = []; this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
+      this.emit({ type: 'bossDefeated', respawnAt: this.bossRespawnAtMs });
+    }
     if (this.targetId === m.id) { this.targetId = null; this.autoAttack = false; }
     this.emit({ type: 'death', id: m.id });
     this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.gainXp(def.xpBase + def.xpPerLevel * (m.level - 1));
     this.dropLoot(m, def);
+    if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
 
   private killPlayer() {
@@ -680,7 +807,8 @@ export class World {
     if (!L) return;
     const spot = () => ({ x: m.x + this.rng.range(-0.4, 0.4), y: m.y + this.rng.range(-0.4, 0.4) });
     if (L.gold) {
-      const g = this.rng.int(L.gold.min, L.gold.max);
+      const add = (L.gold.perLevel ?? 0) * (m.level - 1);
+      const g = this.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add));
       if (g > 0) { this.gold += g; this.bumpInv(); this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' }); this.emit({ type: 'goldPickup', amount: g }); }
     }
     for (const pd of L.potions ?? []) {
@@ -690,16 +818,23 @@ export class World {
       this.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
       this.collect(makePotion(pd.id, 1), s.x, s.y);
     }
-    const eq = L.equipment;
-    if (eq && this.rng.next() < eq.chance) {
-      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel <= eq.maxReqLevel && (!BASES[id].sect || BASES[id].sect === this.classId));
-      if (ids.length) {
-        const id = ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))];
-        const it = makeEquipment(id, rollRarity(this.rng), CLASSES[this.classId].element, this.rng, m.level);
-        const s = spot();
-        this.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
-        this.collect(it, s.x, s.y);
-      }
+    const sectOk = (id: string) => !BASES[id].sect || BASES[id].sect === this.classId;
+    const give = (id: string, rarity: Rarity, ilvl = m.level) => {
+      const it = makeEquipment(id, rarity, CLASSES[this.classId].element, this.rng, ilvl);
+      const s = spot();
+      this.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
+      this.collect(it, s.x, s.y);
+    };
+    const eqs = L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [];
+    for (const eq of eqs) {
+      if (eq.minMonsterLevel && m.level < eq.minMonsterLevel) continue;
+      if (this.rng.next() >= eq.chance) continue;
+      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id));
+      if (ids.length) give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], rollRarity(this.rng));
+    }
+    if (L.guaranteed) { // 1 item garantido de slot aleatório (arma só da seita do jogador)
+      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel === L.guaranteed!.reqLevel && sectOk(id));
+      if (ids.length) give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], L.guaranteed.rarity, L.guaranteed.reqLevel);
     }
   }
 
@@ -906,10 +1041,19 @@ export class World {
     this.moveInput = { x: 0, y: 0 };
     this.targetId = null; this.autoAttack = false; this.pendingSkill = null; this.portalCd = 1;
     this.monsters = []; this.npcs = []; this.ground = []; this.openNpc = null; this.npcGoal = null;
+    this.telegraphs = []; this.arenas = []; this.bossSummoned = false; this.arenaSeen = false;
+    if (this.bossRespawnAtMs && this.bossRespawnAtMs <= this.clock()) this.bossRespawnAtMs = 0;
     for (const o of this.map.objects) {
       if (o.type === 'monsterSpawn') {
         const def = MONSTERS[String(o.props.monster)];
-        if (def) this.monsters.push(this.makeMonster(def, { x: o.x, y: o.y }));
+        if (!def) continue;
+        const m = this.makeMonster(def, { x: o.x, y: o.y });
+        m.group = Number(o.props.group) || 0;
+        this.monsters.push(m);
+        if (def.boss) {
+          this.arenas.push({ x: o.x, y: o.y, r: def.boss.arenaRadius });
+          if (this.bossRespawnAtMs > this.clock()) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000; }
+        }
       } else if (o.type === 'npc') {
         this.npcs.push({ ...this.blank('npc', o.name, 1), x: o.x, y: o.y });
       }
@@ -923,7 +1067,7 @@ export class World {
       id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
       derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
       damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
-      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [],
+      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false,
     };
   }
 
@@ -942,6 +1086,7 @@ export class World {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
+    if (def.defMul) { e.derived.physDef *= def.defMul.phys; e.derived.spiritDef *= def.defMul.spirit; }
     e.hp = e.derived.maxHp;
   }
 
@@ -956,6 +1101,7 @@ export class World {
 
   private respawn(m: Entity, def: MonsterDef) {
     this.applyMonsterLevel(m, def, this.rng.int(def.minLevel, def.maxLevel));
+    if (def.boss) { this.bossRespawnAtMs = 0; this.resetBoss(m); }
     m.buffs = []; m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
   }
 

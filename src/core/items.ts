@@ -11,10 +11,11 @@ interface BonusDef { stat: string; min: number; max: number }
 
 const J = itemsJson as unknown as {
   slots: Slot[]; slotNames: Record<Slot, string>; bagSize: number; stackMax: number; sellRatio: number; repairCostPerPoint: number;
-  groundSeconds: number; startingKit: Record<string, number>; startingWeapon: Record<string, string>;
+  groundSeconds: number; wearPerHit: number; startingKit: Record<string, number>; startingWeapon: Record<string, string>;
   rarities: Record<Rarity, RarityDef>; bonusPool: BonusDef[]; bases: Record<string, ItemBase>; potions: Record<string, PotionDef>;
 };
 export const SLOTS = J.slots, SLOT_NAMES = J.slotNames, BAG_SIZE = J.bagSize, STACK_MAX = J.stackMax;
+export const WEAR_PER_HIT = J.wearPerHit;
 export const GROUND_SECONDS = J.groundSeconds, STARTING_KIT = J.startingKit, STARTING_WEAPON = J.startingWeapon;
 export const RARITIES = J.rarities, BASES = J.bases, POTIONS = J.potions;
 export const RARITY_ORDER: Rarity[] = ['comum', 'incomum', 'raro'];

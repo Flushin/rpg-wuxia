@@ -65,5 +65,21 @@
   "ganho_offline": {
     "title": "Ganhos enquanto você está fora",
     "text": "Deixe o Auto ligado num mapa de caça ao fechar o jogo e você recebe XP, ouro e itens pelo tempo fora, no ritmo que o auto media antes de você sair. Rende 60% até 12 h, 40% de 12 h a 18 h, 20% de 18 h a 24 h e nada depois disso. Sem mortes, e as poções são gastas no ritmo medido."
+  },
+  "bandidos": {
+    "title": "Bandidos",
+    "text": "Os Bandidos Arqueiros atiram de longe e recuam quando você chega perto. Feche a distância rápido (ou use uma skill com alcance) e mate o arqueiro primeiro. Os espadachins andam em grupo: ao atacar um, os outros do bando vêm juntos."
+  },
+  "terracota": {
+    "title": "Defesa física e espiritual",
+    "text": "Guerreiros de Terracota têm muita defesa física e pouca defesa espiritual. Dano espiritual (Pavilhão das Nuvens) atravessa a armadura deles; dano físico rende bem menos.",
+    "byClass": {
+      "lamina": "Dica: o Golpe Rompe-Guarda reduz a defesa do alvo e deixa seus golpes físicos mais fortes. Use-o antes das outras skills.",
+      "pavilhao": "Dica: você é espiritual, então tem vantagem aqui."
+    }
+  },
+  "chefe": {
+    "title": "Arena do General",
+    "text": "Você entrou na arena do General de Terracota. Círculos vermelhos no chão mostram onde o golpe em área vai cair em 1,5 segundo: saia de dentro do círculo antes que ele encha. Com metade da vida ele invoca guerreiros. O auto-combate não luta contra o chefe."
   }
 }
