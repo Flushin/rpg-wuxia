@@ -12,8 +12,8 @@
 - **Ambiente do Lucas:** Windows sem admin, Node portátil em `C:\nodejs`, VSCode. O repositório tem `.vscode/settings.json` que coloca `C:\nodejs` no PATH do terminal.
 
 ## Plano de desenvolvimento
-- **Marco 1 (concluído, em teste):** estrutura do projeto, cidade e floresta com placeholders, criação de personagem (2 seitas), movimento PC/celular, seleção de alvo, ataque básico, lobos com IA, XP/nível até 10, pontos de atributo, morte → cidade, HUD, save no IndexedDB.
-- **Marco 2:** skills das duas seitas + nível por uso, hotbar.
+- **Marco 1 (concluído):** estrutura do projeto, cidade e floresta com placeholders, criação de personagem (2 seitas), movimento PC/celular, seleção de alvo, ataque básico, lobos com IA, XP/nível até 10, pontos de atributo, morte → cidade, HUD, save no IndexedDB.
+- **Marco 2 (concluído, em teste):** skills das duas seitas + nível por uso, hotbar, painel de skills (K).
 - **Marco 3:** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
 - **Marco 4:** auto-combate (menu de skills, poções) e ganho offline.
 - **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento.
