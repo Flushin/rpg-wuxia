@@ -1,3 +1,4 @@
+import { L } from '../core/i18n';
 import { initials, skillScale, type SkillDef } from '../core/skills';
 import type { World } from '../core/world';
 import { isTouch } from './controls';
@@ -94,7 +95,7 @@ export class Hotbar {
       s.btn.classList.toggle('locked', locked);
       s.btn.classList.toggle('nomana', nomana);
       s.btn.classList.toggle('ready', !locked && !nomana && cd <= 0);
-      s.lock.textContent = locked ? `Nv ${d.unlock}` : '';
+      s.lock.textContent = locked ? L(`Nv ${d.unlock}`, `Lv ${d.unlock}`) : '';
       s.cdt.textContent = !locked && cd > 0 ? (cd >= 10 ? String(Math.ceil(cd)) : cd.toFixed(1)) : '';
       s.sweep.style.background = frac > 0 ? `conic-gradient(rgba(0,0,0,.65) ${frac * 360}deg, transparent 0)` : '';
     });
@@ -105,8 +106,8 @@ export class Hotbar {
 export function skillTipHtml(w: World, d: SkillDef): string {
   const lvl = w.skillLevel(d), need = w.skillXpNeed(d), st = w.skills[d.id];
   const unlocked = w.isUnlocked(d);
-  const stats = d.type === 'active' ? `<span class="st">Mana ${d.mana} · Recarga ${d.cooldown}s</span><br>` : '';
-  const xp = d.type === 'passive' ? '' : need === null ? '<div>Nível máximo</div>' : `<div>XP ${st.xp} / ${need}</div><div class="sk-bar"><i style="width:${(st.xp / need) * 100}%"></i></div>`;
-  return `<b>${d.name}</b>${d.type === 'passive' ? ' <small>(Passiva)</small>' : ''}<p>${d.description}</p>${stats}`
-    + (unlocked ? `Nível ${lvl}/10 · efeito +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}` : `<span class="st">Desbloqueia no nível ${d.unlock}</span>`);
+  const stats = d.type === 'active' ? `<span class="st">Mana ${d.mana} · ${L('Recarga', 'Cooldown')} ${d.cooldown}s</span><br>` : '';
+  const xp = d.type === 'passive' ? '' : need === null ? `<div>${L('Nível máximo', 'Max level')}</div>` : `<div>XP ${st.xp} / ${need}</div><div class="sk-bar"><i style="width:${(st.xp / need) * 100}%"></i></div>`;
+  return `<b>${d.name}</b>${d.type === 'passive' ? ` <small>(${L('Passiva', 'Passive')})</small>` : ''}<p>${d.description}</p>${stats}`
+    + (unlocked ? `${L('Nível', 'Level')} ${lvl}/10 · ${L('efeito', 'effect')} +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}` : `<span class="st">${L(`Desbloqueia no nível ${d.unlock}`, `Unlocks at level ${d.unlock}`)}</span>`);
 }

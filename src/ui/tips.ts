@@ -1,3 +1,4 @@
+import { L, bindLangButtons, langButtons, localize } from '../core/i18n';
 import tipsJson from '../data/tips.json';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
@@ -6,7 +7,7 @@ import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
 
 interface TipDef { title: string; text: string; textTouch?: string; byClass?: Record<string, string> }
-const TIPS = tipsJson as Record<string, TipDef>;
+const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
 export class TipManager {
@@ -56,15 +57,17 @@ export class TipManager {
   }
 
   private renderPanel() {
-    $('settings-panel').innerHTML = `<div class="card"><h2>Configurações</h2>
-      <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> Mostrar dicas</label>
-      <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> Mudo</label>
-      <label class="sld">Efeitos<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
-      <label class="sld">Música<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
-      <button data-act="reset">Rever dicas</button>
-      <small class="muted">${this.world.seenTips.length ? `${this.world.seenTips.length} dica(s) já vista(s)` : 'Nenhuma dica vista ainda'}</small>
-      <button data-act="switch">Trocar personagem</button>
-      <button class="primary" data-act="close">Fechar</button></div>`;
+    $('settings-panel').innerHTML = `<div class="card"><h2>${L('Configurações', 'Settings')}</h2>
+      <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
+      <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
+      <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
+      <label class="sld">${L('Efeitos', 'Effects')}<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
+      <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
+      <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
+      <small class="muted">${this.world.seenTips.length ? L(`${this.world.seenTips.length} dica(s) já vista(s)`, `${this.world.seenTips.length} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
+      <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
+      <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
+    bindLangButtons($('settings-panel'));
   }
 
   trigger(id: string) {

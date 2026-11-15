@@ -1,3 +1,4 @@
+import { L } from '../core/i18n';
 import { CLASSES } from '../core/data';
 import { BASES, POTIONS, RARITIES, SLOT_NAMES, baseOf, fmtStat, fmtStatValue, isBroken, itemColor, itemName, itemStats, maxDurability, sellValue, STAT_LABELS } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
@@ -19,33 +20,33 @@ export function compareHtml(w: World, it: ItemInstance): string {
     if (Math.abs(d) < 1e-9) continue;
     rows.push(`<div style="color:${d > 0 ? GREEN : RED}">${d > 0 ? '+' : '−'}${fmtStatValue(k, Math.abs(d))} ${STAT_LABELS[k] ?? k}</div>`);
   }
-  const head = cur ? `Em comparação ao equipado (${itemName(cur)}):` : 'Slot vazio, ao equipar:';
-  return `<div class="tip-cmp"><small>${head}</small>${rows.join('') || '<div><small>Sem diferença</small></div>'}</div>`;
+  const head = cur ? L(`Em comparação ao equipado (${itemName(cur)}):`, `Compared to equipped (${itemName(cur)}):`) : L('Slot vazio, ao equipar:', 'Empty slot, if equipped:');
+  return `<div class="tip-cmp"><small>${head}</small>${rows.join('') || `<div><small>${L('Sem diferença', 'No difference')}</small></div>`}</div>`;
 }
 
 export function itemTipHtml(w: World, it: ItemInstance, compare = true): string {
   const pot = POTIONS[it.baseId];
   if (pot) {
     return `<b style="color:${pot.color}">${pot.name}</b>
-      <div>Recupera ${Math.round(pot.percent * 100)}% de ${pot.kind === 'hp' ? 'vida' : 'mana'} em ${pot.duration} s</div>
-      <small>Usar outra do mesmo tipo reinicia o efeito.</small>
-      <div>Quantidade: ${it.qty ?? 1}</div><div class="tip-sell">Venda: ${sellValue(it)} ouro (cada)</div>`;
+      <div>${L(`Recupera ${Math.round(pot.percent * 100)}% de ${pot.kind === 'hp' ? 'vida' : 'mana'} em ${pot.duration} s`, `Restores ${Math.round(pot.percent * 100)}% ${pot.kind === 'hp' ? 'health' : 'mana'} over ${pot.duration} s`)}</div>
+      <small>${L('Usar outra do mesmo tipo reinicia o efeito.', 'Using another of the same type restarts the effect.')}</small>
+      <div>${L('Quantidade', 'Quantity')}: ${it.qty ?? 1}</div><div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro (cada)`, `Sell: ${sellValue(it)} gold (each)`)}</div>`;
   }
   const b = BASES[it.baseId];
   if (!b) return `<b>${it.baseId}</b>`;
   const r = RARITIES[it.rarity], lvlBad = w.player.level < b.reqLevel, sectBad = !!b.sect && b.sect !== w.classId;
   const lines = Object.entries(b.stats).map(([k, v]) => `<div>${fmtStat(k, v)}</div>`).join('');
-  const bonus = it.bonuses.map((x) => `<div style="color:${r.color}">${fmtStat(x.stat, x.value)} <small>(bônus)</small></div>`).join('');
+  const bonus = it.bonuses.map((x) => `<div style="color:${r.color}">${fmtStat(x.stat, x.value)} <small>(${L('bônus', 'bonus')})</small></div>`).join('');
   const max = maxDurability(it), broken = isBroken(it);
-  const dur = broken ? `<div style="color:${RED}">Durabilidade 0/${max}. Quebrado — sem efeito</div>` : `<div>Durabilidade ${Math.round(it.durability)}/${max}</div>`;
+  const dur = broken ? `<div style="color:${RED}">${L(`Durabilidade 0/${max}. Quebrado — sem efeito`, `Durability 0/${max}. Broken — no effect`)}</div>` : `<div>${L('Durabilidade', 'Durability')} ${Math.round(it.durability)}/${max}</div>`;
   return `<b style="color:${itemColor(it)}">${b.name}</b>
     <div><small style="color:${r.color}">${r.name}</small> <small>· ${SLOT_NAMES[b.slot]}</small></div>
-    <div style="color:${lvlBad ? RED : 'inherit'}">Requer nível ${b.reqLevel}</div>
-    ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">Seita: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
-    ${lines}${bonus}${dur}<div class="tip-sell">Venda: ${sellValue(it)} ouro</div>${compare ? compareHtml(w, it) : ''}`;
+    <div style="color:${lvlBad ? RED : 'inherit'}">${L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`)}</div>
+    ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
+    ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
-export const SLOT_ABBR: Record<Slot, string> = { colar: 'Co', tronco: 'Tr', arma: 'Ar', cabeca: 'Ca', calca: 'Cl', bota: 'Bo' };
+export const SLOT_ABBR: Record<Slot, string> = { colar: L('Co', 'Ne'), tronco: L('Tr', 'Ch'), arma: L('Ar', 'We'), cabeca: L('Ca', 'He'), calca: L('Cl', 'Le'), bota: 'Bo' };
 export function cellHtml(it: ItemInstance | null): string {
   if (!it) return '';
   const b = BASES[it.baseId], pot = POTIONS[it.baseId];

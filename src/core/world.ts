@@ -1,4 +1,5 @@
 import { CLASSES, MONSTERS, PROGRESSION, type MonsterDef } from './data';
+import { L } from './i18n';
 import { distributeByRatio } from './distribute';
 import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
@@ -841,9 +842,9 @@ export class World {
   // retorna mensagem de erro (PT-BR) ou null se deu certo
   canEquip(it: ItemInstance): string | null {
     const b = baseOf(it);
-    if (!b) return 'Este item não é equipável';
-    if (this.player.level < b.reqLevel) return `Requer nível ${b.reqLevel}`;
-    if (b.sect && b.sect !== this.classId) return `Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`;
+    if (!b) return L('Este item não é equipável', 'This item cannot be equipped');
+    if (this.player.level < b.reqLevel) return L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`);
+    if (b.sect && b.sect !== this.classId) return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
     return null;
   }
   equip(bagIndex: number): string | null {
@@ -861,7 +862,7 @@ export class World {
     const it = this.equipment[slot];
     if (!it) return null;
     const i = this.bag.findIndex((b) => !b);
-    if (i < 0) return 'Mochila cheia';
+    if (i < 0) return L('Mochila cheia', 'Bag full');
     this.bag[i] = it; this.equipment[slot] = null;
     this.afterEquip();
     return null;
@@ -925,22 +926,22 @@ export class World {
   }
 
   buy(potionId: string, qty: number): string | null {
-    if (this.npcRole() !== 'vendedor') return 'Fale com o vendedor';
+    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
     return this.purchase(potionId, qty);
   }
   // compra sem exigir a janela do NPC aberta (usado pelo auto-combate ao chegar no vendedor)
   purchase(potionId: string, qty: number): string | null {
     if (!POTIONS[potionId] || qty < 1) return null;
     const cost = buyPrice(potionId) * qty;
-    if (this.gold < cost) return 'Ouro insuficiente';
-    if (!this.canFit(potionId, qty)) return 'Mochila cheia';
+    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
+    if (!this.canFit(potionId, qty)) return L('Mochila cheia', 'Bag full');
     this.gold -= cost;
     this.addItem(makePotion(potionId, qty));
     this.emit({ type: 'trade', kind: 'buy', gold: cost });
     return null;
   }
   sell(bagIndex: number, qty = 1): string | null {
-    if (this.npcRole() !== 'vendedor') return 'Fale com o vendedor';
+    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
     this.sellRaw(bagIndex, qty);
     return null;
   }
@@ -1007,10 +1008,10 @@ export class World {
     return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter((i): i is ItemInstance => !!i && !!BASES[i.baseId]);
   }
   repair(it: ItemInstance): string | null {
-    if (this.npcRole() !== 'ferreiro') return 'Fale com o ferreiro';
+    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
     const cost = repairCost(it);
     if (cost <= 0) return null;
-    if (this.gold < cost) return 'Ouro insuficiente';
+    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
     this.gold -= cost; it.durability = maxDurability(it);
     this.recalc(this.player, false); this.bumpInv();
     this.emit({ type: 'repair', gold: cost });
@@ -1018,10 +1019,10 @@ export class World {
   }
   repairAllCost(): number { return this.repairTargets().reduce((a, i) => a + repairCost(i), 0); }
   repairAll(): string | null {
-    if (this.npcRole() !== 'ferreiro') return 'Fale com o ferreiro';
+    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
     const cost = this.repairAllCost();
     if (cost <= 0) return null;
-    if (this.gold < cost) return 'Ouro insuficiente';
+    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
     this.gold -= cost;
     for (const i of this.repairTargets()) i.durability = maxDurability(i);
     this.recalc(this.player, false); this.bumpInv();

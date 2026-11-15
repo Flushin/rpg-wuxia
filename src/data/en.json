@@ -1,0 +1,181 @@
+{
+  "classes": {
+    "lamina": {
+      "name": "Tempest",
+      "description": "Wandering swordsmen who fight up close with the fury of thunder.",
+      "rangeLabel": "Melee",
+      "recommended": [
+        { "reason": "your damage is physical" },
+        { "reason": "accuracy and crits suit fast strikes" }
+      ],
+      "optional": [
+        { "reason": "if you keep dying" }
+      ]
+    },
+    "pavilhao": {
+      "name": "Frost",
+      "description": "Masters of spiritual energy who strike from afar with the ice of the mountains.",
+      "rangeLabel": "Ranged",
+      "recommended": [
+        { "reason": "your damage is spiritual" },
+        { "reason": "mana to sustain area skills" }
+      ],
+      "optional": [
+        { "reason": "if you keep dying" }
+      ]
+    }
+  },
+  "skills": {
+    "lamina": [
+      { "name": "Twin Fangs", "description": "Two quick strikes on the target, each for 80% of your normal damage." },
+      { "name": "Lightning Step", "description": "Dash to the target (up to 8 tiles, needs a clear path) and hit it for 120% damage." },
+      { "name": "Blade Storm", "description": "Spin your blades to deal 170% damage to all monsters within 2.5 tiles. No target needed." },
+      { "name": "Guardbreak", "description": "Heavy strike for 220% damage that lowers the target's defense by 30% for 6 s." },
+      { "name": "Blade Flow", "description": "Passive: +10% attack speed and +5% crit chance. Grows with your level." }
+    ],
+    "pavilhao": [
+      { "name": "Frost Orb", "description": "Hurl an ice orb that deals 130% of your normal damage. Range 7." },
+      { "name": "Icebloom", "description": "An ice flower that deals 110% damage and slows the target by 40% for 4 s." },
+      { "name": "Blizzard", "description": "A blizzard that deals 180% damage to all monsters within 2.5 tiles of the target." },
+      { "name": "Mist Veil", "description": "Wrap yourself in mist that absorbs damage equal to 25% of max health for 8 s. No target needed." },
+      { "name": "Serene Mind", "description": "Passive: regenerates 1% of max mana per second outside town. Grows with your level." }
+    ]
+  },
+  "items": {
+    "slotNames": { "colar": "Necklace", "tronco": "Chest", "arma": "Weapon", "cabeca": "Head", "calca": "Legs", "bota": "Boots" },
+    "rarities": {
+      "comum": { "name": "Common" },
+      "incomum": { "name": "Uncommon" },
+      "raro": { "name": "Rare" }
+    },
+    "bases": {
+      "colar_jade": { "name": "Plain Jade Necklace" },
+      "colar_dragao": { "name": "Serene Dragon Necklace" },
+      "tunica_algodao": { "name": "Cotton Tunic" },
+      "manto_seda": { "name": "Blue Silk Robe" },
+      "espadas_ferro": { "name": "Twin Iron Swords" },
+      "espadas_vento": { "name": "Twin Cutting Wind Swords" },
+      "leque_bambu": { "name": "Bamboo Qi Fan" },
+      "leque_nuvens": { "name": "White Cloud Qi Fan" },
+      "faixa_linho": { "name": "Linen Headband" },
+      "coroa_monge": { "name": "Bronze Monk Crown" },
+      "calca_algodao": { "name": "Cotton Pants" },
+      "calca_couro": { "name": "Reinforced Leather Pants" },
+      "sandalia_palha": { "name": "Straw Sandals" },
+      "botas_andarilho": { "name": "Wanderer's Silk Boots" }
+    },
+    "potions": {
+      "pocao_hp_p": { "name": "Small Health Potion" },
+      "pocao_hp_g": { "name": "Large Health Potion" },
+      "pocao_mp_p": { "name": "Small Mana Potion" },
+      "pocao_mp_g": { "name": "Large Mana Potion" }
+    }
+  },
+  "monsters": {
+    "lobo": { "name": "Wolf" },
+    "bandido_espadachim": { "name": "Bandit Swordsman" },
+    "bandido_arqueiro": { "name": "Bandit Archer" },
+    "guerreiro_terracota": { "name": "Terracotta Warrior" },
+    "general_terracota": { "name": "Terracotta General" }
+  },
+  "tips": {
+    "inicio": {
+      "title": "Welcome!",
+      "text": "Click the ground to move. Click a monster to select it and your character attacks on its own. Tab switches target and Space attacks the nearest one.",
+      "textTouch": "Use the joystick on the left to move. Tap a monster to select it and use the Attack button on the right."
+    },
+    "portal": {
+      "title": "Portal",
+      "text": "This portal leads to the forest, where monsters await. Walk into it to cross. If things get hard, you respawn in the village."
+    },
+    "primeiro_abate": {
+      "title": "First kill",
+      "text": "Defeating monsters gives experience (XP). Watch the yellow bar on your panel: when it fills, you level up."
+    },
+    "primeiro_nivel": {
+      "title": "Level up!",
+      "text": "You gained free attribute points. Open the panel with the C key (or the Attributes button) and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
+      "textTouch": "You gained free attribute points. Tap the Attributes button and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once."
+    },
+    "primeira_morte": {
+      "title": "Back to the village",
+      "text": "When you die you return to the village and each equipped item loses 10% of its max durability. Items at 0 durability stop giving bonuses: repair them with the Blacksmith."
+    },
+    "primeira_skill": {
+      "title": "New skill!",
+      "text": "Use your skills with keys 1 to 4 or by clicking the buttons on the bar below. Each skill costs mana and has a cooldown. The more you use a skill, the higher it levels and the stronger it gets. Open the skills panel with the K key (or the Skills button) to see them all.",
+      "textTouch": "Use your skills with the buttons arcing around the Attack button. Each skill costs mana and has a cooldown. Hold a button to see its details. The more you use a skill, the higher it levels and the stronger it gets. The Skills button shows them all."
+    },
+    "skill_nivel": {
+      "title": "Skill level up!",
+      "text": "Active skills gain experience with every use and get 8% stronger per level (max 10). Passives level up along with your character level. See the progress in the skills panel (K)."
+    },
+    "primeiro_item": {
+      "title": "You found equipment!",
+      "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
+      "textTouch": "Open the bag with the Bag button. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button."
+    },
+    "primeira_pocao": {
+      "title": "Potions",
+      "text": "Use the Q key for a health potion and E for a mana potion. They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village.",
+      "textTouch": "Use the potion buttons above the joystick: health (HP) and mana (MP). They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village."
+    },
+    "primeiro_npc": {
+      "title": "Villagers",
+      "text": "Click a villager to walk up to them and open their window. The Blacksmith repairs equipment and the Potion Seller buys and sells items.",
+      "textTouch": "Tap a villager to walk up to them and open their window. The Blacksmith repairs equipment and the Potion Seller buys and sells items."
+    },
+    "durabilidade_baixa": {
+      "title": "Gear wearing out",
+      "text": "An equipped item is low on durability. Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost)."
+    },
+    "mochila_cheia": {
+      "title": "Bag full",
+      "text": "The bag has 30 slots. The item stays on the ground for 60 seconds: free up space (sell items to the Potion Seller) and walk over it to pick it up."
+    },
+    "primeiro_ouro": {
+      "title": "Gold",
+      "text": "Monsters drop gold. Use it to repair equipment and buy potions. Items you don't use can be sold to the Potion Seller."
+    },
+    "auto_combate": {
+      "title": "Auto-battle",
+      "text": "The Auto button (or the Z key) makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving your character pauses auto; press Z again to resume. The gear next to the button opens the menu: choose skills, potion limits and how much to buy in the village.",
+      "textTouch": "The Auto button makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving with the joystick pauses auto; tap Auto again to resume. The gear next to it opens the menu: choose skills, potion limits and how much to buy in the village."
+    },
+    "ganho_offline": {
+      "title": "Earnings while you are away",
+      "text": "Leave Auto on in a hunting map when you close the game and you get XP, gold and items for the time away, at the pace auto measured before you left. It pays 60% up to 12 h, 40% from 12 h to 18 h, 20% from 18 h to 24 h and nothing after that. No deaths, and potions are used at the measured pace."
+    },
+    "bandidos": {
+      "title": "Bandits",
+      "text": "Bandit Archers shoot from afar and back off when you get close. Close the distance fast (or use a ranged skill) and kill the archer first. The swordsmen move in groups: attack one and the rest of the gang joins in."
+    },
+    "terracota": {
+      "title": "Physical and spiritual defense",
+      "text": "Terracotta Warriors have high physical defense and low spiritual defense. Spiritual damage (Frost sect) pierces their armor; physical damage does much less.",
+      "byClass": {
+        "lamina": "Tip: Guardbreak lowers the target's defense and makes your physical strikes stronger. Use it before your other skills.",
+        "pavilhao": "Tip: you are spiritual, so you have the advantage here."
+      }
+    },
+    "chefe": {
+      "title": "General's Arena",
+      "text": "You entered the Terracotta General's arena. Red circles on the ground show where the area strike will land in 1.5 seconds: get out of the circle before it fills. At half health he summons warriors. Auto-battle does not fight the boss."
+    }
+  },
+  "names": {
+    "Vila das Nuvens": "Cloud Village",
+    "Floresta Sombria": "Dark Forest",
+    "Ruínas de Terracota": "Terracotta Ruins",
+    "Floresta": "Forest",
+    "Vila": "Village",
+    "Ferreiro": "Blacksmith",
+    "Vendedor de Poções": "Potion Seller",
+    "Ancião": "Elder",
+    "Lobo": "Wolf",
+    "Bandido Espadachim": "Bandit Swordsman",
+    "Bandido Arqueiro": "Bandit Archer",
+    "Guerreiro de Terracota": "Terracotta Warrior",
+    "General de Terracota": "Terracotta General"
+  }
+}

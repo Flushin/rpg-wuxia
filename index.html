@@ -61,7 +61,10 @@ button[disabled]{opacity:.45;cursor:default}
 .pts b{color:#d4a017;font-size:16px}
 .card .primary{width:100%;margin-top:14px}
 #create{background:radial-gradient(circle at 50% 30%,#2a3350,#0c0f18);z-index:10}
-#create .card{width:min(560px,100%)}
+#create .card{width:min(560px,100%);position:relative}
+#lang-slot{position:absolute;top:8px;right:8px}
+.opt .lang-sw{margin-left:auto}
+.lang-sw{display:flex;gap:4px;align-items:center}.lang-sw button,.lang-sw button.primary{padding:4px 9px;font-size:12px;line-height:1.2;min-height:0;height:auto;width:auto;margin:0}
 #create h1{margin:0 0 4px;font-size:26px;text-align:center;letter-spacing:2px}
 #create p.sub{margin:0 0 14px;text-align:center;color:#99a}
 label{display:block;margin-bottom:6px;color:#ccd}
@@ -228,16 +231,17 @@ button.danger{background:#8a2a2a;border-color:#f66}
 </div>
 <div id="create" class="hidden">
   <div class="card">
+    <div id="lang-slot"></div>
     <h1>RPG WUXIA</h1>
     <div id="slots-view">
-      <p class="sub">Escolha seu personagem</p>
+      <p class="sub" id="sub-slots">Escolha seu personagem</p>
       <div id="slot-list"></div>
     </div>
     <div id="create-view" class="hidden">
-      <p class="sub">Criar personagem</p>
-      <label for="char-name">Nome</label>
+      <p class="sub" id="sub-create">Criar personagem</p>
+      <label for="char-name" id="lbl-name">Nome</label>
       <input id="char-name" maxlength="16" placeholder="Seu nome" autocomplete="off" />
-      <label>Seita</label>
+      <label id="lbl-sect">Seita</label>
       <div id="class-cards"></div>
       <button id="btn-start" class="primary">Começar jornada</button>
       <button id="btn-back" class="wide">Voltar</button>

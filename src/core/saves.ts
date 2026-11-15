@@ -1,3 +1,4 @@
+import { L } from './i18n';
 import type { SaveData } from './types';
 
 export const SLOT_COUNT = 4;
@@ -35,8 +36,8 @@ export function deleteSlot(f: SaveFile, i: number): SaveFile {
 // "há 2 h", "há 5 min", "agora"
 export function relativeTime(ms: number, now = Date.now()): string {
   const d = Math.max(0, now - (Number(ms) || now)) / 1000;
-  if (d < 60) return 'agora há pouco';
-  if (d < 3600) return `há ${Math.floor(d / 60)} min`;
-  if (d < 86400) return `há ${Math.floor(d / 3600)} h`;
-  return `há ${Math.floor(d / 86400)} d`;
+  if (d < 60) return L('agora há pouco', 'just now');
+  if (d < 3600) return L(`há ${Math.floor(d / 60)} min`, `${Math.floor(d / 60)} min ago`);
+  if (d < 86400) return L(`há ${Math.floor(d / 3600)} h`, `${Math.floor(d / 3600)} h ago`);
+  return L(`há ${Math.floor(d / 86400)} d`, `${Math.floor(d / 86400)} d ago`);
 }

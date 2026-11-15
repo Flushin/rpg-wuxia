@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { L } from '../core/i18n';
 import { screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
@@ -155,7 +156,7 @@ export class GameScene extends Phaser.Scene {
     this.autoText.setVisible(show);
     if (!show) return;
     const s = tileToScreen(p.x, p.y);
-    this.autoText.setText(a.state === 'pausado' ? 'Auto pausado' : a.status ? `Auto\n${a.status}` : 'Auto')
+    this.autoText.setText(a.state === 'pausado' ? L('Auto pausado', 'Auto paused') : a.status ? `Auto\n${a.status}` : 'Auto')
       .setColor(a.state === 'pausado' ? '#f0c060' : '#9fe8a0').setPosition(s.x, s.y - 70);
   }
 
@@ -204,45 +205,45 @@ export class GameScene extends Phaser.Scene {
       }
       case 'miss': {
         const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, 'Errou', '#aaaaaa', 13);
+        this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), '#aaaaaa', 13);
         break;
       }
       case 'attack': if (!this.isArcher(ev.fromId)) this.beam(ev); break;
       case 'projectile': this.arrowFx(ev); break;
-      case 'bossSummon': this.hud.toast('O General invoca guerreiros!', '#ff8a60'); break;
-      case 'bossDefeated': this.hud.toast('General de Terracota derrotado!', '#ffd23f'); break;
-      case 'telegraphResolved': if (ev.hit) { const s = tileToScreen(ev.x, ev.y); this.cameras.main.shake(180, 0.006); this.floatText(s.x, s.y - 20, 'Golpe em área!', '#ff6a50', 15); } break;
+      case 'bossSummon': this.hud.toast(L('O General invoca guerreiros!', 'The General summons warriors!'), '#ff8a60'); break;
+      case 'bossDefeated': this.hud.toast(L('General de Terracota derrotado!', 'Terracotta General defeated!'), '#ffd23f'); break;
+      case 'telegraphResolved': if (ev.hit) { const s = tileToScreen(ev.x, ev.y); this.cameras.main.shake(180, 0.006); this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), '#ff6a50', 15); } break;
       case 'skillCast': case 'dash': this.fx.onEvent(ev); break;
       case 'skillFail': {
-        const msg = { mana: 'Sem mana', cooldown: 'Recarregando', notarget: 'Sem alvo', blocked: 'Caminho bloqueado', locked: 'Bloqueada' }[ev.reason];
+        const msg = { mana: L('Sem mana', 'No mana'), cooldown: L('Recarregando', 'On cooldown'), notarget: L('Sem alvo', 'No target'), blocked: L('Caminho bloqueado', 'Path blocked'), locked: L('Bloqueada', 'Locked') }[ev.reason];
         const s = tileToScreen(this.world.player.x, this.world.player.y);
         this.floatText(s.x, s.y - 64, msg, ev.reason === 'mana' ? '#6aa8ff' : '#dddddd', 15);
         break;
       }
-      case 'skillUnlocked': this.hud.toast(`Nova skill desbloqueada: ${Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name ?? ''}`); break;
+      case 'skillUnlocked': this.hud.toast(L('Nova skill desbloqueada: ', 'New skill unlocked: ') + (Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name ?? '')); break;
       case 'skillLevelUp': {
         const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(s.x, s.y - 80, `${Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name} nv ${ev.level}!`, '#ffd23f', 15);
+        this.floatText(s.x, s.y - 80, `${Object.values(SKILLS).flat().find((d) => d.id === ev.skillId)?.name} ${L('nv', 'lv')} ${ev.level}!`, '#ffd23f', 15);
         break;
       }
       case 'buffApplied':
-        if (ev.kind === 'shield' && ev.targetId === this.world.player.id) { const s = tileToScreen(this.world.player.x, this.world.player.y); this.floatText(s.x, s.y - 64, 'Escudo', '#bfe0ff', 15); }
+        if (ev.kind === 'shield' && ev.targetId === this.world.player.id) { const s = tileToScreen(this.world.player.x, this.world.player.y); this.floatText(s.x, s.y - 64, L('Escudo', 'Shield'), '#bfe0ff', 15); }
         break;
       case 'shieldAbsorb': { const s = tileToScreen(ev.x, ev.y); this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, '#9fd0ff', 14); break; }
       case 'drop': this.dropFx(ev.x, ev.y, ev.color); break;
       case 'itemPickup': this.hud.toast(`+ ${ev.name}${ev.qty > 1 ? ` x${ev.qty}` : ''}`, ev.color); break;
-      case 'goldPickup': this.hud.toast(`+ ${ev.amount} ouro`, '#ffd23f'); break;
-      case 'bagFull': this.hud.toast('Mochila cheia', '#ff8a80'); break;
-      case 'autoStopped': this.hud.toast('Auto-combate parado: item quebrado. Conserte no Ferreiro.', '#ff8a80'); break;
-      case 'durabilityLost': this.hud.toast('Seus equipamentos perderam durabilidade', '#f1a02e'); break;
+      case 'goldPickup': this.hud.toast(`+ ${ev.amount} ${L('ouro', 'gold')}`, '#ffd23f'); break;
+      case 'bagFull': this.hud.toast(L('Mochila cheia', 'Bag full'), '#ff8a80'); break;
+      case 'autoStopped': this.hud.toast(L('Auto-combate parado: item quebrado. Conserte no Ferreiro.', 'Auto-battle stopped: broken item. Repair it with the Blacksmith.'), '#ff8a80'); break;
+      case 'durabilityLost': this.hud.toast(L('Seus equipamentos perderam durabilidade', 'Your equipment lost durability'), '#f1a02e'); break;
       case 'potionFail': {
-        const msg = { none: 'Sem poção', cooldown: 'Recarregando', full: ev.kind === 'hp' ? 'Vida cheia' : 'Mana cheia' }[ev.reason];
+        const msg = { none: L('Sem poção', 'No potion'), cooldown: L('Recarregando', 'On cooldown'), full: ev.kind === 'hp' ? L('Vida cheia', 'Health full') : L('Mana cheia', 'Mana full') }[ev.reason];
         const s = tileToScreen(this.world.player.x, this.world.player.y);
         this.floatText(s.x, s.y - 64, msg, '#dddddd', 15);
         break;
       }
-      case 'levelup': this.hud.toast(`Nível ${ev.level}! +3 pontos de atributo`); break;
-      case 'playerDeath': this.hud.toast('Você morreu... Renascendo na vila'); break;
+      case 'levelup': this.hud.toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`)); break;
+      case 'playerDeath': this.hud.toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village')); break;
       default: break;
     }
   }

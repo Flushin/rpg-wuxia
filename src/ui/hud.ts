@@ -1,3 +1,4 @@
+import { L } from '../core/i18n';
 import { PROGRESSION } from '../core/data';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
@@ -89,14 +90,14 @@ export class Hud {
   update() {
     const w = this.world, p = w.player, d = p.derived;
     $('p-name').textContent = p.name;
-    $('p-level').textContent = `Nv ${p.level}`;
+    $('p-level').textContent = L(`Nv ${p.level}`, `Lv ${p.level}`);
     $('p-hp').style.width = pct(p.hp, d.maxHp);
     $('p-hp-t').textContent = `${Math.ceil(p.hp)} / ${d.maxHp}`;
     $('p-mp').style.width = pct(p.mana, d.maxMana);
     $('p-mp-t').textContent = `${Math.floor(p.mana)} / ${d.maxMana}`;
     const need = w.xpToNext();
     $('p-xp').style.width = need === null ? '100%' : pct(w.xp, need);
-    $('p-xp-t').textContent = need === null ? `Nível máximo (${PROGRESSION.levelCap})` : `XP ${Math.floor(w.xp)} / ${need}`;
+    $('p-xp-t').textContent = need === null ? L(`Nível máximo (${PROGRESSION.levelCap})`, `Max level (${PROGRESSION.levelCap})`) : `XP ${Math.floor(w.xp)} / ${need}`;
     $('map-name').textContent = w.map.name;
     const badge = $('pts-badge');
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
@@ -105,7 +106,7 @@ export class Hud {
     const boss = w.engagedBoss(), bb = $('boss-bar');
     bb.classList.toggle('hidden', !boss);
     if (boss) {
-      $('boss-name').textContent = `Nv ${boss.level} ${boss.name}`;
+      $('boss-name').textContent = L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`);
       $('boss-hp').style.width = pct(boss.hp, boss.derived.maxHp);
       $('boss-hp-t').textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`;
     }
@@ -113,7 +114,7 @@ export class Hud {
     tf.classList.toggle('hidden', !t || t === boss);
     if (t) {
       $('t-name').textContent = t.name;
-      $('t-level').textContent = `Nv ${t.level}`;
+      $('t-level').textContent = L(`Nv ${t.level}`, `Lv ${t.level}`);
       $('t-hp').style.width = pct(t.hp, t.derived.maxHp);
       $('t-hp-t').textContent = `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`;
     }
@@ -129,7 +130,7 @@ export class Hud {
       this.autoSig = sig;
       const b = $('btn-auto');
       b.classList.toggle('on', as === 'on'); b.classList.toggle('paused', as === 'pausado');
-      b.textContent = as === 'on' ? 'Auto ligado' : as === 'pausado' ? 'Auto pausado' : isTouch ? 'Auto' : 'Auto (Z)';
+      b.textContent = as === 'on' ? L('Auto ligado', 'Auto on') : as === 'pausado' ? L('Auto pausado', 'Auto paused') : isTouch ? 'Auto' : 'Auto (Z)';
     }
   }
 
@@ -141,25 +142,25 @@ export class Hud {
     const cls = CLASSES[w.classId];
     const rows = ATTR_KEYS.map((k) => {
       const rec = cls.recommended?.find((r) => r.attr === k), opt = cls.optional?.find((r) => r.attr === k);
-      const badge = rec ? `<span class="badge rec">Recomendado</span>` : opt ? `<span class="badge opt">Opcional</span>` : '';
+      const badge = rec ? `<span class="badge rec">${L('Recomendado', 'Recommended')}</span>` : opt ? `<span class="badge opt">${L('Opcional', 'Optional')}</span>` : '';
       const why = rec ?? opt;
       return `<tr class="${rec ? 'rec' : opt ? 'opt' : ''}"><td><b>${ATTR_LABELS[k]}</b> ${badge}<small>${ATTR_HINTS[k]}</small>${why ? `<small class="why">${why.reason}</small>` : ''}</td><td class="num">${p.attrs[k]}</td>
       <td class="plus">${w.freePoints > 0 ? `<button data-attr="${k}">+</button>` : ''}</td></tr>`;
     }).join('');
     const der: [string, string][] = [
-      ['Vida máxima', String(d.maxHp)], ['Mana máxima', String(d.maxMana)],
-      ['Ataque físico', String(d.physAtk)], ['Ataque espiritual', String(d.spiritAtk)],
-      ['Defesa física', String(d.physDef)], ['Defesa espiritual', String(d.spiritDef)],
-      ['Precisão', String(d.hit)], ['Esquiva', String(d.evasion)],
-      ['Chance de crítico', `${(d.critChance * 100).toFixed(1)}%`], ['Dano crítico', `${Math.round(d.critDamage * 100)}%`],
+      [L('Vida máxima', 'Max health'), String(d.maxHp)], [L('Mana máxima', 'Max mana'), String(d.maxMana)],
+      [L('Ataque físico', 'Physical attack'), String(d.physAtk)], [L('Ataque espiritual', 'Spiritual attack'), String(d.spiritAtk)],
+      [L('Defesa física', 'Physical defense'), String(d.physDef)], [L('Defesa espiritual', 'Spiritual defense'), String(d.spiritDef)],
+      [L('Precisão', 'Accuracy'), String(d.hit)], [L('Esquiva', 'Evasion'), String(d.evasion)],
+      [L('Chance de crítico', 'Crit chance'), `${(d.critChance * 100).toFixed(1)}%`], [L('Dano crítico', 'Crit damage'), `${Math.round(d.critDamage * 100)}%`],
     ];
     const els = ELEMENTS.map((e) => `<tr><td>${ELEMENT_LABELS[e]}</td><td class="num">${p.elemAtk[e]}</td><td class="num">${p.elemRes[e]}</td></tr>`).join('');
-    $('attrs-panel').innerHTML = `<div class="card"><h2>${p.name} - Nível ${p.level}</h2>
-      <div class="pts">Pontos livres: <b>${w.freePoints}</b></div>
+    $('attrs-panel').innerHTML = `<div class="card"><h2>${p.name} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
+      <div class="pts">${L('Pontos livres', 'Free points')}: <b>${w.freePoints}</b></div>
       <table>${rows}</table>
-      <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>Distribuir recomendado</button>
-      <h3>Derivados</h3><table class="two">${der.map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
-      <h3>Elementos</h3><table><tr><th></th><th>Ataque</th><th>Resist.</th></tr>${els}</table>
-      <button class="primary" data-close="1">Fechar</button></div>`;
+      <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>${L('Distribuir recomendado', 'Distribute recommended')}</button>
+      <h3>${L('Derivados', 'Derived stats')}</h3><table class="two">${der.map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
+      <h3>${L('Elementos', 'Elements')}</h3><table><tr><th></th><th>${L('Ataque', 'Attack')}</th><th>${L('Resist.', 'Resist.')}</th></tr>${els}</table>
+      <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`;
   }
 }

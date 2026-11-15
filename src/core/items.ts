@@ -1,4 +1,5 @@
 import itemsJson from '../data/items.json';
+import { L, localize } from './i18n';
 import type { Rng } from './rng';
 import type { Bonus, ItemInstance, PotionKind, Rarity, Slot } from './types';
 
@@ -9,7 +10,7 @@ export interface PotionDef { name: string; kind: PotionKind; percent: number; du
 export interface RarityDef { name: string; color: string; weight: number; bonuses: number; valueMul: number }
 interface BonusDef { stat: string; min: number; max: number }
 
-const J = itemsJson as unknown as {
+const J = localize('items', itemsJson) as unknown as {
   slots: Slot[]; slotNames: Record<Slot, string>; bagSize: number; stackMax: number; sellRatio: number; repairCostPerPoint: number;
   groundSeconds: number; wearPerHit: number; startingKit: Record<string, number>; startingWeapon: Record<string, string>;
   rarities: Record<Rarity, RarityDef>; bonusPool: BonusDef[]; bases: Record<string, ItemBase>; potions: Record<string, PotionDef>;
@@ -22,11 +23,11 @@ export const RARITY_ORDER: Rarity[] = ['comum', 'incomum', 'raro'];
 export const isPotionId = (id: string) => id in POTIONS;
 
 export const STAT_LABELS: Record<string, string> = {
-  strength: 'Força', intelligence: 'Inteligência', stamina: 'Vigor', agility: 'Agilidade', willpower: 'Vontade',
-  maxHp: 'Vida máxima', maxMana: 'Mana máxima', physAtk: 'Ataque físico', spiritAtk: 'Ataque espiritual',
-  physDef: 'Defesa física', spiritDef: 'Defesa espiritual', hit: 'Precisão', evasion: 'Esquiva',
-  critChance: 'Chance de crítico', critDamage: 'Dano crítico',
-  elem_fire: 'Ataque de Fogo', elem_ice: 'Ataque de Gelo', elem_thunder: 'Ataque de Trovão', elem_poison: 'Ataque de Veneno',
+  strength: L('Força', 'Strength'), intelligence: L('Inteligência', 'Intelligence'), stamina: L('Vigor', 'Stamina'), agility: L('Agilidade', 'Agility'), willpower: L('Vontade', 'Willpower'),
+  maxHp: L('Vida máxima', 'Max health'), maxMana: L('Mana máxima', 'Max mana'), physAtk: L('Ataque físico', 'Physical attack'), spiritAtk: L('Ataque espiritual', 'Spiritual attack'),
+  physDef: L('Defesa física', 'Physical defense'), spiritDef: L('Defesa espiritual', 'Spiritual defense'), hit: L('Precisão', 'Accuracy'), evasion: L('Esquiva', 'Evasion'),
+  critChance: L('Chance de crítico', 'Crit chance'), critDamage: L('Dano crítico', 'Crit damage'),
+  elem_fire: L('Ataque de Fogo', 'Fire Attack'), elem_ice: L('Ataque de Gelo', 'Ice Attack'), elem_thunder: L('Ataque de Trovão', 'Thunder Attack'), elem_poison: L('Ataque de Veneno', 'Poison Attack'),
 };
 const PERCENT_STATS = new Set(['critChance', 'critDamage']);
 export const fmtStatValue = (stat: string, v: number) => PERCENT_STATS.has(stat) ? `${+(v * 100).toFixed(1)}%` : String(+v.toFixed(2));

@@ -39,6 +39,8 @@
 - **Idioma:** o jogo terá **português e inglês**, escolhidos pelo jogador (textos separados por idioma).
 - **Seitas:** nome de **uma palavra**, forte e conciso (como no Dragon Oath).
 - **Skills:** nomes bonitos, mas curtos.
+- **Troca de idioma:** botões PT | EN na tela inicial e nas configurações (⚙); trocar salva a escolha e recarrega a página. Na primeira vez, usa o idioma do navegador (português → PT; qualquer outro → EN).
+- **Como funciona:** textos fixos usam `L('pt', 'en')` (`src/core/i18n.ts`); os JSON de dados continuam em PT e `src/data/en.json` traz só os textos em inglês. `npm run check:i18n` confere se falta alguma tradução.
 - Os ids internos (`lamina`, `pavilhao`, `corte_duplo`…) continuam os mesmos para não quebrar saves; só os nomes exibidos mudaram.
 
 | Antes | PT | EN |

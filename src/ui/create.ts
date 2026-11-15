@@ -1,3 +1,4 @@
+import { L, bindLangButtons, langButtons } from '../core/i18n';
 import { CLASSES } from '../core/data';
 import { SLOT_COUNT, relativeTime, type SaveFile } from '../core/saves';
 import { ATTR_KEYS } from '../core/types';
@@ -24,11 +25,11 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
   const renderSlots = () => {
     list.innerHTML = Array.from({ length: SLOT_COUNT }, (_, i) => {
       const s = file.slots[i];
-      if (!s) return `<div class="slot-card empty"><div class="slot-info"><b>Espaço ${i + 1}</b><small>Vazio</small></div><div class="slot-btns"><button data-act="new" data-i="${i}" class="primary">Criar personagem</button></div></div>`;
+      if (!s) return `<div class="slot-card empty"><div class="slot-info"><b>${L(`Espaço ${i + 1}`, `Slot ${i + 1}`)}</b><small>${L('Vazio', 'Empty')}</small></div><div class="slot-btns"><button data-act="new" data-i="${i}" class="primary">${L('Criar personagem', 'Create character')}</button></div></div>`;
       const c = CLASSES[s.classId];
       return `<div class="slot-card${i === file.lastPlayedSlot ? ' last' : ''}" style="--c:${c?.color ?? '#667'}"><div class="slot-info"><b>${esc(s.name)}</b>
-        <small>${c?.name ?? s.classId} - Nível ${s.level}</small><small>${mapName(s.mapId)} - ${relativeTime(s.lastSeen)}</small></div>
-        <div class="slot-btns"><button data-act="play" data-i="${i}" class="primary">Jogar</button><button data-act="del" data-i="${i}" class="danger">Apagar</button></div></div>`;
+        <small>${c?.name ?? s.classId} - ${L(`Nível ${s.level}`, `Level ${s.level}`)}</small><small>${mapName(s.mapId)} - ${relativeTime(s.lastSeen)}</small></div>
+        <div class="slot-btns"><button data-act="play" data-i="${i}" class="primary">${L('Jogar', 'Play')}</button><button data-act="del" data-i="${i}" class="danger">${L('Apagar', 'Delete')}</button></div></div>`;
     }).join('');
   };
   list.onclick = (e) => {
@@ -39,7 +40,7 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
     else if (t.dataset.act === 'new') { slot = i; ($('char-name') as HTMLInputElement).value = ''; show('create'); }
     else if (t.dataset.act === 'del' && s) {
       slot = i;
-      $('del-msg').textContent = `Apagar "${s.name}" (Nv ${s.level}) para sempre? Digite o nome do personagem para confirmar.`;
+      $('del-msg').textContent = L(`Apagar "${s.name}" (Nv ${s.level}) para sempre? Digite o nome do personagem para confirmar.`, `Delete "${s.name}" (Lv ${s.level}) forever? Type the character name to confirm.`);
       const inp = $('del-name') as HTMLInputElement; inp.value = ''; ($('btn-del-ok') as HTMLButtonElement).disabled = true;
       show('del');
     }
@@ -48,7 +49,7 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
   // criação
   const cards = $('class-cards');
   cards.innerHTML = Object.values(CLASSES).map((c) => `<button class="class-card" data-id="${c.id}" style="--c:${c.color}">
-    <b>${c.name}</b><span>${c.rangeLabel} - dano ${DAMAGE_LABELS[c.damageType].toLowerCase()} - ${ELEMENT_LABELS[c.element]}</span>
+    <b>${c.name}</b><span>${c.rangeLabel} - ${L('dano', 'damage:')} ${DAMAGE_LABELS[c.damageType].toLowerCase()} - ${ELEMENT_LABELS[c.element]}</span>
     <em>${c.description}</em>
     <small>${ATTR_KEYS.map((k) => `${ATTR_LABELS[k].slice(0, 3)} ${c.baseAttributes[k]}`).join(' / ')}</small></button>`).join('');
   const refresh = () => cards.querySelectorAll<HTMLElement>('.class-card').forEach((el) => el.classList.toggle('sel', el.dataset.id === selected));
@@ -77,5 +78,6 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
     renderSlots(); show('slots');
   };
 
+  $('lang-slot').innerHTML = langButtons(); bindLangButtons($('lang-slot'));
   renderSlots(); show('slots');
 }

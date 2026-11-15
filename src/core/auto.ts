@@ -1,4 +1,5 @@
 import { MONSTERS } from './data';
+import { L } from './i18n';
 import { buyPrice, BASES, SLOTS } from './items';
 import { findPath } from './pathfinding';
 import type { AutoBucket, AutoConfig, AutoRate, AutoSave, AutoState, Entity, GameEvent, ItemInstance, Point } from './types';
@@ -140,12 +141,12 @@ export class AutoCombat {
       this.leaving = true; w.targetId = null; w.autoAttack = false;
     }
     if (this.leaving) {
-      this.status = 'Indo comprar poções';
+      this.status = L('Indo comprar poções', 'Buying potions');
       const p = this.exitPortal();
       if (p) this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
       return;
     }
-    this.status = 'Caçando';
+    this.status = L('Caçando', 'Hunting');
     this.combat();
   }
 
@@ -184,15 +185,15 @@ export class AutoCombat {
     if (this.visit.shop && !this.visit.shopped) {
       const v = w.npcs.find((n) => w.npcRole(n) === 'vendedor');
       if (v) {
-        this.status = 'Indo comprar poções';
+        this.status = L('Indo comprar poções', 'Buying potions');
         if (dist(w.player, v) > 1.5) { this.walkTo(v); return; }
         this.shop();
       }
       this.visit.shopped = true;
     }
     const pl = w.player;
-    if (pl.hp < pl.derived.maxHp * REST_DONE && this.restSec < REST_MAX_SEC) { this.restSec += dt; this.status = 'Descansando na vila'; return; }
-    this.status = 'Voltando para caçar';
+    if (pl.hp < pl.derived.maxHp * REST_DONE && this.restSec < REST_MAX_SEC) { this.restSec += dt; this.status = L('Descansando na vila', 'Resting in village'); return; }
+    this.status = L('Voltando para caçar', 'Heading back to hunt');
     const p = this.portalTo(this.huntMap || null) ?? this.portalTo(null);
     if (p) { this.huntMap = p.target; this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 }); }
   }

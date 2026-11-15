@@ -1,3 +1,4 @@
+import { L } from '../core/i18n';
 import { BASES, POTIONS, SLOTS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
@@ -96,23 +97,23 @@ export class InventoryPanel {
     }).join('');
     const bag = w.bag.map((it, i) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(it)}">${cellHtml(it)}</button>`).join('');
     const it = this.selItem(), s = this.sel;
-    let detail = '<div class="muted">Toque em um item para ver os detalhes. Duplo toque equipa ou usa.</div>';
+    let detail = `<div class="muted">${L('Toque em um item para ver os detalhes. Duplo toque equipa ou usa.', 'Tap an item to see details. Double tap equips or uses.')}</div>`;
     if (it && s) {
       const pot = POTIONS[it.baseId];
       let btn = '';
-      if (s.kind === 'eq') btn = '<button class="primary" data-act="unequip">Desequipar</button>';
-      else if (pot) btn = '<button class="primary" data-act="use">Usar</button>';
+      if (s.kind === 'eq') btn = `<button class="primary" data-act="unequip">${L('Desequipar', 'Unequip')}</button>`;
+      else if (pot) btn = `<button class="primary" data-act="use">${L('Usar', 'Use')}</button>`;
       else {
         const err = w.canEquip(it);
-        btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>Equipar</button>${err ? `<small class="muted">${err}</small>` : ''}`;
+        btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>${L('Equipar', 'Equip')}</button>${err ? `<small class="muted">${err}</small>` : ''}`;
       }
       detail = `<div class="tipbody">${itemTipHtml(w, it, s.kind === 'bag')}</div>${btn}`;
     }
     $('inv-panel').innerHTML = `<div class="card inv-card"><div class="inv-main">
-      <h2>Mochila <span class="gold">${w.gold} ouro</span></h2>
-      <h3>Equipamento</h3><div class="eq-grid">${eq}</div>
-      <h3>Bolsa (${w.bag.filter(Boolean).length}/${w.bag.length})</h3><div class="bag-grid">${bag}</div>
-      <button class="close-btn" data-act="close">Fechar</button></div>
+      <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
+      <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-grid">${eq}</div>
+      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length})</h3><div class="bag-grid">${bag}</div>
+      <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div>
       <div class="inv-detail">${detail}</div></div>`;
   }
 }

@@ -1,4 +1,5 @@
 import skillsJson from '../data/skills.json';
+import { localize } from './i18n';
 import type { BuffKind } from './types';
 
 export interface SkillDef {
@@ -13,7 +14,7 @@ export interface SkillDef {
 }
 export interface SkillState { level: number; xp: number; cd: number }
 
-export const SKILLS = skillsJson as unknown as Record<string, SkillDef[]>;
+export const SKILLS = localize('skills', skillsJson) as unknown as Record<string, SkillDef[]>;
 export const SKILL_MAX_LEVEL = 10;
 export const GLOBAL_COOLDOWN = 0.5;
 export const LEVEL_BONUS = 0.08;

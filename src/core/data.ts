@@ -1,6 +1,7 @@
 import classesJson from '../data/classes.json';
 import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
+import { localize } from './i18n';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
 
 export interface ClassDef {
@@ -38,6 +39,6 @@ export interface MonsterDef {
 export interface EquipDrop { chance: number; maxReqLevel: number; minReqLevel?: number; minMonsterLevel?: number }
 export interface Progression { levelCap: number; xpToNext: number[]; freePointsPerLevel: number }
 
-export const CLASSES = classesJson as unknown as Record<string, ClassDef>;
-export const MONSTERS = monstersJson as unknown as Record<string, MonsterDef>;
+export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;
+export const MONSTERS = localize('monsters', monstersJson) as unknown as Record<string, MonsterDef>;
 export const PROGRESSION = progressionJson as Progression;

@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import { tileToScreen } from '../core/iso';
 import { MONSTERS } from '../core/data';
+import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
+
+const labelOf = (e: Entity) => (e.kind === 'monster' ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`) : e.kind === 'npc' ? tn(e.name) : e.name);
 
 export class EntityView {
   container: Phaser.GameObjects.Container;
@@ -21,7 +24,7 @@ export class EntityView {
     this.ring = scene.add.graphics();
     this.bar = scene.add.graphics();
     const color = e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : '#f0d070';
-    const text = e.kind === 'monster' ? `Nv ${e.level} ${e.name}` : e.name;
+    const text = labelOf(e);
     const label = scene.add.text(0, e.kind === 'monster' ? -36 * this.sc : -52, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5, 1).setResolution(2);
     label.setName('label');
@@ -37,7 +40,7 @@ export class EntityView {
     this.container.setPosition(s.x, s.y).setDepth(e.x + e.y);
     this.container.setVisible(!(e.dead && e.kind === 'monster'));
     this.sprite.setAlpha(e.dead ? 0.35 : 1);
-    (this.container.getByName('label') as Phaser.GameObjects.Text).setText(e.kind === 'monster' ? `Nv ${e.level} ${e.name}` : e.name);
+    (this.container.getByName('label') as Phaser.GameObjects.Text).setText(labelOf(e));
     this.ring.clear(); this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha
     const slow = e.buffs.some((b) => b.kind === 'slow'), broken = e.buffs.some((b) => b.kind === 'defReduction'), shield = e.buffs.some((b) => b.kind === 'shield' && b.value > 0);

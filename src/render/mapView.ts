@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { tn } from '../core/i18n';
 import { tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
 
@@ -29,7 +30,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     }
     scene.tweens.add({ targets: g, alpha: 0.5, yoyo: true, repeat: -1, duration: 900 });
     const c = tileToScreen(o.x + o.w / 2, o.y + o.h / 2);
-    const label = scene.add.text(c.x, c.y - 20, o.name, { fontSize: '13px', color: '#e8d0ff', stroke: '#000', strokeThickness: 3 })
+    const label = scene.add.text(c.x, c.y - 20, tn(o.name), { fontSize: '13px', color: '#e8d0ff', stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5).setDepth(99999);
     out.push(g, label);
   }

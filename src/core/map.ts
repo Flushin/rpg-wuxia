@@ -1,3 +1,5 @@
+import { tn } from './i18n';
+
 export interface MapObject {
   id: number; name: string; type: string;
   x: number; y: number; w: number; h: number; // em tiles
@@ -29,6 +31,6 @@ export function parseTiledMap(id: string, json: any): GameMap {
   for (const l of json.layers.filter((l: any) => l.type === 'objectgroup'))
     for (const o of l.objects)
       objects.push({ id: o.id, name: o.name, type: o.type, x: o.x / th, y: o.y / th, w: o.width / th, h: o.height / th, props: toProps(o.properties) });
-  const name = String(toProps(json.properties).displayName ?? id);
+  const name = tn(String(toProps(json.properties).displayName ?? id));
   return { id, name, width: json.width, height: json.height, tiles, walkable, objects };
 }
