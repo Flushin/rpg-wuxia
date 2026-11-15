@@ -16,9 +16,9 @@
 - **Marco 1 (concluído):** estrutura do projeto, cidade e floresta com placeholders, criação de personagem (2 seitas), movimento PC/celular, seleção de alvo, ataque básico, lobos com IA, XP/nível até 10, pontos de atributo, morte → cidade, HUD, save no IndexedDB.
 - **Marco 2 (concluído):** skills das duas seitas + nível por uso, hotbar, painel de skills (K).
 - **Marco 3 (concluído):** itens, equipamentos, durabilidade, drops, ferreiro e vendedor de poções, interação com NPCs.
-- **Marco 4 (concluído, em teste):** auto-combate (menu de skills, poções) e ganho offline.
-- **Marco 5:** bandidos, guerreiros de terracota e o General de Terracota; balanceamento; **vários personagens**:
-  - Tela inicial com **4 espaços**; o jogador escolhe qual personagem jogar (o personagem atual vira o primeiro espaço).
+- **Marco 4 (concluído):** auto-combate (menu de skills, poções) e ganho offline.
+- **Marco 5 (concluído, em teste):** bandidos, guerreiros de terracota e o General de Terracota; balanceamento; **vários personagens**:
+  - Tela inicial com **4 espaços**; cada um mostra nome, seita, nível, mapa e último acesso, com botões Jogar e Apagar (apagar pede para digitar o nome). O personagem atual vira o primeiro espaço.
   - Ganho offline vale só para o **último personagem jogado**.
   - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois).
 
@@ -103,10 +103,10 @@
 - **Skills de área nunca exigem alvo:** saem na hora, gastando mana e cooldown mesmo sem monstro perto. Tempestade de Lâminas: em volta do personagem. Chuva de Qi: no alvo selecionado se estiver no alcance; senão, em volta do personagem. Só ganham experiência se acertarem algum monstro.
 - **Hotbar:** PC — teclas 1–4 e clique; celular — 4 botões em arco ao redor do botão de ataque (canto inferior direito).
 - **Números iniciais (aprovados, ajustáveis no balanceamento):**
-  - Corte Duplo 2×70% · cd 4 s · 8 mana
+  - Corte Duplo 2×80% · cd 4 s · 8 mana
   - Passo Fantasma: avança até 8 tiles, 120% · cd 10 s · 12 mana
-  - Tempestade de Lâminas: 150% em volta, raio 2,5 · cd 12 s · 18 mana
-  - Golpe Rompe-Guarda: 200% e −30% defesa por 6 s · cd 15 s · 20 mana
+  - Tempestade de Lâminas: 170% em volta, raio 2,5 · cd 12 s · 18 mana
+  - Golpe Rompe-Guarda: 220% e −30% defesa por 6 s · cd 15 s · 20 mana
   - Fluxo da Lâmina: +10% velocidade de ataque, +5% crítico
   - Esfera de Qi: 130% · cd 3 s · 8 mana
   - Lótus Congelante: 110% + lentidão 40% por 4 s · cd 10 s · 14 mana
@@ -142,6 +142,7 @@
 - **Itens:** atributos fixos por base + raridade: **Comum** (branco), **Incomum** (verde, +1 bônus aleatório), **Raro** (azul, +2 bônus aleatórios). Nível mínimo para usar.
 - **Lista de teste:** 2 bases por slot (nível 1 e nível 5). Arma separada por seita (espadas duplas / leque de qi).
 - **Perda por morte:** −10% da durabilidade máxima em cada item equipado.
+- **Desgaste por golpe:** cada golpe recebido tira 0,3 de durabilidade dos itens equipados (aprovado no marco 5).
 - **Mochila:** 30 espaços; poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
 - **Ouro:** cai dos monstros. O **vendedor de poções também compra qualquer item**.
 - **Poções:** recuperam **ao longo de 8 s** (estilo Dragon Oath); não acumulam (usar outra do mesmo tipo reinicia o efeito). **Pequena:** 30%. **Grande:** 60%, mais cara, cai de monstros nível 5+ (até os bandidos existirem, só na loja). Atalhos no PC (Q = HP, E = mana) e botões no celular.
@@ -159,14 +160,21 @@
 - O personagem volta para a cidade e os itens equipados perdem durabilidade.
 
 ### Monstros (v1)
-- **Lobos:** níveis 1–3. Visão (aggro) de 3 tiles.
-- **Bandidos:** níveis 4–6.
-- **Guerreiros de Terracota:** níveis 7–9.
-- **Chefe — General de Terracota (nv 10):** lento e resistente; ataques em área que o jogador consegue desviar.
+- **Floresta:** lobos (nv 1–3, visão de 3 tiles) e bandidos (nv 4–6).
+- **Bandidos:** mistura de espadachins (andam em grupos de 2–3) e arqueiros (atacam de longe).
+- **Novo mapa "Ruínas de Terracota"** (ligado à floresta): guerreiros de terracota (nv 7–9) e o General no fundo.
+- **Guerreiros de Terracota:** defesa física ×2,4 e espiritual ×0,7 (ensina tipos de dano: Pavilhão leva vantagem; Lâmina usa o Golpe Rompe-Guarda).
+- **Chefe — General de Terracota (nv 10):** lento e resistente; golpe em área marcado no chão com círculo vermelho 1,5 s antes (dá para sair). Com 50% de HP invoca 2 guerreiros. Renasce 10 min após morrer. Drop garantido de item Raro nível 5.
+- **Auto-combate ignora o chefe** e evita a área dele.
+- **Auto-combate (ajustes do marco 5, aprovados):** prefere monstros com nível ≥ (nível do personagem − 1), os mais fracos só se não houver outros; volta à cidade para descansar com HP < 35% e sem poção de vida; bebe poção mais cedo contra 2+ monstros.
+
+### Balanceamento
+- **Ritmo:** ~1 hora de jogo ativo para chegar ao nível 10.
+- **Resultado da simulação:** Lâmina ~69 min (~3 mortes), Pavilhão ~50 min (~7 mortes). Chefe: Lâmina vence 40% (Incomum) / 75% (Raro); Pavilhão vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
 
 ### Escopo da primeira versão jogável
 - 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função.
-- 1 mapa de monstros com os 3 tipos acima + o chefe.
+- Floresta (lobos + bandidos) e Ruínas de Terracota (guerreiros + General).
 - 2 classes: Lâmina Errante e Pavilhão das Nuvens.
 
 ## Em aberto (detalhes para a fase de balanceamento)
