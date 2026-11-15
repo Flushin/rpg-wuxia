@@ -12,6 +12,9 @@ export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
+const TOWN_MAPS = new Set(['cidade']);
+const TOWN_REGEN = 0.03; // 3% por segundo
+
 export class World {
   mapId = 'cidade';
   map: GameMap;
@@ -28,6 +31,7 @@ export class World {
   time = 0;
   targetId: number | null = null;
   autoAttack = false;
+  private chasing = false;
   private moveInput: Point = { x: 0, y: 0 };
   private respawnTimer = 0;
   private portalCd = 0;
@@ -67,7 +71,9 @@ export class World {
   // ---------- comandos ----------
   moveTo(x: number, y: number) {
     if (this.player.dead) return;
-    this.autoAttack = false; this.moveInput = { x: 0, y: 0 };
+    if (!this.player.attackWhileMoving) this.autoAttack = false;
+    this.chasing = false;
+    this.moveInput = { x: 0, y: 0 };
     this.player.path = findPath(this.map, this.player, { x, y });
   }
 
@@ -151,16 +157,28 @@ export class World {
   private tickPlayer(dt: number) {
     const p = this.player, d = p.derived;
     p.attackCd = Math.max(0, p.attackCd - dt);
-    if (this.time - this.lastDamaged > 5) p.hp = Math.min(d.maxHp, p.hp + d.maxHp * 0.01 * dt);
-    p.mana = Math.min(d.maxMana, p.mana + d.maxMana * 0.02 * dt);
-    const mi = this.moveInput;
-    if (mi.x || mi.y) {
-      this.autoAttack = false; p.path = [];
-      this.step(p, mi.x, mi.y, p.moveSpeed * dt);
-      return;
+    // HP e mana só regeneram na cidade
+    if (TOWN_MAPS.has(this.mapId) && this.time - this.lastDamaged > 5) {
+      p.hp = Math.min(d.maxHp, p.hp + d.maxHp * TOWN_REGEN * dt);
+      p.mana = Math.min(d.maxMana, p.mana + d.maxMana * TOWN_REGEN * dt);
     }
     const t = this.getTarget();
     if (this.targetId !== null && !t) { this.targetId = null; this.autoAttack = false; }
+    const mi = this.moveInput;
+    if (mi.x || mi.y) {
+      p.path = [];
+      this.step(p, mi.x, mi.y, p.moveSpeed * dt);
+      if (p.attackWhileMoving && this.autoAttack && t) this.attackIfInRange(p, t);
+      else this.autoAttack = false;
+      return;
+    }
+    // ranged: andando por clique, continua atacando o alvo se estiver no alcance
+    if (p.attackWhileMoving && this.autoAttack && t && p.path.length && !this.chasing) {
+      this.attackIfInRange(p, t);
+      this.followPath(p, dt, 1);
+      return;
+    }
+    this.chasing = false;
     if (this.autoAttack && t) {
       if (dist(p, t) <= p.attackRange) {
         p.path = [];
@@ -169,8 +187,13 @@ export class World {
       }
       p.repathCd -= dt;
       if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = findPath(this.map, p, t); }
+      this.chasing = true;
     }
     this.followPath(p, dt, 1);
+  }
+
+  private attackIfInRange(p: Entity, t: Entity) {
+    if (p.attackCd <= 0 && dist(p, t) <= p.attackRange) { p.attackCd = p.attackInterval; this.attack(p, t); }
   }
 
   private checkPortals() {
@@ -317,7 +340,7 @@ export class World {
     return {
       id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
       derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
-      damageType: 'physical', element: null, attackRange: 1, attackInterval: 1, attackCd: 0, moveSpeed: 3,
+      damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
       path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0,
     };
   }
@@ -328,7 +351,7 @@ export class World {
     e.id = 1; e.attrs = attrs; e.derived = computeDerived(attrs);
     e.elemAtk = { ...emptyElements(), ...c.elementAttack };
     e.damageType = c.damageType; e.element = c.element;
-    e.attackRange = c.attackRange; e.attackInterval = c.attackInterval; e.moveSpeed = c.moveSpeed;
+    e.attackRange = c.attackRange; e.attackWhileMoving = !!c.attackWhileMoving; e.attackInterval = c.attackInterval; e.moveSpeed = c.moveSpeed;
     e.hp = e.derived.maxHp; e.mana = e.derived.maxMana;
     return e;
   }

@@ -8,7 +8,7 @@
     "baseAttributes": { "strength": 4, "intelligence": 0, "stamina": 5, "agility": 4, "willpower": 1 },
     "perLevel": { "strength": 1.5, "intelligence": 0, "stamina": 2, "agility": 1, "willpower": 0.5 },
     "damageType": "physical",
-    "aggroRange": 5,
+    "aggroRange": 3,
     "leashRange": 13,
     "attackRange": 1.4,
     "attackInterval": 1.6,

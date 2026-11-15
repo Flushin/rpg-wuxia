@@ -32,6 +32,7 @@ export interface Entity {
   damageType: DamageType;
   element: Element | null;
   attackRange: number;
+  attackWhileMoving: boolean;
   attackInterval: number;
   attackCd: number;
   moveSpeed: number;

@@ -111,11 +111,15 @@
 - **Conserto:** ferreiro na cidade, por ouro — o ferreiro já funciona na v1.
 - **Origem na v1:** equipamentos só caem de monstros (drop); poções caem de monstros e também são vendidas por um NPC na cidade.
 
+### Regeneração e movimento em combate
+- **HP e mana só regeneram na cidade:** 3% por segundo (após 5 s sem tomar dano). No mapa de caça, só poções (e passivas).
+- **Ranged atacam andando:** o ataque básico continua no alvo enquanto o personagem anda (joystick ou clique). As skills dos ranged também poderão ser usadas andando (marco 2). Melee param para atacar.
+
 ### Morte
 - O personagem volta para a cidade e os itens equipados perdem durabilidade.
 
 ### Monstros (v1)
-- **Lobos:** níveis 1–3.
+- **Lobos:** níveis 1–3. Visão (aggro) de 3 tiles.
 - **Bandidos:** níveis 4–6.
 - **Guerreiros de Terracota:** níveis 7–9.
 - **Chefe — General de Terracota (nv 10):** lento e resistente; ataques em área que o jogador consegue desviar.

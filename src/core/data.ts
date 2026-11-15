@@ -6,7 +6,7 @@ import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './typ
 export interface ClassDef {
   id: string; name: string; description: string; rangeLabel: string;
   damageType: DamageType; element: Element;
-  attackRange: number; attackInterval: number; moveSpeed: number; color: string;
+  attackRange: number; attackWhileMoving?: boolean; attackInterval: number; moveSpeed: number; color: string;
   baseAttributes: Attributes; levelUpAttributes: Attributes;
   elementAttack: Partial<ElementMap>;
   recommended: { attr: AttrKey; reason: string }[];
