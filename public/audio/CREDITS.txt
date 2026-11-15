@@ -1,2 +1,6 @@
 Efeitos sonoros: Kenney (https://kenney.nl), licença CC0 (domínio público).
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
+
+Música (CC0):
+- cidade: "Oriental" — Shadowfire452 — https://opengameart.org/node/15485
+- floresta: "Asian/Oriental 1" — Tozan — https://opengameart.org/content/asianoriental1

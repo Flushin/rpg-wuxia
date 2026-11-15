@@ -111,6 +111,11 @@
 - **Conserto:** ferreiro na cidade, por ouro — o ferreiro já funciona na v1.
 - **Origem na v1:** equipamentos só caem de monstros (drop); poções caem de monstros e também são vendidas por um NPC na cidade.
 
+### Som
+- **Origem:** pacotes gratuitos CC0 (Kenney: RPG Audio, Impact Sounds, UI Audio). Créditos em `public/audio/CREDITS.txt`.
+- **Escopo:** efeitos de combate, progressão e interface + música ambiente (uma faixa para a cidade, outra para a floresta, com transição suave).
+- **Controle:** volumes separados de efeitos e música + mudo, na engrenagem de configurações (padrão: efeitos 80, música 50).
+
 ### Regeneração e movimento em combate
 - **HP e mana só regeneram na cidade:** 3% por segundo (após 5 s sem tomar dano). No mapa de caça, só poções (e passivas).
 - **Ranged atacam andando:** o ataque básico continua no alvo enquanto o personagem anda (joystick ou clique). As skills dos ranged também poderão ser usadas andando (marco 2). Melee param para atacar.
