@@ -245,6 +245,8 @@ Implementadas a pedido do Lucas e publicadas no site.
 
 - **Minimapa** *(PR #8)*: no canto superior direito, acima do nome do mapa (os botões descem um pouco). Mapa em losango com as cores dos tiles; personagem (branco), monstros (pontinhos vermelhos minúsculos), chefe (laranja, maior), NPCs (amarelo) e portais (losango roxo). **Mapa grande:** tecla **M** ou toque/clique no minimapa; mostra também os nomes dos portais e NPCs e uma legenda; fecha com M, Esc, X ou tocando fora. Atualiza a cada 0,15 s. Código em `src/ui/minimap.ts`. Testado no PC e no celular (em pé e deitado).
 
+- **Layout do celular deitado** *(PR #9)*: em telas deitadas com pouca altura (até 450 px, ex.: Galaxy Z Fold fechado ≈ 920×316) os botões se sobrepunham. Agora: topo direito numa linha só (minimapa menor, Auto, ☰, ⚙ e Skills/Atributos/Mochila como ícones 📜 💪 🎒; nome do mapa escondido); quadro do alvo abaixo do quadro do personagem; poções ao lado do joystick; arco de skills mais baixo e compacto; avisos menores. Em pé, o quadro do alvo foi para a esquerda, abaixo do quadro do personagem (o minimapa empurrava os botões para cima dele). Teste automático mede sobreposições em 4 tamanhos de celular.
+
 ### Câmera (15/11/2026)
 - **Zoom** *(PR #3)*: roda do mouse no PC e pinça com dois dedos no celular. Só aproxima: 100% a 200% (gruda em 100%). Fica salvo no aparelho (`localStorage`, vale para todos os personagens).
 

@@ -187,7 +187,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
 @media (max-width:340px){#joystick{width:96px;height:96px}#potion-bar.touch{bottom:122px}}
 @media (max-width:640px){
  #player-frame{width:150px}
- #target-frame{top:78px;width:200px}
+ #target-frame{top:92px;left:8px;transform:none;width:min(200px,calc(100% - 190px))}
  #boss-bar{top:8px;left:164px;transform:none;width:calc(100% - 330px);min-width:150px;padding:4px 6px}#boss-bar b{font-size:12px}#boss-bar .bar{height:16px}#boss-bar .bar span{line-height:16px;font-size:10px}
  #map-name{font-size:12px;padding:4px 8px}
  #hud .frame .line{font-size:12px}
@@ -202,6 +202,29 @@ button.danger{background:#8a2a2a;border-color:#f66}
 .bigmap-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:#ccd}.bigmap-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;border:1px solid #000;vertical-align:-1px}.bigmap-legend i.dia{border-radius:1px;transform:rotate(45deg)}
 @media (max-width:640px){#minimap{width:132px;height:72px}}
 @media (max-height:520px){#minimap{width:120px;height:66px}}
+
+/* Celular deitado com pouca altura (ex.: Galaxy Z Fold fechado, ~920x316): tudo compacto, sem sobreposição */
+@media (orientation:landscape) and (max-height:450px){
+ #player-frame{width:150px;padding:4px 6px}#player-frame .line{font-size:11px}
+ #target-frame{top:86px;left:8px;transform:none;width:180px;padding:4px 6px}
+ #top-right{flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:5px;max-width:none}
+ #minimap{width:104px;height:56px}
+ #map-name{display:none}
+ #top-right>button:not(#minimap),#auto-row>button{min-height:40px;height:40px;padding:0 10px}
+ #btn-auto{min-width:72px;font-size:13px}#btn-auto-cfg,#btn-settings{width:40px;min-width:40px;padding:0}
+ #btn-skills,#btn-attrs,#btn-bag{position:relative;width:40px;min-width:40px;padding:0;font-size:0}
+ #btn-skills::before,#btn-attrs::before,#btn-bag::before{font-size:19px;line-height:40px}
+ #btn-skills::before{content:"📜"}#btn-attrs::before{content:"💪"}#btn-bag::before{content:"🎒"}
+ #pts-badge{font-size:11px}
+ #dur-warn{font-size:0;width:40px;min-width:40px;padding:0}#dur-warn::before{content:"⚠";font-size:19px;line-height:40px}
+ #joystick{width:96px;height:96px;left:12px;bottom:10px}
+ #potion-bar.touch{left:118px;bottom:10px}
+ #potion-bar.touch .pot{width:46px;height:46px}
+ #btn-attack{width:78px;height:78px;right:14px;bottom:12px;font-size:14px}
+ #hotbar.touch .slot{width:46px;height:46px}
+ #toast{top:22%;font-size:14px;padding:6px 12px}
+ #boss-bar{top:auto;bottom:10px;left:50%;transform:translateX(-50%);width:min(300px,40%)}
+}
 </style>
 </head>
 <body>
