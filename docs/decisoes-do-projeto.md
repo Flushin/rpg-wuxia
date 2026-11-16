@@ -1,4 +1,4 @@
-# Decisões do projeto — RPG de navegador (inspiração: Dragon Oath)
+# Decisões do projeto — Wanderers, RPG de navegador (inspiração: Dragon Oath)
 
 ## Regras de trabalho
 - Toda decisão tomada é registrada neste documento.
@@ -162,6 +162,7 @@ Decidido pelo Lucas em 16/11/2026.
 - **Save:** local em cada aparelho (PC e celular têm progresso separado por enquanto). Confirmado em 16/11/2026: continua assim até o marco online.
 
 ### Idioma e nomes (15/11/2026)
+- **Nome do jogo: Wanderers** (decidido pelo Lucas em 16/11/2026) — nome único, igual em PT e EN (título da aba e tela inicial). Antes era "RPG Wuxia". O repositório e o endereço do site continuam `rpg-wuxia`; o assunto dos e-mails de bug continua `[RPG bug]` (filtro do Gmail).
 - **Idioma:** o jogo terá **português e inglês**, escolhidos pelo jogador (textos separados por idioma).
 - **Seitas:** nome de **uma palavra**, forte e conciso (como no Dragon Oath).
 - **Skills:** nomes bonitos, mas curtos.
