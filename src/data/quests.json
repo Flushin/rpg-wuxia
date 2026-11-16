@@ -1,0 +1,156 @@
+{
+ "chain": [
+  {
+   "id": "boas_vindas",
+   "giver": "anciao",
+   "turnIn": "mestre",
+   "minLevel": 1,
+   "objective": {
+    "type": "talk",
+    "npc": "mestre"
+   },
+   "reward": {
+    "xp": 100,
+    "gold": 20
+   },
+   "name": "Boas-vindas",
+   "offer": "Você chegou em boa hora, jovem. Antes de pegar em armas, apresente-se ao mestre da sua seita na praça. Ele vai guiar seus primeiros passos.",
+   "goal": "Fale com o mestre da sua seita",
+   "done": "Então você é o novo discípulo. O ancião fez bem em mandá-lo até mim."
+  },
+  {
+   "id": "primeiro_treino",
+   "giver": "mestre",
+   "turnIn": "mestre",
+   "minLevel": 1,
+   "objective": {
+    "type": "kill",
+    "monster": "lobo",
+    "count": 5
+   },
+   "reward": {
+    "xp": 150,
+    "gold": 30
+   },
+   "name": "Primeiro treino",
+   "offer": "Golpes no ar não ensinam nada. Siga para a Floresta Sombria pelo portão leste e derrote 5 lobos. Volte quando terminar.",
+   "goal": "Derrote lobos",
+   "done": "Nada mal. Seu corpo já começa a entender o caminho da seita."
+  },
+  {
+   "id": "lobos_estrada",
+   "giver": "guarda",
+   "turnIn": "guarda",
+   "minLevel": 2,
+   "objective": {
+    "type": "kill",
+    "monster": "lobo",
+    "count": 8
+   },
+   "reward": {
+    "xp": 300,
+    "gold": 50
+   },
+   "name": "Lobos na estrada",
+   "offer": "As alcateias estão rondando a estrada da floresta e os mercadores não conseguem passar. Derrote 8 lobos e a estrada volta a ser segura.",
+   "goal": "Derrote lobos",
+   "done": "A estrada está mais calma. Os mercadores agradecem, e eu também."
+  },
+  {
+   "id": "acampamentos",
+   "giver": "guarda",
+   "turnIn": "guarda",
+   "minLevel": 4,
+   "objective": {
+    "type": "kill",
+    "monster": "bandido_espadachim",
+    "count": 6
+   },
+   "reward": {
+    "xp": 900,
+    "gold": 120,
+    "item": "arma"
+   },
+   "name": "Acampamentos",
+   "offer": "Bandidos montaram acampamentos no fundo da floresta. Os espadachins andam em grupo, então tome cuidado. Derrote 6 deles.",
+   "goal": "Derrote bandidos espadachins",
+   "done": "Você enfrentou os grupos sozinho? Fique com esta arma do arsenal da vila. Use-a quando estiver pronto."
+  },
+  {
+   "id": "carga_roubada",
+   "giver": "mercador",
+   "turnIn": "mercador",
+   "minLevel": 5,
+   "objective": {
+    "type": "kill",
+    "monster": "bandido_arqueiro",
+    "count": 4
+   },
+   "reward": {
+    "xp": 1600,
+    "gold": 150
+   },
+   "name": "Carga roubada",
+   "offer": "Os arqueiros dos bandidos atacaram minha carroça e levaram metade da carga! Derrote 4 deles. Eles atiram de longe, então chegue perto rápido.",
+   "goal": "Derrote bandidos arqueiros",
+   "done": "Minha carga não volta, mas pelo menos eles não vão roubar mais ninguém. Tome, pela ajuda."
+  },
+  {
+   "id": "portao_antigo",
+   "giver": "anciao",
+   "turnIn": "anciao",
+   "minLevel": 6,
+   "objective": {
+    "type": "reach",
+    "map": "ruinas"
+   },
+   "reward": {
+    "xp": 1500,
+    "gold": 150
+   },
+   "name": "O portão antigo",
+   "offer": "No fim da estrada da floresta há um portal de pedra que leva às ruínas do imperador. Vá até lá e me conte o que viu.",
+   "goal": "Chegue às Ruínas de Terracota",
+   "done": "Guerreiros de barro andando entre as colunas... Então as histórias eram verdade. Fale com seu mestre: ele vai saber o que fazer."
+  },
+  {
+   "id": "barro_bronze",
+   "giver": "mestre",
+   "turnIn": "mestre",
+   "minLevel": 7,
+   "objective": {
+    "type": "kill",
+    "monster": "guerreiro_terracota",
+    "count": 8
+   },
+   "reward": {
+    "xp": 4000,
+    "gold": 300,
+    "item": "tronco"
+   },
+   "name": "Barro e bronze",
+   "offer": "Os guerreiros de terracota resistem bem a lâminas, mas o barro tem pontos fracos. Derrote 8 deles e aprenda a quebrá-los.",
+   "goal": "Derrote guerreiros de terracota",
+   "done": "Agora você conhece o inimigo. Vista isto: um discípulo que vai enfrentar o General precisa de proteção melhor."
+  },
+  {
+   "id": "general_desperta",
+   "giver": "anciao",
+   "turnIn": "anciao",
+   "minLevel": 9,
+   "objective": {
+    "type": "kill",
+    "monster": "general_terracota",
+    "count": 1
+   },
+   "reward": {
+    "xp": 6000,
+    "gold": 800
+   },
+   "name": "O General desperta",
+   "offer": "O General de Terracota comanda tudo do fundo das ruínas. Enquanto ele estiver de pé, a vila não terá paz. Derrote-o. Saia do círculo vermelho quando ele erguer a lâmina.",
+   "goal": "Derrote o General de Terracota",
+   "done": "O General caiu! A Vila das Nuvens vai lembrar do seu nome por gerações. Este ouro é pouco perto do que você fez."
+  }
+ ]
+}

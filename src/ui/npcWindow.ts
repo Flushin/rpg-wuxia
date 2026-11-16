@@ -5,6 +5,7 @@ import type { ItemInstance } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { MASTER_PORTRAITS } from '../render/sprites';
+import { npcName, rewardText } from './questTracker';
 
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -29,6 +30,8 @@ export class NpcWindow {
     let err: string | null = null;
     if (a === 'close') { w.closeNpc(); return; }
     if (a === 'next') { audio.ui('ui_click'); this.line++; return; }
+    if (a === 'qaccept') { audio.ui('ui_open'); w.questAccept(); return; }
+    if (a === 'qturn') { audio.ui('level_up'); w.questTurnIn(); return; }
     if (a === 'tab') { audio.ui('ui_click'); this.tab = v as 'buy' | 'sell'; this.pending = -1; return; }
     if (a === 'qty') { audio.ui('ui_click'); this.qty = +v; return; }
     if (a === 'buy') err = w.buy(v, this.qty);
@@ -50,7 +53,7 @@ export class NpcWindow {
     const w = this.world, n = w.openNpc, el = $('npc-panel');
     if (!n) { if (!el.classList.contains('hidden')) { el.classList.add('hidden'); this.sig = ''; this.npcId = -1; this.pending = -1; } return; }
     if (this.npcId !== n.id) { this.npcId = n.id; this.tab = 'buy'; this.pending = -1; this.sig = ''; this.line = 0; }
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -62,7 +65,31 @@ export class NpcWindow {
     else if (role.startsWith('mestre_')) { const m = this.master(role.slice(7)); body = m.body; sub = m.sub; }
     else body = this.talk(role);
     el.innerHTML = `<div class="card npc-card"><div class="npc-head"><h2>${esc(tn(n.name))}${sub}</h2><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>
-      ${shop ? `<div class="gold">${w.gold} ${L('ouro', 'gold')}</div>` : ''}${body}</div>`;
+      ${this.questBox(role)}${shop ? `<div class="gold">${w.gold} ${L('ouro', 'gold')}</div>` : ''}${body}</div>`;
+  }
+
+  /** Missão ligada a este NPC (marco 7): oferta com "Aceitar", entrega com "Entregar" ou o andamento. */
+  private questBox(role: string): string {
+    const w = this.world, v = w.questView(), q = v.def;
+    if (!q) return '';
+    const head = (tag: string) => `<div class="q-head"><span class="q-tag">${tag}</span> <b>${esc(q.name)}</b></div>`;
+    const rew = `<div class="q-rew">${L('Recompensa', 'Reward')}: ${rewardText(q.reward)}</div>`;
+    if (v.phase === 'available' && v.giver === role) {
+      return `<div class="quest-box">${head(L('Missão', 'Quest'))}<p class="lore">“${esc(q.offer)}”</p>
+        <div class="q-goal">${L('Objetivo', 'Goal')}: ${esc(q.goal)}${v.count > 1 ? ` (${v.count})` : ''}</div>${rew}
+        <button class="primary" data-a="qaccept">${L('Aceitar', 'Accept')}</button></div>`;
+    }
+    if (v.phase === 'ready' && v.turnIn === role) {
+      return `<div class="quest-box ready">${head(L('Concluída', 'Complete'))}<p class="lore">“${esc(q.done)}”</p>${rew}
+        <button class="primary" data-a="qturn">${L('Entregar', 'Turn in')}</button></div>`;
+    }
+    if (v.phase === 'active' && (v.giver === role || v.turnIn === role)) {
+      return `<div class="quest-box">${head(L('Em andamento', 'In progress'))}<div class="q-goal">${esc(q.goal)}${v.count > 1 ? ` <b>${v.progress}/${v.count}</b>` : ''}</div></div>`;
+    }
+    if (v.phase === 'locked' && v.giver === role) {
+      return `<div class="quest-box"><small class="muted">${L(`Volte quando estiver no nível ${q.minLevel}: tenho uma tarefa para você.`, `Come back at level ${q.minLevel}: I have a task for you.`)}</small></div>`;
+    }
+    return '';
   }
 
   /** Mestre da seita: apresenta a seita (o mesmo texto da criação) e dá dicas; Titã e Víbora ainda fechadas. */

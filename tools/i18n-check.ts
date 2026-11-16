@@ -6,6 +6,7 @@ import items from '../src/data/items.json';
 import monsters from '../src/data/monsters.json';
 import tips from '../src/data/tips.json';
 import npcs from '../src/data/npcs.json';
+import quests from '../src/data/quests.json';
 import { readFileSync, readdirSync } from 'node:fs';
 
 type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -34,7 +35,7 @@ function need(p: unknown, e: unknown, path: string) {
 }
 
 const E = en as J;
-const sections: [string, unknown][] = [['classes', classes], ['skills', skills], ['items', items], ['monsters', monsters], ['tips', tips], ['npcs', npcs]];
+const sections: [string, unknown][] = [['classes', classes], ['skills', skills], ['items', items], ['monsters', monsters], ['tips', tips], ['npcs', npcs], ['quests', quests]];
 for (const [name, data] of sections) orphans(E[name], data, name);
 
 // classes: name, description, rangeLabel, reasons
@@ -58,6 +59,8 @@ for (const [id, t] of Object.entries(tips as J)) {
 }
 // npcs (falas dos NPCs e mestres): todo texto
 need(npcs, E.npcs, 'npcs');
+// missões (marco 7): nome, oferta, objetivo e fala de entrega de cada etapa
+(quests as J).chain.forEach((q: J, i: number) => { for (const f of ['name', 'offer', 'goal', 'done']) need(q[f], E.quests?.chain?.[i]?.[f], `quests.chain[${i}].${f}`); });
 // no mais, itens: o EN do item não pode conter o PT idêntico por engano? (só avisa nomes iguais ao PT em campos longos)
 
 // names: todo displayName / portal / NPC / spawn dos mapas tem tradução, e nenhuma chave é órfã
@@ -74,7 +77,7 @@ for (const f of readdirSync('public/maps').filter((x) => x.endsWith('.json'))) {
 }
 for (const n of used) if (!E.names?.[n]) bad(`names: "${n}" (mapas) sem tradução EN`);
 for (const k of Object.keys(E.names ?? {})) if (!used.has(k)) bad(`names: chave órfã "${k}" (não aparece nos mapas)`);
-for (const k of Object.keys(E)) if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'names'].includes(k)) bad(`seção desconhecida "${k}"`);
+for (const k of Object.keys(E)) if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'names'].includes(k)) bad(`seção desconhecida "${k}"`);
 
 console.log(fails ? `${fails} problema(s)` : 'i18n-check: tudo ok');
 process.exit(fails ? 1 : 0);

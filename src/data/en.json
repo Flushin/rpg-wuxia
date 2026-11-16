@@ -279,5 +279,57 @@
     "Bandido Arqueiro": "Bandit Archer",
     "Guerreiro de Terracota": "Terracotta Warrior",
     "General de Terracota": "Terracotta General"
+  },
+  "quests": {
+    "chain": [
+      {
+        "name": "Welcome",
+        "offer": "You arrived just in time, young one. Before taking up arms, present yourself to your sect master in the square. They will guide your first steps.",
+        "goal": "Talk to your sect master",
+        "done": "So you are the new disciple. The elder did well to send you to me."
+      },
+      {
+        "name": "First Training",
+        "offer": "Strikes at the air teach nothing. Head into the Dark Forest through the east gate and defeat 5 wolves. Come back when you are done.",
+        "goal": "Defeat wolves",
+        "done": "Not bad. Your body is starting to understand the way of the sect."
+      },
+      {
+        "name": "Wolves on the Road",
+        "offer": "Packs are prowling the forest road and the merchants cannot get through. Defeat 8 wolves and the road will be safe again.",
+        "goal": "Defeat wolves",
+        "done": "The road is calmer now. The merchants thank you, and so do I."
+      },
+      {
+        "name": "The Camps",
+        "offer": "Bandits have set up camps deep in the forest. The swordsmen move in groups, so be careful. Defeat 6 of them.",
+        "goal": "Defeat bandit swordsmen",
+        "done": "You took on the groups alone? Keep this weapon from the village armory. Use it when you are ready."
+      },
+      {
+        "name": "Stolen Cargo",
+        "offer": "The bandit archers attacked my cart and took half my cargo! Defeat 4 of them. They shoot from afar, so close in fast.",
+        "goal": "Defeat bandit archers",
+        "done": "My cargo is gone, but at least they will not rob anyone else. Here, for your help."
+      },
+      {
+        "name": "The Ancient Gate",
+        "offer": "At the end of the forest road there is a stone portal leading to the emperor's ruins. Go there and tell me what you saw.",
+        "goal": "Reach the Terracotta Ruins",
+        "done": "Clay warriors walking among the columns... So the stories were true. Talk to your master: they will know what to do."
+      },
+      {
+        "name": "Clay and Bronze",
+        "offer": "The terracotta warriors resist blades well, but clay has weak points. Defeat 8 of them and learn how to break them.",
+        "goal": "Defeat terracotta warriors",
+        "done": "Now you know the enemy. Wear this: a disciple who will face the General needs better protection."
+      },
+      {
+        "name": "The General Awakens",
+        "offer": "The Terracotta General commands everything from the depths of the ruins. While he stands, the village will have no peace. Defeat him. Step out of the red circle when he raises his blade.",
+        "goal": "Defeat the Terracotta General",
+        "done": "The General has fallen! Cloud Village will remember your name for generations. This gold is little next to what you did."
+      }
+    ]
   }
 }

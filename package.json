@@ -16,6 +16,7 @@
     "check:i18n": "esbuild tools/i18n-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/i18n-check.mjs && node /tmp/i18n-check.mjs",
     "check:m5": "esbuild tools/m5-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m5-check.mjs && node /tmp/m5-check.mjs",
     "check:layout": "node tools/layout-check.mjs",
+    "check:quests": "esbuild tools/quests-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/quests-check.mjs && node /tmp/quests-check.mjs",
     "check:respawn": "esbuild tools/respawn-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/respawn-check.mjs && node /tmp/respawn-check.mjs"
   },
   "dependencies": {

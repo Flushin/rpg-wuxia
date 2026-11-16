@@ -174,7 +174,7 @@ export class GameScene extends Phaser.Scene {
     const tgt = w.monsters.find((m) => m.id === w.targetId && !m.dead);
     if (tgt && Math.hypot(tgt.x - w.player.x, tgt.y - w.player.y) <= w.player.attackRange + 1) this.viewFor(w.player).face(tgt.x, tgt.y, w.player.x, w.player.y);
     this.viewFor(w.player).sync(w.player, false);
-    w.npcs.forEach((n, i) => { live.add(n.id); this.viewFor(n, i).sync(n, false); });
+    w.npcs.forEach((n, i) => { live.add(n.id); const v = this.viewFor(n, i); v.sync(n, false); v.setMark(w.questMark(n.npcId ?? '')); });
     for (const m of w.monsters) {
       live.add(m.id);
       const v = this.viewFor(m);
@@ -320,6 +320,11 @@ export class GameScene extends Phaser.Scene {
         this.floatText(s.x, s.y - 64, msg, '#dddddd', 15);
         break;
       }
+      case 'quest':
+        if (ev.kind === 'accepted') this.hud.toast(L(`Missão aceita: ${ev.name}`, `Quest accepted: ${ev.name}`), '#f0d070');
+        else if (ev.kind === 'ready') { this.hud.toast(L(`Objetivo cumprido: ${ev.name}`, `Objective complete: ${ev.name}`), '#9fe8a0'); audio.ui('tip'); }
+        else if (ev.kind === 'completed') this.hud.toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
+        break;
       case 'levelup': this.hud.toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`)); break;
       case 'playerDeath': this.hud.toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village')); break;
       default: break;

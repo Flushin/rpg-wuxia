@@ -14,6 +14,7 @@ const arg = (k: string, d: number) => { const a = process.argv.find((x) => x.sta
 const SEEDS = arg('seeds', 3), MAX_MIN = arg('max', 120), RUINS_LEVEL = arg('ruinas', 7);
 const DT = 1 / 30;
 const DEBUG_DEATHS = process.argv.includes('--deaths');
+const QUESTS_ON = !process.argv.includes('--sem-missoes'); // marco 7: cadeia de missões (aceita/entrega na hora)
 const priv = (w: World) => w as unknown as { rng: Rng; recalc: (e: unknown, k: boolean) => void };
 
 // pontuação simples de equipamento para o "jogador médio" decidir o que vestir
@@ -27,13 +28,13 @@ function score(it: ItemInstance, classId: string): number {
 
 interface Run {
   classId: string; levelAt: number[]; deaths: number; goldEarned: number; goldSpent: { potions: number; repair: number }; kills: number; minutes: number;
-  levelDeaths: number[]; ruinsAt: number; levelKills: number[]; levelXp: number[]; levelGold: number[];
+  levelDeaths: number[]; ruinsAt: number; levelKills: number[]; levelXp: number[]; levelGold: number[]; quests: number;
 }
 
 function huntRun(classId: string, seed: number): Run {
   const w = World.create(maps, 'Sim', classId);
   priv(w).rng = new Rng(seed * 7919 + 13);
-  const run: Run = { classId, levelAt: [0], deaths: 0, goldEarned: 0, goldSpent: { potions: 0, repair: 0 }, kills: 0, minutes: 0, levelDeaths: Array(11).fill(0), ruinsAt: 0, levelKills: Array(11).fill(0), levelXp: Array(11).fill(0), levelGold: Array(11).fill(0) };
+  const run: Run = { classId, levelAt: [0], deaths: 0, goldEarned: 0, goldSpent: { potions: 0, repair: 0 }, kills: 0, minutes: 0, levelDeaths: Array(11).fill(0), ruinsAt: 0, levelKills: Array(11).fill(0), levelXp: Array(11).fill(0), levelGold: Array(11).fill(0), quests: 0 };
   const onEv = (ev: GameEvent) => {
     if (ev.type === 'levelup') run.levelAt[ev.level - 1] = w.time / 60;
     else if (ev.type === 'playerDeath') {
@@ -64,6 +65,13 @@ function huntRun(classId: string, seed: number): Run {
 // o jogador médio: gasta pontos, veste upgrades, conserta e vende sobras na vila, vai às ruínas no nível certo
 function policy(w: World, run: Run) {
   if (w.freePoints > 0) w.distributeRecommended();
+  if (QUESTS_ON) {
+    // a viagem até o NPC é ignorada (o jogador entrega quando passa pela cidade); conversa = cumprida na hora
+    const v = w.questView();
+    if (v.phase === 'available') w.questAccept(true);
+    if (w.questView().phase === 'active' && w.questTalkTarget()) (w as unknown as { questTalk: (id: string) => void }).questTalk(w.questTalkTarget());
+    if (w.questView().phase === 'ready') { w.questTurnIn(true); run.quests++; }
+  }
   for (let i = 0; i < w.bag.length; i++) {
     const it = w.bag[i];
     if (!it || !BASES[it.baseId] || w.canEquip(it) || isBroken(it)) continue;

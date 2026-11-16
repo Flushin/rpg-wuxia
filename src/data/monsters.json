@@ -25,8 +25,8 @@
     "attackRange": 1.4,
     "attackInterval": 1.6,
     "moveSpeed": 3.6,
-    "xpBase": 10,
-    "xpPerLevel": 6,
+    "xpBase": 8,
+    "xpPerLevel": 5,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -86,8 +86,8 @@
     "attackInterval": 1.6,
     "moveSpeed": 3.8,
     "groupAggro": true,
-    "xpBase": 30,
-    "xpPerLevel": 8,
+    "xpBase": 23,
+    "xpPerLevel": 6,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -158,8 +158,8 @@
     "keepDistance": 3.5,
     "projectile": "arrow",
     "groupAggro": true,
-    "xpBase": 33,
-    "xpPerLevel": 9,
+    "xpBase": 26,
+    "xpPerLevel": 7,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -231,8 +231,8 @@
       "phys": 2.4,
       "spirit": 0.7
     },
-    "xpBase": 70,
-    "xpPerLevel": 12,
+    "xpBase": 55,
+    "xpPerLevel": 9,
     "respawnSeconds": 30,
     "loot": {
       "gold": {

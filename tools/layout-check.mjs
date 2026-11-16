@@ -13,7 +13,7 @@ const SIZES = [
   { name: 'Fold aberto 884×1028', w: 884, h: 1028, touch: true, feed: 4 },
   { name: 'PC 1366×768', w: 1366, h: 768, touch: false, feed: 4 },
 ];
-const IDS = ['player-frame', 'target-frame', 'loot-feed', 'top-right', 'joystick', 'potion-bar', 'btn-attack', 'hotbar'];
+const IDS = ['player-frame', 'target-frame', 'loot-feed', 'top-right', 'quest-tracker', 'joystick', 'potion-bar', 'btn-attack', 'hotbar'];
 
 const browser = await pw.chromium.launch({ executablePath: process.env.CHROME ?? undefined }).catch(() => pw.chromium.launch({ executablePath: '/usr/bin/google-chrome' }));
 let fails = 0;

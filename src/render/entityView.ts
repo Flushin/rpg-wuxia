@@ -34,6 +34,8 @@ export class EntityView {
   private top: number; // altura (px) do topo do personagem acima dos pés
   private label!: Phaser.GameObjects.Text;
   private labelY: number | null = null; // NPC: nome solto (fora do container)
+  private mark?: Phaser.GameObjects.Text; // missão: "!" ou "?" sobre o NPC (marco 7)
+  private markSig: string | null = null;
 
   constructor(private scene: Phaser.Scene, e: Entity, texture: string) {
     const shadow = scene.add.image(0, 0, 'shadow');
@@ -75,6 +77,7 @@ export class EntityView {
     this.lastSx = s.x;
     this.container.setPosition(s.x, s.y).setDepth(e.x + e.y);
     if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
+    if (this.mark) this.mark.setPosition(s.x, s.y + (this.labelY ?? -50) - 16 + Math.sin(this.scene.time.now / 260) * 3);
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
     this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
     this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
@@ -155,5 +158,17 @@ export class EntityView {
     this.flashTimer = this.scene.time.delayedCall(80, () => { this.flashing = false; this.sprite.clearTint(); });
   }
 
-  destroy() { this.flashTimer?.remove(); this.container.destroy(); if (this.labelY !== null) this.label.destroy(); }
+  /** Marca de missão sobre o NPC: "!" (missão para pegar) ou "?" (para entregar). */
+  setMark(m: '!' | '?' | null) {
+    if (m === this.markSig) return;
+    this.markSig = m;
+    if (!m) { this.mark?.destroy(); this.mark = undefined; return; }
+    if (!this.mark) {
+      this.mark = this.scene.add.text(0, 0, m, { fontSize: '26px', fontStyle: 'bold', color: '#ffd23f', stroke: '#3a2400', strokeThickness: 5 })
+        .setOrigin(0.5, 1).setResolution(DPR * 2).setDepth(99996);
+    }
+    this.mark.setText(m).setColor(m === '!' ? '#ffd23f' : '#9fe8a0');
+  }
+
+  destroy() { this.flashTimer?.remove(); this.container.destroy(); if (this.labelY !== null) this.label.destroy(); this.mark?.destroy(); }
 }
