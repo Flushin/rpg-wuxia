@@ -163,6 +163,109 @@
       "text": "You entered the Terracotta General's arena. Red circles on the ground show where the area strike will land in 1.5 seconds: get out of the circle before it fills. At half health he summons warriors. Auto-battle does not fight the boss."
     }
   },
+  "npcs": {
+    "masters": {
+      "lamina": {
+        "name": "Master Lei",
+        "title": "Tempest Master",
+        "greeting": "Thunder waits for no one, young one. Come, let us see if you keep up.",
+        "intro": "In the Tempest we fight up close, with twin swords and fast strikes charged with Thunder. Our damage is physical and swift. Those who walk this path should favor Strength and Agility.",
+        "tips": [
+          "Use Guardbreak on the terracotta warriors: it lowers their defense by 30% and opens the way for everything else.",
+          "Lightning Step carries you to your target in an instant. Use it to reach archers who shoot from afar.",
+          "Surrounded by bandits? Blade Storm strikes everything around you. If you die a lot, put points into Stamina."
+        ]
+      },
+      "pavilhao": {
+        "name": "Mistress Shuang",
+        "title": "Frost Mistress",
+        "greeting": "Breathe deep and calm your mind. Frost comes with stillness.",
+        "intro": "In Frost, we wield qi through a fan, striking from afar with Ice magic. Our damage is spiritual and area-based, and we can attack while walking. Favor Intelligence and Willpower.",
+        "tips": [
+          "You attack while walking. Back away without ever ceasing to cast Frost Orb, and keep the wolves at a distance.",
+          "Icebloom deals damage and slows the target. Pair it with Blizzard to dominate groups of bandits.",
+          "Terracotta warriors have fragile spirits. Our spiritual damage hurts them far more than ordinary blades."
+        ]
+      },
+      "tita": {
+        "name": "Master Gang",
+        "title": "Titan Master",
+        "greeting": "Hm. Even the mountain knows how to wait.",
+        "intro": "In the Titan sect, we hold the front line with staff or fists, taking the blows for everyone. We are the wall that shields our companions. Ours is a path of endurance and raw strength.",
+        "locked": "The gates of the Titan are not yet open to new disciples; return when the mountain is ready."
+      },
+      "vibora": {
+        "name": "Mistress Du",
+        "title": "Viper Mistress",
+        "greeting": "Quiet as a shadow, patient as venom.",
+        "intro": "In the Viper sect, we strike from afar with poisoned needles. Venom wears the enemy down little by little, and our arts even mend allies a bit. Here, the patient prevail.",
+        "locked": "The gates of the Viper are still closed to new disciples; return in another season."
+      }
+    },
+    "npcs": {
+      "guarda": {
+        "name": "Gate Guard",
+        "lines": [
+          "Heading out the east gate? Near the entrance of the Dark Forest, hungry wolves prowl. Good prey for a beginner.",
+          "Deeper in the forest lie the bandit camps. Swordsmen move in groups of two or three. Do not fight them surrounded.",
+          "Beware the bandit archers. They shoot from afar, so close the distance fast or find cover.",
+          "Beyond the forest lie the Terracotta Ruins. The clay warriors have towering physical defense, but their spirit is frail.",
+          "At the back of the ruins stands the Terracotta General. When a red circle appears on the ground, step out of it. And repair your gear at the blacksmith."
+        ]
+      },
+      "anciao": {
+        "name": "Elder",
+        "lines": [
+          "Cloud Village was born centuries ago, when weary travelers stopped beneath the mist of these hills and chose to stay.",
+          "Long ago, the four sects protected the village: Tempest, Frost, Titan and Viper. Together, no danger could reach us.",
+          "In the ruins to the east sleeps the terracotta army of a forgotten emperor. No one knew there was life in that clay.",
+          "One day, something woke the General. His warriors rose, and the forest filled with bandits and beasts.",
+          "Now the sects need new disciples. If you have courage, young one, choose a master and help the village regain its peace."
+        ]
+      },
+      "mercador": {
+        "name": "Traveling Merchant",
+        "lines": [
+          "Ah, traveler! I have walked a thousand roads, yet my carts are still empty for now.",
+          "I have nothing to sell today. I await rare goods from distant lands, and they say the wait is worth it.",
+          "Silk from the south, spices from the desert, relics from forgotten monasteries... all of it may arrive someday.",
+          "Come back later, friend. Perhaps I will have something worthy of a warrior like you."
+        ]
+      },
+      "morador1": {
+        "name": "Villager Mei",
+        "lines": [
+          "My husband swears a wolf chased him to the gate. I think it was just a frightened dog.",
+          "Drink a potion when you are hurt, but remember: it heals gradually, over eight seconds.",
+          "When you return from the forest, rest in the village. Here your health and energy recover on their own."
+        ]
+      },
+      "morador2": {
+        "name": "Old Fisher Hu",
+        "lines": [
+          "I have fished this stream for forty years and only ever hooked boots. But they are very fine boots!",
+          "If your potions are running low, do not wait for the final blow. Drink in time, because healing is not instant.",
+          "Only in the village does the body renew fully. In the forest, every drop of life counts."
+        ]
+      },
+      "morador3": {
+        "name": "Little Tao",
+        "lines": [
+          "When I grow up, I will be a great Tempest master! I already defeated three chickens with a stick.",
+          "Grandfather says the blacksmith can mend anything. Even my wooden sword, if I ask politely.",
+          "They say the Terracotta General is huge and slow. I would run away, but not slowly, mind you."
+        ]
+      },
+      "morador4": {
+        "name": "Cook Lan",
+        "lines": [
+          "Fresh hot buns! Oh, they are not for sale, they are for the guards. But the smell is free.",
+          "An adventurer with an empty belly fights poorly. Rest in the village, where the body mends itself.",
+          "The potion seller buys anything you bring. Even that junk you found in the forest."
+        ]
+      }
+    }
+  },
   "names": {
     "Vila das Nuvens": "Cloud Village",
     "Floresta Sombria": "Dark Forest",
@@ -171,7 +274,6 @@
     "Vila": "Village",
     "Ferreiro": "Blacksmith",
     "Vendedor de Poções": "Potion Seller",
-    "Ancião": "Elder",
     "Lobo": "Wolf",
     "Bandido Espadachim": "Bandit Swordsman",
     "Bandido Arqueiro": "Bandit Archer",

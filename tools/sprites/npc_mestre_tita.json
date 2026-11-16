@@ -1,0 +1,68 @@
+{
+ "name": "npc_mestre_tita",
+ "model": ".cache/kaykit/Characters/gltf/Barbarian.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Axe",
+  "1H_Axe_Offhand",
+  "2H_Axe",
+  "Barbarian_Round_Shield",
+  "Icosphere",
+  "Mug",
+  "Barbarian_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "barbarian_texture",
+  "cells": {
+   "0,1": [
+    200,
+    110,
+    40
+   ],
+   "1,1": [
+    160,
+    80,
+    30
+   ],
+   "2,2": [
+    200,
+    110,
+    40
+   ],
+   "1,2": [
+    40,
+    34,
+    30
+   ],
+   "2,1": [
+    235,
+    220,
+    190
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ],
+ "portrait_png": true
+}

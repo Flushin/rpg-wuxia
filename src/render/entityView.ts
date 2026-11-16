@@ -32,6 +32,8 @@ export class EntityView {
   private accX = 0; // deslocamento acumulado desde a última troca de direção
   private accY = 0;
   private top: number; // altura (px) do topo do personagem acima dos pés
+  private label!: Phaser.GameObjects.Text;
+  private labelY: number | null = null; // NPC: nome solto (fora do container)
 
   constructor(private scene: Phaser.Scene, e: Entity, texture: string) {
     const shadow = scene.add.image(0, 0, 'shadow');
@@ -58,7 +60,10 @@ export class EntityView {
     const label = scene.add.text(0, labelY, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5, 1).setResolution(DPR * 2);
     label.setName('label');
-    this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar, label]);
+    this.label = label;
+    // NPCs: nome fora do container, sempre por cima (casas e o portão não cortam o nome)
+    if (e.kind === 'npc') { this.labelY = labelY; label.setDepth(99995); }
+    this.container = scene.add.container(0, 0, e.kind === 'npc' ? [this.ring, shadow, this.sprite, this.bar] : [this.ring, shadow, this.sprite, this.bar, label]);
     this.sync(e, false);
     this.lastSx = this.container.x;
   }
@@ -69,12 +74,13 @@ export class EntityView {
     else if (Math.abs(s.x - this.lastSx) > 0.2) this.sprite.setFlipX(s.x < this.lastSx);
     this.lastSx = s.x;
     this.container.setPosition(s.x, s.y).setDepth(e.x + e.y);
+    if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
     this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
     this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
-    if (e.dead && this.sheet) { this.ring.clear(); this.bar.clear(); (this.container.getByName('label') as Phaser.GameObjects.Text).setVisible(false); return; }
-    (this.container.getByName('label') as Phaser.GameObjects.Text).setVisible(true);
-    (this.container.getByName('label') as Phaser.GameObjects.Text).setText(labelOf(e));
+    if (e.dead && this.sheet) { this.ring.clear(); this.bar.clear(); this.label.setVisible(false); return; }
+    this.label.setVisible(true);
+    this.label.setText(labelOf(e));
     this.ring.clear(); this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha
     const slow = e.buffs.some((b) => b.kind === 'slow'), broken = e.buffs.some((b) => b.kind === 'defReduction'), shield = e.buffs.some((b) => b.kind === 'shield' && b.value > 0);
@@ -149,5 +155,5 @@ export class EntityView {
     this.flashTimer = this.scene.time.delayedCall(80, () => { this.flashing = false; this.sprite.clearTint(); });
   }
 
-  destroy() { this.flashTimer?.remove(); this.container.destroy(); }
+  destroy() { this.flashTimer?.remove(); this.container.destroy(); if (this.labelY !== null) this.label.destroy(); }
 }

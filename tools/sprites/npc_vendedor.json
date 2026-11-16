@@ -1,0 +1,66 @@
+{
+ "name": "npc_vendedor",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "2H_Staff",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "mage_texture",
+  "cells": {
+   "0,1": [
+    120,
+    150,
+    90
+   ],
+   "2,1": [
+    210,
+    190,
+    130
+   ],
+   "7,1": [
+    70,
+    80,
+    60
+   ],
+   "2,2": [
+    190,
+    170,
+    110
+   ],
+   "1,0": [
+    40,
+    35,
+    30
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

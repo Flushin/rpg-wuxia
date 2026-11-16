@@ -1,0 +1,73 @@
+{
+ "name": "npc_guarda",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword_Offhand",
+  "2H_Sword",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield",
+  "Knight_Helmet"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "1,0": [
+    35,
+    30,
+    28
+   ],
+   "3,1": [
+    140,
+    40,
+    35
+   ],
+   "2,1": [
+    190,
+    150,
+    80
+   ],
+   "0,1": [
+    150,
+    35,
+    35
+   ],
+   "2,2": [
+    150,
+    35,
+    35
+   ],
+   "4,1": [
+    200,
+    160,
+    70
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

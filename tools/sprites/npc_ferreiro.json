@@ -1,0 +1,62 @@
+{
+ "name": "npc_ferreiro",
+ "model": ".cache/kaykit/Characters/gltf/Barbarian.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Axe",
+  "1H_Axe_Offhand",
+  "2H_Axe",
+  "Barbarian_Round_Shield",
+  "Icosphere",
+  "Mug",
+  "Barbarian_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "barbarian_texture",
+  "cells": {
+   "0,1": [
+    110,
+    80,
+    55
+   ],
+   "1,1": [
+    80,
+    60,
+    45
+   ],
+   "2,2": [
+    90,
+    70,
+    50
+   ],
+   "1,2": [
+    50,
+    40,
+    35
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

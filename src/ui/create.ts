@@ -1,5 +1,6 @@
 import { L, bindLangButtons, langButtons } from '../core/i18n';
-import { CLASSES } from '../core/data';
+import { CLASSES, NPC_TEXT, SECT_ORDER } from '../core/data';
+import { MASTER_PORTRAITS } from '../render/sprites';
 import { SLOT_COUNT, relativeTime, type SaveFile } from '../core/saves';
 import { ATTR_KEYS } from '../core/types';
 import { ATTR_LABELS, DAMAGE_LABELS, ELEMENT_LABELS } from './labels';
@@ -48,14 +49,33 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
 
   // criação
   const cards = $('class-cards');
-  cards.innerHTML = Object.values(CLASSES).map((c) => `<button class="class-card" data-id="${c.id}" style="--c:${c.color}">
+  // cada seita é apresentada pelo seu mestre (o mesmo que fica na praça da cidade);
+  // Titã e Víbora aparecem bloqueadas ("em breve")
+  const LOCKED: Record<string, { name: string; color: string; range: string }> = {
+    tita: { name: L('Titã', 'Titan'), color: '#c48028', range: L('Corpo a corpo - tanque', 'Melee - tank') },
+    vibora: { name: L('Víbora', 'Viper'), color: '#34804a', range: L('À distância - veneno', 'Ranged - poison') },
+  };
+  const masterBlock = (id: string, color: string) => {
+    const m = NPC_TEXT.masters[id];
+    if (!m) return '';
+    return `<div class="master" style="--c:${color}"><img src="${MASTER_PORTRAITS[id] ?? ''}" alt="" loading="lazy"><div><strong>${esc(m.name)}</strong><i>${esc(m.title)}</i></div></div>
+      <q>${esc(m.intro)}</q>`;
+  };
+  cards.innerHTML = SECT_ORDER.map((id) => {
+    const c = CLASSES[id];
+    if (c) return `<button class="class-card" data-id="${c.id}" style="--c:${c.color}">
     <b>${c.name}</b><span>${c.rangeLabel} - ${L('dano', 'damage:')} ${DAMAGE_LABELS[c.damageType].toLowerCase()} - ${ELEMENT_LABELS[c.element]}</span>
-    <em>${c.description}</em>
-    <small>${ATTR_KEYS.map((k) => `${ATTR_LABELS[k].slice(0, 3)} ${c.baseAttributes[k]}`).join(' / ')}</small></button>`).join('');
+    ${masterBlock(id, c.color)}
+    <small>${ATTR_KEYS.map((k) => `${ATTR_LABELS[k].slice(0, 3)} ${c.baseAttributes[k]}`).join(' / ')}</small></button>`;
+    const lk = LOCKED[id];
+    return lk ? `<button class="class-card locked" data-locked="1" disabled aria-disabled="true" style="--c:${lk.color}">
+    <b>${lk.name}</b><span>${lk.range}</span><span class="soon">${L('Em breve', 'Coming soon')}</span>
+    ${masterBlock(id, lk.color)}</button>` : '';
+  }).join('');
   const refresh = () => cards.querySelectorAll<HTMLElement>('.class-card').forEach((el) => el.classList.toggle('sel', el.dataset.id === selected));
   cards.onclick = (e) => {
     const t = (e.target as HTMLElement).closest('.class-card') as HTMLElement | null;
-    if (t) { selected = t.dataset.id!; refresh(); }
+    if (t && !t.dataset.locked) { selected = t.dataset.id!; refresh(); }
   };
   refresh();
   const input = $('char-name') as HTMLInputElement;

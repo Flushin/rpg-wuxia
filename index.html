@@ -87,6 +87,12 @@ label{display:block;margin-bottom:6px;color:#ccd}
 .class-card{flex:1 1 220px;text-align:left;display:flex;flex-direction:column;gap:4px;border:2px solid #445;border-left:6px solid var(--c)}
 .class-card.sel{border-color:var(--c);background:#2f3550}
 .class-card b{font-size:16px}.class-card span{font-size:12px;color:#fc9}.class-card em{font-size:12px;color:#bbc;font-style:normal}.class-card small{font-size:11px;color:#889}
+.class-card .master{display:flex;gap:8px;align-items:center;margin-top:4px}
+.class-card .master img{width:52px;height:52px;object-fit:contain;flex:none;background:#262a3c;border-radius:8px}
+.class-card .master div{display:flex;flex-direction:column;gap:1px}.class-card .master i{font-size:12px;color:#cdb}
+.class-card .master strong{font-size:12px;color:var(--c)}
+.class-card q{font-size:12px;color:#dde;line-height:1.45;quotes:'“' '”'}
+.class-card.locked{opacity:.6;cursor:not-allowed}.class-card.locked .soon{align-self:flex-start;font-size:11px;background:#445;color:#ffd;padding:1px 6px;border-radius:6px}
 #btn-start,button.wide{width:100%;margin-top:10px;padding:12px;min-height:44px}
 #del-name{width:100%;padding:10px;border-radius:8px;border:1px solid #667;background:#10141c;color:#fff;font:inherit;font-size:16px;margin-bottom:6px;user-select:text;-webkit-user-select:text}
 button.danger{background:#8a2a2a;border-color:#f66}
@@ -180,6 +186,11 @@ button.danger{background:#8a2a2a;border-color:#f66}
 .qty button{min-width:44px;min-height:44px}
 .tabs button.on,.qty button.on{background:#8a3b2a;border-color:#c66}
 .lore{font-style:italic;color:#cdb;line-height:1.5}
+.npc-head h2 small.npc-title{display:block;font-size:12px;font-weight:normal;color:#d4a017;margin-top:2px}
+.npc-talk{display:flex;gap:10px;align-items:center}.npc-talk .lore{margin:4px 0}
+.npc-pic{width:56px;height:56px;object-fit:contain;flex:none;background:#262a3c;border-radius:8px}
+.npc-tips{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.45;color:#dde}.npc-tips li{margin-bottom:4px}
+.npc-next{display:flex;justify-content:space-between;align-items:center;gap:8px}.npc-next button{min-height:40px}
 #npc-panel .card .primary{min-height:44px}
 #auto-row{display:flex;gap:6px}
 #btn-auto,#btn-auto-cfg{min-height:44px}

@@ -22,8 +22,10 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 |---|---|
 | `render_sprites.py` | Personagem/monstro animado → atlas `public/sprites/<nome>.png/.json` + `src/data/sprites/<nome>.json` (animações, âncora, altura) |
 | `render_props.py` | Objetos parados (árvores, pedras…) → atlas `public/sprites/floresta.*` com o ponto do chão (pivot) |
-| `ground_tiles.py` | Pisos 2D (grama, caminho) → `public/sprites/pisos.png` |
+| `render_town.py` | Cidade: casas wuxia, portão, lanternas, estandartes, incensário… gerados por script + cerejeiras → `public/sprites/cidade.*` |
+| `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça) → `public/sprites/pisos.png` |
 | `tormenta.json`, `geada.json`, `lobo.json`, `floresta.json` | Configuração de cada folha |
+| `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |
 | `fetch-assets.sh` | Baixa só os modelos usados (espelhos no GitHub) |
 
 ## Padrões fixados
@@ -38,6 +40,10 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
   `recolor` troca a cor de materiais por nome (modelos Kenney/Quaternius).
 - **Objetos presos a ossos:** `attach` cria um objeto e prende num osso. Hoje só `kind: "fan"` (leque de qi da Geada,
   na `handslot.r`), com `rot` (graus), `scale`, `color` e `rib`.
+
+- **Casas no jogo:** objetos `building` do mapa, desenhados em fatias verticais de 32 px com a profundidade da frente
+  da casa em cada coluna (`src/render/mapView.ts`). Pegada da casa = tiles `house` (bloqueiam).
+- **Enfeites:** objetos `decor` (`sprite`, `block` = bloqueia o tile, `top` = sempre por cima, como o topo do portão).
 
 ## Nova folha
 
