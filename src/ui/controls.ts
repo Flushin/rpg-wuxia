@@ -6,7 +6,7 @@ const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
 export function setupControls(world: World, hud: Hud) {
   window.addEventListener('keydown', (e) => {
-    if (e.target instanceof HTMLInputElement) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (e.key === 'Tab') { e.preventDefault(); world.cycleTarget(); }
     else if (e.key === 'c' || e.key === 'C') hud.togglePanel();
     else if (e.key === 'k' || e.key === 'K') hud.toggleSkills();

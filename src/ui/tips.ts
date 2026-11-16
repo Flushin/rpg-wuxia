@@ -8,6 +8,7 @@ import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
+import { BugReport } from './bugReport';
 
 interface TipDef { title: string; text: string; textTouch?: string; byClass?: Record<string, string> }
 const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
@@ -19,8 +20,10 @@ export class TipManager {
   private diedPending = false;
   private kills = 0;
   private levelUps = 0;
+  private bug: BugReport;
 
   constructor(private world: World, private onChange: () => void, private onSwitch: () => void = () => {}, private rewards?: Rewards) {
+    this.bug = new BugReport(world);
     $('tip-ok').onclick = () => this.dismiss();
     $('btn-settings').onclick = () => this.togglePanel();
     const panel = $('settings-panel');
@@ -29,6 +32,7 @@ export class TipManager {
       if (!t) { if (e.target === panel) this.togglePanel(false); return; }
       audio.ui('ui_click');
       if (t.dataset.act === 'close') this.togglePanel(false);
+      else if (t.dataset.act === 'bug') { this.togglePanel(false); this.bug.open(); }
       else if (t.dataset.act === 'switch') { this.togglePanel(false); this.onSwitch(); }
       else if (t.dataset.act === 'reset') { this.world.seenTips = []; this.onChange(); this.renderPanel(); }
     };
@@ -72,6 +76,7 @@ export class TipManager {
       <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
       <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
       <small class="muted">${this.world.seenTips.length ? L(`${this.world.seenTips.length} dica(s) já vista(s)`, `${this.world.seenTips.length} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
+      <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
       <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
     bindLangButtons($('settings-panel'));

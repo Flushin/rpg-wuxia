@@ -15,14 +15,22 @@ class PerfMeter {
   setEnabled(on: boolean) {
     this.enabled = on;
     try { localStorage.setItem(KEY, on ? '1' : '0'); } catch { /* sem armazenamento */ }
-    if (!on) { this.el?.remove(); this.el = null; this.frames = []; this.total = 0; }
+    if (!on) { this.el?.remove(); this.el = null; }
+  }
+
+  /** FPS médio e "pior 1%" dos últimos 10 s (para o report de bug). */
+  summary(): { avg: number; low: number } | null {
+    if (this.frames.length < 10) return null;
+    const sorted = [...this.frames].sort((a, b) => b - a), n = Math.max(1, Math.floor(sorted.length / 100));
+    return { avg: Math.round(1000 / (this.total / this.frames.length)), low: Math.round(1000 / (sorted.slice(0, n).reduce((a, b) => a + b, 0) / n)) };
   }
 
   /** Chamado a cada quadro pela cena do jogo. */
   tick(deltaMs: number, objects: number) {
-    if (!this.enabled) return;
+    // os quadros são guardados sempre (custo mínimo) para o report de bug; o contador só aparece se ligado
     this.frames.push(deltaMs); this.total += deltaMs;
     while (this.total > WINDOW_MS && this.frames.length > 1) this.total -= this.frames.shift()!;
+    if (!this.enabled) return;
     const now = performance.now();
     if (now - this.lastPaint < 500) return;
     this.lastPaint = now;
