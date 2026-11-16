@@ -10,7 +10,7 @@ Precisa de **Python 3.13** (o Blender 5.x como módulo só funciona nessa versã
 
 ```bash
 python3.13 -m venv .venv-blender
-.venv-blender/bin/pip install bpy numpy pillow      # Windows: .venv-blender\Scripts\pip
+.venv-blender/bin/pip install "bpy==5.2.4" numpy pillow   # Windows: .venv-blender\Scripts\pip  (o 5.3.0 trava no Linux: "InitGoogleLogging() twice")
 PY=.venv-blender/bin/python tools/sprites/build.sh   # baixa os modelos na 1ª vez (fetch-assets.sh)
 ```
 
@@ -23,7 +23,10 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_sprites.py` | Personagem/monstro animado → atlas `public/sprites/<nome>.png/.json` + `src/data/sprites/<nome>.json` (animações, âncora, altura) |
 | `render_props.py` | Objetos parados (árvores, pedras…) → atlas `public/sprites/floresta.*` com o ponto do chão (pivot) |
 | `render_town.py` | Cidade: casas wuxia, portão, lanternas, estandartes, incensário… gerados por script + cerejeiras → `public/sprites/cidade.*` |
-| `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça) → `public/sprites/pisos.png` |
+| `render_ruins.py` | Ruínas e portais: colunas de pedra, entulho, cacos, braseiros e a porta-lua do portal → `public/sprites/ruinas.*` |
+| `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água) → `public/sprites/pisos.png` |
+| `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |
+| `bandido_*.json`, `terracota.json`, `general.json` | Monstros KayKit recoloridos (lenço/chapéu gerados com `attach`) |
 | `tormenta.json`, `geada.json`, `lobo.json`, `floresta.json` | Configuração de cada folha |
 | `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |
 | `fetch-assets.sh` | Baixa só os modelos usados (espelhos no GitHub) |
@@ -38,8 +41,11 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 - **Folhas:** quadros recortados e empacotados (atlas do Phaser, máx. 2048×4096), paleta de 256 cores.
 - **Recolorir:** `texture.cells` troca blocos da paleta de texturas estilo KayKit (grade 8×4);
   `recolor` troca a cor de materiais por nome (modelos Kenney/Quaternius).
-- **Objetos presos a ossos:** `attach` cria um objeto e prende num osso. Hoje só `kind: "fan"` (leque de qi da Geada,
-  na `handslot.r`), com `rot` (graus), `scale`, `color` e `rib`.
+- **Objetos presos a ossos:** `attach` cria um objeto e prende num osso: `kind: "fan"` (leque de qi da Geada, na
+  `handslot.r`; `rot` em graus, `scale`, `color`, `rib`), `"mask"` (lenço no rosto, osso `head`; `radius`, `height`, `color`)
+  e `"hat"` (chapéu de palha cônico, osso `head`; `radius`, `height`, `color`, `band`).
+- **Cores do cenário x inimigos:** o cenário não usa as cores dos monstros do mesmo mapa (ex.: ruínas em pedra
+  cinza-azulada, nada de argila, porque os guerreiros de terracota são laranja). Confira com uma captura antes de fechar.
 
 - **Casas no jogo:** objetos `building` do mapa, desenhados em fatias verticais de 32 px com a profundidade da frente
   da casa em cada coluna (`src/render/mapView.ts`). Pegada da casa = tiles `house` (bloqueiam).

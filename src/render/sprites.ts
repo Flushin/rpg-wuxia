@@ -2,6 +2,10 @@ import Phaser from 'phaser';
 import tormenta from '../data/sprites/tormenta.json';
 import geada from '../data/sprites/geada.json';
 import lobo from '../data/sprites/lobo.json';
+import banditSword from '../data/sprites/bandido_espadachim.json';
+import banditArcher from '../data/sprites/bandido_arqueiro.json';
+import terracota from '../data/sprites/terracota.json';
+import general from '../data/sprites/general.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -29,6 +33,10 @@ const SHEETS: Record<string, SheetMeta> = {
   tormenta: tormenta as SheetMeta,
   geada: geada as SheetMeta,
   lobo: lobo as SheetMeta,
+  bandido_espadachim: banditSword as SheetMeta,
+  bandido_arqueiro: banditArcher as SheetMeta,
+  terracota: terracota as SheetMeta,
+  general: general as SheetMeta,
   ...npcSheets,
 };
 
@@ -37,6 +45,10 @@ const BY_TEXTURE: Record<string, string> = {
   'player-lamina': 'tormenta',
   'player-pavilhao': 'geada',
   wolf: 'lobo',
+  'bandit-sword': 'bandido_espadachim',
+  'bandit-archer': 'bandido_arqueiro',
+  terracotta: 'terracota',
+  general: 'general',
 };
 
 // retrato parado de frente, usado na mochila (por seita)
@@ -58,6 +70,7 @@ export function preloadSprites(scene: Phaser.Scene) {
   for (const key of Object.keys(SHEETS)) scene.load.atlas('sp-' + key, `sprites/${key}.png`, `sprites/${key}.json`);
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
+  scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 

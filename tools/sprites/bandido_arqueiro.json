@@ -1,0 +1,146 @@
+{
+ "name": "bandido_arqueiro",
+ "model": ".cache/kaykit/Characters/gltf/Rogue.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Crossbow",
+  "Icosphere",
+  "Throwable",
+  "Knife",
+  "Knife_Offhand",
+  "Rogue_Cape"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "rogue_texture",
+  "cells": {
+   "1,0": [
+    58,
+    44,
+    34
+   ],
+   "0,1": [
+    160,
+    122,
+    84
+   ],
+   "1,1": [
+    140,
+    136,
+    128
+   ],
+   "3,2": [
+    128,
+    124,
+    116
+   ],
+   "5,2": [
+    170,
+    136,
+    98
+   ],
+   "7,1": [
+    118,
+    92,
+    66
+   ],
+   "6,0": [
+    132,
+    102,
+    72
+   ],
+   "3,0": [
+    150,
+    146,
+    138
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "2H_Ranged_Aiming",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "2H_Ranged_Shoot",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "attach": [
+  {
+   "kind": "mask",
+   "bone": "head",
+   "offset": [
+    0,
+    0.02,
+    0.02
+   ],
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "scale": 1.0,
+   "radius": 0.52,
+   "height": 0.2,
+   "color": [
+    120,
+    104,
+    88
+   ]
+  },
+  {
+   "kind": "hat",
+   "bone": "head",
+   "offset": [
+    0,
+    0.98,
+    0
+   ],
+   "rot": [
+    -8,
+    0,
+    0
+   ],
+   "scale": 1.0,
+   "radius": 0.85,
+   "height": 0.38,
+   "color": [
+    200,
+    168,
+    100
+   ],
+   "band": [
+    120,
+    86,
+    48
+   ]
+  }
+ ]
+}

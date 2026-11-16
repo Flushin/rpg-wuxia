@@ -4,9 +4,10 @@ import { screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
-import { buildMapView, fadeTreesNear } from '../render/mapView';
+import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
 import { audio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
+import { perf } from '../ui/perf';
 import { SKILLS } from '../core/skills';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
@@ -162,6 +163,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_t: number, delta: number) {
+    perf.tick(delta, this.children.length);
     const w = this.world;
     this.updatePinch();
     w.advance(delta / 1000);
@@ -180,6 +182,7 @@ export class GameScene extends Phaser.Scene {
       v.sync(m, m.id === w.targetId);
     }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
+    cullMap(this.mapObjs, this.cameras.main, !this.trees);
     if (!this.trees) this.trees = this.mapObjs.filter((o) => o.name === 'tree' || o.name === 'building') as Phaser.GameObjects.Image[];
     {
       const who: { x: number; y: number; depth: number }[] = [];

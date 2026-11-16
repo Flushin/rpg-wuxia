@@ -2,6 +2,7 @@ import { L } from '../core/i18n';
 import { initials, skillScale, type SkillDef } from '../core/skills';
 import type { World } from '../core/world';
 import { isTouch } from './controls';
+import { skillIconHtml } from './icons';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const SIZE = 56, R = 118;
@@ -22,7 +23,7 @@ export class Hotbar {
     defs.forEach((d, i) => {
       const b = document.createElement('button');
       b.className = 'slot'; b.style.setProperty('--c', d.color);
-      b.innerHTML = `<span class="ic">${initials(d.name)}</span><span class="key">${i + 1}</span><span class="sweep"></span><span class="cdt"></span><span class="lock"></span>`;
+      b.innerHTML = `<span class="ic">${skillIconHtml(d.id, initials(d.name))}</span><span class="key">${i + 1}</span><span class="sweep"></span><span class="cdt"></span><span class="lock"></span>`;
       this.el.appendChild(b);
       this.slots.push({ btn: b, sweep: b.querySelector('.sweep')!, cdt: b.querySelector('.cdt')!, lock: b.querySelector('.lock')!, sig: '' });
       this.bind(b, i);

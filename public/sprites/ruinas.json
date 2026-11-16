@@ -1,0 +1,252 @@
+{
+ "frames": {
+  "portal": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 238,
+    "h": 359
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 238,
+    "h": 359
+   },
+   "sourceSize": {
+    "w": 238,
+    "h": 359
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8384
+   }
+  },
+  "coluna_a": {
+   "frame": {
+    "x": 240,
+    "y": 0,
+    "w": 82,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 82,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9231
+   }
+  },
+  "coluna_d": {
+   "frame": {
+    "x": 324,
+    "y": 0,
+    "w": 82,
+    "h": 181
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 181
+   },
+   "sourceSize": {
+    "w": 82,
+    "h": 181
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9006
+   }
+  },
+  "coluna_b": {
+   "frame": {
+    "x": 408,
+    "y": 0,
+    "w": 83,
+    "h": 145
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 83,
+    "h": 145
+   },
+   "sourceSize": {
+    "w": 83,
+    "h": 145
+   },
+   "pivot": {
+    "x": 0.494,
+    "y": 0.8759
+   }
+  },
+  "coluna_c": {
+   "frame": {
+    "x": 493,
+    "y": 0,
+    "w": 82,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 82,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8269
+   }
+  },
+  "braseiro": {
+   "frame": {
+    "x": 577,
+    "y": 0,
+    "w": 66,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 96
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8438
+   }
+  },
+  "entulho": {
+   "frame": {
+    "x": 645,
+    "y": 0,
+    "w": 74,
+    "h": 59
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 74,
+    "h": 59
+   },
+   "sourceSize": {
+    "w": 74,
+    "h": 59
+   },
+   "pivot": {
+    "x": 0.473,
+    "y": 0.6441
+   }
+  },
+  "cacos": {
+   "frame": {
+    "x": 721,
+    "y": 0,
+    "w": 53,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 53,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 53,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.5283,
+    "y": 0.6389
+   }
+  },
+  "mato_seco": {
+   "frame": {
+    "x": 776,
+    "y": 0,
+    "w": 16,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9062
+   }
+  },
+  "pedras": {
+   "frame": {
+    "x": 794,
+    "y": 0,
+    "w": 35,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 35,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 35,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.2857,
+    "y": 0.7143
+   }
+  }
+ },
+ "meta": {
+  "image": "ruinas.png",
+  "size": {
+   "w": 1024,
+   "h": 359
+  },
+  "scale": "0.5"
+ }
+}

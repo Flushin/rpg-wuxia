@@ -42,6 +42,8 @@ export function makeTextures(scene: Phaser.Scene) {
   g.generateTexture('tile-house', 64, 68);
 
   g.clear(); g.fillStyle(0x000000, 0.35); g.fillEllipse(15, 7, 28, 12); g.generateTexture('shadow', 30, 14);
+  // ponto de luz suave (partículas: portais e efeitos das skills)
+  g.clear(); for (let r = 8; r > 0; r--) { g.fillStyle(0xffffff, 0.12 + (8 - r) * 0.11); g.fillCircle(8, 8, r); } g.generateTexture('fx-dot', 16, 16);
 
   const figure = (key: string, body: number, trim: number, extra?: (g: Phaser.GameObjects.Graphics) => void) => {
     g.clear();

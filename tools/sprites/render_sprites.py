@@ -173,9 +173,70 @@ def make_fan(a):
     return o
 
 
+def _mat(name, rgb):
+    m = bpy.data.materials.new(name); m.use_nodes = True
+    bsdf = m.node_tree.nodes['Principled BSDF']
+    bsdf.inputs['Base Color'].default_value = srgb(rgb)
+    bsdf.inputs['Roughness'].default_value = 0.9
+    return m
+
+
+def make_hat(a):
+    """Chapéu de palha cônico (douli): cone baixo e largo + aba levemente caída. Eixo vertical = Y do osso."""
+    import bmesh
+    r, hgt, n = a.get('radius', 0.6), a.get('height', 0.3), 24
+    me = bpy.data.meshes.new('Hat'); bm = bmesh.new()
+    me.materials.append(_mat('HatStraw', a.get('color', [196, 164, 98])))
+    me.materials.append(_mat('HatBand', a.get('band', [110, 80, 45])))
+    tip = bm.verts.new((0, hgt, 0))
+    ring = [bm.verts.new((math.cos(2 * math.pi * i / n) * r, -0.04, math.sin(2 * math.pi * i / n) * r)) for i in range(n)]
+    mid = [bm.verts.new((math.cos(2 * math.pi * i / n) * r * 0.55, hgt * 0.45, math.sin(2 * math.pi * i / n) * r * 0.55)) for i in range(n)]
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((tip, mid[j], mid[i])).material_index = 0
+        f = bm.faces.new((mid[i], mid[j], ring[j], ring[i])); f.material_index = 0
+    band = [bm.verts.new((math.cos(2 * math.pi * i / n) * r * 0.58, hgt * 0.38, math.sin(2 * math.pi * i / n) * r * 0.58)) for i in range(n)]
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((band[i], band[j], mid[j], mid[i])).material_index = 1
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    o = bpy.data.objects.new('Hat', me)
+    o.modifiers.new('Solid', 'SOLIDIFY').thickness = 0.02
+    return o
+
+
+def make_mask(a):
+    """Lenço cobrindo boca e nariz: faixa curva na frente do rosto + ponta triangular caindo no peito.
+    Eixo vertical = Y do osso; frente = +Z (ajuste com rot se o modelo olhar para outro lado)."""
+    import bmesh
+    r, hgt, n = a.get('radius', 0.45), a.get('height', 0.22), 16
+    span = math.radians(a.get('angle', 230))
+    me = bpy.data.meshes.new('Mask'); bm = bmesh.new()
+    me.materials.append(_mat('MaskCloth', a.get('color', [90, 78, 66])))
+    lo, hi = [], []
+    for i in range(n + 1):
+        t = -span / 2 + span * i / n
+        x, z = math.sin(t), math.cos(t)
+        lo.append(bm.verts.new((x * r * 0.97, 0, z * r * 0.97)))
+        hi.append(bm.verts.new((x * r, hgt, z * r)))
+    for i in range(n):
+        bm.faces.new((lo[i], lo[i + 1], hi[i + 1], hi[i]))
+    # ponta do lenço na frente, caindo abaixo do queixo
+    k = n // 2
+    p = bm.verts.new((0, -a.get('tail', 0.22), r * 1.02))
+    bm.faces.new((lo[k - 3], lo[k + 3], p)) if n >= 6 else None
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    o = bpy.data.objects.new('Mask', me)
+    o.modifiers.new('Solid', 'SOLIDIFY').thickness = 0.03
+    return o
+
+
 def attach(a, arm):
-    """Objeto extra preso a um osso (ex.: leque na mão). a = {kind, bone, offset, rot (graus), scale, ...}."""
-    o = make_fan(a) if a['kind'] == 'fan' else None
+    """Objeto extra preso a um osso (ex.: leque na mão). a = {kind, bone, offset, rot (graus), scale, ...}.
+    kind: fan (leque), hat (chapéu de palha), mask (lenço no rosto)."""
+    o = {'fan': make_fan, 'hat': make_hat, 'mask': make_mask}[a['kind']](a)
     bpy.context.scene.collection.objects.link(o)
     o.parent = arm; o.parent_type = 'BONE'; o.parent_bone = a['bone']
     # parent_type BONE prende na ponta do osso; volta para a cabeça do osso + ajuste

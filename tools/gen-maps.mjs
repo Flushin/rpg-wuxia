@@ -10,8 +10,8 @@ const TILES = [
   { name: 'tree', walkable: false, color: [40, 95, 50] },
   { name: 'house', walkable: false, color: [150, 90, 70] },
   { name: 'plaza', walkable: true, color: [190, 185, 170] },
-  { name: 'ruin', walkable: true, color: [158, 124, 92] },
-  { name: 'pillar', walkable: false, color: [104, 80, 62] },
+  { name: 'ruin', walkable: true, color: [140, 143, 143] },
+  { name: 'pillar', walkable: false, color: [85, 89, 94] },
 ];
 const [G, P, WA, T, HS, PL, RU, PI] = [1, 2, 3, 4, 5, 6, 7, 8];
 const walkable = (id) => TILES[id - 1].walkable;

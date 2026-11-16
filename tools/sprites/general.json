@@ -1,0 +1,126 @@
+{
+ "name": "general",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword",
+  "1H_Sword_Offhand",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "0,0": [
+    236,
+    160,
+    104
+   ],
+   "1,0": [
+    190,
+    112,
+    70
+   ],
+   "2,0": [
+    80,
+    46,
+    30
+   ],
+   "3,0": [
+    226,
+    146,
+    92
+   ],
+   "7,0": [
+    236,
+    190,
+    80
+   ],
+   "4,0": [
+    210,
+    134,
+    84
+   ],
+   "6,0": [
+    228,
+    182,
+    72
+   ],
+   "7,1": [
+    214,
+    166,
+    62
+   ],
+   "2,1": [
+    220,
+    140,
+    86
+   ],
+   "0,1": [
+    160,
+    44,
+    36
+   ],
+   "1,1": [
+    190,
+    116,
+    70
+   ],
+   "3,1": [
+    232,
+    196,
+    100
+   ],
+   "5,1": [
+    120,
+    80,
+    50
+   ],
+   "2,2": [
+    232,
+    196,
+    100
+   ]
+  }
+ },
+ "frame": [
+  160,
+  128
+ ],
+ "anchor": [
+  80,
+  92
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "2H_Melee_Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Walking_A",
+   "frames": 8,
+   "fps": 9
+  },
+  "attack": {
+   "action": "2H_Melee_Attack_Slice",
+   "frames": 8,
+   "fps": 11,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_B",
+   "frames": 6,
+   "fps": 9,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle"
+}
