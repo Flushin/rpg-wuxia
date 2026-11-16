@@ -251,10 +251,10 @@ console.log('\n== vendedor: comprar e vender ==');
   ok(w.buy('pocao_mp_g', 10) === 'Ouro insuficiente', 'compra 10 sem ouro suficiente falha');
   w.gold = 5000; w.buy('pocao_mp_g', 10); ok(w.potionCount('pocao_mp_g') === 10, 'compra 10 grandes');
   const g0 = w.gold, i = w.bag.findIndex((b) => b?.baseId === 'pocao_hp_p');
-  ok(w.sell(i, 1) === null && w.gold === g0 + sellValue(makePotion('pocao_hp_p')) && w.potionCount('pocao_hp_p') === 4, 'vende 1 poção (25%)');
+  ok(w.sell(i, 1) === null && w.gold === g0 + sellValue(makePotion('pocao_hp_p')) && w.potionCount('pocao_hp_p') === 4, 'vende 1 poção (15%)');
   w.sell(i, 99); ok(w.potionCount('pocao_hp_p') === 0 && w.bag[i] === null, 'vende a pilha toda');
   const raro = equipOf(w, 'espadas_vento', 'raro'); w.addItem(raro); const j = w.bag.indexOf(raro), g1 = w.gold;
-  const exp = Math.floor(200 * 2.6 * 0.25);
+  const exp = Math.floor(200 * 2.6 * 0.15 + 1e-9);
   ok(sellValue(raro) === exp && w.sell(j) === null && w.gold === g1 + exp && w.bag[j] === null, `vende raro por ${exp}`);
   // mochila cheia na compra
   const w2 = mk('lamina', 5, 'cidade'); near(w2, 'vendedor'); w2.gold = 999; for (let k = 0; k < 30; k++) w2.addItem(equipOf(w2, 'colar_jade'));

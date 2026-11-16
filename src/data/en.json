@@ -2,7 +2,7 @@
   "classes": {
     "lamina": {
       "name": "Tempest",
-      "description": "Wandering swordsmen who fight up close with the fury of thunder.",
+      "description": "Wandering swordsmen who fight up close with the fury of thunder. Every hit restores a little health.",
       "rangeLabel": "Melee",
       "recommended": [
         { "reason": "your damage is physical" },
@@ -30,7 +30,7 @@
       { "name": "Twin Fangs", "description": "Two quick strikes on the target, each for 80% of your normal damage." },
       { "name": "Lightning Step", "description": "Dash to the target (up to 8 tiles, needs a clear path) and hit it for 120% damage." },
       { "name": "Blade Storm", "description": "Spin your blades to deal 170% damage to all monsters within 2.5 tiles. No target needed." },
-      { "name": "Guardbreak", "description": "Heavy strike for 220% damage that lowers the target's defense by 30% for 6 s." },
+      { "name": "Guardbreak", "description": "Heavy strike for 280% damage that lowers the target's defense by 40% for 6 s." },
       { "name": "Blade Flow", "description": "Passive: +10% attack speed and +5% crit chance. Grows with your level." }
     ],
     "pavilhao": [

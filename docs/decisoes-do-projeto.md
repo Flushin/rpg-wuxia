@@ -38,11 +38,11 @@
 
 ### Roteiro dos próximos marcos (decidido pelo Lucas em 16/11/2026)
 - **Ordem:** terminar o Marco 6 → **fechar a v1** → **novas seitas** → **conteúdo pós-nível-10** → online.
-- **Marco 7 (em andamento): fechar a v1 (versão 0.1).**
+- **Marco 7 (concluído em 16/11/2026): fechar a v1 (versão 0.1).** Detalhes em "Fechamento do marco 7" abaixo.
   - Jogar do nível 1 ao 10 com as duas seitas e fechar os itens de "Em aberto" (curva de XP, drops, chefe). Atenção: a Geada morre ~2× mais que a Tormenta.
   - **Missões: cadeia principal do nível 1 ao 10 que guia o jogador até o General**, dada pelos NPCs que hoje só falam (ancião, guarda…). Sem missões repetíveis por enquanto. **Decidido em 16/11/2026** — ver "Missões (marco 7)" abaixo.
   - **Missões: feitas (16/11/2026).** Falta: jogar 1→10 com as duas seitas e fechar os itens de "Em aberto".
-  - Polimento proposto: tela de carregamento e instalar como app no celular (PWA).
+  - Polimento: tela de carregamento, instalar como app no celular (PWA) e versão na tela inicial — **feitos**.
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
 - **Marco 8: Titã e Víbora.** 4 ativas + 1 passiva cada (níveis 1, 3, 5, 7, 9), balanceadas com o simulador. Sugestão de sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas. Skills e números: **a decidir com o Lucas**.
 - **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
@@ -51,6 +51,22 @@
 
 
 ## Decididas
+
+### Fechamento do marco 7 (16/11/2026)
+Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
+- **Tormenta vs. General** (perdia 6/6 com o equipamento Incomum das missões): **Tormenta fortalecida, General igual.**
+  - **Roubo de vida:** 8% do dano causado volta como vida (`lifeSteal` em `classes.json`; vale para golpe e skills). Descrição da seita avisa.
+  - **Quebra-Guarda:** 220% → **280%** e −30% → **−40%** de defesa por 6 s.
+  - Resultado: vence **10–11 de 12** com Incomum e 12/12 com Raro.
+- **Geada mais resistente, continua a mais rápida:** Stamina inicial 5 → **8**. Mortes até o nível 10: ~4 → **~0–1**; ritmo igual (~47 min).
+  Tormenta: ~66 min, ~1,5 morte. (A diferença de ritmo entre as seitas foi mantida de propósito: Geada rápida, Tormenta firme.)
+- **Menos ouro:** ouro dos monstros comuns **pela metade** (lobo 2–5; bandidos 3–5 +0,8/nível; terracota 5–8 +1/nível; General igual)
+  e venda de itens **25% → 15%** do valor. Recompensas de missão iguais (passam a pesar mais).
+  Gasto com poções + conserto: Tormenta ~75% do ouro ganho (antes ~40%), Geada ~40% (antes ~20%).
+- **Acabamentos:** tela de carregamento (WANDERERS + barra de progresso); **PWA** instalável (`public/manifest.webmanifest`, ícones em
+  `public/icons/` gerados por `tools/icons/make_app_icons.py`, service worker `public/sw.js` que sempre busca a versão nova quando há
+  internet e não intercepta o envio de bug); **versão** discreta (`v0.1.0 · commit`) no canto da tela inicial.
+- **Itens de "Em aberto"** fechados para a v1 com esses números; o ajuste fino segue com os reports dos amigos.
 
 ### Missões (marco 7, 16/11/2026)
 Decidido pelo Lucas em 16/11/2026.
@@ -326,6 +342,7 @@ Decidido pelo Lucas em 16/11/2026.
 - 2 classes: Tormenta e Geada.
 
 ## Em aberto (detalhes para a fase de balanceamento)
+*Fechados para a v1 em 16/11/2026 (ver "Fechamento do marco 7"); revisar com o retorno dos jogadores.*
 - Curva de XP até o nível 10
 - Números de dano, cooldown e custo de mana das skills
 - Lista de equipamentos de teste e taxas de drop

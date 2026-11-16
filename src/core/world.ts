@@ -651,6 +651,9 @@ export class World {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
       t.hp -= dealt;
       if (dealt > 0) this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
+      // roubo de vida da seita (Tormenta): parte do dano causado volta como vida
+      const ls = a.kind === 'player' ? CLASSES[this.classId].lifeSteal ?? 0 : 0;
+      if (ls > 0 && dealt > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + dealt * ls);
     } else {
       this.emit({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
     }

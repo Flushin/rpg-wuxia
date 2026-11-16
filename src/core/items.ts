@@ -86,9 +86,9 @@ export const buyPrice = (id: string) => POTIONS[id]?.price ?? 0;
 // valor de venda de UMA unidade
 export function sellValue(it: ItemInstance): number {
   const p = POTIONS[it.baseId];
-  if (p) return Math.max(1, Math.floor(p.price * J.sellRatio));
+  if (p) return Math.max(1, Math.floor(p.price * J.sellRatio + 1e-9));
   const b = BASES[it.baseId];
-  return b ? Math.max(1, Math.floor(b.value * RARITIES[it.rarity].valueMul * J.sellRatio)) : 0;
+  return b ? Math.max(1, Math.floor(b.value * RARITIES[it.rarity].valueMul * J.sellRatio + 1e-9)) : 0;
 }
 export function repairCost(it: ItemInstance): number {
   const b = BASES[it.baseId];
