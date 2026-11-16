@@ -1,4 +1,4 @@
-# RPG Wuxia (Marco 1)
+# Wanderers (Marco 1)
 
 RPG isométrico no navegador (TypeScript + Vite + Phaser 3), combate tab-target.
 
