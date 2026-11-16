@@ -404,6 +404,11 @@ Implementadas a pedido do Lucas e publicadas no site.
   - **Chave:** `BUG_REPORT_KEY` em `src/ui/bugReport.ts` (é pública por natureza; só envia e-mail para o dono). Sem chave, o botão
     mostra "ainda não configurado".
 
+- **Correções para iPhone e skills** *(PR #18, 16/11/2026)*: no iPhone deitado o Safari aumentava sozinho o texto
+  (faltava `text-size-adjust: 100%`), cortando a interface; dicas no celular deitado baixo agora ficam embaixo, no meio, compactas.
+  Nomes de monstros e do jogador ficam sempre por cima (árvores não cortam mais). Skills prontas não ficam mais apagadas (a camada
+  escura de "bloqueada" cobria todas): **só ficam apagadas em recarga**; sem mana continua a borda azul.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

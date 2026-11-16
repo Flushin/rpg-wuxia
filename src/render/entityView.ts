@@ -33,7 +33,7 @@ export class EntityView {
   private accY = 0;
   private top: number; // altura (px) do topo do personagem acima dos pés
   private label!: Phaser.GameObjects.Text;
-  private labelY: number | null = null; // NPC: nome solto (fora do container)
+  private labelY: number | null = null; // nome solto (fora do container), sempre por cima
   private mark?: Phaser.GameObjects.Text; // missão: "!" ou "?" sobre o NPC (marco 7)
   private markSig: string | null = null;
 
@@ -63,9 +63,9 @@ export class EntityView {
       .setOrigin(0.5, 1).setResolution(DPR * 2);
     label.setName('label');
     this.label = label;
-    // NPCs: nome fora do container, sempre por cima (casas e o portão não cortam o nome)
-    if (e.kind === 'npc') { this.labelY = labelY; label.setDepth(99995); }
-    this.container = scene.add.container(0, 0, e.kind === 'npc' ? [this.ring, shadow, this.sprite, this.bar] : [this.ring, shadow, this.sprite, this.bar, label]);
+    // nome fora do container, sempre por cima (árvores, casas e o portão não cortam o nome) — NPCs, monstros e jogador
+    this.labelY = labelY; label.setDepth(99995);
+    this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar]);
     this.sync(e, false);
     this.lastSx = this.container.x;
   }
@@ -82,7 +82,7 @@ export class EntityView {
     this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
     this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
     if (e.dead && this.sheet) { this.ring.clear(); this.bar.clear(); this.label.setVisible(false); return; }
-    this.label.setVisible(true);
+    this.label.setVisible(this.container.visible);
     this.label.setText(labelOf(e));
     this.ring.clear(); this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha

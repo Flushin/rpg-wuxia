@@ -98,6 +98,7 @@ export class Hotbar {
       s.sig = sig;
       s.btn.classList.toggle('locked', locked);
       s.btn.classList.toggle('nomana', nomana);
+      s.btn.classList.toggle('cd', !locked && cd > 0); // só fica apagada em recarga
       s.btn.classList.toggle('ready', !locked && !nomana && cd <= 0);
       s.lock.textContent = locked ? L(`Nv ${d.unlock}`, `Lv ${d.unlock}`) : '';
       s.cdt.textContent = !locked && cd > 0 ? (cd >= 10 ? String(Math.ceil(cd)) : cd.toFixed(1)) : '';
