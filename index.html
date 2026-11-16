@@ -31,6 +31,19 @@ button.primary{background:#8a3b2a;border-color:#c66}
 #pts-badge{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;border-radius:10px;background:#d4a017;color:#000;font-weight:700;font-size:12px;line-height:20px;text-align:center}
 #toast{position:absolute;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);padding:10px 18px;border-radius:10px;font-size:18px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;text-align:center}
 #toast.show{opacity:1}
+/* Recompensas no HUD: ouro com "+N" que some, barra de XP que brilha, feed de itens à esquerda */
+.gold-line{display:flex;align-items:center;gap:4px;margin-top:2px;font-size:11px;line-height:13px;color:#ffd23f}
+.gold-line .coin{font-size:10px}
+#p-gold-plus{font-size:10px;font-weight:700;color:#fff3b0;opacity:0;transform:translateY(2px);transition:opacity .25s,transform .25s}
+#p-gold-plus.show{opacity:1;transform:none}
+#p-gold-plus.fade{opacity:0;transform:translateY(-4px);transition:opacity .6s,transform .6s}
+.bar.xp{transition:box-shadow .3s}
+.bar.xp.glow{box-shadow:0 0 6px 1px #ffd23f}
+.bar.xp.glow i{filter:brightness(1.45)}
+#loot-feed{position:absolute;top:110px;left:8px;width:200px;pointer-events:none!important;display:flex;flex-direction:column;gap:2px}
+#loot-feed:empty{display:none}
+#loot-feed div{background:rgba(10,12,20,.62);border-radius:6px;padding:2px 8px;font-size:13px;font-weight:600;text-shadow:0 0 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:feedIn .2s ease-out}
+@keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
 #joystick{position:absolute;left:20px;bottom:20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);touch-action:none}
 #knob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.35);pointer-events:none}
 #btn-attack{position:absolute;right:24px;bottom:30px;width:96px;height:96px;border-radius:50%;background:rgba(160,50,40,.75);border:2px solid #f99;font-size:16px;font-weight:700;touch-action:none}
@@ -187,9 +200,10 @@ button.danger{background:#8a2a2a;border-color:#f66}
 @media (max-width:340px){#joystick{width:96px;height:96px}#potion-bar.touch{bottom:122px}}
 @media (max-width:640px){
  #player-frame{width:150px}
- #target-frame{top:92px;left:8px;transform:none;width:min(200px,calc(100% - 190px))}
+ #target-frame{top:108px;left:8px;transform:none;width:min(200px,calc(100% - 190px))}
  #boss-bar{top:8px;left:164px;transform:none;width:calc(100% - 330px);min-width:150px;padding:4px 6px}#boss-bar b{font-size:12px}#boss-bar .bar{height:16px}#boss-bar .bar span{line-height:16px;font-size:10px}
  #map-name{font-size:12px;padding:4px 8px}
+ #loot-feed{width:min(200px,calc(100% - 190px))}#loot-feed div{font-size:12px}
  #hud .frame .line{font-size:12px}
 }
 #minimap{display:block;width:176px;height:96px;padding:0;min-height:0;background:rgba(10,12,20,.72);border:1px solid #556;border-radius:10px;cursor:pointer;touch-action:manipulation;overflow:hidden}
@@ -206,7 +220,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
 /* Celular deitado com pouca altura (ex.: Galaxy Z Fold fechado, ~920x316): tudo compacto, sem sobreposição */
 @media (orientation:landscape) and (max-height:450px){
  #player-frame{width:150px;padding:4px 6px}#player-frame .line{font-size:11px}
- #target-frame{top:86px;left:8px;transform:none;width:180px;padding:4px 6px}
+ #target-frame{top:100px;left:8px;transform:none;width:180px;padding:4px 6px}
  #top-right{flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:5px;max-width:none}
  #minimap{width:104px;height:56px}
  #map-name{display:none}
@@ -223,6 +237,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
  #btn-attack{width:78px;height:78px;right:14px;bottom:12px;font-size:14px}
  #hotbar.touch .slot{width:46px;height:46px}
  #toast{top:22%;font-size:14px;padding:6px 12px}
+ #loot-feed{width:180px}#loot-feed div{font-size:11px;padding:1px 6px}
  #boss-bar{top:auto;bottom:10px;left:50%;transform:translateX(-50%);width:min(300px,40%)}
 }
 </style>
@@ -235,6 +250,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
     <div class="bar hp"><i id="p-hp"></i><span id="p-hp-t"></span></div>
     <div class="bar mp"><i id="p-mp"></i><span id="p-mp-t"></span></div>
     <div class="bar xp"><i id="p-xp"></i><span id="p-xp-t"></span></div>
+    <div class="gold-line"><span class="coin">&#128176;</span><b id="p-gold">0</b><span id="p-gold-plus"></span></div>
   </div>
   <div id="target-frame" class="frame hidden">
     <div class="line"><b id="t-name"></b><span id="t-level"></span></div>
@@ -252,6 +268,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
     <button id="dur-warn" class="hidden" aria-label="Equipamento com pouca durabilidade">&#9888; Reparar</button>
   </div>
   <div id="toast"></div>
+  <div id="loot-feed" aria-live="polite"></div>
   <div id="hotbar"></div>
   <div id="skill-tip" class="hidden"></div>
   <div id="potion-bar">

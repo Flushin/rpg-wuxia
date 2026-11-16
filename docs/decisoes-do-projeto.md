@@ -257,6 +257,16 @@ Implementadas a pedido do Lucas e publicadas no site.
 ### Monstros (15/11/2026)
 - **Renascimento com tempo** *(PR #3)*: corrigido o exploit de trocar de mapa para renascer todos. Cada monstro comum morto guarda o horário de renascimento (relógio real) pelo ponto de spawn (`mapa#índice`); o tempo continua fora do mapa e vai no save (`respawns`). Comuns: **30 s** (lobos eram 15 s; bandidos e terracota 35–40 s). General: 10 min, como já era. Simulação de balanceamento quase igual (Tormenta ~72 min, Geada ~52 min até o nível 10). Teste: `npm run check:respawn`.
 
+### Interface (16/11/2026)
+- **Recompensas fora do meio da tela** *(PR #__PR__)*: o aviso no centro ao matar saiu.
+  - **Ouro no quadro do personagem:** nova linha 💰 com o total; cada ganho mostra um "+12" pequeno ao lado, que some sozinho em ~2,5 s. Abates seguidos **somam** no mesmo número.
+  - **XP:** a barra de XP brilha a cada ganho (sem aviso).
+  - **Feed de itens** à esquerda, abaixo do quadro do personagem (ou do quadro do alvo, quando ele fica empilhado à esquerda). Cada linha some em ~3 s; itens iguais se agrupam ("×3"); cor pela raridade. **Fold fechado / celular deitado baixo:** até 2 linhas, texto menor; **demais telas e PC:** até 4.
+  - **Filtro (⚙):** "Avisar todos os itens coletados" — desligado por padrão (só Incomum e Raro). Fica salvo no aparelho (`localStorage`). Tudo continua indo para a mochila normalmente.
+  - Os outros avisos (nível, skill nova, mochila cheia, morte, chefe) continuam no centro.
+  - Por causa da linha de ouro, o quadro do alvo empilhado à esquerda desceu um pouco (celular em pé e deitado).
+  - **Teste de sobreposição** agora fica no repositório: `tools/layout-check.mjs` (6 tamanhos, incluindo **Fold fechado 920×316** e **Fold aberto 884×1028**, com o feed cheio e o quadro do alvo visível). Código do feed em `src/ui/rewards.ts`.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

@@ -14,6 +14,7 @@ import { Minimap } from './minimap';
 import { isTouch } from './controls';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
+import { Rewards } from './rewards';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -32,6 +33,7 @@ export class Hud {
   private autoPanel: AutoPanel;
   private autoSig = '';
   private minimap: Minimap;
+  readonly rewards = new Rewards();
   constructor(private world: World) {
     this.minimap = new Minimap(world);
     this.hotbar = new Hotbar(world);
@@ -111,6 +113,8 @@ export class Hud {
     $('p-xp').style.width = need === null ? '100%' : pct(w.xp, need);
     $('p-xp-t').textContent = need === null ? L(`Nível máximo (${PROGRESSION.levelCap})`, `Max level (${PROGRESSION.levelCap})`) : `XP ${Math.floor(w.xp)} / ${need}`;
     $('map-name').textContent = w.map.name;
+    if (w.gold !== this.goldSig) { this.goldSig = w.gold; $('p-gold').textContent = String(w.gold); }
+    this.rewards.update();
     const badge = $('pts-badge');
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
     badge.classList.toggle('hidden', w.freePoints <= 0);
