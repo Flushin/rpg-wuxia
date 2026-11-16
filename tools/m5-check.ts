@@ -292,8 +292,12 @@ console.log('\n== auto-combate ignora o chefe e a arena ==');
   ok(pl({ x: 14, y: 16.5 }, inside).length === 0, 'auto: não gera caminho para dentro da arena');
   ok(w2.pathLength(inside) === Infinity, 'auto: alvo na arena é inalcançável');
   // regra de nível continua: nível do jogador + 2
+  // monstros passivos: se um guerreiro atacasse, o auto revidaria (regra "revidar primeiro") e o teste ficava instável
+  // um guerreiro pode surgir perto do ponto de chegada e atacar: aí o auto revida (regra "revidar primeiro"), o que é
+  // permitido. O que não pode é escolher sozinho um alvo novo acima do limite de nível.
   const w3 = mk('lamina', 1, 'ruinas'); w3.auto.toggle(); run(w3, 3);
-  ok(w3.targetId === null, 'nv 1 não ataca terracota nv 7+ (regra nível ≤ jogador + 2)');
+  const t3 = w3.getTarget();
+  ok(!t3 || t3.ai === 'chase', 'nv 1 não ataca terracota nv 7+ (regra nível ≤ jogador + 2; só revida quem o ataca)');
 }
 
 console.log('\n== vários personagens: save ==');

@@ -38,9 +38,10 @@
 
 ### Roteiro dos próximos marcos (decidido pelo Lucas em 16/11/2026)
 - **Ordem:** terminar o Marco 6 → **fechar a v1** → **novas seitas** → **conteúdo pós-nível-10** → online.
-- **Marco 7: fechar a v1 (versão 0.1).**
+- **Marco 7 (em andamento): fechar a v1 (versão 0.1).**
   - Jogar do nível 1 ao 10 com as duas seitas e fechar os itens de "Em aberto" (curva de XP, drops, chefe). Atenção: a Geada morre ~2× mais que a Tormenta.
-  - **Missões: cadeia principal do nível 1 ao 10 que guia o jogador até o General**, dada pelos NPCs que hoje só falam (ancião, guarda…), com recompensa de XP/ouro. Missões, NPCs de cada etapa e recompensas: **a decidir com o Lucas**. Sem missões repetíveis por enquanto.
+  - **Missões: cadeia principal do nível 1 ao 10 que guia o jogador até o General**, dada pelos NPCs que hoje só falam (ancião, guarda…). Sem missões repetíveis por enquanto. **Decidido em 16/11/2026** — ver "Missões (marco 7)" abaixo.
+  - **Missões: feitas (16/11/2026).** Falta: jogar 1→10 com as duas seitas e fechar os itens de "Em aberto".
   - Polimento proposto: tela de carregamento e instalar como app no celular (PWA).
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
 - **Marco 8: Titã e Víbora.** 4 ativas + 1 passiva cada (níveis 1, 3, 5, 7, 9), balanceadas com o simulador. Sugestão de sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas. Skills e números: **a decidir com o Lucas**.
@@ -50,6 +51,42 @@
 
 
 ## Decididas
+
+### Missões (marco 7, 16/11/2026)
+Decidido pelo Lucas em 16/11/2026.
+- **Objetivos:** só **abater, falar e ir até um lugar** (sem itens de missão para coletar).
+- **Recompensas:** XP e ouro em todas; **equipamento garantido em 2 etapas-chave** (4 e 7).
+- **Ritmo:** continua **~1 hora até o nível 10**: o XP dos monstros diminui um pouco para compensar o XP das missões (conferido no simulador).
+- **Acompanhamento:** **rastreador** pequeno no HUD (objetivo e progresso, ex.: Lobos 3/6) e **"!"/"?"** sobre o NPC (missão para pegar / para entregar).
+- **Cadeia principal (8 etapas; a próxima só libera ao atingir o nível indicado):**
+  1. Ancião (nv 1) — *Boas-vindas*: fale com o mestre da sua seita.
+  2. Mestre da seita (nv 1) — *Primeiro treino*: derrote 5 lobos.
+  3. Guarda do Portão (nv 2) — *Lobos na estrada*: derrote 8 lobos.
+  4. Guarda do Portão (nv 4) — *Acampamentos*: derrote 6 bandidos espadachins → **arma Incomum nv 5 da seita**.
+  5. Mercador Ambulante (nv 5) — *Carga roubada*: derrote 4 bandidos arqueiros.
+  6. Ancião (nv 6) — *O portão antigo*: chegue às Ruínas de Terracota.
+  7. Mestre da seita (nv 7) — *Barro e bronze*: derrote 8 guerreiros de terracota → **túnica/manto Incomum nv 5**.
+  8. Ancião (nv 9) — *O General desperta*: derrote o General de Terracota → **bônus grande de ouro**.
+
+**Como ficou (feito em 16/11/2026):**
+- **Recompensas** (XP · ouro): 1) 100 · 20 · 2) 150 · 30 · 3) 300 · 50 · 4) 900 · 120 + **arma Incomum nv 5 da seita** ·
+  5) 1.600 · 150 · 6) 1.500 · 150 · 7) 4.000 · 300 + **Manto de Seda Incomum nv 5** · 8) 6.000 · **800**. Total ~14.550 XP (~24% do XP até o nível 10).
+  Mochila cheia: o item cai no chão (60 s), não se perde. No nível 10 a missão dá só o ouro.
+- **XP dos monstros −22%** para compensar: lobo 8 + 5/nível, espadachim 23 + 6, arqueiro 26 + 7, terracota 55 + 9 (General igual).
+  **Simulador** (com as missões, sem contar a caminhada até os NPCs): Tormenta **64,6 min** (antes 64,3), Geada **46,6 min** (antes 46,4).
+  Os níveis 2 e 3 chegam bem rápido (as duas primeiras missões), como um tutorial.
+- **Janela do NPC:** em cima aparece a missão daquele NPC: oferta com **Aceitar**, conclusão com **Entregar** (com a fala de entrega),
+  ou o andamento. Abaixo continuam a loja, o ferreiro ou as falas de sempre. Com nível baixo o NPC avisa: "Volte quando estiver no nível X".
+- **Marcas:** "!" amarelo sobre quem tem missão para dar; "?" verde sobre quem recebe (e sobre o mestre na missão de conversa). Balançam devagar.
+- **Rastreador:** canto direito, logo abaixo dos botões do topo (funciona no Fold fechado): nome da missão e objetivo com progresso
+  ("Derrote lobos 3/5"), "Fale com …", "✓ Volte a …" ou "Próxima missão no nível X". Some quando a cadeia termina.
+- **Avisos:** "Missão aceita", "Objetivo cumprido" (com som) e "Missão concluída".
+- **Regras:** abates do auto-combate contam; o **ganho offline não conta** para missões. Saves antigos começam a cadeia do zero
+  (personagens de nível alto conseguem fazer as etapas antigas rapidamente).
+- **Código:** `src/core/quests.ts` (dados e tipos), estado e regras em `World` (`questView`, `questMark`, `questAccept`, `questTurnIn`),
+  textos em `src/data/quests.json` + seção `quests` do `en.json`. Teste: `npm run check:quests`. O simulador faz a cadeia
+  (`--sem-missoes` para comparar).
+- **Teste instável corrigido:** o `check:m5` falhava quando um guerreiro atacava o personagem de nível 1 (o auto revida, o que é permitido).
 
 ### Fechamento do marco 6 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026: entram os 4 blocos (bandidos/terracota, ruínas/água/portais, efeitos das skills, ícones + FPS).
@@ -76,8 +113,7 @@ Decidido pelo Lucas em 16/11/2026: entram os 4 blocos (bandidos/terracota, ruín
   objetos. Objetos do mapa fora da tela deixam de ser desenhados. Medição aqui (CPU 4× mais lenta, tela de celular deitado): o JS
   gasta ~6–8 ms por quadro (p95 ~11–14 ms na floresta), dentro dos 16,7 ms de 60 FPS. A medida real é no celular do Lucas com o
   contador (o ambiente de teste não tem placa de vídeo).
-- **Observação:** o teste `check:m5` ("nv 1 não ataca terracota nv 7+") falha às vezes também na `main` (~1 em 3); é instável e
-  anterior a este marco.
+- **Observação:** o teste `check:m5` ("nv 1 não ataca terracota nv 7+") falhava às vezes (~1 em 3); corrigido no marco 7.
 
 ### Cidade, NPCs e mestres das seitas (marco 6, 16/11/2026)
 Decidido pelo Lucas em 16/11/2026.
@@ -294,7 +330,6 @@ Decidido pelo Lucas em 16/11/2026.
 - Lista de equipamentos de teste e taxas de drop
 - Taxa exata do idle/offline e limite de horas
 - Comportamento do chefe em detalhe (padrão de ataques, frequência de invocação/área)
-- Cadeia de missões do Marco 7 (etapas, NPCs, recompensas)
 
 ## Notas de implementação (marco 3)
 - Q/E usam a poção pequena primeiro, depois a grande. Um efeito ativo por tipo (HP/mana).

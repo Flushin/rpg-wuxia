@@ -174,6 +174,14 @@ button.danger{background:#8a2a2a;border-color:#f66}
 .cell .ic.img{padding:2px}.cell .ic.empty.img .ico{filter:grayscale(1)}
 .pot .lb .ico{width:40px;height:40px}.pot .lb:has(.ico){filter:none}
 #fps-meter{position:fixed;left:50%;transform:translateX(-50%);top:2px;z-index:40;font:11px/1.2 ui-monospace,monospace;background:rgba(0,0,0,.55);padding:2px 8px;border-radius:6px;pointer-events:none;white-space:nowrap}
+#quest-tracker{position:absolute;right:8px;top:300px;max-width:230px;padding:5px 9px;border-radius:8px;background:rgba(10,14,24,.72);border:1px solid #d4a01766;font-size:12px;line-height:1.35;text-align:right;pointer-events:none}
+#quest-tracker .qt-name{color:#f0d070;font-weight:700;font-size:12px}#quest-tracker .qt-line b{color:#fff}
+.qm{font-style:normal;font-weight:900;color:#ffd23f}
+.quest-box{border:1px solid #d4a017aa;background:rgba(212,160,23,.08);border-radius:10px;padding:8px 10px;margin:6px 0 10px}
+.quest-box.ready{border-color:#4cd964aa;background:rgba(76,217,100,.08)}
+.q-head{margin-bottom:4px}.q-tag{font-size:11px;color:#f0d070;text-transform:uppercase;letter-spacing:.04em}.quest-box.ready .q-tag{color:#4cd964}
+.q-goal,.q-rew{font-size:12px;margin:3px 0}.q-rew{color:#cdb}.quest-box button{margin-top:6px;width:100%}
+@media (orientation:landscape) and (max-height:450px){#quest-tracker{max-width:190px;font-size:11px;padding:3px 7px}}
 .opt-ic .ico{display:inline-block;width:22px;height:22px;vertical-align:middle;border-radius:4px}
 @media (min-width:600px){.inv-card{width:min(720px,100%);display:grid;grid-template-columns:1fr 250px;gap:16px}.inv-detail{margin:0;position:sticky;top:0;bottom:auto;align-self:start;border-top:0;border-left:1px solid #445;padding:0 0 0 14px;max-height:none}}
 #item-tip{position:fixed;z-index:30;width:230px;background:rgba(14,18,30,.97);border:1px solid #d4a017;border-radius:10px;padding:8px 10px;pointer-events:none;font-size:12px}
@@ -286,6 +294,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
   </div>
   <div id="toast"></div>
   <div id="loot-feed" aria-live="polite"></div>
+  <div id="quest-tracker" class="hidden" aria-live="polite"></div>
   <div id="hotbar"></div>
   <div id="skill-tip" class="hidden"></div>
   <div id="potion-bar">

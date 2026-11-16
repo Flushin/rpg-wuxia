@@ -74,6 +74,7 @@ export type GameEvent =
   | { type: 'miss'; targetId: number; targetKind: Entity['kind']; x: number; y: number }
   | { type: 'death'; id: number }
   | { type: 'kill'; monsterId: string; level?: number }
+  | { type: 'quest'; kind: 'accepted' | 'progress' | 'ready' | 'completed'; questId: string; name: string }
   | { type: 'xp'; amount: number }
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
@@ -147,4 +148,5 @@ export interface SaveData {
   auto?: AutoSave;
   bossRespawnAt?: number; // ms (relógio real) em que o chefe renasce
   respawns?: Record<string, number>; // "mapa#índice" → ms (relógio real) em que o monstro comum renasce
+  quest?: { stage: number; status: string; progress: number }; // cadeia principal de missões (marco 7)
 }

@@ -15,6 +15,7 @@ import { isTouch } from './controls';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
 import { Rewards } from './rewards';
+import { QuestTracker } from './questTracker';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -34,6 +35,7 @@ export class Hud {
   private autoSig = '';
   private minimap: Minimap;
   readonly rewards = new Rewards();
+  private questTracker = new QuestTracker();
   constructor(private world: World) {
     this.minimap = new Minimap(world);
     this.hotbar = new Hotbar(world);
@@ -115,6 +117,7 @@ export class Hud {
     $('map-name').textContent = w.map.name;
     if (w.gold !== this.goldSig) { this.goldSig = w.gold; $('p-gold').textContent = String(w.gold); }
     this.rewards.update();
+    this.questTracker.update(this.world);
     const badge = $('pts-badge');
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
     badge.classList.toggle('hidden', w.freePoints <= 0);
