@@ -377,6 +377,15 @@ Implementadas a pedido do Lucas e publicadas no site.
   - Por causa da linha de ouro, o quadro do alvo empilhado à esquerda desceu um pouco (celular em pé e deitado).
   - **Teste de sobreposição** agora fica no repositório: `tools/layout-check.mjs` (6 tamanhos, incluindo **Fold fechado 920×316** e **Fold aberto 884×1028**, com o feed cheio e o quadro do alvo visível). Código do feed em `src/ui/rewards.ts`.
 
+- **Reportar bug** *(PR #15, pedido pelo Lucas em 16/11/2026)*: botão **🐞 Reportar bug** em ⚙. Abre uma caixa onde o jogador
+  escreve o que aconteceu (e, se quiser, nome/contato) e envia. O report chega **por e-mail** para o Lucas pelo **Web3Forms**
+  (grátis, 250 envios/mês; o plano grátis não tem anexo, por isso **sem print** — escolha do Lucas).
+  - **Vai junto automaticamente:** versão e commit do build; personagem, seita, nível, mapa, posição, HP, auto-combate, missão e alvo;
+    navegador, tela/janela, DPR, em pé/deitado, toque/mouse, idioma; FPS médio e "pior 1%" dos últimos 10 s; últimos 10 erros do console.
+  - Limite de **1 report por minuto** por aparelho. Digitar na caixa não aciona os atalhos do jogo.
+  - **Chave:** `BUG_REPORT_KEY` em `src/ui/bugReport.ts` (é pública por natureza; só envia e-mail para o dono). Sem chave, o botão
+    mostra "ainda não configurado".
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

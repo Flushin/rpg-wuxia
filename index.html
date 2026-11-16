@@ -64,6 +64,10 @@ button[disabled]{opacity:.45;cursor:default}
 #attrs-panel,#settings-panel{touch-action:pan-y}
 #settings-panel{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto}
 #settings-panel .card{display:flex;flex-direction:column;gap:10px;width:min(320px,100%)}
+#bug-panel{position:fixed;inset:0;z-index:6;display:flex;background:rgba(0,0,0,.6);padding:12px;overflow:auto;touch-action:pan-y}
+#bug-panel .card{display:flex;flex-direction:column;gap:8px;width:min(360px,100%);margin:auto;flex-shrink:0}
+#bug-panel textarea{min-height:72px;flex-shrink:0}
+#bug-panel textarea,#bug-panel input{width:100%;box-sizing:border-box;font:inherit;font-size:14px;color:#e8e2d4;background:#0d1118;border:1px solid #445;border-radius:6px;padding:8px;resize:vertical}
 .opt{display:flex;align-items:center;gap:10px;margin:0;font-size:16px}.opt input{width:22px;height:22px}
 .muted{color:#889}
 .sld{display:grid;grid-template-columns:70px 1fr 32px;align-items:center;gap:8px;margin:0;font-size:16px}.sld input{width:100%;height:36px;touch-action:none;margin:0;padding:0}.sld output{text-align:right;color:#aab;font-size:14px}

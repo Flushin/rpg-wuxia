@@ -5,6 +5,9 @@ import { CreateScene } from './scenes/createScene';
 import { GameScene } from './scenes/gameScene';
 import { DPR, cssSize } from './render/display';
 import { fillIcons } from './ui/icons';
+import { captureErrors } from './ui/bugReport';
+
+captureErrors();
 
 fillIcons();
 
