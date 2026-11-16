@@ -9,7 +9,7 @@ import { perf } from './perf';
 // Reportar bug: botão em ⚙ abre uma caixa de texto; o report vai por e-mail para o Lucas pelo Web3Forms
 // (grátis, 250 envios/mês, sem anexo). Junto vão dados do jogo, do aparelho, FPS e os últimos erros do console.
 // A chave do Web3Forms é pública por natureza (fica no JS do site); ela só permite enviar e-mail para o dono.
-export const BUG_REPORT_KEY = '';
+export const BUG_REPORT_KEY = '7eb73268-6a10-45f2-97a1-9325e680240b';
 const ENDPOINT = 'https://api.web3forms.com/submit';
 const COOLDOWN_MS = 60_000;
 const LAST_KEY = 'rpg-bug-last';
