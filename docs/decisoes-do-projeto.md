@@ -25,14 +25,15 @@
 - **Marco 6 (em andamento): gráficos — fatia pequena.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Só depois estender para Geada, outros monstros, cidade e ruínas.
   - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos em `public/sprites/CREDITS.txt`.
   - **Primeira fatia (15/11/2026, feita):** Tormenta, lobo, árvores e piso da floresta já no jogo; retrato da Tormenta na mochila (fim da silhueta para ela). Detalhes em "Gráficos (marco 6)" abaixo.
-  - **Próximos passos:** Geada (Mage do KayKit, mesmo esqueleto), bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), NPCs, cidade (casas, praça), ruínas, água e portais.
+  - **Geada (16/11/2026, feita):** Mage do KayKit recolorido em **branco e azul-gelo** (túnica branca, capa azul-gelo, cabelo prateado, sem chapéu), segurando um **leque de qi** gerado pelo script (nenhum pacote CC0 tem leque). Animações: parado, correr, ataque = `Spellcast_Shoot`, morte. Retrato na mochila (fim da silhueta para ela também).
+  - **Próximos passos:** bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), NPCs, cidade (casas, praça), ruínas, água e portais.
 
 
 ## Decididas
 
 ### Gráficos (marco 6, 15/11/2026)
 - **Método:** modelos **3D CC0** renderizados em sprites isométricos por um script do Blender. Motivo: quase não existem sprites 2D CC0 isométricos com cara de wuxia, e misturar pacotes 2D de autores diferentes quebra o estilo; renderizando tudo com a mesma câmera e luz, o estilo fica coeso.
-- **Personagens:** linha **KayKit** (Kay Lousberg, CC0), estilo "cabeçudo" — escolhida no lugar da Quaternius porque já traz ataque com duas lâminas, mago (Geada) e esqueletos (base para os guerreiros de terracota), todos com o mesmo esqueleto e animações. **Tormenta = Rogue** recolorido (cabelo preto, túnica carmim, capa escura, cinto dourado).
+- **Personagens:** linha **KayKit** (Kay Lousberg, CC0), estilo "cabeçudo" — escolhida no lugar da Quaternius porque já traz ataque com duas lâminas, mago (Geada) e esqueletos (base para os guerreiros de terracota), todos com o mesmo esqueleto e animações. **Tormenta = Rogue** recolorido (cabelo preto, túnica carmim, capa escura, cinto dourado). **Geada = Mage** recolorido (túnica branca, detalhes azul-gelo, cabelo prateado, sem chapéu) com **leque de qi** — decidido pelo Lucas em 16/11/2026.
 - **Monstros:** lobo da Quaternius (Ultimate Animated Animals, CC0). Outros monstros: preferir KayKit recolorido.
 - **Cenário:** **Nature Kit 3D da Kenney** (CC0) renderizado com a mesma câmera e luz dos personagens (em vez de pacotes 2D), com as cores trocadas para uma paleta de floresta. Piso (grama, caminho) em 2D gerado por script, sem frestas.
 - **Estilo aprovado pelo Lucas:** personagem com **~48 px** de altura no zoom 100%; **sem contorno**; árvores do tamanho da prévia (bem mais altas que o personagem).
@@ -241,7 +242,7 @@ Implementadas a pedido do Lucas e publicadas no site.
 - **Ícones nos slots de equipamento** *(PR #1)*: emoji no lugar das siglas — ⛑️ cabeça, 📿 colar, 👘 tronco, ⚔️ arma, 👖 calça, 👢 bota; esmaecidos nos slots vazios; o nome do slot continua no title/aria-label. Equipamentos na mochila também mostram o emoji (poções seguem HP/MP). Conferir como ficam no celular.
 - **Atributos detalhados** *(PR #2)*: no painel C, cada atributo mostra o total e, embaixo, uma linha pequena "5 base + 14 níveis + 6 equip." (EN: base / levels / equip.). Níveis = pontos automáticos + livres; equipamento ignora itens com durabilidade 0. Função `attrBreakdown` em `src/core/stats.ts`. Conferir a largura em telas estreitas.
 - **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O contador (x/30) e o "Organizar" continuam valendo para a mochila toda. Craft e Gemas entram quando esses sistemas existirem.
-- **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. **Marco 6:** a Tormenta já mostra o retrato (sprite); a Geada troca quando ganhar arte.
+- **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. **Marco 6:** Tormenta e Geada já mostram o retrato (sprite).
 
 - **Minimapa** *(PR #8)*: no canto superior direito, acima do nome do mapa (os botões descem um pouco). Mapa em losango com as cores dos tiles; personagem (branco), monstros (pontinhos vermelhos minúsculos), chefe (laranja, maior), NPCs (amarelo) e portais (losango roxo). **Mapa grande:** tecla **M** ou toque/clique no minimapa; mostra também os nomes dos portais e NPCs e uma legenda; fecha com M, Esc, X ou tocando fora. Atualiza a cada 0,15 s. Código em `src/ui/minimap.ts`. Testado no PC e no celular (em pé e deitado).
 

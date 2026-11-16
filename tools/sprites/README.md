@@ -23,7 +23,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_sprites.py` | Personagem/monstro animado → atlas `public/sprites/<nome>.png/.json` + `src/data/sprites/<nome>.json` (animações, âncora, altura) |
 | `render_props.py` | Objetos parados (árvores, pedras…) → atlas `public/sprites/floresta.*` com o ponto do chão (pivot) |
 | `ground_tiles.py` | Pisos 2D (grama, caminho) → `public/sprites/pisos.png` |
-| `tormenta.json`, `lobo.json`, `floresta.json` | Configuração de cada folha |
+| `tormenta.json`, `geada.json`, `lobo.json`, `floresta.json` | Configuração de cada folha |
 | `fetch-assets.sh` | Baixa só os modelos usados (espelhos no GitHub) |
 
 ## Padrões fixados
@@ -36,6 +36,8 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 - **Folhas:** quadros recortados e empacotados (atlas do Phaser, máx. 2048×4096), paleta de 256 cores.
 - **Recolorir:** `texture.cells` troca blocos da paleta de texturas estilo KayKit (grade 8×4);
   `recolor` troca a cor de materiais por nome (modelos Kenney/Quaternius).
+- **Objetos presos a ossos:** `attach` cria um objeto e prende num osso. Hoje só `kind: "fan"` (leque de qi da Geada,
+  na `handslot.r`), com `rot` (graus), `scale`, `color` e `rib`.
 
 ## Nova folha
 

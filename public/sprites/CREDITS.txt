@@ -3,6 +3,8 @@ Sprites gerados a partir de modelos 3D CC0 (domínio público), renderizados por
 Personagens:
 - Tormenta: "Rogue" do KayKit Adventurers Character Pack 1.0 — Kay Lousberg (https://kaylousberg.com), CC0.
   Recolorido (cabelo, túnica, capa e cinto) para a seita Tormenta.
+- Geada: "Mage" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (branco e azul-gelo, cabelo prateado),
+  sem chapéu, cajado ou livro; o leque de qi é gerado pelo script (tools/sprites/render_sprites.py).
 
 Monstros:
 - Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.

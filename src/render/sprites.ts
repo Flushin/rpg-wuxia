@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import tormenta from '../data/sprites/tormenta.json';
+import geada from '../data/sprites/geada.json';
 import lobo from '../data/sprites/lobo.json';
 
 // Sprites renderizados dos modelos 3D (tools/sprites). Cada folha é um atlas do Phaser
@@ -16,17 +17,22 @@ export interface SheetMeta {
 
 const SHEETS: Record<string, SheetMeta> = {
   tormenta: tormenta as SheetMeta,
+  geada: geada as SheetMeta,
   lobo: lobo as SheetMeta,
 };
 
 // textura antiga (placeholder) -> folha animada. O que não estiver aqui continua placeholder.
 const BY_TEXTURE: Record<string, string> = {
   'player-lamina': 'tormenta',
+  'player-pavilhao': 'geada',
   wolf: 'lobo',
 };
 
 // retrato parado de frente, usado na mochila (por seita)
-export const PORTRAITS: Record<string, string> = { lamina: 'sprites/tormenta_retrato.png' };
+export const PORTRAITS: Record<string, string> = {
+  lamina: 'sprites/tormenta_retrato.png',
+  pavilhao: 'sprites/geada_retrato.png',
+};
 
 export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | null => {
   const key = BY_TEXTURE[texture];

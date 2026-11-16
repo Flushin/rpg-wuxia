@@ -49,6 +49,8 @@ def setup_scene(cfg):
     if cfg.get('texture'):
         retexture(cfg['texture'])
     arm = next((o for o in bpy.data.objects if o.type == 'ARMATURE'), None)
+    for a in cfg.get('attach', []):
+        attach(a, arm)
     # raiz que gira para as 8 direções
     root = bpy.data.objects.new('SpriteRoot', None)
     sc.collection.objects.link(root)
@@ -126,6 +128,57 @@ def retexture(t):
     img.pixels[:] = px.ravel()
     img.update()
     img.pack()
+
+
+def srgb(rgb):
+    return tuple((v / 255.0) ** 2.2 for v in rgb) + (1,)
+
+
+def make_fan(a):
+    """Leque de qi plissado (gerado aqui; nenhum pacote CC0 tem um): varetas + papel em zigue-zague."""
+    import bmesh
+    r0, r1 = a.get('inner', 0.05), a.get('radius', 0.4)
+    n = a.get('pleats', 12); span = math.radians(a.get('angle', 150)); depth = a.get('pleat', 0.025)
+    me = bpy.data.meshes.new('Fan'); bm = bmesh.new()
+    paper, rib = bpy.data.materials.new('FanPaper'), bpy.data.materials.new('FanRib')
+    for m, c in ((paper, a.get('color', [200, 230, 250])), (rib, a.get('rib', [90, 110, 140]))):
+        m.use_nodes = True
+        m.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = srgb(c)
+    me.materials.append(paper); me.materials.append(rib)
+    ring = []
+    for i in range(n * 2 + 1):  # 2 vértices por prega (dobra para fora / para dentro)
+        t = -span / 2 + span * i / (n * 2)
+        z = depth if i % 2 else 0.0
+        ring.append((bm.verts.new((math.sin(t) * r0, math.cos(t) * r0, z * 0.2)),
+                     bm.verts.new((math.sin(t) * r1, math.cos(t) * r1, z))))
+    for i in range(len(ring) - 1):
+        f = bm.faces.new((ring[i][0], ring[i][1], ring[i + 1][1], ring[i + 1][0])); f.material_index = 0
+    # varetas (lâminas finas nas dobras de fora) e cabo
+    w = 0.012
+    for i in range(0, len(ring), 2):
+        t = -span / 2 + span * i / (n * 2)
+        dx, dy = math.cos(t) * w, -math.sin(t) * w
+        v = [bm.verts.new((sx * r * math.sin(t) + k * dx, r * math.cos(t) + k * dy, -0.006))
+             for r, k in ((0, -1), (r1 * 0.98, -1), (r1 * 0.98, 1), (0, 1)) for sx in (1,)]
+        f = bm.faces.new(v); f.material_index = 1
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    for poly in me.polygons:
+        poly.use_smooth = False
+    o = bpy.data.objects.new('Fan', me)
+    o.modifiers.new('Solid', 'SOLIDIFY').thickness = 0.006
+    return o
+
+
+def attach(a, arm):
+    """Objeto extra preso a um osso (ex.: leque na mão). a = {kind, bone, offset, rot (graus), scale, ...}."""
+    o = make_fan(a) if a['kind'] == 'fan' else None
+    bpy.context.scene.collection.objects.link(o)
+    o.parent = arm; o.parent_type = 'BONE'; o.parent_bone = a['bone']
+    # parent_type BONE prende na ponta do osso; volta para a cabeça do osso + ajuste
+    o.location = Vector(a.get('offset', [0, 0, 0])) - Vector((0, arm.data.bones[a['bone']].length, 0))
+    o.rotation_euler = [math.radians(v) for v in a.get('rot', [0, 0, 0])]
+    o.scale = (a.get('scale', 1.0),) * 3
 
 
 def facing_rot(k):
