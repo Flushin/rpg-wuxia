@@ -1,0 +1,69 @@
+{
+ "name": "npc_morador2",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "2H_Staff",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat",
+  "Mage_Cape"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "mage_texture",
+  "cells": {
+   "0,1": [
+    200,
+    120,
+    130
+   ],
+   "2,1": [
+    240,
+    220,
+    200
+   ],
+   "7,1": [
+    120,
+    70,
+    80
+   ],
+   "2,2": [
+    220,
+    170,
+    170
+   ],
+   "1,0": [
+    30,
+    25,
+    25
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Walking_A",
+   "frames": 8,
+   "fps": 10
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle"
+}

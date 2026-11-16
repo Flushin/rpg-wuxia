@@ -97,23 +97,80 @@ function tilesetPng() {
 }
 
 // ---- cidade ----
+// Vila das Nuvens (marco 6): praça de pedra no centro com o incensário e os 4 mestres (um em cada canto,
+// ao lado do estandarte da seita); casas wuxia em volta; ferraria e loja de poções na beira da praça;
+// estrada de pedra até o portão leste (floresta). Casas = objetos "building" (tiles 'house' bloqueiam);
+// enfeites = objetos "decor" (block = 1 bloqueia o tile). Moradores andam (wander = raio em tiles).
 function cidade() {
   const rnd = rngFn(11);
   const gr = makeGrid();
-  gr.rect(1, 15, 30, 2, P); gr.rect(15, 1, 2, 30, P); gr.rect(12, 12, 8, 8, PL);
-  [[4, 4, 4, 4], [23, 4, 5, 4], [4, 23, 4, 5], [23, 23, 5, 4]].forEach(([x, y, w, h]) => gr.rect(x, y, w, h, HS));
-  for (let n = 0; n < 24; n++) {
+  gr.rect(1, 15, 30, 2, P); gr.rect(15, 1, 2, 30, P);
+  gr.rect(11, 11, 10, 10, PL); gr.rect(21, 15, 9, 2, PL); // praça + estrada de pedra até o portão
+  const objs = [];
+  const used = new Set(); // tiles reservados (casas, enfeites, NPCs e vizinhos) — sem árvores aleatórias
+  const reserve = (i, j, pad = 0) => { for (let y = j - pad; y <= j + pad; y++) for (let x = i - pad; x <= i + pad; x++) used.add(y * W + x); };
+  const building = (sprite, i, j, w, h, extra = []) => {
+    gr.rect(i, j, w, h, HS);
+    for (const [x, y] of extra) gr.set(x, y, HS); // partes que saem da pegada (bigorna, forja, bancada)
+    for (let y = j - 1; y <= j + h + 1; y++) for (let x = i - 1; x <= i + w + 1; x++) reserve(x, y);
+    objs.push(area(sprite, 'building', i, j, w, h, { sprite }));
+  };
+  const decor = (sprite, i, j, block = 1, extra = {}) => {
+    if (block) gr.set(i, j, gr.get(i, j) === PL ? PL : G);
+    reserve(i, j, 1);
+    objs.push(point(sprite, 'decor', i + 0.5, j + 0.5, { sprite, block, ...extra }));
+  };
+  const npc = (name, id, x, y, extra = {}) => { reserve(Math.floor(x), Math.floor(y), 1); objs.push(point(name, 'npc', x, y, { npc: id, ...extra })); };
+
+  building('ferraria', 6, 11, 4, 3, [[7, 14], [8, 14], [10, 12]]);
+  building('loja_pocoes', 21, 11, 4, 3, [[22, 14], [23, 14]]);
+  building('casa_3x3', 3, 5, 3, 3);
+  building('casa_4x3', 8, 5, 4, 3);
+  building('casa_3x4', 19, 3, 3, 4);
+  building('casa_3x3', 24, 5, 3, 3);
+  building('casa_3x3b', 4, 20, 3, 3);
+  building('casa_4x3', 8, 24, 4, 3);
+  building('casa_3x4', 20, 21, 3, 4);
+  building('casa_3x3', 24, 22, 3, 3);
+  building('incensario', 15, 15, 2, 2);
+
+  // mestres das seitas nos cantos da praça, ao lado do estandarte
+  const masters = [['lamina', 'tormenta', 11, 11, 12.5, 12.4], ['pavilhao', 'geada', 20, 11, 19.6, 12.5],
+    ['tita', 'tita', 11, 20, 12.4, 19.6], ['vibora', 'vibora', 20, 20, 19.5, 19.5]];
+  for (const [sect, banner, bi, bj, mx, my] of masters) { decor('estandarte_' + banner, bi, bj); npc('Mestre', 'mestre_' + sect, mx, my); }
+
+  // portão leste (pailou) sobre a estrada de pedra
+  decor('portao_coluna', 27, 14); decor('portao_coluna', 27, 17);
+  objs.push(point('portao_topo', 'decor', 27.5, 16, { sprite: 'portao_topo', block: 0, top: 1 }));
+  for (const [i, j] of [[25, 14], [25, 17], [6, 17], [13, 8], [18, 8], [13, 23], [18, 23]]) decor('lanterna', i, j);
+  for (const [i, j] of [[14, 10], [17, 10], [14, 21], [17, 21], [10, 14], [10, 17], [21, 17]]) decor('lanterna_pedra', i, j);
+  decor('poco', 6, 18);
+  decor('carroca', 3, 13);
+  for (const [s2, i, j] of [['barril', 12, 9], ['caixotes', 7, 9], ['barril', 23, 9], ['caixotes', 27, 9], ['vaso', 18, 25], ['vaso', 7, 23],
+    ['caixotes', 13, 26], ['barril', 26, 20], ['vaso', 3, 9]]) decor(s2, i, j);
+
+  // NPCs
+  npc('Ferreiro', 'ferreiro', 9.7, 14.4);
+  npc('Vendedor de Poções', 'vendedor', 21.5, 14.4);
+  npc('Ancião', 'anciao', 14.2, 17.6);
+  npc('Guarda do Portão', 'guarda', 26.3, 13.5);
+  npc('Mercador Ambulante', 'mercador', 4.6, 13.5);
+  const walkers = [['morador1', 13.5, 14.2], ['morador2', 8.5, 17.5], ['morador3', 18.4, 17.8], ['morador4', 17.6, 13.4]];
+  for (const [id, x, y] of walkers) objs.push(point('Morador', 'npc', x, y, { npc: id, wander: 4 }));
+
+  // árvores (cerejeiras e carvalhos) só na grama livre, longe das casas, estradas e da praça
+  reserve(16, 17, 1);
+  let n = 0;
+  for (let tries = 0; tries < 2000 && n < 30; tries++) {
     const x = 1 + Math.floor(rnd() * 30), y = 1 + Math.floor(rnd() * 30);
-    if (gr.get(x, y) === G && Math.hypot(x - 16, y - 16) > 7) gr.set(x, y, T);
+    if (gr.get(x, y) !== G || used.has(y * W + x)) continue;
+    let nearRoad = false;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (gr.get(x + dx, y + dy) === P || gr.get(x + dx, y + dy) === PL) nearRoad = true;
+    if (nearRoad) continue;
+    gr.set(x, y, T); n++;
   }
   sealUnreachable(gr, 16, 17);
-  const objs = [
-    point('player', 'spawn', 16.5, 17.5),
-    area('Floresta', 'portal', 29, 14, 2, 4, { target: 'floresta', targetX: 5.5, targetY: 16.5 }),
-    point('Ferreiro', 'npc', 10.5, 13.5),
-    point('Vendedor de Poções', 'npc', 21.5, 13.5),
-    point('Ancião', 'npc', 16.5, 21.5),
-  ];
+  objs.unshift(point('player', 'spawn', 16.5, 17.5), area('Floresta', 'portal', 29, 14, 2, 4, { target: 'floresta', targetX: 5.5, targetY: 16.5 }));
   return tiled('Vila das Nuvens', gr, objs);
 }
 

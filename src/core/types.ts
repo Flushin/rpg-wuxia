@@ -63,6 +63,9 @@ export interface Entity {
   group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
   summoned: boolean;
   spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
+  // NPCs
+  npcId: string; // id em npcs.json / papel (ferreiro, vendedor, mestre_lamina, morador1...)
+  wander: number; // raio em tiles para andar pela cidade (0 = parado)
 }
 
 export type GameEvent =

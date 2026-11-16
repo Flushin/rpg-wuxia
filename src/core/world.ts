@@ -1,5 +1,5 @@
-import { CLASSES, MONSTERS, PROGRESSION, type MonsterDef } from './data';
-import { L } from './i18n';
+import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
+import { L, tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
@@ -24,7 +24,7 @@ const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 const DEATH_DURABILITY_LOSS = 0.1;
-const NPC_ROLES: Record<string, string> = { 'Ferreiro': 'ferreiro', 'Vendedor de Poções': 'vendedor', 'Ancião': 'anciao' };
+const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
 export interface PotionFx { id: string; remaining: number; rate: number }
 export interface OfflineReport {
   elapsedMs: number; effMin: number; efficiency: number; kills: number; xp: number; levelsGained: number; newLevel: number; gold: number;
@@ -81,6 +81,7 @@ export class World {
   private acc = 0;
   private nextId = 2;
   private rng = new Rng((Date.now() & 0xffffffff) >>> 0);
+  private npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   private constructor(private maps: Record<string, GameMap>, name: string, classId: string, level: number, attrs: Attributes) {
     this.classId = classId;
@@ -437,6 +438,7 @@ export class World {
       if (this.arenas.length && !this.arenaSeen && this.inArena(this.player)) { this.arenaSeen = true; this.emit({ type: 'bossArena' }); }
     }
     for (const m of this.monsters) this.tickMonster(m, dt);
+    for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
     this.tickTelegraphs(dt);
   }
 
@@ -922,7 +924,8 @@ export class World {
     this.moveInput = { x: 0, y: 0 }; this.player.path = [];
     this.npcGoal = entityId;
   }
-  npcRole(n: Entity | null = this.openNpc): string { return n ? NPC_ROLES[n.name] ?? '' : ''; }
+  /** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'... */
+  npcRole(n: Entity | null = this.openNpc): string { return n?.npcId ?? ''; }
   private openNpcWindow(n: Entity) {
     if (this.openNpc === n) return;
     this.openNpc = n;
@@ -1070,7 +1073,11 @@ export class World {
           if (this.bossRespawnAtMs > this.clock()) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000; }
         }
       } else if (o.type === 'npc') {
-        this.npcs.push({ ...this.blank('npc', o.name, 1), x: o.x, y: o.y });
+        const id = String(o.props.npc ?? '');
+        const txt = id.startsWith('mestre_') ? NPC_TEXT.masters[id.slice(7)] : NPC_TEXT.npcs[id];
+        const n = { ...this.blank('npc', txt?.name ?? tn(o.name), 1), x: o.x, y: o.y, npcId: id, wander: Number(o.props.wander) || 0 };
+        n.home = { x: o.x, y: o.y }; n.moveSpeed = NPC_WALK_SPEED; n.aiTimer = this.npcRng.range(0.5, 4);
+        this.npcs.push(n);
       }
     });
     this.emit({ type: 'mapChange', mapId });
@@ -1082,7 +1089,7 @@ export class World {
       id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
       derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
       damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
-      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false, spawnKey: '',
+      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false, spawnKey: '', npcId: '', wander: 0,
     };
   }
 
@@ -1119,6 +1126,22 @@ export class World {
     if (def.boss) { this.bossRespawnAtMs = 0; this.resetBoss(m); }
     if (m.spawnKey) delete this.respawnAtMs[m.spawnKey];
     m.buffs = []; m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
+  }
+
+  /** Morador: anda até um ponto perto de casa, para um pouco e escolhe outro. Para quando o jogador conversa com ele. */
+  private tickWalker(n: Entity, dt: number) {
+    if (this.openNpc === n || this.npcGoal === n.id && dist(n, this.player) < 2.5) { n.path = []; return; }
+    if (n.path.length) { this.followPath(n, dt, 1); if (!n.path.length) n.aiTimer = this.npcRng.range(2, 6); return; }
+    n.aiTimer -= dt;
+    if (n.aiTimer > 0) return;
+    n.aiTimer = 1;
+    for (let k = 0; k < 6; k++) {
+      const a = this.npcRng.range(0, Math.PI * 2), r = this.npcRng.range(1.5, n.wander);
+      const t = { x: n.home.x + Math.cos(a) * r, y: n.home.y + Math.sin(a) * r };
+      if (!isWalkable(this.map, t.x, t.y)) continue;
+      const path = findPath(this.map, n, t);
+      if (path.length && path.length < n.wander * 3) { n.path = path; return; }
+    }
   }
 
   // ---------- movimento ----------

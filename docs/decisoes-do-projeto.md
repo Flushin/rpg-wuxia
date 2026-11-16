@@ -26,10 +26,37 @@
   - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos em `public/sprites/CREDITS.txt`.
   - **Primeira fatia (15/11/2026, feita):** Tormenta, lobo, árvores e piso da floresta já no jogo; retrato da Tormenta na mochila (fim da silhueta para ela). Detalhes em "Gráficos (marco 6)" abaixo.
   - **Geada (16/11/2026, feita):** Mage do KayKit recolorido em **branco e azul-gelo** (túnica branca, capa azul-gelo, cabelo prateado, sem chapéu), segurando um **leque de qi** gerado pelo script (nenhum pacote CC0 tem leque). Animações: parado, correr, ataque = `Spellcast_Shoot`, morte. Retrato na mochila (fim da silhueta para ela também).
-  - **Próximos passos:** bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), NPCs, cidade (casas, praça), ruínas, água e portais.
+  - **Cidade, NPCs e mestres (16/11/2026, feita):** Vila das Nuvens refeita (praça de pedra, casas wuxia, portão leste), 13 NPCs com sprite e falas em PT/EN, mestres das 4 seitas na criação e na praça. Detalhes em "Cidade, NPCs e mestres das seitas (marco 6)" abaixo.
+  - **Próximos passos depois disso:** bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), ruínas, água e portais.
 
 
 ## Decididas
+
+### Cidade, NPCs e mestres das seitas (marco 6, 16/11/2026)
+Decidido pelo Lucas em 16/11/2026.
+- **Mapa da cidade:** mesmo tamanho; reorganizado com **praça central**, casas wuxia de **telhado curvo**, piso de pedra e enfeites, e espaço na praça para os 4 mestres. Ferreiro, vendedor de poções e portal para a floresta continuam na cidade.
+- **Mestres das seitas — onde explicam:** **na criação e na cidade.**
+  - **Criação de personagem:** cada seita é apresentada pelo seu mestre (retrato + fala curta explicando estilo de luta, elemento, atributos recomendados) antes da escolha.
+  - **Cidade:** o mesmo mestre fica na praça; ao falar com ele, repete a apresentação e dá dicas da seita.
+- **Quais mestres:** **os 4.** Tormenta e Geada jogáveis; **Titã e Víbora aparecem como "em breve"** (bloqueados na criação; na cidade só falam, apresentando a seita).
+- **NPCs novos (só falas, sem função por enquanto):**
+  - **Guarda do portão** — perto do portal da floresta; avisa sobre os perigos de cada mapa (lobos, bandidos, ruínas).
+  - **Ancião da vila** — conta a história da cidade e do General de Terracota.
+  - **Moradores andando** — 2 a 4 aldeões que caminham pela praça, com falas curtas.
+  - **Mercador ambulante** — só fala por enquanto; no futuro pode vender itens raros.
+- **Arte:** mesmo método do marco 6 (modelos 3D CC0 renderizados no Blender com a mesma câmera e luz; personagens KayKit recoloridos). Falas em PT e EN.
+
+**Como ficou (feito em 16/11/2026):**
+- **Mapa** (`tools/gen-maps.mjs`): praça de lajotas 10×10 com o **incensário de bronze** no centro (bloqueia 2×2); estrada de pedra da praça até o **portão leste** (pailou vermelho sobre a estrada, antes do portal da floresta); estradas de terra para norte, sul e oeste; 8 casas, **ferraria** (chaminé, forja acesa, bigorna, barril) e **loja de poções** (telhado verde, bancada com frascos) na beira da praça; lanternas de papel e de pedra, poço, barris, caixotes, vasos e a carroça do mercador; cerejeiras e carvalhos na grama. O jogador chega da floresta embaixo do portão.
+- **Arte nova:** `tools/sprites/render_town.py` gera as casas e enfeites por script no Blender (nenhum pacote CC0 tem arquitetura chinesa): base de pedra, paredes de reboco, colunas e viga vermelhas, janelas de treliça e **telhado côncavo com as pontas levantadas**. Cerejeiras = árvores do Nature Kit com folhas rosa. Lajotas da praça em `ground_tiles.py`. Atlas `public/sprites/cidade.*`.
+- **Profundidade das casas:** cada casa é desenhada em fatias verticais de 32 px, cada uma com a profundidade do ponto mais à frente da casa naquela coluna — o personagem passa na frente e atrás sem erro. Se a casa cobre o jogador, **a casa inteira fica transparente**. O topo do portão fica sempre por cima.
+- **NPCs (13, todos com sprite KayKit recolorido):** Ferreiro, Vendedor de Poções, Ancião (com cajado), Guarda do Portão (armadura vermelha), Mercador Ambulante (capuz), **Mestre Lei** (Tormenta, cabelo branco, túnica carmim), **Mestra Shuang** (Geada, azul, com leque), **Mestre Gang** (Titã, careca, laranja), **Mestra Du** (Víbora, capuz verde) e 4 moradores que andam: **Aldeã Mei, Velho Pescador Hu, Menino Tao, Cozinheira Lan** (EN: Master Lei, Mistress Shuang, Master Gang, Mistress Du…). NPCs parados só têm a animação parada de frente (folhas pequenas); moradores andam nas 8 direções.
+- **Moradores andando:** passeiam até ~4 tiles do ponto de origem, param 2–6 s e escolhem outro lugar; param quando o jogador vai falar com eles. Sorteio próprio (não mexe no combate; simulação de balanceamento igual).
+- **Cada mestre fica ao lado do estandarte da sua seita**, um em cada canto da praça (vermelho Tormenta, azul-gelo Geada, ocre Titã, verde Víbora).
+- **Janela de conversa:** mestres mostram retrato, título, saudação, a apresentação da seita, **3 dicas** (Tormenta/Geada) ou o aviso de que os portões ainda estão fechados (Titã/Víbora); mostra "sua seita" no mestre do personagem. Guarda, ancião, mercador e moradores falam **uma fala por vez** com "Continuar ›" (volta ao começo no fim).
+- **Criação de personagem:** os 4 cartões mostram o retrato e o nome do mestre e a apresentação dele; Titã e Víbora esmaecidos com "Em breve" (não dá para escolher).
+- **Nomes dos NPCs** ficam sempre por cima (casas e portão não cortam o nome).
+- **Textos:** `src/data/npcs.json` (PT) e seção `npcs` do `en.json`; `npm run check:i18n` confere as falas também.
 
 ### Gráficos (marco 6, 15/11/2026)
 - **Método:** modelos **3D CC0** renderizados em sprites isométricos por um script do Blender. Motivo: quase não existem sprites 2D CC0 isométricos com cara de wuxia, e misturar pacotes 2D de autores diferentes quebra o estilo; renderizando tudo com a mesma câmera e luz, o estilo fica coeso.
@@ -210,7 +237,7 @@
 - **Resultado da simulação:** Tormenta ~69 min (~3 mortes), Geada ~50 min (~7 mortes). Chefe: Tormenta vence 40% (Incomum) / 75% (Raro); Geada vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
 
 ### Escopo da primeira versão jogável
-- 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função.
+- 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função (mestres das 4 seitas, guarda do portão, ancião, moradores e mercador ambulante — só falas).
 - Floresta (lobos + bandidos) e Ruínas de Terracota (guerreiros + General).
 - 2 classes: Tormenta e Geada.
 

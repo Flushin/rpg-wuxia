@@ -1,6 +1,7 @@
 import classesJson from '../data/classes.json';
 import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
+import npcsJson from '../data/npcs.json';
 import { localize } from './i18n';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
 
@@ -42,3 +43,10 @@ export interface Progression { levelCap: number; xpToNext: number[]; freePointsP
 export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;
 export const MONSTERS = localize('monsters', monstersJson) as unknown as Record<string, MonsterDef>;
 export const PROGRESSION = progressionJson as Progression;
+
+// Falas dos NPCs da cidade e dos mestres das seitas (também usadas na criação de personagem)
+export interface MasterText { name: string; title: string; greeting: string; intro: string; tips?: string[]; locked?: string }
+export interface NpcText { name: string; lines: string[] }
+export const NPC_TEXT = localize('npcs', npcsJson) as unknown as { masters: Record<string, MasterText>; npcs: Record<string, NpcText> };
+/** Seitas na ordem da criação: jogáveis primeiro, depois as que ainda virão. */
+export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];

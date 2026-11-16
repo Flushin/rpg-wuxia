@@ -29,7 +29,10 @@ def load_cfg():
 
 def setup_scene(cfg):
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=cfg['model'])
+    if cfg.get('model'):
+        bpy.ops.import_scene.gltf(filepath=cfg['model'])
+    if cfg.get('build'):
+        cfg['build']()  # objetos gerados por script (cidade: casas, lanternas...)
     sc = bpy.context.scene
     keep = cfg.get('keep')
     for o in list(bpy.data.objects):
@@ -205,7 +208,7 @@ def render(cfg):
         n = a['frames']
         loop = a.get('loop', True)
         meta_anims[anim_name] = {'row': len(rows), 'frames': n, 'fps': a.get('fps', 10), 'loop': loop}
-        for k in range(8):
+        for k in cfg.get('dir_list', range(8)):
             root.rotation_euler = (0, 0, facing_rot(k))
             files = []
             for i in range(n):
@@ -229,10 +232,11 @@ def assemble(cfg, rows, meta_anims, rs):
     fw, fh = w * rs, h * rs
     names = [a for a in meta_anims]
     pieces = []
+    dirs = list(cfg.get('dir_list', range(8)))
     for anim in names:
         a = meta_anims[anim]
-        for d in range(8):
-            for i, fp in enumerate(rows[a['row'] + d]):
+        for n, d in enumerate(dirs):
+            for i, fp in enumerate(rows[a['row'] + n]):
                 im = Image.open(fp).convert('RGBA')
                 if cfg.get('outline'):
                     im = add_outline(im, tuple(cfg['outline']))
@@ -253,6 +257,8 @@ def assemble(cfg, rows, meta_anims, rs):
     top = round((ay - min(b[1] for b in idle)) / rs) if idle else h
     meta = {'frameWidth': fw, 'frameHeight': fh, 'scale': 1 / rs, 'top': top,
             'anchor': [cfg['anchor'][0] / w, cfg['anchor'][1] / h], 'dirs': 8, 'anims': meta_anims}
+    if dirs != list(range(8)):
+        meta['dirList'] = dirs  # só estas direções foram renderizadas (NPC parado olha sempre para 0)
     jdir = cfg.get('out_json', cfg['out'])
     os.makedirs(jdir, exist_ok=True)
     with open(os.path.join(jdir, name + '.json'), 'w') as f:

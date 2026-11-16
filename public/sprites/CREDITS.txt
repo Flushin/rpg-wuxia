@@ -6,10 +6,16 @@ Personagens:
 - Geada: "Mage" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (branco e azul-gelo, cabelo prateado),
   sem chapéu, cajado ou livro; o leque de qi é gerado pelo script (tools/sprites/render_sprites.py).
 
+- NPCs da cidade (ferreiro, vendedor, ancião, guarda, mercador, 4 mestres das seitas e 4 moradores):
+  "Rogue", "Rogue_Hooded", "Mage", "Knight" e "Barbarian" do mesmo pacote KayKit — Kay Lousberg, CC0. Recoloridos.
+
 Monstros:
 - Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
 
 Cenário:
 - Árvores, pedras, plantas, flores, cogumelos, toco e tronco: Nature Kit — Kenney (https://kenney.nl), CC0.
   Cores trocadas para a paleta da floresta.
-- Pisos (grama e caminho): gerados por tools/sprites/ground_tiles.py.
+- Cerejeiras da cidade: árvores do Nature Kit — Kenney, CC0, com as folhas recoloridas.
+- Casas, portão, lanternas, estandartes, incensário, poço, carroça e enfeites da cidade: gerados por
+  tools/sprites/render_town.py (sem modelos de terceiros).
+- Pisos (grama, caminho e lajotas da praça): gerados por tools/sprites/ground_tiles.py.

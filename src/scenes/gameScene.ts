@@ -39,6 +39,8 @@ export class GameScene extends Phaser.Scene {
   init(data: { world: World }) { this.world = data.world; }
 
   create() {
+    // só no `npm run dev`: acesso ao mundo pelo console (testes visuais); some no build
+    if (import.meta.env.DEV) (window as unknown as { __game: unknown }).__game = { world: this.world, scene: this };
     audio.bind(this, this.world.audio, () => { void writeSave(this.world.serialize()); });
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
@@ -110,7 +112,7 @@ export class GameScene extends Phaser.Scene {
   private textureFor(e: Entity, idx = 0): string {
     if (e.kind === 'player') return 'player-' + this.world.classId;
     if (e.kind === 'monster') return MONSTERS[e.monsterId].sprite;
-    return 'npc-' + (idx % 3);
+    return e.npcId ? 'npc-' + e.npcId : 'npc-' + (idx % 3);
   }
 
   private viewFor(e: Entity, idx = 0): EntityView {
@@ -178,7 +180,7 @@ export class GameScene extends Phaser.Scene {
       v.sync(m, m.id === w.targetId);
     }
     for (const [id, v] of this.views) if (!live.has(id)) { v.destroy(); this.views.delete(id); }
-    if (!this.trees) this.trees = this.mapObjs.filter((o) => o.name === 'tree') as Phaser.GameObjects.Image[];
+    if (!this.trees) this.trees = this.mapObjs.filter((o) => o.name === 'tree' || o.name === 'building') as Phaser.GameObjects.Image[];
     {
       const who: { x: number; y: number; depth: number }[] = [];
       for (const e of [w.player, tgt]) { const v = e && this.views.get(e.id); if (e && v) who.push({ x: v.container.x, y: v.container.y, depth: e.x + e.y }); }

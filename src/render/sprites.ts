@@ -3,6 +3,16 @@ import tormenta from '../data/sprites/tormenta.json';
 import geada from '../data/sprites/geada.json';
 import lobo from '../data/sprites/lobo.json';
 
+// NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
+// moradores = parado + andar nas 8 direções.
+const NPC_SHEETS = import.meta.glob('../data/sprites/npc_*.json', { eager: true, import: 'default' }) as Record<string, SheetMeta>;
+const npcSheets = Object.fromEntries(Object.entries(NPC_SHEETS).map(([p, m]) => [p.replace(/^.*\/(npc_[^/]+)\.json$/, '$1'), m]));
+/** npcId (mapa) -> folha. Os mestres usam o nome da seita no mapa. */
+const NPC_SHEET_BY_ID: Record<string, string> = {
+  mestre_lamina: 'npc_mestre_tormenta', mestre_pavilhao: 'npc_mestra_geada', mestre_tita: 'npc_mestre_tita', mestre_vibora: 'npc_mestra_vibora',
+};
+export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;
+
 // Sprites renderizados dos modelos 3D (tools/sprites). Cada folha é um atlas do Phaser
 // com quadros "<anim>_<direção>_<i>"; o JSON em src/data/sprites traz animações e âncora.
 // Direções: 0=S (para baixo na tela), 1=SE, 2=E, 3=NE, 4=N, 5=NW, 6=W, 7=SW.
@@ -11,7 +21,7 @@ export type AnimName = 'idle' | 'walk' | 'attack' | 'death';
 
 export interface SheetMeta {
   frameWidth: number; frameHeight: number; scale: number; top: number;
-  anchor: number[]; dirs: number;
+  anchor: number[]; dirs: number; dirList?: number[]; // dirList: só estas direções existem na folha
   anims: Record<string, { frames: number; fps: number; loop: boolean }>;
 }
 
@@ -19,6 +29,7 @@ const SHEETS: Record<string, SheetMeta> = {
   tormenta: tormenta as SheetMeta,
   geada: geada as SheetMeta,
   lobo: lobo as SheetMeta,
+  ...npcSheets,
 };
 
 // textura antiga (placeholder) -> folha animada. O que não estiver aqui continua placeholder.
@@ -34,21 +45,26 @@ export const PORTRAITS: Record<string, string> = {
   pavilhao: 'sprites/geada_retrato.png',
 };
 
+// retrato dos mestres (tela de criação e janela de diálogo), por seita
+export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
+  Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]));
+
 export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | null => {
-  const key = BY_TEXTURE[texture];
+  const key = BY_TEXTURE[texture] ?? (texture.startsWith('npc-') && SHEETS[npcSheetKey(texture.slice(4))] ? npcSheetKey(texture.slice(4)) : undefined);
   return key ? { key, meta: SHEETS[key] } : null;
 };
 
 export function preloadSprites(scene: Phaser.Scene) {
   for (const key of Object.keys(SHEETS)) scene.load.atlas('sp-' + key, `sprites/${key}.png`, `sprites/${key}.json`);
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
+  scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 
 export function createSpriteAnims(scene: Phaser.Scene) {
   for (const [key, meta] of Object.entries(SHEETS)) {
     for (const [anim, a] of Object.entries(meta.anims)) {
-      for (let d = 0; d < meta.dirs; d++) {
+      for (const d of meta.dirList ?? Array.from({ length: meta.dirs }, (_, k) => k)) {
         const id = animKey(key, anim, d);
         if (scene.anims.exists(id)) continue;
         scene.anims.create({

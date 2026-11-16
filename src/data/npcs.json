@@ -1,0 +1,103 @@
+{
+  "masters": {
+    "lamina": {
+      "name": "Mestre Lei",
+      "title": "Mestre da Tormenta",
+      "greeting": "O trovão não espera, jovem. Venha, vamos ver se você acompanha.",
+      "intro": "Na Tormenta lutamos de perto, com duas espadas e golpes rápidos carregados de Trovão. Nosso dano é físico e veloz. Quem escolhe este caminho deve favorecer Força e Agilidade.",
+      "tips": [
+        "Use Quebra-Guarda contra os guerreiros de terracota: reduz a defesa deles em 30% e abre caminho para o resto.",
+        "Passo do Raio leva você até o alvo num instante. Use para alcançar arqueiros que atiram de longe.",
+        "Cercado por bandidos? Tempestade de Lâminas golpeia tudo ao seu redor. Se morrer muito, ponha pontos em Vigor."
+      ]
+    },
+    "pavilhao": {
+      "name": "Mestra Shuang",
+      "title": "Mestra da Geada",
+      "greeting": "Respire fundo e acalme a mente. A geada vem com a calma.",
+      "intro": "Na Geada, manejamos o qi com um leque, atacando de longe com magia de Gelo. Nosso dano é espiritual e em área, e podemos atacar enquanto caminhamos. Favoreça Inteligência e Vontade.",
+      "tips": [
+        "Você ataca enquanto anda. Recue sem parar de lançar Orbe Gélido e mantenha os lobos sempre a distância.",
+        "Flor de Gelo causa dano e deixa o alvo lento. Combine com Nevasca para dominar grupos de bandidos.",
+        "Guerreiros de terracota têm espírito frágil. Nosso dano espiritual os fere muito mais que lâminas comuns."
+      ]
+    },
+    "tita": {
+      "name": "Mestre Gang",
+      "title": "Mestre do Titã",
+      "greeting": "Hm. A montanha também sabe esperar.",
+      "intro": "No Titã, ficamos firmes na linha de frente, de cajado ou punhos, aguentando os golpes por todos. Somos a muralha que protege os companheiros. Nosso caminho é de resistência e força bruta.",
+      "locked": "Os portões do Titã ainda não se abriram a novos discípulos; volte quando a montanha estiver pronta."
+    },
+    "vibora": {
+      "name": "Mestra Du",
+      "title": "Mestra da Víbora",
+      "greeting": "Quieta como a sombra, paciente como o veneno.",
+      "intro": "Na Víbora, atacamos de longe com agulhas envenenadas. O veneno corrói o inimigo aos poucos, e nossas artes ainda curam um pouco os aliados. Aqui vence quem tem paciência.",
+      "locked": "Os portões da Víbora ainda estão fechados a novos discípulos; volte em outra estação."
+    }
+  },
+  "npcs": {
+    "guarda": {
+      "name": "Guarda do Portão",
+      "lines": [
+        "Vai sair pelo portão leste? Na Floresta Sombria, perto da entrada, rondam lobos famintos. Bons para quem está começando.",
+        "Mais fundo na floresta ficam os acampamentos de bandidos. Espadachins andam em grupos de dois ou três. Não os enfrente cercado.",
+        "Cuidado com os arqueiros bandidos. Atiram de longe, então aproxime-se rápido ou procure abrigo.",
+        "Além da floresta ficam as Ruínas de Terracota. Os guerreiros de barro têm defesa física altíssima, mas o espírito deles é frágil.",
+        "No fundo das ruínas está o General de Terracota. Quando um círculo vermelho surgir no chão, saia de dentro dele. E conserte o equipamento no ferreiro."
+      ]
+    },
+    "anciao": {
+      "name": "Ancião",
+      "lines": [
+        "A Vila das Nuvens nasceu há séculos, quando viajantes cansados pararam sob a névoa destas colinas e decidiram ficar.",
+        "Antigamente, as quatro seitas protegiam a vila: Tormenta, Geada, Titã e Víbora. Juntas, nenhum perigo nos alcançava.",
+        "Nas ruínas a leste dorme o exército de terracota de um imperador esquecido. Ninguém sabia que havia vida naquele barro.",
+        "Um dia, algo despertou o General. Seus guerreiros se levantaram, e a floresta se encheu de bandidos e feras.",
+        "Agora as seitas precisam de novos discípulos. Se tiver coragem, jovem, escolha um mestre e ajude a vila a recuperar a paz."
+      ]
+    },
+    "mercador": {
+      "name": "Mercador Ambulante",
+      "lines": [
+        "Ah, viajante! Percorri mil estradas, mas minhas carroças ainda estão vazias por enquanto.",
+        "Não tenho nada à venda hoje. Espero mercadorias raras de terras distantes, e dizem que a espera vale a pena.",
+        "Seda do sul, especiarias do deserto, relíquias de mosteiros esquecidos... tudo isso pode chegar um dia.",
+        "Volte mais tarde, amigo. Quem sabe eu tenha algo digno de um guerreiro como você."
+      ]
+    },
+    "morador1": {
+      "name": "Aldeã Mei",
+      "lines": [
+        "Meu marido jura que um lobo o perseguiu até o portão. Eu acho que era só um cachorro assustado.",
+        "Tome uma poção quando estiver ferido, mas lembre: ela cura aos poucos, ao longo de oito segundos.",
+        "Quando voltar da floresta, descanse na vila. Aqui sua vida e sua energia se recuperam sozinhas."
+      ]
+    },
+    "morador2": {
+      "name": "Velho Pescador Hu",
+      "lines": [
+        "Pesco neste riacho há quarenta anos e só fisguei botas. Mas são botas de muito boa qualidade!",
+        "Se a poção estiver acabando, não espere o último golpe. Beba a tempo, porque a cura não é instantânea.",
+        "Só na vila o corpo se renova por completo. Na floresta, cada gota de vida conta."
+      ]
+    },
+    "morador3": {
+      "name": "Menino Tao",
+      "lines": [
+        "Quando crescer, vou ser um grande mestre da Tormenta! Já derrotei três galinhas com um graveto.",
+        "Meu avô diz que o ferreiro conserta qualquer coisa. Até minha espada de madeira, se eu pedir com educação.",
+        "Dizem que o General de Terracota é enorme e lento. Eu fugiria correndo, mas devagar não, hein."
+      ]
+    },
+    "morador4": {
+      "name": "Cozinheira Lan",
+      "lines": [
+        "Bolinhos quentinhos! Ah, não estão à venda, são para os guardas. Mas o cheiro é de graça.",
+        "Aventureiro de barriga vazia luta mal. Descanse na vila, que aqui o corpo se refaz sozinho.",
+        "O vendedor de poções compra qualquer coisa que você trouxer. Até aquela tralha que encontrou na floresta."
+      ]
+    }
+  }
+}

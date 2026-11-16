@@ -1,13 +1,14 @@
 import { L, tn } from '../core/i18n';
+import { NPC_TEXT } from '../core/data';
 import { BASES, POTIONS, SLOTS, SLOT_NAMES, baseOf, buyPrice, isPotionId, itemColor, itemName, maxDurability, repairCost, sellValue } from '../core/items';
 import type { ItemInstance } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
+import { MASTER_PORTRAITS } from '../render/sprites';
+
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
-const LORE = L('Jovem viajante, a Vila das Nuvens já abrigou grandes mestres das duas seitas. Hoje a floresta a leste está cheia de lobos famintos. Leve poções, cuide do seu equipamento e volte inteiro. Que os ventos guiem seus passos.',
-  'Young traveler, Cloud Village once sheltered great masters of both sects. Today the forest to the east is full of hungry wolves. Bring potions, look after your gear and come back whole. May the winds guide your steps.');
-
 // Janela dos NPCs (abre sozinha quando o personagem chega). Não bloqueia o jogo ao redor.
 export class NpcWindow {
   private sig = '';
@@ -15,6 +16,7 @@ export class NpcWindow {
   private qty = 1;
   private pending = -1; // venda aguardando confirmação (incomum/raro)
   private npcId = -1;
+  private line = 0; // fala atual (NPCs de conversa)
   constructor(private world: World, private toast: (m: string, c?: string) => void) {
     $('npc-panel').addEventListener('click', (e) => this.click(e));
   }
@@ -26,6 +28,7 @@ export class NpcWindow {
     this.sig = '';
     let err: string | null = null;
     if (a === 'close') { w.closeNpc(); return; }
+    if (a === 'next') { audio.ui('ui_click'); this.line++; return; }
     if (a === 'tab') { audio.ui('ui_click'); this.tab = v as 'buy' | 'sell'; this.pending = -1; return; }
     if (a === 'qty') { audio.ui('ui_click'); this.qty = +v; return; }
     if (a === 'buy') err = w.buy(v, this.qty);
@@ -46,18 +49,43 @@ export class NpcWindow {
   update() {
     const w = this.world, n = w.openNpc, el = $('npc-panel');
     if (!n) { if (!el.classList.contains('hidden')) { el.classList.add('hidden'); this.sig = ''; this.npcId = -1; this.pending = -1; } return; }
-    if (this.npcId !== n.id) { this.npcId = n.id; this.tab = 'buy'; this.pending = -1; this.sig = ''; }
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${w.invVersion}`;
+    if (this.npcId !== n.id) { this.npcId = n.id; this.tab = 'buy'; this.pending = -1; this.sig = ''; this.line = 0; }
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
     const role = w.npcRole(n);
-    let body = '';
+    const shop = role === 'ferreiro' || role === 'vendedor';
+    let body = '', sub = '';
     if (role === 'ferreiro') body = this.smith();
     else if (role === 'vendedor') body = this.shop();
-    else body = `<p class="lore">“${LORE}”</p>`;
-    el.innerHTML = `<div class="card npc-card"><div class="npc-head"><h2>${tn(n.name)}</h2><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>
-      ${role === 'anciao' ? '' : `<div class="gold">${w.gold} ${L('ouro', 'gold')}</div>`}${body}</div>`;
+    else if (role.startsWith('mestre_')) { const m = this.master(role.slice(7)); body = m.body; sub = m.sub; }
+    else body = this.talk(role);
+    el.innerHTML = `<div class="card npc-card"><div class="npc-head"><h2>${esc(tn(n.name))}${sub}</h2><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>
+      ${shop ? `<div class="gold">${w.gold} ${L('ouro', 'gold')}</div>` : ''}${body}</div>`;
+  }
+
+  /** Mestre da seita: apresenta a seita (o mesmo texto da criação) e dá dicas; Titã e Víbora ainda fechadas. */
+  private master(sect: string): { sub: string; body: string } {
+    const m = NPC_TEXT.masters[sect];
+    if (!m) return { sub: '', body: '' };
+    const mine = this.world.classId === sect;
+    const pic = MASTER_PORTRAITS[sect] ? `<img class="npc-pic" src="${MASTER_PORTRAITS[sect]}" alt="">` : '';
+    const tips = m.tips?.length ? `<ul class="npc-tips">${m.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
+    return {
+      sub: `<small class="npc-title">${esc(m.title)}${mine ? ` · <b>${L('sua seita', 'your sect')}</b>` : ''}</small>`,
+      body: `<div class="npc-talk">${pic}<p class="lore">“${esc(m.greeting)}”</p></div><p>${esc(m.intro)}</p>${tips}
+        ${m.locked ? `<p class="muted">${esc(m.locked)}</p>` : ''}`,
+    };
+  }
+
+  /** NPC de conversa: uma fala por vez; "Continuar" passa para a próxima (volta ao começo no fim). */
+  private talk(role: string): string {
+    const t = NPC_TEXT.npcs[role];
+    if (!t?.lines.length) return '';
+    const k = this.line % t.lines.length;
+    return `<p class="lore">“${esc(t.lines[k])}”</p>
+      ${t.lines.length > 1 ? `<div class="npc-next"><small class="muted">${k + 1}/${t.lines.length}</small><button data-a="next">${k + 1 < t.lines.length ? L('Continuar ›', 'Continue ›') : L('Do começo ↺', 'From the start ↺')}</button></div>` : ''}`;
   }
 
   private smith(): string {
