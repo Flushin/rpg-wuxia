@@ -47,7 +47,7 @@ export class GameScene extends Phaser.Scene {
     this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); }, () => {
       // salva e recarrega a página: volta à tela inicial com tudo limpo (HUD, áudio e timers)
       void writeSave(this.world.serialize()).finally(() => window.location.reload());
-    });
+    }, this.hud.rewards);
     this.autoText = this.add.text(0, 0, '', { fontSize: '12px', color: '#9fe8a0', fontStyle: 'bold', align: 'center', stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5, 1).setDepth(100001).setResolution(TEXT_RES).setVisible(false);
     const rep = this.world.offlineReport;
@@ -303,8 +303,9 @@ export class GameScene extends Phaser.Scene {
         break;
       case 'shieldAbsorb': { const s = tileToScreen(ev.x, ev.y); this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, '#9fd0ff', 14); break; }
       case 'drop': this.dropFx(ev.x, ev.y, ev.color); break;
-      case 'itemPickup': this.hud.toast(`+ ${ev.name}${ev.qty > 1 ? ` x${ev.qty}` : ''}`, ev.color); break;
-      case 'goldPickup': this.hud.toast(`+ ${ev.amount} ${L('ouro', 'gold')}`, '#ffd23f'); break;
+      case 'itemPickup': this.hud.rewards.item(ev.name, ev.color, ev.qty, ev.rarity, ev.potion); break;
+      case 'goldPickup': this.hud.rewards.gold(ev.amount); break;
+      case 'xp': this.hud.rewards.xp(); break;
       case 'bagFull': this.hud.toast(L('Mochila cheia', 'Bag full'), '#ff8a80'); break;
       case 'autoStopped': this.hud.toast(L('Auto-combate parado: item quebrado. Conserte no Ferreiro.', 'Auto-battle stopped: broken item. Repair it with the Blacksmith.'), '#ff8a80'); break;
       case 'durabilityLost': this.hud.toast(L('Seus equipamentos perderam durabilidade', 'Your equipment lost durability'), '#f1a02e'); break;
