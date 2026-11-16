@@ -45,8 +45,8 @@ Respawn: lobo 15 s, bandido 35 s, terracota 40 s, General 600 s. O respawn mais 
 
 ## Ouro, poções e conserto
 
-- Ouro por abate: lobo 4-9, bandido 11-18 (+1,5 por nível), terracota 22-32 (+2 por nível), General 260-340. Itens vendem por 25% do valor.
-- Poções (preço da vila): vida P 12, G 36; mana P 14, G 40. Gasto medido: Lâmina ~38% do ouro ganho, Pavilhão ~28% (acessível).
+- Ouro por abate (marco 7, reduzido à metade): lobo 2-5, bandido 3-5 (+0,8 por nível), terracota 5-8 (+1 por nível), General 260-340 (igual). Itens vendem por 15% do valor (antes 25%).
+- Poções (preço da vila): vida P 12, G 36; mana P 14, G 40. Gasto com poções + conserto (simulador, marco 7): Tormenta ~75% do ouro ganho, Geada ~40%.
 - Conserto: `durabilidade faltante × nível do item × 0,5`. A durabilidade agora também cai em combate: **cada golpe recebido gasta 0,3 ponto** de um item equipado aleatório (`wearPerHit` em `items.json`), além dos −10% por morte. Resultado: conserto = 12% (Lâmina) e 6% (Pavilhão) do ouro ganho; o Pavilhão apanha menos.
 - Drops de nível 5+: monstros nível 5 ou mais soltam equipamento nível 5 (espadachim/arqueiro 8%, terracota 12%) e poções grandes (10% vida, 6% mana). Abaixo disso, equipamento nível 1 (5-6%).
 

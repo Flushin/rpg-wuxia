@@ -10,9 +10,9 @@
       "description": "Gira as lâminas e causa 170% do dano a todos os monstros num raio de 2,5 tiles. Não precisa de alvo.",
       "mana": 18, "cooldown": 12, "target": "none", "area": "self", "radius": 2.5, "hits": [1.7] },
     { "id": "golpe_rompe_guarda", "name": "Quebra-Guarda", "type": "active", "unlock": 7, "color": "#c03a3a", "fx": "heavy",
-      "description": "Golpe pesado de 220% do dano que reduz a defesa do alvo em 30% por 6 s.",
-      "mana": 20, "cooldown": 15, "target": "target", "range": "melee", "hits": [2.2],
-      "debuff": { "kind": "defReduction", "value": 0.3, "duration": 6 } },
+      "description": "Golpe pesado de 280% do dano que reduz a defesa do alvo em 40% por 6 s.",
+      "mana": 20, "cooldown": 15, "target": "target", "range": "melee", "hits": [2.8],
+      "debuff": { "kind": "defReduction", "value": 0.4, "duration": 6 } },
     { "id": "fluxo_lamina", "name": "Fluxo da Lâmina", "type": "passive", "unlock": 9, "color": "#d0d0e0",
       "description": "Passiva: +10% de velocidade de ataque e +5% de chance de crítico. Sobe junto com seu nível.",
       "passive": { "attackSpeed": 0.1, "crit": 0.05 } }

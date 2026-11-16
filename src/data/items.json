@@ -4,7 +4,7 @@
     "stats das bases: attributes (strength, intelligence, stamina, agility, willpower) somam nos atributos antes dos derivados;",
     "maxHp, maxMana, physAtk, spiritAtk, physDef, spiritDef, hit, evasion somam nos derivados; critChance/critDamage sao fracoes; elem_<elemento> soma no ataque elemental.",
     "Bonus aleatorios: valor = sorteio(min..max) * (1 + 0.2 * (nivelDoItem - 1)); ints arredondados (minimo 1). 'elemAtk' vira o elemento da seita de quem recebeu o drop.",
-    "value = valor de referencia em ouro; venda = value * multiplicador da raridade * sellRatio (25%). Pocoes: price = preco de compra; venda = price * sellRatio.",
+    "value = valor de referencia em ouro; venda = value * multiplicador da raridade * sellRatio (15%). Pocoes: price = preco de compra; venda = price * sellRatio.",
     "Conserto: ceil(durabilidade faltando * nivelDoItem * repairCostPerPoint).",
     "Pocoes: curam percent do maximo ao longo de duration s; um efeito por tipo (hp/mp), usar outra do mesmo tipo reinicia; cooldown por tipo."
   ],
@@ -12,7 +12,7 @@
   "slotNames": { "colar": "Colar", "tronco": "Tronco", "arma": "Arma", "cabeca": "Cabeça", "calca": "Calça", "bota": "Bota" },
   "bagSize": 30,
   "stackMax": 99,
-  "sellRatio": 0.25,
+  "sellRatio": 0.15,
   "repairCostPerPoint": 0.5,
   "groundSeconds": 60,
   "wearPerHit": 0.3,

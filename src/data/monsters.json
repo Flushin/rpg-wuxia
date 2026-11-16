@@ -30,8 +30,8 @@
     "respawnSeconds": 30,
     "loot": {
       "gold": {
-        "min": 4,
-        "max": 9
+        "min": 2,
+        "max": 5
       },
       "potions": [
         {
@@ -91,9 +91,9 @@
     "respawnSeconds": 30,
     "loot": {
       "gold": {
-        "min": 6,
-        "max": 10,
-        "perLevel": 1.5
+        "min": 3,
+        "max": 5,
+        "perLevel": 0.8
       },
       "potions": [
         {
@@ -163,9 +163,9 @@
     "respawnSeconds": 30,
     "loot": {
       "gold": {
-        "min": 6,
-        "max": 10,
-        "perLevel": 1.5
+        "min": 3,
+        "max": 5,
+        "perLevel": 0.8
       },
       "potions": [
         {
@@ -236,9 +236,9 @@
     "respawnSeconds": 30,
     "loot": {
       "gold": {
-        "min": 10,
-        "max": 16,
-        "perLevel": 2
+        "min": 5,
+        "max": 8,
+        "perLevel": 1
       },
       "potions": [
         {

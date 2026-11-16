@@ -14,6 +14,7 @@ export interface ClassDef {
   recommended: { attr: AttrKey; reason: string }[];
   optional: { attr: AttrKey; reason: string }[];
   recommendedRatio: Partial<Record<AttrKey, number>>;
+  lifeSteal?: number; // fração do dano causado que volta como vida (Tormenta, marco 7)
 }
 export interface MonsterDef {
   id: string; name: string; sprite: string; minLevel: number; maxLevel: number;
