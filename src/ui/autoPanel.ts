@@ -1,6 +1,7 @@
 import { L } from '../core/i18n';
 import { RARITIES } from '../core/items';
 import { initials } from '../core/skills';
+import { skillIconHtml } from './icons';
 import type { World, OfflineReport } from '../core/world';
 import { audio } from '../render/audio';
 import { closeX } from './labels';
@@ -47,7 +48,7 @@ export class AutoPanel {
     const w = this.world, c = w.auto.cfg, r = w.auto.rate();
     const skills = w.activeSkills().map((d) => {
       const unlocked = w.isUnlocked(d);
-      return `<label class="opt"><input type="checkbox" data-skill="${d.id}" ${unlocked && !c.skillsOff.includes(d.id) ? 'checked' : ''} ${unlocked ? '' : 'disabled'}/> <span>${initials(d.name)}</span> ${d.name}${unlocked ? '' : ` <small class="muted">(${L(`nível ${d.unlock}`, `level ${d.unlock}`)})</small>`}</label>`;
+      return `<label class="opt"><input type="checkbox" data-skill="${d.id}" ${unlocked && !c.skillsOff.includes(d.id) ? 'checked' : ''} ${unlocked ? '' : 'disabled'}/> <span class="opt-ic">${skillIconHtml(d.id, initials(d.name))}</span> ${d.name}${unlocked ? '' : ` <small class="muted">(${L(`nível ${d.unlock}`, `level ${d.unlock}`)})</small>`}</label>`;
     }).join('');
     const sld = (label: string, k: string, min: number, max: number, v: number, pct: boolean) =>
       `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${v}${pct ? '%' : ''}</output></label>`;

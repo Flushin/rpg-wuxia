@@ -11,6 +11,12 @@ Personagens:
 
 Monstros:
 - Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
+- Bandido Espadachim: "Knight" do KayKit Adventurers — Kay Lousberg, CC0. Sem elmo e escudos, couro marrom e pano cinza;
+  o lenço no rosto é gerado pelo script.
+- Bandido Arqueiro: "Rogue" do KayKit Adventurers (com a besta) — Kay Lousberg, CC0. Recolorido; lenço e chapéu de palha
+  gerados pelo script.
+- Guerreiro de Terracota e General de Terracota: "Knight" do KayKit Adventurers (espada de duas mãos) — Kay Lousberg, CC0.
+  Recoloridos em barro alaranjado; o General com elmo, capa e detalhes dourados.
 
 Cenário:
 - Árvores, pedras, plantas, flores, cogumelos, toco e tronco: Nature Kit — Kenney (https://kenney.nl), CC0.
@@ -18,4 +24,9 @@ Cenário:
 - Cerejeiras da cidade: árvores do Nature Kit — Kenney, CC0, com as folhas recoloridas.
 - Casas, portão, lanternas, estandartes, incensário, poço, carroça e enfeites da cidade: gerados por
   tools/sprites/render_town.py (sem modelos de terceiros).
-- Pisos (grama, caminho e lajotas da praça): gerados por tools/sprites/ground_tiles.py.
+- Ruínas (colunas, entulho, cacos, braseiros) e o portal de pedra: gerados por tools/sprites/render_ruins.py
+  (sem modelos de terceiros).
+- Pisos (grama, caminho, lajotas da praça e das ruínas, água): gerados por tools/sprites/ground_tiles.py.
+
+Interface:
+- Ícones de itens e skills (icones.png): desenhados por tools/sprites/icons.py (sem arte de terceiros).

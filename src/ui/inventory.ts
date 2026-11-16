@@ -5,7 +5,8 @@ import { BASES, POTIONS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
 import { closeX } from './labels';
-import { SLOT_ICON, cellHtml, cellStyle, itemTipHtml } from './itemTip';
+import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
+import { slotIconHtml } from './icons';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
@@ -122,7 +123,7 @@ export class InventoryPanel {
     if (this.sel && !this.selItem()) this.sel = null;
     const eqCell = (sl: Slot) => {
       const it = w.equipment[sl];
-      return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty">${SLOT_ICON[sl]}</span>`}</button></div>`;
+      return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel && selKey(this.sel) === `e${sl}` ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it) : `<span class="ic empty img">${slotIconHtml(sl, w.classId)}</span>`}</button></div>`;
     };
     const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${bodyFigure(w.classId, CLASSES[w.classId]?.color ?? '#889')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
     const bagCell = (i: number) => `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i])}</button>`;

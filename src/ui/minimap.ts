@@ -10,7 +10,7 @@ import { closeX } from './labels';
 
 const TILE_COLOR: Record<string, string> = {
   grass: '#4b7f3b', path: '#a8875a', water: '#35679e', tree: '#24502a',
-  house: '#94473a', plaza: '#b3ad9d', ruin: '#8a6a4c', pillar: '#4f3e30',
+  house: '#94473a', plaza: '#b3ad9d', ruin: '#8c8f8f', pillar: '#55595e',
 };
 const COLOR = { player: '#ffffff', monster: '#ff5a4a', boss: '#ff9a1f', npc: '#ffd23f', portal: '#c08cff' };
 const REDRAW_MS = 150;

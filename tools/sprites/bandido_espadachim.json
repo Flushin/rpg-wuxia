@@ -1,0 +1,127 @@
+{
+ "name": "bandido_espadachim",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword_Offhand",
+  "2H_Sword",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield",
+  "Knight_Helmet",
+  "Knight_Cape"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "1,0": [
+    58,
+    44,
+    34
+   ],
+   "3,0": [
+    160,
+    120,
+    82
+   ],
+   "7,0": [
+    150,
+    146,
+    138
+   ],
+   "4,0": [
+    132,
+    100,
+    70
+   ],
+   "6,0": [
+    140,
+    106,
+    74
+   ],
+   "7,1": [
+    128,
+    124,
+    118
+   ],
+   "2,1": [
+    170,
+    134,
+    96
+   ],
+   "0,1": [
+    146,
+    140,
+    132
+   ],
+   "1,1": [
+    118,
+    96,
+    74
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "1H_Melee_Attack_Chop",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "attach": [
+  {
+   "kind": "mask",
+   "bone": "head",
+   "offset": [
+    0,
+    0.02,
+    0.02
+   ],
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "scale": 1.0,
+   "radius": 0.52,
+   "height": 0.2,
+   "color": [
+    120,
+    104,
+    88
+   ]
+  }
+ ]
+}

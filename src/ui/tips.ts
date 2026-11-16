@@ -7,6 +7,7 @@ import { audio } from '../render/audio';
 import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
 import { saveLootFilter, type Rewards } from './rewards';
+import { perf } from './perf';
 
 interface TipDef { title: string; text: string; textTouch?: string; byClass?: Record<string, string> }
 const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
@@ -42,6 +43,7 @@ export class TipManager {
     panel.onchange = (e) => {
       const el = e.target as HTMLInputElement;
       if (el.id === 'opt-loot') { const v = el.checked ? 'all' : 'rare'; saveLootFilter(v); if (this.rewards) this.rewards.filter = v; return; }
+      if (el.id === 'opt-fps') { perf.setEnabled(el.checked); return; }
       if (el.id === 'opt-mute') { audio.setSettings({ muted: el.checked }); audio.ui('ui_click'); return; }
       if (el.id !== 'opt-tips') return;
       this.world.tipsEnabled = el.checked;
@@ -64,6 +66,7 @@ export class TipManager {
       <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
+      <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
       <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
       <label class="sld">${L('Efeitos', 'Effects')}<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
       <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>

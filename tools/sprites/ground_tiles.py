@@ -38,6 +38,52 @@ def flagstone(base, seed, slabs=2, grout=(112, 108, 100)):
     img[..., :3] = np.clip(col, 0, 255)
     img[..., 3] = diamond_mask() * 255
     return Image.fromarray(img)
+def ruin(base, seed, moss=0.0):
+    """Lajotas gastas das ruínas: grade 2x2, juntas largas com terra, rachaduras e musgo."""
+    rng = np.random.default_rng(seed)
+    im = np.array(flagstone(base, seed, slabs=2, grout=(104, 108, 112)), np.float32)
+    col = im[..., :3]
+    # terra/areia nas juntas e manchas
+    dirt = np.array(tile((118, 120, 112), 0.2, seed + 100), np.float32)[..., :3]
+    m = rng.normal(0, 1, (H // 8 + 2, W // 8 + 2))
+    m = np.array(Image.fromarray(((m - m.min()) / (np.ptp(m) + 1e-9) * 255).astype(np.uint8)).resize((W, H), Image.BICUBIC), np.float32) / 255
+    a = np.clip((m - 0.62) * 5, 0, 1)[..., None]
+    col = col * (1 - a) + dirt * a
+    if moss:
+        mm = rng.normal(0, 1, (H // 8 + 2, W // 8 + 2))
+        mm = np.array(Image.fromarray(((mm - mm.min()) / (np.ptp(mm) + 1e-9) * 255).astype(np.uint8)).resize((W, H), Image.BICUBIC), np.float32) / 255
+        b = np.clip((mm - (1 - moss)) * 5, 0, 1)[..., None]
+        col = col * (1 - b) + np.array((92, 112, 62), np.float32) * (0.9 + 0.2 * rng.random((H, W, 1))) * b
+    # rachaduras: passeios aleatórios escuros
+    for _ in range(2):
+        x, y = rng.uniform(W * 0.3, W * 0.7), rng.uniform(H * 0.3, H * 0.7)
+        ang = rng.uniform(0, 6.28)
+        for _ in range(40):
+            ang += rng.normal(0, 0.5); x += np.cos(ang) * 1.5; y += np.sin(ang) * 0.8
+            xi, yi = int(x), int(y)
+            if 0 <= xi < W and 0 <= yi < H: col[yi, xi] *= 0.6
+    out = np.zeros((H, W, 4), np.uint8)
+    out[..., :3] = np.clip(col, 0, 255); out[..., 3] = diamond_mask() * 255
+    return Image.fromarray(out)
+def water(frame, seed=40):
+    """Água com reflexos que se movem (3 quadros em ciclo). Reflexos longe da borda: sem emenda entre tiles."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:H, 0:W].astype(np.float32)
+    base = np.array((52, 98, 150), np.float32)
+    n = np.array(tile((52, 98, 150), 0.08, seed), np.float32)[..., :3]
+    ph = frame * 2 * np.pi / 3
+    wave = np.sin(x * 0.11 + y * 0.32 + ph) * np.sin(x * 0.05 - y * 0.12 - ph * 0.5)
+    col = n * (1 + 0.07 * wave[..., None])
+    inner = (np.abs(x + 0.5 - W / 2) / (W / 2) + np.abs(y + 0.5 - H / 2) / (H / 2)) < 0.72
+    for k in range(4):
+        cx = W * (0.28 + 0.44 * rng.random()) + np.cos(ph + k) * 4
+        cy = H * (0.3 + 0.4 * rng.random()) + np.sin(ph + k) * 1.5
+        L = 7 + 5 * rng.random()
+        hl = (np.abs(y - cy) < 0.9) & (np.abs(x - cx) < L) & inner
+        col[hl] = col[hl] * 0.4 + np.array((190, 220, 245)) * 0.6
+    out = np.zeros((H, W, 4), np.uint8)
+    out[..., :3] = np.clip(col, 0, 255); out[..., 3] = diamond_mask() * 255
+    return Image.fromarray(out)
 out = sys.argv[1]
 tiles = {
   'grass1': tile((96, 150, 72), 0.16, 1),
@@ -46,6 +92,10 @@ tiles = {
   'path':   tile((160, 132, 96), 0.14, 4, [((140, 114, 82), 0.4)]),
   'plaza1': flagstone((178, 172, 160), 5),
   'plaza2': flagstone((172, 168, 158), 6),
+  'ruin1':  ruin((146, 148, 146), 7),
+  'ruin2':  ruin((140, 144, 142), 8, moss=0.3),
+  'ruin3':  ruin((150, 150, 148), 9, moss=0.15),
+  'water1': water(0), 'water2': water(1), 'water3': water(2),
 }
 sheet = Image.new('RGBA', (W * len(tiles), H))
 for i, im in enumerate(tiles.values()): sheet.paste(im, (i * W, 0))

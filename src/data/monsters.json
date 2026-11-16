@@ -280,7 +280,7 @@
     "sprite": "general",
     "minLevel": 10,
     "maxLevel": 10,
-    "scale": 1.7,
+    "scale": 1.5,
     "baseAttributes": {
       "strength": 6,
       "intelligence": 0,

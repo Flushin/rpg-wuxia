@@ -3,6 +3,7 @@ import { CLASSES } from '../core/data';
 import { BASES, POTIONS, RARITIES, SLOT_NAMES, baseOf, fmtStat, fmtStatValue, isBroken, itemColor, itemName, itemStats, maxDurability, sellValue, STAT_LABELS } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
+import { hasIcon, iconHtml } from './icons';
 
 const GREEN = '#6fdc6f', RED = '#ff6b6b';
 
@@ -46,12 +47,12 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
-// ícones provisórios (emoji) por peça; a arte final substitui depois
+// marco 6: ícone desenhado de cada item (tools/sprites/icons.py); emoji só se faltar o ícone
 export const SLOT_ICON: Record<Slot, string> = { colar: '📿', tronco: '👘', arma: '⚔️', cabeca: '⛑️', calca: '👖', bota: '👢' };
 export function cellHtml(it: ItemInstance | null): string {
   if (!it) return '';
   const b = BASES[it.baseId], pot = POTIONS[it.baseId];
-  const label = pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : SLOT_ICON[b.slot];
+  const label = iconHtml(it.baseId, pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : SLOT_ICON[b.slot]);
   const col = itemColor(it);
   let extra = '';
   if (pot) extra = `<i class="qty">${it.qty ?? 1}</i>`;
@@ -59,6 +60,6 @@ export function cellHtml(it: ItemInstance | null): string {
     const max = maxDurability(it), f = Math.max(0, Math.min(1, it.durability / max));
     extra = `<i class="dur ${f <= 0 ? 'zero' : f <= 0.2 ? 'low' : ''}"><u style="width:${f * 100}%"></u></i>`;
   }
-  return `<span class="ic${pot ? '' : ' sym'}" style="--rc:${col}">${label}</span>${extra}`;
+  return `<span class="ic${hasIcon(it.baseId) ? ' img' : pot ? '' : ' sym'}" style="--rc:${col}">${label}</span>${extra}`;
 }
 export const cellStyle = (it: ItemInstance | null) => (it ? `border-color:${itemColor(it)}` : '');

@@ -22,15 +22,62 @@
   - Tela inicial com **4 espaços**; cada um mostra nome, seita, nível, mapa e último acesso, com botões Jogar e Apagar (apagar pede para digitar o nome). O personagem atual vira o primeiro espaço.
   - Ganho offline vale só para o **último personagem jogado**.
   - Personagens **não compartilham** nada por enquanto (baú/ouro compartilhado pode vir depois).
-- **Marco 6 (em andamento): gráficos — fatia pequena.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Só depois estender para Geada, outros monstros, cidade e ruínas.
+- **Marco 6 (concluído, em teste): gráficos.** Definir o estilo de arte com **Tormenta + lobo + um trecho da floresta** antes de trocar o resto. Só depois estender para Geada, outros monstros, cidade e ruínas.
   - **Origem da arte:** pacotes gratuitos **CC0** (mesma linha do som). Créditos em `public/sprites/CREDITS.txt`.
   - **Primeira fatia (15/11/2026, feita):** Tormenta, lobo, árvores e piso da floresta já no jogo; retrato da Tormenta na mochila (fim da silhueta para ela). Detalhes em "Gráficos (marco 6)" abaixo.
   - **Geada (16/11/2026, feita):** Mage do KayKit recolorido em **branco e azul-gelo** (túnica branca, capa azul-gelo, cabelo prateado, sem chapéu), segurando um **leque de qi** gerado pelo script (nenhum pacote CC0 tem leque). Animações: parado, correr, ataque = `Spellcast_Shoot`, morte. Retrato na mochila (fim da silhueta para ela também).
   - **Cidade, NPCs e mestres (16/11/2026, feita):** Vila das Nuvens refeita (praça de pedra, casas wuxia, portão leste), 13 NPCs com sprite e falas em PT/EN, mestres das 4 seitas na criação e na praça. Detalhes em "Cidade, NPCs e mestres das seitas (marco 6)" abaixo.
-  - **Próximos passos depois disso:** bandidos e guerreiros/General de terracota (personagens KayKit recoloridos), ruínas, água e portais.
+  - **Para fechar o marco 6 (decidido pelo Lucas em 16/11/2026) — entram os 4 blocos:**
+    1. **Bandidos e terracota:** espadachins, arqueiros, guerreiros de terracota e General com sprite KayKit recolorido.
+       - **Bandidos:** roupa marrom e cinza, **lenço cobrindo a boca**; arqueiros com **chapéu de palha**.
+       - **Terracota:** **barro alaranjado** (cor de argila) com armadura de placas; **General 1,5× maior com detalhes dourados**.
+    2. **Ruínas, água e portais** com arte nova.
+    3. **Efeitos visuais das skills** (raios, lâminas, gelo, névoa) no lugar dos efeitos simples.
+    4. **Ícones de skills/itens** no lugar dos emojis + **medição de desempenho (FPS) no celular**.
+  - **Fechamento (16/11/2026, feito):** os 4 blocos no jogo. Detalhes em "Fechamento do marco 6" abaixo.
+
+### Roteiro dos próximos marcos (decidido pelo Lucas em 16/11/2026)
+- **Ordem:** terminar o Marco 6 → **fechar a v1** → **novas seitas** → **conteúdo pós-nível-10** → online.
+- **Marco 7: fechar a v1 (versão 0.1).**
+  - Jogar do nível 1 ao 10 com as duas seitas e fechar os itens de "Em aberto" (curva de XP, drops, chefe). Atenção: a Geada morre ~2× mais que a Tormenta.
+  - **Missões: cadeia principal do nível 1 ao 10 que guia o jogador até o General**, dada pelos NPCs que hoje só falam (ancião, guarda…), com recompensa de XP/ouro. Missões, NPCs de cada etapa e recompensas: **a decidir com o Lucas**. Sem missões repetíveis por enquanto.
+  - Polimento proposto: tela de carregamento e instalar como app no celular (PWA).
+  - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
+- **Marco 8: Titã e Víbora.** 4 ativas + 1 passiva cada (níveis 1, 3, 5, 7, 9), balanceadas com o simulador. Sugestão de sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas. Skills e números: **a decidir com o Lucas**.
+- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
+- **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
+- **Contínuo (proposto):** rodar `check:i18n`, `check:respawn` e `tools/layout-check.mjs` no GitHub Actions a cada push.
 
 
 ## Decididas
+
+### Fechamento do marco 6 (16/11/2026)
+Decidido pelo Lucas em 16/11/2026: entram os 4 blocos (bandidos/terracota, ruínas/água/portais, efeitos das skills, ícones + FPS).
+- **Regra de cor (pedida pelo Lucas):** o terreno e as estruturas fixas **nunca usam a cor dos inimigos do mesmo mapa**, para os
+  monstros se destacarem. Por isso as ruínas são de **pedra cinza-azulada** (sem argila nem laca vermelha) e não têm estátuas de
+  terracota no cenário. Vale para os próximos mapas.
+- **Bandidos** (KayKit recolorido): espadachim = Knight sem elmo/escudo, couro marrom e pano cinza, **lenço no rosto**; arqueiro =
+  Rogue com besta, **chapéu de palha** e lenço. Lenço e chapéu são gerados pelo script (`attach` `mask` e `hat`).
+- **Terracota:** guerreiros = Knight em **barro alaranjado** com espada de duas mãos (o esqueleto KayKit não tem armas e parecia
+  menos com os guerreiros de terracota). **General** = mesmo modelo com elmo, capa vermelha e **detalhes dourados**, **1,5×** maior
+  (era 1,7× no placeholder; só visual).
+- **Ruínas** (`render_ruins.py`): colunas de pedra inteiras e quebradas, entulho, cacos, mato seco; os pilares em volta do General
+  viram **braseiros acesos**. Piso de lajotas gastas com rachaduras e musgo.
+- **Água:** 3 quadros animados (reflexos que se movem, cada tile com sua fase) e espuma clara na margem.
+- **Portais:** porta-lua de pedra com véu de luz roxa, chão brilhando e faíscas subindo; nome por cima. Iguais em todos os mapas.
+- **Efeitos das skills** (`src/render/skillFx.ts`, só visual): Tormenta em amarelo/violeta de trovão (cortes cruzados com faíscas,
+  relâmpago no Passo do Raio, lâminas girando com raios na Tempestade, corte pesado com onda de choque e rachaduras no Quebra-Guarda);
+  Geada em azul/branco de gelo (orbe com rastro de flocos que estoura em cristais, flor de cristais, nevasca com cristais caindo,
+  névoa que se fecha em bolha).
+- **Ícones** (`tools/sprites/icons.py`, atlas `icones.png`): um por item (14 equipamentos + 4 poções) e um por skill (10), na mochila,
+  slots vazios (peça mais simples do slot, em cinza), botões de poção, hotbar, painel de skills e menu do auto-combate.
+  Os botões do topo no celular deitado (📜 💪 🎒) continuam emoji.
+- **Desempenho:** ⚙ **"Mostrar FPS"** (salvo no aparelho) mostra no topo FPS atual, média e "pior 1%" dos últimos 10 s e o número de
+  objetos. Objetos do mapa fora da tela deixam de ser desenhados. Medição aqui (CPU 4× mais lenta, tela de celular deitado): o JS
+  gasta ~6–8 ms por quadro (p95 ~11–14 ms na floresta), dentro dos 16,7 ms de 60 FPS. A medida real é no celular do Lucas com o
+  contador (o ambiente de teste não tem placa de vídeo).
+- **Observação:** o teste `check:m5` ("nv 1 não ataca terracota nv 7+") falha às vezes também na `main` (~1 em 3); é instável e
+  anterior a este marco.
 
 ### Cidade, NPCs e mestres das seitas (marco 6, 16/11/2026)
 Decidido pelo Lucas em 16/11/2026.
@@ -76,7 +123,7 @@ Decidido pelo Lucas em 16/11/2026.
 - **Arte da v1:** placeholders (formas simples) para testar a jogabilidade; arte definitiva depois.
 - **Ambientação:** wuxia, com seitas como classes.
 - **Experiência do dev:** intermediário (já fez projetos web).
-- **Save:** local em cada aparelho (PC e celular têm progresso separado por enquanto).
+- **Save:** local em cada aparelho (PC e celular têm progresso separado por enquanto). Confirmado em 16/11/2026: continua assim até o marco online.
 
 ### Idioma e nomes (15/11/2026)
 - **Idioma:** o jogo terá **português e inglês**, escolhidos pelo jogador (textos separados por idioma).
@@ -237,7 +284,7 @@ Decidido pelo Lucas em 16/11/2026.
 - **Resultado da simulação:** Tormenta ~69 min (~3 mortes), Geada ~50 min (~7 mortes). Chefe: Tormenta vence 40% (Incomum) / 75% (Raro); Geada vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
 
 ### Escopo da primeira versão jogável
-- 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função (mestres das 4 seitas, guarda do portão, ancião, moradores e mercador ambulante — só falas).
+- 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função (mestres das 4 seitas, guarda do portão, ancião, moradores e mercador ambulante — só falas). No Marco 7, parte deles passa a dar as missões da cadeia principal.
 - Floresta (lobos + bandidos) e Ruínas de Terracota (guerreiros + General).
 - 2 classes: Tormenta e Geada.
 
@@ -247,6 +294,7 @@ Decidido pelo Lucas em 16/11/2026.
 - Lista de equipamentos de teste e taxas de drop
 - Taxa exata do idle/offline e limite de horas
 - Comportamento do chefe em detalhe (padrão de ataques, frequência de invocação/área)
+- Cadeia de missões do Marco 7 (etapas, NPCs, recompensas)
 
 ## Notas de implementação (marco 3)
 - Q/E usam a poção pequena primeiro, depois a grande. Um efeito ativo por tipo (HP/mana).
