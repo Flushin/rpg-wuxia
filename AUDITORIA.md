@@ -122,7 +122,7 @@ flowchart TD
 ## 3. Decisões encontradas e se o código as respeita
 
 Fontes lidas: `docs/decisoes-do-projeto.md` (principal), `docs/balanceamento.md`, `README.md`, `tools/sprites/README.md`,
-`public/audio/music/README.md`, `public/*/CREDITS.txt`, o `_doc` de `src/data/items.json` e comentários com "aprovado/decidido" no código.
+`docs/musica.md` (antes `public/audio/music/README.md`), `public/*/CREDITS.txt`, o `_doc` de `src/data/items.json` e comentários com "aprovado/decidido" no código.
 Não existem `CLAUDE.md`, `CHANGELOG` nem `CONTRIBUTING`.
 
 Legenda: ✅ respeitada · ⚠️ divergência · ℹ️ não verificável no código
