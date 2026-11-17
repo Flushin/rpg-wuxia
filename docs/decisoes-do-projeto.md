@@ -59,7 +59,7 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Ganho offline no app:** ao voltar do segundo plano depois de **mais de 5 min** fora com o Auto ligado, aplica o mesmo cálculo offline e mostra o resumo (a fazer na etapa D5).
 - **Formatação:** Prettier aplicado de uma vez, num PR só de formatação.
 - **Nomes no código novo:** em inglês; comentários e docs em português; ids salvos e de dados (`lamina`, `colar`, `comum`…) não mudam.
-- **Volumes de som:** passam a ser **por aparelho** (hoje são por personagem).
+- **Volumes de som:** **por aparelho** (feito na B6; antes eram por personagem).
 - **Ordem do plano:** Fase A (rede de segurança) → B (legibilidade) → C (estrutura) → D (lojas). Nenhuma etapa começa sem o Lucas pedir.
 - **Lojas:** **só Android por enquanto** (Google Play); o código fica preparado para iOS.
 - **Política de privacidade:** página PT/EN no GitHub Pages do jogo, com link em ⚙ e na tela inicial.
@@ -100,6 +100,12 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   da arte do marco 8). Saíram os pisos, árvores, casas, lobo, bandidos, terracota, General, jogadores e NPCs desenhados
   em código (todos já tinham arte). Tipo de piso sem arte passa a mostrar grama em vez de buraco. `BY_TEXTURE` continua
   (liga os nomes de sprite dos dados às folhas). `public/maps/tiles.png` (1 KB) continua: é o tileset do formato Tiled.
+- **B6 (17/11/2026):** preferências do aparelho num lugar só: `src/platform/prefs.ts` com `getPref`/`setPref` (o
+  `try/catch` uma vez só) e a lista `PREF` de chaves documentada. **As chaves são as mesmas** (preferências atuais
+  preservadas). **Volumes agora são por aparelho** (decisão P6): ficam em `rpg-audio`; na primeira vez, herdam os volumes
+  do personagem que entrar. O campo `audio` do save continua igual (formato não muda), mas só é lido nessa primeira vez.
+
+**Fase B concluída em 17/11/2026** (B1–B6). Próxima: Fase C (estrutura), quando o Lucas pedir.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
@@ -357,7 +363,7 @@ Decidido pelo Lucas em 16/11/2026.
 ### Som
 - **Origem:** pacotes gratuitos CC0 (Kenney: RPG Audio, Impact Sounds, UI Audio). Créditos em `public/audio/CREDITS.txt`.
 - **Escopo:** efeitos de combate, progressão e interface + música ambiente (uma faixa para a cidade, outra para a floresta, com transição suave).
-- **Controle:** volumes separados de efeitos e música + mudo, na engrenagem de configurações (padrão: efeitos 80, música 50).
+- **Controle:** volumes separados de efeitos e música + mudo, na engrenagem de configurações (padrão: efeitos 80, música 50). Por aparelho desde a B6 (17/11/2026).
 
 ### Regeneração e movimento em combate
 - **HP e mana só regeneram na cidade:** 3% por segundo (após 5 s sem tomar dano). No mapa de caça, só poções (e passivas).

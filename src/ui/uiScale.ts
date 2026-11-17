@@ -2,17 +2,13 @@
 // O HUD inteiro (#hud) é desenhado numa "tela virtual" menor e ampliado com transform: scale(--ui),
 // então tudo cresce na mesma proporção e as regras de layout continuam valendo.
 // Coordenadas de getBoundingClientRect() são da tela real: use uiRect()/toUi() antes de gravar em style.
+import { PREF, getPref, setPref } from '../platform/prefs';
 export type UiSize = 'auto' | 'p' | 'm' | 'g';
-const KEY = 'rpg-ui-size';
 const FIXED: Record<Exclude<UiSize, 'auto'>, number> = { p: 1, m: 1.15, g: 1.3 };
 
 function load(): UiSize {
-  try {
-    const v = localStorage.getItem(KEY);
-    if (v === 'auto' || v === 'p' || v === 'm' || v === 'g') return v;
-  } catch {
-    /* sem storage */
-  }
+  const v = getPref(PREF.UI_SIZE);
+  if (v === 'auto' || v === 'p' || v === 'm' || v === 'g') return v;
   return 'auto';
 }
 
@@ -52,11 +48,7 @@ export const uiSize = () => mode;
 export const uiScale = () => scale;
 export function setUiSize(m: UiSize) {
   mode = m;
-  try {
-    localStorage.setItem(KEY, m);
-  } catch {
-    /* sem storage */
-  }
+  setPref(PREF.UI_SIZE, m);
   apply();
 }
 /** px da tela real → px do HUD */
