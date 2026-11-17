@@ -447,6 +447,8 @@ Implementadas a pedido do Lucas e publicadas no site.
   gastando durabilidade, item coletado, poção usada) redesenhava a mochila inteira, e a rolagem voltava para o topo.
   Agora a posição da rolagem é mantida, e mudanças vindas do jogo esperam o jogador parar de rolar (~0,7 s depois de soltar o
   dedo) para redesenhar. Ações do próprio jogador (tocar num item, equipar, trocar de aba) continuam na hora.
+  - **Reforço (PR #23):** a moldura que rola (`.inv-card`) passou a ser criada uma vez só; a cada mudança só o conteúdo de dentro
+    é trocado, então a rolagem nunca é perdida (antes a moldura inteira era recriada e a posição era restaurada depois).
 
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
