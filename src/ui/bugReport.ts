@@ -25,22 +25,37 @@ function pushError(msg: string) {
 
 /** Começa a guardar os erros do console. Chamar o quanto antes (main.ts). */
 export function captureErrors() {
-  window.addEventListener('error', (e) => pushError(`${e.message} @ ${e.filename?.split('/').pop() ?? '?'}:${e.lineno}:${e.colno}${e.error?.stack ? `\n${String(e.error.stack).split('\n').slice(1, 4).join('\n')}` : ''}`));
+  window.addEventListener('error', (e) =>
+    pushError(
+      `${e.message} @ ${e.filename?.split('/').pop() ?? '?'}:${e.lineno}:${e.colno}${e.error?.stack ? `\n${String(e.error.stack).split('\n').slice(1, 4).join('\n')}` : ''}`,
+    ),
+  );
   window.addEventListener('unhandledrejection', (e) => {
     const r = e.reason as { message?: string; stack?: string } | undefined;
-    pushError(`Promise: ${r?.message ?? String(e.reason)}${r?.stack ? `\n${r.stack.split('\n').slice(1, 4).join('\n')}` : ''}`);
+    pushError(
+      `Promise: ${r?.message ?? String(e.reason)}${r?.stack ? `\n${r.stack.split('\n').slice(1, 4).join('\n')}` : ''}`,
+    );
   });
   const orig = console.error.bind(console);
   console.error = (...args: unknown[]) => {
-    pushError(args.map((a) => (a instanceof Error ? `${a.message}` : typeof a === 'string' ? a : safeJson(a))).join(' '));
+    pushError(
+      args.map((a) => (a instanceof Error ? `${a.message}` : typeof a === 'string' ? a : safeJson(a))).join(' '),
+    );
     orig(...args);
   };
 }
 
-function safeJson(v: unknown) { try { return JSON.stringify(v); } catch { return String(v); } }
+function safeJson(v: unknown) {
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return String(v);
+  }
+}
 
 function gameInfo(w: World): string {
-  const p = w.player, q = w.questView();
+  const p = w.player,
+    q = w.questView();
   return [
     `Personagem: ${p.name} · ${CLASSES[w.classId]?.name ?? w.classId} · nível ${p.level}`,
     `Mapa: ${w.mapId} · posição ${p.x.toFixed(1)}, ${p.y.toFixed(1)} · HP ${Math.round(p.hp)} · ${p.dead ? 'morto' : 'vivo'}`,
@@ -70,7 +85,10 @@ export class BugReport {
     document.body.appendChild(this.el);
     this.el.onclick = (e) => {
       const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
-      if (!t) { if (e.target === this.el) this.close(); return; }
+      if (!t) {
+        if (e.target === this.el) this.close();
+        return;
+      }
       audio.ui('ui_click');
       if (t.dataset.act === 'close') this.close();
       else if (t.dataset.act === 'send') void this.send();
@@ -81,8 +99,10 @@ export class BugReport {
     audio.ui('ui_open');
     const ready = !!BUG_REPORT_KEY;
     this.el.innerHTML = `<div class="card">${closeX('data-act="close"')}<h2>🐞 ${L('Reportar bug', 'Report a bug')}</h2>
-      <small class="muted">${L('Conte o que aconteceu e o que você estava fazendo. Junto vão a versão do jogo, seu personagem, mapa, aparelho, FPS e erros técnicos (nada da sua conta ou de outros apps).',
-        'Tell what happened and what you were doing. The game version, your character, map, device, FPS and technical errors are sent too (nothing from your accounts or other apps).')}</small>
+      <small class="muted">${L(
+        'Conte o que aconteceu e o que você estava fazendo. Junto vão a versão do jogo, seu personagem, mapa, aparelho, FPS e erros técnicos (nada da sua conta ou de outros apps).',
+        'Tell what happened and what you were doing. The game version, your character, map, device, FPS and technical errors are sent too (nothing from your accounts or other apps).',
+      )}</small>
       <textarea id="bug-text" rows="6" maxlength="2000" placeholder="${L('Ex.: matei o lobo e ele não sumiu…', 'E.g.: I killed the wolf and it did not disappear…')}"></textarea>
       <input id="bug-contact" maxlength="80" placeholder="${L('Seu nome ou contato (opcional)', 'Your name or contact (optional)')}"/>
       <small id="bug-status" class="muted">${ready ? '' : L('O envio de reports ainda não foi configurado.', 'Bug reports are not set up yet.')}</small>
@@ -92,29 +112,48 @@ export class BugReport {
     if (!isTouch) (this.el.querySelector('#bug-text') as HTMLTextAreaElement | null)?.focus();
   }
 
-  close() { this.el.classList.add('hidden'); audio.ui('ui_close'); }
+  close() {
+    this.el.classList.add('hidden');
+    audio.ui('ui_close');
+  }
 
   private status(msg: string, ok = false) {
     const s = this.el.querySelector('#bug-status') as HTMLElement | null;
-    if (s) { s.textContent = msg; s.style.color = ok ? '#9fe8a0' : '#ff8a80'; }
+    if (s) {
+      s.textContent = msg;
+      s.style.color = ok ? '#9fe8a0' : '#ff8a80';
+    }
   }
 
   private async send() {
     const text = (this.el.querySelector('#bug-text') as HTMLTextAreaElement).value.trim();
     const contact = (this.el.querySelector('#bug-contact') as HTMLInputElement).value.trim();
-    if (text.length < 5) { this.status(L('Escreva o que aconteceu.', 'Describe what happened.')); return; }
+    if (text.length < 5) {
+      this.status(L('Escreva o que aconteceu.', 'Describe what happened.'));
+      return;
+    }
     let last = 0;
-    try { last = Number(localStorage.getItem(LAST_KEY)) || 0; } catch { /* sem armazenamento */ }
+    try {
+      last = Number(localStorage.getItem(LAST_KEY)) || 0;
+    } catch {
+      /* sem armazenamento */
+    }
     const wait = Math.ceil((last + COOLDOWN_MS - Date.now()) / 1000);
-    if (wait > 0) { this.status(L(`Aguarde ${wait} s para enviar outro report.`, `Wait ${wait} s to send another report.`)); return; }
+    if (wait > 0) {
+      this.status(L(`Aguarde ${wait} s para enviar outro report.`, `Wait ${wait} s to send another report.`));
+      return;
+    }
     const btn = this.el.querySelector('[data-act="send"]') as HTMLButtonElement;
     btn.disabled = true;
     this.status(L('Enviando…', 'Sending…'), true);
     const w = this.world;
     const message = [
-      text, '',
-      `— Jogo —\nVersão: ${__APP_VERSION__} (${__BUILD__})\n${gameInfo(w)}`, '',
-      `— Aparelho —\n${deviceInfo()}`, '',
+      text,
+      '',
+      `— Jogo —\nVersão: ${__APP_VERSION__} (${__BUILD__})\n${gameInfo(w)}`,
+      '',
+      `— Aparelho —\n${deviceInfo()}`,
+      '',
       `— Erros do console (${errors.length}) —\n${errors.length ? errors.join('\n') : 'nenhum'}`,
     ].join('\n');
     try {
@@ -129,16 +168,26 @@ export class BugReport {
           botcheck: false,
         }),
       });
-      const data = await res.json().catch(() => ({})) as { success?: boolean; message?: string };
+      const data = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
       if (!res.ok || !data.success) throw new Error(data.message || `HTTP ${res.status}`);
-      try { localStorage.setItem(LAST_KEY, String(Date.now())); } catch { /* sem armazenamento */ }
+      try {
+        localStorage.setItem(LAST_KEY, String(Date.now()));
+      } catch {
+        /* sem armazenamento */
+      }
       this.status(L('Report enviado. Obrigado!', 'Report sent. Thank you!'), true);
       (this.el.querySelector('#bug-text') as HTMLTextAreaElement).value = '';
-      setTimeout(() => { if (!this.el.classList.contains('hidden')) this.close(); }, 1500);
+      setTimeout(() => {
+        if (!this.el.classList.contains('hidden')) this.close();
+      }, 1500);
     } catch (err) {
       btn.disabled = false;
-      this.status(L(`Não foi possível enviar (${(err as Error).message}). Verifique a internet e tente de novo.`,
-        `Could not send (${(err as Error).message}). Check your connection and try again.`));
+      this.status(
+        L(
+          `Não foi possível enviar (${(err as Error).message}). Verifique a internet e tente de novo.`,
+          `Could not send (${(err as Error).message}). Check your connection and try again.`,
+        ),
+      );
     }
   }
 }

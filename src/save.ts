@@ -2,7 +2,8 @@ import { get, set, del } from 'idb-keyval';
 import { deleteSlot as dropSlot, emptySaveFile, migrateSaves, setSlot, type SaveFile } from './core/saves';
 import type { SaveData } from './core/types';
 
-const KEY = 'rpg-saves-v2', LEGACY_KEY = 'rpg-save-v1';
+const KEY = 'rpg-saves-v2',
+  LEGACY_KEY = 'rpg-save-v1';
 // Leitura: o IndexedDB do iPhone às vezes falha uma vez ("Connection to Indexed Database server lost") e funciona na seguinte.
 const READ_ATTEMPTS = 3;
 const READ_RETRY_MS = 300;
@@ -34,7 +35,10 @@ export async function loadAll(): Promise<SaveFile> {
   const [cur, legacy] = await Promise.all([readWithRetry(KEY), readWithRetry(LEGACY_KEY)]);
   file = migrateSaves(cur, legacy);
   loaded = true;
-  if (!cur && legacy) { await set(KEY, file); await del(LEGACY_KEY); }
+  if (!cur && legacy) {
+    await set(KEY, file);
+    await del(LEGACY_KEY);
+  }
   return file;
 }
 
@@ -43,7 +47,9 @@ function assertLoaded() {
 }
 
 export const currentFile = () => file;
-export const setActiveSlot = (i: number) => { active = i; };
+export const setActiveSlot = (i: number) => {
+  active = i;
+};
 export const activeSlot = () => active;
 
 // grava o personagem ativo (e o marca como último jogado)

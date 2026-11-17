@@ -17,14 +17,21 @@ export interface QuestDef {
   minLevel: number;
   objective: QuestObjective;
   reward: { xp: number; gold: number; item?: 'arma' | 'tronco' };
-  name: string; offer: string; goal: string; done: string;
+  name: string;
+  offer: string;
+  goal: string;
+  done: string;
 }
 
 export const QUESTS: QuestDef[] = (localize('quests', questsJson) as { chain: QuestDef[] }).chain;
 
 /** pending = ainda não aceita; active = em andamento; ready = objetivo cumprido, falta entregar */
 export type QuestStatus = 'pending' | 'active' | 'ready';
-export interface QuestState { stage: number; status: QuestStatus; progress: number }
+export interface QuestState {
+  stage: number;
+  status: QuestStatus;
+  progress: number;
+}
 
 /** Como a missão aparece para a interface. */
 export type QuestPhase = 'locked' | 'available' | 'active' | 'ready' | 'complete';

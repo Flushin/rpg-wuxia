@@ -7,7 +7,12 @@ const KEY = 'rpg-ui-size';
 const FIXED: Record<Exclude<UiSize, 'auto'>, number> = { p: 1, m: 1.15, g: 1.3 };
 
 function load(): UiSize {
-  try { const v = localStorage.getItem(KEY); if (v === 'auto' || v === 'p' || v === 'm' || v === 'g') return v; } catch { /* sem storage */ }
+  try {
+    const v = localStorage.getItem(KEY);
+    if (v === 'auto' || v === 'p' || v === 'm' || v === 'g') return v;
+  } catch {
+    /* sem storage */
+  }
   return 'auto';
 }
 
@@ -17,18 +22,21 @@ let scale = 1;
 /** Automático: só no toque e com o aparelho deitado (em pé e no PC continua 100%). */
 export function autoScale(): number {
   if (!matchMedia('(pointer:coarse)').matches) return 1;
-  const w = innerWidth, h = innerHeight;
+  const w = innerWidth,
+    h = innerHeight;
   if (w <= h) return 1;
   if (h < 360) return 1.15; // Galaxy Z Fold fechado deitado (~920×316): pouca altura, cresce menos
-  if (h < 600) return 1.2;  // celulares grandes deitados (iPhone Pro Max ~932×430)
-  return 1;                 // Fold aberto, tablets
+  if (h < 600) return 1.2; // celulares grandes deitados (iPhone Pro Max ~932×430)
+  return 1; // Fold aberto, tablets
 }
 
 /** Maior escala em que o HUD ainda cabe sem sobrepor (conferido com tools/layout-check.mjs):
  *  deitado, a tela virtual precisa de pelo menos MIN_H de altura; em pé, MIN_W de largura. */
-const MIN_H = 270, MIN_W = 360;
+const MIN_H = 270,
+  MIN_W = 360;
 export function maxScale(): number {
-  const w = innerWidth, h = innerHeight;
+  const w = innerWidth,
+    h = innerHeight;
   return Math.max(1, w > h ? h / MIN_H : w / MIN_W);
 }
 
@@ -44,15 +52,27 @@ export const uiSize = () => mode;
 export const uiScale = () => scale;
 export function setUiSize(m: UiSize) {
   mode = m;
-  try { localStorage.setItem(KEY, m); } catch { /* sem storage */ }
+  try {
+    localStorage.setItem(KEY, m);
+  } catch {
+    /* sem storage */
+  }
   apply();
 }
 /** px da tela real → px do HUD */
 export const toUi = (px: number) => px / scale;
 /** retângulo de um elemento em px do HUD */
 export function uiRect(el: Element) {
-  const r = el.getBoundingClientRect(), s = scale;
-  return { left: r.left / s, top: r.top / s, right: r.right / s, bottom: r.bottom / s, width: r.width / s, height: r.height / s };
+  const r = el.getBoundingClientRect(),
+    s = scale;
+  return {
+    left: r.left / s,
+    top: r.top / s,
+    right: r.right / s,
+    bottom: r.bottom / s,
+    width: r.width / s,
+    height: r.height / s,
+  };
 }
 /** largura/altura da tela em px do HUD */
 export const uiW = () => innerWidth / scale;

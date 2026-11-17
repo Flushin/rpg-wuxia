@@ -13,7 +13,10 @@ export class PotionBar {
     $('potion-bar').classList.toggle('touch', isTouch);
     for (const k of ['hp', 'mp'] as PotionKind[]) {
       const b = $(`pot-${k}`);
-      b.addEventListener('pointerdown', (e) => { e.preventDefault(); this.world.usePotion(k); });
+      b.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        this.world.usePotion(k);
+      });
       b.addEventListener('contextmenu', (e) => e.preventDefault());
       b.addEventListener('focus', () => b.blur());
     }
@@ -21,7 +24,8 @@ export class PotionBar {
   update() {
     const w = this.world;
     for (const k of ['hp', 'mp'] as PotionKind[]) {
-      const fx = w.potionFx[k], n = w.kindCount(k);
+      const fx = w.potionFx[k],
+        n = w.kindCount(k);
       const frac = fx ? Math.max(0, fx.remaining / POTIONS[fx.id].duration) : 0;
       const sig = `${n}|${fx ? Math.ceil(fx.remaining) : 0}|${Math.round(frac * 50)}|${w.potionCd[k] > 0}`;
       if (sig === this.sigs[k]) continue;

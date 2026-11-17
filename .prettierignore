@@ -1,0 +1,12 @@
+# Gerados ou de terceiros: não formatar
+node_modules
+dist
+public
+package-lock.json
+tools/sprites/.cache
+.venv-blender
+# Documentos em Markdown ficam como estão (tabelas e quebras escritas à mão)
+*.md
+# JSON fica como está: os de sprites são gerados pelos scripts do Blender e os de dados
+# (src/data) estão em tabelas de uma linha por item, mais fáceis de comparar que a versão do Prettier
+*.json

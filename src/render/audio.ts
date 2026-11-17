@@ -1,7 +1,11 @@
 import Phaser from 'phaser';
 import data from '../data/audio.json';
 
-export interface AudioSettings { sfx: number; music: number; muted: boolean }
+export interface AudioSettings {
+  sfx: number;
+  music: number;
+  muted: boolean;
+}
 export const DEFAULT_AUDIO: AudioSettings = { sfx: 80, music: 50, muted: false };
 
 type SfxDef = { file: string; volume: number };
@@ -11,7 +15,8 @@ const MUSIC = data.music as Record<string, MusicDef>;
 const MAX_INSTANCES = 3;
 const FADE_MS = 1000;
 
-export const sfxFiles = () => Object.entries(SFX).map(([key, d]) => ({ key, urls: [`audio/sfx/${d.file}.ogg`, `audio/sfx/${d.file}.mp3`] }));
+export const sfxFiles = () =>
+  Object.entries(SFX).map(([key, d]) => ({ key, urls: [`audio/sfx/${d.file}.ogg`, `audio/sfx/${d.file}.mp3`] }));
 
 class AudioManager {
   settings: AudioSettings = { ...DEFAULT_AUDIO };
@@ -29,15 +34,23 @@ class AudioManager {
     this.onChange = onChange ?? (() => {});
     this.music = null;
     this.playing.clear();
-    scene.events.once('shutdown', () => { this.stopMusic(); this.scene = null; });
+    scene.events.once('shutdown', () => {
+      this.stopMusic();
+      this.scene = null;
+    });
   }
   private onChange: () => void = () => {};
 
-  private sfxGain() { return this.settings.muted ? 0 : this.settings.sfx / 100; }
-  private musicGain() { return this.settings.muted ? 0 : this.settings.music / 100; }
+  private sfxGain() {
+    return this.settings.muted ? 0 : this.settings.sfx / 100;
+  }
+  private musicGain() {
+    return this.settings.muted ? 0 : this.settings.music / 100;
+  }
 
   sfx(key: string, detune = 0) {
-    const s = this.scene, d = SFX[key];
+    const s = this.scene,
+      d = SFX[key];
     if (!s || !d || !s.cache.audio.exists(key)) return;
     const vol = d.volume * this.sfxGain();
     if (vol <= 0) return;
@@ -45,12 +58,17 @@ class AudioManager {
     if (n >= MAX_INSTANCES) return;
     this.playing.set(key, n + 1);
     const snd = s.sound.add(key, { volume: vol, detune: detune ? Phaser.Math.Between(-detune, detune) : 0 });
-    const done = () => { this.playing.set(key, Math.max(0, (this.playing.get(key) ?? 1) - 1)); snd.destroy(); };
+    const done = () => {
+      this.playing.set(key, Math.max(0, (this.playing.get(key) ?? 1) - 1));
+      snd.destroy();
+    };
     snd.once('complete', done);
     if (!snd.play()) done();
   }
 
-  ui(key: string) { this.sfx(key); }
+  ui(key: string) {
+    this.sfx(key);
+  }
 
   setSettings(p: Partial<AudioSettings>) {
     Object.assign(this.settings, p);
@@ -64,32 +82,74 @@ class AudioManager {
   onEvent(ev: import('../core/types').GameEvent, playerId: number) {
     switch (ev.type) {
       case 'attack':
-        if (ev.fromId === playerId) { this.lastRanged = ev.ranged; if (ev.ranged) this.sfx('spell', 500); }
-        else this.sfx('monster_attack', 300);
+        if (ev.fromId === playerId) {
+          this.lastRanged = ev.ranged;
+          if (ev.ranged) this.sfx('spell', 500);
+        } else this.sfx('monster_attack', 300);
         break;
       case 'hit':
-        if (ev.targetKind === 'player') { if (ev.crit) this.sfx('crit', 300); }
-        else this.sfx(ev.crit ? 'crit' : this.lastRanged ? 'spell' : 'hit', 500);
+        if (ev.targetKind === 'player') {
+          if (ev.crit) this.sfx('crit', 300);
+        } else this.sfx(ev.crit ? 'crit' : this.lastRanged ? 'spell' : 'hit', 500);
         break;
-      case 'miss': this.sfx('miss', 500); break;
-      case 'death': if (ev.id !== playerId) this.sfx('monster_death', 300); break;
-      case 'playerDeath': this.sfx('player_death'); break;
-      case 'levelup': this.sfx('level_up'); break;
-      case 'skillLevelUp': this.sfx('level_up'); break;
-      case 'skillCast': this.lastRanged = ev.ranged; if (ev.ranged) this.sfx('spell', 300); break;
-      case 'skillFail': this.sfx('ui_click'); break;
-      case 'itemPickup': this.sfx('pickup', 200); break;
-      case 'goldPickup': this.sfx('coin', 200); break;
-      case 'bagFull': this.sfx('bag_full'); break;
-      case 'equipChange': this.sfx('equip'); break;
-      case 'potionUsed': this.sfx('potion'); break;
-      case 'potionFail': this.sfx('ui_click'); break;
-      case 'npcOpen': this.sfx('ui_open'); break;
-      case 'npcClose': this.sfx('ui_close'); break;
-      case 'trade': this.sfx('coin'); break;
-      case 'repair': this.sfx('repair'); break;
-      case 'mapChange': this.sfx('portal'); this.playMusicForMap(ev.mapId); break;
-      default: break;
+      case 'miss':
+        this.sfx('miss', 500);
+        break;
+      case 'death':
+        if (ev.id !== playerId) this.sfx('monster_death', 300);
+        break;
+      case 'playerDeath':
+        this.sfx('player_death');
+        break;
+      case 'levelup':
+        this.sfx('level_up');
+        break;
+      case 'skillLevelUp':
+        this.sfx('level_up');
+        break;
+      case 'skillCast':
+        this.lastRanged = ev.ranged;
+        if (ev.ranged) this.sfx('spell', 300);
+        break;
+      case 'skillFail':
+        this.sfx('ui_click');
+        break;
+      case 'itemPickup':
+        this.sfx('pickup', 200);
+        break;
+      case 'goldPickup':
+        this.sfx('coin', 200);
+        break;
+      case 'bagFull':
+        this.sfx('bag_full');
+        break;
+      case 'equipChange':
+        this.sfx('equip');
+        break;
+      case 'potionUsed':
+        this.sfx('potion');
+        break;
+      case 'potionFail':
+        this.sfx('ui_click');
+        break;
+      case 'npcOpen':
+        this.sfx('ui_open');
+        break;
+      case 'npcClose':
+        this.sfx('ui_close');
+        break;
+      case 'trade':
+        this.sfx('coin');
+        break;
+      case 'repair':
+        this.sfx('repair');
+        break;
+      case 'mapChange':
+        this.sfx('portal');
+        this.playMusicForMap(ev.mapId);
+        break;
+      default:
+        break;
     }
   }
 
@@ -102,8 +162,16 @@ class AudioManager {
     const s = this.scene;
     this.wantMusic = key;
     if (!s || this.music?.key === key || this.missing.has(key)) return;
-    if (s.sound.locked) { s.sound.once('unlocked', () => { if (this.wantMusic === key) this.playMusic(key); }); return; }
-    if (!s.cache.audio.exists(key)) { this.loadMusic(key); return; }
+    if (s.sound.locked) {
+      s.sound.once('unlocked', () => {
+        if (this.wantMusic === key) this.playMusic(key);
+      });
+      return;
+    }
+    if (!s.cache.audio.exists(key)) {
+      this.loadMusic(key);
+      return;
+    }
     const d = MUSIC[key];
     const old = this.music;
     const snd = s.sound.add(key, { loop: true, volume: 0 });
@@ -117,21 +185,35 @@ class AudioManager {
   }
 
   private loadMusic(key: string) {
-    const s = this.scene, d = MUSIC[key];
+    const s = this.scene,
+      d = MUSIC[key];
     if (!s || !d || this.loading.has(key)) return;
     this.loading.add(key);
-    const fail = () => { this.missing.add(key); this.loading.delete(key); };
+    const fail = () => {
+      this.missing.add(key);
+      this.loading.delete(key);
+    };
     const l = s.load;
-    const onErr = (f: Phaser.Loader.File) => { if (f.key === key) fail(); };
+    const onErr = (f: Phaser.Loader.File) => {
+      if (f.key === key) fail();
+    };
     l.on('loaderror', onErr);
     l.once('complete', () => {
       l.off('loaderror', onErr);
       if (!this.loading.has(key)) return;
       this.loading.delete(key);
-      if (!s.cache.audio.exists(key)) { this.missing.add(key); return; }
+      if (!s.cache.audio.exists(key)) {
+        this.missing.add(key);
+        return;
+      }
       if (this.wantMusic === key && this.scene === s) this.playMusic(key);
     });
-    try { l.audio(key, [`audio/music/${d.file}.ogg`, `audio/music/${d.file}.mp3`]); l.start(); } catch { fail(); }
+    try {
+      l.audio(key, [`audio/music/${d.file}.ogg`, `audio/music/${d.file}.mp3`]);
+      l.start();
+    } catch {
+      fail();
+    }
   }
 
   private stopMusic() {

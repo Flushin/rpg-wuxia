@@ -24,17 +24,29 @@ export function rewardText(r: { xp: number; gold: number; item?: 'arma' | 'tronc
 export class QuestTracker {
   private sig = '';
   update(w: World) {
-    const el = $('quest-tracker'), v = w.questView();
+    const el = $('quest-tracker'),
+      v = w.questView();
     const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${innerWidth}x${innerHeight}|${uiScale()}`;
     if (sig !== this.sig) {
       this.sig = sig;
-      if (!v.def) { el.classList.add('hidden'); return; }
+      if (!v.def) {
+        el.classList.add('hidden');
+        return;
+      }
       let line = '';
-      if (v.phase === 'locked') line = `<span class="muted">${L(`Próxima missão no nível ${v.def.minLevel}`, `Next quest at level ${v.def.minLevel}`)}</span>`;
-      else if (v.phase === 'available') line = L(`Fale com <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`, `Talk to <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`);
-      else if (v.phase === 'ready') line = `✓ ${L(`Volte a <b>${esc(npcName(v.turnIn))}</b>`, `Return to <b>${esc(npcName(v.turnIn))}</b>`)} <i class="qm">?</i>`;
-      else if (v.def.objective.type === 'talk') { const who = npcName(w.questTalkTarget()); line = L(`Fale com <b>${esc(who)}</b> <i class="qm">?</i>`, `Talk to <b>${esc(who)}</b> <i class="qm">?</i>`); }
-      else line = v.count > 1 ? `${esc(v.def.goal)} <b>${v.progress}/${v.count}</b>` : esc(v.def.goal);
+      if (v.phase === 'locked')
+        line = `<span class="muted">${L(`Próxima missão no nível ${v.def.minLevel}`, `Next quest at level ${v.def.minLevel}`)}</span>`;
+      else if (v.phase === 'available')
+        line = L(
+          `Fale com <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`,
+          `Talk to <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`,
+        );
+      else if (v.phase === 'ready')
+        line = `✓ ${L(`Volte a <b>${esc(npcName(v.turnIn))}</b>`, `Return to <b>${esc(npcName(v.turnIn))}</b>`)} <i class="qm">?</i>`;
+      else if (v.def.objective.type === 'talk') {
+        const who = npcName(w.questTalkTarget());
+        line = L(`Fale com <b>${esc(who)}</b> <i class="qm">?</i>`, `Talk to <b>${esc(who)}</b> <i class="qm">?</i>`);
+      } else line = v.count > 1 ? `${esc(v.def.goal)} <b>${v.progress}/${v.count}</b>` : esc(v.def.goal);
       el.innerHTML = `<div class="qt-name">${esc(v.def.name)}</div><div class="qt-line">${line}</div>`;
       el.classList.remove('hidden');
     }

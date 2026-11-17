@@ -21,8 +21,17 @@ export function computeDerived(a: Attributes): Derived {
 
 // Origem de cada atributo: base da classe + níveis (automáticos e pontos distribuídos) + equipamento.
 // `gear` são os bônus dos equipamentos (itens quebrados já ficam fora). total = base + levels + equip.
-export interface AttrParts { base: number; levels: number; equip: number; total: number }
-export function attrBreakdown(attrs: Attributes, base: Attributes, gear: Record<string, number>): Record<keyof Attributes, AttrParts> {
+export interface AttrParts {
+  base: number;
+  levels: number;
+  equip: number;
+  total: number;
+}
+export function attrBreakdown(
+  attrs: Attributes,
+  base: Attributes,
+  gear: Record<string, number>,
+): Record<keyof Attributes, AttrParts> {
   const out = {} as Record<keyof Attributes, AttrParts>;
   for (const k of Object.keys(attrs) as (keyof Attributes)[]) {
     const equip = gear[k] ?? 0;

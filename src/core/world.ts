@@ -5,15 +5,74 @@ import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
 import { findPath, isWalkable, type Avoid } from './pathfinding';
-import { GLOBAL_COOLDOWN, SKILLS, SKILL_MAX_LEVEL, classActives, skillScale, skillXpToNext, type SkillDef, type SkillState } from './skills';
-import { BAG_SIZE, BASES, GROUND_SECONDS, POTIONS, SLOTS, STACK_MAX, STARTING_KIT, STARTING_WEAPON, baseOf, buyPrice, equipmentBaseIds, isBroken, isPotionId, itemColor, itemName,
-  itemStats, makeEquipment, makePotion, maxDurability, repairCost, rollRarity, sanitizeItem, sellValue, sortedBag, WEAR_PER_HIT } from './items';
+import {
+  GLOBAL_COOLDOWN,
+  SKILLS,
+  SKILL_MAX_LEVEL,
+  classActives,
+  skillScale,
+  skillXpToNext,
+  type SkillDef,
+  type SkillState,
+} from './skills';
+import {
+  BAG_SIZE,
+  BASES,
+  GROUND_SECONDS,
+  POTIONS,
+  SLOTS,
+  STACK_MAX,
+  STARTING_KIT,
+  STARTING_WEAPON,
+  baseOf,
+  buyPrice,
+  equipmentBaseIds,
+  isBroken,
+  isPotionId,
+  itemColor,
+  itemName,
+  itemStats,
+  makeEquipment,
+  makePotion,
+  maxDurability,
+  repairCost,
+  rollRarity,
+  sanitizeItem,
+  sellValue,
+  sortedBag,
+  WEAR_PER_HIT,
+} from './items';
 import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
-import { QUESTS, questGoalCount, resolveNpc, sanitizeQuest, type QuestDef, type QuestPhase, type QuestState } from './quests';
+import {
+  QUESTS,
+  questGoalCount,
+  resolveNpc,
+  sanitizeQuest,
+  type QuestDef,
+  type QuestPhase,
+  type QuestState,
+} from './quests';
 import { computeDerived, emptyElements } from './stats';
-import { ATTR_KEYS, ELEMENTS, type AttrKey, type Attributes, type BuffKind, type Entity, type GameEvent, type GroundItem, type ItemInstance, type Point, type PotionKind, type Rarity, type SaveData, type SkillFailReason, type Slot, type Telegraph } from './types';
+import {
+  ATTR_KEYS,
+  ELEMENTS,
+  type AttrKey,
+  type Attributes,
+  type BuffKind,
+  type Entity,
+  type GameEvent,
+  type GroundItem,
+  type ItemInstance,
+  type Point,
+  type PotionKind,
+  type Rarity,
+  type SaveData,
+  type SkillFailReason,
+  type Slot,
+  type Telegraph,
+} from './types';
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
@@ -26,11 +85,24 @@ const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 const DEATH_DURABILITY_LOSS = 0.1;
 const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
-export interface PotionFx { id: string; remaining: number; rate: number }
+export interface PotionFx {
+  id: string;
+  remaining: number;
+  rate: number;
+}
 export interface OfflineReport {
-  elapsedMs: number; effMin: number; efficiency: number; kills: number; xp: number; levelsGained: number; newLevel: number; gold: number;
+  elapsedMs: number;
+  effMin: number;
+  efficiency: number;
+  kills: number;
+  xp: number;
+  levelsGained: number;
+  newLevel: number;
+  gold: number;
   items: { name: string; color: string; rarity: Rarity; qty: number }[];
-  potionsUsed: Record<PotionKind, number>; soldCount: number; soldGold: number;
+  potionsUsed: Record<PotionKind, number>;
+  soldCount: number;
+  soldGold: number;
 }
 
 export class World {
@@ -53,7 +125,14 @@ export class World {
   gcd = 0;
   gold = 0;
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
-  equipment: Record<Slot, ItemInstance | null> = { colar: null, tronco: null, arma: null, cabeca: null, calca: null, bota: null };
+  equipment: Record<Slot, ItemInstance | null> = {
+    colar: null,
+    tronco: null,
+    arma: null,
+    cabeca: null,
+    calca: null,
+    bota: null,
+  };
   ground: GroundItem[] = [];
   invVersion = 0; // sobe a cada mudança de inventário/equipamento/ouro (a UI usa para redesenhar)
   potionFx: Record<PotionKind, PotionFx | null> = { hp: null, mp: null };
@@ -84,7 +163,13 @@ export class World {
   private rng = new Rng((Date.now() & 0xffffffff) >>> 0);
   private npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
-  private constructor(private maps: Record<string, GameMap>, name: string, classId: string, level: number, attrs: Attributes) {
+  private constructor(
+    private maps: Record<string, GameMap>,
+    name: string,
+    classId: string,
+    level: number,
+    attrs: Attributes,
+  ) {
     this.classId = classId;
     this.auto = new AutoCombat(this, classId);
     this.map = maps[this.mapId];
@@ -99,7 +184,8 @@ export class World {
     const wid = STARTING_WEAPON[classId];
     if (wid) w.equipment.arma = makeEquipment(wid, 'comum', null, w.rng);
     w.recalc(w.player, false);
-    w.player.hp = w.player.derived.maxHp; w.player.mana = w.player.derived.maxMana;
+    w.player.hp = w.player.derived.maxHp;
+    w.player.mana = w.player.derived.maxMana;
     w.changeMap('cidade');
     for (const s of SKILLS[classId] ?? []) if (s.unlock <= 1) w.events.push({ type: 'skillUnlocked', skillId: s.id });
     return w;
@@ -108,8 +194,11 @@ export class World {
   // offline=false: não aplica ganho offline (só o último personagem jogado recebe)
   static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now(), offline = true): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
-    w.xp = s.xp; w.freePoints = s.freePoints;
-    w.ratioCursor = s.ratioCursor ?? 0; w.seenTips = [...(s.seenTips ?? [])]; w.tipsEnabled = s.tipsEnabled ?? true;
+    w.xp = s.xp;
+    w.freePoints = s.freePoints;
+    w.ratioCursor = s.ratioCursor ?? 0;
+    w.seenTips = [...(s.seenTips ?? [])];
+    w.tipsEnabled = s.tipsEnabled ?? true;
     w.audio = { sfx: s.audio?.sfx ?? 80, music: s.audio?.music ?? 50, muted: s.audio?.muted ?? false };
     for (const [id, st] of Object.entries(s.skills ?? {})) {
       const cur = w.skills[id];
@@ -118,7 +207,9 @@ export class World {
       cur.xp = cur.level >= SKILL_MAX_LEVEL ? 0 : Math.max(0, Number(st.xp) || 0);
     }
     w.gold = Math.max(0, Math.floor(Number(s.gold) || 0));
-    (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => { w.bag[i] = sanitizeItem(raw); });
+    (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
+      w.bag[i] = sanitizeItem(raw);
+    });
     for (const sl of SLOTS) {
       const it = sanitizeItem(s.equipment?.[sl]);
       if (it && BASES[it.baseId]?.slot === sl) w.equipment[sl] = it;
@@ -127,7 +218,8 @@ export class World {
     w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
     w.clock = () => now;
     w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
-    for (const [k, v] of Object.entries(s.respawns ?? {})) if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
+    for (const [k, v] of Object.entries(s.respawns ?? {}))
+      if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
     w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
     w.clock = () => Date.now();
     w.auto.load(s.auto);
@@ -138,47 +230,79 @@ export class World {
 
   serialize(): SaveData {
     return {
-      version: 1, name: this.player.name, classId: this.classId, level: this.player.level, xp: this.xp,
-      freePoints: this.freePoints, attributes: { ...this.player.attrs }, mapId: this.mapId, lastSeen: Date.now(),
+      version: 1,
+      name: this.player.name,
+      classId: this.classId,
+      level: this.player.level,
+      xp: this.xp,
+      freePoints: this.freePoints,
+      attributes: { ...this.player.attrs },
+      mapId: this.mapId,
+      lastSeen: Date.now(),
       skills: Object.fromEntries(Object.entries(this.skills).map(([id, st]) => [id, { level: st.level, xp: st.xp }])),
-      ratioCursor: this.ratioCursor, seenTips: [...this.seenTips], tipsEnabled: this.tipsEnabled, audio: { ...this.audio },
-      gold: this.gold, bag: JSON.parse(JSON.stringify(this.bag)),
-      equipment: JSON.parse(JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])))),
-      auto: this.auto.serialize(), bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
+      ratioCursor: this.ratioCursor,
+      seenTips: [...this.seenTips],
+      tipsEnabled: this.tipsEnabled,
+      audio: { ...this.audio },
+      gold: this.gold,
+      bag: JSON.parse(JSON.stringify(this.bag)),
+      equipment: JSON.parse(
+        JSON.stringify(
+          Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])),
+        ),
+      ),
+      auto: this.auto.serialize(),
+      bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
       respawns: Object.fromEntries(Object.entries(this.respawnAtMs).filter(([, t]) => t > this.clock())),
       quest: { ...this.quest },
     };
   }
 
-  emit(ev: GameEvent) { this.events.push(ev); this.auto.observe(ev); }
+  emit(ev: GameEvent) {
+    this.events.push(ev);
+    this.auto.observe(ev);
+  }
 
   // ---------- comandos ----------
   // andar do auto-combate (não pausa o auto)
-  autoMove(x: number, y: number, viaPortal = false) { if (!this.player.dead) this.player.path = this.pf(this.player, { x, y }, viaPortal); }
+  autoMove(x: number, y: number, viaPortal = false) {
+    if (!this.player.dead) this.player.path = this.pf(this.player, { x, y }, viaPortal);
+  }
   // o auto-combate nunca entra na área do chefe e só atravessa portais de propósito (viaPortal)
   private pf(from: Point, to: Point, viaPortal = false): Point[] {
     if (this.auto.state !== 'on') return findPath(this.map, from, to);
     const avoid: Avoid[] = this.arenas.map((a) => ({ ...a, r: a.r + 1.5 }));
-    if (!viaPortal) for (const o of this.map.objects) if (o.type === 'portal') avoid.push({ x: o.x + o.w / 2, y: o.y + o.h / 2, r: Math.max(o.w, o.h) / 2 + 0.6 });
+    if (!viaPortal)
+      for (const o of this.map.objects)
+        if (o.type === 'portal') avoid.push({ x: o.x + o.w / 2, y: o.y + o.h / 2, r: Math.max(o.w, o.h) / 2 + 0.6 });
     return findPath(this.map, from, to, avoid.length ? avoid : undefined);
   }
   // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
   /** Caminho do jogador até `to` (lista de pontos; vazia = sem caminho ou já está lá). */
-  pathFromPlayer(to: Point): Point[] { return this.pf(this.player, to); }
+  pathFromPlayer(to: Point): Point[] {
+    return this.pf(this.player, to);
+  }
   pathLength(to: Point): number {
     const path = this.pf(this.player, to);
     if (!path.length) return dist(this.player, to) < 1 ? 0 : Infinity;
-    let len = 0, a: Point = this.player;
-    for (const q of path) { len += dist(a, q); a = q; }
+    let len = 0,
+      a: Point = this.player;
+    for (const q of path) {
+      len += dist(a, q);
+      a = q;
+    }
     return len;
   }
-  inArena(pt: Point, margin = 0): boolean { return this.arenas.some((a) => dist(a, pt) <= a.r + margin); }
+  inArena(pt: Point, margin = 0): boolean {
+    return this.arenas.some((a) => dist(a, pt) <= a.r + margin);
+  }
 
   moveTo(x: number, y: number) {
     if (this.player.dead) return;
     this.auto.manualMove();
     if (!this.player.attackWhileMoving) this.autoAttack = false;
-    this.pendingSkill = null; this.npcGoal = null;
+    this.pendingSkill = null;
+    this.npcGoal = null;
     this.chasing = false;
     this.moveInput = { x: 0, y: 0 };
     this.player.path = findPath(this.map, this.player, { x, y });
@@ -186,18 +310,28 @@ export class World {
 
   // vetor em espaço de tela (joystick); convertido para tiles
   setMoveInput(sx: number, sy: number) {
-    const t = screenToTile(sx, sy), l = Math.hypot(t.x, t.y);
+    const t = screenToTile(sx, sy),
+      l = Math.hypot(t.x, t.y);
     this.moveInput = l < 0.001 ? { x: 0, y: 0 } : { x: t.x / l, y: t.y / l };
-    if (l >= 0.001) { this.npcGoal = null; this.auto.manualMove(); }
+    if (l >= 0.001) {
+      this.npcGoal = null;
+      this.auto.manualMove();
+    }
   }
 
   setTarget(id: number | null) {
-    if (id === null) { this.targetId = null; this.autoAttack = false; this.pendingSkill = null; return; }
+    if (id === null) {
+      this.targetId = null;
+      this.autoAttack = false;
+      this.pendingSkill = null;
+      return;
+    }
     const m = this.monsters.find((e) => e.id === id);
     if (!m || m.dead) return;
     this.npcGoal = null;
     if (this.targetId !== id) this.pendingSkill = null;
-    this.targetId = id; this.autoAttack = true;
+    this.targetId = id;
+    this.autoAttack = true;
   }
 
   getTarget(): Entity | null {
@@ -206,7 +340,9 @@ export class World {
   }
 
   private nearbyMonsters(): Entity[] {
-    return this.monsters.filter((m) => !m.dead && dist(m, this.player) <= TARGET_RANGE).sort((a, b) => dist(a, this.player) - dist(b, this.player));
+    return this.monsters
+      .filter((m) => !m.dead && dist(m, this.player) <= TARGET_RANGE)
+      .sort((a, b) => dist(a, this.player) - dist(b, this.player));
   }
 
   cycleTarget() {
@@ -217,14 +353,18 @@ export class World {
   }
 
   attackNearest() {
-    if (this.getTarget()) { this.autoAttack = true; return; }
+    if (this.getTarget()) {
+      this.autoAttack = true;
+      return;
+    }
     const c = this.nearbyMonsters();
     if (c.length) this.setTarget(c[0].id);
   }
 
   spendPoint(k: AttrKey) {
     if (this.freePoints <= 0) return;
-    this.freePoints--; this.player.attrs[k]++;
+    this.freePoints--;
+    this.player.attrs[k]++;
     this.recalc(this.player, true);
   }
 
@@ -233,14 +373,21 @@ export class World {
     const r = distributeByRatio(this.freePoints, CLASSES[this.classId].recommendedRatio ?? {}, this.ratioCursor);
     if (!r.spent) return;
     for (const k of ATTR_KEYS) this.player.attrs[k] += r.added[k];
-    this.freePoints -= r.spent; this.ratioCursor = r.cursor;
+    this.freePoints -= r.spent;
+    this.ratioCursor = r.cursor;
     this.recalc(this.player, true);
   }
 
   // ---------- skills ----------
-  classSkills(): SkillDef[] { return SKILLS[this.classId] ?? []; }
-  activeSkills(): SkillDef[] { return classActives(this.classId); }
-  isUnlocked(def: SkillDef) { return this.player.level >= def.unlock; }
+  classSkills(): SkillDef[] {
+    return SKILLS[this.classId] ?? [];
+  }
+  activeSkills(): SkillDef[] {
+    return classActives(this.classId);
+  }
+  isUnlocked(def: SkillDef) {
+    return this.player.level >= def.unlock;
+  }
   // ativa: sobe pelo uso; passiva: acompanha o nível do personagem
   skillLevel(def: SkillDef): number {
     if (def.type === 'passive') return Math.max(1, Math.min(SKILL_MAX_LEVEL, this.player.level - def.unlock + 1));
@@ -260,11 +407,15 @@ export class World {
     return v;
   }
 
-  hasBuff(e: Entity, kind: BuffKind) { return e.buffs.some((b) => b.kind === kind); }
+  hasBuff(e: Entity, kind: BuffKind) {
+    return e.buffs.some((b) => b.kind === kind);
+  }
   addBuff(e: Entity, id: string, kind: BuffKind, value: number, duration: number) {
     const old = e.buffs.find((b) => b.id === id && b.kind === kind);
-    if (old) { old.value = value; old.remaining = old.duration = duration; }
-    else e.buffs.push({ id, kind, value, remaining: duration, duration });
+    if (old) {
+      old.value = value;
+      old.remaining = old.duration = duration;
+    } else e.buffs.push({ id, kind, value, remaining: duration, duration });
     this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration });
   }
   private tickBuffs(e: Entity, dt: number) {
@@ -291,38 +442,57 @@ export class World {
     for (const b of e.buffs) {
       if (b.kind !== 'shield' || rem <= 0) continue;
       const a = Math.min(b.value, rem);
-      b.value -= a; rem -= a;
+      b.value -= a;
+      rem -= a;
     }
     if (rem < amount) this.emit({ type: 'shieldAbsorb', targetId: e.id, amount: amount - rem, x: e.x, y: e.y });
     return rem;
   }
 
-  skillReach(def: SkillDef): number { return def.range === 'melee' ? this.player.attackRange : (def.range ?? 0); }
+  skillReach(def: SkillDef): number {
+    return def.range === 'melee' ? this.player.attackRange : (def.range ?? 0);
+  }
 
-  private fail(def: SkillDef, reason: SkillFailReason) { this.emit({ type: 'skillFail', skillId: def.id, reason }); }
+  private fail(def: SkillDef, reason: SkillFailReason) {
+    this.emit({ type: 'skillFail', skillId: def.id, reason });
+  }
 
   useSkill(slot: number) {
-    const p = this.player, def = this.activeSkills()[slot];
+    const p = this.player,
+      def = this.activeSkills()[slot];
     if (!def || p.dead) return;
     if (!this.isUnlocked(def)) return this.fail(def, 'locked');
     const st = this.skills[def.id];
     if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
     if (p.mana < (def.mana ?? 0)) return this.fail(def, 'mana');
-    if (def.target === 'none') { this.castSkill(def, null); return; }
+    if (def.target === 'none') {
+      this.castSkill(def, null);
+      return;
+    }
     const t = this.getTarget();
-    if (def.area) { // skill de área nunca exige alvo: no alvo se estiver no alcance, senão em volta do personagem
+    if (def.area) {
+      // skill de área nunca exige alvo: no alvo se estiver no alcance, senão em volta do personagem
       this.pendingSkill = null;
-      this.castSkill(def, t && dist(p, t) <= this.skillReach(def) ? t : null); return;
+      this.castSkill(def, t && dist(p, t) <= this.skillReach(def) ? t : null);
+      return;
     }
     if (!t) return this.fail(def, 'notarget');
-    if (dist(p, t) <= this.skillReach(def)) { this.pendingSkill = null; this.castSkill(def, t); return; }
+    if (dist(p, t) <= this.skillReach(def)) {
+      this.pendingSkill = null;
+      this.castSkill(def, t);
+      return;
+    }
     this.pendingSkill = slot; // anda até o alvo e lança em seguida
   }
 
   // retorna true se está andando até o alvo (consome o movimento do tick)
   private tickPending(dt: number, t: Entity | null, moving: boolean): boolean {
-    const p = this.player, def = this.pendingSkill === null ? undefined : this.activeSkills()[this.pendingSkill];
-    if (!def || !t) { this.pendingSkill = null; return false; }
+    const p = this.player,
+      def = this.pendingSkill === null ? undefined : this.activeSkills()[this.pendingSkill];
+    if (!def || !t) {
+      this.pendingSkill = null;
+      return false;
+    }
     if (dist(p, t) <= this.skillReach(def)) {
       if (this.gcd > 0 || this.skills[def.id].cd > 0) return false;
       this.pendingSkill = null;
@@ -330,9 +500,15 @@ export class World {
       else this.castSkill(def, t);
       return false;
     }
-    if (moving) { if (!p.attackWhileMoving) this.pendingSkill = null; return false; }
+    if (moving) {
+      if (!p.attackWhileMoving) this.pendingSkill = null;
+      return false;
+    }
     p.repathCd -= dt;
-    if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, t); }
+    if (p.repathCd <= 0 || !p.path.length) {
+      p.repathCd = 0.3;
+      p.path = this.pf(p, t);
+    }
     this.chasing = true;
     this.followPath(p, dt, 1);
     return true;
@@ -348,7 +524,9 @@ export class World {
   }
 
   private castSkill(def: SkillDef, t: Entity | null) {
-    const p = this.player, st = this.skills[def.id], scale = skillScale(st.level);
+    const p = this.player,
+      st = this.skills[def.id],
+      scale = skillScale(st.level);
     const around = def.area === 'self' ? p : def.area === 'target' ? (t ?? p) : null;
     let victims: Entity[] = t ? [t] : [];
     if (around) victims = this.monsters.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
@@ -362,29 +540,49 @@ export class World {
       }
     }
     p.mana -= def.mana ?? 0;
-    st.cd = def.cooldown ?? 0; this.gcd = GLOBAL_COOLDOWN;
+    st.cd = def.cooldown ?? 0;
+    this.gcd = GLOBAL_COOLDOWN;
     p.attackCd = Math.max(p.attackCd, 0.3);
-    this.emit({ type: 'skillCast', skillId: def.id, casterId: p.id, x: p.x, y: p.y, targetId: t?.id ?? null, tx: (t ?? p).x, ty: (t ?? p).y, ranged: p.attackRange > 3 });
+    this.emit({
+      type: 'skillCast',
+      skillId: def.id,
+      casterId: p.id,
+      x: p.x,
+      y: p.y,
+      targetId: t?.id ?? null,
+      tx: (t ?? p).x,
+      ty: (t ?? p).y,
+      ranged: p.attackRange > 3,
+    });
     if (dest) {
       this.emit({ type: 'dash', fromX: p.x, fromY: p.y, toX: dest.x, toY: dest.y });
-      p.x = dest.x; p.y = dest.y; p.path = [];
+      p.x = dest.x;
+      p.y = dest.y;
+      p.path = [];
     }
     for (const v of victims) {
       for (const pct of def.hits ?? []) {
         if (v.dead) break;
         const r = this.attack(p, v, pct * scale, true);
-        if (r.hit && !v.dead && def.debuff) this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
+        if (r.hit && !v.dead && def.debuff)
+          this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
       }
     }
-    if (def.shield) this.addBuff(p, def.id, 'shield', p.derived.maxHp * def.shield.percent * scale, def.shield.duration);
+    if (def.shield)
+      this.addBuff(p, def.id, 'shield', p.derived.maxHp * def.shield.percent * scale, def.shield.duration);
     if (victims.length || def.shield) this.gainSkillXp(def, st); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
   }
 
   private gainSkillXp(def: SkillDef, st: SkillState) {
     if (st.level >= SKILL_MAX_LEVEL) return;
     st.xp++;
-    for (let need = skillXpToNext(st.level); st.level < SKILL_MAX_LEVEL && st.xp >= need; need = skillXpToNext(st.level)) {
-      st.xp -= need; st.level++;
+    for (
+      let need = skillXpToNext(st.level);
+      st.level < SKILL_MAX_LEVEL && st.xp >= need;
+      need = skillXpToNext(st.level)
+    ) {
+      st.xp -= need;
+      st.level++;
       this.emit({ type: 'skillLevelUp', skillId: def.id, level: st.level });
     }
     if (st.level >= SKILL_MAX_LEVEL) st.xp = 0;
@@ -411,14 +609,22 @@ export class World {
       lost = true;
     }
     this.potionFx = { hp: null, mp: null };
-    this.closeNpc(); this.npcGoal = null;
-    if (lost) { this.recalc(this.player, false); this.invVersion++; this.emit({ type: 'durabilityLost' }); }
+    this.closeNpc();
+    this.npcGoal = null;
+    if (lost) {
+      this.recalc(this.player, false);
+      this.invVersion++;
+      this.emit({ type: 'durabilityLost' });
+    }
   }
 
   // ---------- simulação ----------
   advance(dt: number) {
     this.acc = Math.min(this.acc + dt, 0.25);
-    while (this.acc >= STEP) { this.tick(STEP); this.acc -= STEP; }
+    while (this.acc >= STEP) {
+      this.tick(STEP);
+      this.acc -= STEP;
+    }
   }
 
   tick(dt: number) {
@@ -428,8 +634,12 @@ export class World {
     this.tickBuffs(this.player, dt);
     for (const m of this.monsters) this.tickBuffs(m, dt);
     this.portalCd = Math.max(0, this.portalCd - dt);
-    this.potionCd.hp = Math.max(0, this.potionCd.hp - dt); this.potionCd.mp = Math.max(0, this.potionCd.mp - dt);
-    if (!this.player.dead) { this.tickPotions(dt); this.tickGround(); }
+    this.potionCd.hp = Math.max(0, this.potionCd.hp - dt);
+    this.potionCd.mp = Math.max(0, this.potionCd.mp - dt);
+    if (!this.player.dead) {
+      this.tickPotions(dt);
+      this.tickGround();
+    }
     if (this.openNpc && (this.player.dead || dist(this.openNpc, this.player) > NPC_LEAVE)) this.closeNpc();
     if (this.player.dead) {
       this.respawnTimer -= dt;
@@ -438,7 +648,10 @@ export class World {
       this.auto.tick(dt);
       this.tickPlayer(dt);
       this.checkPortals();
-      if (this.arenas.length && !this.arenaSeen && this.inArena(this.player)) { this.arenaSeen = true; this.emit({ type: 'bossArena' }); }
+      if (this.arenas.length && !this.arenaSeen && this.inArena(this.player)) {
+        this.arenaSeen = true;
+        this.emit({ type: 'bossArena' });
+      }
     }
     for (const m of this.monsters) this.tickMonster(m, dt);
     for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
@@ -446,7 +659,8 @@ export class World {
   }
 
   private tickPlayer(dt: number) {
-    const p = this.player, d = p.derived;
+    const p = this.player,
+      d = p.derived;
     p.attackCd = Math.max(0, p.attackCd - dt);
     // HP e mana só regeneram na cidade
     if (TOWN_MAPS.has(this.mapId) && this.time - this.lastDamaged > 5) {
@@ -456,16 +670,29 @@ export class World {
       p.mana = Math.min(d.maxMana, p.mana + d.maxMana * this.passiveValue('manaRegen') * dt);
     }
     const t = this.getTarget();
-    if (this.targetId !== null && !t) { this.targetId = null; this.autoAttack = false; }
-    const mi = this.moveInput, moving = !!(mi.x || mi.y);
-    if (this.pendingSkill !== null && this.tickPending(dt, t, moving || (p.attackWhileMoving && p.path.length > 0))) return;
+    if (this.targetId !== null && !t) {
+      this.targetId = null;
+      this.autoAttack = false;
+    }
+    const mi = this.moveInput,
+      moving = !!(mi.x || mi.y);
+    if (this.pendingSkill !== null && this.tickPending(dt, t, moving || (p.attackWhileMoving && p.path.length > 0)))
+      return;
     if (this.npcGoal !== null) {
       const n = this.npcs.find((e) => e.id === this.npcGoal);
       if (!n || moving) this.npcGoal = null;
       else {
-        if (dist(p, n) <= NPC_REACH) { p.path = []; this.npcGoal = null; this.openNpcWindow(n); return; }
+        if (dist(p, n) <= NPC_REACH) {
+          p.path = [];
+          this.npcGoal = null;
+          this.openNpcWindow(n);
+          return;
+        }
         p.repathCd -= dt;
-        if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, n); }
+        if (p.repathCd <= 0 || !p.path.length) {
+          p.repathCd = 0.3;
+          p.path = this.pf(p, n);
+        }
         this.followPath(p, dt, 1);
         return;
       }
@@ -487,18 +714,27 @@ export class World {
     if (this.autoAttack && t) {
       if (dist(p, t) <= p.attackRange) {
         p.path = [];
-        if (p.attackCd <= 0) { p.attackCd = p.attackInterval; this.attack(p, t); }
+        if (p.attackCd <= 0) {
+          p.attackCd = p.attackInterval;
+          this.attack(p, t);
+        }
         return;
       }
       p.repathCd -= dt;
-      if (p.repathCd <= 0 || !p.path.length) { p.repathCd = 0.3; p.path = this.pf(p, t); }
+      if (p.repathCd <= 0 || !p.path.length) {
+        p.repathCd = 0.3;
+        p.path = this.pf(p, t);
+      }
       this.chasing = true;
     }
     this.followPath(p, dt, 1);
   }
 
   private attackIfInRange(p: Entity, t: Entity) {
-    if (p.attackCd <= 0 && dist(p, t) <= p.attackRange) { p.attackCd = p.attackInterval; this.attack(p, t); }
+    if (p.attackCd <= 0 && dist(p, t) <= p.attackRange) {
+      p.attackCd = p.attackInterval;
+      this.attack(p, t);
+    }
   }
 
   private checkPortals() {
@@ -512,49 +748,83 @@ export class World {
   }
 
   private tickMonster(m: Entity, dt: number) {
-    const def = MONSTERS[m.monsterId], p = this.player;
-    if (m.dead) { if (this.time >= m.respawnAt) this.respawn(m, def); return; }
+    const def = MONSTERS[m.monsterId],
+      p = this.player;
+    if (m.dead) {
+      if (this.time >= m.respawnAt) this.respawn(m, def);
+      return;
+    }
     m.attackCd = Math.max(0, m.attackCd - dt);
     const pd = p.dead ? Infinity : dist(m, p);
     const boss = def.boss;
     if (boss) this.tickBossExtras(m, def, dt);
     const wake = !boss || (!p.dead && dist(p, m.home) <= boss.arenaRadius); // chefe só acorda com o jogador na arena
     if (m.ai === 'idle') {
-      if (pd < def.aggroRange && wake) { this.aggro(m); return; }
+      if (pd < def.aggroRange && wake) {
+        this.aggro(m);
+        return;
+      }
       m.aiTimer -= dt;
       if (m.aiTimer <= 0 && !boss) {
-        const a = this.rng.range(0, Math.PI * 2), r = this.rng.range(1, 3.5);
+        const a = this.rng.range(0, Math.PI * 2),
+          r = this.rng.range(1, 3.5);
         const w = { x: m.home.x + Math.cos(a) * r, y: m.home.y + Math.sin(a) * r };
-        if (isWalkable(this.map, w.x, w.y)) { m.path = [w]; m.ai = 'wander'; }
-        else m.aiTimer = 1;
+        if (isWalkable(this.map, w.x, w.y)) {
+          m.path = [w];
+          m.ai = 'wander';
+        } else m.aiTimer = 1;
       }
     } else if (m.ai === 'wander') {
-      if (pd < def.aggroRange) { this.aggro(m); return; }
+      if (pd < def.aggroRange) {
+        this.aggro(m);
+        return;
+      }
       this.followPath(m, dt, 0.5);
-      if (!m.path.length) { m.ai = 'idle'; m.aiTimer = this.rng.range(2, 5); }
+      if (!m.path.length) {
+        m.ai = 'idle';
+        m.aiTimer = this.rng.range(2, 5);
+      }
     } else if (m.ai === 'chase') {
       if (p.dead || dist(m, m.home) > def.leashRange || (boss && !wake)) {
-        m.ai = 'return'; m.path = findPath(this.map, m, m.home);
+        m.ai = 'return';
+        m.path = findPath(this.map, m, m.home);
         return;
       }
       if (def.keepDistance && pd < def.keepDistance && dist(m, m.home) < def.leashRange * 0.8) {
         // arqueiro: recua um pouco mantendo distância e continua atirando
         m.path = [];
-        this.step(m, (m.x - p.x) / Math.max(0.01, pd), (m.y - p.y) / Math.max(0.01, pd), m.moveSpeed * 0.9 * this.speedMul(m) * dt);
-        if (m.attackCd <= 0 && pd <= m.attackRange) { m.attackCd = m.attackInterval; this.attack(m, p); }
+        this.step(
+          m,
+          (m.x - p.x) / Math.max(0.01, pd),
+          (m.y - p.y) / Math.max(0.01, pd),
+          m.moveSpeed * 0.9 * this.speedMul(m) * dt,
+        );
+        if (m.attackCd <= 0 && pd <= m.attackRange) {
+          m.attackCd = m.attackInterval;
+          this.attack(m, p);
+        }
       } else if (pd <= m.attackRange) {
         m.path = [];
-        if (m.attackCd <= 0) { m.attackCd = m.attackInterval; this.attack(m, p); }
+        if (m.attackCd <= 0) {
+          m.attackCd = m.attackInterval;
+          this.attack(m, p);
+        }
       } else {
         m.repathCd -= dt;
-        if (m.repathCd <= 0 || !m.path.length) { m.repathCd = 0.4; m.path = findPath(this.map, m, p); }
+        if (m.repathCd <= 0 || !m.path.length) {
+          m.repathCd = 0.4;
+          m.path = findPath(this.map, m, p);
+        }
         this.followPath(m, dt, 1);
       }
     } else {
       m.hp = Math.min(m.derived.maxHp, m.hp + m.derived.maxHp * 0.25 * dt);
       this.followPath(m, dt, 1.3);
       if (!m.path.length || dist(m, m.home) < 0.3) {
-        m.path = []; m.ai = 'idle'; m.aiTimer = 1; m.hp = m.derived.maxHp;
+        m.path = [];
+        m.ai = 'idle';
+        m.aiTimer = 1;
+        m.hp = m.derived.maxHp;
         if (boss) this.resetBoss(m);
       }
     }
@@ -562,20 +832,37 @@ export class World {
 
   private aggro(m: Entity) {
     if (m.ai !== 'chase' && MONSTERS[m.monsterId]?.boss) m.aiTimer = 3;
-    m.ai = 'chase'; m.repathCd = 0; m.path = [];
+    m.ai = 'chase';
+    m.repathCd = 0;
+    m.path = [];
     if (m.group && MONSTERS[m.monsterId]?.groupAggro) {
-      for (const o of this.monsters) if (o !== m && o.group === m.group && !o.dead && (o.ai === 'idle' || o.ai === 'wander')) { o.ai = 'chase'; o.repathCd = 0; o.path = []; }
+      for (const o of this.monsters)
+        if (o !== m && o.group === m.group && !o.dead && (o.ai === 'idle' || o.ai === 'wander')) {
+          o.ai = 'chase';
+          o.repathCd = 0;
+          o.path = [];
+        }
     }
   }
 
   // ---------- chefe ----------
   private tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
-    const b = def.boss!, p = this.player;
+    const b = def.boss!,
+      p = this.player;
     if (m.ai === 'chase') {
       m.aiTimer -= dt;
       if (m.aiTimer <= 0 && !p.dead) {
         m.aiTimer = m.hp <= m.derived.maxHp * b.summon.atHpPct ? b.aoe.intervalPhase2 : b.aoe.interval;
-        const t: Telegraph = { id: this.nextTelegraph++, x: p.x, y: p.y, radius: b.aoe.radius, delay: b.aoe.delay, remaining: b.aoe.delay, ownerId: m.id, mult: b.aoe.mult };
+        const t: Telegraph = {
+          id: this.nextTelegraph++,
+          x: p.x,
+          y: p.y,
+          radius: b.aoe.radius,
+          delay: b.aoe.delay,
+          remaining: b.aoe.delay,
+          ownerId: m.id,
+          mult: b.aoe.mult,
+        };
         this.telegraphs.push(t);
         this.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
       }
@@ -584,15 +871,20 @@ export class World {
   }
   private summonAdds(boss: Entity, sm: { monsterId: string; count: number; level: number }) {
     this.bossSummoned = true;
-    const sdef = MONSTERS[sm.monsterId], ids: number[] = [];
+    const sdef = MONSTERS[sm.monsterId],
+      ids: number[] = [];
     for (let i = 0; i < sm.count; i++) {
       const a = (i / sm.count) * Math.PI * 2 + 0.7;
       let pos: Point = { x: boss.x + Math.cos(a) * 2.2, y: boss.y + Math.sin(a) * 2.2 };
       if (!isWalkable(this.map, pos.x, pos.y)) pos = { x: boss.x, y: boss.y };
       const e = this.makeMonster(sdef, pos);
       this.applyMonsterLevel(e, sdef, sm.level);
-      e.home = { ...boss.home }; e.summoned = true; e.ai = 'chase'; e.respawnAt = Infinity;
-      this.monsters.push(e); ids.push(e.id);
+      e.home = { ...boss.home };
+      e.summoned = true;
+      e.ai = 'chase';
+      e.respawnAt = Infinity;
+      this.monsters.push(e);
+      ids.push(e.id);
     }
     this.emit({ type: 'bossSummon', ids });
   }
@@ -618,18 +910,24 @@ export class World {
   // dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa
   private directDamage(a: Entity, t: Entity, mult: number) {
     const physical = a.damageType === 'physical';
-    const atk = physical ? a.derived.physAtk : a.derived.spiritAtk, df = physical ? t.derived.physDef : t.derived.spiritDef;
+    const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
+      df = physical ? t.derived.physDef : t.derived.spiritDef;
     const amount = Math.max(1, Math.round(atk * mult * (1 - df / (df + 100))));
     const dealt = this.absorb(t, amount);
     t.hp -= dealt;
-    if (dealt > 0) this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
+    if (dealt > 0)
+      this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
     this.lastDamaged = this.time;
     this.wearGear();
     if (t.hp <= 0) this.killPlayer();
   }
   // chefe engajado (para a barra grande no topo)
   engagedBoss(): Entity | null {
-    return this.monsters.find((m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && (m.ai === 'chase' || m.hp < m.derived.maxHp)) ?? null;
+    return (
+      this.monsters.find(
+        (m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && (m.ai === 'chase' || m.hp < m.derived.maxHp),
+      ) ?? null
+    );
   }
   private wearGear() {
     if (WEAR_PER_HIT <= 0) return;
@@ -645,14 +943,16 @@ export class World {
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
-    if (a.kind === 'monster' && MONSTERS[a.monsterId]?.projectile) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: 'arrow' });
+    if (a.kind === 'monster' && MONSTERS[a.monsterId]?.projectile)
+      this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: 'arrow' });
     if (r.hit && t.kind === 'player' && a.kind === 'monster') this.wearGear();
     if (r.hit) {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
       t.hp -= dealt;
-      if (dealt > 0) this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
+      if (dealt > 0)
+        this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
       // roubo de vida da seita (Tormenta): parte do dano causado volta como vida
-      const ls = a.kind === 'player' ? CLASSES[this.classId].lifeSteal ?? 0 : 0;
+      const ls = a.kind === 'player' ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
       if (ls > 0 && dealt > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + dealt * ls);
     } else {
       this.emit({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
@@ -671,11 +971,24 @@ export class World {
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 };
 
   /** Missão atual da cadeia e em que fase ela está para a interface. */
-  questView(): { def: QuestDef | null; phase: QuestPhase; progress: number; count: number; giver: string; turnIn: string } {
+  questView(): {
+    def: QuestDef | null;
+    phase: QuestPhase;
+    progress: number;
+    count: number;
+    giver: string;
+    turnIn: string;
+  } {
     const def = QUESTS[this.quest.stage] ?? null;
     if (!def) return { def: null, phase: 'complete', progress: 0, count: 0, giver: '', turnIn: '' };
-    const giver = resolveNpc(def.giver, this.classId), turnIn = resolveNpc(def.turnIn, this.classId);
-    const phase: QuestPhase = this.quest.status === 'pending' ? (this.player.level >= def.minLevel ? 'available' : 'locked') : this.quest.status;
+    const giver = resolveNpc(def.giver, this.classId),
+      turnIn = resolveNpc(def.turnIn, this.classId);
+    const phase: QuestPhase =
+      this.quest.status === 'pending'
+        ? this.player.level >= def.minLevel
+          ? 'available'
+          : 'locked'
+        : this.quest.status;
     return { def, phase, progress: this.quest.progress, count: questGoalCount(def), giver, turnIn };
   }
   /** Marca sobre o NPC: "!" = tem missão para dar; "?" = missão para entregar (ou falar com ele cumpre o objetivo). */
@@ -684,7 +997,12 @@ export class World {
     if (!v.def) return null;
     if (v.phase === 'available' && v.giver === npcId) return '!';
     if (v.phase === 'ready' && v.turnIn === npcId) return '?';
-    if (v.phase === 'active' && v.def.objective.type === 'talk' && resolveNpc(v.def.objective.npc, this.classId) === npcId) return '?';
+    if (
+      v.phase === 'active' &&
+      v.def.objective.type === 'talk' &&
+      resolveNpc(v.def.objective.npc, this.classId) === npcId
+    )
+      return '?';
     return null;
   }
   /** NPC com quem falar numa missão de conversa ('' se não for). */
@@ -696,7 +1014,8 @@ export class World {
   questAccept(force = false): boolean {
     const v = this.questView();
     if (!v.def || v.phase !== 'available' || (!force && this.npcRole() !== v.giver)) return false;
-    this.quest.status = 'active'; this.quest.progress = 0;
+    this.quest.status = 'active';
+    this.quest.progress = 0;
     this.emit({ type: 'quest', kind: 'accepted', questId: v.def.id, name: v.def.name });
     // objetivo já cumprido na hora de aceitar (ex.: falar com quem está aberto, já estar no mapa)
     const o = v.def.objective;
@@ -711,45 +1030,67 @@ export class World {
     const r = v.def.reward;
     this.quest = { stage: this.quest.stage + 1, status: 'pending', progress: 0 };
     this.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });
-    if (r.gold) { this.gold += r.gold; this.bumpInv(); this.emit({ type: 'goldPickup', amount: r.gold }); }
+    if (r.gold) {
+      this.gold += r.gold;
+      this.bumpInv();
+      this.emit({ type: 'goldPickup', amount: r.gold });
+    }
     if (r.item) {
-      const base = Object.entries(BASES).find(([, b]) => b.slot === r.item && b.reqLevel === 5 && (!b.sect || b.sect === this.classId));
+      const base = Object.entries(BASES).find(
+        ([, b]) => b.slot === r.item && b.reqLevel === 5 && (!b.sect || b.sect === this.classId),
+      );
       if (base) this.collect(makeEquipment(base[0], 'incomum', null, this.rng, 5), this.player.x, this.player.y);
     }
     if (r.xp) this.gainXp(r.xp);
     return true;
   }
   private questReady(def: QuestDef) {
-    this.quest.status = 'ready'; this.quest.progress = questGoalCount(def);
+    this.quest.status = 'ready';
+    this.quest.progress = questGoalCount(def);
     this.emit({ type: 'quest', kind: 'ready', questId: def.id, name: def.name });
   }
   private questKill(monsterId: string) {
     const def = QUESTS[this.quest.stage];
-    if (!def || this.quest.status !== 'active' || def.objective.type !== 'kill' || def.objective.monster !== monsterId) return;
+    if (!def || this.quest.status !== 'active' || def.objective.type !== 'kill' || def.objective.monster !== monsterId)
+      return;
     this.quest.progress = Math.min(def.objective.count, this.quest.progress + 1);
     if (this.quest.progress >= def.objective.count) this.questReady(def);
     else this.emit({ type: 'quest', kind: 'progress', questId: def.id, name: def.name });
   }
   private questTalk(npcId: string) {
     const def = QUESTS[this.quest.stage];
-    if (def && this.quest.status === 'active' && def.objective.type === 'talk' && resolveNpc(def.objective.npc, this.classId) === npcId) this.questReady(def);
+    if (
+      def &&
+      this.quest.status === 'active' &&
+      def.objective.type === 'talk' &&
+      resolveNpc(def.objective.npc, this.classId) === npcId
+    )
+      this.questReady(def);
   }
   private questReach(mapId: string) {
     const def = QUESTS[this.quest.stage];
-    if (def && this.quest.status === 'active' && def.objective.type === 'reach' && def.objective.map === mapId) this.questReady(def);
+    if (def && this.quest.status === 'active' && def.objective.type === 'reach' && def.objective.map === mapId)
+      this.questReady(def);
   }
 
   private killMonster(m: Entity) {
     const def = MONSTERS[m.monsterId];
-    m.dead = true; m.hp = 0; m.path = []; m.buffs = [];
+    m.dead = true;
+    m.hp = 0;
+    m.path = [];
+    m.buffs = [];
     m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
     if (!m.summoned && !def.boss && m.spawnKey) this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
     if (def.boss) {
       this.bossRespawnAtMs = this.clock() + def.respawnSeconds * 1000;
-      this.telegraphs = []; this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
+      this.telegraphs = [];
+      this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
       this.emit({ type: 'bossDefeated', respawnAt: this.bossRespawnAtMs });
     }
-    if (this.targetId === m.id) { this.targetId = null; this.autoAttack = false; }
+    if (this.targetId === m.id) {
+      this.targetId = null;
+      this.autoAttack = false;
+    }
     this.emit({ type: 'death', id: m.id });
     this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.questKill(m.monsterId);
@@ -760,15 +1101,24 @@ export class World {
 
   private killPlayer() {
     const p = this.player;
-    p.dead = true; p.hp = 0; p.path = []; p.buffs = []; this.pendingSkill = null; this.moveInput = { x: 0, y: 0 };
-    this.targetId = null; this.autoAttack = false; this.respawnTimer = 3;
+    p.dead = true;
+    p.hp = 0;
+    p.path = [];
+    p.buffs = [];
+    this.pendingSkill = null;
+    this.moveInput = { x: 0, y: 0 };
+    this.targetId = null;
+    this.autoAttack = false;
+    this.respawnTimer = 3;
     this.emit({ type: 'playerDeath' });
     this.onPlayerDeath();
   }
 
   private respawnPlayer() {
     const p = this.player;
-    p.dead = false; p.hp = p.derived.maxHp; p.mana = p.derived.maxMana;
+    p.dead = false;
+    p.hp = p.derived.maxHp;
+    p.mana = p.derived.maxMana;
     this.changeMap('cidade');
   }
 
@@ -778,12 +1128,14 @@ export class World {
     this.xp += n;
     this.emit({ type: 'xp', amount: n });
     for (let need = this.xpToNext(); need !== null && this.xp >= need; need = this.xpToNext()) {
-      this.xp -= need; p.level++;
+      this.xp -= need;
+      p.level++;
       const up = CLASSES[this.classId].levelUpAttributes;
       for (const k of ATTR_KEYS) p.attrs[k] += up[k];
       this.freePoints += PROGRESSION.freePointsPerLevel;
       this.recalc(p, false);
-      p.hp = p.derived.maxHp; p.mana = p.derived.maxMana;
+      p.hp = p.derived.maxHp;
+      p.mana = p.derived.maxMana;
       this.emit({ type: 'levelup', level: p.level });
       for (const s of this.classSkills()) if (s.unlock === p.level) this.emit({ type: 'skillUnlocked', skillId: s.id });
     }
@@ -792,12 +1144,14 @@ export class World {
 
   private recalc(e: Entity, keepGain: boolean) {
     const old = e.derived;
-    if (e.kind === 'player') this.applyGear(e); else e.derived = computeDerived(e.attrs);
+    if (e.kind === 'player') this.applyGear(e);
+    else e.derived = computeDerived(e.attrs);
     if (keepGain) {
       e.hp += Math.max(0, e.derived.maxHp - old.maxHp);
       e.mana += Math.max(0, e.derived.maxMana - old.maxMana);
     }
-    e.hp = Math.min(e.hp, e.derived.maxHp); e.mana = Math.min(e.mana, e.derived.maxMana);
+    e.hp = Math.min(e.hp, e.derived.maxHp);
+    e.mana = Math.min(e.mana, e.derived.maxMana);
     if (e.kind === 'player') this.applyPassives();
   }
 
@@ -813,10 +1167,23 @@ export class World {
   }
 
   private applyGear(e: Entity) {
-    const g = this.gearStats(), eff = { ...e.attrs };
+    const g = this.gearStats(),
+      eff = { ...e.attrs };
     for (const k of ATTR_KEYS) eff[k] += g[k] ?? 0;
     const d = computeDerived(eff);
-    for (const k of ['maxHp', 'maxMana', 'physAtk', 'spiritAtk', 'physDef', 'spiritDef', 'hit', 'evasion', 'critChance', 'critDamage'] as const) d[k] += g[k] ?? 0;
+    for (const k of [
+      'maxHp',
+      'maxMana',
+      'physAtk',
+      'spiritAtk',
+      'physDef',
+      'spiritDef',
+      'hit',
+      'evasion',
+      'critChance',
+      'critDamage',
+    ] as const)
+      d[k] += g[k] ?? 0;
     d.critChance = Math.min(0.95, d.critChance);
     e.derived = d;
     e.elemAtk = { ...emptyElements(), ...CLASSES[this.classId].elementAttack };
@@ -824,11 +1191,18 @@ export class World {
   }
 
   // ---------- inventário ----------
-  private bumpInv() { this.invVersion++; }
+  private bumpInv() {
+    this.invVersion++;
+  }
 
-  sortBag() { this.bag = sortedBag(this.bag); this.bumpInv(); }
+  sortBag() {
+    this.bag = sortedBag(this.bag);
+    this.bumpInv();
+  }
 
-  freeSlots(): number { return this.bag.filter((b) => !b).length; }
+  freeSlots(): number {
+    return this.bag.filter((b) => !b).length;
+  }
   canFit(baseId: string, qty = 1): boolean {
     if (!isPotionId(baseId)) return this.freeSlots() >= 1;
     let room = this.freeSlots() * STACK_MAX;
@@ -843,36 +1217,61 @@ export class World {
       let rem = qty;
       for (const b of this.bag) {
         if (rem <= 0) break;
-        if (b && b.baseId === item.baseId && (b.qty ?? 1) < STACK_MAX) { const a = Math.min(rem, STACK_MAX - (b.qty ?? 1)); b.qty = (b.qty ?? 1) + a; rem -= a; }
+        if (b && b.baseId === item.baseId && (b.qty ?? 1) < STACK_MAX) {
+          const a = Math.min(rem, STACK_MAX - (b.qty ?? 1));
+          b.qty = (b.qty ?? 1) + a;
+          rem -= a;
+        }
       }
       while (rem > 0) {
-        const i = this.bag.findIndex((b) => !b), a = Math.min(rem, STACK_MAX);
-        this.bag[i] = { ...item, uid: i === 0 && a === qty ? item.uid : makePotion(item.baseId).uid, qty: a }; rem -= a;
+        const i = this.bag.findIndex((b) => !b),
+          a = Math.min(rem, STACK_MAX);
+        this.bag[i] = { ...item, uid: i === 0 && a === qty ? item.uid : makePotion(item.baseId).uid, qty: a };
+        rem -= a;
       }
     } else this.bag[this.bag.findIndex((b) => !b)] = item;
     this.bumpInv();
     return true;
   }
-  potionCount(baseId: string): number { return this.bag.reduce((a, b) => a + (b && b.baseId === baseId ? (b.qty ?? 1) : 0), 0); }
-  kindCount(kind: PotionKind): number { return Object.keys(POTIONS).filter((id) => POTIONS[id].kind === kind).reduce((a, id) => a + this.potionCount(id), 0); }
+  potionCount(baseId: string): number {
+    return this.bag.reduce((a, b) => a + (b && b.baseId === baseId ? (b.qty ?? 1) : 0), 0);
+  }
+  kindCount(kind: PotionKind): number {
+    return Object.keys(POTIONS)
+      .filter((id) => POTIONS[id].kind === kind)
+      .reduce((a, id) => a + this.potionCount(id), 0);
+  }
 
   private removeFromBag(i: number, qty = 1) {
     const b = this.bag[i];
     if (!b) return;
-    if (b.qty && b.qty > qty) b.qty -= qty; else this.bag[i] = null;
+    if (b.qty && b.qty > qty) b.qty -= qty;
+    else this.bag[i] = null;
     this.bumpInv();
   }
 
   private collect(item: ItemInstance, x: number, y: number) {
     this.auto.recordDrop(item);
     let placed = this.addItem(item);
-    if (!placed && this.auto.sellingActive) { // auto-combate: mochila cheia vende o que a regra permite
+    if (!placed && this.auto.sellingActive) {
+      // auto-combate: mochila cheia vende o que a regra permite
       this.auto.makeRoom();
       placed = this.addItem(item);
-      if (!placed && this.auto.sellable(item)) { this.sellValueNow(item); return; }
+      if (!placed && this.auto.sellable(item)) {
+        this.sellValueNow(item);
+        return;
+      }
     }
     if (placed) {
-      this.emit({ type: 'itemPickup', baseId: item.baseId, name: itemName(item), color: itemColor(item), qty: item.qty ?? 1, potion: isPotionId(item.baseId), rarity: item.rarity });
+      this.emit({
+        type: 'itemPickup',
+        baseId: item.baseId,
+        name: itemName(item),
+        color: itemColor(item),
+        qty: item.qty ?? 1,
+        potion: isPotionId(item.baseId),
+        rarity: item.rarity,
+      });
     } else {
       this.ground.push({ id: this.nextGround++, x, y, item, expires: this.time + GROUND_SECONDS });
       this.emit({ type: 'bagFull' });
@@ -883,12 +1282,24 @@ export class World {
     if (!this.ground.length) return;
     const p = this.player;
     for (const g of [...this.ground]) {
-      if (this.time >= g.expires) { this.ground = this.ground.filter((x) => x !== g); this.emit({ type: 'groundGone', id: g.id }); continue; }
+      if (this.time >= g.expires) {
+        this.ground = this.ground.filter((x) => x !== g);
+        this.emit({ type: 'groundGone', id: g.id });
+        continue;
+      }
       if (g.item && dist(g, p) < 0.9 && this.addItem(g.item)) {
         const it = g.item;
         this.ground = this.ground.filter((x) => x !== g);
         this.emit({ type: 'groundGone', id: g.id });
-        this.emit({ type: 'itemPickup', baseId: it.baseId, name: itemName(it), color: itemColor(it), qty: it.qty ?? 1, potion: isPotionId(it.baseId), rarity: it.rarity });
+        this.emit({
+          type: 'itemPickup',
+          baseId: it.baseId,
+          name: itemName(it),
+          color: itemColor(it),
+          qty: it.qty ?? 1,
+          potion: isPotionId(it.baseId),
+          rarity: it.rarity,
+        });
       }
     }
   }
@@ -900,7 +1311,12 @@ export class World {
     if (L.gold) {
       const add = (L.gold.perLevel ?? 0) * (m.level - 1);
       const g = this.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add));
-      if (g > 0) { this.gold += g; this.bumpInv(); this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' }); this.emit({ type: 'goldPickup', amount: g }); }
+      if (g > 0) {
+        this.gold += g;
+        this.bumpInv();
+        this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
+        this.emit({ type: 'goldPickup', amount: g });
+      }
     }
     for (const pd of L.potions ?? []) {
       if (pd.minMonsterLevel && m.level < pd.minMonsterLevel) continue;
@@ -920,12 +1336,21 @@ export class World {
     for (const eq of eqs) {
       if (eq.minMonsterLevel && m.level < eq.minMonsterLevel) continue;
       if (this.rng.next() >= eq.chance) continue;
-      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id));
-      if (ids.length) give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], rollRarity(this.rng));
+      const ids = equipmentBaseIds().filter(
+        (id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id),
+      );
+      if (ids.length)
+        give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], rollRarity(this.rng));
     }
-    if (L.guaranteed) { // 1 item garantido de slot aleatório (arma só da seita do jogador)
+    if (L.guaranteed) {
+      // 1 item garantido de slot aleatório (arma só da seita do jogador)
       const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel === L.guaranteed!.reqLevel && sectOk(id));
-      if (ids.length) give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], L.guaranteed.rarity, L.guaranteed.reqLevel);
+      if (ids.length)
+        give(
+          ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))],
+          L.guaranteed.rarity,
+          L.guaranteed.reqLevel,
+        );
     }
   }
 
@@ -934,7 +1359,8 @@ export class World {
     const b = baseOf(it);
     if (!b) return L('Este item não é equipável', 'This item cannot be equipped');
     if (this.player.level < b.reqLevel) return L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`);
-    if (b.sect && b.sect !== this.classId) return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
+    if (b.sect && b.sect !== this.classId)
+      return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
     return null;
   }
   equip(bagIndex: number): string | null {
@@ -953,7 +1379,8 @@ export class World {
     if (!it) return null;
     const i = this.bag.findIndex((b) => !b);
     if (i < 0) return L('Mochila cheia', 'Bag full');
-    this.bag[i] = it; this.equipment[slot] = null;
+    this.bag[i] = it;
+    this.equipment[slot] = null;
     this.afterEquip();
     return null;
   }
@@ -967,12 +1394,21 @@ export class World {
   usePotion(kind: PotionKind, baseId?: string): boolean {
     const p = this.player;
     if (p.dead) return false;
-    if (this.potionCd[kind] > 0) { this.emit({ type: 'potionFail', kind, reason: 'cooldown' }); return false; }
+    if (this.potionCd[kind] > 0) {
+      this.emit({ type: 'potionFail', kind, reason: 'cooldown' });
+      return false;
+    }
     const ids = baseId ? [baseId] : Object.keys(POTIONS).filter((id) => POTIONS[id].kind === kind);
     const id = ids.find((x) => POTIONS[x]?.kind === kind && this.potionCount(x) > 0);
-    if (!id) { this.emit({ type: 'potionFail', kind, reason: 'none' }); return false; }
+    if (!id) {
+      this.emit({ type: 'potionFail', kind, reason: 'none' });
+      return false;
+    }
     const full = kind === 'hp' ? p.hp >= p.derived.maxHp - 0.01 : p.mana >= p.derived.maxMana - 0.01;
-    if (full) { this.emit({ type: 'potionFail', kind, reason: 'full' }); return false; }
+    if (full) {
+      this.emit({ type: 'potionFail', kind, reason: 'full' });
+      return false;
+    }
     const d = POTIONS[id];
     this.removeFromBag(this.bag.findIndex((b) => b && b.baseId === id));
     const max = kind === 'hp' ? p.derived.maxHp : p.derived.maxMana;
@@ -987,8 +1423,10 @@ export class World {
     for (const kind of ['hp', 'mp'] as PotionKind[]) {
       const fx = this.potionFx[kind];
       if (!fx) continue;
-      const step = Math.min(dt, fx.remaining), amt = fx.rate * step;
-      if (kind === 'hp') p.hp = Math.min(p.derived.maxHp, p.hp + amt); else p.mana = Math.min(p.derived.maxMana, p.mana + amt);
+      const step = Math.min(dt, fx.remaining),
+        amt = fx.rate * step;
+      if (kind === 'hp') p.hp = Math.min(p.derived.maxHp, p.hp + amt);
+      else p.mana = Math.min(p.derived.maxMana, p.mana + amt);
       fx.remaining -= dt;
       if (fx.remaining <= 0) this.potionFx[kind] = null;
     }
@@ -999,12 +1437,18 @@ export class World {
     const n = this.npcs.find((e) => e.id === entityId);
     if (!n || this.player.dead) return;
     this.auto.manualMove();
-    this.pendingSkill = null; this.chasing = false; this.autoAttack = false; this.targetId = null;
-    this.moveInput = { x: 0, y: 0 }; this.player.path = [];
+    this.pendingSkill = null;
+    this.chasing = false;
+    this.autoAttack = false;
+    this.targetId = null;
+    this.moveInput = { x: 0, y: 0 };
+    this.player.path = [];
     this.npcGoal = entityId;
   }
   /** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'... */
-  npcRole(n: Entity | null = this.openNpc): string { return n?.npcId ?? ''; }
+  npcRole(n: Entity | null = this.openNpc): string {
+    return n?.npcId ?? '';
+  }
   private openNpcWindow(n: Entity) {
     if (this.openNpc === n) return;
     this.openNpc = n;
@@ -1041,16 +1485,19 @@ export class World {
   sellRaw(bagIndex: number, qty = 1): number {
     const it = this.bag[bagIndex];
     if (!it) return 0;
-    const n = Math.max(1, Math.min(qty, it.qty ?? 1)), gold = sellValue(it) * n;
+    const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
+      gold = sellValue(it) * n;
     this.removeFromBag(bagIndex, n);
-    this.gold += gold; this.bumpInv();
+    this.gold += gold;
+    this.bumpInv();
     this.emit({ type: 'trade', kind: 'sell', gold });
     return gold;
   }
   // vende um item que nem chegou a entrar na mochila
   sellValueNow(it: ItemInstance): number {
     const gold = sellValue(it) * (it.qty ?? 1);
-    this.gold += gold; this.bumpInv();
+    this.gold += gold;
+    this.bumpInv();
     this.emit({ type: 'trade', kind: 'sell', gold });
     return gold;
   }
@@ -1062,25 +1509,42 @@ export class World {
     if (!rate) return null;
     const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0
     const res: OfflineResult = computeOffline({
-      elapsedMs, rate, level: this.player.level, xp: this.xp,
-      potions: { hp: this.kindCount('hp'), mp: this.kindCount('mp') }, seed: (now ^ Math.floor(this.xp * 7919)) >>> 0,
+      elapsedMs,
+      rate,
+      level: this.player.level,
+      xp: this.xp,
+      potions: { hp: this.kindCount('hp'), mp: this.kindCount('mp') },
+      seed: (now ^ Math.floor(this.xp * 7919)) >>> 0,
     });
     if (res.kills < 1) return null;
     const lvl0 = this.player.level;
     this.gold += res.gold;
     this.gainXp(res.xp);
     const items: OfflineReport['items'] = [];
-    let soldCount = 0, soldGold = 0;
-    const sell = (it: ItemInstance) => { soldCount += it.qty ?? 1; soldGold += this.sellValueNow(it); };
+    let soldCount = 0,
+      soldGold = 0;
+    const sell = (it: ItemInstance) => {
+      soldCount += it.qty ?? 1;
+      soldGold += this.sellValueNow(it);
+    };
     for (const d of res.drops) {
       const isPot = isPotionId(d.baseId);
       for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
-        const it = isPot ? makePotion(d.baseId, d.qty) : makeEquipment(d.baseId, d.rarity, CLASSES[this.classId].element, this.rng, rate.monLevel);
+        const it = isPot
+          ? makePotion(d.baseId, d.qty)
+          : makeEquipment(d.baseId, d.rarity, CLASSES[this.classId].element, this.rng, rate.monLevel);
         let placed = this.addItem(it);
-        if (!placed) { this.auto.makeRoom(); placed = this.addItem(it); }
-        if (!placed) { sell(it); continue; }
+        if (!placed) {
+          this.auto.makeRoom();
+          placed = this.addItem(it);
+        }
+        if (!placed) {
+          sell(it);
+          continue;
+        }
         const e = items.find((x) => x.name === itemName(it) && x.rarity === it.rarity);
-        if (e) e.qty += it.qty ?? 1; else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
+        if (e) e.qty += it.qty ?? 1;
+        else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
       }
     }
     const used: Record<PotionKind, number> = { hp: 0, mp: 0 };
@@ -1088,28 +1552,48 @@ export class World {
       for (let n = res.potionsUsed[k]; n > 0; n--) {
         const i = this.bag.findIndex((b) => b && POTIONS[b.baseId]?.kind === k);
         if (i < 0) break;
-        this.removeFromBag(i); used[k]++;
+        this.removeFromBag(i);
+        used[k]++;
       }
     }
-    this.player.hp = this.player.derived.maxHp; this.player.mana = this.player.derived.maxMana;
+    this.player.hp = this.player.derived.maxHp;
+    this.player.mana = this.player.derived.maxMana;
     this.events.length = 0; // sem toasts de nível/skill atrás do resumo
-    return { elapsedMs, effMin: res.effMin, efficiency: res.efficiency, kills: res.kills, xp: res.xp, levelsGained: this.player.level - lvl0, newLevel: this.player.level,
-      gold: res.gold, items, potionsUsed: used, soldCount, soldGold };
+    return {
+      elapsedMs,
+      effMin: res.effMin,
+      efficiency: res.efficiency,
+      kills: res.kills,
+      xp: res.xp,
+      levelsGained: this.player.level - lvl0,
+      newLevel: this.player.level,
+      gold: res.gold,
+      items,
+      potionsUsed: used,
+      soldCount,
+      soldGold,
+    };
   }
   private repairTargets(): ItemInstance[] {
-    return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter((i): i is ItemInstance => !!i && !!BASES[i.baseId]);
+    return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter(
+      (i): i is ItemInstance => !!i && !!BASES[i.baseId],
+    );
   }
   repair(it: ItemInstance): string | null {
     if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
     const cost = repairCost(it);
     if (cost <= 0) return null;
     if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    this.gold -= cost; it.durability = maxDurability(it);
-    this.recalc(this.player, false); this.bumpInv();
+    this.gold -= cost;
+    it.durability = maxDurability(it);
+    this.recalc(this.player, false);
+    this.bumpInv();
     this.emit({ type: 'repair', gold: cost });
     return null;
   }
-  repairAllCost(): number { return this.repairTargets().reduce((a, i) => a + repairCost(i), 0); }
+  repairAllCost(): number {
+    return this.repairTargets().reduce((a, i) => a + repairCost(i), 0);
+  }
   repairAll(): string | null {
     if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
     const cost = this.repairAllCost();
@@ -1117,24 +1601,41 @@ export class World {
     if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
     this.gold -= cost;
     for (const i of this.repairTargets()) i.durability = maxDurability(i);
-    this.recalc(this.player, false); this.bumpInv();
+    this.recalc(this.player, false);
+    this.bumpInv();
     this.emit({ type: 'repair', gold: cost });
     return null;
   }
   lowDurability(): boolean {
-    return SLOTS.some((s) => { const i = this.equipment[s]; return !!i && i.durability <= maxDurability(i) * 0.2; });
+    return SLOTS.some((s) => {
+      const i = this.equipment[s];
+      return !!i && i.durability <= maxDurability(i) * 0.2;
+    });
   }
 
   // ---------- mapa / entidades ----------
   changeMap(mapId: string, x?: number, y?: number) {
-    this.mapId = mapId; this.map = this.maps[mapId];
+    this.mapId = mapId;
+    this.map = this.maps[mapId];
     const sp = this.map.objects.find((o) => o.type === 'spawn');
     const p = this.player;
-    p.x = x ?? sp?.x ?? 1.5; p.y = y ?? sp?.y ?? 1.5; p.path = [];
+    p.x = x ?? sp?.x ?? 1.5;
+    p.y = y ?? sp?.y ?? 1.5;
+    p.path = [];
     this.moveInput = { x: 0, y: 0 };
-    this.targetId = null; this.autoAttack = false; this.pendingSkill = null; this.portalCd = 1;
-    this.monsters = []; this.npcs = []; this.ground = []; this.openNpc = null; this.npcGoal = null;
-    this.telegraphs = []; this.arenas = []; this.bossSummoned = false; this.arenaSeen = false;
+    this.targetId = null;
+    this.autoAttack = false;
+    this.pendingSkill = null;
+    this.portalCd = 1;
+    this.monsters = [];
+    this.npcs = [];
+    this.ground = [];
+    this.openNpc = null;
+    this.npcGoal = null;
+    this.telegraphs = [];
+    this.arenas = [];
+    this.bossSummoned = false;
+    this.arenaSeen = false;
     if (this.bossRespawnAtMs && this.bossRespawnAtMs <= this.clock()) this.bossRespawnAtMs = 0;
     const now = this.clock();
     for (const [k, t] of Object.entries(this.respawnAtMs)) if (t <= now) delete this.respawnAtMs[k];
@@ -1147,16 +1648,32 @@ export class World {
         m.spawnKey = `${mapId}#${idx}`;
         this.monsters.push(m);
         const until = this.respawnAtMs[m.spawnKey];
-        if (!def.boss && until > now) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (until - now) / 1000; }
+        if (!def.boss && until > now) {
+          m.dead = true;
+          m.hp = 0;
+          m.respawnAt = this.time + (until - now) / 1000;
+        }
         if (def.boss) {
           this.arenas.push({ x: o.x, y: o.y, r: def.boss.arenaRadius });
-          if (this.bossRespawnAtMs > this.clock()) { m.dead = true; m.hp = 0; m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000; }
+          if (this.bossRespawnAtMs > this.clock()) {
+            m.dead = true;
+            m.hp = 0;
+            m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000;
+          }
         }
       } else if (o.type === 'npc') {
         const id = String(o.props.npc ?? '');
         const txt = id.startsWith('mestre_') ? NPC_TEXT.masters[id.slice(7)] : NPC_TEXT.npcs[id];
-        const n = { ...this.blank('npc', txt?.name ?? tn(o.name), 1), x: o.x, y: o.y, npcId: id, wander: Number(o.props.wander) || 0 };
-        n.home = { x: o.x, y: o.y }; n.moveSpeed = NPC_WALK_SPEED; n.aiTimer = this.npcRng.range(0.5, 4);
+        const n = {
+          ...this.blank('npc', txt?.name ?? tn(o.name), 1),
+          x: o.x,
+          y: o.y,
+          npcId: id,
+          wander: Number(o.props.wander) || 0,
+        };
+        n.home = { x: o.x, y: o.y };
+        n.moveSpeed = NPC_WALK_SPEED;
+        n.aiTimer = this.npcRng.range(0.5, 4);
         this.npcs.push(n);
       }
     });
@@ -1167,21 +1684,57 @@ export class World {
   private blank(kind: Entity['kind'], name: string, level: number): Entity {
     const attrs: Attributes = { strength: 1, intelligence: 1, stamina: 1, agility: 1, willpower: 1 };
     return {
-      id: this.nextId++, kind, name, level, x: 0, y: 0, hp: 1, mana: 0, dead: false, attrs,
-      derived: computeDerived(attrs), elemAtk: emptyElements(), elemRes: emptyElements(),
-      damageType: 'physical', element: null, attackRange: 1, attackWhileMoving: false, attackInterval: 1, attackCd: 0, moveSpeed: 3,
-      path: [], repathCd: 0, monsterId: '', home: { x: 0, y: 0 }, ai: 'idle', aiTimer: 0, respawnAt: 0, buffs: [], group: 0, summoned: false, spawnKey: '', npcId: '', wander: 0,
+      id: this.nextId++,
+      kind,
+      name,
+      level,
+      x: 0,
+      y: 0,
+      hp: 1,
+      mana: 0,
+      dead: false,
+      attrs,
+      derived: computeDerived(attrs),
+      elemAtk: emptyElements(),
+      elemRes: emptyElements(),
+      damageType: 'physical',
+      element: null,
+      attackRange: 1,
+      attackWhileMoving: false,
+      attackInterval: 1,
+      attackCd: 0,
+      moveSpeed: 3,
+      path: [],
+      repathCd: 0,
+      monsterId: '',
+      home: { x: 0, y: 0 },
+      ai: 'idle',
+      aiTimer: 0,
+      respawnAt: 0,
+      buffs: [],
+      group: 0,
+      summoned: false,
+      spawnKey: '',
+      npcId: '',
+      wander: 0,
     };
   }
 
   private makePlayer(name: string, classId: string, level: number, attrs: Attributes): Entity {
     const c = CLASSES[classId];
     const e = this.blank('player', name, level);
-    e.id = 1; e.attrs = attrs; e.derived = computeDerived(attrs);
+    e.id = 1;
+    e.attrs = attrs;
+    e.derived = computeDerived(attrs);
     e.elemAtk = { ...emptyElements(), ...c.elementAttack };
-    e.damageType = c.damageType; e.element = c.element;
-    e.attackRange = c.attackRange; e.attackWhileMoving = !!c.attackWhileMoving; e.attackInterval = c.attackInterval; e.moveSpeed = c.moveSpeed;
-    e.hp = e.derived.maxHp; e.mana = e.derived.maxMana;
+    e.damageType = c.damageType;
+    e.element = c.element;
+    e.attackRange = c.attackRange;
+    e.attackWhileMoving = !!c.attackWhileMoving;
+    e.attackInterval = c.attackInterval;
+    e.moveSpeed = c.moveSpeed;
+    e.hp = e.derived.maxHp;
+    e.mana = e.derived.maxMana;
     return e;
   }
 
@@ -1189,14 +1742,23 @@ export class World {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
-    if (def.defMul) { e.derived.physDef *= def.defMul.phys; e.derived.spiritDef *= def.defMul.spirit; }
+    if (def.defMul) {
+      e.derived.physDef *= def.defMul.phys;
+      e.derived.spiritDef *= def.defMul.spirit;
+    }
     e.hp = e.derived.maxHp;
   }
 
   private makeMonster(def: MonsterDef, home: Point): Entity {
     const e = this.blank('monster', def.name, 1);
-    e.monsterId = def.id; e.home = { ...home }; e.x = home.x; e.y = home.y;
-    e.damageType = def.damageType; e.attackRange = def.attackRange; e.attackInterval = def.attackInterval; e.moveSpeed = def.moveSpeed;
+    e.monsterId = def.id;
+    e.home = { ...home };
+    e.x = home.x;
+    e.y = home.y;
+    e.damageType = def.damageType;
+    e.attackRange = def.attackRange;
+    e.attackInterval = def.attackInterval;
+    e.moveSpeed = def.moveSpeed;
     e.aiTimer = this.rng.range(0.5, 4);
     this.applyMonsterLevel(e, def, this.rng.int(def.minLevel, def.maxLevel));
     return e;
@@ -1204,24 +1766,45 @@ export class World {
 
   private respawn(m: Entity, def: MonsterDef) {
     this.applyMonsterLevel(m, def, this.rng.int(def.minLevel, def.maxLevel));
-    if (def.boss) { this.bossRespawnAtMs = 0; this.resetBoss(m); }
+    if (def.boss) {
+      this.bossRespawnAtMs = 0;
+      this.resetBoss(m);
+    }
     if (m.spawnKey) delete this.respawnAtMs[m.spawnKey];
-    m.buffs = []; m.dead = false; m.x = m.home.x; m.y = m.home.y; m.ai = 'idle'; m.aiTimer = 2; m.path = []; m.attackCd = 1;
+    m.buffs = [];
+    m.dead = false;
+    m.x = m.home.x;
+    m.y = m.home.y;
+    m.ai = 'idle';
+    m.aiTimer = 2;
+    m.path = [];
+    m.attackCd = 1;
   }
 
   /** Morador: anda até um ponto perto de casa, para um pouco e escolhe outro. Para quando o jogador conversa com ele. */
   private tickWalker(n: Entity, dt: number) {
-    if (this.openNpc === n || this.npcGoal === n.id && dist(n, this.player) < 2.5) { n.path = []; return; }
-    if (n.path.length) { this.followPath(n, dt, 1); if (!n.path.length) n.aiTimer = this.npcRng.range(2, 6); return; }
+    if (this.openNpc === n || (this.npcGoal === n.id && dist(n, this.player) < 2.5)) {
+      n.path = [];
+      return;
+    }
+    if (n.path.length) {
+      this.followPath(n, dt, 1);
+      if (!n.path.length) n.aiTimer = this.npcRng.range(2, 6);
+      return;
+    }
     n.aiTimer -= dt;
     if (n.aiTimer > 0) return;
     n.aiTimer = 1;
     for (let k = 0; k < 6; k++) {
-      const a = this.npcRng.range(0, Math.PI * 2), r = this.npcRng.range(1.5, n.wander);
+      const a = this.npcRng.range(0, Math.PI * 2),
+        r = this.npcRng.range(1.5, n.wander);
       const t = { x: n.home.x + Math.cos(a) * r, y: n.home.y + Math.sin(a) * r };
       if (!isWalkable(this.map, t.x, t.y)) continue;
       const path = findPath(this.map, n, t);
-      if (path.length && path.length < n.wander * 3) { n.path = path; return; }
+      if (path.length && path.length < n.wander * 3) {
+        n.path = path;
+        return;
+      }
     }
   }
 
@@ -1229,16 +1812,30 @@ export class World {
   private followPath(e: Entity, dt: number, mul: number) {
     let rem = e.moveSpeed * mul * this.speedMul(e) * dt;
     while (rem > 0 && e.path.length) {
-      const w = e.path[0], dx = w.x - e.x, dy = w.y - e.y, d = Math.hypot(dx, dy);
-      if (d <= rem) { e.x = w.x; e.y = w.y; rem -= d; e.path.shift(); }
-      else { e.x += (dx / d) * rem; e.y += (dy / d) * rem; rem = 0; }
+      const w = e.path[0],
+        dx = w.x - e.x,
+        dy = w.y - e.y,
+        d = Math.hypot(dx, dy);
+      if (d <= rem) {
+        e.x = w.x;
+        e.y = w.y;
+        rem -= d;
+        e.path.shift();
+      } else {
+        e.x += (dx / d) * rem;
+        e.y += (dy / d) * rem;
+        rem = 0;
+      }
     }
   }
 
   private step(e: Entity, dx: number, dy: number, d: number) {
-    const nx = e.x + dx * d, ny = e.y + dy * d;
-    if (isWalkable(this.map, nx, ny)) { e.x = nx; e.y = ny; }
-    else if (isWalkable(this.map, nx, e.y)) e.x = nx;
+    const nx = e.x + dx * d,
+      ny = e.y + dy * d;
+    if (isWalkable(this.map, nx, ny)) {
+      e.x = nx;
+      e.y = ny;
+    } else if (isWalkable(this.map, nx, e.y)) e.x = nx;
     else if (isWalkable(this.map, e.x, ny)) e.y = ny;
   }
 }

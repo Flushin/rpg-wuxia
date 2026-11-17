@@ -6,10 +6,19 @@ import { localize } from './i18n';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
 
 export interface ClassDef {
-  id: string; name: string; description: string; rangeLabel: string;
-  damageType: DamageType; element: Element;
-  attackRange: number; attackWhileMoving?: boolean; attackInterval: number; moveSpeed: number; color: string;
-  baseAttributes: Attributes; levelUpAttributes: Attributes;
+  id: string;
+  name: string;
+  description: string;
+  rangeLabel: string;
+  damageType: DamageType;
+  element: Element;
+  attackRange: number;
+  attackWhileMoving?: boolean;
+  attackInterval: number;
+  moveSpeed: number;
+  color: string;
+  baseAttributes: Attributes;
+  levelUpAttributes: Attributes;
   elementAttack: Partial<ElementMap>;
   recommended: { attr: AttrKey; reason: string }[];
   optional: { attr: AttrKey; reason: string }[];
@@ -17,10 +26,22 @@ export interface ClassDef {
   lifeSteal?: number; // fração do dano causado que volta como vida (Tormenta, marco 7)
 }
 export interface MonsterDef {
-  id: string; name: string; sprite: string; minLevel: number; maxLevel: number;
-  baseAttributes: Attributes; perLevel: Attributes; damageType: DamageType;
-  aggroRange: number; leashRange: number; attackRange: number; attackInterval: number;
-  moveSpeed: number; xpBase: number; xpPerLevel: number; respawnSeconds: number;
+  id: string;
+  name: string;
+  sprite: string;
+  minLevel: number;
+  maxLevel: number;
+  baseAttributes: Attributes;
+  perLevel: Attributes;
+  damageType: DamageType;
+  aggroRange: number;
+  leashRange: number;
+  attackRange: number;
+  attackInterval: number;
+  moveSpeed: number;
+  xpBase: number;
+  xpPerLevel: number;
+  respawnSeconds: number;
   scale?: number; // tamanho do sprite
   defMul?: { phys: number; spirit: number }; // multiplicadores sobre a defesa derivada
   keepDistance?: number; // arqueiro: recua se o jogador chegar mais perto que isso
@@ -38,16 +59,38 @@ export interface MonsterDef {
     guaranteed?: { rarity: 'comum' | 'incomum' | 'raro'; reqLevel: number }; // 1 item garantido (slot aleatório)
   };
 }
-export interface EquipDrop { chance: number; maxReqLevel: number; minReqLevel?: number; minMonsterLevel?: number }
-export interface Progression { levelCap: number; xpToNext: number[]; freePointsPerLevel: number }
+export interface EquipDrop {
+  chance: number;
+  maxReqLevel: number;
+  minReqLevel?: number;
+  minMonsterLevel?: number;
+}
+export interface Progression {
+  levelCap: number;
+  xpToNext: number[];
+  freePointsPerLevel: number;
+}
 
 export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;
 export const MONSTERS = localize('monsters', monstersJson) as unknown as Record<string, MonsterDef>;
 export const PROGRESSION = progressionJson as Progression;
 
 // Falas dos NPCs da cidade e dos mestres das seitas (também usadas na criação de personagem)
-export interface MasterText { name: string; title: string; greeting: string; intro: string; tips?: string[]; locked?: string }
-export interface NpcText { name: string; lines: string[] }
-export const NPC_TEXT = localize('npcs', npcsJson) as unknown as { masters: Record<string, MasterText>; npcs: Record<string, NpcText> };
+export interface MasterText {
+  name: string;
+  title: string;
+  greeting: string;
+  intro: string;
+  tips?: string[];
+  locked?: string;
+}
+export interface NpcText {
+  name: string;
+  lines: string[];
+}
+export const NPC_TEXT = localize('npcs', npcsJson) as unknown as {
+  masters: Record<string, MasterText>;
+  npcs: Record<string, NpcText>;
+};
 /** Seitas na ordem da criação: jogáveis primeiro, depois as que ainda virão. */
 export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];

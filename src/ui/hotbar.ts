@@ -6,27 +6,39 @@ import { skillIconHtml } from './icons';
 import { uiRect, uiW } from './uiScale';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
-const SIZE = 56, R = 118;
+const SIZE = 56,
+  R = 118;
 
 // Barra de skills: PC (embaixo, centro, teclas 1-4) e celular (arco em volta do botão Atacar).
 export class Hotbar {
   private el = $('hotbar');
   private tip = $('skill-tip');
-  private slots: { btn: HTMLButtonElement; sweep: HTMLElement; cdt: HTMLElement; lock: HTMLElement; sig: string }[] = [];
+  private slots: { btn: HTMLButtonElement; sweep: HTMLElement; cdt: HTMLElement; lock: HTMLElement; sig: string }[] =
+    [];
   private shown = -1;
   private pressTimer = 0;
   private longPressed = false;
 
-  constructor(private world: World, private onUse?: () => void) {
+  constructor(
+    private world: World,
+    private onUse?: () => void,
+  ) {
     const defs = world.activeSkills();
     this.el.classList.toggle('touch', isTouch);
     this.el.innerHTML = '';
     defs.forEach((d, i) => {
       const b = document.createElement('button');
-      b.className = 'slot'; b.style.setProperty('--c', d.color);
+      b.className = 'slot';
+      b.style.setProperty('--c', d.color);
       b.innerHTML = `<span class="ic">${skillIconHtml(d.id, initials(d.name))}</span><span class="key">${i + 1}</span><span class="sweep"></span><span class="cdt"></span><span class="lock"></span>`;
       this.el.appendChild(b);
-      this.slots.push({ btn: b, sweep: b.querySelector('.sweep')!, cdt: b.querySelector('.cdt')!, lock: b.querySelector('.lock')!, sig: '' });
+      this.slots.push({
+        btn: b,
+        sweep: b.querySelector('.sweep')!,
+        cdt: b.querySelector('.cdt')!,
+        lock: b.querySelector('.lock')!,
+        sig: '',
+      });
       this.bind(b, i);
     });
     window.addEventListener('resize', () => this.layout());
@@ -35,38 +47,63 @@ export class Hotbar {
 
   private bind(b: HTMLButtonElement, i: number) {
     b.addEventListener('contextmenu', (e) => e.preventDefault());
-    b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') this.showTip(i); });
-    b.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') this.hideTip(); });
+    b.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse') this.showTip(i);
+    });
+    b.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'mouse') this.hideTip();
+    });
     b.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       this.longPressed = false;
       if (e.pointerType === 'mouse') return;
       clearTimeout(this.pressTimer);
-      this.pressTimer = window.setTimeout(() => { this.longPressed = true; this.showTip(i); }, 450);
+      this.pressTimer = window.setTimeout(() => {
+        this.longPressed = true;
+        this.showTip(i);
+      }, 450);
     });
-    const end = () => { clearTimeout(this.pressTimer); };
-    b.addEventListener('pointercancel', () => { end(); this.hideTip(); });
+    const end = () => {
+      clearTimeout(this.pressTimer);
+    };
+    b.addEventListener('pointercancel', () => {
+      end();
+      this.hideTip();
+    });
     b.addEventListener('pointerup', (e) => {
       end();
       if (e.pointerType === 'mouse') return;
-      if (this.longPressed) { this.longPressed = false; this.hideTip(); return; }
+      if (this.longPressed) {
+        this.longPressed = false;
+        this.hideTip();
+        return;
+      }
       this.use(i);
     });
-    b.addEventListener('click', (e) => { if ((e as PointerEvent).pointerType === 'mouse') this.use(i); });
+    b.addEventListener('click', (e) => {
+      if ((e as PointerEvent).pointerType === 'mouse') this.use(i);
+    });
     b.addEventListener('focus', () => b.blur());
   }
 
-  use(i: number) { this.world.useSkill(i); this.onUse?.(); }
+  use(i: number) {
+    this.world.useSkill(i);
+    this.onUse?.();
+  }
 
   private layout() {
     if (!isTouch) return;
     // celular deitado com pouca altura (ex.: Fold fechado): arco baixo e compacto, para não subir até os botões do topo
     const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
-    const size = short ? 46 : SIZE, r = short ? 84 : R, cx = short ? 53 : 72, cy = short ? 51 : 78;
+    const size = short ? 46 : SIZE,
+      r = short ? 84 : R,
+      cx = short ? 53 : 72,
+      cy = short ? 51 : 78;
     // passo mínimo para os botões não encostarem: corda do arco ≥ tamanho + 6 px (antes, deitado, ficavam um em cima do outro)
     const minStep = (2 * Math.asin(Math.min(1, (size + 6) / (2 * r))) * 180) / Math.PI;
-    const step = short ? Math.max(28, minStep) : narrow ? 28 : 30, start = short ? 178 : narrow ? 152 : 165;
+    const step = short ? Math.max(28, minStep) : narrow ? 28 : 30,
+      start = short ? 178 : narrow ? 152 : 165;
     this.slots.forEach((s, i) => {
       const a = ((start - i * step) * Math.PI) / 180;
       s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
@@ -74,14 +111,22 @@ export class Hotbar {
     });
   }
 
-  private showTip(i: number) { this.shown = i; this.tip.classList.remove('hidden'); this.renderTip(); }
-  private hideTip() { this.shown = -1; this.tip.classList.add('hidden'); }
+  private showTip(i: number) {
+    this.shown = i;
+    this.tip.classList.remove('hidden');
+    this.renderTip();
+  }
+  private hideTip() {
+    this.shown = -1;
+    this.tip.classList.add('hidden');
+  }
 
   private renderTip() {
     const d = this.world.activeSkills()[this.shown];
     if (!d) return this.hideTip();
     this.tip.innerHTML = skillTipHtml(this.world, d);
-    const r = uiRect(this.slots[this.shown].btn), w = 240;
+    const r = uiRect(this.slots[this.shown].btn),
+      w = 240;
     const x = Math.max(6, Math.min(uiW() - w - 6, r.left + r.width / 2 - w / 2));
     this.tip.style.left = `${x}px`;
     this.tip.style.top = '0px';
@@ -90,10 +135,14 @@ export class Hotbar {
   }
 
   update() {
-    const w = this.world, p = w.player;
+    const w = this.world,
+      p = w.player;
     w.activeSkills().forEach((d, i) => {
-      const s = this.slots[i], st = w.skills[d.id];
-      const locked = !w.isUnlocked(d), cd = Math.max(st.cd, 0), total = d.cooldown ?? 1;
+      const s = this.slots[i],
+        st = w.skills[d.id];
+      const locked = !w.isUnlocked(d),
+        cd = Math.max(st.cd, 0),
+        total = d.cooldown ?? 1;
       const nomana = !locked && p.mana < (d.mana ?? 0);
       const frac = locked ? 0 : Math.min(1, cd / total);
       const sig = `${locked}|${nomana}|${cd > 0 ? cd.toFixed(1) : 0}|${Math.round(frac * 100)}|${w.gcd > 0}`;
@@ -112,10 +161,24 @@ export class Hotbar {
 }
 
 export function skillTipHtml(w: World, d: SkillDef): string {
-  const lvl = w.skillLevel(d), need = w.skillXpNeed(d), st = w.skills[d.id];
+  const lvl = w.skillLevel(d),
+    need = w.skillXpNeed(d),
+    st = w.skills[d.id];
   const unlocked = w.isUnlocked(d);
-  const stats = d.type === 'active' ? `<span class="st">Mana ${d.mana} · ${L('Recarga', 'Cooldown')} ${d.cooldown}s</span><br>` : '';
-  const xp = d.type === 'passive' ? '' : need === null ? `<div>${L('Nível máximo', 'Max level')}</div>` : `<div>XP ${st.xp} / ${need}</div><div class="sk-bar"><i style="width:${(st.xp / need) * 100}%"></i></div>`;
-  return `<b>${d.name}</b>${d.type === 'passive' ? ` <small>(${L('Passiva', 'Passive')})</small>` : ''}<p>${d.description}</p>${stats}`
-    + (unlocked ? `${L('Nível', 'Level')} ${lvl}/10 · ${L('efeito', 'effect')} +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}` : `<span class="st">${L(`Desbloqueia no nível ${d.unlock}`, `Unlocks at level ${d.unlock}`)}</span>`);
+  const stats =
+    d.type === 'active'
+      ? `<span class="st">Mana ${d.mana} · ${L('Recarga', 'Cooldown')} ${d.cooldown}s</span><br>`
+      : '';
+  const xp =
+    d.type === 'passive'
+      ? ''
+      : need === null
+        ? `<div>${L('Nível máximo', 'Max level')}</div>`
+        : `<div>XP ${st.xp} / ${need}</div><div class="sk-bar"><i style="width:${(st.xp / need) * 100}%"></i></div>`;
+  return (
+    `<b>${d.name}</b>${d.type === 'passive' ? ` <small>(${L('Passiva', 'Passive')})</small>` : ''}<p>${d.description}</p>${stats}` +
+    (unlocked
+      ? `${L('Nível', 'Level')} ${lvl}/10 · ${L('efeito', 'effect')} +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}`
+      : `<span class="st">${L(`Desbloqueia no nível ${d.unlock}`, `Unlocks at level ${d.unlock}`)}</span>`)
+  );
 }

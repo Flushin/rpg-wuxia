@@ -6,11 +6,20 @@ import { L } from '../core/i18n';
 const zoomed = () => (window.visualViewport?.scale ?? 1) > 1.01;
 
 export function initNoBrowserZoom() {
-  const block = (e: Event) => { if (!zoomed()) e.preventDefault(); };
+  const block = (e: Event) => {
+    if (!zoomed()) e.preventDefault();
+  };
   // Safari: eventos próprios do gesto de pinça
-  for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, block, { passive: false });
+  for (const ev of ['gesturestart', 'gesturechange', 'gestureend'])
+    document.addEventListener(ev, block, { passive: false });
   // qualquer navegador: dois ou mais dedos movendo = pinça
-  document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) block(e); }, { passive: false });
+  document.addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.touches.length > 1) block(e);
+    },
+    { passive: false },
+  );
   // toque duplo: touch-action: manipulation nos botões (CSS) + dblclick cancelado
   document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
 
@@ -20,7 +29,10 @@ export function initNoBrowserZoom() {
   const note = document.createElement('div');
   note.id = 'zoom-note';
   note.className = 'hidden';
-  note.textContent = L('Página ampliada — afaste dois dedos para voltar ao normal', 'Page zoomed in — pinch out to go back to normal');
+  note.textContent = L(
+    'Página ampliada — afaste dois dedos para voltar ao normal',
+    'Page zoomed in — pinch out to go back to normal',
+  );
   document.body.appendChild(note);
   const check = () => {
     const z = zoomed();

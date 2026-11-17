@@ -339,6 +339,7 @@ As etapas dentro de cada fase são independentes entre si.
 ### Fase B — legibilidade barata
 
 **B1. Formatador automático (Prettier) + `.editorconfig`** — M
+> ✅ **Feita em 17/11/2026** (JSON e Markdown ficaram de fora; ver doc de decisões).
 - Objetivo: quebrar as linhas de 200–385 colunas e padronizar tudo. Sugestão `printWidth: 120`. Pode ser aplicado **arquivo por arquivo** (junto da etapa que mexer nele) ou de uma vez (PR grande, só formatação). Ver P4.
 - Arquivos: `package.json`, `.prettierrc`, `.editorconfig`, `src/**`.
 - Risco: muito baixo (só espaços/quebras); o diff grande atrapalha o `git blame` (dá para ignorar o commit com `.git-blame-ignore-revs`).
