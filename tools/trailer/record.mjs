@@ -71,6 +71,17 @@ async function installDirector() {
       D.cam.setZoom(D.base * z);
       D.cam.centerOn(s.x, s.y - lift);
     },
+    /** como look(), mas trava o centro para a vista nunca sair do mapa (32×32, borda de árvores/pilares) */
+    lookSafe(tx, ty, z = 1, lift = 0) {
+      const hw = 960 / (D.base * z),
+        hh = 540 / (D.base * z);
+      const e = (hw / 32 + hh / 16) / 2 + 0.3,
+        up = lift / 32;
+      const lo = 1 + e - up,
+        hi = 31 - e + up;
+      const c = (v) => (lo > hi ? 16 : Math.max(lo, Math.min(hi, v)));
+      D.look(c(tx), c(ty), z, lift);
+    },
     /** posição desenhada (suave) de uma entidade, em tiles */
     pos(e) {
       return { x: e.x, y: e.y };

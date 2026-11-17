@@ -74,15 +74,15 @@ export const SHOTS = [
     frames: 540,
     setup(D) {
       D.w.changeMap('floresta', 20.5, 20.5);
-      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 18);
+      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 17);
       for (const [x, y] of [
-        [25.5, 24.5],
-        [26.5, 23],
-        [24, 25.8],
-        [27, 25.5],
+        [24.5, 21],
+        [25.5, 19.5],
+        [23.5, 22.5],
+        [26, 22],
       ])
         D.spawn('bandido_espadachim', x, y, 3);
-      D.spawn('bandido_arqueiro', 27.5, 22, 2.5);
+      D.spawn('bandido_arqueiro', 27, 20.5, 2.5);
       D.cx = undefined;
     },
     tick(D, i) {
@@ -106,9 +106,9 @@ export const SHOTS = [
       const p = D.w.player;
       D.cx = D.cx === undefined ? p.x : D.lerp(D.cx, p.x, 0.1);
       D.cy = D.cy === undefined ? p.y : D.lerp(D.cy, p.y, 0.1);
-      let z = 1.9;
-      if (i >= 195 && i < 285) z = 1.9 + 0.5 * Math.sin((Math.PI * (i - 195)) / 90);
-      D.look(D.cx, D.cy, z, 26);
+      let z = 2.15;
+      if (i >= 195 && i < 285) z = 2.15 + 0.45 * Math.sin((Math.PI * (i - 195)) / 90);
+      D.lookSafe(D.cx, D.cy, z, 26);
     },
   },
   {
@@ -172,7 +172,7 @@ export const SHOTS = [
         ty = (p.y * 2 + b.y) / 3;
       D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.08);
       D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.08);
-      D.look(Math.min(D.cx, 22), D.cy, 1.85, 24);
+      D.lookSafe(D.cx, D.cy, 1.85, 24);
     },
   },
   {
@@ -206,7 +206,7 @@ export const SHOTS = [
       D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.1);
       D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.1);
       const z = i < 90 ? 2.1 : 2.1 + 0.5 * D.easeSine(Math.min(1, (i - 90) / 60));
-      D.look(Math.min(D.cx, 22.5), D.cy, z, 30);
+      D.lookSafe(D.cx, D.cy, z, 30);
       if (i === 118) {
         D.cam.flash(250, 255, 240, 200);
         D.cam.shake(400, 0.008);
@@ -224,13 +224,13 @@ export const SHOTS = [
       D.hook();
       D.strong();
       D.w.changeMap('floresta', 20.5, 21);
-      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 18);
+      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 17);
       for (const [id, x, y] of [
-        ['lobo', 25.5, 24.5],
-        ['lobo', 26.5, 25.5],
-        ['lobo', 24.5, 26],
-        ['bandido_espadachim', 26.5, 23.5],
-        ['bandido_espadachim', 27.5, 26],
+        ['lobo', 24.5, 21],
+        ['lobo', 25.5, 22.5],
+        ['lobo', 23.5, 22.5],
+        ['bandido_espadachim', 25.5, 20],
+        ['bandido_espadachim', 26.5, 22],
       ])
         D.spawn(id, x, y, id === 'lobo' ? 6 : 3);
       D.cx = undefined;
@@ -258,9 +258,9 @@ export const SHOTS = [
         ty = (p.y * 3 + t.y * 2) / 5;
       D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.06);
       D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.06);
-      let z = 1.6;
-      if (i >= 135 && i < 235) z = 1.6 + 0.35 * Math.sin((Math.PI * (i - 135)) / 100);
-      D.look(D.cx, D.cy, z, 24);
+      let z = 1.95;
+      if (i >= 135 && i < 235) z = 1.95 + 0.35 * Math.sin((Math.PI * (i - 135)) / 100);
+      D.lookSafe(D.cx, D.cy, z, 24);
     },
   },
 ];
