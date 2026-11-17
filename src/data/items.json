@@ -1,6 +1,6 @@
 {
   "_doc": [
-    "Dados de itens (BALANCEAMENTO PROVISORIO - placeholders).",
+    "Dados de itens. Numeros fechados para a v1 no marco 7 (ver docs/decisoes-do-projeto.md); ajustar com npm run sim:balance.",
     "stats das bases: attributes (strength, intelligence, stamina, agility, willpower) somam nos atributos antes dos derivados;",
     "maxHp, maxMana, physAtk, spiritAtk, physDef, spiritDef, hit, evasion somam nos derivados; critChance/critDamage sao fracoes; elem_<elemento> soma no ataque elemental.",
     "Bonus aleatorios: valor = sorteio(min..max) * (1 + 0.2 * (nivelDoItem - 1)); ints arredondados (minimo 1). 'elemAtk' vira o elemento da seita de quem recebeu o drop.",

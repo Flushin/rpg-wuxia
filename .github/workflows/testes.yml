@@ -1,0 +1,21 @@
+# Testes automáticos em todo PR e em todo push fora da main (a main roda os mesmos testes no deploy.yml antes de publicar).
+# Não roda o check:layout (precisa de navegador e servidor) nem o sim:balance (lento): esses continuam manuais.
+name: Testes
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+permissions:
+  contents: read
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test

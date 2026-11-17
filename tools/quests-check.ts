@@ -75,13 +75,15 @@ for (const classId of ['lamina', 'pavilhao']) {
     if (o.type === 'kill') for (let i = 0; i < o.count; i++) kill(w, o.monster);
     else if (o.type === 'reach') w.changeMap(o.map);
     ok(w.questView().phase === 'ready', `"${q.name}" cumprida`);
-    const before = bagEquip().length;
+    // Os abates acima soltam itens por sorteio (às vezes uma arma Incomum nv 1): olhar só o que a entrega acrescentou.
+    const before = new Set(bagEquip().map((x) => x.uid));
     ok(w.questTurnIn(true), `entrega "${q.name}"`);
+    const gained = bagEquip().filter((x) => !before.has(x.uid));
     if (q.reward.item === 'arma') {
-      const it = bagEquip().find((x) => BASES[x.baseId].slot === 'arma' && x.rarity === 'incomum');
-      ok(bagEquip().length === before + 1 && !!it && BASES[it.baseId].sect === classId && BASES[it.baseId].reqLevel === 5, 'arma Incomum nv 5 da própria seita');
+      const it = gained[0];
+      ok(gained.length === 1 && BASES[it.baseId].slot === 'arma' && it.rarity === 'incomum' && BASES[it.baseId].sect === classId && BASES[it.baseId].reqLevel === 5, 'arma Incomum nv 5 da própria seita');
     }
-    if (q.reward.item === 'tronco') ok(bagEquip().some((x) => BASES[x.baseId].slot === 'tronco' && x.rarity === 'incomum' && BASES[x.baseId].reqLevel === 5), 'manto Incomum nv 5');
+    if (q.reward.item === 'tronco') ok(gained.length === 1 && BASES[gained[0].baseId].slot === 'tronco' && gained[0].rarity === 'incomum' && BASES[gained[0].baseId].reqLevel === 5, 'manto Incomum nv 5');
     w.changeMap('cidade');
   }
   ok(w.questView().phase === 'complete' && ['anciao', 'guarda', 'mercador', mestre].every((n) => w.questMark(n) === null), 'cadeia completa: sem marcas');

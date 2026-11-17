@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn",
     "maps": "node tools/gen-maps.mjs",
     "check:items": "esbuild tools/items-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/items-check.mjs && node /tmp/items-check.mjs",
     "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
@@ -24,6 +25,7 @@
     "phaser": "^3.90.0"
   },
   "devDependencies": {
+    "esbuild": "^0.21.5",
     "typescript": "^5.9.3",
     "vite": "^5.4.21"
   }

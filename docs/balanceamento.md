@@ -1,4 +1,42 @@
-# Balanceamento (marco 5)
+# Balanceamento
+
+> **Este documento é o registro do marco 5** (método e resultados daquela época). Vários números mudaram depois
+> (XP dos monstros −22%, ouro pela metade, respawn de 30 s, Tormenta com roubo de vida, Geada com Stamina 10…).
+> Os valores atuais estão nos JSON de `src/data/` e as decisões em `docs/decisoes-do-projeto.md`.
+> A seção "Situação atual" logo abaixo traz a última medição.
+
+## Situação atual (17/11/2026)
+
+`npm run sim:balance -- --seeds=5` com os dados do marco 7 e o **simulador corrigido** (auditoria, etapa A2):
+o relógio dos renascimentos agora acompanha o tempo simulado e a luta do chefe usa a semente desde o começo,
+então **a mesma semente dá sempre o mesmo resultado**. Nenhuma regra do jogo mudou.
+
+| Seita | Nível 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | Mortes | Ouro/h | Ouro/h (nv 7+) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Tormenta | 0.6 | 1.6 | 5.8 | 8.1 | 13.5 | 27.1 | 34.0 | 46.9 | 61.3 | 1.8 | 8801 | 14818 |
+| Geada | 0.5 | 1.5 | 4.7 | 6.5 | 10.5 | 20.1 | 24.1 | 32.8 | 43.0 | 0.2 | 12130 | 20900 |
+
+| Seita | Gasto em poções | Gasto em conserto | Conserto / ouro ganho |
+|---|---|---|---|
+| Tormenta | 4934 | 1606 | 16.6% |
+| Geada | 3046 | 295 | 3.0% |
+
+| Seita | Equipamento nv 5 | Vitórias | Tempo médio (s) | Poções usadas | Mortes |
+|---|---|---|---|---|---|
+| Tormenta | incomum | 10/10 | 61 | 14.7 | 0.0 |
+| Tormenta | raro | 10/10 | 52 | 10.0 | 0.0 |
+| Geada | incomum | 10/10 | 43 | 0.6 | 0.0 |
+| Geada | raro | 10/10 | 40 | 0.1 | 0.0 |
+
+**Por que os números mudaram em relação ao marco 7** (Tormenta ~65 → ~61 min, Geada ~47 → ~43 min; Tormenta vence o chefe
+com Incomum 10/10 em vez de ~10/12): antes, o simulador usava o relógio real do computador para o renascimento de monstros
+ao trocar de mapa. Como a simulação roda muito mais rápido que o tempo real, os monstros pareciam demorar muito mais para
+voltar do que no jogo. Agora o simulador mede o que o jogador realmente vê. Na luta do chefe, os guerreiros das Ruínas
+nasciam com sorteio não controlado. O ritmo continua dentro da meta de ~1 hora.
+
+---
+
+# Registro do marco 5
 
 > Nomes antigos usados neste documento: Lâmina Errante = **Tormenta**, Pavilhão das Nuvens = **Geada**, Corte Duplo = Presas Gêmeas, Golpe Rompe-Guarda = Quebra-Guarda.
 

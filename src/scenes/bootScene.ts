@@ -4,6 +4,7 @@ import { makeTextures } from '../render/textures';
 import { createSpriteAnims, preloadSprites } from '../render/sprites';
 import { sfxFiles } from '../render/audio';
 import { loadAll } from '../save';
+import { showLoadError } from '../ui/create';
 
 export const MAP_IDS = ['cidade', 'floresta', 'ruinas'];
 
@@ -26,6 +27,18 @@ export class BootScene extends Phaser.Scene {
     // some com a tela de carregamento antes de aparecer a seleção de personagem
     const ld = document.getElementById('loading');
     if (ld) { ld.classList.add('out'); setTimeout(() => ld.remove(), 300); }
-    loadAll().then((file) => this.scene.start('Create', { file }), () => this.scene.start('Create', {}));
+    this.openTitle();
+  }
+
+  // Lê os personagens e abre a tela inicial. Se a leitura falhar, NÃO abre a lista vazia (o jogador poderia criar
+  // um personagem e a gravação apagaria os outros): mostra o erro com "Tentar de novo".
+  private openTitle() {
+    loadAll().then(
+      (file) => this.scene.start('Create', { file }),
+      (err) => {
+        console.error('Falha ao ler os personagens', err);
+        showLoadError(() => this.openTitle());
+      },
+    );
   }
 }

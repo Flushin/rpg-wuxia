@@ -101,3 +101,18 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
   $('lang-slot').innerHTML = langButtons(); bindLangButtons($('lang-slot'));
   renderSlots(); show('slots');
 }
+
+/** Tela inicial quando os personagens não puderam ser lidos: aviso + "Tentar de novo" (nada é gravado até ler). */
+export function showLoadError(onRetry: () => void) {
+  const root = $('create');
+  root.classList.remove('hidden');
+  $('create-view').classList.add('hidden');
+  $('del-view').classList.add('hidden');
+  $('slots-view').classList.remove('hidden');
+  $('slot-list').innerHTML = `<div class="slot-card empty"><div class="slot-info">
+    <b>${L('Não foi possível ler seus personagens', 'Could not read your characters')}</b>
+    <small>${L('Eles não foram apagados. Tente de novo; se continuar, feche e abra o jogo.', 'They were not deleted. Try again; if it keeps happening, close and reopen the game.')}</small>
+    </div><div class="slot-btns"><button id="btn-load-retry" class="primary">${L('Tentar de novo', 'Try again')}</button></div></div>`;
+  const retry = $('btn-load-retry') as HTMLButtonElement;
+  retry.onclick = () => { retry.disabled = true; onRetry(); };
+}
