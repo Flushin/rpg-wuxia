@@ -157,16 +157,21 @@ export class InventoryPanel {
       }
       detail = `<div class="tipbody">${itemTipHtml(w, it, s.kind === 'bag')}</div>${btn}`;
     }
-    // guarda a rolagem: a mochila é redesenhada inteira e voltava para o topo
-    const panel = $('inv-panel'), keep = ['.inv-card', '.inv-detail'].map((q) => panel.querySelector(q)?.scrollTop ?? 0);
-    const keepPanel = panel.scrollTop;
-    panel.innerHTML = `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
+    // A moldura (.inv-card, que é quem rola) é criada uma vez e nunca é trocada: só o conteúdo de dentro é redesenhado.
+    // Trocar a moldura inteira jogava a rolagem para o topo (e cortava a rolagem no meio, no iPhone).
+    const panel = $('inv-panel');
+    let main = panel.querySelector('.inv-main') as HTMLElement | null, det = panel.querySelector('.inv-detail') as HTMLElement | null;
+    if (!main || !det) {
+      panel.innerHTML = '<div class="card inv-card"><div class="inv-main"></div><div class="inv-detail"></div></div>';
+      main = panel.querySelector('.inv-main') as HTMLElement; det = panel.querySelector('.inv-detail') as HTMLElement;
+    }
+    const card = panel.querySelector('.inv-card') as HTMLElement, keep = [panel.scrollTop, card.scrollTop, det.scrollTop];
+    main.innerHTML = `${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
       <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-body">${eq}</div>
       <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
-      <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div>
-      <div class="inv-detail">${detail}</div></div>`;
-    panel.scrollTop = keepPanel;
-    ['.inv-card', '.inv-detail'].forEach((q, i) => { const el = panel.querySelector(q); if (el) el.scrollTop = keep[i]; });
+      <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button>`;
+    det.innerHTML = detail;
+    [panel.scrollTop, card.scrollTop, det.scrollTop] = keep;
   }
 }
