@@ -499,6 +499,12 @@ Implementadas a pedido do Lucas e publicadas no site.
   - **Reforço (PR #23):** a moldura que rola (`.inv-card`) passou a ser criada uma vez só; a cada mudança só o conteúdo de dentro
     é trocado, então a rolagem nunca é perdida (antes a moldura inteira era recriada e a posição era restaurada depois).
 
+- **Tela "Créditos e licenças"** *(17/11/2026, pedida pelo Lucas a partir do `AUDITORIA_DIREITOS.md`)*: abre por um link
+  discreto no rodapé da tela inicial (ao lado da versão) e pelo botão "Créditos e licenças" em ⚙. Mostra quem fez o jogo, os
+  créditos de arte e som (todos CC0) e as bibliotecas com o texto completo da licença (toca para abrir). As licenças MIT e
+  Apache-2.0 exigem esse aviso no app. Os textos vêm dos arquivos de `docs/licencas/`, sem cópia. Fecha com X, Fechar,
+  toque fora ou Esc. Código: `src/ui/credits.ts`. Registro de assets: `ASSETS_LICENCAS.md`.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

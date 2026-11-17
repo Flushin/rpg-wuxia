@@ -9,6 +9,7 @@ import { MONSTERS } from '../core/data';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
 import { BugReport } from './bugReport';
+import { credits } from './credits';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import { byId } from './dom';
 
@@ -56,6 +57,9 @@ export class TipManager {
       else if (t.dataset.act === 'bug') {
         this.togglePanel(false);
         this.bug.open();
+      } else if (t.dataset.act === 'credits') {
+        this.togglePanel(false);
+        credits().open();
       } else if (t.dataset.act === 'switch') {
         this.togglePanel(false);
         this.onSwitch();
@@ -132,6 +136,7 @@ export class TipManager {
       <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
       <small class="muted">${this.world.seenTips.length ? L(`${this.world.seenTips.length} dica(s) já vista(s)`, `${this.world.seenTips.length} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
       <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
+      <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
       <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
     bindLangButtons(byId('settings-panel'));

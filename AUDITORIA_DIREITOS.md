@@ -420,10 +420,10 @@ Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar al
 
 ### Prioridade 2 — junto com a primeira versão (exigências de licença e prova)
 
-5. **Tela "Créditos e licenças"** no app (em ⚙ e na tela inicial), com o conteúdo do rascunho da seção 6, incluindo o texto
-   completo das licenças MIT (Phaser, eventemitter3) e Apache-2.0 (idb-keyval) — e, quando entrar, Capacitor/AndroidX.
-   Também gerar um `THIRD_PARTY_LICENSES.txt` no pacote (ex.: com `npx license-checker --production` ou
-   `rollup-plugin-license`), conferido à mão.
+5. ~~Tela "Créditos e licenças"~~ — **feita (17/11/2026)**: `src/ui/credits.ts`, aberta pelo link no rodapé da tela inicial e
+   pelo botão em ⚙, em PT/EN, com os créditos de arte e som e o texto completo das licenças MIT (Phaser, eventemitter3) e
+   Apache-2.0 (idb-keyval), lido de `docs/licencas/`. Quando entrar Capacitor/AndroidX/SDK de anúncios, acrescentar as
+   licenças deles na lista `LIBRARIES` desse arquivo. Um `THIRD_PARTY_LICENSES.txt` separado fica opcional.
 6. **Arquivar as provas de licença** numa pasta `docs/licencas/` (fora do pacote). **Em andamento (17/11/2026):** já estão lá
    as licenças do KayKit, do espelho Quaternius, do Kenney UI Audio, do Phaser, do eventemitter3 e do idb-keyval, mais os
    textos completos da CC0 e da Apache-2.0. O que falta (Kenney Nature Kit/RPG Audio/Impact Sounds, páginas do OpenGameArt

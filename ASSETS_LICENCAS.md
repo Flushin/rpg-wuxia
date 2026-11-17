@@ -16,7 +16,8 @@ A análise completa está em [`AUDITORIA_DIREITOS.md`](AUDITORIA_DIREITOS.md).
 5. **Anotar o nome do arquivo original** quando o arquivo do jogo for renomeado (ex.: `ui_click` = `click1`).
 6. **IA generativa:** anotar a ferramenta, o plano e os termos vigentes e a data. Até 17/11/2026 nenhum asset usou IA generativa.
 7. Ao adicionar um asset de terceiros, atualizar também o crédito visível: `public/audio/CREDITS.txt`,
-   `public/sprites/CREDITS.txt` e, quando existir, a tela de créditos do jogo.
+   `public/sprites/CREDITS.txt` e a tela "Créditos e licenças" do jogo (`src/ui/credits.ts`: listas `ART`, `SOUND` e
+   `LIBRARIES`).
 
 **Risco:** 🟢 ok · 🟡 exige ação · 🔴 não pode ir para a loja · ❓ origem desconhecida (proibido até ter prova).
 
@@ -103,9 +104,9 @@ As dependências só de desenvolvimento (Vite, TypeScript, esbuild, Prettier) **
 
 | Biblioteca | Versão | Licença | Titular | Exigência | Prova em `docs/licencas/` | Risco |
 |---|---|---|---|---|---|---|
-| Phaser | 3.90.0 | MIT | © 2024 Richard Davey, Phaser Studio Inc. | Aviso + licença em toda cópia distribuída | `phaser-3.90.0-LICENSE.md` | 🟡 (falta mostrar no app) |
-| eventemitter3 | 5.0.4 | MIT | © 2014 Arnout Kazemier | idem | `eventemitter3-5.0.4-LICENSE.txt` | 🟡 (falta mostrar no app) |
-| idb-keyval | 6.3.0 | Apache-2.0 | © 2016 Jake Archibald | Cópia da licença Apache-2.0 (o pacote não tem NOTICE) | `idb-keyval-6.3.0-LICENCE.txt` + `Apache-2.0.txt` | 🟡 (falta mostrar no app) |
+| Phaser | 3.90.0 | MIT | © 2024 Richard Davey, Phaser Studio Inc. | Aviso + licença em toda cópia distribuída | `phaser-3.90.0-LICENSE.md` | 🟢 (na tela de créditos) |
+| eventemitter3 | 5.0.4 | MIT | © 2014 Arnout Kazemier | idem | `eventemitter3-5.0.4-LICENSE.txt` | 🟢 (na tela de créditos) |
+| idb-keyval | 6.3.0 | Apache-2.0 | © 2016 Jake Archibald | Cópia da licença Apache-2.0 (o pacote não tem NOTICE) | `idb-keyval-6.3.0-LICENCE.txt` + `Apache-2.0.txt` | 🟢 (na tela de créditos) |
 
 Ao atualizar a versão de uma biblioteca, troque a linha e o arquivo da licença. Capacitor, SDK de anúncios e Billing
 entram aqui quando forem adicionados.
