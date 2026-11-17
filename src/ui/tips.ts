@@ -1,16 +1,12 @@
-import { L, bindLangButtons, langButtons, localize } from '../core/i18n';
+// Dicas de primeira vez: fila de cartões, gatilhos por evento/estado e quais o jogador já viu.
+// O painel ⚙ (que liga/desliga e reinicia as dicas) fica em settingsPanel.ts.
+import { localize } from '../core/i18n';
 import tipsJson from '../data/tips.json';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
-import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
-import { saveLootFilter, type Rewards } from './rewards';
-import { perf } from './perf';
-import { BugReport } from './bugReport';
-import { credits } from './credits';
-import { setUiSize, uiSize, type UiSize } from './uiScale';
 import { byId } from './dom';
 
 interface TipDef {
@@ -27,119 +23,29 @@ export class TipManager {
   private diedPending = false;
   private kills = 0;
   private levelUps = 0;
-  private bug: BugReport;
 
   constructor(
     private world: World,
     private onChange: () => void,
-    private onSwitch: () => void = () => {},
-    private rewards?: Rewards,
   ) {
-    this.bug = new BugReport(world);
     byId('tip-ok').onclick = () => this.dismiss();
-    byId('btn-settings').onclick = () => this.togglePanel();
-    const panel = byId('settings-panel');
-    panel.onclick = (e) => {
-      const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
-      const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
-      if (ui) {
-        audio.ui('ui_click');
-        setUiSize(ui.dataset.ui as UiSize);
-        this.renderPanel();
-        return;
-      }
-      if (!t) {
-        if (e.target === panel) this.togglePanel(false);
-        return;
-      }
-      audio.ui('ui_click');
-      if (t.dataset.act === 'close') this.togglePanel(false);
-      else if (t.dataset.act === 'bug') {
-        this.togglePanel(false);
-        this.bug.open();
-      } else if (t.dataset.act === 'credits') {
-        this.togglePanel(false);
-        credits().open();
-      } else if (t.dataset.act === 'switch') {
-        this.togglePanel(false);
-        this.onSwitch();
-      } else if (t.dataset.act === 'reset') {
-        this.world.seenTips = [];
-        this.onChange();
-        this.renderPanel();
-      }
-    };
-    panel.oninput = (e) => {
-      const el = e.target as HTMLInputElement;
-      if (el.id === 'opt-sfx' || el.id === 'opt-music') {
-        audio.setSettings(el.id === 'opt-sfx' ? { sfx: +el.value } : { music: +el.value });
-        const o = el.nextElementSibling as HTMLElement | null;
-        if (o) o.textContent = el.value;
-      }
-    };
-    panel.onchange = (e) => {
-      const el = e.target as HTMLInputElement;
-      if (el.id === 'opt-loot') {
-        const v = el.checked ? 'all' : 'rare';
-        saveLootFilter(v);
-        if (this.rewards) this.rewards.filter = v;
-        return;
-      }
-      if (el.id === 'opt-fps') {
-        perf.setEnabled(el.checked);
-        return;
-      }
-      if (el.id === 'opt-mute') {
-        audio.setSettings({ muted: el.checked });
-        audio.ui('ui_click');
-        return;
-      }
-      if (el.id !== 'opt-tips') return;
-      this.world.tipsEnabled = el.checked;
-      if (!el.checked) {
-        this.queue = [];
-        this.hideCard();
-      }
-      this.onChange();
-    };
     this.trigger('inicio');
   }
 
-  private togglePanel(open?: boolean) {
-    const p = byId('settings-panel');
-    const show = open ?? p.classList.contains('hidden');
-    if (show !== !p.classList.contains('hidden')) audio.ui(show ? 'ui_open' : 'ui_close');
-    p.classList.toggle('hidden', !show);
-    if (show) this.renderPanel();
+  /** Liga/desliga as dicas; ao desligar, descarta a fila e esconde o cartão aberto. */
+  setEnabled(enabled: boolean) {
+    this.world.tipsEnabled = enabled;
+    if (!enabled) {
+      this.queue = [];
+      this.hideCard();
+    }
+    this.onChange();
   }
 
-  private renderPanel() {
-    byId('settings-panel').innerHTML =
-      `<div class="card">${closeX('data-act="close"')}<h2>${L('Configurações', 'Settings')}</h2>
-      <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
-      <div class="opt ui-size-row"><span>${L('Tamanho da interface', 'Interface size')}</span><div class="ui-size">${(
-        [
-          ['auto', L('Automático', 'Auto')],
-          ['p', L('Pequena', 'Small')],
-          ['m', L('Normal', 'Normal')],
-          ['g', L('Grande', 'Large')],
-        ] as [UiSize, string][]
-      )
-        .map(([k, t]) => `<button data-ui="${k}" class="${uiSize() === k ? 'primary' : ''}">${t}</button>`)
-        .join('')}</div></div>
-      <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
-      <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
-      <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
-      <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
-      <label class="sld">${L('Efeitos', 'Effects')}<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
-      <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
-      <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
-      <small class="muted">${this.world.seenTips.length ? L(`${this.world.seenTips.length} dica(s) já vista(s)`, `${this.world.seenTips.length} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
-      <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
-      <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
-      <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
-      <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
-    bindLangButtons(byId('settings-panel'));
+  /** "Rever dicas": esquece as já vistas para elas aparecerem de novo. */
+  resetSeen() {
+    this.world.seenTips = [];
+    this.onChange();
   }
 
   trigger(id: string) {

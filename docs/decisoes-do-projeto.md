@@ -105,7 +105,9 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   preservadas). **Volumes agora são por aparelho** (decisão P6): ficam em `rpg-audio`; na primeira vez, herdam os volumes
   do personagem que entrar. O campo `audio` do save continua igual (formato não muda), mas só é lido nessa primeira vez.
 
-**Fase B concluída em 17/11/2026** (B1–B6). Próxima: Fase C (estrutura), quando o Lucas pedir.
+**Fase B concluída em 17/11/2026** (B1–B6). Fase C (estrutura) em andamento:
+- **C1 (17/11/2026):** o painel ⚙ saiu de `src/ui/tips.ts` para `src/ui/settingsPanel.ts` (`SettingsPanel`).
+  `TipManager` ficou só com as dicas e ganhou `setEnabled()` e `resetSeen()`, que o painel chama. O comportamento é o mesmo.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

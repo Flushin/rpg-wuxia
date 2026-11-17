@@ -380,6 +380,7 @@ As etapas dentro de cada fase são independentes entre si.
 ### Fase C — estrutura
 
 **C1. Separar o painel de Configurações das Dicas** — M
+> ✅ **Feita em 17/11/2026.**
 - Objetivo: `src/ui/settingsPanel.ts` sai de `tips.ts:29-88`; `TipManager` fica só com dicas.
 - Arquivos: `src/ui/tips.ts`, novo `src/ui/settingsPanel.ts`, `src/scenes/gameScene.ts:50`.
 - Risco: baixo. Teste: RT + cada controle de ⚙ (mudo, volumes, idioma, tamanho, FPS, feed, dicas, report, voltar ao título).
