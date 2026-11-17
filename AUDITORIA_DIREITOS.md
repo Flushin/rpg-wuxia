@@ -436,8 +436,8 @@ Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar al
 7. **Corrigir a origem** do `tools/sprites/fetch-assets.sh` para fontes oficiais (download do kenney.nl / quaternius.com) ou,
    no mínimo, documentar que os espelhos foram conferidos byte a byte com os pacotes oficiais.
 8. ~~Identificar a origem de `point_spent`, `tip` e `ui_click`~~ — **feito** (Kenney UI Audio `click3`, `rollover3`,
-   `click1`; seção 2.2.1). Nomes originais já registrados em `public/audio/CREDITS.txt`; falta o `ASSETS_LICENCAS.md`.
-9. **Começar o `ASSETS_LICENCAS.md`** (seção 7) com todos os itens da tabela 2.
+   `click1`; seção 2.2.1). Nomes originais já registrados em `public/audio/CREDITS.txt` e em `ASSETS_LICENCAS.md`.
+9. ~~Começar o `ASSETS_LICENCAS.md`~~ — **feito (17/11/2026)**, na raiz do repositório, com todos os itens da tabela 2.
 
 ### Prioridade 3 — antes de monetizar ou de entrar online
 
