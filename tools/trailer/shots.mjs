@@ -68,39 +68,47 @@ export const SHOTS = [
     },
   },
   {
-    // Tormenta contra o bando de bandidos: Passo do Raio, Presas Gêmeas, Tempestade (câmera lenta), Quebra-Guarda
+    // Tormenta contra um bando na clareira da floresta (sem árvores na frente da câmera):
+    // Passo do Raio, Presas Gêmeas, Tempestade de Lâminas em câmera lenta, Quebra-Guarda
     name: 'combate_tormenta',
-    frames: 480,
+    frames: 540,
     setup(D) {
-      D.w.changeMap('floresta', 18.5, 11.5);
+      D.w.changeMap('floresta', 20.5, 20.5);
+      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 18);
+      for (const [x, y] of [
+        [25.5, 24.5],
+        [26.5, 23],
+        [24, 25.8],
+        [27, 25.5],
+      ])
+        D.spawn('bandido_espadachim', x, y, 3);
+      D.spawn('bandido_arqueiro', 27.5, 22, 2.5);
+      D.cx = undefined;
     },
     tick(D, i) {
-      const w = D.w,
-        p = w.player;
-      const alvo = () => D.mon('bandido_espadachim', p) ?? D.mon(null, p);
-      if (i === 10) w.setTarget(alvo()?.id ?? null);
-      if (i === 25) D.skill(1);
-      if (i === 90) D.skill(0);
-      if (i === 190) D.skill(2);
-      if (i === 300) D.skill(3);
-      if (i === 380) D.skill(0);
-      if (i > 10 && (!w.targetId || !w.monsters.find((m) => m.id === w.targetId && !m.dead))) {
-        const m = alvo();
-        if (m && Math.hypot(m.x - p.x, m.y - p.y) < 8) w.setTarget(m.id);
-      }
+      const w = D.w;
+      if (i === 10) w.setTarget(D.nearest()?.id ?? null);
+      if (i === 24) D.skill(1); // Passo do Raio até o bando
+      if (i === 30) for (const m of w.monsters) if (!m.dead && m.x > 22) w.aggro(m);
+      if (i === 95) D.skill(0);
+      if (i === 205) D.skill(2); // Tempestade de Lâminas
+      if (i === 320) D.skill(3);
+      if (i === 400) D.skill(0);
+      if (i === 455) D.skill(2);
+      if (i > 10) D.keepTarget();
     },
     speed(i) {
-      // câmera lenta na Tempestade de Lâminas
-      if (i >= 185 && i < 260) return i < 195 ? 1 - (i - 185) * 0.07 : i > 245 ? 0.3 + (i - 245) * 0.047 : 0.3;
+      // câmera lenta na primeira Tempestade de Lâminas
+      if (i >= 198 && i < 275) return i < 208 ? 1 - (i - 198) * 0.07 : i > 260 ? 0.3 + (i - 260) * 0.047 : 0.3;
       return 1;
     },
     cam(D, i, n) {
       const p = D.w.player;
-      D.cx = D.cx === undefined ? p.x : D.lerp(D.cx, p.x, 0.12);
-      D.cy = D.cy === undefined ? p.y : D.lerp(D.cy, p.y, 0.12);
-      let z = 1.75;
-      if (i >= 180 && i < 270) z = 1.75 + 0.55 * Math.sin((Math.PI * (i - 180)) / 90);
-      D.look(D.cx, D.cy, z, 24);
+      D.cx = D.cx === undefined ? p.x : D.lerp(D.cx, p.x, 0.1);
+      D.cy = D.cy === undefined ? p.y : D.lerp(D.cy, p.y, 0.1);
+      let z = 1.9;
+      if (i >= 195 && i < 285) z = 1.9 + 0.5 * Math.sin((Math.PI * (i - 195)) / 90);
+      D.look(D.cx, D.cy, z, 26);
     },
   },
   {
@@ -206,45 +214,52 @@ export const SHOTS = [
     },
   },
   {
-    // segunda seita: Geada (à distância, gelo) contra bandidos — troca o personagem
+    // segunda seita: Geada (à distância, gelo) — troca o personagem; Véu de Névoa, Orbe, Nevasca no bando
     name: 'combate_geada',
-    frames: 450,
+    frames: 480,
     setup(D) {
       D.newWorld('pavilhao');
       D.step();
       D.step();
       D.hook();
       D.strong();
-      D.w.changeMap('floresta', 17, 22.5);
+      D.w.changeMap('floresta', 20.5, 21);
+      D.w.monsters = D.w.monsters.filter((m) => m.x < 17 || m.y < 18);
+      for (const [id, x, y] of [
+        ['lobo', 25.5, 24.5],
+        ['lobo', 26.5, 25.5],
+        ['lobo', 24.5, 26],
+        ['bandido_espadachim', 26.5, 23.5],
+        ['bandido_espadachim', 27.5, 26],
+      ])
+        D.spawn(id, x, y, id === 'lobo' ? 6 : 3);
       D.cx = undefined;
     },
     tick(D, i) {
-      const w = D.w,
-        p = w.player;
-      const alvo = () => D.mon('bandido_espadachim', { x: 22, y: 26.5 });
-      if (i === 5) D.skill(3);
-      if (i === 30) w.setTarget(alvo()?.id ?? null);
-      if (i === 45) D.skill(0);
-      if (i === 120) D.skill(2);
-      if (i === 260) D.skill(1);
-      if (i === 340) D.skill(2);
-      if (i > 30 && (!w.targetId || !w.monsters.find((m) => m.id === w.targetId && !m.dead))) {
-        const m = D.mon(null, p);
-        if (m && Math.hypot(m.x - p.x, m.y - p.y) < 8) w.setTarget(m.id);
-      }
+      const w = D.w;
+      if (i === 5) D.skill(3); // Véu de Névoa
+      if (i === 30) w.setTarget(D.nearest()?.id ?? null);
+      if (i === 40) D.skill(0);
+      if (i === 45) for (const m of w.monsters) if (!m.dead && m.x > 22) w.aggro(m);
+      if (i === 140) D.skill(2); // Nevasca
+      if (i === 270) D.skill(1); // Flor de Gelo
+      if (i === 330) D.skill(0);
+      if (i === 380) D.skill(2);
+      if (i > 30) D.keepTarget();
     },
     speed(i) {
-      if (i >= 120 && i < 200) return i < 130 ? 1 - (i - 120) * 0.065 : i > 185 ? 0.35 + (i - 185) * 0.043 : 0.35;
+      if (i >= 140 && i < 225) return i < 150 ? 1 - (i - 140) * 0.065 : i > 210 ? 0.35 + (i - 210) * 0.043 : 0.35;
       return 1;
     },
     cam(D, i, n) {
-      const p = D.w.player;
-      const tx = p.x + 2.2,
-        ty = p.y + 1.8;
-      D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.08);
-      D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.08);
-      let z = 1.5;
-      if (i >= 115 && i < 215) z = 1.5 + 0.35 * Math.sin((Math.PI * (i - 115)) / 100);
+      const p = D.w.player,
+        t = D.w.getTarget() ?? p;
+      const tx = (p.x * 3 + t.x * 2) / 5,
+        ty = (p.y * 3 + t.y * 2) / 5;
+      D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.06);
+      D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.06);
+      let z = 1.6;
+      if (i >= 135 && i < 235) z = 1.6 + 0.35 * Math.sin((Math.PI * (i - 135)) / 100);
       D.look(D.cx, D.cy, z, 24);
     },
   },

@@ -42,6 +42,7 @@ async function installDirector() {
   const { tileToScreen } = await import('/src/core/iso.ts');
   const { World } = await import('/src/core/world.ts');
   const { audio } = await import('/src/render/audio.ts');
+  const { MONSTERS } = await import('/src/core/data.ts');
   const D = (window.D = {
     g,
     fi: 0,
@@ -87,6 +88,40 @@ async function installDirector() {
       w.gcd = 0;
       w.player.mana = w.player.derived.maxMana;
       w.useSkill(slot);
+    },
+    /** põe um monstro no mapa (vida × hpMul para a luta render na tela); chase = já vem atacando */
+    spawn(id, x, y, hpMul = 1, chase = false) {
+      const w = D.w;
+      const m = w.makeMonster(MONSTERS[id], { x, y });
+      m.derived.maxHp = Math.round(m.derived.maxHp * hpMul);
+      m.hp = m.derived.maxHp;
+      m.respawnAt = Infinity;
+      w.monsters.push(m);
+      if (chase) w.aggro(m);
+      return m;
+    },
+    /** mais perto do personagem, vivo */
+    nearest(maxD = 99) {
+      const p = D.w.player;
+      let best = null,
+        bd = maxD;
+      for (const m of D.w.monsters) {
+        if (m.dead) continue;
+        const d = Math.hypot(m.x - p.x, m.y - p.y);
+        if (d < bd) {
+          bd = d;
+          best = m;
+        }
+      }
+      return best;
+    },
+    /** mantém o personagem sempre com alvo */
+    keepTarget() {
+      const w = D.w;
+      if (!w.targetId || !w.monsters.find((m) => m.id === w.targetId && !m.dead)) {
+        const m = D.nearest();
+        if (m) w.setTarget(m.id);
+      }
     },
     strong() {
       const w = D.w;
