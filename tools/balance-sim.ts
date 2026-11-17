@@ -16,6 +16,11 @@ const DT = 1 / 30;
 const DEBUG_DEATHS = process.argv.includes('--deaths');
 const QUESTS_ON = !process.argv.includes('--sem-missoes'); // marco 7: cadeia de missões (aceita/entrega na hora)
 const priv = (w: World) => w as unknown as { rng: Rng; recalc: (e: unknown, k: boolean) => void };
+// Relógio simulado: o World usa o relógio "real" (ms) para o renascimento de monstros fora do mapa e do chefe.
+// No simulador o tempo de jogo corre muito mais rápido que o real, então o relógio acompanha w.time.
+// Isso também deixa a simulação determinística (mesma semente = mesmo resultado, em qualquer computador).
+const SIM_EPOCH_MS = Date.UTC(2026, 0, 1);
+const useSimClock = (w: World) => { w.clock = () => SIM_EPOCH_MS + w.time * 1000; };
 
 // pontuação simples de equipamento para o "jogador médio" decidir o que vestir
 function score(it: ItemInstance, classId: string): number {
@@ -34,6 +39,7 @@ interface Run {
 function huntRun(classId: string, seed: number): Run {
   const w = World.create(maps, 'Sim', classId);
   priv(w).rng = new Rng(seed * 7919 + 13);
+  useSimClock(w);
   const run: Run = { classId, levelAt: [0], deaths: 0, goldEarned: 0, goldSpent: { potions: 0, repair: 0 }, kills: 0, minutes: 0, levelDeaths: Array(11).fill(0), ruinsAt: 0, levelKills: Array(11).fill(0), levelXp: Array(11).fill(0), levelGold: Array(11).fill(0), quests: 0 };
   const onEv = (ev: GameEvent) => {
     if (ev.type === 'levelup') run.levelAt[ev.level - 1] = w.time / 60;
@@ -102,9 +108,12 @@ interface BossRun { classId: string; tier: string; win: boolean; seconds: number
 function bossFight(classId: string, seed: number, rarity: Rarity, trace = false): BossRun {
   const c = CLASSES[classId], attrs = { ...c.baseAttributes };
   for (const k of Object.keys(attrs) as (keyof typeof attrs)[]) attrs[k] += c.levelUpAttributes[k] * 9;
-  const s: SaveData = { version: 1, name: 'Sim', classId, level: 10, xp: 0, freePoints: 27, attributes: attrs, mapId: 'ruinas', lastSeen: 0 };
-  const w = World.fromSave(maps, s, Date.now(), false);
+  // carrega na cidade (sem monstros), fixa semente e relógio e só então entra nas Ruínas: os monstros nascem com a semente
+  const s: SaveData = { version: 1, name: 'Sim', classId, level: 10, xp: 0, freePoints: 27, attributes: attrs, mapId: 'cidade', lastSeen: 0 };
+  const w = World.fromSave(maps, s, SIM_EPOCH_MS, false);
   priv(w).rng = new Rng(seed * 104729 + 7);
+  useSimClock(w);
+  w.changeMap('ruinas');
   w.distributeRecommended();
   for (const sl of SLOTS) {
     const id = equipmentBaseIds(sl).find((b) => BASES[b].reqLevel === 5 && (!BASES[b].sect || BASES[b].sect === classId))!;
@@ -116,12 +125,14 @@ function bossFight(classId: string, seed: number, rarity: Rarity, trace = false)
   const boss = w.monsters.find((m) => !!MONSTERS[m.monsterId].boss)!;
   const hpMax = boss.derived.maxHp;
   w.player.x = boss.x - 6; w.player.y = boss.y; w.player.path = [];
-  const pot0 = w.kindCount('hp') + w.kindCount('mp');
+  // poções contadas pelo uso (contar a mochila dava número negativo quando o jogador pegava poção caída)
+  let potionsUsed = 0;
   let deaths = 0, react = 0.45, seenTele = new Map<number, number>();
   for (let i = 0; i < 600 / DT; i++) {
     w.tick(DT);
     for (const ev of w.events.splice(0)) {
       if (ev.type === 'playerDeath') deaths++;
+      if (ev.type === 'potionUsed') potionsUsed++;
       if (trace && ev.type === 'hit' && ev.targetKind === 'player') console.log(`  ${w.time.toFixed(1)}s dano ${ev.amount}`);
       if (trace && ev.type === 'telegraphResolved') console.log(`  ${w.time.toFixed(1)}s telegrafo ${ev.hit ? 'ACERTOU' : 'errou'}`);
     }
@@ -168,7 +179,7 @@ function bossFight(classId: string, seed: number, rarity: Rarity, trace = false)
       w.useSkill(slot); break;
     }
   }
-  return { classId, tier: rarity, win: boss.dead, seconds: w.time, potions: pot0 - (w.kindCount('hp') + w.kindCount('mp')), deaths, hpLeftPct: Math.round((100 * Math.max(0, boss.hp)) / hpMax) };
+  return { classId, tier: rarity, win: boss.dead, seconds: w.time, potions: potionsUsed, deaths, hpLeftPct: Math.round((100 * Math.max(0, boss.hp)) / hpMax) };
 }
 
 if (process.argv.includes('--trace')) { const c = process.argv.find((x) => x.startsWith('--class='))?.split('=')[1] ?? 'lamina'; console.log(bossFight(c, 1, 'incomum', true)); process.exit(0); }
