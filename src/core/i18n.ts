@@ -1,17 +1,13 @@
 // Idioma do jogo (PT/EN). Decidido uma vez ao carregar a página; trocar salva a escolha e recarrega.
 import en from '../data/en.json';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
 export type Lang = 'pt' | 'en';
-const KEY = 'rpg-wuxia-lang';
 
 function detect(): Lang {
   if (typeof window === 'undefined') return 'pt'; // scripts de teste (Node) rodam em PT
-  try {
-    const s = window.localStorage.getItem(KEY);
-    if (s === 'pt' || s === 'en') return s;
-  } catch {
-    /* storage bloqueado */
-  }
+  const s = getPref(PREF.LANG);
+  if (s === 'pt' || s === 'en') return s;
   return (navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en';
 }
 
@@ -23,11 +19,7 @@ export const L = (pt: string, en: string) => (LANG === 'en' ? en : pt);
 /** Salva o idioma e recarrega (o jogo já salva no pagehide). */
 export function setLang(lang: Lang) {
   if (lang === LANG) return;
-  try {
-    window.localStorage.setItem(KEY, lang);
-  } catch {
-    /* ignora */
-  }
+  setPref(PREF.LANG, lang);
   window.location.reload();
 }
 

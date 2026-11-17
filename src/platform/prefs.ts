@@ -1,0 +1,38 @@
+// Preferências do aparelho (localStorage). Valem para todos os personagens deste navegador/aparelho.
+// O save dos personagens fica no IndexedDB (src/save.ts), não aqui.
+// As chaves não mudam: são as que já estão gravadas nos aparelhos dos jogadores.
+export const PREF = {
+  /** idioma: 'pt' | 'en' */
+  LANG: 'rpg-wuxia-lang',
+  /** zoom do jogador: 1 a 2 */
+  ZOOM: 'rpg-zoom',
+  /** tamanho da interface: 'auto' | 'p' | 'm' | 'g' */
+  UI_SIZE: 'rpg-ui-size',
+  /** contador de FPS: '1' ligado */
+  FPS: 'rpg-fps',
+  /** avisos de itens coletados: 'all' | 'rare' */
+  LOOT_FEED: 'rpg.lootFeed',
+  /** horário (ms) do último report de bug enviado */
+  BUG_LAST: 'rpg-bug-last',
+  /** volumes e mudo, em JSON (antes ficavam no save de cada personagem) */
+  AUDIO: 'rpg-audio',
+} as const;
+export type PrefKey = (typeof PREF)[keyof typeof PREF];
+
+/** Lê uma preferência; null se não existir ou se o armazenamento estiver bloqueado (modo privado, Node nos testes). */
+export function getPref(key: PrefKey): string | null {
+  try {
+    return globalThis.localStorage?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Grava uma preferência; sem armazenamento, não faz nada (o jogo segue com o valor em memória). */
+export function setPref(key: PrefKey, value: string) {
+  try {
+    globalThis.localStorage?.setItem(key, value);
+  } catch {
+    /* sem armazenamento */
+  }
+}

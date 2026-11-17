@@ -2,26 +2,14 @@
 import type { Rarity } from '../core/types';
 import { uiRect } from './uiScale';
 import { byId, escapeHtml } from './dom';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
-const FEED_KEY = 'rpg.lootFeed';
 const LINE_MS = 3000;
 const GOLD_MS = 2500;
 
 export type LootFilter = 'rare' | 'all';
-export const loadLootFilter = (): LootFilter => {
-  try {
-    return localStorage.getItem(FEED_KEY) === 'all' ? 'all' : 'rare';
-  } catch {
-    return 'rare';
-  }
-};
-export const saveLootFilter = (v: LootFilter) => {
-  try {
-    localStorage.setItem(FEED_KEY, v);
-  } catch {
-    /* sem armazenamento */
-  }
-};
+export const loadLootFilter = (): LootFilter => (getPref(PREF.LOOT_FEED) === 'all' ? 'all' : 'rare');
+export const saveLootFilter = (v: LootFilter) => setPref(PREF.LOOT_FEED, v);
 
 /** Celular deitado com pouca altura (ex.: Galaxy Z Fold fechado ~920×316): só 2 linhas. */
 const compact = () => window.matchMedia('(orientation:landscape) and (max-height:450px)').matches;

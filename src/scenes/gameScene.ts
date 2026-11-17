@@ -5,7 +5,7 @@ import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
 import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
-import { audio } from '../render/audio';
+import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
 import { SKILLS } from '../core/skills';
@@ -17,11 +17,11 @@ import { MONSTERS } from '../core/data';
 import { itemColor } from '../core/items';
 import { DPR, cssSize } from '../render/display';
 import { DEPTH } from '../render/depth';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
-  ZOOM_MAX = 2,
-  ZOOM_KEY = 'rpg-zoom';
+  ZOOM_MAX = 2;
 const TEXT_RES = DPR * 2;
 // Área de clique/toque para escolher alvo (px do mundo, em volta do ponto acima dos pés)
 const PICK = {
@@ -48,12 +48,8 @@ const FLOAT_COLOR = {
   ABSORB: '#9fd0ff', // dano absorvido pelo escudo
 };
 const loadZoom = () => {
-  try {
-    const v = Number(localStorage.getItem(ZOOM_KEY));
-    return v >= ZOOM_MIN && v <= ZOOM_MAX ? v : 1;
-  } catch {
-    return 1;
-  }
+  const v = Number(getPref(PREF.ZOOM));
+  return v >= ZOOM_MIN && v <= ZOOM_MAX ? v : 1;
 };
 
 export class GameScene extends Phaser.Scene {
@@ -80,9 +76,10 @@ export class GameScene extends Phaser.Scene {
   create() {
     // só no `npm run dev`: acesso ao mundo pelo console (testes visuais); some no build
     if (import.meta.env.DEV) (window as unknown as { __game: unknown }).__game = { world: this.world, scene: this };
-    audio.bind(this, this.world.audio, () => {
-      void writeSave(this.world.serialize());
-    });
+    // volumes são do aparelho; o campo audio do save fica como estava (só é lido na primeira vez)
+    const sound = loadDeviceAudio(this.world.audio);
+    saveDeviceAudio(sound);
+    audio.bind(this, sound, () => saveDeviceAudio(sound));
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
     this.fx = new SkillFx(this);
@@ -153,11 +150,7 @@ export class GameScene extends Phaser.Scene {
     if (Math.abs(z - 1) < 0.03) z = 1; // gruda em 100%
     if (z === this.userZoom) return;
     this.userZoom = z;
-    try {
-      localStorage.setItem(ZOOM_KEY, String(z));
-    } catch {
-      /* sem armazenamento */
-    }
+    setPref(PREF.ZOOM, String(z));
     this.applyZoom();
   }
 

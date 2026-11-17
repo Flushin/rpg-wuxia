@@ -1,18 +1,12 @@
 import { L } from '../core/i18n';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
 // Medidor de desempenho (marco 6): FPS atual, média e pior momento dos últimos 10 s, e quantos objetos
 // estão na cena. Liga em ⚙ "Mostrar FPS"; a escolha fica salva no aparelho.
-const KEY = 'rpg-fps';
 const WINDOW_MS = 10000;
 
 class PerfMeter {
-  enabled = (() => {
-    try {
-      return localStorage.getItem(KEY) === '1';
-    } catch {
-      return false;
-    }
-  })();
+  enabled = getPref(PREF.FPS) === '1';
   private el: HTMLElement | null = null;
   private frames: number[] = []; // duração (ms) de cada quadro recente
   private total = 0;
@@ -20,11 +14,7 @@ class PerfMeter {
 
   setEnabled(on: boolean) {
     this.enabled = on;
-    try {
-      localStorage.setItem(KEY, on ? '1' : '0');
-    } catch {
-      /* sem armazenamento */
-    }
+    setPref(PREF.FPS, on ? '1' : '0');
     if (!on) {
       this.el?.remove();
       this.el = null;
