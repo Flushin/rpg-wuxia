@@ -47,7 +47,7 @@
 - **Marco 8: Titã e Víbora.** 4 ativas + 1 passiva cada (níveis 1, 3, 5, 7, 9), balanceadas com o simulador. Sugestão de sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas. Skills e números: **a decidir com o Lucas**.
 - **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
-- **Contínuo (proposto):** rodar `check:i18n`, `check:respawn` e `tools/layout-check.mjs` no GitHub Actions a cada push.
+- **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os 7 `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
 
 
 ## Decididas
@@ -65,13 +65,23 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Política de privacidade:** página PT/EN no GitHub Pages do jogo, com link em ⚙ e na tela inicial.
 - **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety.
 
+**Fase A feita (17/11/2026, sem mudar regras do jogo):**
+- **A1:** testes no GitHub Actions (ver "Contínuo" no roteiro); `esbuild` declarado no `package.json`; `npm test` roda os 7 checks.
+- **A2:** simulador determinístico — o relógio dos renascimentos acompanha o tempo simulado e a luta do chefe usa a semente
+  desde o começo. A medição mudou (Tormenta ~61 min, Geada ~43 min; Tormenta vence o chefe com Incomum 10/10): antes os
+  monstros pareciam renascer mais devagar do que no jogo ao trocar de mapa. Detalhes em `docs/balanceamento.md`.
+- **A3:** se o armazenamento não puder ser lido, a tela inicial mostra o aviso com "Tentar de novo" e nada é gravado
+  (antes isso virava "sem personagens" e a próxima gravação apagava os 4 espaços). A leitura tenta 3 vezes.
+- **Teste instável corrigido:** o `check:quests` falhava ~1 em 12 vezes (confundia um drop com a recompensa da missão).
+- **A4:** README, `docs/balanceamento.md` e o `_doc` de `items.json` atualizados.
+
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
 - **Tormenta vs. General** (perdia 6/6 com o equipamento Incomum das missões): **Tormenta fortalecida, General igual.**
   - **Roubo de vida:** 8% do dano causado volta como vida (`lifeSteal` em `classes.json`; vale para golpe e skills). Descrição da seita avisa.
   - **Quebra-Guarda:** 220% → **280%** e −30% → **−40%** de defesa por 6 s.
   - Resultado: vence **10–11 de 12** com Incomum e 12/12 com Raro.
-- **Geada mais resistente, continua a mais rápida:** Stamina inicial 5 → **8**. Mortes até o nível 10: ~4 → **~0–1**; ritmo igual (~47 min).
+- **Geada mais resistente, continua a mais rápida:** Stamina inicial 5 → **10** (o texto dizia 8; o código e o simulador sempre usaram 10 — corrigido na auditoria de 17/11/2026). Mortes até o nível 10: ~4 → **~0–1**; ritmo igual (~47 min).
   Tormenta: ~66 min, ~1,5 morte. (A diferença de ritmo entre as seitas foi mantida de propósito: Geada rápida, Tormenta firme.)
 - **Menos ouro:** ouro dos monstros comuns **pela metade** (lobo 2–5; bandidos 3–5 +0,8/nível; terracota 5–8 +1/nível; General igual)
   e venda de itens **25% → 15%** do valor. Recompensas de missão iguais (passam a pesar mais).
@@ -209,7 +219,7 @@ Decidido pelo Lucas em 16/11/2026.
 ### Tecnologia (confirmada)
 - TypeScript + Vite
 - Phaser 3 para renderização/input (mouse e toque)
-- Mapas isométricos feitos no Tiled (exportados em JSON)
+- Mapas isométricos no formato JSON do Tiled, **gerados pelo script** `tools/gen-maps.mjs` (`npm run maps`), não editados no Tiled (confirmado em 17/11/2026)
 - Dados de classes, skills, itens e monstros em arquivos JSON (data-driven)
 - Save local em IndexedDB, com horário da última sessão (para calcular o ganho offline)
 

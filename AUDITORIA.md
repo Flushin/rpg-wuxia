@@ -312,6 +312,8 @@ As etapas dentro de cada fase são independentes entre si.
 
 ### Fase A — rede de segurança (fazer primeiro)
 
+> ✅ **Feita em 17/11/2026** (A1–A4 + correção do teste instável `check:quests`). Resumo no doc de decisões, seção "Auditoria do código".
+
 **A1. Rodar os testes no GitHub Actions** — P
 - Objetivo: nenhum push na `main` publica com teste quebrado (já era o item "Contínuo (proposto)").
 - Arquivos: `.github/workflows/deploy.yml` (passo de checks antes do build) ou um `ci.yml` separado para PRs; `package.json` (declarar `esbuild` em `devDependencies`).
