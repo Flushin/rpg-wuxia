@@ -426,6 +426,18 @@ Implementadas a pedido do Lucas e publicadas no site.
   - **Código:** `src/ui/uiScale.ts`, `src/ui/noBrowserZoom.ts`. `tools/layout-check.mjs` agora testa cada tamanho com interface
     Automática e Grande e inclui o **iPhone Pro Max deitado 932×430**.
 
+- **Joystick flutuante** *(PR #20, pedido pelo Lucas em 17/11/2026 — em teste, pode voltar atrás)*: jogadores de iPhone
+  reclamavam que o dedo "escapava" do joystick.
+  - **Tocar em qualquer lugar da metade esquerda da tela** cria o joystick embaixo do dedo (área invisível `#joy-zone`, por baixo
+    de todo o HUD; botões, quadros e poções continuam funcionando por cima dela).
+  - **A base segue o dedo:** se o dedo passa do limite, o círculo vai junto em vez de o pino travar.
+  - Parado, o círculo fica no lugar de sempre, meio transparente, como guia; ao soltar, volta para lá.
+  - **Toque em monstro ou NPC na metade esquerda** continua selecionando/abrindo a conversa (não abre o joystick).
+  - **Efeito colateral:** a pinça para dar zoom no jogo só funciona começando na metade direita da tela.
+  - **Rollback:** reverter o PR #20. Ideias não feitas (B margens de segurança do iPhone, D área maior, E eventos de toque,
+    F diagnóstico no report) ficam disponíveis se o problema continuar.
+  - Código: `setupJoystick` em `src/ui/controls.ts`; `tapAt`/`pickAt` em `src/scenes/gameScene.ts`.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

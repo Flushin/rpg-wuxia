@@ -46,7 +46,7 @@ export class GameScene extends Phaser.Scene {
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
     this.fx = new SkillFx(this);
-    setupControls(this.world, this.hud);
+    setupControls(this.world, this.hud, (x, y) => this.tapAt(x, y));
     this.tips = new TipManager(this.world, () => { void writeSave(this.world.serialize()); }, () => {
       // salva e recarrega a página: volta à tela inicial com tudo limpo (HUD, áudio e timers)
       void writeSave(this.world.serialize()).finally(() => window.location.reload());
@@ -132,10 +132,22 @@ export class GameScene extends Phaser.Scene {
       const t = [...ev.changedTouches].find((q) => q.identifier === p.identifier) ?? ev.changedTouches[0];
       cx = t.clientX; cy = t.clientY;
     } else if (ev && 'clientX' in ev) { cx = ev.clientX; cy = ev.clientY; }
+    return this.clientWorld(cx, cy) ?? { x: p.worldX, y: p.worldY };
+  }
+
+  /** Ponto da tela (clientX/Y) → mundo. */
+  private clientWorld(cx: number | undefined, cy: number | undefined): { x: number; y: number } | null {
     const canvas = this.game.canvas, r = canvas.getBoundingClientRect();
-    if (cx === undefined || cy === undefined || !r.width || !r.height) return { x: p.worldX, y: p.worldY };
+    if (cx === undefined || cy === undefined || !r.width || !r.height) return null;
     const wp = this.cameras.main.getWorldPoint((cx - r.left) * (canvas.width / r.width), (cy - r.top) * (canvas.height / r.height));
     return { x: wp.x, y: wp.y };
+  }
+
+  /** Toque na área do joystick flutuante: se caiu num monstro/NPC, seleciona e não abre o joystick. */
+  tapAt(cx: number, cy: number): boolean {
+    if (this.world.player.dead) return false;
+    const w = this.clientWorld(cx, cy);
+    return !!w && this.pickAt(w.x, w.y, true);
   }
 
   private onPointer(p: Phaser.Input.Pointer) {
@@ -143,23 +155,29 @@ export class GameScene extends Phaser.Scene {
     const fingers = p.event && 'touches' in p.event ? (p.event as TouchEvent).touches.length : this.touchPointers().length;
     if (p.wasTouch && fingers > 1) return; // segundo dedo = pinça
     const { x: wx, y: wy } = this.pointerWorld(p);
-    const k = p.wasTouch ? 1.5 : 1; // dedo é menos preciso que o mouse: área de toque maior
+    if (this.pickAt(wx, wy, p.wasTouch)) return;
+    if (p.wasTouch) return; // toque usa o joystick; mouse continua com clique-para-mover
+    const t = screenToTile(wx, wy);
+    this.world.moveTo(t.x, t.y);
+  }
+
+  /** Seleciona o monstro ou fala com o NPC sob o ponto do mundo; devolve se acertou algum. */
+  private pickAt(wx: number, wy: number, touch: boolean): boolean {
+    const k = touch ? 1.5 : 1; // dedo é menos preciso que o mouse: área de toque maior
     let best: Entity | null = null, bd = Infinity;
     for (const m of this.world.monsters) {
       if (m.dead) continue;
       const s = tileToScreen(m.x, m.y), dx = wx - s.x, dy = wy - (s.y - 14);
       if (Math.abs(dx) < 26 * k && Math.abs(dy) < 26 * k && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); best = m; }
     }
-    if (best) { this.world.setTarget(best.id); return; }
+    if (best) { this.world.setTarget(best.id); return true; }
     let npc: Entity | null = null; bd = Infinity;
     for (const n of this.world.npcs) {
       const s = tileToScreen(n.x, n.y), dx = wx - s.x, dy = wy - (s.y - 24);
       if (Math.abs(dx) < 28 * k && Math.abs(dy) < 40 * k && Math.hypot(dx, dy) < bd) { bd = Math.hypot(dx, dy); npc = n; }
     }
-    if (npc) { this.world.interactNpc(npc.id); return; }
-    if (p.wasTouch) return; // toque usa o joystick; mouse continua com clique-para-mover
-    const t = screenToTile(wx, wy);
-    this.world.moveTo(t.x, t.y);
+    if (npc) { this.world.interactNpc(npc.id); return true; }
+    return false;
   }
 
   update(_t: number, delta: number) {

@@ -57,6 +57,9 @@ button.primary{background:#8a3b2a;border-color:#c66}
 #loot-feed div{background:rgba(10,12,20,.62);border-radius:6px;padding:2px 8px;font-size:13px;font-weight:600;text-shadow:0 0 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:feedIn .2s ease-out}
 @keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
 #joystick{position:absolute;left:20px;bottom:20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);touch-action:none}
+/* joystick flutuante: área invisível na metade esquerda (embaixo de todo o HUD); o círculo vai para onde o dedo toca */
+#joy-zone{position:absolute;left:0;top:0;width:50%;height:100%;touch-action:none}
+#joystick{pointer-events:none!important;opacity:.55;transition:opacity .15s}#joystick.live{opacity:1;transition:none}
 #knob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.35);pointer-events:none}
 #btn-attack{position:absolute;right:24px;bottom:30px;width:96px;height:96px;border-radius:50%;background:rgba(160,50,40,.75);border:2px solid #f99;font-size:16px;font-weight:700;touch-action:none}
 #attrs-panel,#create{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:12px;overflow:auto}
@@ -300,6 +303,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
 <div id="loading" role="status"><h1>WANDERERS</h1><div class="ld-bar"><i id="ld-fill"></i></div><div class="ld-txt" id="ld-txt">Carregando…</div></div>
 <div id="game"></div>
 <div id="hud" class="hidden">
+  <div id="joy-zone" class="hidden"></div>
   <div id="player-frame" class="frame">
     <div class="line"><b id="p-name"></b><span id="p-level"></span></div>
     <div class="bar hp"><i id="p-hp"></i><span id="p-hp-t"></span></div>
