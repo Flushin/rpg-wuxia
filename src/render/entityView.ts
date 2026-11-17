@@ -5,6 +5,7 @@ import { MONSTERS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, type AnimName, type SheetMeta } from './sprites';
+import { DEPTH } from './depth';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -88,7 +89,7 @@ export class EntityView {
     this.label = label;
     // nome fora do container, sempre por cima (árvores, casas e o portão não cortam o nome) — NPCs, monstros e jogador
     this.labelY = labelY;
-    label.setDepth(99995);
+    label.setDepth(DEPTH.NAME);
     this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar]);
     this.sync(e, false);
     this.lastSx = this.container.x;
@@ -265,7 +266,7 @@ export class EntityView {
         .text(0, 0, m, { fontSize: '26px', fontStyle: 'bold', color: '#ffd23f', stroke: '#3a2400', strokeThickness: 5 })
         .setOrigin(0.5, 1)
         .setResolution(DPR * 2)
-        .setDepth(99996);
+        .setDepth(DEPTH.QUEST_MARK);
     }
     this.mark.setText(m).setColor(m === '!' ? '#ffd23f' : '#9fe8a0');
   }
