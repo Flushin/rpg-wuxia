@@ -39,6 +39,7 @@ function silhouette(color: string): string {
 // Painel de mochila (tecla I): 6 slots de equipamento, 30 espaços, ouro, detalhes e ações.
 export class InventoryPanel {
   private sig = '';
+  private busyUntil = 0; // jogador rolando/tocando a mochila
   private sel: Sel | null = null;
   private last = { key: '', t: 0 };
   private tab: Tab = 'equip';
@@ -46,6 +47,12 @@ export class InventoryPanel {
     const el = $('inv-panel'), tip = $('item-tip');
     el.addEventListener('click', (e) => this.click(e));
     el.addEventListener('contextmenu', (e) => e.preventDefault());
+    const busy = (ms: number) => () => { this.busyUntil = Math.max(this.busyUntil, performance.now() + ms); };
+    el.addEventListener('touchstart', busy(10000), { passive: true }); // dedo na tela: até soltar
+    el.addEventListener('touchmove', busy(10000), { passive: true });
+    el.addEventListener('touchend', () => { this.busyUntil = performance.now() + 700; }, { passive: true }); // rolagem com embalo
+    el.addEventListener('touchcancel', () => { this.busyUntil = performance.now() + 700; }, { passive: true });
+    el.addEventListener('scroll', busy(400), { capture: true, passive: true });
     el.addEventListener('pointerover', (e) => {
       if (e.pointerType !== 'mouse') return;
       const c = (e.target as HTMLElement).closest('[data-bag],[data-eq]') as HTMLElement | null;
@@ -120,6 +127,9 @@ export class InventoryPanel {
     const w = this.world;
     const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}`;
     if (sig === this.sig) return;
+    // mudança vinda do jogo (auto pegando item, poção gasta…) enquanto o jogador rola a mochila: espera ele parar,
+    // senão a lista é refeita no meio da rolagem. Ações do próprio jogador (sig vazio) redesenham na hora.
+    if (this.sig !== '' && performance.now() < this.busyUntil) return;
     this.sig = sig;
     if (this.sel && !this.selItem()) this.sel = null;
     const eqCell = (sl: Slot) => {
@@ -147,11 +157,16 @@ export class InventoryPanel {
       }
       detail = `<div class="tipbody">${itemTipHtml(w, it, s.kind === 'bag')}</div>${btn}`;
     }
-    $('inv-panel').innerHTML = `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
+    // guarda a rolagem: a mochila é redesenhada inteira e voltava para o topo
+    const panel = $('inv-panel'), keep = ['.inv-card', '.inv-detail'].map((q) => panel.querySelector(q)?.scrollTop ?? 0);
+    const keepPanel = panel.scrollTop;
+    panel.innerHTML = `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
       <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-body">${eq}</div>
       <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div>
       <div class="inv-detail">${detail}</div></div>`;
+    panel.scrollTop = keepPanel;
+    ['.inv-card', '.inv-detail'].forEach((q, i) => { const el = panel.querySelector(q); if (el) el.scrollTop = keep[i]; });
   }
 }
