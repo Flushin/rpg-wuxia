@@ -16,6 +16,7 @@ npm run build       # tsc --noEmit (strict) + build de produção em dist/
 npm test            # os 7 testes de regra (check:*) — também rodam no GitHub Actions
 npm run sim:balance # simulador de balanceamento (determinístico: mesma semente = mesmo resultado)
 npm run maps        # regenera os mapas em public/maps/ a partir de tools/gen-maps.mjs
+npm run format      # formata o código com o Prettier (format:check só confere; roda no CI)
 ```
 
 Teste de sobreposição do HUD (precisa do Playwright e de um preview rodando):

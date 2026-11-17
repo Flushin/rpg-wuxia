@@ -75,6 +75,14 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Teste instável corrigido:** o `check:quests` falhava ~1 em 12 vezes (confundia um drop com a recompensa da missão).
 - **A4:** README, `docs/balanceamento.md` e o `_doc` de `items.json` atualizados.
 
+**Fase B em andamento:**
+- **B1 (17/11/2026):** Prettier 3.6.2 aplicado em todo o código de uma vez (`.prettierrc.json`: 120 colunas, aspas simples)
+  e `.editorconfig`. Não formata JSON (os de sprites são gerados pelos scripts do Blender e os de `src/data` ficam em
+  tabelas de uma linha por item) nem Markdown. Comandos: `npm run format` (formata) e `npm run format:check` (confere);
+  o `format:check` roda no CI dos PRs. No VSCode, a extensão Prettier formata ao salvar (recomendada em
+  `.vscode/extensions.json`). O JS do build saiu idêntico (mesmo hash) e o simulador deu a mesma saída.
+  Linhas com mais de 120 colunas: de 752 para 146 (o que sobrou são textos e comentários longos, que o Prettier não quebra).
+
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
 - **Tormenta vs. General** (perdia 6/6 com o equipamento Incomum das missões): **Tormenta fortalecida, General igual.**

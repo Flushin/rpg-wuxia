@@ -18,7 +18,9 @@
     "check:m5": "esbuild tools/m5-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m5-check.mjs && node /tmp/m5-check.mjs",
     "check:layout": "node tools/layout-check.mjs",
     "check:quests": "esbuild tools/quests-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/quests-check.mjs && node /tmp/quests-check.mjs",
-    "check:respawn": "esbuild tools/respawn-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/respawn-check.mjs && node /tmp/respawn-check.mjs"
+    "check:respawn": "esbuild tools/respawn-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/respawn-check.mjs && node /tmp/respawn-check.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "idb-keyval": "^6.3.0",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.21.5",
+    "prettier": "3.6.2",
     "typescript": "^5.9.3",
     "vite": "^5.4.21"
   }
