@@ -22,6 +22,8 @@ npm run format      # formata o código com o Prettier (format:check só confere
 Teste de sobreposição do HUD (precisa do Playwright e de um preview rodando):
 `npm run build && npx vite preview --port 4173` e, em outro terminal, `npm run check:layout`.
 
+Trailer (vídeo promocional gravado do próprio jogo): veja [`tools/trailer/README.md`](tools/trailer/README.md).
+
 ## Controles
 
 - PC: clique no chão para andar, clique no monstro para selecionar, `Tab` alterna alvos, `Espaço` ataca o mais próximo,
