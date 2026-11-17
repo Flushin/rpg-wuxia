@@ -1,11 +1,27 @@
 import { L } from '../core/i18n';
-import { RARITIES } from '../core/items';
+import { BUCKET_SEC, MAX_BUCKETS, RATE_MIN_SEC, SHIELD_HP } from '../core/auto';
+import { GROUND_SECONDS, RARITIES } from '../core/items';
+import { OFFLINE_TIERS } from '../core/offline';
 import { initials } from '../core/skills';
 import { skillIconHtml } from './icons';
 import type { World, OfflineReport } from '../core/world';
 import { audio } from '../render/audio';
 import { closeX } from './labels';
 import { byId } from './dom';
+
+const pct = (frac: number) => `${Math.round(frac * 100)}%`;
+const RATE_WINDOW_MIN = (BUCKET_SEC * MAX_BUCKETS) / 60;
+// "<b>60%</b> até 12 h · <b>40%</b> de 12 h a 18 h · … · <b>0%</b> depois de 24 h", lido de OFFLINE_TIERS
+const tierText = (upTo: string, fromTo: string, after: string) => {
+  const parts = OFFLINE_TIERS.map((t, i) =>
+    i === 0
+      ? `<b>${pct(t.eff)}</b> ${upTo} ${t.untilH} h`
+      : `<b>${pct(t.eff)}</b> ${fromTo.replace('{a}', String(OFFLINE_TIERS[i - 1].untilH)).replace('{b}', String(t.untilH))}`,
+  );
+  return [...parts, `<b>0%</b> ${after} ${OFFLINE_TIERS[OFFLINE_TIERS.length - 1].untilH} h`].join(' · ');
+};
+const tiersPt = tierText('até', 'de {a} h a {b} h', 'depois de'),
+  tiersEn = tierText('up to', 'from {a} h to {b} h', 'after');
 
 const fmtDur = (ms: number) => {
   const m = Math.floor(ms / 60000),
@@ -66,7 +82,7 @@ export class AutoPanel {
     byId('auto-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
-      <small class="muted">${L('O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de 70% em combate.', 'The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below 70% in combat.')}</small>
+      <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de ${pct(SHIELD_HP)} em combate.`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below ${pct(SHIELD_HP)} in combat.`)}</small>
       <h3>${L('Poções', 'Potions')}</h3>
       ${sld(L('Beber vida abaixo de', 'Drink health below'), 'hpThreshold', 5, 95, c.hpThreshold, true)}
       ${sld(L('Beber mana abaixo de', 'Drink mana below'), 'mpThreshold', 0, 95, c.mpThreshold, true)}
@@ -76,13 +92,13 @@ export class AutoPanel {
       <small class="muted">${L('Se faltar ouro, compra o que der. Sem ouro, continua caçando sem poção.', 'If gold runs short, buys what it can. With no gold, keeps hunting without potions.')}</small>
       <h3>${L('Mochila cheia', 'Bag full')}</h3>
       <label class="opt"><input type="checkbox" id="auto-sell-inc" ${c.sellIncomum ? 'checked' : ''}/> ${L('Vender também itens Incomuns', 'Also sell Uncommon items')}</label>
-      <small class="muted">${L('Itens Comuns são vendidos sozinhos quando a mochila enche. Raros (e Incomuns, se a opção estiver desligada) ficam no chão por 60 s.', 'Common items are sold automatically when the bag fills up. Rare items (and Uncommon, if the option is off) stay on the ground for 60 s.')}</small>
+      <small class="muted">${L(`Itens Comuns são vendidos sozinhos quando a mochila enche. Raros (e Incomuns, se a opção estiver desligada) ficam no chão por ${GROUND_SECONDS} s.`, `Common items are sold automatically when the bag fills up. Rare items (and Uncommon, if the option is off) stay on the ground for ${GROUND_SECONDS} s.`)}</small>
       <div class="how">${L(
-        `<b>Ganho offline.</b> Se você fechar o jogo com o Auto ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora, no ritmo medido nos últimos ~30 min de auto-combate (precisa de pelo menos 2 min de dados).<br>
-      Rendimento: <b>60%</b> até 12 h · <b>40%</b> de 12 h a 18 h · <b>20%</b> de 18 h a 24 h · <b>0%</b> depois de 24 h.<br>
+        `<b>Ganho offline.</b> Se você fechar o jogo com o Auto ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora, no ritmo medido nos últimos ~${RATE_WINDOW_MIN} min de auto-combate (precisa de pelo menos ${RATE_MIN_SEC / 60} min de dados).<br>
+      Rendimento: ${tiersPt}.<br>
       Offline não há morte nem perda de durabilidade; as poções são gastas no ritmo medido (se acabarem, os ganhos continuam); itens que não cabem na mochila são vendidos. Skills não ganham XP offline.<br>`,
-        `<b>Offline earnings.</b> If you close the game with Auto on in a hunting map, when you return you get XP, gold and items for the time away, at the pace measured over the last ~30 min of auto-battle (needs at least 2 min of data).<br>
-      Yield: <b>60%</b> up to 12 h · <b>40%</b> from 12 h to 18 h · <b>20%</b> from 18 h to 24 h · <b>0%</b> after 24 h.<br>
+        `<b>Offline earnings.</b> If you close the game with Auto on in a hunting map, when you return you get XP, gold and items for the time away, at the pace measured over the last ~${RATE_WINDOW_MIN} min of auto-battle (needs at least ${RATE_MIN_SEC / 60} min of data).<br>
+      Yield: ${tiersEn}.<br>
       Offline there is no death or durability loss; potions are used at the measured pace (if they run out, earnings continue); items that don't fit in the bag are sold. Skills don't gain XP offline.<br>`,
       )}
       ${r ? L(`Seu ritmo atual: <b>${r.killsPerMin.toFixed(1)}</b> abates por minuto.`, `Your current pace: <b>${r.killsPerMin.toFixed(1)}</b> kills per minute.`) : L('Seu ritmo ainda não foi medido: deixe o Auto ligado por alguns minutos.', 'Your pace has not been measured yet: leave Auto on for a few minutes.')}</div>

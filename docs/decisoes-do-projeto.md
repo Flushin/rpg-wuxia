@@ -90,6 +90,11 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   `SKILL_FX`, `FLOAT_TEXT`…) no lugar dos números soltos; em `gameScene.ts`, constantes para a área de clique/toque
   (`PICK`), a elipse do aviso do chefe derivada de `TILE_W/TILE_H` e as cores dos textos flutuantes (`FLOAT_COLOR`).
   Mesmos valores (a elipse muda 0,005 px por tile de raio, por usar √2 exato).
+- **B4 (17/11/2026):** o painel do auto-combate (☰) lê os números das constantes do código em vez de repeti-los no
+  texto: vida do Véu de Névoa (`SHIELD_HP`), tempo dos itens no chão (`groundSeconds`), janela do ritmo e mínimo de dados
+  (`BUCKET_SEC × MAX_BUCKETS`, `RATE_MIN_SEC`) e faixas do ganho offline (`OFFLINE_TIERS`). **Corrigido:** a dica do Mestre
+  Lei dizia que o Quebra-Guarda reduz a defesa em 30%; a skill reduz **40%** (`skills.json`). As dicas de `tips.json` ainda
+  repetem números (durabilidade 10%, +8% por nível, faixas offline) — conferidos e iguais ao código.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

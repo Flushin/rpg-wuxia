@@ -358,6 +358,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo (valores iguais). Teste: RT + captura de tela antes/depois iguais.
 
 **B4. Uma fonte para textos que repetem números** — P
+> ✅ **Feita em 17/11/2026** (e corrigida a dica do Quebra-Guarda: 30% → 40%).
 - Objetivo: o texto do auto-combate ler `SHIELD_HP` em vez de "70%" fixo (`autoPanel.ts:56` × `auto.ts:22`); procurar outros casos iguais nos textos de dicas.
 - Arquivos: `src/ui/autoPanel.ts`, `src/core/auto.ts` (exportar a constante).
 - Risco: nenhum. Teste: RT + abrir ☰ em PT e EN.
