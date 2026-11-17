@@ -53,7 +53,7 @@ const SHEETS: Record<string, SheetMeta> = {
   ...npcSheets,
 };
 
-// textura antiga (placeholder) -> folha animada. O que não estiver aqui continua placeholder.
+// nome do sprite nos dados (monsters.json, 'player-' + seita) -> folha animada. Sem folha: figura genérica (PLACEHOLDER).
 const BY_TEXTURE: Record<string, string> = {
   'player-lamina': 'tormenta',
   'player-pavilhao': 'geada',

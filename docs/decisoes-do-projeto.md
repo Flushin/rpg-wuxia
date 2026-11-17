@@ -95,6 +95,11 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   (`BUCKET_SEC × MAX_BUCKETS`, `RATE_MIN_SEC`) e faixas do ganho offline (`OFFLINE_TIERS`). **Corrigido:** a dica do Mestre
   Lei dizia que o Quebra-Guarda reduz a defesa em 30%; a skill reduz **40%** (`skills.json`). As dicas de `tips.json` ainda
   repetem números (durabilidade 10%, +8% por nível, faixas offline) — conferidos e iguais ao código.
+- **B5 (17/11/2026):** `src/render/textures.ts` passou de 219 para ~35 linhas: só a sombra, o ponto de luz das
+  partículas e uma **figura genérica** (`PLACEHOLDER`), usada por quem não tem folha de sprites (ex.: Titã e Víbora antes
+  da arte do marco 8). Saíram os pisos, árvores, casas, lobo, bandidos, terracota, General, jogadores e NPCs desenhados
+  em código (todos já tinham arte). Tipo de piso sem arte passa a mostrar grama em vez de buraco. `BY_TEXTURE` continua
+  (liga os nomes de sprite dos dados às folhas). `public/maps/tiles.png` (1 KB) continua: é o tileset do formato Tiled.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

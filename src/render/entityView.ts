@@ -5,6 +5,7 @@ import { MONSTERS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, type AnimName, type SheetMeta } from './sprites';
+import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
@@ -68,7 +69,7 @@ export class EntityView {
       this.dir = e.kind === 'monster' ? Phaser.Math.Between(0, 7) : 0;
     } else {
       this.sprite = scene.add
-        .image(0, 2, texture)
+        .image(0, 2, PLACEHOLDER)
         .setOrigin(0.5, e.kind === 'monster' ? 0.92 : 0.93)
         .setScale(this.sc);
       this.top = e.kind === 'monster' ? 40 * this.sc : 48;

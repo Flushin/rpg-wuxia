@@ -70,13 +70,11 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
   const out: Phaser.GameObjects.GameObject[] = [];
   const water: Phaser.GameObjects.Image[] = [];
   const ground = (name: string, i: number, j: number, x: number, y: number) => {
-    const frames = GROUND[name];
-    if (frames)
-      return scene.add
-        .image(x, y, 'pisos', pick(frames, hash(i, j, 1)))
-        .setScale(SPRITE_SCALE)
-        .setDepth(DEPTH.GROUND);
-    return scene.add.image(x, y, 'tile-' + name).setDepth(DEPTH.GROUND);
+    const frames = GROUND[name] ?? GROUND.grass; // tipo de piso sem arte: grama (não deixa buraco no mapa)
+    return scene.add
+      .image(x, y, 'pisos', pick(frames, hash(i, j, 1)))
+      .setScale(SPRITE_SCALE)
+      .setDepth(DEPTH.GROUND);
   };
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {

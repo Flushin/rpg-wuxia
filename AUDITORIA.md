@@ -364,6 +364,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: nenhum. Teste: RT + abrir ☰ em PT e EN.
 
 **B5. Remover placeholders mortos** — P
+> ✅ **Feita em 17/11/2026** (`BY_TEXTURE` e `tiles.png` ficaram; ver doc de decisões).
 - Objetivo: tirar de `textures.ts` o que não é usado (`tile-*`, `wolf`, `terracotta`, `npc-0..2`, `tile-house`…), mantendo `shadow`, `fx-dot` e o necessário para seitas sem arte; tirar `BY_TEXTURE` se ficar sem uso; não copiar `public/maps/tiles.png` para o build se não for usado.
 - Arquivos: `src/render/textures.ts`, `src/render/sprites.ts`, `src/scenes/gameScene.ts:113-117`.
 - Risco: médio-baixo (um mapa com tile sem arte mostraria vazio). Teste: RT + visitar os 3 mapas inteiros pelo mapa grande (M) procurando buracos.
