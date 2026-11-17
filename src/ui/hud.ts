@@ -17,8 +17,8 @@ import { PotionBar } from './potions';
 import { Rewards } from './rewards';
 import { QuestTracker } from './questTracker';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
+import { byId, escapeHtml } from './dom';
 
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
 
 export class Hud {
@@ -49,15 +49,15 @@ export class Hud {
     this.potions = new PotionBar(world);
     this.autoPanel = new AutoPanel(world);
     for (const id of ['btn-auto', 'btn-auto-cfg'])
-      $(id).addEventListener('focus', (e) => (e.target as HTMLElement).blur());
-    $('btn-auto').addEventListener('click', () => {
+      byId(id).addEventListener('focus', (e) => (e.target as HTMLElement).blur());
+    byId('btn-auto').addEventListener('click', () => {
       audio.ui('ui_click');
       world.auto.toggle();
     });
-    $('btn-auto-cfg').addEventListener('click', () => this.autoPanel.set(!this.autoPanel.open));
-    $('dur-warn').addEventListener('click', () => this.toggleInventory(true));
-    $('hud').classList.remove('hidden');
-    $('attrs-panel').addEventListener('click', (e) => {
+    byId('btn-auto-cfg').addEventListener('click', () => this.autoPanel.set(!this.autoPanel.open));
+    byId('dur-warn').addEventListener('click', () => this.toggleInventory(true));
+    byId('hud').classList.remove('hidden');
+    byId('attrs-panel').addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest('[data-attr],[data-close],[data-dist]') as HTMLElement | null;
       if (!t) return;
       if (t.dataset.dist) {
@@ -73,7 +73,7 @@ export class Hud {
   }
 
   togglePanel(open?: boolean) {
-    const p = $('attrs-panel');
+    const p = byId('attrs-panel');
     const show = open ?? p.classList.contains('hidden');
     if (show !== !p.classList.contains('hidden')) audio.ui(show ? 'ui_open' : 'ui_close');
     p.classList.toggle('hidden', !show);
@@ -111,11 +111,11 @@ export class Hud {
     showOfflineReport(rep, onClose);
   }
   get offlineOpen() {
-    return !$('offline-panel').classList.contains('hidden');
+    return !byId('offline-panel').classList.contains('hidden');
   }
 
   toast(msg: string, color?: string) {
-    const t = $('toast');
+    const t = byId('toast');
     const line = { msg, color };
     this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), line] : [line];
     t.innerHTML = this.toastLines
@@ -137,58 +137,58 @@ export class Hud {
     const w = this.world,
       p = w.player,
       d = p.derived;
-    $('p-name').textContent = p.name;
-    $('p-level').textContent = L(`Nv ${p.level}`, `Lv ${p.level}`);
-    $('p-hp').style.width = pct(p.hp, d.maxHp);
-    $('p-hp-t').textContent = `${Math.ceil(p.hp)} / ${d.maxHp}`;
-    $('p-mp').style.width = pct(p.mana, d.maxMana);
-    $('p-mp-t').textContent = `${Math.floor(p.mana)} / ${d.maxMana}`;
+    byId('p-name').textContent = p.name;
+    byId('p-level').textContent = L(`Nv ${p.level}`, `Lv ${p.level}`);
+    byId('p-hp').style.width = pct(p.hp, d.maxHp);
+    byId('p-hp-t').textContent = `${Math.ceil(p.hp)} / ${d.maxHp}`;
+    byId('p-mp').style.width = pct(p.mana, d.maxMana);
+    byId('p-mp-t').textContent = `${Math.floor(p.mana)} / ${d.maxMana}`;
     const need = w.xpToNext();
-    $('p-xp').style.width = need === null ? '100%' : pct(w.xp, need);
-    $('p-xp-t').textContent =
+    byId('p-xp').style.width = need === null ? '100%' : pct(w.xp, need);
+    byId('p-xp-t').textContent =
       need === null
         ? L(`Nível máximo (${PROGRESSION.levelCap})`, `Max level (${PROGRESSION.levelCap})`)
         : `XP ${Math.floor(w.xp)} / ${need}`;
-    $('map-name').textContent = w.map.name;
+    byId('map-name').textContent = w.map.name;
     if (w.gold !== this.goldSig) {
       this.goldSig = w.gold;
-      $('p-gold').textContent = String(w.gold);
+      byId('p-gold').textContent = String(w.gold);
     }
     this.rewards.update();
     this.questTracker.update(this.world);
-    const badge = $('pts-badge');
+    const badge = byId('pts-badge');
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
     badge.classList.toggle('hidden', w.freePoints <= 0);
 
     const boss = w.engagedBoss(),
-      bb = $('boss-bar');
+      bb = byId('boss-bar');
     bb.classList.toggle('hidden', !boss);
     if (boss) {
-      $('boss-name').textContent = L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`);
-      $('boss-hp').style.width = pct(boss.hp, boss.derived.maxHp);
-      $('boss-hp-t').textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`;
+      byId('boss-name').textContent = L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`);
+      byId('boss-hp').style.width = pct(boss.hp, boss.derived.maxHp);
+      byId('boss-hp-t').textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`;
     }
     const t = w.getTarget(),
-      tf = $('target-frame');
+      tf = byId('target-frame');
     tf.classList.toggle('hidden', !t || t === boss);
     if (t) {
-      $('t-name').textContent = t.name;
-      $('t-level').textContent = L(`Nv ${t.level}`, `Lv ${t.level}`);
-      $('t-hp').style.width = pct(t.hp, t.derived.maxHp);
-      $('t-hp-t').textContent = `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`;
+      byId('t-name').textContent = t.name;
+      byId('t-level').textContent = L(`Nv ${t.level}`, `Lv ${t.level}`);
+      byId('t-hp').style.width = pct(t.hp, t.derived.maxHp);
+      byId('t-hp-t').textContent = `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`;
     }
-    if (!$('attrs-panel').classList.contains('hidden')) this.renderPanel();
+    if (!byId('attrs-panel').classList.contains('hidden')) this.renderPanel();
     this.hotbar.update();
     this.skills.update();
     this.inv.update();
     this.npc.update();
     this.potions.update();
-    $('dur-warn').classList.toggle('hidden', !w.lowDurability());
+    byId('dur-warn').classList.toggle('hidden', !w.lowDurability());
     const as = w.auto.state,
       sig = `${as}|${isTouch}`;
     if (sig !== this.autoSig) {
       this.autoSig = sig;
-      const b = $('btn-auto');
+      const b = byId('btn-auto');
       b.classList.toggle('on', as === 'on');
       b.classList.toggle('paused', as === 'pausado');
       b.textContent =
@@ -239,8 +239,8 @@ export class Hud {
       (e) =>
         `<tr><td>${ELEMENT_LABELS[e]}</td><td class="num">${p.elemAtk[e]}</td><td class="num">${p.elemRes[e]}</td></tr>`,
     ).join('');
-    $('attrs-panel').innerHTML =
-      `<div class="card">${closeX('data-close="1"')}<h2>${p.name} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
+    byId('attrs-panel').innerHTML =
+      `<div class="card">${closeX('data-close="1"')}<h2>${escapeHtml(p.name)} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
       <div class="pts">${L('Pontos livres', 'Free points')}: <b>${w.freePoints}</b></div>
       <table>${rows}</table>
       <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>${L('Distribuir recomendado', 'Distribute recommended')}</button>

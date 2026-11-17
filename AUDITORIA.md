@@ -346,6 +346,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Teste: RT completo.
 
 **B2. Helpers de DOM únicos** — P · ⚠️ muda comportamento num caso raro
+> ✅ **Feita em 17/11/2026.**
 - Objetivo: `src/ui/dom.ts` com `byId()` e `escapeHtml()` (escapa `& < > " '`); apagar as 13 cópias de `$` e 4 de `esc`. Corrige o nome sem escape em `hud.ts:178` (um nome com `<` hoje quebraria o painel C).
 - Arquivos: `src/ui/*.ts` (13 arquivos), novo `src/ui/dom.ts`.
 - Risco: baixo. Teste: RT + criar personagem com nome `a<b&"c` e abrir C, mochila, report.

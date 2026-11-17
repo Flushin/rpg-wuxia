@@ -19,10 +19,8 @@ import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { MASTER_PORTRAITS } from '../render/sprites';
 import { npcName, rewardText } from './questTracker';
+import { byId, escapeHtml } from './dom';
 
-const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 // Janela dos NPCs (abre sozinha quando o personagem chega). Não bloqueia o jogo ao redor.
 export class NpcWindow {
   private sig = '';
@@ -35,7 +33,7 @@ export class NpcWindow {
     private world: World,
     private toast: (m: string, c?: string) => void,
   ) {
-    $('npc-panel').addEventListener('click', (e) => this.click(e));
+    byId('npc-panel').addEventListener('click', (e) => this.click(e));
   }
 
   private click(e: MouseEvent) {
@@ -98,7 +96,7 @@ export class NpcWindow {
   update() {
     const w = this.world,
       n = w.openNpc,
-      el = $('npc-panel');
+      el = byId('npc-panel');
     if (!n) {
       if (!el.classList.contains('hidden')) {
         el.classList.add('hidden');
@@ -130,7 +128,7 @@ export class NpcWindow {
       body = m.body;
       sub = m.sub;
     } else body = this.talk(role);
-    el.innerHTML = `<div class="card npc-card"><div class="npc-head"><h2>${esc(tn(n.name))}${sub}</h2><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>
+    el.innerHTML = `<div class="card npc-card"><div class="npc-head"><h2>${escapeHtml(tn(n.name))}${sub}</h2><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>
       ${this.questBox(role)}${shop ? `<div class="gold">${w.gold} ${L('ouro', 'gold')}</div>` : ''}${body}</div>`;
   }
 
@@ -140,19 +138,20 @@ export class NpcWindow {
       v = w.questView(),
       q = v.def;
     if (!q) return '';
-    const head = (tag: string) => `<div class="q-head"><span class="q-tag">${tag}</span> <b>${esc(q.name)}</b></div>`;
+    const head = (tag: string) =>
+      `<div class="q-head"><span class="q-tag">${tag}</span> <b>${escapeHtml(q.name)}</b></div>`;
     const rew = `<div class="q-rew">${L('Recompensa', 'Reward')}: ${rewardText(q.reward)}</div>`;
     if (v.phase === 'available' && v.giver === role) {
-      return `<div class="quest-box">${head(L('Missão', 'Quest'))}<p class="lore">“${esc(q.offer)}”</p>
-        <div class="q-goal">${L('Objetivo', 'Goal')}: ${esc(q.goal)}${v.count > 1 ? ` (${v.count})` : ''}</div>${rew}
+      return `<div class="quest-box">${head(L('Missão', 'Quest'))}<p class="lore">“${escapeHtml(q.offer)}”</p>
+        <div class="q-goal">${L('Objetivo', 'Goal')}: ${escapeHtml(q.goal)}${v.count > 1 ? ` (${v.count})` : ''}</div>${rew}
         <button class="primary" data-a="qaccept">${L('Aceitar', 'Accept')}</button></div>`;
     }
     if (v.phase === 'ready' && v.turnIn === role) {
-      return `<div class="quest-box ready">${head(L('Concluída', 'Complete'))}<p class="lore">“${esc(q.done)}”</p>${rew}
+      return `<div class="quest-box ready">${head(L('Concluída', 'Complete'))}<p class="lore">“${escapeHtml(q.done)}”</p>${rew}
         <button class="primary" data-a="qturn">${L('Entregar', 'Turn in')}</button></div>`;
     }
     if (v.phase === 'active' && (v.giver === role || v.turnIn === role)) {
-      return `<div class="quest-box">${head(L('Em andamento', 'In progress'))}<div class="q-goal">${esc(q.goal)}${v.count > 1 ? ` <b>${v.progress}/${v.count}</b>` : ''}</div></div>`;
+      return `<div class="quest-box">${head(L('Em andamento', 'In progress'))}<div class="q-goal">${escapeHtml(q.goal)}${v.count > 1 ? ` <b>${v.progress}/${v.count}</b>` : ''}</div></div>`;
     }
     if (v.phase === 'locked' && v.giver === role) {
       return `<div class="quest-box"><small class="muted">${L(`Volte quando estiver no nível ${q.minLevel}: tenho uma tarefa para você.`, `Come back at level ${q.minLevel}: I have a task for you.`)}</small></div>`;
@@ -166,11 +165,13 @@ export class NpcWindow {
     if (!m) return { sub: '', body: '' };
     const mine = this.world.classId === sect;
     const pic = MASTER_PORTRAITS[sect] ? `<img class="npc-pic" src="${MASTER_PORTRAITS[sect]}" alt="">` : '';
-    const tips = m.tips?.length ? `<ul class="npc-tips">${m.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
+    const tips = m.tips?.length
+      ? `<ul class="npc-tips">${m.tips.map((t) => `<li>${escapeHtml(t)}</li>`).join('')}</ul>`
+      : '';
     return {
-      sub: `<small class="npc-title">${esc(m.title)}${mine ? ` · <b>${L('sua seita', 'your sect')}</b>` : ''}</small>`,
-      body: `<div class="npc-talk">${pic}<p class="lore">“${esc(m.greeting)}”</p></div><p>${esc(m.intro)}</p>${tips}
-        ${m.locked ? `<p class="muted">${esc(m.locked)}</p>` : ''}`,
+      sub: `<small class="npc-title">${escapeHtml(m.title)}${mine ? ` · <b>${L('sua seita', 'your sect')}</b>` : ''}</small>`,
+      body: `<div class="npc-talk">${pic}<p class="lore">“${escapeHtml(m.greeting)}”</p></div><p>${escapeHtml(m.intro)}</p>${tips}
+        ${m.locked ? `<p class="muted">${escapeHtml(m.locked)}</p>` : ''}`,
     };
   }
 
@@ -179,7 +180,7 @@ export class NpcWindow {
     const t = NPC_TEXT.npcs[role];
     if (!t?.lines.length) return '';
     const k = this.line % t.lines.length;
-    return `<p class="lore">“${esc(t.lines[k])}”</p>
+    return `<p class="lore">“${escapeHtml(t.lines[k])}”</p>
       ${t.lines.length > 1 ? `<div class="npc-next"><small class="muted">${k + 1}/${t.lines.length}</small><button data-a="next">${k + 1 < t.lines.length ? L('Continuar ›', 'Continue ›') : L('Do começo ↺', 'From the start ↺')}</button></div>` : ''}`;
   }
 

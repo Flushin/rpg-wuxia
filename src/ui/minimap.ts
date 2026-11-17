@@ -4,6 +4,7 @@ import type { GameMap } from '../core/map';
 import type { World } from '../core/world';
 import { closeX } from './labels';
 import { uiScale } from './uiScale';
+import { byId } from './dom';
 
 // Minimapa (melhoria aprovada em 15/11/2026): canto superior direito, mapa isométrico em losango.
 // Monstros = pontinhos minúsculos; chefe destacado; NPCs, portais e o personagem.
@@ -21,8 +22,6 @@ const TILE_COLOR: Record<string, string> = {
 };
 const COLOR = { player: '#ffffff', monster: '#ff5a4a', boss: '#ff9a1f', npc: '#ffd23f', portal: '#c08cff' };
 const REDRAW_MS = 150;
-
-const $ = (id: string) => document.getElementById(id)!;
 
 /** Desenha o mapa (fundo, guardado) e os pontos num canvas, em projeção isométrica. */
 class MapPainter {
@@ -152,11 +151,11 @@ export class Minimap {
   private last = 0;
 
   constructor(private world: World) {
-    const box = $('minimap');
+    const box = byId('minimap');
     box.setAttribute('aria-label', L('Minimapa — toque para abrir o mapa (M)', 'Minimap — tap to open the map (M)'));
     box.title = L('Mapa (M)', 'Map (M)');
-    this.small = new MapPainter($('minimap-canvas') as HTMLCanvasElement);
-    const panel = $('bigmap');
+    this.small = new MapPainter(byId('minimap-canvas') as HTMLCanvasElement);
+    const panel = byId('bigmap');
     panel.innerHTML = `<div class="card bigmap-card"><div class="bigmap-head"><h2 id="bigmap-title"></h2>${closeX('data-close')}</div>
       <canvas id="bigmap-canvas"></canvas>
       <div class="bigmap-legend">
@@ -166,7 +165,7 @@ export class Minimap {
         <span><i style="background:${COLOR.npc}"></i>NPC</span>
         <span><i class="dia" style="background:${COLOR.portal}"></i>${L('Portal', 'Portal')}</span>
       </div></div>`;
-    this.big = new MapPainter($('bigmap-canvas') as HTMLCanvasElement);
+    this.big = new MapPainter(byId('bigmap-canvas') as HTMLCanvasElement);
     box.addEventListener('focus', () => box.blur()); // senão Espaço "clicaria" no minimapa em vez de atacar
     box.addEventListener('click', () => this.toggle(true));
     panel.addEventListener('click', (e) => {
@@ -176,14 +175,14 @@ export class Minimap {
   }
 
   get open() {
-    return !$('bigmap').classList.contains('hidden');
+    return !byId('bigmap').classList.contains('hidden');
   }
 
   toggle(open?: boolean) {
     const show = open ?? !this.open;
-    $('bigmap').classList.toggle('hidden', !show);
+    byId('bigmap').classList.toggle('hidden', !show);
     if (show) {
-      $('bigmap-title').textContent = this.world.map.name;
+      byId('bigmap-title').textContent = this.world.map.name;
       this.big.draw(this.world, true);
     }
   }
@@ -194,7 +193,7 @@ export class Minimap {
     this.last = now;
     this.small.draw(this.world, false);
     if (this.open) {
-      $('bigmap-title').textContent = this.world.map.name;
+      byId('bigmap-title').textContent = this.world.map.name;
       this.big.draw(this.world, true);
     }
   }

@@ -82,6 +82,10 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   o `format:check` roda no CI dos PRs. No VSCode, a extensão Prettier formata ao salvar (recomendada em
   `.vscode/extensions.json`). O JS do build saiu idêntico (mesmo hash) e o simulador deu a mesma saída.
   Linhas com mais de 120 colunas: de 752 para 146 (o que sobrou são textos e comentários longos, que o Prettier não quebra).
+- **B2 (17/11/2026):** `src/ui/dom.ts` com `byId()` (pega elemento pelo id) e `escapeHtml()` (escapa `& < > " '`);
+  apagadas as 13 cópias de `$` e as 4 de `esc` dos arquivos de `src/ui/`. Corrigido: o nome do personagem no painel de
+  Atributos (C) não era escapado — um nome com `<` quebrava o painel. Testado com o nome `a<b&"c'>` (painel C, mochila e
+  tela inicial).
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
