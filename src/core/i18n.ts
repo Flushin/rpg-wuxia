@@ -9,7 +9,9 @@ function detect(): Lang {
   try {
     const s = window.localStorage.getItem(KEY);
     if (s === 'pt' || s === 'en') return s;
-  } catch { /* storage bloqueado */ }
+  } catch {
+    /* storage bloqueado */
+  }
   return (navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en';
 }
 
@@ -21,7 +23,11 @@ export const L = (pt: string, en: string) => (LANG === 'en' ? en : pt);
 /** Salva o idioma e recarrega (o jogo já salva no pagehide). */
 export function setLang(lang: Lang) {
   if (lang === LANG) return;
-  try { window.localStorage.setItem(KEY, lang); } catch { /* ignora */ }
+  try {
+    window.localStorage.setItem(KEY, lang);
+  } catch {
+    /* ignora */
+  }
   window.location.reload();
 }
 
@@ -29,7 +35,12 @@ export function setLang(lang: Lang) {
 export const langButtons = () =>
   `<div class="lang-sw">${(['pt', 'en'] as Lang[]).map((l) => `<button data-lang="${l}" class="${l === LANG ? 'primary' : ''}">${l.toUpperCase()}</button>`).join('')}</div>`;
 export function bindLangButtons(root: HTMLElement) {
-  root.querySelectorAll<HTMLElement>('[data-lang]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); setLang(b.dataset.lang as Lang); }; });
+  root.querySelectorAll<HTMLElement>('[data-lang]').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      setLang(b.dataset.lang as Lang);
+    };
+  });
 }
 
 type Overlay = { [k: string]: unknown };

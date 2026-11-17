@@ -8,13 +8,21 @@ import { World } from '../src/core/world';
 import type { Entity, GameEvent } from '../src/core/types';
 
 let fails = 0;
-const ok = (c: boolean, m: string) => { if (!c) { fails++; console.error('  FALHOU:', m); } else console.log('  ok:', m); };
+const ok = (c: boolean, m: string) => {
+  if (!c) {
+    fails++;
+    console.error('  FALHOU:', m);
+  } else console.log('  ok:', m);
+};
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas']) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
+for (const id of ['cidade', 'floresta', 'ruinas'])
+  maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 type Priv = { killMonster: (m: Entity) => void; questTalk: (id: string) => void; openNpcWindow: (n: Entity) => void };
 const priv = (w: World) => w as unknown as Priv;
 const drain = (w: World): GameEvent[] => w.events.splice(0);
-const setLevel = (w: World, lvl: number) => { w.player.level = lvl; };
+const setLevel = (w: World, lvl: number) => {
+  w.player.level = lvl;
+};
 /** Mata (de mentira) um monstro do tipo pedido, criando-o se o mapa não tiver. */
 function kill(w: World, monsterId: string) {
   const m = { ...w.monsters[0], monsterId, dead: false, hp: 1, summoned: true, spawnKey: undefined } as Entity;
@@ -24,28 +32,45 @@ function kill(w: World, monsterId: string) {
 const talkTo = (w: World, role: string) => {
   const n = w.npcs.find((x) => x.npcId === role);
   if (!n) throw new Error('npc ' + role);
-  w.closeNpc(); priv(w).openNpcWindow(n);
+  w.closeNpc();
+  priv(w).openNpcWindow(n);
 };
 
 console.log('== dados ==');
 ok(QUESTS.length === 8, '8 etapas na cadeia');
-ok(QUESTS.every((q, i) => i === 0 || q.minLevel >= QUESTS[i - 1].minLevel), 'níveis mínimos em ordem');
-ok(QUESTS.every((q) => q.objective.type !== 'kill' || MONSTERS[q.objective.monster]), 'todos os monstros das missões existem');
-ok(QUESTS.filter((q) => q.reward.item).map((q) => q.id).join() === 'acampamentos,barro_bronze', 'itens nas etapas 4 e 7');
+ok(
+  QUESTS.every((q, i) => i === 0 || q.minLevel >= QUESTS[i - 1].minLevel),
+  'níveis mínimos em ordem',
+);
+ok(
+  QUESTS.every((q) => q.objective.type !== 'kill' || MONSTERS[q.objective.monster]),
+  'todos os monstros das missões existem',
+);
+ok(
+  QUESTS.filter((q) => q.reward.item)
+    .map((q) => q.id)
+    .join() === 'acampamentos,barro_bronze',
+  'itens nas etapas 4 e 7',
+);
 
 for (const classId of ['lamina', 'pavilhao']) {
   console.log(`== cadeia completa (${CLASSES[classId].name}) ==`);
-  const w = World.create(maps, 'Teste', classId); drain(w);
+  const w = World.create(maps, 'Teste', classId);
+  drain(w);
   const mestre = 'mestre_' + classId;
   ok(w.questMark('anciao') === '!', 'ancião mostra "!" no começo');
   ok(!w.questAccept(), 'não aceita sem falar com o ancião');
   talkTo(w, 'anciao');
   ok(w.questAccept(), 'aceita falando com o ancião');
   ok(w.questMark(mestre) === '?', 'mestre da seita mostra "?" (falar com ele cumpre)');
-  ok(w.questMark('mestre_' + (classId === 'lamina' ? 'pavilhao' : 'lamina')) === null, 'mestre de outra seita não tem marca');
+  ok(
+    w.questMark('mestre_' + (classId === 'lamina' ? 'pavilhao' : 'lamina')) === null,
+    'mestre de outra seita não tem marca',
+  );
   talkTo(w, mestre);
   ok(w.questView().phase === 'ready', 'falar com o mestre deixa a missão pronta');
-  const xp0 = w.xp, gold0 = w.gold;
+  const xp0 = w.xp,
+    gold0 = w.gold;
   ok(w.questTurnIn(), 'entrega para o mestre');
   ok(w.gold === gold0 + QUESTS[0].reward.gold && (w.xp > xp0 || w.player.level > 1), 'recebe ouro e XP');
   ok(w.questView().phase === 'available' && w.questMark(mestre) === '!', 'etapa 2 já disponível no mestre (nível 1)');
@@ -59,7 +84,9 @@ for (const classId of ['lamina', 'pavilhao']) {
   kill(w, 'lobo');
   ok(w.quest.progress === 5, 'progresso não passa do total');
   ok(!w.questTurnIn(), 'não entrega longe do mestre');
-  w.changeMap('cidade'); talkTo(w, mestre); ok(w.questTurnIn(), 'entrega a etapa 2');
+  w.changeMap('cidade');
+  talkTo(w, mestre);
+  ok(w.questTurnIn(), 'entrega a etapa 2');
   // trava de nível
   setLevel(w, 1);
   ok(w.questView().phase === 'locked' && w.questMark('guarda') === null, 'etapa 3 travada no nível 1 (sem "!")');
@@ -81,12 +108,30 @@ for (const classId of ['lamina', 'pavilhao']) {
     const gained = bagEquip().filter((x) => !before.has(x.uid));
     if (q.reward.item === 'arma') {
       const it = gained[0];
-      ok(gained.length === 1 && BASES[it.baseId].slot === 'arma' && it.rarity === 'incomum' && BASES[it.baseId].sect === classId && BASES[it.baseId].reqLevel === 5, 'arma Incomum nv 5 da própria seita');
+      ok(
+        gained.length === 1 &&
+          BASES[it.baseId].slot === 'arma' &&
+          it.rarity === 'incomum' &&
+          BASES[it.baseId].sect === classId &&
+          BASES[it.baseId].reqLevel === 5,
+        'arma Incomum nv 5 da própria seita',
+      );
     }
-    if (q.reward.item === 'tronco') ok(gained.length === 1 && BASES[gained[0].baseId].slot === 'tronco' && gained[0].rarity === 'incomum' && BASES[gained[0].baseId].reqLevel === 5, 'manto Incomum nv 5');
+    if (q.reward.item === 'tronco')
+      ok(
+        gained.length === 1 &&
+          BASES[gained[0].baseId].slot === 'tronco' &&
+          gained[0].rarity === 'incomum' &&
+          BASES[gained[0].baseId].reqLevel === 5,
+        'manto Incomum nv 5',
+      );
     w.changeMap('cidade');
   }
-  ok(w.questView().phase === 'complete' && ['anciao', 'guarda', 'mercador', mestre].every((n) => w.questMark(n) === null), 'cadeia completa: sem marcas');
+  ok(
+    w.questView().phase === 'complete' &&
+      ['anciao', 'guarda', 'mercador', mestre].every((n) => w.questMark(n) === null),
+    'cadeia completa: sem marcas',
+  );
   const evs = drain(w).filter((e) => e.type === 'quest');
   ok(evs.filter((e) => e.type === 'quest' && e.kind === 'completed').length === 8, '8 avisos de missão concluída');
 }
@@ -94,10 +139,12 @@ for (const classId of ['lamina', 'pavilhao']) {
 console.log('== save ==');
 {
   const w = World.create(maps, 'Teste', 'lamina');
-  w.questAccept(true); w.quest = { stage: 2, status: 'active', progress: 3 };
+  w.questAccept(true);
+  w.quest = { stage: 2, status: 'active', progress: 3 };
   const w2 = World.fromSave(maps, w.serialize(), Date.now(), false);
   ok(w2.quest.stage === 2 && w2.quest.status === 'active' && w2.quest.progress === 3, 'missão volta igual do save');
-  const old = w.serialize(); delete old.quest;
+  const old = w.serialize();
+  delete old.quest;
   ok(World.fromSave(maps, old, Date.now(), false).quest.stage === 0, 'save antigo começa a cadeia do zero');
   const bad = sanitizeQuest({ stage: 99, status: 'xx', progress: -4 });
   ok(bad.stage === QUESTS.length && bad.status === 'pending' && bad.progress === 0, 'save corrompido é saneado');
@@ -109,16 +156,23 @@ console.log('== mochila cheia ==');
   const w = World.create(maps, 'Teste', 'lamina');
   for (let i = 0; i < BAG_SIZE; i++) w.bag[i] = makePotion(i % 2 ? 'pocao_hp_p' : 'pocao_mp_p', 99);
   w.quest = { stage: 3, status: 'ready', progress: 6 };
-  ok(w.questTurnIn(true) && w.ground.some((g) => g.item && BASES[g.item.baseId]?.slot === 'arma'), 'mochila cheia: a arma cai no chão (não se perde)');
+  ok(
+    w.questTurnIn(true) && w.ground.some((g) => g.item && BASES[g.item.baseId]?.slot === 'arma'),
+    'mochila cheia: a arma cai no chão (não se perde)',
+  );
 }
 
 console.log('== nível 10 ==');
 {
   const w = World.create(maps, 'Teste', 'lamina');
-  setLevel(w, 10); w.xp = 0;
+  setLevel(w, 10);
+  w.xp = 0;
   w.quest = { stage: 7, status: 'ready', progress: 1 };
   const g0 = w.gold;
-  ok(w.questTurnIn(true) && w.player.level === 10 && w.xp === 0 && w.gold === g0 + QUESTS[7].reward.gold, 'no nível máximo: só o ouro (sem XP extra)');
+  ok(
+    w.questTurnIn(true) && w.player.level === 10 && w.xp === 0 && w.gold === g0 + QUESTS[7].reward.gold,
+    'no nível máximo: só o ouro (sem XP extra)',
+  );
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

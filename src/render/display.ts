@@ -4,5 +4,8 @@ export const DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
 
 export function cssSize(): { w: number; h: number } {
   const el = document.getElementById('game');
-  return { w: Math.max(1, el?.clientWidth || window.innerWidth), h: Math.max(1, el?.clientHeight || window.innerHeight) };
+  return {
+    w: Math.max(1, el?.clientWidth || window.innerWidth),
+    h: Math.max(1, el?.clientHeight || window.innerHeight),
+  };
 }

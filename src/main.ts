@@ -18,7 +18,10 @@ fillIcons();
 // Texto fixo do index.html (os ids ficam em português no HTML; aqui entra o idioma escolhido).
 function applyStaticText() {
   document.documentElement.lang = LANG === 'en' ? 'en' : 'pt-BR';
-  const txt = (id: string, v: string) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const txt = (id: string, v: string) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = v;
+  };
   const attr = (id: string, a: string, v: string) => document.getElementById(id)?.setAttribute(a, v);
   txt('sub-slots', L('Escolha seu personagem', 'Choose your character'));
   txt('sub-create', L('Criar personagem', 'Create character'));
@@ -58,7 +61,10 @@ const game = new Phaser.Game({
   scene: [BootScene, CreateScene, GameScene],
 });
 
-const fit = () => { const { w, h } = cssSize(); game.scale.resize(w * DPR, h * DPR); };
+const fit = () => {
+  const { w, h } = cssSize();
+  game.scale.resize(w * DPR, h * DPR);
+};
 window.addEventListener('resize', fit);
 window.addEventListener('orientationchange', () => setTimeout(fit, 200));
 
@@ -67,5 +73,7 @@ if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = gam
 
 // PWA: service worker só em produção (caminho relativo por causa do subpath do GitHub Pages)
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
 }

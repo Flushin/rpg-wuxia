@@ -5,29 +5,59 @@ export const ATTR_KEYS: AttrKey[] = ['strength', 'intelligence', 'stamina', 'agi
 export type Attributes = Record<AttrKey, number>;
 export type ElementMap = Record<Element, number>;
 export type DamageType = 'physical' | 'spiritual';
-export interface Point { x: number; y: number }
+export interface Point {
+  x: number;
+  y: number;
+}
 
 export type Slot = 'colar' | 'tronco' | 'arma' | 'cabeca' | 'calca' | 'bota';
 export type Rarity = 'comum' | 'incomum' | 'raro';
-export interface Bonus { stat: string; value: number }
+export interface Bonus {
+  stat: string;
+  value: number;
+}
 // Instância de item. Poções usam qty (empilham); equipamentos usam rarity/bonuses/durability.
 export interface ItemInstance {
-  uid: string; baseId: string; rarity: Rarity; bonuses: Bonus[]; ilvl: number; durability: number; qty?: number;
+  uid: string;
+  baseId: string;
+  rarity: Rarity;
+  bonuses: Bonus[];
+  ilvl: number;
+  durability: number;
+  qty?: number;
 }
-export interface GroundItem { id: number; x: number; y: number; item?: ItemInstance; gold?: number; expires: number }
+export interface GroundItem {
+  id: number;
+  x: number;
+  y: number;
+  item?: ItemInstance;
+  gold?: number;
+  expires: number;
+}
 export type PotionKind = 'hp' | 'mp';
 
 export interface Derived {
-  maxHp: number; maxMana: number;
-  physAtk: number; spiritAtk: number;
-  physDef: number; spiritDef: number;
-  hit: number; evasion: number;
-  critChance: number; critDamage: number;
+  maxHp: number;
+  maxMana: number;
+  physAtk: number;
+  spiritAtk: number;
+  physDef: number;
+  spiritDef: number;
+  hit: number;
+  evasion: number;
+  critChance: number;
+  critDamage: number;
 }
 
 export type BuffKind = 'defReduction' | 'slow' | 'shield';
 // value: fração (defReduction/slow) ou pontos de absorção restantes (shield)
-export interface Buff { id: string; kind: BuffKind; value: number; remaining: number; duration: number }
+export interface Buff {
+  id: string;
+  kind: BuffKind;
+  value: number;
+  remaining: number;
+  duration: number;
+}
 export type SkillFailReason = 'mana' | 'cooldown' | 'notarget' | 'locked' | 'blocked';
 
 export type AiState = 'idle' | 'wander' | 'chase' | 'return';
@@ -37,8 +67,10 @@ export interface Entity {
   kind: 'player' | 'monster' | 'npc';
   name: string;
   level: number;
-  x: number; y: number;
-  hp: number; mana: number;
+  x: number;
+  y: number;
+  hp: number;
+  mana: number;
   dead: boolean;
   attrs: Attributes;
   derived: Derived;
@@ -79,7 +111,17 @@ export type GameEvent =
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
   | { type: 'mapChange'; mapId: string }
-  | { type: 'skillCast'; skillId: string; casterId: number; x: number; y: number; targetId: number | null; tx: number; ty: number; ranged: boolean }
+  | {
+      type: 'skillCast';
+      skillId: string;
+      casterId: number;
+      x: number;
+      y: number;
+      targetId: number | null;
+      tx: number;
+      ty: number;
+      ranged: boolean;
+    }
   | { type: 'skillFail'; skillId: string; reason: SkillFailReason }
   | { type: 'skillLevelUp'; skillId: string; level: number }
   | { type: 'skillUnlocked'; skillId: string }
@@ -110,22 +152,53 @@ export type GameEvent =
   | { type: 'bossDefeated'; respawnAt: number };
 
 // Círculo de aviso no chão (golpe em área do chefe)
-export interface Telegraph { id: number; x: number; y: number; radius: number; delay: number; remaining: number; ownerId: number; mult: number }
+export interface Telegraph {
+  id: number;
+  x: number;
+  y: number;
+  radius: number;
+  delay: number;
+  remaining: number;
+  ownerId: number;
+  mult: number;
+}
 
 export type AutoState = 'off' | 'on' | 'pausado';
 export interface AutoConfig {
   skillsOff: string[]; // skills ativas desligadas no menu (o resto é usado)
-  hpThreshold: number; mpThreshold: number; // % abaixo da qual bebe poção
-  buyHp: number; buyMp: number; // quantidade comprada por viagem à vila
+  hpThreshold: number;
+  mpThreshold: number; // % abaixo da qual bebe poção
+  buyHp: number;
+  buyMp: number; // quantidade comprada por viagem à vila
   sellIncomum: boolean;
 }
 // Balde de ~60 s de auto-combate ativo em mapa de caça (janela móvel de ~30 min)
-export interface AutoBucket { sec: number; kills: number; xp: number; gold: number; potHp: number; potMp: number; levelSum: number; drops: Record<string, number> }
+export interface AutoBucket {
+  sec: number;
+  kills: number;
+  xp: number;
+  gold: number;
+  potHp: number;
+  potMp: number;
+  levelSum: number;
+  drops: Record<string, number>;
+}
 export interface AutoRate {
-  killsPerMin: number; xpPerKill: number; goldPerKill: number; potHpPerKill: number; potMpPerKill: number; monLevel: number; sampleMin: number;
+  killsPerMin: number;
+  xpPerKill: number;
+  goldPerKill: number;
+  potHpPerKill: number;
+  potMpPerKill: number;
+  monLevel: number;
+  sampleMin: number;
   drops: { baseId: string; rarity: Rarity; perKill: number }[];
 }
-export interface AutoSave { active: boolean; mapId: string; config?: Partial<AutoConfig>; buckets?: AutoBucket[] }
+export interface AutoSave {
+  active: boolean;
+  mapId: string;
+  config?: Partial<AutoConfig>;
+  buckets?: AutoBucket[];
+}
 
 export interface SaveData {
   version: 1;

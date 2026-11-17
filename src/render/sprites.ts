@@ -9,11 +9,19 @@ import general from '../data/sprites/general.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
-const NPC_SHEETS = import.meta.glob('../data/sprites/npc_*.json', { eager: true, import: 'default' }) as Record<string, SheetMeta>;
-const npcSheets = Object.fromEntries(Object.entries(NPC_SHEETS).map(([p, m]) => [p.replace(/^.*\/(npc_[^/]+)\.json$/, '$1'), m]));
+const NPC_SHEETS = import.meta.glob('../data/sprites/npc_*.json', { eager: true, import: 'default' }) as Record<
+  string,
+  SheetMeta
+>;
+const npcSheets = Object.fromEntries(
+  Object.entries(NPC_SHEETS).map(([p, m]) => [p.replace(/^.*\/(npc_[^/]+)\.json$/, '$1'), m]),
+);
 /** npcId (mapa) -> folha. Os mestres usam o nome da seita no mapa. */
 const NPC_SHEET_BY_ID: Record<string, string> = {
-  mestre_lamina: 'npc_mestre_tormenta', mestre_pavilhao: 'npc_mestra_geada', mestre_tita: 'npc_mestre_tita', mestre_vibora: 'npc_mestra_vibora',
+  mestre_lamina: 'npc_mestre_tormenta',
+  mestre_pavilhao: 'npc_mestra_geada',
+  mestre_tita: 'npc_mestre_tita',
+  mestre_vibora: 'npc_mestra_vibora',
 };
 export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;
 
@@ -24,8 +32,13 @@ export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' +
 export type AnimName = 'idle' | 'walk' | 'attack' | 'death';
 
 export interface SheetMeta {
-  frameWidth: number; frameHeight: number; scale: number; top: number;
-  anchor: number[]; dirs: number; dirList?: number[]; // dirList: só estas direções existem na folha
+  frameWidth: number;
+  frameHeight: number;
+  scale: number;
+  top: number;
+  anchor: number[];
+  dirs: number;
+  dirList?: number[]; // dirList: só estas direções existem na folha
   anims: Record<string, { frames: number; fps: number; loop: boolean }>;
 }
 
@@ -59,10 +72,13 @@ export const PORTRAITS: Record<string, string> = {
 
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
-  Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]));
+  Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),
+);
 
 export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | null => {
-  const key = BY_TEXTURE[texture] ?? (texture.startsWith('npc-') && SHEETS[npcSheetKey(texture.slice(4))] ? npcSheetKey(texture.slice(4)) : undefined);
+  const key =
+    BY_TEXTURE[texture] ??
+    (texture.startsWith('npc-') && SHEETS[npcSheetKey(texture.slice(4))] ? npcSheetKey(texture.slice(4)) : undefined);
   return key ? { key, meta: SHEETS[key] } : null;
 };
 
@@ -95,7 +111,8 @@ export const animKey = (sheet: string, anim: string, dir: number) => `${sheet}:$
 
 /** Direção (0..7) a partir de um deslocamento em tiles. */
 export function dirFromDelta(dx: number, dy: number): number {
-  const down = dx + dy, right = dx - dy; // tile -> eixos da tela
+  const down = dx + dy,
+    right = dx - dy; // tile -> eixos da tela
   const k = Math.round(Math.atan2(right, down) / (Math.PI / 4));
   return ((k % 8) + 8) % 8;
 }

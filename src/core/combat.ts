@@ -2,10 +2,17 @@ import type { Derived, DamageType, Element, ElementMap } from './types';
 import type { Rng } from './rng';
 
 export interface Combatant {
-  derived: Derived; damageType: DamageType; element: Element | null;
-  elemAtk: ElementMap; elemRes: ElementMap;
+  derived: Derived;
+  damageType: DamageType;
+  element: Element | null;
+  elemAtk: ElementMap;
+  elemRes: ElementMap;
 }
-export interface AttackResult { hit: boolean; crit: boolean; amount: number }
+export interface AttackResult {
+  hit: boolean;
+  crit: boolean;
+  amount: number;
+}
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 

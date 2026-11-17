@@ -8,14 +8,33 @@ const LINE_MS = 3000;
 const GOLD_MS = 2500;
 
 export type LootFilter = 'rare' | 'all';
-export const loadLootFilter = (): LootFilter => { try { return localStorage.getItem(FEED_KEY) === 'all' ? 'all' : 'rare'; } catch { return 'rare'; } };
-export const saveLootFilter = (v: LootFilter) => { try { localStorage.setItem(FEED_KEY, v); } catch { /* sem armazenamento */ } };
+export const loadLootFilter = (): LootFilter => {
+  try {
+    return localStorage.getItem(FEED_KEY) === 'all' ? 'all' : 'rare';
+  } catch {
+    return 'rare';
+  }
+};
+export const saveLootFilter = (v: LootFilter) => {
+  try {
+    localStorage.setItem(FEED_KEY, v);
+  } catch {
+    /* sem armazenamento */
+  }
+};
 
 /** Celular deitado com pouca altura (ex.: Galaxy Z Fold fechado ~920×316): só 2 linhas. */
 const compact = () => window.matchMedia('(orientation:landscape) and (max-height:450px)').matches;
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-interface Line { key: string; name: string; color: string; qty: number; el: HTMLElement; until: number }
+interface Line {
+  key: string;
+  name: string;
+  color: string;
+  qty: number;
+  el: HTMLElement;
+  until: number;
+}
 
 export class Rewards {
   private lines: Line[] = [];
@@ -30,7 +49,8 @@ export class Rewards {
     this.goldUntil = now + GOLD_MS;
     const el = $('p-gold-plus');
     el.textContent = `+${this.goldSum}`;
-    el.classList.remove('fade'); el.classList.add('show');
+    el.classList.remove('fade');
+    el.classList.add('show');
   }
 
   xp() {
@@ -43,10 +63,14 @@ export class Rewards {
   item(name: string, color: string, qty: number, rarity: Rarity | undefined, potion: boolean) {
     const notable = !potion && (rarity === 'incomum' || rarity === 'raro');
     if (!notable && this.filter !== 'all') return; // continua indo para a mochila normalmente
-    const key = `${name}|${color}`, now = performance.now();
+    const key = `${name}|${color}`,
+      now = performance.now();
     let ln = this.lines.find((l) => l.key === key);
-    if (ln) { ln.qty += qty; ln.until = now + LINE_MS; this.lines = [...this.lines.filter((l) => l !== ln), ln]; }
-    else {
+    if (ln) {
+      ln.qty += qty;
+      ln.until = now + LINE_MS;
+      this.lines = [...this.lines.filter((l) => l !== ln), ln];
+    } else {
       const el = document.createElement('div');
       ln = { key, name, color, qty, el, until: now + LINE_MS };
       this.lines.push(ln);
@@ -62,32 +86,46 @@ export class Rewards {
 
   update() {
     const now = performance.now();
-    if (this.goldUntil && now >= this.goldUntil) { this.goldUntil = 0; this.goldSum = 0; $('p-gold-plus').classList.replace('show', 'fade'); }
+    if (this.goldUntil && now >= this.goldUntil) {
+      this.goldUntil = 0;
+      this.goldSum = 0;
+      $('p-gold-plus').classList.replace('show', 'fade');
+    }
     if (!this.lines.length) return;
     const gone = this.lines.filter((l) => now >= l.until);
-    if (gone.length) { for (const l of gone) l.el.remove(); this.lines = this.lines.filter((l) => now < l.until); }
+    if (gone.length) {
+      for (const l of gone) l.el.remove();
+      this.lines = this.lines.filter((l) => now < l.until);
+    }
     if (this.lines.length) this.place();
   }
 
-  private place() { placeFeed(); }
+  private place() {
+    placeFeed();
+  }
 }
 
 /** Abaixo do quadro do personagem — ou do quadro do alvo, quando ele está empilhado à esquerda.
  *  Se não sobra espaço até o joystick (tela baixa com interface grande), vai para o lado do quadro do personagem. */
 export function placeFeed() {
-  const pf = uiRect($('player-frame')), tf = $('target-frame'), feed = $('loot-feed');
+  const pf = uiRect($('player-frame')),
+    tf = $('target-frame'),
+    feed = $('loot-feed');
   let top = pf.bottom;
   if (!tf.classList.contains('hidden')) {
     const r = uiRect(tf);
     if (r.left < pf.right && r.top >= pf.bottom - 2) top = r.bottom;
   }
-  feed.style.left = ''; feed.style.maxHeight = ''; feed.style.width = '';
+  feed.style.left = '';
+  feed.style.maxHeight = '';
+  feed.style.width = '';
   const y = Math.round(top + 6);
   feed.style.top = `${y}px`;
   const room = feedRoom(y);
   const side = Math.floor(uiRect($('top-right')).left - 8 - (pf.right + 8)); // espaço entre o quadro e os botões do topo
   if (room !== '' && parseInt(room) < 40 && side >= 120) {
-    feed.style.left = `${Math.round(pf.right + 8)}px`; feed.style.top = `${Math.round(pf.top)}px`;
+    feed.style.left = `${Math.round(pf.right + 8)}px`;
+    feed.style.top = `${Math.round(pf.top)}px`;
     if (side < feed.offsetWidth) feed.style.width = `${side}px`;
   } else feed.style.maxHeight = room;
 }
@@ -99,7 +137,8 @@ export function feedRoom(top: number): string {
   for (const id of ['joystick', 'potion-bar']) {
     const el = document.getElementById(id);
     if (!el || el.classList.contains('hidden') || !el.offsetWidth) continue;
-    const r = uiRect(el), f = uiRect($('loot-feed'));
+    const r = uiRect(el),
+      f = uiRect($('loot-feed'));
     if (r.left < f.left + f.width && f.left < r.right) limit = Math.min(limit, r.top - 6);
   }
   return limit === Infinity ? '' : `${Math.max(0, Math.floor(limit - top))}px`;
