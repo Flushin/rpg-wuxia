@@ -13,6 +13,7 @@ import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
 import { TipManager } from '../ui/tips';
+import { SettingsPanel } from '../ui/settingsPanel';
 import { MONSTERS } from '../core/data';
 import { itemColor } from '../core/items';
 import { DPR, cssSize } from '../render/display';
@@ -84,11 +85,13 @@ export class GameScene extends Phaser.Scene {
     this.hud = new Hud(this.world);
     this.fx = new SkillFx(this);
     setupControls(this.world, this.hud, (x, y) => this.tapAt(x, y));
-    this.tips = new TipManager(
+    const persist = () => {
+      void writeSave(this.world.serialize());
+    };
+    this.tips = new TipManager(this.world, persist);
+    new SettingsPanel(
       this.world,
-      () => {
-        void writeSave(this.world.serialize());
-      },
+      this.tips,
       () => {
         // salva e recarrega a página: volta à tela inicial com tudo limpo (HUD, áudio e timers)
         void writeSave(this.world.serialize()).finally(() => window.location.reload());
