@@ -18,7 +18,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:#10141c;color:#eee;fon
 #game{position:fixed;inset:0}
 #game canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
 .hidden{display:none!important}
-#hud{position:fixed;inset:0;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+/* Tamanho da interface (⚙): o HUD é desenhado numa tela virtual 1/--ui menor e ampliado (src/ui/uiScale.ts) */
+#hud{position:fixed;top:0;left:0;width:calc(100% / var(--ui,1));height:calc(100% / var(--ui,1));transform:scale(var(--ui,1));transform-origin:0 0;pointer-events:none;padding:calc(env(safe-area-inset-top) / var(--ui,1)) calc(env(safe-area-inset-right) / var(--ui,1)) calc(env(safe-area-inset-bottom) / var(--ui,1)) calc(env(safe-area-inset-left) / var(--ui,1))}
+button,label,.slot,.pot,.cell{touch-action:manipulation}
+#zoom-note{position:fixed;top:0;left:0;z-index:60;transform-origin:0 0;padding:10px 14px;background:#8a3b2a;color:#fff;font-weight:700;text-align:center;pointer-events:none}
+.ui-size-row{flex-direction:column;align-items:stretch!important;gap:6px}.ui-size{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%}.ui-size button{flex:none;width:auto;margin:0;padding:6px 4px;min-height:36px;height:100%}
 #hud>*{pointer-events:auto}
 .frame{position:absolute;background:rgba(10,12,20,.72);border:1px solid #556;border-radius:8px;padding:6px 8px}
 .line{display:flex;justify-content:space-between;gap:8px;margin-bottom:3px;font-size:13px}
@@ -48,7 +52,7 @@ button.primary{background:#8a3b2a;border-color:#c66}
 .bar.xp{transition:box-shadow .3s}
 .bar.xp.glow{box-shadow:0 0 6px 1px #ffd23f}
 .bar.xp.glow i{filter:brightness(1.45)}
-#loot-feed{position:absolute;top:110px;left:8px;width:200px;pointer-events:none!important;display:flex;flex-direction:column;gap:2px}
+#loot-feed{position:absolute;top:110px;left:8px;width:200px;pointer-events:none!important;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;overflow:hidden}
 #loot-feed:empty{display:none}
 #loot-feed div{background:rgba(10,12,20,.62);border-radius:6px;padding:2px 8px;font-size:13px;font-weight:600;text-shadow:0 0 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:feedIn .2s ease-out}
 @keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
@@ -252,7 +256,7 @@ button.danger{background:#8a2a2a;border-color:#f66}
 #bigmap.hidden{display:none}
 #bigmap .bigmap-card{width:min(820px,100%);padding:12px 14px}
 .bigmap-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.bigmap-head h2{margin:0;font-size:18px}.bigmap-head .win-x{margin:0;position:static}
-#bigmap-canvas{display:block;width:100%;height:min(calc(100vh - 150px),calc((min(820px,100vw) - 52px) * .54));background:#0e1218;border-radius:8px}
+#bigmap-canvas{display:block;width:100%;height:min(calc(100vh / var(--ui,1) - 150px),calc((min(820px,100vw / var(--ui,1)) - 52px) * .54));background:#0e1218;border-radius:8px}
 .bigmap-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:#ccd}.bigmap-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;border:1px solid #000;vertical-align:-1px}.bigmap-legend i.dia{border-radius:1px;transform:rotate(45deg)}
 @media (max-width:640px){#minimap{width:132px;height:72px}}
 @media (max-height:520px){#minimap{width:120px;height:66px}}

@@ -1,5 +1,6 @@
 import type { World } from '../core/world';
 import type { Hud } from './hud';
+import { toUi } from './uiScale';
 
 export const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
@@ -32,7 +33,7 @@ export function setupControls(world: World, hud: Hud) {
     let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R);
     const l = Math.hypot(dx, dy), max = R * 0.7;
     if (l > max) { dx = (dx / l) * max; dy = (dy / l) * max; }
-    knob.style.transform = `translate(${dx}px,${dy}px)`;
+    knob.style.transform = `translate(${toUi(dx)}px,${toUi(dy)}px)`;
     if (l < R * 0.15) world.setMoveInput(0, 0); else world.setMoveInput(dx, dy);
   };
   const end = (e: PointerEvent) => {

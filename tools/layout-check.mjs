@@ -9,6 +9,7 @@ const SIZES = [
   { name: 'celular em pé 390×844', w: 390, h: 844, touch: true },
   { name: 'celular deitado 844×390', w: 844, h: 390, touch: true },
   { name: 'celular pequeno 360×740', w: 360, h: 740, touch: true },
+  { name: 'iPhone Pro Max deitado 932×430', w: 932, h: 430, touch: true, feed: 2 },
   { name: 'Fold fechado deitado 920×316', w: 920, h: 316, touch: true, feed: 2 },
   { name: 'Fold aberto 884×1028', w: 884, h: 1028, touch: true, feed: 4 },
   { name: 'PC 1366×768', w: 1366, h: 768, touch: false, feed: 4 },
@@ -17,9 +18,13 @@ const IDS = ['player-frame', 'target-frame', 'loot-feed', 'top-right', 'quest-tr
 
 const browser = await pw.chromium.launch({ executablePath: process.env.CHROME ?? undefined }).catch(() => pw.chromium.launch({ executablePath: '/usr/bin/google-chrome' }));
 let fails = 0;
-for (const sz of SIZES) {
+// cada tamanho é testado com o tamanho da interface Automático e Grande (⚙)
+const MODES = (process.env.UI_MODES ?? 'auto,g').split(',');
+for (const sz0 of SIZES) for (const mode of MODES) {
+  const sz = { ...sz0, name: `${sz0.name} [interface ${mode}]` };
   const ctx = await browser.newContext({ viewport: { width: sz.w, height: sz.h }, isMobile: sz.touch, hasTouch: sz.touch, deviceScaleFactor: 2 });
   const page = await ctx.newPage();
+  await page.addInitScript((m) => { try { localStorage.setItem('rpg-ui-size', m); } catch {} }, mode);
   await page.goto(URL);
   await page.click('[data-act="new"]');
   await page.fill('#char-name', 'Teste');
@@ -34,9 +39,9 @@ for (const sz of SIZES) {
     const compact = matchMedia('(orientation:landscape) and (max-height:450px)').matches;
     const n = Math.min(lines ?? 4, compact ? 2 : 4);
     feed.innerHTML = Array.from({ length: n }, (_, i) => `<div style="color:#4aa3ff">+ Couraça de Couro Reforçado ${i} <b>×3</b></div>`).join('');
-    // mesma regra de Rewards.place(): abaixo do quadro do personagem ou do alvo empilhado à esquerda
-    const pf = $('player-frame').getBoundingClientRect(), r = tf.getBoundingClientRect();
-    feed.style.top = `${Math.round((r.left < pf.right && r.top >= pf.bottom - 2 ? r.bottom : pf.bottom) + 6)}px`;
+    // regra real do jogo (placeFeed em src/ui/rewards.ts): abaixo do quadro do personagem/alvo, ou ao lado se não couber
+    window.__placeFeed();
+    const ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1;
     const boxes = [];
     for (const id of ids) {
       const el = $(id);
@@ -51,12 +56,12 @@ for (const sz of SIZES) {
       if (a.startsWith('hotbar') && b.startsWith('hotbar')) continue;
       if (A.left < B.right - 1 && B.left < A.right - 1 && A.top < B.bottom - 1 && B.top < A.bottom - 1) out.push(`${a} × ${b}`);
     }
-    return { out, feedLines: n, compact };
+    return { out, feedLines: n, compact, ui };
   }, { ids: IDS, lines: sz.feed });
   const ok = !res.out.length;
   if (!ok) fails++;
-  console.log(`${ok ? 'OK   ' : 'FALHA'} ${sz.name} (feed ${res.feedLines} linhas)${ok ? '' : ': ' + res.out.join('; ')}`);
-  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/${sz.w}x${sz.h}.png` });
+  console.log(`${ok ? 'OK   ' : 'FALHA'} ${sz.name} (feed ${res.feedLines} linhas, escala ${res.ui})${ok ? '' : ': ' + res.out.join('; ')}`);
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/${sz.w}x${sz.h}-${mode}.png` });
   await ctx.close();
 }
 await browser.close();

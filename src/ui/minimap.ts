@@ -3,6 +3,7 @@ import { L, tn } from '../core/i18n';
 import type { GameMap } from '../core/map';
 import type { World } from '../core/world';
 import { closeX } from './labels';
+import { uiScale } from './uiScale';
 
 // Minimapa (melhoria aprovada em 15/11/2026): canto superior direito, mapa isométrico em losango.
 // Monstros = pontinhos minúsculos; chefe destacado; NPCs, portais e o personagem.
@@ -25,7 +26,7 @@ class MapPainter {
 
   /** Losango que cabe em w×h: tile (i,j) -> pixel. */
   private layout(map: GameMap) {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(3, Math.min(2, window.devicePixelRatio || 1) * uiScale());
     const w = this.canvas.clientWidth || 1, h = this.canvas.clientHeight || 1;
     if (this.canvas.width !== Math.round(w * dpr) || this.canvas.height !== Math.round(h * dpr)) {
       this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); this.bgKey = '';
