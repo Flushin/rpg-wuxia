@@ -2138,6 +2138,76 @@
         }
       }
       /* Versão discreta no canto do card inicial */
+      #create-foot {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 10px 0 -6px;
+      }
+      #create-foot #ver-label {
+        margin: 0;
+      }
+      button.link {
+        background: none;
+        border: none;
+        padding: 4px 0;
+        font-size: 11px;
+        color: #99a;
+        text-decoration: underline;
+      }
+      /* Créditos e licenças (tela inicial e ⚙) */
+      #credits-panel {
+        position: fixed;
+        inset: 0;
+        z-index: 35; /* acima da tela inicial (10) e das dicas de item (30); abaixo do carregamento (50) */
+        display: flex;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 12px;
+        overflow: auto;
+        touch-action: pan-y;
+      }
+      #credits-panel .card {
+        width: min(460px, 100%);
+        max-height: none;
+        margin: auto;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        user-select: text;
+        -webkit-user-select: text;
+      }
+      #credits-panel p {
+        margin: 0;
+        font-size: 13px;
+      }
+      .cr-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 13px;
+      }
+      .cr-list li {
+        margin: 0 0 6px;
+      }
+      .cr-lib {
+        font-size: 13px;
+        border: 1px solid #445;
+        border-radius: 6px;
+        padding: 6px 8px;
+      }
+      .cr-lib summary {
+        cursor: pointer;
+      }
+      .cr-lib pre {
+        margin: 8px 0 0;
+        max-height: 40vh;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 11px;
+        color: #bbc;
+      }
       #ver-label {
         margin: 10px 0 -6px;
         text-align: right;
@@ -2241,7 +2311,10 @@
           <button id="btn-del-ok" class="danger wide" disabled>Apagar personagem</button>
           <button id="btn-del-cancel" class="wide">Cancelar</button>
         </div>
-        <div id="ver-label"></div>
+        <div id="create-foot">
+          <button id="btn-credits" class="link">Créditos e licenças</button>
+          <div id="ver-label"></div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

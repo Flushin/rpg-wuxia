@@ -1,6 +1,18 @@
 Efeitos sonoros: Kenney (https://kenney.nl), licença CC0 (domínio público).
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
+Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
+- ui_click     -> UI Audio, "click1"
+- point_spent  -> UI Audio, "click3"
+- tip          -> UI Audio, "rollover3"
+  (os três foram identificados em 17/11/2026 comparando o áudio com o pacote; ver AUDITORIA_DIREITOS.md, seção 2.2.1)
+- miss         -> RPG Audio, "clothBelt"
+- portal       -> RPG Audio, "door4"
+- ui_open      -> RPG Audio, "bookOpen"
+- ui_close     -> RPG Audio, "bookClose"
+- hit, crit, level_up, spell, monster_attack, monster_death, player_death
+               -> Kenney (o autor está gravado nos próprios arquivos); o nome do arquivo original não foi registrado
+
 Música (CC0):
 - cidade: "Oriental" — Shadowfire452 — https://opengameart.org/node/15485
 - floresta: "Asian/Oriental 1" — Tozan — https://opengameart.org/content/asianoriental1

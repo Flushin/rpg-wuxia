@@ -6,6 +6,7 @@ import { GameScene } from './scenes/gameScene';
 import { DPR, cssSize } from './render/display';
 import { fillIcons } from './ui/icons';
 import { captureErrors } from './ui/bugReport';
+import { credits } from './ui/credits';
 import { initUiScale } from './ui/uiScale';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
 
@@ -45,9 +46,11 @@ function applyStaticText() {
   txt('btn-attack', L('Atacar', 'Attack'));
   txt('ld-txt', L('Carregando…', 'Loading…'));
   txt('ver-label', `v${__APP_VERSION__} · ${__BUILD__}`);
+  txt('btn-credits', L('Créditos e licenças', 'Credits and licenses'));
   txt('tip-ok', L('Entendi', 'Got it'));
 }
 applyStaticText();
+document.getElementById('btn-credits')?.addEventListener('click', () => credits().open());
 
 const start = cssSize();
 const game = new Phaser.Game({
