@@ -3,6 +3,7 @@ import { initials, skillScale, type SkillDef } from '../core/skills';
 import type { World } from '../core/world';
 import { isTouch } from './controls';
 import { skillIconHtml } from './icons';
+import { uiRect, uiW } from './uiScale';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const SIZE = 56, R = 118;
@@ -78,8 +79,8 @@ export class Hotbar {
     const d = this.world.activeSkills()[this.shown];
     if (!d) return this.hideTip();
     this.tip.innerHTML = skillTipHtml(this.world, d);
-    const r = this.slots[this.shown].btn.getBoundingClientRect(), w = 240;
-    const x = Math.max(6, Math.min(window.innerWidth - w - 6, r.left + r.width / 2 - w / 2));
+    const r = uiRect(this.slots[this.shown].btn), w = 240;
+    const x = Math.max(6, Math.min(uiW() - w - 6, r.left + r.width / 2 - w / 2));
     this.tip.style.left = `${x}px`;
     this.tip.style.top = '0px';
     const h = this.tip.offsetHeight;

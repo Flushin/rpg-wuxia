@@ -7,6 +7,7 @@ import type { World } from '../core/world';
 import { closeX } from './labels';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import { slotIconHtml } from './icons';
+import { uiH, uiRect, uiW } from './uiScale';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
@@ -51,11 +52,11 @@ export class InventoryPanel {
       const it = c ? this.itemOf(c) : null;
       if (!c || !it) { tip.classList.add('hidden'); return; }
       tip.innerHTML = itemTipHtml(this.world, it); tip.classList.remove('hidden');
-      const r = c.getBoundingClientRect(), w = 230;
-      tip.style.left = `${Math.max(6, Math.min(window.innerWidth - w - 6, r.left + r.width / 2 - w / 2))}px`;
+      const r = uiRect(c), w = 230;
+      tip.style.left = `${Math.max(6, Math.min(uiW() - w - 6, r.left + r.width / 2 - w / 2))}px`;
       tip.style.top = '0px';
       const h = tip.offsetHeight;
-      tip.style.top = `${r.top - h - 8 >= 6 ? r.top - h - 8 : Math.min(window.innerHeight - h - 6, r.bottom + 8)}px`;
+      tip.style.top = `${r.top - h - 8 >= 6 ? r.top - h - 8 : Math.min(uiH() - h - 6, r.bottom + 8)}px`;
     });
     el.addEventListener('pointerout', (e) => { if (e.pointerType === 'mouse') tip.classList.add('hidden'); });
   }

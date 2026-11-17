@@ -9,6 +9,7 @@ import { MONSTERS } from '../core/data';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
 import { BugReport } from './bugReport';
+import { setUiSize, uiSize, type UiSize } from './uiScale';
 
 interface TipDef { title: string; text: string; textTouch?: string; byClass?: Record<string, string> }
 const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
@@ -29,6 +30,8 @@ export class TipManager {
     const panel = $('settings-panel');
     panel.onclick = (e) => {
       const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
+      const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
+      if (ui) { audio.ui('ui_click'); setUiSize(ui.dataset.ui as UiSize); this.renderPanel(); return; }
       if (!t) { if (e.target === panel) this.togglePanel(false); return; }
       audio.ui('ui_click');
       if (t.dataset.act === 'close') this.togglePanel(false);
@@ -68,6 +71,9 @@ export class TipManager {
   private renderPanel() {
     $('settings-panel').innerHTML = `<div class="card">${closeX('data-act="close"')}<h2>${L('Configurações', 'Settings')}</h2>
       <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
+      <div class="opt ui-size-row"><span>${L('Tamanho da interface', 'Interface size')}</span><div class="ui-size">${(
+        [['auto', L('Automático', 'Auto')], ['p', L('Pequena', 'Small')], ['m', L('Normal', 'Normal')], ['g', L('Grande', 'Large')]] as [UiSize, string][]
+      ).map(([k, t]) => `<button data-ui="${k}" class="${uiSize() === k ? 'primary' : ''}">${t}</button>`).join('')}</div></div>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>

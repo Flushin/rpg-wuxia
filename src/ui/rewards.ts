@@ -1,5 +1,6 @@
 // Recompensas fora do meio da tela: XP e ouro no próprio HUD, itens num feed curto à esquerda.
 import type { Rarity } from '../core/types';
+import { uiRect } from './uiScale';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const FEED_KEY = 'rpg.lootFeed';
@@ -68,14 +69,38 @@ export class Rewards {
     if (this.lines.length) this.place();
   }
 
-  /** Abaixo do quadro do personagem — ou do quadro do alvo, quando ele está empilhado à esquerda. */
-  private place() {
-    const pf = $('player-frame').getBoundingClientRect(), tf = $('target-frame');
-    let top = pf.bottom;
-    if (!tf.classList.contains('hidden')) {
-      const r = tf.getBoundingClientRect();
-      if (r.left < pf.right && r.top >= pf.bottom - 2) top = r.bottom;
-    }
-    $('loot-feed').style.top = `${Math.round(top + 6)}px`;
+  private place() { placeFeed(); }
+}
+
+/** Abaixo do quadro do personagem — ou do quadro do alvo, quando ele está empilhado à esquerda.
+ *  Se não sobra espaço até o joystick (tela baixa com interface grande), vai para o lado do quadro do personagem. */
+export function placeFeed() {
+  const pf = uiRect($('player-frame')), tf = $('target-frame'), feed = $('loot-feed');
+  let top = pf.bottom;
+  if (!tf.classList.contains('hidden')) {
+    const r = uiRect(tf);
+    if (r.left < pf.right && r.top >= pf.bottom - 2) top = r.bottom;
   }
+  feed.style.left = ''; feed.style.maxHeight = ''; feed.style.width = '';
+  const y = Math.round(top + 6);
+  feed.style.top = `${y}px`;
+  const room = feedRoom(y);
+  const side = Math.floor(uiRect($('top-right')).left - 8 - (pf.right + 8)); // espaço entre o quadro e os botões do topo
+  if (room !== '' && parseInt(room) < 40 && side >= 120) {
+    feed.style.left = `${Math.round(pf.right + 8)}px`; feed.style.top = `${Math.round(pf.top)}px`;
+    if (side < feed.offsetWidth) feed.style.width = `${side}px`;
+  } else feed.style.maxHeight = room;
+}
+(window as unknown as { __placeFeed: () => void }).__placeFeed = placeFeed; // usado por tools/layout-check.mjs
+
+/** Espaço até o joystick/poções embaixo (interface grande em tela baixa): as linhas mais antigas ficam escondidas. */
+export function feedRoom(top: number): string {
+  let limit = Infinity;
+  for (const id of ['joystick', 'potion-bar']) {
+    const el = document.getElementById(id);
+    if (!el || el.classList.contains('hidden') || !el.offsetWidth) continue;
+    const r = uiRect(el), f = uiRect($('loot-feed'));
+    if (r.left < f.left + f.width && f.left < r.right) limit = Math.min(limit, r.top - 6);
+  }
+  return limit === Infinity ? '' : `${Math.max(0, Math.floor(limit - top))}px`;
 }

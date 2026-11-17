@@ -409,6 +409,23 @@ Implementadas a pedido do Lucas e publicadas no site.
   Nomes de monstros e do jogador ficam sempre por cima (árvores não cortam mais). Skills prontas não ficam mais apagadas (a camada
   escura de "bloqueada" cobria todas): **só ficam apagadas em recarga**; sem mana continua a borda azul.
 
+- **Tamanho da interface e zoom do navegador** *(PR #19, pedido pelo Lucas em 16/11/2026)*: no celular deitado tudo ficava
+  pequeno demais (telas até 450 px de altura entram no modo compacto), e no iPhone o pinça às vezes ampliava a página em vez do jogo,
+  quebrando o HUD.
+  - **⚙ "Tamanho da interface":** Automático (padrão) / Pequena (100%, como antes) / Normal (115%) / Grande (130%), salvo em cada
+    aparelho (`localStorage` `rpg-ui-size`). O HUD inteiro (quadros, botões, skills, joystick, janelas) cresce na mesma proporção.
+  - **Automático:** só no toque com o aparelho deitado: **120%** em celulares como o iPhone Pro Max (~932×430) e **115%** no Fold
+    fechado (~920×316). Em pé, no Fold aberto e no PC continua 100%.
+  - **Limite para caber:** a escala nunca passa do que cabe sem sobreposição (deitado: tela virtual com pelo menos 270 px de altura;
+    em pé: 360 px de largura). Ex.: Grande no Fold fechado vira ~117%.
+  - **Feed de itens:** se não houver espaço até o joystick, vai para o lado do quadro do personagem.
+  - **Zoom do mundo continua em 100%** (pinça no mapa segue funcionando).
+  - **Zoom do navegador bloqueado:** pinça (eventos de gesto do Safari e dois dedos) e toque duplo (`touch-action: manipulation`
+    nos botões). Se a página ainda assim ficar ampliada, aparece um aviso ("Página ampliada — afaste dois dedos") e o gesto é
+    liberado para o jogador voltar ao normal.
+  - **Código:** `src/ui/uiScale.ts`, `src/ui/noBrowserZoom.ts`. `tools/layout-check.mjs` agora testa cada tamanho com interface
+    Automática e Grande e inclui o **iPhone Pro Max deitado 932×430**.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

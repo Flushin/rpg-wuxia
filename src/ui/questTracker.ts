@@ -1,6 +1,7 @@
 import { L } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import type { World } from '../core/world';
+import { uiRect, uiScale } from './uiScale';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -24,7 +25,7 @@ export class QuestTracker {
   private sig = '';
   update(w: World) {
     const el = $('quest-tracker'), v = w.questView();
-    const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${innerWidth}x${innerHeight}`;
+    const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${innerWidth}x${innerHeight}|${uiScale()}`;
     if (sig !== this.sig) {
       this.sig = sig;
       if (!v.def) { el.classList.add('hidden'); return; }
@@ -38,7 +39,7 @@ export class QuestTracker {
       el.classList.remove('hidden');
     }
     // logo abaixo do bloco do topo direito (que muda de altura conforme a tela)
-    const r = $('top-right').getBoundingClientRect();
+    const r = uiRect($('top-right'));
     el.style.top = `${Math.round(r.bottom + 6)}px`;
   }
 }

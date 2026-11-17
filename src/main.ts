@@ -6,8 +6,12 @@ import { GameScene } from './scenes/gameScene';
 import { DPR, cssSize } from './render/display';
 import { fillIcons } from './ui/icons';
 import { captureErrors } from './ui/bugReport';
+import { initUiScale } from './ui/uiScale';
+import { initNoBrowserZoom } from './ui/noBrowserZoom';
 
 captureErrors();
+initUiScale();
+initNoBrowserZoom();
 
 fillIcons();
 
