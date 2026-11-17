@@ -443,6 +443,11 @@ Implementadas a pedido do Lucas e publicadas no site.
   calculado para sobrar pelo menos 6 px (~36°). Em pé não mudou. O `layout-check` passou a comparar os botões redondos entre si
   (antes ignorava as skills umas com as outras, por isso não pegou).
 
+- **Mochila voltando para o topo** *(PR #22, 17/11/2026)*: com o auto ligado, cada mudança no inventário (golpe recebido
+  gastando durabilidade, item coletado, poção usada) redesenhava a mochila inteira, e a rolagem voltava para o topo.
+  Agora a posição da rolagem é mantida, e mudanças vindas do jogo esperam o jogador parar de rolar (~0,7 s depois de soltar o
+  dedo) para redesenhar. Ações do próprio jogador (tocar num item, equipar, trocar de aba) continuam na hora.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
