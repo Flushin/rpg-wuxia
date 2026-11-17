@@ -2,9 +2,7 @@ import { L } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import type { World } from '../core/world';
 import { uiRect, uiScale } from './uiScale';
-
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
-const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+import { byId, escapeHtml } from './dom';
 
 /** Nome de exibição de um NPC pelo id ('anciao', 'mestre_lamina'...). */
 export function npcName(id: string): string {
@@ -24,7 +22,7 @@ export function rewardText(r: { xp: number; gold: number; item?: 'arma' | 'tronc
 export class QuestTracker {
   private sig = '';
   update(w: World) {
-    const el = $('quest-tracker'),
+    const el = byId('quest-tracker'),
       v = w.questView();
     const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${innerWidth}x${innerHeight}|${uiScale()}`;
     if (sig !== this.sig) {
@@ -38,20 +36,23 @@ export class QuestTracker {
         line = `<span class="muted">${L(`Próxima missão no nível ${v.def.minLevel}`, `Next quest at level ${v.def.minLevel}`)}</span>`;
       else if (v.phase === 'available')
         line = L(
-          `Fale com <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`,
-          `Talk to <b>${esc(npcName(v.giver))}</b> <i class="qm">!</i>`,
+          `Fale com <b>${escapeHtml(npcName(v.giver))}</b> <i class="qm">!</i>`,
+          `Talk to <b>${escapeHtml(npcName(v.giver))}</b> <i class="qm">!</i>`,
         );
       else if (v.phase === 'ready')
-        line = `✓ ${L(`Volte a <b>${esc(npcName(v.turnIn))}</b>`, `Return to <b>${esc(npcName(v.turnIn))}</b>`)} <i class="qm">?</i>`;
+        line = `✓ ${L(`Volte a <b>${escapeHtml(npcName(v.turnIn))}</b>`, `Return to <b>${escapeHtml(npcName(v.turnIn))}</b>`)} <i class="qm">?</i>`;
       else if (v.def.objective.type === 'talk') {
         const who = npcName(w.questTalkTarget());
-        line = L(`Fale com <b>${esc(who)}</b> <i class="qm">?</i>`, `Talk to <b>${esc(who)}</b> <i class="qm">?</i>`);
-      } else line = v.count > 1 ? `${esc(v.def.goal)} <b>${v.progress}/${v.count}</b>` : esc(v.def.goal);
-      el.innerHTML = `<div class="qt-name">${esc(v.def.name)}</div><div class="qt-line">${line}</div>`;
+        line = L(
+          `Fale com <b>${escapeHtml(who)}</b> <i class="qm">?</i>`,
+          `Talk to <b>${escapeHtml(who)}</b> <i class="qm">?</i>`,
+        );
+      } else line = v.count > 1 ? `${escapeHtml(v.def.goal)} <b>${v.progress}/${v.count}</b>` : escapeHtml(v.def.goal);
+      el.innerHTML = `<div class="qt-name">${escapeHtml(v.def.name)}</div><div class="qt-line">${line}</div>`;
       el.classList.remove('hidden');
     }
     // logo abaixo do bloco do topo direito (que muda de altura conforme a tela)
-    const r = uiRect($('top-right'));
+    const r = uiRect(byId('top-right'));
     el.style.top = `${Math.round(r.bottom + 6)}px`;
   }
 }

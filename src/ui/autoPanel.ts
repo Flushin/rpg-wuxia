@@ -5,8 +5,8 @@ import { skillIconHtml } from './icons';
 import type { World, OfflineReport } from '../core/world';
 import { audio } from '../render/audio';
 import { closeX } from './labels';
+import { byId } from './dom';
 
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const fmtDur = (ms: number) => {
   const m = Math.floor(ms / 60000),
     h = Math.floor(m / 60);
@@ -16,7 +16,7 @@ const fmtDur = (ms: number) => {
 // Menu do auto-combate (engrenagem ao lado do botão Auto).
 export class AutoPanel {
   constructor(private world: World) {
-    const el = $('auto-panel');
+    const el = byId('auto-panel');
     el.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
       if (t === el || t.closest('[data-act="close"]')) this.set(false);
@@ -41,12 +41,12 @@ export class AutoPanel {
     });
   }
   get open() {
-    return !$('auto-panel').classList.contains('hidden');
+    return !byId('auto-panel').classList.contains('hidden');
   }
   set(open: boolean) {
     if (open === this.open) return;
     audio.ui(open ? 'ui_open' : 'ui_close');
-    $('auto-panel').classList.toggle('hidden', !open);
+    byId('auto-panel').classList.toggle('hidden', !open);
     if (open) this.render();
   }
 
@@ -63,7 +63,7 @@ export class AutoPanel {
       .join('');
     const sld = (label: string, k: string, min: number, max: number, v: number, pct: boolean) =>
       `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${v}${pct ? '%' : ''}</output></label>`;
-    $('auto-panel').innerHTML =
+    byId('auto-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
       <small class="muted">${L('O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de 70% em combate.', 'The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below 70% in combat.')}</small>
@@ -91,7 +91,7 @@ export class AutoPanel {
 }
 
 export function showOfflineReport(rep: OfflineReport, onClose: () => void) {
-  const el = $('offline-panel');
+  const el = byId('offline-panel');
   const row = (a: string, b: string) => `<div class="rep-row"><span>${a}</span><b>${b}</b></div>`;
   const items = (['raro', 'incomum', 'comum'] as const)
     .map((r) => {
@@ -115,7 +115,7 @@ export function showOfflineReport(rep: OfflineReport, onClose: () => void) {
     <button class="primary" id="offline-ok">${L('Continuar', 'Continue')}</button></div>`;
   el.classList.remove('hidden');
   audio.ui('ui_open');
-  ($('offline-ok') as HTMLButtonElement).onclick = () => {
+  (byId('offline-ok') as HTMLButtonElement).onclick = () => {
     el.classList.add('hidden');
     audio.ui('ui_close');
     onClose();

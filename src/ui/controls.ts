@@ -1,9 +1,9 @@
 import type { World } from '../core/world';
 import type { Hud } from './hud';
 import { toUi } from './uiScale';
+import { byId } from './dom';
 
 export const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
 export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: number) => boolean = () => false) {
   window.addEventListener('keydown', (e) => {
@@ -26,13 +26,13 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
       world.attackNearest();
     }
   });
-  $('btn-attrs').addEventListener('click', () => hud.togglePanel());
-  $('btn-skills').addEventListener('click', () => hud.toggleSkills());
-  $('btn-bag').addEventListener('click', () => hud.toggleInventory());
+  byId('btn-attrs').addEventListener('click', () => hud.togglePanel());
+  byId('btn-skills').addEventListener('click', () => hud.toggleSkills());
+  byId('btn-bag').addEventListener('click', () => hud.toggleInventory());
 
   if (!isTouch) return;
   setupJoystick(world, tapAt);
-  const atk = $('btn-attack');
+  const atk = byId('btn-attack');
   atk.classList.remove('hidden');
   atk.addEventListener('pointerdown', (e) => {
     e.preventDefault();
@@ -44,9 +44,9 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
  *  se o dedo passa do limite, a base vai junto (o pino nunca trava). Parado, o círculo fica no lugar de sempre como guia.
  *  Toque em monstro/NPC dentro da área continua selecionando (não abre o joystick). */
 function setupJoystick(world: World, tapAt: (x: number, y: number) => boolean) {
-  const zone = $('joy-zone'),
-    joy = $('joystick'),
-    knob = $('knob');
+  const zone = byId('joy-zone'),
+    joy = byId('joystick'),
+    knob = byId('knob');
   zone.classList.remove('hidden');
   joy.classList.remove('hidden');
   let active: number | null = null;

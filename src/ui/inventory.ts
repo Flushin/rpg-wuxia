@@ -8,8 +8,8 @@ import { closeX } from './labels';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import { slotIconHtml } from './icons';
 import { uiH, uiRect, uiW } from './uiScale';
+import { byId } from './dom';
 
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
 const selKey = (s: Sel | null) => (s ? (s.kind === 'bag' ? `b${s.i}` : `e${s.slot}`) : '');
 type Tab = 'equip' | 'pot'; // Craft e Gemas entram quando esses sistemas existirem
@@ -49,8 +49,8 @@ export class InventoryPanel {
     private toast: (m: string, c?: string) => void,
     private onClose: () => void,
   ) {
-    const el = $('inv-panel'),
-      tip = $('item-tip');
+    const el = byId('inv-panel'),
+      tip = byId('item-tip');
     el.addEventListener('click', (e) => this.click(e));
     el.addEventListener('contextmenu', (e) => e.preventDefault());
     const busy = (ms: number) => () => {
@@ -96,11 +96,11 @@ export class InventoryPanel {
   }
 
   get open() {
-    return !$('inv-panel').classList.contains('hidden');
+    return !byId('inv-panel').classList.contains('hidden');
   }
   set(open: boolean) {
-    $('inv-panel').classList.toggle('hidden', !open);
-    $('item-tip').classList.add('hidden');
+    byId('inv-panel').classList.toggle('hidden', !open);
+    byId('item-tip').classList.add('hidden');
     this.sig = '';
     if (!open) this.sel = null;
   }
@@ -120,7 +120,7 @@ export class InventoryPanel {
       this.act(act.dataset.act!);
       return;
     }
-    if (t === $('inv-panel')) {
+    if (t === byId('inv-panel')) {
       this.onClose();
       return;
     }
@@ -134,7 +134,7 @@ export class InventoryPanel {
     this.last = { key, t: now };
     this.sel = sel;
     this.sig = '';
-    $('item-tip').classList.add('hidden');
+    byId('item-tip').classList.add('hidden');
     if (dbl && this.selItem())
       this.act(sel.kind === 'eq' ? 'unequip' : POTIONS[this.selItem()!.baseId] ? 'use' : 'equip');
   }
@@ -217,7 +217,7 @@ export class InventoryPanel {
     }
     // A moldura (.inv-card, que é quem rola) é criada uma vez e nunca é trocada: só o conteúdo de dentro é redesenhado.
     // Trocar a moldura inteira jogava a rolagem para o topo (e cortava a rolagem no meio, no iPhone).
-    const panel = $('inv-panel');
+    const panel = byId('inv-panel');
     let main = panel.querySelector('.inv-main') as HTMLElement | null,
       det = panel.querySelector('.inv-detail') as HTMLElement | null;
     if (!main || !det) {

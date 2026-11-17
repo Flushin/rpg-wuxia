@@ -1,8 +1,8 @@
 // Recompensas fora do meio da tela: XP e ouro no próprio HUD, itens num feed curto à esquerda.
 import type { Rarity } from '../core/types';
 import { uiRect } from './uiScale';
+import { byId, escapeHtml } from './dom';
 
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const FEED_KEY = 'rpg.lootFeed';
 const LINE_MS = 3000;
 const GOLD_MS = 2500;
@@ -25,7 +25,6 @@ export const saveLootFilter = (v: LootFilter) => {
 
 /** Celular deitado com pouca altura (ex.: Galaxy Z Fold fechado ~920×316): só 2 linhas. */
 const compact = () => window.matchMedia('(orientation:landscape) and (max-height:450px)').matches;
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 interface Line {
   key: string;
@@ -47,14 +46,14 @@ export class Rewards {
     const now = performance.now();
     this.goldSum = now < this.goldUntil ? this.goldSum + amount : amount; // abates seguidos somam no mesmo número
     this.goldUntil = now + GOLD_MS;
-    const el = $('p-gold-plus');
+    const el = byId('p-gold-plus');
     el.textContent = `+${this.goldSum}`;
     el.classList.remove('fade');
     el.classList.add('show');
   }
 
   xp() {
-    const bar = $('p-xp').parentElement as HTMLElement;
+    const bar = byId('p-xp').parentElement as HTMLElement;
     bar.classList.add('glow');
     clearTimeout(this.xpTimer);
     this.xpTimer = window.setTimeout(() => bar.classList.remove('glow'), 700);
@@ -76,10 +75,10 @@ export class Rewards {
       this.lines.push(ln);
     }
     ln.el.style.color = color;
-    ln.el.innerHTML = `+ ${esc(name)}${ln.qty > 1 ? ` <b>×${ln.qty}</b>` : ''}`;
+    ln.el.innerHTML = `+ ${escapeHtml(name)}${ln.qty > 1 ? ` <b>×${ln.qty}</b>` : ''}`;
     const max = compact() ? 2 : 4;
     while (this.lines.length > max) this.lines.shift()!.el.remove();
-    const feed = $('loot-feed');
+    const feed = byId('loot-feed');
     for (const l of this.lines) feed.appendChild(l.el); // ordem: mais novo embaixo
     this.place();
   }
@@ -89,7 +88,7 @@ export class Rewards {
     if (this.goldUntil && now >= this.goldUntil) {
       this.goldUntil = 0;
       this.goldSum = 0;
-      $('p-gold-plus').classList.replace('show', 'fade');
+      byId('p-gold-plus').classList.replace('show', 'fade');
     }
     if (!this.lines.length) return;
     const gone = this.lines.filter((l) => now >= l.until);
@@ -108,9 +107,9 @@ export class Rewards {
 /** Abaixo do quadro do personagem — ou do quadro do alvo, quando ele está empilhado à esquerda.
  *  Se não sobra espaço até o joystick (tela baixa com interface grande), vai para o lado do quadro do personagem. */
 export function placeFeed() {
-  const pf = uiRect($('player-frame')),
-    tf = $('target-frame'),
-    feed = $('loot-feed');
+  const pf = uiRect(byId('player-frame')),
+    tf = byId('target-frame'),
+    feed = byId('loot-feed');
   let top = pf.bottom;
   if (!tf.classList.contains('hidden')) {
     const r = uiRect(tf);
@@ -122,7 +121,7 @@ export function placeFeed() {
   const y = Math.round(top + 6);
   feed.style.top = `${y}px`;
   const room = feedRoom(y);
-  const side = Math.floor(uiRect($('top-right')).left - 8 - (pf.right + 8)); // espaço entre o quadro e os botões do topo
+  const side = Math.floor(uiRect(byId('top-right')).left - 8 - (pf.right + 8)); // espaço entre o quadro e os botões do topo
   if (room !== '' && parseInt(room) < 40 && side >= 120) {
     feed.style.left = `${Math.round(pf.right + 8)}px`;
     feed.style.top = `${Math.round(pf.top)}px`;
@@ -138,7 +137,7 @@ export function feedRoom(top: number): string {
     const el = document.getElementById(id);
     if (!el || el.classList.contains('hidden') || !el.offsetWidth) continue;
     const r = uiRect(el),
-      f = uiRect($('loot-feed'));
+      f = uiRect(byId('loot-feed'));
     if (r.left < f.left + f.width && f.left < r.right) limit = Math.min(limit, r.top - 6);
   }
   return limit === Infinity ? '' : `${Math.max(0, Math.floor(limit - top))}px`;

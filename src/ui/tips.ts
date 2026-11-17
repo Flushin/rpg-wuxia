@@ -10,6 +10,7 @@ import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
 import { BugReport } from './bugReport';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
+import { byId } from './dom';
 
 interface TipDef {
   title: string;
@@ -18,7 +19,6 @@ interface TipDef {
   byClass?: Record<string, string>;
 }
 const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 
 export class TipManager {
   private queue: string[] = [];
@@ -35,9 +35,9 @@ export class TipManager {
     private rewards?: Rewards,
   ) {
     this.bug = new BugReport(world);
-    $('tip-ok').onclick = () => this.dismiss();
-    $('btn-settings').onclick = () => this.togglePanel();
-    const panel = $('settings-panel');
+    byId('tip-ok').onclick = () => this.dismiss();
+    byId('btn-settings').onclick = () => this.togglePanel();
+    const panel = byId('settings-panel');
     panel.onclick = (e) => {
       const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
       const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
@@ -102,7 +102,7 @@ export class TipManager {
   }
 
   private togglePanel(open?: boolean) {
-    const p = $('settings-panel');
+    const p = byId('settings-panel');
     const show = open ?? p.classList.contains('hidden');
     if (show !== !p.classList.contains('hidden')) audio.ui(show ? 'ui_open' : 'ui_close');
     p.classList.toggle('hidden', !show);
@@ -110,7 +110,7 @@ export class TipManager {
   }
 
   private renderPanel() {
-    $('settings-panel').innerHTML =
+    byId('settings-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Configurações', 'Settings')}</h2>
       <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
       <div class="opt ui-size-row"><span>${L('Tamanho da interface', 'Interface size')}</span><div class="ui-size">${(
@@ -134,7 +134,7 @@ export class TipManager {
       <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
       <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
-    bindLangButtons($('settings-panel'));
+    bindLangButtons(byId('settings-panel'));
   }
 
   trigger(id: string) {
@@ -149,17 +149,17 @@ export class TipManager {
     if (this.current || !this.queue.length) return;
     this.current = this.queue.shift()!;
     const t = TIPS[this.current];
-    $('tip-title').textContent = t.title;
-    $('tip-text').textContent =
+    byId('tip-title').textContent = t.title;
+    byId('tip-text').textContent =
       (isTouch && t.textTouch ? t.textTouch : t.text) +
       (t.byClass?.[this.world.classId] ? ` ${t.byClass[this.world.classId]}` : '');
-    $('tip-card').classList.remove('hidden');
+    byId('tip-card').classList.remove('hidden');
     audio.ui('tip');
   }
 
   private hideCard() {
     this.current = null;
-    $('tip-card').classList.add('hidden');
+    byId('tip-card').classList.add('hidden');
   }
 
   private dismiss() {

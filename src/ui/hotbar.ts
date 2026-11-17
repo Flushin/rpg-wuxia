@@ -4,15 +4,15 @@ import type { World } from '../core/world';
 import { isTouch } from './controls';
 import { skillIconHtml } from './icons';
 import { uiRect, uiW } from './uiScale';
+import { byId } from './dom';
 
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const SIZE = 56,
   R = 118;
 
 // Barra de skills: PC (embaixo, centro, teclas 1-4) e celular (arco em volta do botão Atacar).
 export class Hotbar {
-  private el = $('hotbar');
-  private tip = $('skill-tip');
+  private el = byId('hotbar');
+  private tip = byId('skill-tip');
   private slots: { btn: HTMLButtonElement; sweep: HTMLElement; cdt: HTMLElement; lock: HTMLElement; sig: string }[] =
     [];
   private shown = -1;

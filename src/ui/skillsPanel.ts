@@ -3,8 +3,7 @@ import { initials, skillScale } from '../core/skills';
 import { skillIconHtml } from './icons';
 import type { World } from '../core/world';
 import { closeX } from './labels';
-
-const $ = (id: string) => document.getElementById(id) as HTMLElement;
+import { byId } from './dom';
 
 // Painel de skills (tecla K): ensina o que cada skill faz e como ela evolui.
 export class SkillsPanel {
@@ -13,7 +12,7 @@ export class SkillsPanel {
     private world: World,
     private onClose: () => void,
   ) {
-    const el = $('skills-panel');
+    const el = byId('skills-panel');
     el.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
       if (t === el || t.closest('[data-close]')) this.onClose();
@@ -21,10 +20,10 @@ export class SkillsPanel {
   }
 
   get open() {
-    return !$('skills-panel').classList.contains('hidden');
+    return !byId('skills-panel').classList.contains('hidden');
   }
   set(open: boolean) {
-    $('skills-panel').classList.toggle('hidden', !open);
+    byId('skills-panel').classList.toggle('hidden', !open);
     this.sig = '';
   }
 
@@ -60,7 +59,7 @@ export class SkillsPanel {
         <div><b>${d.name}</b>${key}<div class="d">${d.description}</div>${stats}${prog}</div></div>`;
       })
       .join('');
-    $('skills-panel').innerHTML = `<div class="card">${closeX('data-close="1"')}<h2>Skills</h2>
+    byId('skills-panel').innerHTML = `<div class="card">${closeX('data-close="1"')}<h2>Skills</h2>
       <small class="muted">${L('Skills ativas sobem de nível quando usadas. Passivas sobem com o nível do personagem. Cada nível dá +8% de efeito.', 'Active skills level up when used. Passives grow with your character level. Each level gives +8% effect.')}</small>${rows}
       <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`;
   }
