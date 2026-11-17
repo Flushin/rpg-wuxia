@@ -1,6 +1,6 @@
 // Monta o trailer a partir das tomadas gravadas por record.mjs: cortes, textos, transições,
 // música (faixa CC0 do próprio jogo) e efeitos sonoros nos quadros em que aconteceram.
-// Uso: node tools/trailer/build.mjs [--out trailer-out]   →   trailer-out/wanderers-trailer.mp4
+// Uso: node tools/trailer/build.mjs [--out trailer-out]   [--cut longo|curto]   →   trailer-out/wanderers-trailer-<corte>.mp4
 // Precisa de ffmpeg e do Playwright (para desenhar os textos em HTML).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,19 +22,34 @@ fs.mkdirSync(TMP, { recursive: true });
 
 // ---------- montagem: ordem, cortes (em quadros) e textos ----------
 // text: [arquivo do texto, início (s), fim (s)] — tempos dentro da tomada já cortada
-const EDIT = [
-  { shot: 'vila', from: 0, to: 330, texts: [['titulo', 0.4, 3.6]] },
-  { shot: 'mestres', from: 0, to: 270, texts: [['seitas', 0.5, 4.0]] },
-  { shot: 'portao', from: 20, to: 300, texts: [['explore', 0.5, 3.6]] },
-  { shot: 'floresta', from: 0, to: 270 },
-  { shot: 'combate_tormenta', from: 0, to: 480, texts: [['tormenta', 0.3, 3.0]] },
-  { shot: 'combate_geada', from: 0, to: 450, texts: [['geada', 0.3, 3.0]] },
-  { shot: 'ruinas', from: 0, to: 270, texts: [['ruinas', 0.5, 4.0]] },
-  { shot: 'general_revela', from: 0, to: 240, texts: [['general', 1.2, 3.9]] },
-  { shot: 'general_luta', from: 0, to: 420 },
-  { shot: 'general_final', from: 40, to: 300 },
-  { card: 'fim', seconds: 5 },
-];
+const CUTS = {
+  // ~55 s: página do jogo, YouTube
+  longo: [
+    { shot: 'vila', from: 0, to: 330, texts: [['titulo', 0.4, 3.6]] },
+    { shot: 'mestres', from: 0, to: 270, texts: [['seitas', 0.5, 4.0]] },
+    { shot: 'portao', from: 20, to: 240, texts: [['explore', 0.4, 3.2]] },
+    { shot: 'floresta', from: 0, to: 270 },
+    { shot: 'combate_tormenta', from: 0, to: 510, texts: [['tormenta', 0.3, 3.0]] },
+    { shot: 'combate_geada', from: 0, to: 450, texts: [['geada', 0.3, 3.0]] },
+    { shot: 'ruinas', from: 0, to: 270, texts: [['ruinas', 0.5, 4.0]] },
+    { shot: 'general_revela', from: 0, to: 240, texts: [['general', 1.2, 3.9]] },
+    { shot: 'general_luta', from: 0, to: 420 },
+    { shot: 'general_final', from: 40, to: 300 },
+    { card: 'fim', seconds: 5 },
+  ],
+  // ~28 s: Reels, TikTok, Shorts, anúncios
+  curto: [
+    { shot: 'vila', from: 0, to: 180, texts: [['titulo', 0.2, 2.9]] },
+    { shot: 'portao', from: 20, to: 200, texts: [['explore', 0.2, 2.8]] },
+    { shot: 'combate_tormenta', from: 150, to: 510, texts: [['tormenta', 0.2, 2.6]] },
+    { shot: 'combate_geada', from: 100, to: 400, texts: [['geada', 0.2, 2.6]] },
+    { shot: 'general_revela', from: 60, to: 240, texts: [['general', 0.3, 2.9]] },
+    { shot: 'general_luta', from: 120, to: 300 },
+    { shot: 'general_final', from: 60, to: 300 },
+    { card: 'fim', seconds: 4 },
+  ],
+};
+const ONLY = arg('--cut', '');
 
 // ---------- textos (HTML → PNG transparente) ----------
 const FONT = `'Inter Display', 'Inter', system-ui, sans-serif`;
@@ -99,8 +114,8 @@ function ff(args) {
 }
 
 // ---------- cada tomada vira um clipe (com os textos por cima) ----------
-function buildClip(e, i) {
-  const out = path.join(TMP, `clip_${String(i).padStart(2, '0')}.mp4`);
+function buildClip(e, i, cut) {
+  const out = path.join(TMP, `clip_${cut}_${String(i).padStart(2, '0')}.mp4`);
   const enc = ['-c:v', 'libx264', '-preset', 'medium', '-crf', '12', '-pix_fmt', 'yuv420p', '-r', String(FPS)];
   if (e.card) {
     const d = e.seconds;
@@ -151,7 +166,7 @@ function decode(file) {
   const b = r.stdout;
   return new Float32Array(b.buffer, b.byteOffset, b.length / 4);
 }
-function mixAudio(clips, total) {
+function mixAudio(clips, total, cut) {
   const N = Math.ceil(total * SR) * 2,
     mix = new Float32Array(N);
   const music = decode(path.join(ROOT, 'public/audio/music/floresta.mp3'));
@@ -195,71 +210,75 @@ function mixAudio(clips, total) {
   for (let j = 0; j < N; j++) peak = Math.max(peak, Math.abs(mix[j]));
   const k = peak > 0.95 ? 0.95 / peak : 1;
   for (let j = 0; j < N; j++) mix[j] = Math.tanh(mix[j] * k * 1.1) / Math.tanh(1.1);
-  const raw = path.join(TMP, 'mix.f32');
+  const raw = path.join(TMP, `mix_${cut}.f32`);
   fs.writeFileSync(raw, Buffer.from(mix.buffer));
   console.log(`áudio: ${count} efeitos sonoros, pico ${peak.toFixed(2)}`);
   return raw;
 }
 
 // ---------- montagem final ----------
-await renderTexts();
-const clips = [];
-let t = 0;
-EDIT.forEach((e, i) => {
-  const c = buildClip(e, i);
-  c.edit = e;
-  c.start = i === 0 ? 0 : t - XF;
-  t = c.start + c.dur;
-  clips.push(c);
-  console.log(`clipe ${i} ${e.shot ?? e.card}: ${c.dur.toFixed(2)} s (começa em ${c.start.toFixed(2)} s)`);
-});
-const total = t;
-const raw = mixAudio(clips, total);
+function makeCut(cut, edit) {
+  const clips = [];
+  let t = 0;
+  edit.forEach((e, i) => {
+    const c = buildClip(e, i, cut);
+    c.edit = e;
+    c.start = i === 0 ? 0 : t - XF;
+    t = c.start + c.dur;
+    clips.push(c);
+    console.log(`clipe ${i} ${e.shot ?? e.card}: ${c.dur.toFixed(2)} s (começa em ${c.start.toFixed(2)} s)`);
+  });
+  const total = t;
+  const raw = mixAudio(clips, total, cut);
 
-const inputs = clips.flatMap((c) => ['-i', c.out]);
-let filter = '',
-  prev = '[0:v]';
-clips.slice(1).forEach((c, k) => {
-  const i = k + 1;
-  const trans = i === clips.length - 1 ? 'fadeblack' : 'fade';
-  filter += `${prev}[${i}:v]xfade=transition=${trans}:duration=${XF}:offset=${c.start.toFixed(4)}[x${i}];`;
-  prev = `[x${i}]`;
-});
-filter += `${prev}fade=in:st=0:d=0.8,fade=out:st=${(total - 0.8).toFixed(3)}:d=0.8,format=yuv420p[v]`;
-const final = path.join(OUT, 'wanderers-trailer.mp4');
-ff([
-  ...inputs,
-  '-f',
-  'f32le',
-  '-ar',
-  String(SR),
-  '-ac',
-  '2',
-  '-i',
-  raw,
-  '-filter_complex',
-  filter,
-  '-map',
-  '[v]',
-  '-map',
-  `${clips.length}:a`,
-  '-c:v',
-  'libx264',
-  '-preset',
-  'slow',
-  '-crf',
-  '18',
-  '-profile:v',
-  'high',
-  '-r',
-  String(FPS),
-  '-c:a',
-  'aac',
-  '-b:a',
-  '192k',
-  '-shortest',
-  '-movflags',
-  '+faststart',
-  final,
-]);
-console.log(`pronto: ${final} (${total.toFixed(1)} s)`);
+  const inputs = clips.flatMap((c) => ['-i', c.out]);
+  let filter = '',
+    prev = '[0:v]';
+  clips.slice(1).forEach((c, k) => {
+    const i = k + 1;
+    const trans = i === clips.length - 1 ? 'fadeblack' : 'fade';
+    filter += `${prev}[${i}:v]xfade=transition=${trans}:duration=${XF}:offset=${c.start.toFixed(4)}[x${i}];`;
+    prev = `[x${i}]`;
+  });
+  filter += `${prev}fade=in:st=0:d=0.8,fade=out:st=${(total - 0.8).toFixed(3)}:d=0.8,format=yuv420p[v]`;
+  const final = path.join(OUT, `wanderers-trailer-${cut}.mp4`);
+  ff([
+    ...inputs,
+    '-f',
+    'f32le',
+    '-ar',
+    String(SR),
+    '-ac',
+    '2',
+    '-i',
+    raw,
+    '-filter_complex',
+    filter,
+    '-map',
+    '[v]',
+    '-map',
+    `${clips.length}:a`,
+    '-c:v',
+    'libx264',
+    '-preset',
+    'slow',
+    '-crf',
+    '18',
+    '-profile:v',
+    'high',
+    '-r',
+    String(FPS),
+    '-c:a',
+    'aac',
+    '-b:a',
+    '192k',
+    '-shortest',
+    '-movflags',
+    '+faststart',
+    final,
+  ]);
+  console.log(`pronto: ${final} (${total.toFixed(1)} s)`);
+}
+
+await renderTexts();
+for (const [cut, edit] of Object.entries(CUTS)) if (!ONLY || ONLY === cut) makeCut(cut, edit);

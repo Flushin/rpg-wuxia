@@ -132,7 +132,7 @@ export const SHOTS = [
     },
     cam(D, i, n) {
       const t = D.ease(i / (n - 1));
-      D.look(D.lerp(16, 24.5, t), D.lerp(16.5, 16.5, t), D.lerp(1.3, 2.3, t), D.lerp(20, 40, t));
+      D.look(D.lerp(16, 23.6, t), D.lerp(16.5, 16.2, t), D.lerp(1.45, 2.4, t), D.lerp(20, 40, t));
     },
   },
   {
@@ -172,7 +172,7 @@ export const SHOTS = [
         ty = (p.y * 2 + b.y) / 3;
       D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.08);
       D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.08);
-      D.look(D.cx, D.cy, 1.55, 24);
+      D.look(Math.min(D.cx, 22), D.cy, 1.85, 24);
     },
   },
   {
@@ -205,8 +205,8 @@ export const SHOTS = [
         ty = (p.y + b.y) / 2;
       D.cx = D.cx === undefined ? tx : D.lerp(D.cx, tx, 0.1);
       D.cy = D.cy === undefined ? ty : D.lerp(D.cy, ty, 0.1);
-      const z = i < 90 ? 1.8 : 1.8 + 0.6 * D.easeSine(Math.min(1, (i - 90) / 60));
-      D.look(D.cx, D.cy, z, 30);
+      const z = i < 90 ? 2.1 : 2.1 + 0.5 * D.easeSine(Math.min(1, (i - 90) / 60));
+      D.look(Math.min(D.cx, 22.5), D.cy, z, 30);
       if (i === 118) {
         D.cam.flash(250, 255, 240, 200);
         D.cam.shake(400, 0.008);
