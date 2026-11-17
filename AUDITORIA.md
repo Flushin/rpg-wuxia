@@ -352,6 +352,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo. Teste: RT + criar personagem com nome `a<b&"c` e abrir C, mochila, report.
 
 **B3. Constantes nomeadas no desenho e no toque** — P
+> ✅ **Feita em 17/11/2026.**
 - Objetivo: `src/render/depth.ts` (camadas: chão, telegraph, entidades, efeitos, textos) e constantes para a área de toque (`gameScene.ts:166-177`), elipse do telegraph (`gameScene.ts:224`, derivar de `TILE_W/TILE_H`), cores dos textos flutuantes.
 - Arquivos: `src/scenes/gameScene.ts`, `src/render/skillFx.ts`, `src/render/mapView.ts`, `src/render/entityView.ts`.
 - Risco: baixo (valores iguais). Teste: RT + captura de tela antes/depois iguais.

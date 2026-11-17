@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { L } from '../core/i18n';
-import { screenToTile, tileToScreen } from '../core/iso';
+import { TILE_H, TILE_W, screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { EntityView } from '../render/entityView';
@@ -16,12 +16,37 @@ import { TipManager } from '../ui/tips';
 import { MONSTERS } from '../core/data';
 import { itemColor } from '../core/items';
 import { DPR, cssSize } from '../render/display';
+import { DEPTH } from '../render/depth';
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
   ZOOM_MAX = 2,
   ZOOM_KEY = 'rpg-zoom';
 const TEXT_RES = DPR * 2;
+// Área de clique/toque para escolher alvo (px do mundo, em volta do ponto acima dos pés)
+const PICK = {
+  TOUCH_SCALE: 1.5, // dedo é menos preciso que o mouse: área de toque maior
+  MONSTER_LIFT: 14, // centro da área: 14 px acima dos pés
+  MONSTER_HALF: 26, // meia largura e meia altura
+  NPC_LIFT: 24,
+  NPC_HALF_W: 28,
+  NPC_HALF_H: 40,
+};
+// Elipse do aviso do chefe: um raio de 1 tile vira meia diagonal do losango (TILE/2 × √2)
+const TELEGRAPH_RX = (TILE_W / 2) * Math.SQRT2,
+  TELEGRAPH_RY = (TILE_H / 2) * Math.SQRT2;
+// Cores dos textos que sobem do mapa
+const FLOAT_COLOR = {
+  DAMAGE: '#ffffff', // dano normal
+  CRIT: '#ffd23f', // crítico e skill subindo de nível
+  HURT: '#ff5555', // dano no jogador
+  MISS: '#aaaaaa',
+  WARNING: '#ff6a50', // golpe em área do chefe
+  MANA: '#6aa8ff', // sem mana
+  INFO: '#dddddd', // avisos (recarga, sem poção…)
+  SHIELD: '#bfe0ff',
+  ABSORB: '#9fd0ff', // dano absorvido pelo escudo
+};
 const loadZoom = () => {
   try {
     const v = Number(localStorage.getItem(ZOOM_KEY));
@@ -83,7 +108,7 @@ export class GameScene extends Phaser.Scene {
         strokeThickness: 3,
       })
       .setOrigin(0.5, 1)
-      .setDepth(100001)
+      .setDepth(DEPTH.AUTO_TEXT)
       .setResolution(TEXT_RES)
       .setVisible(false);
     const rep = this.world.offlineReport;
@@ -231,15 +256,15 @@ export class GameScene extends Phaser.Scene {
 
   /** Seleciona o monstro ou fala com o NPC sob o ponto do mundo; devolve se acertou algum. */
   private pickAt(wx: number, wy: number, touch: boolean): boolean {
-    const k = touch ? 1.5 : 1; // dedo é menos preciso que o mouse: área de toque maior
+    const k = touch ? PICK.TOUCH_SCALE : 1;
     let best: Entity | null = null,
       bd = Infinity;
     for (const m of this.world.monsters) {
       if (m.dead) continue;
       const s = tileToScreen(m.x, m.y),
         dx = wx - s.x,
-        dy = wy - (s.y - 14);
-      if (Math.abs(dx) < 26 * k && Math.abs(dy) < 26 * k && Math.hypot(dx, dy) < bd) {
+        dy = wy - (s.y - PICK.MONSTER_LIFT);
+      if (Math.abs(dx) < PICK.MONSTER_HALF * k && Math.abs(dy) < PICK.MONSTER_HALF * k && Math.hypot(dx, dy) < bd) {
         bd = Math.hypot(dx, dy);
         best = m;
       }
@@ -253,8 +278,8 @@ export class GameScene extends Phaser.Scene {
     for (const n of this.world.npcs) {
       const s = tileToScreen(n.x, n.y),
         dx = wx - s.x,
-        dy = wy - (s.y - 24);
-      if (Math.abs(dx) < 28 * k && Math.abs(dy) < 40 * k && Math.hypot(dx, dy) < bd) {
+        dy = wy - (s.y - PICK.NPC_LIFT);
+      if (Math.abs(dx) < PICK.NPC_HALF_W * k && Math.abs(dy) < PICK.NPC_HALF_H * k && Math.hypot(dx, dy) < bd) {
         bd = Math.hypot(dx, dy);
         npc = n;
       }
@@ -321,12 +346,12 @@ export class GameScene extends Phaser.Scene {
       live.add(t.id);
       let g = this.teleViews.get(t.id);
       if (!g) {
-        g = this.add.graphics().setDepth(-80000);
+        g = this.add.graphics().setDepth(DEPTH.TELEGRAPH);
         this.teleViews.set(t.id, g);
       }
       const c = tileToScreen(t.x, t.y),
-        rx = t.radius * 45.25,
-        ry = t.radius * 22.63,
+        rx = t.radius * TELEGRAPH_RX,
+        ry = t.radius * TELEGRAPH_RY,
         k = Math.max(0, Math.min(1, 1 - t.remaining / t.delay));
       g.clear().setPosition(c.x, c.y);
       g.fillStyle(0xff2020, 0.14);
@@ -346,7 +371,7 @@ export class GameScene extends Phaser.Scene {
   private arrowFx(ev: Extract<GameEvent, { type: 'projectile' }>) {
     const a = tileToScreen(ev.fromX, ev.fromY),
       b = tileToScreen(ev.toX, ev.toY);
-    const g = this.add.graphics().setDepth(99998);
+    const g = this.add.graphics().setDepth(DEPTH.HIT_LINE);
     const ang = Math.atan2(b.y - a.y, b.x - a.x);
     g.lineStyle(2, 0xe8d8a8, 1);
     g.lineBetween(-9, 0, 9, 0);
@@ -426,7 +451,7 @@ export class GameScene extends Phaser.Scene {
     const col = Phaser.Display.Color.HexStringToColor(color).color;
     const a = tileToScreen(x, y),
       b = tileToScreen(this.world.player.x, this.world.player.y);
-    const g = this.add.graphics().setDepth(99999);
+    const g = this.add.graphics().setDepth(DEPTH.DROP_FX);
     g.fillStyle(col, 1);
     g.fillCircle(0, 0, 5);
     g.lineStyle(1, 0xffffff, 1);
@@ -465,7 +490,7 @@ export class GameScene extends Phaser.Scene {
           s.x,
           s.y - 40,
           ev.crit ? `${ev.amount}!` : String(ev.amount),
-          toPlayer ? '#ff5555' : ev.crit ? '#ffd23f' : '#ffffff',
+          toPlayer ? FLOAT_COLOR.HURT : ev.crit ? FLOAT_COLOR.CRIT : FLOAT_COLOR.DAMAGE,
           ev.crit ? 22 : 16,
         );
         this.views.get(ev.targetId)?.flash();
@@ -473,7 +498,7 @@ export class GameScene extends Phaser.Scene {
       }
       case 'miss': {
         const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), '#aaaaaa', 13);
+        this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), FLOAT_COLOR.MISS, 13);
         break;
       }
       case 'attack':
@@ -493,7 +518,7 @@ export class GameScene extends Phaser.Scene {
         if (ev.hit) {
           const s = tileToScreen(ev.x, ev.y);
           this.cameras.main.shake(180, 0.006);
-          this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), '#ff6a50', 15);
+          this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), FLOAT_COLOR.WARNING, 15);
         }
         break;
       case 'skillCast': {
@@ -514,7 +539,7 @@ export class GameScene extends Phaser.Scene {
           locked: L('Bloqueada', 'Locked'),
         }[ev.reason];
         const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(s.x, s.y - 64, msg, ev.reason === 'mana' ? '#6aa8ff' : '#dddddd', 15);
+        this.floatText(s.x, s.y - 64, msg, ev.reason === 'mana' ? FLOAT_COLOR.MANA : FLOAT_COLOR.INFO, 15);
         break;
       }
       case 'skillUnlocked':
@@ -535,7 +560,7 @@ export class GameScene extends Phaser.Scene {
               .flat()
               .find((d) => d.id === ev.skillId)?.name
           } ${L('nv', 'lv')} ${ev.level}!`,
-          '#ffd23f',
+          FLOAT_COLOR.CRIT,
           15,
         );
         break;
@@ -543,12 +568,12 @@ export class GameScene extends Phaser.Scene {
       case 'buffApplied':
         if (ev.kind === 'shield' && ev.targetId === this.world.player.id) {
           const s = tileToScreen(this.world.player.x, this.world.player.y);
-          this.floatText(s.x, s.y - 64, L('Escudo', 'Shield'), '#bfe0ff', 15);
+          this.floatText(s.x, s.y - 64, L('Escudo', 'Shield'), FLOAT_COLOR.SHIELD, 15);
         }
         break;
       case 'shieldAbsorb': {
         const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, '#9fd0ff', 14);
+        this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, FLOAT_COLOR.ABSORB, 14);
         break;
       }
       case 'drop':
@@ -585,7 +610,7 @@ export class GameScene extends Phaser.Scene {
           full: ev.kind === 'hp' ? L('Vida cheia', 'Health full') : L('Mana cheia', 'Mana full'),
         }[ev.reason];
         const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(s.x, s.y - 64, msg, '#dddddd', 15);
+        this.floatText(s.x, s.y - 64, msg, FLOAT_COLOR.INFO, 15);
         break;
       }
       case 'quest':
@@ -631,7 +656,7 @@ export class GameScene extends Phaser.Scene {
     if (!a || !t) return;
     const fromPlayer = ev.fromId === this.world.player.id;
     const color = !fromPlayer ? 0xffffff : this.world.player.element === 'ice' ? 0x9ee0ff : 0xffe14a;
-    const g = this.add.graphics().setDepth(99998);
+    const g = this.add.graphics().setDepth(DEPTH.HIT_LINE);
     g.lineStyle(ev.ranged ? 3 : 4, color, 1);
     const x1 = a.container.x,
       y1 = a.container.y - 18,
@@ -651,7 +676,7 @@ export class GameScene extends Phaser.Scene {
     const t = this.add
       .text(x, y, text, { fontSize: `${size}px`, color, fontStyle: 'bold', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0.5)
-      .setDepth(100000)
+      .setDepth(DEPTH.FLOAT_TEXT)
       .setResolution(TEXT_RES);
     this.tweens.add({
       targets: t,

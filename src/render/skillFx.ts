@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import { SKILLS } from '../core/skills';
 import type { GameEvent } from '../core/types';
+import { DEPTH } from './depth';
 
-const DEPTH = 99997;
+const FX: number = DEPTH.SKILL_FX;
 const DEFS = Object.fromEntries(
   Object.values(SKILLS)
     .flat()
@@ -32,7 +33,7 @@ export class SkillFx {
   }
 
   // ---------- utilidades ----------
-  private gfx(depth = DEPTH) {
+  private gfx(depth = FX) {
     return this.scene.add.graphics().setDepth(depth);
   }
   private fade(o: Phaser.GameObjects.GameObject, ms: number, extra?: Partial<Phaser.Types.Tweens.TweenBuilderConfig>) {
@@ -51,7 +52,7 @@ export class SkillFx {
     y: number,
     n: number,
     cfg: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig,
-    depth = DEPTH + 1,
+    depth = FX + 1,
   ) {
     const life = typeof cfg.lifespan === 'number' ? cfg.lifespan : 700;
     const e = this.scene.add.particles(x, y, 'fx-dot', { emitting: false, blendMode: 'ADD', ...cfg }).setDepth(depth);
@@ -187,7 +188,7 @@ export class SkillFx {
     this.fade(g, 260);
     this.scene.time.delayedCall(70, () => {
       const r = this.iso(1.4);
-      const w = this.gfx(DEPTH - 1);
+      const w = this.gfx(FX - 1);
       w.setPosition(t.x, t.y);
       w.lineStyle(4, 0xff5a3a, 0.9);
       w.strokeEllipse(0, 0, r.w, r.h);
@@ -212,7 +213,7 @@ export class SkillFx {
         }
         cr.strokePath();
       }
-      cr.setDepth(DEPTH - 2);
+      cr.setDepth(FX - 2);
       this.fade(cr, 900, { delay: 300 });
       this.burst(t.x, t.y - 10, 16, {
         speed: { min: 90, max: 200 },
@@ -234,7 +235,7 @@ export class SkillFx {
     this.fade(g, 450);
     for (let i = 0; i < 5; i++) {
       const k = i / 4,
-        s = this.gfx(DEPTH - 1);
+        s = this.gfx(FX - 1);
       s.fillStyle(0x8a6ad0, 0.55);
       s.fillEllipse(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k - 18, 20, 34);
       this.fade(s, 260 + i * 40);
@@ -256,7 +257,7 @@ export class SkillFx {
   /** Tempestade de Lâminas: lâminas girando em volta + raios curtos na borda. */
   private bladeStorm(c: Pt, radius: number) {
     const r = this.iso(radius);
-    const ring = this.gfx(DEPTH - 1);
+    const ring = this.gfx(FX - 1);
     ring.setPosition(c.x, c.y);
     ring.fillStyle(0xffe14a, 0.12);
     ring.fillEllipse(0, 0, r.w, r.h);
@@ -333,7 +334,7 @@ export class SkillFx {
         frequency: 16,
         blendMode: 'ADD',
       })
-      .setDepth(DEPTH);
+      .setDepth(FX);
     const dur = Math.max(140, Math.hypot(to.x - from.x, to.y - from.y) * 1.1);
     this.scene.tweens.add({
       targets: orb,
@@ -379,7 +380,7 @@ export class SkillFx {
       duration: 170,
       onComplete: () => {
         orb.destroy();
-        const base = this.gfx(DEPTH - 1);
+        const base = this.gfx(FX - 1);
         base.setPosition(t.x, t.y);
         base.fillStyle(0x7fd0f0, 0.25);
         base.fillEllipse(0, 0, 76, 38);
@@ -417,7 +418,7 @@ export class SkillFx {
   /** Nevasca: área marcada, cristais caindo do céu e neve girando. */
   private blizzard(t: Pt, radius: number) {
     const r = this.iso(radius);
-    const area = this.gfx(DEPTH - 1);
+    const area = this.gfx(FX - 1);
     area.setPosition(t.x, t.y);
     area.fillStyle(0x6ab8f0, 0.16);
     area.fillEllipse(0, 0, r.w, r.h);
@@ -441,7 +442,7 @@ export class SkillFx {
         frequency: 14,
         blendMode: 'ADD',
       })
-      .setDepth(DEPTH);
+      .setDepth(FX);
     this.scene.time.delayedCall(650, () => {
       snow.stop();
       this.scene.time.delayedCall(800, () => snow.destroy());
@@ -464,7 +465,7 @@ export class SkillFx {
         ease: 'Quad.easeIn',
         onComplete: () => {
           s.destroy();
-          const hit = this.gfx(DEPTH - 1);
+          const hit = this.gfx(FX - 1);
           hit.lineStyle(2, 0xe8fbff, 0.9);
           hit.strokeEllipse(x, y, 16, 8);
           this.fade(hit, 240);

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
+import { DEPTH } from './depth';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
@@ -74,15 +75,15 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       return scene.add
         .image(x, y, 'pisos', pick(frames, hash(i, j, 1)))
         .setScale(SPRITE_SCALE)
-        .setDepth(-100000);
-    return scene.add.image(x, y, 'tile-' + name).setDepth(-100000);
+        .setDepth(DEPTH.GROUND);
+    return scene.add.image(x, y, 'tile-' + name).setDepth(DEPTH.GROUND);
   };
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
       const name = map.tiles[j * map.width + i],
         pos = tileToScreen(i + 0.5, j + 0.5);
       if (name === 'water') {
-        const w = scene.add.image(pos.x, pos.y, 'pisos', WATER_FRAMES[0]).setScale(SPRITE_SCALE).setDepth(-100000);
+        const w = scene.add.image(pos.x, pos.y, 'pisos', WATER_FRAMES[0]).setScale(SPRITE_SCALE).setDepth(DEPTH.GROUND);
         w.setData('phase', Math.floor(hash(i, j, 11) * WATER_FRAMES.length));
         water.push(w);
         out.push(w);
@@ -152,7 +153,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         .image(p.x, p.y, 'props-cidade', String(o.props.sprite))
         .setScale(SPRITE_SCALE)
         // parte de cima do portão: sempre por cima de quem passa embaixo
-        .setDepth(o.props.top ? 99990 : Math.floor(o.x) + Math.floor(o.y) + 1);
+        .setDepth(o.props.top ? DEPTH.GATE_TOP : Math.floor(o.x) + Math.floor(o.y) + 1);
       img.setName('tree'); // fica transparente se cobrir o jogador
       out.push(img);
     }
@@ -188,7 +189,7 @@ function shore(scene: Phaser.Scene, map: GameMap, i: number, j: number): Phaser.
   ];
   const land = sides.filter(([x, y]) => isLand(x, y));
   if (!land.length) return null;
-  const g = scene.add.graphics().setDepth(-99999);
+  const g = scene.add.graphics().setDepth(DEPTH.SHORE);
   for (const [, , ta, tb] of land) {
     const a = tileToScreen(ta[0], ta[1]),
       b = tileToScreen(tb[0], tb[1]);
@@ -211,7 +212,7 @@ function portal(
   name: string,
 ): Phaser.GameObjects.GameObject[] {
   const out: Phaser.GameObjects.GameObject[] = [];
-  const g = scene.add.graphics().setDepth(-90000);
+  const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
   for (let j = Math.floor(y); j < y + h; j++)
     for (let i = Math.floor(x); i < x + w; i++) {
       const pts = [tileToScreen(i, j), tileToScreen(i + 1, j), tileToScreen(i + 1, j + 1), tileToScreen(i, j + 1)];
@@ -250,7 +251,7 @@ function portal(
       strokeThickness: 3,
     })
     .setOrigin(0.5)
-    .setDepth(99999);
+    .setDepth(DEPTH.DROP_FX);
   out.push(label);
   return out;
 }

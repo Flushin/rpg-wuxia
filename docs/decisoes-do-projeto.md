@@ -86,6 +86,10 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   apagadas as 13 cópias de `$` e as 4 de `esc` dos arquivos de `src/ui/`. Corrigido: o nome do personagem no painel de
   Atributos (C) não era escapado — um nome com `<` quebrava o painel. Testado com o nome `a<b&"c'>` (painel C, mochila e
   tela inicial).
+- **B3 (17/11/2026):** camadas de desenho com nome em `src/render/depth.ts` (`DEPTH.GROUND`, `TELEGRAPH`, `NAME`,
+  `SKILL_FX`, `FLOAT_TEXT`…) no lugar dos números soltos; em `gameScene.ts`, constantes para a área de clique/toque
+  (`PICK`), a elipse do aviso do chefe derivada de `TILE_W/TILE_H` e as cores dos textos flutuantes (`FLOAT_COLOR`).
+  Mesmos valores (a elipse muda 0,005 px por tile de raio, por usar √2 exato).
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
