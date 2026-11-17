@@ -191,16 +191,17 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.centerOn(s.x, s.y);
   }
 
-  private textureFor(e: Entity, idx = 0): string {
+  /** Nome do sprite da entidade; sheetFor() acha a folha animada (sem folha: figura genérica). */
+  private textureFor(e: Entity): string {
     if (e.kind === 'player') return 'player-' + this.world.classId;
     if (e.kind === 'monster') return MONSTERS[e.monsterId].sprite;
-    return e.npcId ? 'npc-' + e.npcId : 'npc-' + (idx % 3);
+    return 'npc-' + (e.npcId ?? '');
   }
 
-  private viewFor(e: Entity, idx = 0): EntityView {
+  private viewFor(e: Entity): EntityView {
     let v = this.views.get(e.id);
     if (!v) {
-      v = new EntityView(this, e, this.textureFor(e, idx));
+      v = new EntityView(this, e, this.textureFor(e));
       this.views.set(e.id, v);
     }
     return v;
@@ -304,12 +305,12 @@ export class GameScene extends Phaser.Scene {
     if (tgt && Math.hypot(tgt.x - w.player.x, tgt.y - w.player.y) <= w.player.attackRange + 1)
       this.viewFor(w.player).face(tgt.x, tgt.y, w.player.x, w.player.y);
     this.viewFor(w.player).sync(w.player, false);
-    w.npcs.forEach((n, i) => {
+    for (const n of w.npcs) {
       live.add(n.id);
-      const v = this.viewFor(n, i);
+      const v = this.viewFor(n);
       v.sync(n, false);
       v.setMark(w.questMark(n.npcId ?? ''));
-    });
+    }
     for (const m of w.monsters) {
       live.add(m.id);
       const v = this.viewFor(m);
