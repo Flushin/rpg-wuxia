@@ -338,6 +338,8 @@ As etapas dentro de cada fase são independentes entre si.
 
 ### Fase B — legibilidade barata
 
+> ✅ **Concluída em 17/11/2026** (B1–B6, PRs #25 a #30).
+
 **B1. Formatador automático (Prettier) + `.editorconfig`** — M
 > ✅ **Feita em 17/11/2026** (JSON e Markdown ficaram de fora; ver doc de decisões).
 - Objetivo: quebrar as linhas de 200–385 colunas e padronizar tudo. Sugestão `printWidth: 120`. Pode ser aplicado **arquivo por arquivo** (junto da etapa que mexer nele) ou de uma vez (PR grande, só formatação). Ver P4.
@@ -370,6 +372,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: médio-baixo (um mapa com tile sem arte mostraria vazio). Teste: RT + visitar os 3 mapas inteiros pelo mapa grande (M) procurando buracos.
 
 **B6. Chaves do `localStorage` num só lugar** — P
+> ✅ **Feita em 17/11/2026** (e volumes por aparelho, decisão P6).
 - Objetivo: `src/platform/prefs.ts` com `getPref/setPref` (o `try/catch` uma vez só) e a lista de chaves documentada. Mesmas chaves → preferências atuais preservadas.
 - Arquivos: `i18n.ts`, `gameScene.ts`, `uiScale.ts`, `perf.ts`, `rewards.ts`, `bugReport.ts`.
 - Risco: baixo. Teste: RT + mudar zoom/UI/FPS/idioma, recarregar e conferir.

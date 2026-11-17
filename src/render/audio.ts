@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import data from '../data/audio.json';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
 export interface AudioSettings {
   sfx: number;
@@ -7,6 +8,29 @@ export interface AudioSettings {
   muted: boolean;
 }
 export const DEFAULT_AUDIO: AudioSettings = { sfx: 80, music: 50, muted: false };
+
+/**
+ * Volumes do aparelho (decisão de 17/11/2026: por aparelho, não por personagem).
+ * Na primeira vez, herda os volumes do personagem que está entrando (o que estava no save dele).
+ */
+export function loadDeviceAudio(fromCharacter: AudioSettings): AudioSettings {
+  try {
+    const p = JSON.parse(getPref(PREF.AUDIO) ?? 'null') as Partial<AudioSettings> | null;
+    if (p && typeof p === 'object') {
+      const vol = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 100 ? v : d);
+      return {
+        sfx: vol(p.sfx, DEFAULT_AUDIO.sfx),
+        music: vol(p.music, DEFAULT_AUDIO.music),
+        muted: typeof p.muted === 'boolean' ? p.muted : DEFAULT_AUDIO.muted,
+      };
+    }
+  } catch {
+    /* JSON inválido: usa o do personagem */
+  }
+  return { ...fromCharacter };
+}
+export const saveDeviceAudio = (s: AudioSettings) =>
+  setPref(PREF.AUDIO, JSON.stringify({ sfx: s.sfx, music: s.music, muted: s.muted }));
 
 type SfxDef = { file: string; volume: number };
 type MusicDef = { file: string; volume: number; map: string };

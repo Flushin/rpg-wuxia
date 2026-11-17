@@ -5,6 +5,7 @@ import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { isTouch } from './controls';
 import { perf } from './perf';
+import { PREF, getPref, setPref } from '../platform/prefs';
 
 // Reportar bug: botão em ⚙ abre uma caixa de texto; o report vai por e-mail para o Lucas pelo Web3Forms
 // (grátis, 250 envios/mês, sem anexo). Junto vão dados do jogo, do aparelho, FPS e os últimos erros do console.
@@ -12,7 +13,6 @@ import { perf } from './perf';
 export const BUG_REPORT_KEY = '7eb73268-6a10-45f2-97a1-9325e680240b';
 const ENDPOINT = 'https://api.web3forms.com/submit';
 const COOLDOWN_MS = 60_000;
-const LAST_KEY = 'rpg-bug-last';
 const MAX_ERRORS = 10;
 
 const errors: string[] = [];
@@ -132,12 +132,7 @@ export class BugReport {
       this.status(L('Escreva o que aconteceu.', 'Describe what happened.'));
       return;
     }
-    let last = 0;
-    try {
-      last = Number(localStorage.getItem(LAST_KEY)) || 0;
-    } catch {
-      /* sem armazenamento */
-    }
+    const last = Number(getPref(PREF.BUG_LAST)) || 0;
     const wait = Math.ceil((last + COOLDOWN_MS - Date.now()) / 1000);
     if (wait > 0) {
       this.status(L(`Aguarde ${wait} s para enviar outro report.`, `Wait ${wait} s to send another report.`));
@@ -170,11 +165,7 @@ export class BugReport {
       });
       const data = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
       if (!res.ok || !data.success) throw new Error(data.message || `HTTP ${res.status}`);
-      try {
-        localStorage.setItem(LAST_KEY, String(Date.now()));
-      } catch {
-        /* sem armazenamento */
-      }
+      setPref(PREF.BUG_LAST, String(Date.now()));
       this.status(L('Report enviado. Obrigado!', 'Report sent. Thank you!'), true);
       (this.el.querySelector('#bug-text') as HTMLTextAreaElement).value = '';
       setTimeout(() => {
