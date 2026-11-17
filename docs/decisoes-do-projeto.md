@@ -52,6 +52,19 @@
 
 ## Decididas
 
+### Auditoria do código (17/11/2026)
+Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).
+- **Geada:** Stamina inicial é **10** (não 8 como estava escrito no fechamento do marco 7; o código e o simulador usam 10).
+- **Mapas:** gerados pelo script `tools/gen-maps.mjs` no formato JSON do Tiled (não são editados no Tiled).
+- **Ganho offline no app:** ao voltar do segundo plano depois de **mais de 5 min** fora com o Auto ligado, aplica o mesmo cálculo offline e mostra o resumo (a fazer na etapa D5).
+- **Formatação:** Prettier aplicado de uma vez, num PR só de formatação.
+- **Nomes no código novo:** em inglês; comentários e docs em português; ids salvos e de dados (`lamina`, `colar`, `comum`…) não mudam.
+- **Volumes de som:** passam a ser **por aparelho** (hoje são por personagem).
+- **Ordem do plano:** Fase A (rede de segurança) → B (legibilidade) → C (estrutura) → D (lojas). Nenhuma etapa começa sem o Lucas pedir.
+- **Lojas:** **só Android por enquanto** (Google Play); o código fica preparado para iOS.
+- **Política de privacidade:** página PT/EN no GitHub Pages do jogo, com link em ⚙ e na tela inicial.
+- **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety.
+
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
 - **Tormenta vs. General** (perdia 6/6 com o equipamento Incomum das missões): **Tormenta fortalecida, General igual.**

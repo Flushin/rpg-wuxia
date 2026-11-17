@@ -514,6 +514,22 @@ As etapas dentro de cada fase são independentes entre si.
 
 ## 8. Perguntas para você
 
+### ✅ Respostas do Lucas (17/11/2026)
+| # | Pergunta | Resposta |
+|---|---|---|
+| P1 | Stamina inicial da Geada | **10** (o código está certo; corrigir o doc) |
+| P2 | Mapas "no Tiled" | **Gerados por script** no formato Tiled; atualizar a decisão |
+| P3 | Ganho offline ao voltar do segundo plano | **Sim, após 5 min fora** com o Auto ligado (etapa D5) |
+| P4 | Formatador | **Prettier de uma vez**, num PR só de formatação |
+| P5 | Idioma dos nomes no código novo | **Inglês**; ids salvos e de dados não mudam |
+| P6 | Volumes de som | **Por aparelho** |
+| P7 | Ordem do plano | **A → B → C → D** |
+| P8 | iOS | **Só Android por enquanto** (código preparado para iOS) |
+| P9 | Política de privacidade | **Página no GitHub Pages do jogo** |
+| P10 | Report de bug no app | **Manter o Web3Forms** e declarar na política |
+
+As perguntas originais seguem abaixo como registro.
+
 Em múltipla escolha, como combinado. A recomendação vem primeiro.
 
 **P1. Stamina inicial da Geada** — o doc diz 8, o código tem 10 (PR #17).
