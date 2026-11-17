@@ -438,6 +438,11 @@ Implementadas a pedido do Lucas e publicadas no site.
     F diagnóstico no report) ficam disponíveis se o problema continuar.
   - Código: `setupJoystick` em `src/ui/controls.ts`; `tapAt`/`pickAt` em `src/scenes/gameScene.ts`.
 
+- **Skills sobrepostas no celular deitado** *(PR #21, 17/11/2026)*: erro antigo do layout deitado (PR #9), não da escala da
+  interface: o arco usava botões de 46 px com só 28° entre eles, então um encostava no outro. Agora o espaço entre os botões é
+  calculado para sobrar pelo menos 6 px (~36°). Em pé não mudou. O `layout-check` passou a comparar os botões redondos entre si
+  (antes ignorava as skills umas com as outras, por isso não pegou).
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
