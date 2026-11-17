@@ -64,7 +64,9 @@ export class Hotbar {
     const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
     const size = short ? 46 : SIZE, r = short ? 84 : R, cx = short ? 53 : 72, cy = short ? 51 : 78;
-    const step = short ? 28 : narrow ? 28 : 30, start = short ? 178 : narrow ? 152 : 165;
+    // passo mínimo para os botões não encostarem: corda do arco ≥ tamanho + 6 px (antes, deitado, ficavam um em cima do outro)
+    const minStep = (2 * Math.asin(Math.min(1, (size + 6) / (2 * r))) * 180) / Math.PI;
+    const step = short ? Math.max(28, minStep) : narrow ? 28 : 30, start = short ? 178 : narrow ? 152 : 165;
     this.slots.forEach((s, i) => {
       const a = ((start - i * step) * Math.PI) / 180;
       s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;

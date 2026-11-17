@@ -53,7 +53,11 @@ for (const sz0 of SIZES) for (const mode of MODES) {
     for (const [id, b] of boxes) if (b.left < -1 || b.top < -1 || b.right > W + 1 || b.bottom > H + 1) out.push(`${id} sai da tela`);
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
       const [a, A] = boxes[i], [b, B] = boxes[j];
-      if (a.startsWith('hotbar') && b.startsWith('hotbar')) continue;
+      if (a.startsWith('hotbar') && b.startsWith('hotbar')) { // botões redondos: compara círculos, não caixas
+        const d = Math.hypot((A.left + A.right - B.left - B.right) / 2, (A.top + A.bottom - B.top - B.bottom) / 2);
+        if (d < (A.width + B.width) / 2 - 1) out.push(`${a} × ${b}`);
+        continue;
+      }
       if (A.left < B.right - 1 && B.left < A.right - 1 && A.top < B.bottom - 1 && B.top < A.bottom - 1) out.push(`${a} × ${b}`);
     }
     return { out, feedLines: n, compact, ui };
