@@ -3,3 +3,4 @@ dist
 .venv-blender
 tools/sprites/.cache
 trailer-out
+trailer-rec.log
