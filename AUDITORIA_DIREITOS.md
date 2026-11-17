@@ -424,7 +424,10 @@ Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar al
    completo das licenças MIT (Phaser, eventemitter3) e Apache-2.0 (idb-keyval) — e, quando entrar, Capacitor/AndroidX.
    Também gerar um `THIRD_PARTY_LICENSES.txt` no pacote (ex.: com `npx license-checker --production` ou
    `rollup-plugin-license`), conferido à mão.
-6. **Arquivar as provas de licença** numa pasta `docs/licencas/` (fora do pacote):
+6. **Arquivar as provas de licença** numa pasta `docs/licencas/` (fora do pacote). **Em andamento (17/11/2026):** já estão lá
+   as licenças do KayKit, do espelho Quaternius, do Kenney UI Audio, do Phaser, do eventemitter3 e do idb-keyval, mais os
+   textos completos da CC0 e da Apache-2.0. O que falta (Kenney Nature Kit/RPG Audio/Impact Sounds, páginas do OpenGameArt
+   e do Quaternius, originais das músicas) está listado em `docs/licencas/README.md`. Lista original:
    - `kaykit-adventurers-1.0-LICENSE.txt` (do repositório oficial);
    - cópia/print da página oficial do **Kenney Nature Kit**, **Kenney RPG Audio**, **Impact Sounds**, **UI Audio** (kenney.nl,
      com o License.txt de cada pacote);
@@ -433,7 +436,7 @@ Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar al
 7. **Corrigir a origem** do `tools/sprites/fetch-assets.sh` para fontes oficiais (download do kenney.nl / quaternius.com) ou,
    no mínimo, documentar que os espelhos foram conferidos byte a byte com os pacotes oficiais.
 8. ~~Identificar a origem de `point_spent`, `tip` e `ui_click`~~ — **feito** (Kenney UI Audio `click3`, `rollover3`,
-   `click1`; seção 2.2.1). Falta só registrar os nomes originais em `ASSETS_LICENCAS.md` e em `public/audio/CREDITS.txt`.
+   `click1`; seção 2.2.1). Nomes originais já registrados em `public/audio/CREDITS.txt`; falta o `ASSETS_LICENCAS.md`.
 9. **Começar o `ASSETS_LICENCAS.md`** (seção 7) com todos os itens da tabela 2.
 
 ### Prioridade 3 — antes de monetizar ou de entrar online
