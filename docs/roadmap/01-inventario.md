@@ -57,7 +57,7 @@ Legenda de status: **Completa** (funciona e tem teste ou uso confirmado) · **Pa
 | Equipamentos | 6 slots, 36 bases (níveis 1/5/10/15, arma por seita), durabilidade com desgaste e conserto. | `src/data/items.json`, `src/core/items.ts` | Completa | — |
 | Raridade e bônus aleatórios | Comum, Incomum e Raro, com bônus sorteados de uma lista. | `src/core/items.ts` | Completa | Não há Épico/Lendário nem conjuntos com bônus de set. |
 | Drops e coleta | Itens caem no chão por 60 s e o Auto coleta. O feed mostra o que entrou, com cor da raridade. | `src/core/world/inventory.ts`, `src/ui/rewards.ts` | Completa | — |
-| Forja (crafting) | Melhorar de +1 a +10 com chance (falhar perde só os materiais), subir raridade, trocar bônus e desmontar. | `src/core/world/forge.ts`, `src/ui/npcWindow.ts` | Completa | Não há coleta de recursos no mapa (mineração, ervas): os materiais vêm só de monstros. |
+| Forja (crafting) | Melhorar de +1 a +10 com chance (falhar gasta os materiais e o ouro, mas o item não quebra nem volta de nível), subir raridade, trocar bônus e desmontar. | `src/core/world/forge.ts`, `src/ui/npcWindow.ts` | Completa | Não há coleta de recursos no mapa (mineração, ervas): os materiais vêm só de monstros. |
 | Loja de NPC | Vendedor de poções (compra qualquer item), Ferreiro (conserto e forja) e Mercador Ambulante (estoque raro que renova a cada hora real). | `src/core/world/shop.ts`, `src/core/world/merchant.ts` | Completa | A renovação usa o relógio do aparelho (mesmo risco do offline). |
 | Moeda | Só ouro (soft currency). | `src/core/world.ts` | Completa | Não há moeda premium (planejada: diamantes, no pós-lançamento). |
 | Mercado/leilão e trocas | Não existem. | — | Não existe | Dependem de servidor e economia autoritativa. |
