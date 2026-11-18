@@ -1,5 +1,6 @@
 import questsJson from '../data/quests.json';
 import { localize } from './i18n';
+import { balanceQuests } from './balance';
 
 // Missões (marco 7): uma cadeia principal linear do nível 1 ao 10. Só abater, falar e ir até um mapa.
 // Os textos ficam em src/data/quests.json (PT) e na seção "quests" de en.json.
@@ -24,6 +25,7 @@ export interface QuestDef {
 }
 
 export const QUESTS: QuestDef[] = (localize('quests', questsJson) as { chain: QuestDef[] }).chain;
+balanceQuests(QUESTS); // multiplicadores de src/data/balance.json
 
 /** pending = ainda não aceita; active = em andamento; ready = objetivo cumprido, falta entregar */
 export type QuestStatus = 'pending' | 'active' | 'ready';

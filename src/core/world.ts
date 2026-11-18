@@ -31,6 +31,7 @@ import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { computeDerived, emptyElements } from './stats';
+import { bal } from './balance';
 import {
   ATTR_KEYS,
   ELEMENTS,
@@ -548,7 +549,8 @@ export class World {
     if (v.dead) return;
     if (def.debuff) this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
     if (def.poison) {
-      const total = expectedDamage(this.player, this.defender(v)) * def.poison.percent * scale;
+      const total =
+        expectedDamage(this.player, this.defender(v)) * def.poison.percent * scale * bal('dano.jogador', this.classId);
       this.addBuff(v, def.id, 'poison', total / def.poison.duration, def.poison.duration);
     }
     if (def.stun) this.addBuff(v, def.id, 'stun', 0, def.stun);
@@ -573,9 +575,10 @@ export class World {
     const p = this.player;
     p.derived = { ...p.derived, critChance: Math.min(0.95, p.derived.critChance + this.passiveValue('crit')) };
     p.attackInterval = CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed'));
-    const hpBonus = this.passiveValue('maxHp');
-    if (hpBonus) {
-      p.derived = { ...p.derived, maxHp: Math.round(p.derived.maxHp * (1 + hpBonus)) };
+    const hpBonus = this.passiveValue('maxHp'),
+      hpMul = (1 + hpBonus) * bal('vida.jogador', this.classId);
+    if (hpMul !== 1) {
+      p.derived = { ...p.derived, maxHp: Math.round(p.derived.maxHp * hpMul) };
       p.hp = Math.min(p.hp, p.derived.maxHp);
     }
   }
@@ -591,7 +594,10 @@ export class World {
     for (const sl of SLOTS) {
       const it = this.equipment[sl];
       if (!it) continue;
-      it.durability = Math.max(0, it.durability - maxDurability(it) * DEATH_DURABILITY_LOSS);
+      it.durability = Math.max(
+        0,
+        it.durability - maxDurability(it) * DEATH_DURABILITY_LOSS * bal('desgaste.equipamento'),
+      );
       lost = true;
     }
     this.potionFx = { hp: null, mp: null };
@@ -915,6 +921,9 @@ export class World {
       const bonus = this.passiveValue('poisonedBonus');
       if (bonus) mult *= 1 + bonus;
     }
+    // balanceamento (src/data/balance.json): dano de quem ataca
+    if (a.kind === 'player') mult *= bal('dano.jogador', this.classId);
+    else if (a.kind === 'monster') mult *= bal('dano.monstros', a.monsterId);
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (r.hit && t.kind === 'player') {
       const red = this.passiveValue('damageTaken');
@@ -999,7 +1008,7 @@ export class World {
     this.emit({ type: 'death', id: m.id });
     this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.questKill(m.monsterId);
-    this.gainXp(def.xpBase + def.xpPerLevel * (m.level - 1));
+    this.gainXp(Math.round(def.xpBase + def.xpPerLevel * (m.level - 1)));
     this.dropLoot(m, def);
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
@@ -1282,6 +1291,7 @@ export class World {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
+    e.derived.maxHp = Math.max(1, Math.round(e.derived.maxHp * bal('vida.monstros', def.id)));
     if (def.defMul) {
       e.derived.physDef *= def.defMul.phys;
       e.derived.spiritDef *= def.defMul.spirit;

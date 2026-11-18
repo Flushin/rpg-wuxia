@@ -5,6 +5,44 @@
 > Os valores atuais estão nos JSON de `src/data/` e as decisões em `docs/decisoes-do-projeto.md`.
 > A seção "Situação atual" logo abaixo traz a última medição.
 
+## Módulo de balanceamento (`npm run balance`)
+
+Um lugar só para aumentar ou diminuir, em porcentagem, qualquer número do jogo. Os valores originais continuam nos JSON
+de `src/data/`; o módulo guarda só **multiplicadores** em `src/data/balance.json` (com histórico de cada mudança) e o
+código (`src/core/balance.ts`) aplica por cima ao carregar o jogo. Com tudo em 0%, nada muda.
+
+```bash
+npm run balance                                # lista todas as chaves e o valor atual de cada uma
+npm run balance -- xp.monstros +10%            # +10% sobre o valor atual (duas vezes +10% = +21%)
+npm run balance -- dano.monstros.lobo -15%     # só para um monstro (ou skill, seita, poção, missão, nível)
+npm run balance -- xp.niveis =120%             # define direto: 120% do original (também aceita =1.2)
+npm run balance -- xp.monstros +10% ouro.monstros -5%   # várias de uma vez
+npm run balance -- ver ouro.monstros           # mostra os números de agora, sem mudar nada
+npm run balance -- zerar xp.monstros           # volta ao original (zerar tudo = volta tudo)
+npm run balance -- ids skill                   # ids aceitos: monstro, skill, seita, pocao, missao, nivel
+```
+
+Cada mudança mostra os números antes → depois (ex.: `Lobo: nv 1 8 XP → 9 XP`). Depois, confira o ritmo com
+`npm run sim:balance`.
+
+| Grupo | Chaves |
+|---|---|
+| Combate | `dano.jogador`, `dano.monstros`, `dano.skills`, `vida.jogador`, `vida.monstros`, `roubo_vida`, `cura.pocoes` |
+| Progressão | `xp.monstros`, `xp.missoes`, `xp.niveis` (XP **necessário**), `xp.skills` (+ = skills sobem mais rápido), `skills.bonus_por_nivel`, `skills.mana`, `skills.recarga` |
+| Economia | `ouro.monstros`, `ouro.missoes`, `precos.pocoes`, `venda.itens`, `conserto.custo`, `desgaste.equipamento` |
+| Drops | `drop.pocoes`, `drop.equipamento`, `drop.raros` (peso de Incomum e Raro) |
+| Mundo | `respawn.monstros` (+ = demora mais), `offline.eficiencia` (máximo 100%) |
+
+Observações:
+
+- Uma chave com id (`xp.monstros.lobo`) multiplica junto com a global (`xp.monstros`).
+- Os textos de descrição das skills (ex.: "130% do dano") são escritos à mão em `skills.json`/`en.json` e **não** mudam
+  sozinhos com `dano.skills`; mana, recarga, preços e cura das poções aparecem já corrigidos na interface.
+- Alguns testes conferem números fechados (ex.: `check:respawn` espera 30 s de respawn). Se mudar uma dessas chaves de
+  propósito, atualize o teste junto.
+- `npm run check:balance` (faz parte do `npm test`) recusa chave ou id com erro de digitação no `balance.json` e confere
+  que cada chave muda o que diz.
+
 ## Números atuais (v1, conferidos com `src/data/` em 18/11/2026)
 
 Resumo para não ler os valores antigos do registro do marco 5 por engano. A fonte é sempre o JSON.
