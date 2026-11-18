@@ -37,6 +37,9 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 - **8 direções:** 0=S (para baixo na tela), 1=SE, 2=E, 3=NE, 4=N, 5=NW, 6=W, 7=SW. No jogo: `dirFromDelta` em `src/render/sprites.ts`.
 - **Animações:** `idle` (6 quadros), `walk` (8), `attack` (8, uma vez), `death` (6, uma vez).
 - **Resolução:** renderizado em 2× e mostrado em 0,5 (nítido no celular e no zoom de 200%).
+- **Retratos** (`portrait_png`, `<nome>_retrato.png`: mochila, criação, diálogo): renderização à parte em alta resolução
+  (`portrait_scale`, padrão 10 px por px do jogo, ~550 px de altura), nítida em tela de DPR 3. Só os retratos:
+  `PORTRAIT_ONLY=1 SPRITE_CFG=tita.json .venv-blender/bin/python render_sprites.py` (dentro de `tools/sprites`).
 - **Tamanho:** personagem ~48 px de altura no zoom 100%. Escala dos objetos: 1 unidade do modelo = 1 tile.
 - **Folhas:** quadros recortados e empacotados (atlas do Phaser, máx. 2048×4096), paleta de 256 cores.
 - **Recolorir:** `texture.cells` troca blocos da paleta de texturas estilo KayKit (grade 8×4);
