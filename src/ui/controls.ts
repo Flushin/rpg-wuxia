@@ -2,6 +2,7 @@ import type { World } from '../core/world';
 import type { Hud } from './hud';
 import { toUi } from './uiScale';
 import { byId } from './dom';
+import { onPress } from './press';
 import { isTouch } from '../platform/input';
 
 export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: number) => boolean = () => false) {
@@ -34,10 +35,7 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
   setupJoystick(world, tapAt);
   const atk = byId('btn-attack');
   atk.classList.remove('hidden');
-  atk.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    world.attackNearest();
-  });
+  onPress(atk, () => world.attackNearest());
 }
 
 /** Direção na tela de cada tecla de movimento (por e.code, então funciona com Caps Lock e em AZERTY/QWERTZ). */
