@@ -121,6 +121,20 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
   chefe 10/10 para todas com Incomum.
 - Testes ajustados para o nível máximo vir do `progression.json` (offline, missões, robô do caos).
 
+**Fase 2 feita (18/11/2026): mapa novo (lógica).**
+- **Montanha Nevada** (`montanha`, 32×32, gerada em `tools/gen-maps.mjs`): entrada no sul; trilha em zigue-zague entre
+  pinheiros e pedras; 4 clareiras de caça para a fase 3 (encosta baixa a leste e a oeste, com um lago, e encosta alta no
+  meio e a leste); no topo, o **Templo Abandonado**: muro de pilares com portão no sul e pátio de lajes com 6 braseiros
+  (arena do Abade, centro 16,6). Ainda **sem monstros** (fase 3) e **sem música própria** (continua a da vila).
+- **Tiles novos:** `snow` (andável) e `pine` (bloqueia), no fim do tileset (os mapas antigos não mudam).
+  Arte provisória até a fase 4: neve = lajotas clareadas; pinheiro = o pinheiro da floresta.
+- **Portal norte da vila** (fim da estrada de terra, 15–16,1) com `minLevel: 10`: abaixo do nível 10 não leva e avisa
+  "Montanha Nevada: só a partir do nível 10" (um aviso a cada 3 s parado em cima). Volta da montanha: portal no sul.
+- **Auto:** ligado na vila, vai para o mapa com o maior `autoFromLevel` (em `mapsConfig.ts`) que o nível permite —
+  floresta = 1, montanha = 10 —, **desde que o mapa tenha monstros**. Até a fase 3 continua indo para a floresta.
+  Ligado fora da vila, continua caçando onde foi ligado (como antes). O Auto não usa portais trancados.
+- Testes em `check:auto` (portal trancado/aberto, chegada andável, templo alcançável, escolha do mapa pelo Auto).
+
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).
 - **Geada:** Stamina inicial é **10** (não 8 como estava escrito no fechamento do marco 7; o código e o simulador usam 10).

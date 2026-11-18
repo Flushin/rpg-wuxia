@@ -39,7 +39,7 @@ src/render/   desenho no Phaser: mapa, entidades, efeitos de skill, áudio
 src/scenes/   Boot (carrega), Create (tela inicial, 4 personagens), Game (loop: core → tela)
 src/ui/       HUD e janelas em HTML (DOM) por cima do canvas
 src/save.ts   saves no IndexedDB (idb-keyval)
-public/       servido como está: maps/ (cidade, floresta, ruínas), sprites/ (atlas), audio/, icons/, manifest, sw.js
+public/       servido como está: maps/ (cidade, floresta, ruínas, montanha), sprites/ (atlas), audio/, icons/, manifest, sw.js
 tools/        testes (*-check.ts), simulador (balance-sim.ts), gerador de mapas, teste de layout
 tools/sprites/ renderiza os sprites a partir de modelos 3D CC0 no Blender — veja o README de lá
 docs/         decisões, balanceamento, notas de música

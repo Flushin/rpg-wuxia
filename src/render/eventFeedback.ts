@@ -181,6 +181,12 @@ export class EventFeedback {
       case 'bossSummon':
         toast(L('O General invoca guerreiros!', 'The General summons warriors!'), '#ff8a60');
         return true;
+      case 'portalLocked':
+        toast(
+          L(`${ev.name}: só a partir do nível ${ev.minLevel}`, `${ev.name}: requires level ${ev.minLevel}`),
+          '#ff8a80',
+        );
+        return true;
       case 'bossDefeated':
         toast(L('General de Terracota derrotado!', 'Terracotta General defeated!'), '#ffd23f');
         return true;
