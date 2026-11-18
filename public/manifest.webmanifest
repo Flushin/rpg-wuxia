@@ -1,7 +1,7 @@
 {
-  "name": "Wanderers",
-  "short_name": "Wanderers",
-  "description": "Wanderers - RPG de ação wuxia / wuxia action RPG",
+  "name": "Mistpeak",
+  "short_name": "Mistpeak",
+  "description": "Mistpeak - RPG de ação wuxia / wuxia action RPG",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

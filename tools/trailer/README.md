@@ -13,7 +13,7 @@ música e efeitos sonoros. Rode de novo sempre que o jogo mudar e o vídeo sai a
 ```bash
 npx vite --port 5173                 # o jogo em modo dev (em outro terminal)
 node tools/trailer/record.mjs        # grava todas as tomadas em trailer-out/frames/
-node tools/trailer/build.mjs         # monta trailer-out/wanderers-trailer-curto.mp4 e -longo.mp4
+node tools/trailer/build.mjs         # monta trailer-out/mistpeak-trailer-curto.mp4 e -longo.mp4
 ```
 
 Opções úteis:

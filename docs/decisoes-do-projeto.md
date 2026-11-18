@@ -63,6 +63,11 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Ordem do plano:** Fase A (rede de segurança) → B (legibilidade) → C (estrutura) → D (lojas). Nenhuma etapa começa sem o Lucas pedir.
 - **Lojas:** **só Android por enquanto** (Google Play); o código fica preparado para iOS.
 - **Política de privacidade:** página PT/EN no GitHub Pages do jogo, com link em ⚙ e na tela inicial.
+- **Nome do jogo (18/11/2026):** **Mistpeak** (no jogo, tela inicial, PWA e app); na loja **"Mistpeak: Idle RPG"**.
+  appId `io.github.flushin.mistpeak`. Escolhido entre ~75 nomes triados por busca na web (Play, App Store, Steam e
+  marcas); sem jogo, app ou marca "Mistpeak" encontrados. Falta o Lucas conferir no INPI/USPTO/EUIPO antes de publicar.
+  O repositório continua `rpg-wuxia` (o endereço do site não muda). Substitui "Wanderers" (conflito com "Wanderer",
+  idle RPG no Google Play).
 - **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety. Confirmado pelo Lucas em 18/11/2026 (a auditoria de direitos dizia que seria substituído; vale esta decisão).
 
 **Fase A feita (17/11/2026, sem mudar regras do jogo):**
@@ -186,8 +191,7 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   **Pendente com o Lucas:** e-mail de contato (a Play exige; `TODO` na página) e público-alvo (a página diz que o
   jogo não é direcionado a crianças).
 
-**Fase D concluída em 18/11/2026** (D1–D8). Pendências antes da Play Store: nome do jogo e appId definitivo, e-mail de
-contato, público-alvo, chave de assinatura do app de produção, lista de licenças das bibliotecas Android do APK.
+**Fase D concluída em 18/11/2026** (D1–D8). Pendências antes da Play Store: e-mail de contato, público-alvo, chave de assinatura do app de produção, lista de licenças das bibliotecas Android do APK.
 - **D7 (18/11/2026):** ícone e tela de abertura do app gerados de `assets/` (`tools/icons/make_app_icons.py` →
   `@capacitor/assets`). Versão do app lida do `package.json`: `versionCode = MAJOR*10000 + MINOR*100 + PATCH`
   (`tools/android-version.mjs`). **Regra:** subir a `version` do `package.json` antes de cada envio à loja.

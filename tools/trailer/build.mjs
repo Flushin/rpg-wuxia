@@ -1,6 +1,6 @@
 // Monta o trailer a partir das tomadas gravadas por record.mjs: cortes, textos, transições,
 // música (faixa CC0 do próprio jogo) e efeitos sonoros nos quadros em que aconteceram.
-// Uso: node tools/trailer/build.mjs [--out trailer-out]   [--cut longo|curto]   →   trailer-out/wanderers-trailer-<corte>.mp4
+// Uso: node tools/trailer/build.mjs [--out trailer-out]   [--cut longo|curto]   →   trailer-out/mistpeak-trailer-<corte>.mp4
 // Precisa de ffmpeg e do Playwright (para desenhar os textos em HTML).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -66,7 +66,7 @@ const TEXTS = {
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(8,10,16,.55),rgba(8,10,16,.2) 60%,transparent)"></div>
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:${FONT}">
       <div style="font-size:30px;font-weight:600;letter-spacing:.5em;color:#e9b48a;margin-left:.5em">RPG DE AÇÃO WUXIA</div>
-      <div style="font-size:190px;font-weight:900;letter-spacing:.08em;margin-left:.08em;line-height:1.1;text-shadow:0 8px 40px rgba(0,0,0,.7)">WANDERERS</div>
+      <div style="font-size:190px;font-weight:900;letter-spacing:.08em;margin-left:.08em;line-height:1.1;text-shadow:0 8px 40px rgba(0,0,0,.7)">MISTPEAK</div>
       <div style="width:140px;height:4px;background:#c0623a;margin-top:18px"></div>
     </div>`,
   seitas: caption('ESCOLHA SUA SEITA', 'Mestres e caminhos', 'Cada seita luta de um jeito'),
@@ -98,7 +98,7 @@ async function renderTexts() {
     <div style="position:absolute;inset:-40px;background:url(${bg}) center/cover;filter:blur(14px) brightness(.38) saturate(1.1)"></div>
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
       <img src="${icon}" style="width:170px;height:170px;border-radius:36px;box-shadow:0 10px 40px rgba(0,0,0,.5)">
-      <div style="font-size:150px;font-weight:900;letter-spacing:.08em;margin:26px 0 0 .08em;line-height:1">WANDERERS</div>
+      <div style="font-size:150px;font-weight:900;letter-spacing:.08em;margin:26px 0 0 .08em;line-height:1">MISTPEAK</div>
       <div style="width:140px;height:4px;background:#c0623a;margin:30px 0 34px"></div>
       <div style="font-size:46px;font-weight:600">Jogue grátis no navegador</div>
       <div style="font-size:30px;font-weight:500;color:#d9d2c6;margin-top:14px;letter-spacing:.06em">PC E CELULAR · SEM INSTALAR</div>
@@ -241,7 +241,7 @@ function makeCut(cut, edit) {
     prev = `[x${i}]`;
   });
   filter += `${prev}fade=in:st=0:d=0.8,fade=out:st=${(total - 0.8).toFixed(3)}:d=0.8,format=yuv420p[v]`;
-  const final = path.join(OUT, `wanderers-trailer-${cut}.mp4`);
+  const final = path.join(OUT, `mistpeak-trailer-${cut}.mp4`);
   ff([
     ...inputs,
     '-f',

@@ -43,7 +43,7 @@ de produção são MIT/Apache-2.0. Nenhum asset tem licença não comercial, sem
 |---|---|---|
 | B1 | **Não existe política de privacidade publicada** nem link para ela dentro do app. | Obrigatória para **todo** app no Google Play (mesmo os que não coletam nada), com URL pública, ativa, não-PDF e não geobloqueada, e link no Play Console **e** dentro do app. O app ainda envia dados a um terceiro (Web3Forms) no report de bug. |
 | B2 | **Seção Segurança dos dados (Data Safety) não preenchida/planejada por escrito.** | Obrigatória; tem de bater com a política de privacidade e com o que o report de bug realmente envia (seção 4). |
-| B3 | **Nome do jogo:** você decidiu **trocar "Wanderers"** (17/11/2026). Falta escolher o novo nome e pesquisá-lo. | Risco de denúncia por marca e remoção. O `applicationId` não pode ser mudado depois de publicado, então só deve ser criado com o nome final (seção 3). |
+| B3 | **Nome do jogo:** você decidiu **trocar "Wanderers"** (17/11/2026). ✅ **Escolhido em 18/11/2026: "Mistpeak"** (loja: "Mistpeak: Idle RPG"; appId `io.github.flushin.mistpeak`); falta conferir no INPI/USPTO/EUIPO. | Risco de denúncia por marca e remoção. O `applicationId` não pode ser mudado depois de publicado, então só deve ser criado com o nome final (seção 3). |
 | B4 | **Monetização na 1ª versão** (anúncio com recompensa + pacotes de diamantes comprados com dinheiro real — resposta de 17/11/2026) **ainda sem nada preparado**: SDK de anúncios, consentimento, Google Play Billing, proteção das compras com save só local. | Muda Data Safety, política de privacidade, classificação (IARC), permissões e exige Billing. Ver seção 4.5. |
 
 **Exige ação, mas não bloqueia sozinho (🟡):**

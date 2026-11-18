@@ -1,5 +1,5 @@
 # Gera o APK de teste (debug) do app Android em todo PR e sob demanda (aba Actions → "APK Android" → Run workflow).
-# O APK fica no fim da página da execução, em "Artifacts" (wanderers-debug-apk). Instalar no celular: ver docs/android.md.
+# O APK fica no fim da página da execução, em "Artifacts" (mistpeak-debug-apk). Instalar no celular: ver docs/android.md.
 # A pasta android/ não está no repositório: é gerada aqui a partir do capacitor.config.ts.
 name: APK Android
 on:
@@ -26,6 +26,6 @@ jobs:
         working-directory: android
       - uses: actions/upload-artifact@v4
         with:
-          name: wanderers-debug-apk
+          name: mistpeak-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
