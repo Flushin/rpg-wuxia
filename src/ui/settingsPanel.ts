@@ -9,6 +9,7 @@ import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
 import { BugReport } from './bugReport';
 import { credits } from './credits';
+import { openPrivacyPolicy } from './privacy';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import type { TipManager } from './tips';
 import { byId } from './dom';
@@ -55,6 +56,9 @@ export class SettingsPanel {
       case 'credits':
         this.toggle(false);
         credits().open();
+        break;
+      case 'privacy':
+        openPrivacyPolicy();
         break;
       case 'switch':
         this.toggle(false);
@@ -130,6 +134,7 @@ export class SettingsPanel {
       <small class="muted">${seen ? L(`${seen} dica(s) já vista(s)`, `${seen} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
       <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
       <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
+      <button data-act="privacy">${L('Política de privacidade', 'Privacy policy')}</button>
       <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
     bindLangButtons(byId('settings-panel'));
