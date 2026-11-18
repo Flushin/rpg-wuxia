@@ -9,6 +9,7 @@ import { captureErrors } from './ui/bugReport';
 import { credits } from './ui/credits';
 import { initUiScale } from './ui/uiScale';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
+import { registerServiceWorker } from './platform';
 
 captureErrors();
 initUiScale();
@@ -74,9 +75,4 @@ window.addEventListener('orientationchange', () => setTimeout(fit, 200));
 // só no `npm run dev`: acesso ao jogo pelo console (testes de tela)
 if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
 
-// PWA: service worker só em produção (caminho relativo por causa do subpath do GitHub Pages)
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
+registerServiceWorker();

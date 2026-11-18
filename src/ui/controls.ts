@@ -2,8 +2,7 @@ import type { World } from '../core/world';
 import type { Hud } from './hud';
 import { toUi } from './uiScale';
 import { byId } from './dom';
-
-export const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+import { isTouch } from '../platform/input';
 
 export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: number) => boolean = () => false) {
   window.addEventListener('keydown', (e) => {

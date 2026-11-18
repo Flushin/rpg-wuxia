@@ -1,7 +1,7 @@
 import { POTIONS } from '../core/items';
 import type { PotionKind } from '../core/types';
 import type { World } from '../core/world';
-import { isTouch } from './controls';
+import { isTouch } from '../platform/input';
 import { byId } from './dom';
 
 const KEYS: Record<PotionKind, string> = { hp: 'Q', mp: 'E' };

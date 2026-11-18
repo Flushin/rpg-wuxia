@@ -8,7 +8,7 @@ import { InventoryPanel } from './inventory';
 import { NpcWindow } from './npcWindow';
 import { AutoPanel, showOfflineReport } from './autoPanel';
 import { Minimap } from './minimap';
-import { isTouch } from './controls';
+import { isTouch } from '../platform/input';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
 import { Rewards } from './rewards';

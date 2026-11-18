@@ -1,6 +1,7 @@
 // Idioma do jogo (PT/EN). Decidido uma vez ao carregar a página; trocar salva a escolha e recarrega.
 import en from '../data/en.json';
 import { PREF, getPref, setPref } from '../platform/prefs';
+import { restartApp } from '../platform';
 
 export type Lang = 'pt' | 'en';
 
@@ -16,11 +17,11 @@ export const LANG: Lang = detect();
 /** Texto fixo da interface: L('Jogar', 'Play'). */
 export const L = (pt: string, en: string) => (LANG === 'en' ? en : pt);
 
-/** Salva o idioma e recarrega (o jogo já salva no pagehide). */
+/** Salva o idioma e recomeça o jogo (o jogo já salva ao sair da tela). */
 export function setLang(lang: Lang) {
   if (lang === LANG) return;
   setPref(PREF.LANG, lang);
-  window.location.reload();
+  restartApp();
 }
 
 /** Botões PT | EN para telas e painéis. Use com bindLangButtons. */

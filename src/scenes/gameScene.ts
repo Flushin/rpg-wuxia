@@ -19,7 +19,9 @@ import { DPR, TEXT_RES, cssSize } from '../render/display';
 import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
 import { PREF, getPref, setPref } from '../platform/prefs';
-import { armBackGuard } from '../platform/backGuard';
+import { onBackButton } from '../platform/backButton';
+import { onPause } from '../platform/lifecycle';
+import { restartApp } from '../platform';
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
@@ -84,7 +86,7 @@ export class GameScene extends Phaser.Scene {
       this.tips,
       () => {
         // salva e recarrega a página: volta à tela inicial com tudo limpo (HUD, áudio e timers)
-        void writeSave(this.world.serialize()).finally(() => window.location.reload());
+        void writeSave(this.world.serialize()).finally(restartApp);
       },
       this.hud.rewards,
     );
@@ -120,21 +122,16 @@ export class GameScene extends Phaser.Scene {
       void writeSave(this.world.serialize());
     };
     const timer = window.setInterval(save, 30000);
-    const vis = () => {
-      if (document.visibilityState === 'hidden') save();
-    };
-    document.addEventListener('visibilitychange', vis);
-    window.addEventListener('pagehide', save);
+    const offPause = onPause(save);
     // gesto de voltar: o primeiro só avisa (e já salva, caso o jogador confirme a saída)
-    const disarmBack = armBackGuard(() => {
+    const disarmBack = onBackButton(() => {
       save();
       this.hud.toast(L('Faça o gesto de voltar de novo para sair', 'Go back again to exit'), '#ffd23f');
     });
     this.events.once('shutdown', () => {
       disarmBack();
       clearInterval(timer);
-      document.removeEventListener('visibilitychange', vis);
-      window.removeEventListener('pagehide', save);
+      offPause();
     });
   }
 

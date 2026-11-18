@@ -1,4 +1,4 @@
-import { get, set, del } from 'idb-keyval';
+import { saveStorage } from './platform/storage';
 import { deleteSlot as dropSlot, emptySaveFile, migrateSaves, setSlot, type SaveFile } from './core/saves';
 import type { SaveData } from './core/types';
 
@@ -19,7 +19,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function readWithRetry(key: string): Promise<unknown> {
   for (let attempt = 1; ; attempt++) {
     try {
-      return await get(key);
+      return await saveStorage.read(key);
     } catch (err) {
       if (attempt >= READ_ATTEMPTS) throw err;
       await wait(READ_RETRY_MS);
@@ -36,8 +36,8 @@ export async function loadAll(): Promise<SaveFile> {
   file = migrateSaves(cur, legacy);
   loaded = true;
   if (!cur && legacy) {
-    await set(KEY, file);
-    await del(LEGACY_KEY);
+    await saveStorage.write(KEY, file);
+    await saveStorage.remove(LEGACY_KEY);
   }
   return file;
 }
@@ -57,11 +57,11 @@ export const writeSave = async (s: SaveData) => {
   if (active < 0) return;
   assertLoaded();
   file = setSlot(file, active, s);
-  await set(KEY, file);
+  await saveStorage.write(KEY, file);
 };
 
 export const deleteSlot = async (i: number) => {
   assertLoaded();
   file = dropSlot(file, i);
-  await set(KEY, file);
+  await saveStorage.write(KEY, file);
 };

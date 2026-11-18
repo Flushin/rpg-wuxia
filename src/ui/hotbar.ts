@@ -1,7 +1,7 @@
 import { L } from '../core/i18n';
 import { initials, skillScale, type SkillDef } from '../core/skills';
 import type { World } from '../core/world';
-import { isTouch } from './controls';
+import { isTouch } from '../platform/input';
 import { skillIconHtml } from './icons';
 import { uiRect, uiW } from './uiScale';
 import { byId } from './dom';

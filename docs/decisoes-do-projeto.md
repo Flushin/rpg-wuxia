@@ -146,6 +146,15 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 
 **Fase C concluída em 18/11/2026** (C1–C8). Próxima: Fase D (preparação para as lojas), quando o Lucas pedir.
 
+**Fase D (preparação para as lojas)** — iniciada em 18/11/2026.
+- **D1 (18/11/2026):** camada de plataforma em `src/platform/`: único lugar do código que sabe se o jogo roda no
+  navegador ou no app das lojas (`isNative`). Hoje só existe a implementação web, igual ao comportamento anterior:
+  save (`storage.ts`, IndexedDB), preferências (`prefs.ts`), segundo plano (`lifecycle.ts`: `onPause`/`onResume`),
+  voltar (`backButton.ts`, usa `backGuard.ts`), `isTouch` (`input.ts`), `restartApp()` e `registerServiceWorker()`
+  (`index.ts`, o service worker não é registrado no nativo), vibração (`haptics.ts`, vazia) e compras (`purchases.ts`,
+  vazia). **Regra:** `localStorage`, `idb-keyval`, `location.reload`, `serviceWorker` e eventos de ciclo de vida só
+  dentro de `src/platform/`. A implementação nativa (Capacitor) entra na D2 nesses mesmos arquivos.
+
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
 - **Tormenta vs. General** (perdia 6/6 com o equipamento Incomum das missões): **Tormenta fortalecida, General igual.**
