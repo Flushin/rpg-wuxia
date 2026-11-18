@@ -53,6 +53,22 @@
 
 ## Decididas
 
+### Roadmap online (18/11/2026)
+Respondido pelo Lucas em 18/11/2026, ao pedir o roadmap em `docs/roadmap/` (o roadmap é uma proposta; cada item de
+jogabilidade continua passando por pergunta antes de ser feito).
+- **Modelo online:** **assíncrono**: conta e save na nuvem com o servidor validando, ranking, amigos e guildas, cada jogador
+  no seu próprio mundo. Mundo compartilhado em tempo real, raids e PvP em tempo real ficam fora do escopo.
+- **Monetização:** a v1 sai grátis, sem anúncios e sem compras (confirma a decisão de 18/11/2026); F2P ético depois do lançamento.
+- **Público-alvo:** casual PvE mobile (Auto e ganho offline como pilares; PvP opcional e tardio).
+- **Premissa de trabalho:** o Lucas é solo dev **sem experiência de lançar jogos ou apps nas lojas** e precisa da IA para
+  quase tudo. Consequências no roadmap: só serviços gerenciados (nenhum servidor para operar), nada que exija moderação
+  ou vigilância diária antes do pós-lançamento (chat de texto livre, mercado e troca entre jogadores), manuais escritos
+  para a IA seguir com o Lucas, e cada tarefa marcada com quem faz (🤖 IA · 🤝 juntos · 👤 só o Lucas).
+- **Loja não é antecipada (18/11/2026):** o Lucas quer criar mais e jogar mais offline antes de mandar para a loja. A conta
+  no Play Console e o teste fechado (12 testadores por 14 dias) começam no **início do M3**, ~5 semanas antes do
+  lançamento. O conteúdo que não depende de servidor fica na "Trilha C" do `docs/roadmap/04-marcos.md`.
+- **appId confirmado (18/11/2026):** `io.github.flushin.mistpeak` (já em `capacitor.config.ts`); nada de "wanderers".
+
 ### Titã e Víbora (marco 8, 18/11/2026)
 Aprovado pelo Lucas em 18/11/2026 (skills como propostas; Titã = Fogo; Víbora = físico com Agilidade). Números ajustados
 com o simulador (6 execuções por seita): até o nível 10 — Tormenta ~61 min / 1,7 morte, Geada ~43 / 0,3,
@@ -302,7 +318,8 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **D2 (18/11/2026):** app Android com **Capacitor 8** (`capacitor.config.ts`, guia em `docs/android.md`).
   - **APK de teste gerado pelo GitHub Actions** em todo PR (`.github/workflows/android.yml`), decidido pelo Lucas:
     o ambiente de desenvolvimento não baixa o Android SDK.
-  - **appId provisório** `io.github.flushin.wanderers` e nome "Wanderers": **em espera**, o Lucas pode mudar o nome
+  - ~~**appId provisório** `io.github.flushin.wanderers` e nome "Wanderers"~~ (resolvido: **Mistpeak**, appId
+    `io.github.flushin.mistpeak`; ver "Nome do jogo"). Texto original: em espera, o Lucas pode mudar o nome
     do jogo. Decidir antes do primeiro envio à Play Store (depois disso o appId nunca muda).
   - A pasta `android/` é gerada na hora (`npm run android:prepare`) e não fica no repositório, para o appId ficar
     num lugar só; passa a ser versionada quando precisar de arquivos nativos próprios (D7).
