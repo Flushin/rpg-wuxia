@@ -18,7 +18,7 @@ import type {
   Point,
 } from './types';
 import type { World } from './world';
-import { MAPS_CONFIG, TOWN_MAPS } from './mapsConfig';
+import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 
 export const AUTO_MAX_LEVEL_GAP = 2; // padrão da opção maxLevelAbove: alvos até 2 níveis acima do personagem
 export const AUTO_MAX_LEVEL_LIMIT = 5; // máximo da opção no menu
@@ -139,7 +139,7 @@ export class AutoCombat {
     this.status = '';
     const w = this.w;
     if (s === 'on' && !TOWN_MAPS.has(w.mapId)) this.huntMap = w.mapId;
-    if (s === 'on' && !this.huntMap) this.huntMap = this.portalTo(null)?.target ?? '';
+    if (s === 'on' && !this.huntMap) this.huntMap = this.levelHuntMap() ?? this.portalTo(null)?.target ?? '';
     if (s !== 'on') {
       w.player.path = [];
     }
@@ -423,7 +423,7 @@ export class AutoCombat {
     while (queue.length) {
       const cur = queue.shift()!;
       for (const o of maps[cur]?.objects ?? []) {
-        if (o.type !== 'portal') continue;
+        if (o.type !== 'portal' || portalMinLevel(o) > this.w.player.level) continue;
         const t = String(o.props.target);
         if (t === from || first[t] || !maps[t]) continue;
         first[t] = cur === from ? t : first[cur];
@@ -434,9 +434,24 @@ export class AutoCombat {
     return null;
   }
 
+  /** Mapa de caça pelo nível (autoFromLevel em mapsConfig): o maior que o nível permite, com monstros e caminho. */
+  private levelHuntMap(): string | null {
+    const w = this.w;
+    let best: string | null = null,
+      bestLv = -1;
+    for (const id of MAP_IDS) {
+      const lv = MAPS_CONFIG[id].autoFromLevel;
+      if (lv === undefined || lv > w.player.level || lv <= bestLv || id === w.mapId) continue;
+      if (!w.maps[id]?.objects.some((o) => o.type === 'monsterSpawn') || !this.nextHop(w.mapId, id)) continue;
+      best = id;
+      bestLv = lv;
+    }
+    return best;
+  }
+
   private portalTo(target: string | null) {
     for (const o of this.w.map.objects) {
-      if (o.type !== 'portal') continue;
+      if (o.type !== 'portal' || portalMinLevel(o) > this.w.player.level) continue;
       const t = String(o.props.target);
       if (target === null ? !TOWN_MAPS.has(t) : target === TOWN_TARGET ? TOWN_MAPS.has(t) : t === target)
         return { o, target: t };

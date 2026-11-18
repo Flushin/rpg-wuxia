@@ -17,7 +17,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const HOUR = 3.6e6;
 
@@ -875,13 +875,18 @@ console.log('\n== offline: faixas de eficiência ==');
       computeOffline({ elapsedMs: 24 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 }).kills,
     '30 h rende o mesmo que 24 h',
   );
-  const cap = computeOffline({ elapsedMs: 20 * HOUR, rate, level: 9, xp: 100, potions: { hp: 0, mp: 0 }, seed: 1 });
-  ok(
-    cap.newLevel === PROGRESSION.levelCap && cap.newXp === 0 && cap.levelsGained === 1,
-    'respeita o nível máximo (10)',
-  );
-  const atCap = computeOffline({ elapsedMs: 5 * HOUR, rate, level: 10, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
-  ok(atCap.xp === 0 && atCap.newLevel === 10, 'já no nível máximo: sem XP');
+  const CAP = PROGRESSION.levelCap;
+  const cap = computeOffline({
+    elapsedMs: 20 * HOUR,
+    rate,
+    level: CAP - 1,
+    xp: 100,
+    potions: { hp: 0, mp: 0 },
+    seed: 1,
+  });
+  ok(cap.newLevel === CAP && cap.newXp === 0 && cap.levelsGained === 1, `respeita o nível máximo (${CAP})`);
+  const atCap = computeOffline({ elapsedMs: 5 * HOUR, rate, level: CAP, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
+  ok(atCap.xp === 0 && atCap.newLevel === CAP, 'já no nível máximo: sem XP');
   ok(
     computeOffline({ elapsedMs: -HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 }).kills === 0,
     'relógio atrasado: 0 abates',
@@ -911,14 +916,12 @@ console.log('\n== offline: aplicando no jogo ==');
   ok(!!rep, 'gera relatório');
   if (rep) {
     ok(rep.kills === Math.floor(3 * 216), `abates = taxa × minutos efetivos (${rep.kills})`);
-    ok(
-      w.player.level === PROGRESSION.levelCap && rep.levelsGained === 9,
-      `XP sobe até o nível máximo (nv ${w.player.level})`,
-    );
-    ok(w.freePoints === 9 * PROGRESSION.freePointsPerLevel, `pontos livres acumulam (${w.freePoints})`);
+    const gained = w.player.level - 1;
+    ok(gained >= 5 && rep.levelsGained === gained, `XP sobe vários níveis (nv ${w.player.level})`);
+    ok(w.freePoints === gained * PROGRESSION.freePointsPerLevel, `pontos livres acumulam (${w.freePoints})`);
     ok(
       w.player.attrs.strength ===
-        CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * 9,
+        CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * gained,
       'pontos automáticos aplicados',
     );
     ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);
@@ -986,6 +989,80 @@ console.log('\n== offline: aplicando no jogo ==');
     rOff.applyResumeOffline(NOW + HOUR, NOW, { ...autoAt, active: false }) === null,
     'voltou após 1 h com auto desligado: sem ganhos',
   );
+}
+
+console.log('\n== montanha nevada (marco 9, fase 2) ==');
+{
+  const north = maps.cidade.objects.find((o) => o.type === 'portal' && o.props.target === 'montanha')!;
+  ok(!!north && Number(north.props.minLevel) === 10, 'vila tem a saída norte para a montanha (nível 10)');
+  const back = maps.montanha.objects.find((o) => o.type === 'portal' && o.props.target === 'cidade')!;
+  ok(!!back, 'montanha tem o portal de volta para a vila');
+  const stand = (w: World, o: typeof north) => {
+    run(w, 1.1); // espera de 1 s do portal depois de trocar de mapa
+    w.player.x = o.x + o.w / 2;
+    w.player.y = o.y + o.h / 2;
+    run(w, 0.1);
+  };
+  // nível 9: o portal não leva e avisa uma vez (não a cada quadro)
+  const low = mk('lamina', 9, 'cidade');
+  stand(low, north);
+  run(low, 1);
+  const evs = drain(low);
+  ok(low.mapId === 'cidade' && count(evs, 'portalLocked') === 1, 'nível 9: portal norte trancado, um aviso');
+  // nível 10: atravessa e chega na entrada da montanha (andável); o portal de volta leva à vila (andável)
+  const hi = mk('lamina', 10, 'cidade');
+  stand(hi, north);
+  ok(hi.mapId === 'montanha', 'nível 10: entra na montanha');
+  const tile = (w: World) => w.map.walkable[Math.floor(w.player.y) * w.map.width + Math.floor(w.player.x)];
+  ok(tile(hi), 'chegada na montanha é andável');
+  stand(hi, back);
+  ok(hi.mapId === 'cidade' && tile(hi), 'portal de volta: vila, em tile andável');
+  // templo: o pátio (arena) é alcançável a pé a partir da entrada
+  const m = maps.montanha,
+    seen = new Set([27 * m.width + 16]),
+    q = [[16, 27]];
+  while (q.length) {
+    const [x, y] = q.pop()!;
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const k = (y + dy) * m.width + x + dx;
+      if (!seen.has(k) && m.walkable[k]) (seen.add(k), q.push([x + dx, y + dy]));
+    }
+  }
+  ok(seen.has(6 * m.width + 16), 'montanha: pátio do templo alcançável');
+  // Auto ligado na vila: sem monstros na montanha (fase 3) continua indo para a floresta, mesmo no nível 10
+  const a10 = mk('lamina', 10, 'cidade');
+  a10.auto.toggle();
+  ok(a10.auto.huntMap === 'floresta', 'auto nível 10, montanha sem monstros: caça na floresta');
+  // com monstros na montanha: nível 10 vai para lá; nível 9 não passa pelo portal trancado
+  const withMobs = { ...maps.montanha, objects: [...maps.montanha.objects] };
+  withMobs.objects.push({
+    id: 9999,
+    name: 'Lobo',
+    type: 'monsterSpawn',
+    x: 16.5,
+    y: 20.5,
+    w: 0,
+    h: 0,
+    props: { monster: 'lobo' },
+  });
+  const saved = maps.montanha;
+  maps.montanha = withMobs;
+  const b10 = mk('lamina', 10, 'cidade');
+  b10.auto.toggle();
+  ok(b10.auto.huntMap === 'montanha', 'auto nível 10 com monstros na montanha: vai para a montanha');
+  ok(
+    run(b10, 90, () => b10.mapId === 'montanha'),
+    'auto nível 10: chegou na montanha',
+  );
+  const b9 = mk('lamina', 9, 'cidade');
+  b9.auto.toggle();
+  ok(b9.auto.huntMap === 'floresta', 'auto nível 9: continua na floresta');
+  maps.montanha = saved;
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

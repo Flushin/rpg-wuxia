@@ -19,6 +19,8 @@ const TILE_COLOR: Record<string, string> = {
   plaza: '#b3ad9d',
   ruin: '#8c8f8f',
   pillar: '#55595e',
+  snow: '#dfe6ee',
+  pine: '#2e5446',
 };
 const COLOR = { player: '#ffffff', monster: '#ff5a4a', boss: '#ff9a1f', npc: '#ffd23f', portal: '#c08cff' };
 const REDRAW_MS = 150;

@@ -15,8 +15,11 @@ const TILES = [
   { name: 'plaza', walkable: true, color: [190, 185, 170] },
   { name: 'ruin', walkable: true, color: [140, 143, 143] },
   { name: 'pillar', walkable: false, color: [85, 89, 94] },
+  // marco 9 (montanha): sempre no fim da lista, para não mudar os gids dos mapas antigos
+  { name: 'snow', walkable: true, color: [222, 230, 238] },
+  { name: 'pine', walkable: false, color: [52, 84, 70] },
 ];
-const [G, P, WA, T, HS, PL, RU, PI] = [1, 2, 3, 4, 5, 6, 7, 8];
+const [G, P, WA, T, HS, PL, RU, PI, SN, PN] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const walkable = (id) => TILES[id - 1].walkable;
 
 function rngFn(seed) {
@@ -30,8 +33,8 @@ function rngFn(seed) {
   };
 }
 
-function makeGrid() {
-  const g = new Array(W * H).fill(G);
+function makeGrid(fill = G, border = T) {
+  const g = new Array(W * H).fill(fill);
   const set = (x, y, id) => {
     if (x >= 0 && y >= 0 && x < W && y < H) g[y * W + x] = id;
   };
@@ -43,15 +46,15 @@ function makeGrid() {
     for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) if (Math.hypot(i - cx, j - cy) <= r) set(i, j, id);
   };
   for (let i = 0; i < W; i++) {
-    set(i, 0, T);
-    set(i, H - 1, T);
-    set(0, i, T);
-    set(W - 1, i, T);
+    set(i, 0, border);
+    set(i, H - 1, border);
+    set(0, i, border);
+    set(W - 1, i, border);
   }
   return { g, set, get, rect, disc };
 }
 
-function sealUnreachable(grid, sx, sy) {
+function sealUnreachable(grid, sx, sy, wall = T) {
   const seen = new Set([sy * W + sx]);
   const q = [[sx, sy]];
   while (q.length) {
@@ -71,7 +74,7 @@ function sealUnreachable(grid, sx, sy) {
     }
   }
   for (let j = 0; j < H; j++)
-    for (let i = 0; i < W; i++) if (walkable(grid.get(i, j)) && !seen.has(j * W + i)) grid.set(i, j, T);
+    for (let i = 0; i < W; i++) if (walkable(grid.get(i, j)) && !seen.has(j * W + i)) grid.set(i, j, wall);
   return seen;
 }
 
@@ -344,6 +347,8 @@ function cidade() {
   objs.unshift(
     point('player', 'spawn', 16.5, 17.5),
     area('Floresta', 'portal', 29, 14, 2, 4, { target: 'floresta', targetX: 5.5, targetY: 16.5 }),
+    // saída norte (marco 9): só abre no nível 10 (minLevel)
+    area('Montanha Nevada', 'portal', 15, 1, 2, 2, { target: 'montanha', targetX: 16, targetY: 27.5, minLevel: 10 }),
   );
   return tiled('Vila das Nuvens', gr, objs);
 }
@@ -505,9 +510,60 @@ function ruinas() {
   return tiled('Ruínas de Terracota', gr, objs);
 }
 
+// ---- montanha nevada (marco 9) ----
+// Entrada pelo sul (vinda da saída norte da vila); trilha sobe em zigue-zague entre pinheiros e pedras até o
+// Templo Abandonado no topo (norte). Encosta baixa (y 19–27) e encosta alta (y 12–18) ficam livres para os
+// monstros da fase 3 (Espectro de gelo e Yeti); o pátio do templo é a arena do Abade Caído (centro 16,6).
+// Sem monsterSpawn por enquanto: os monstros entram na fase 3.
+const MONTANHA_ARENA = { x: 16, y: 6, r: 5.5 };
+function montanha() {
+  const rnd = rngFn(2026);
+  const gr = makeGrid(SN, PN);
+  // encosta fechada: bosques de pinheiros e pedras (pilares); a trilha e as clareiras são abertas depois
+  for (let j = 1; j < H - 1; j++)
+    for (let i = 1; i < W - 1; i++) {
+      const r = rnd();
+      if (j < 12 || r < 0.38) gr.set(i, j, r < 0.06 ? PI : PN);
+    }
+  // trilha: entrada (16,28) -> curva oeste -> curva leste -> escadaria do templo
+  gr.rect(15, 24, 2, 7, SN);
+  gr.rect(9, 23, 8, 2, SN);
+  gr.rect(9, 17, 2, 8, SN);
+  gr.rect(9, 16, 14, 2, SN);
+  gr.rect(21, 12, 2, 6, SN);
+  gr.rect(15, 11, 8, 2, SN);
+  // clareiras de caça (fase 3): encosta baixa a leste e a oeste, encosta alta no meio
+  gr.disc(23, 23, 3.2, SN);
+  gr.disc(5, 15, 2.6, SN);
+  gr.disc(6, 21, 3.4, SN);
+  gr.rect(5, 15, 5, 2, SN); // ligação da clareira oeste com a trilha
+  gr.disc(16, 20.5, 2.6, SN);
+  gr.disc(26, 15, 2.6, SN);
+  gr.disc(6, 21, 2.2, WA); // lago (congelado na arte da fase 4), na beira da clareira oeste
+  gr.disc(6, 21, 0.9, WA);
+  // templo: muro de pilares do y 1 ao 11 com portão no sul; pátio de lajes (ruin) com 6 braseiros em volta
+  gr.rect(8, 1, 16, 11, PI);
+  gr.rect(9, 1, 14, 10, RU);
+  gr.rect(15, 10, 2, 2, RU); // portão
+  gr.disc(MONTANHA_ARENA.x, MONTANHA_ARENA.y, 4.6, RU);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(MONTANHA_ARENA.x + Math.cos(a) * 4), Math.floor(MONTANHA_ARENA.y + Math.sin(a) * 4), PI);
+  }
+  const seen = sealUnreachable(gr, 16, 27, PN);
+  if (!seen.has(6 * W + 16)) throw new Error('montanha: templo inalcançável');
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 4.5 }),
+  ];
+  console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável`);
+  return tiled('Montanha Nevada', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
 writeFileSync('public/maps/ruinas.json', JSON.stringify(ruinas()));
+writeFileSync('public/maps/montanha.json', JSON.stringify(montanha()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

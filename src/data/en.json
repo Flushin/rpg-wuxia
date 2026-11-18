@@ -150,7 +150,7 @@
     },
     "skill_nivel": {
       "title": "Skill level up!",
-      "text": "Active skills gain experience with every use and get 8% stronger per level (max 10). Passives level up along with your character level. See the progress in the skills panel (K)."
+      "text": "Active skills gain experience with every use and get 8% stronger per level (max 15). Passives level up along with your character level. See the progress in the skills panel (K)."
     },
     "primeiro_item": {
       "title": "You found equipment!",
@@ -312,6 +312,7 @@
     "Vila das Nuvens": "Cloud Village",
     "Floresta Sombria": "Dark Forest",
     "Ruínas de Terracota": "Terracotta Ruins",
+    "Montanha Nevada": "Snowy Mountain",
     "Floresta": "Forest",
     "Vila": "Village",
     "Ferreiro": "Blacksmith",

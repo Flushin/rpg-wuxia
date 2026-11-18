@@ -102,6 +102,39 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
   retorno** (teleporta para a vila).
 - **Missões:** **sim**, cadeia curta (5–6 missões) do nível 11 ao 20 guiando pela montanha até o Abade (fase 8).
 
+**Fase 1 feita (18/11/2026): progressão até o nível 20.**
+- `progression.json`: nível máximo **20**. Curva do 10 ao 20 **provisória**: 24000 / 28000 / 33000 / 38000 / 44000 /
+  50000 / 57000 / 65000 / 74000 / 84000 (nível 10→11 até 19→20; total ~497 mil XP, ~8× o trecho 1–10). Pensada para
+  ~2 h com os monstros da montanha; será calibrada no simulador na fase 9, quando eles existirem.
+- Skills: nível máximo **15** (`SKILL_MAX_LEVEL`). Curva de XP das skills: até o 10 continua `20 × 1,5^(nível−1)` usos;
+  **do 10 ao 15 cresce ×1,4 por nível** em vez de ×1,5 (decidido pelo Lucas em 18/11/2026: "levemente mais rápido, mas não
+  tanto"): 718 / 1005 / 1407 / 1969 / 2757 usos (total 7856, ~22% menos que os 10139 da curva antiga). No simulador, as
+  ativas estão entre os níveis 3 e 7 quando o personagem chega ao nível 10.
+  Passivas acompanham o nível do personagem (a do nível 9 chega ao 12 no nível 20). Painel de skills mostra "x/15" e a
+  dica fala em "máximo 15".
+- Até a fase 2/3, quem passa do nível 10 continua caçando terracota (127–199 XP por abate) e o General: sobe devagar.
+  Saves antigos no nível 10 (XP zerado) continuam de onde estão.
+- **Simulador consertado:** desde a mudança "Auto volta ao mapa de caça certo", o `sim:balance` parava no nível 7 — ele
+  teleportava para as Ruínas, mas o Auto lembrava a Floresta e voltava. Agora o simulador marca as Ruínas como mapa de
+  caça (como o jogador que liga o Auto lá). O jogo não mudou.
+  Medição (5 execuções, até o nível 10): Tormenta ~53 min / 0 mortes, Geada ~43 / 0,6, Titã ~62 / 0,2, Víbora ~61 / 1,2;
+  chefe 10/10 para todas com Incomum.
+- Testes ajustados para o nível máximo vir do `progression.json` (offline, missões, robô do caos).
+
+**Fase 2 feita (18/11/2026): mapa novo (lógica).**
+- **Montanha Nevada** (`montanha`, 32×32, gerada em `tools/gen-maps.mjs`): entrada no sul; trilha em zigue-zague entre
+  pinheiros e pedras; 4 clareiras de caça para a fase 3 (encosta baixa a leste e a oeste, com um lago, e encosta alta no
+  meio e a leste); no topo, o **Templo Abandonado**: muro de pilares com portão no sul e pátio de lajes com 6 braseiros
+  (arena do Abade, centro 16,6). Ainda **sem monstros** (fase 3) e **sem música própria** (continua a da vila).
+- **Tiles novos:** `snow` (andável) e `pine` (bloqueia), no fim do tileset (os mapas antigos não mudam).
+  Arte provisória até a fase 4: neve = lajotas clareadas; pinheiro = o pinheiro da floresta.
+- **Portal norte da vila** (fim da estrada de terra, 15–16,1) com `minLevel: 10`: abaixo do nível 10 não leva e avisa
+  "Montanha Nevada: só a partir do nível 10" (um aviso a cada 3 s parado em cima). Volta da montanha: portal no sul.
+- **Auto:** ligado na vila, vai para o mapa com o maior `autoFromLevel` (em `mapsConfig.ts`) que o nível permite —
+  floresta = 1, montanha = 10 —, **desde que o mapa tenha monstros**. Até a fase 3 continua indo para a floresta.
+  Ligado fora da vila, continua caçando onde foi ligado (como antes). O Auto não usa portais trancados.
+- Testes em `check:auto` (portal trancado/aberto, chegada andável, templo alcançável, escolha do mapa pelo Auto).
+
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).
 - **Geada:** Stamina inicial é **10** (não 8 como estava escrito no fechamento do marco 7; o código e o simulador usam 10).
@@ -511,7 +544,7 @@ Decidido pelo Lucas em 16/11/2026.
 5. Mente Serena · Serene Mind (nv 9, passiva) — regeneração de mana
 
 ### Progressão (v1)
-- Nível de personagem — **nível máximo 10** na v1.
+- Nível de personagem — **nível máximo 10** na v1 (**20** desde o marco 9, fase 1).
 - Nível de skills (ativas pelo uso, passivas pelo nível do personagem).
 - Equipamentos: só alguns de cada tipo, para teste.
 

@@ -55,8 +55,9 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Guerreiro de Terracota | 7–9 | 55 + 9 | 5–8 (+1 por nível) | 30 s |
 | General de Terracota | 10 | 600 | 260–340 | 600 s |
 
-Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10),
-nível máximo 10. Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
+Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
+Desde o marco 9 (fase 1) o nível máximo é 20, com 24000 / 28000 / 33000 / 38000 / 44000 / 50000 / 57000 / 65000 /
+74000 / 84000 do 10→11 ao 19→20 (**provisório**, calibrar na fase 9 com os monstros da montanha). Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
 
 ## Situação atual (17/11/2026)
 
