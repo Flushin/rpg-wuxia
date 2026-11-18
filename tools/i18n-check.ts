@@ -84,9 +84,10 @@ for (const grp of ['rarities', 'bases', 'potions'])
     need((items as J)[grp][id].name, E.items?.[grp]?.[id]?.name, `items.${grp}.${id}.name`);
 // monsters: name
 for (const [id, m] of Object.entries(monsters as J)) need(m.name, E.monsters?.[id]?.name, `monsters.${id}.name`);
-// tips: title, text, textTouch, byClass
+// tips: title, text, textTouch, textTouchClassic, byClass
 for (const [id, t] of Object.entries(tips as J)) {
-  for (const f of ['title', 'text', 'textTouch']) if (f in t) need(t[f], E.tips?.[id]?.[f], `tips.${id}.${f}`);
+  for (const f of ['title', 'text', 'textTouch', 'textTouchClassic'])
+    if (f in t) need(t[f], E.tips?.[id]?.[f], `tips.${id}.${f}`);
   if (t.byClass) need(t.byClass, E.tips?.[id]?.byClass, `tips.${id}.byClass`);
 }
 // npcs (falas dos NPCs e mestres): todo texto
