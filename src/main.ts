@@ -10,8 +10,10 @@ import { credits } from './ui/credits';
 import { initUiScale } from './ui/uiScale';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
 import { registerServiceWorker } from './platform';
+import { initNativeApp } from './platform/native';
 
 captureErrors();
+initNativeApp();
 initUiScale();
 initNoBrowserZoom();
 

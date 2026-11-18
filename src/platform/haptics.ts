@@ -1,4 +1,10 @@
-// Vibração leve (golpes, subir de nível). Web: nada. Nativo (D2): @capacitor/haptics.
+// Vibração leve (golpes, subir de nível). Web: nada. App (Capacitor): @capacitor/haptics.
+// Ainda não é chamada pelo jogo; onde vibrar é decisão de jogabilidade.
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { isNative } from './index';
+
 export const haptics = {
-  light() {},
+  light() {
+    if (isNative) void Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+  },
 };

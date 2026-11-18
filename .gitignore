@@ -4,3 +4,5 @@ dist
 tools/sprites/.cache
 trailer-out
 trailer-rec.log
+android
+ios

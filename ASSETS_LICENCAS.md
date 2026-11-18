@@ -107,8 +107,12 @@ As dependências só de desenvolvimento (Vite, TypeScript, esbuild, Prettier) **
 | Phaser | 3.90.0 | MIT | © 2024 Richard Davey, Phaser Studio Inc. | Aviso + licença em toda cópia distribuída | `phaser-3.90.0-LICENSE.md` | 🟢 (na tela de créditos) |
 | eventemitter3 | 5.0.4 | MIT | © 2014 Arnout Kazemier | idem | `eventemitter3-5.0.4-LICENSE.txt` | 🟢 (na tela de créditos) |
 | idb-keyval | 6.3.0 | Apache-2.0 | © 2016 Jake Archibald | Cópia da licença Apache-2.0 (o pacote não tem NOTICE) | `idb-keyval-6.3.0-LICENCE.txt` + `Apache-2.0.txt` | 🟢 (na tela de créditos) |
+| Capacitor (`@capacitor/core`, `@capacitor/android`) | 8.6.2 | MIT | © 2017-present Drifty Co. | idem | `capacitor-8.6.2-LICENSE.txt` | 🟢 (na tela de créditos) |
+| `@capacitor/app`, `/haptics`, `/status-bar` | 8.1.2, 8.0.2, 8.0.4 | MIT | © 2020-present Ionic | idem | `capacitor-plugins-app-haptics-status-bar-LICENSE.txt` | 🟢 (na tela de créditos) |
+| `@capacitor/filesystem` | 8.1.5 | MIT | © 2025 Ionic | idem | `capacitor-filesystem-8.1.5-LICENSE.txt` | 🟢 (na tela de créditos) |
+| AndroidX e demais bibliotecas Android que o Capacitor puxa no APK | — | Apache-2.0 (a conferir) | Google / AOSP | Licenças das dependências do APK | — | 🟡 só no APK: levantar a lista exata do build antes de publicar (D8) |
 
-Ao atualizar a versão de uma biblioteca, troque a linha e o arquivo da licença. Capacitor, SDK de anúncios e Billing
+Ao atualizar a versão de uma biblioteca, troque a linha e o arquivo da licença. SDK de anúncios e Billing
 entram aqui quando forem adicionados.
 
 ## Serviços externos usados pelo jogo

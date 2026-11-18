@@ -1,9 +1,10 @@
 // Camada de plataforma: tudo o que muda entre o jogo no navegador (web/PWA) e o app das lojas (Capacitor).
-// O resto do código usa só estas funções; hoje todas têm a implementação web (comportamento de antes da D1).
-// A implementação nativa entra na D2, dentro destes mesmos arquivos, escolhida por `isNative`.
+// O resto do código usa só estas funções. Cada arquivo tem a implementação web e a do app, escolhida por `isNative`.
+// Este arquivo não importa plugins do Capacitor: ele é usado também pelos scripts de teste (Node), via core/i18n.
 //
 // Mapa:
 //   index.ts      isNative, restartApp, registerServiceWorker
+//   native.ts     ajustes feitos uma vez ao abrir o app (barra de status)
 //   storage.ts    onde fica o save dos personagens (IndexedDB na web)
 //   prefs.ts      preferências pequenas do aparelho (localStorage na web)
 //   lifecycle.ts  app foi para o segundo plano / voltou

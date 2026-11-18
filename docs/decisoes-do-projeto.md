@@ -154,6 +154,16 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   (`index.ts`, o service worker não é registrado no nativo), vibração (`haptics.ts`, vazia) e compras (`purchases.ts`,
   vazia). **Regra:** `localStorage`, `idb-keyval`, `location.reload`, `serviceWorker` e eventos de ciclo de vida só
   dentro de `src/platform/`. A implementação nativa (Capacitor) entra na D2 nesses mesmos arquivos.
+- **D2 (18/11/2026):** app Android com **Capacitor 8** (`capacitor.config.ts`, guia em `docs/android.md`).
+  - **APK de teste gerado pelo GitHub Actions** em todo PR (`.github/workflows/android.yml`), decidido pelo Lucas:
+    o ambiente de desenvolvimento não baixa o Android SDK.
+  - **appId provisório** `io.github.flushin.wanderers` e nome "Wanderers": **em espera**, o Lucas pode mudar o nome
+    do jogo. Decidir antes do primeiro envio à Play Store (depois disso o appId nunca muda).
+  - A pasta `android/` é gerada na hora (`npm run android:prepare`) e não fica no repositório, para o appId ficar
+    num lugar só; passa a ser versionada quando precisar de arquivos nativos próprios (D7).
+  - Implementações nativas em `src/platform/`: save em arquivo JSON (gravação atômica + 1 backup), pause/resume e
+    botão Voltar pelo `@capacitor/app`, barra de status escondida, vibração pelo `@capacitor/haptics` (ainda sem uso).
+  - Licenças do Capacitor (MIT) na tela de créditos e em `docs/licencas/`.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
