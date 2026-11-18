@@ -15,7 +15,10 @@ const GROUND: Record<string, number[]> = {
   plaza: [4, 5],
   house: [0, 0, 0, 1, 2],
   ruin: [6, 6, 7, 8],
+  snow: [4, 5], // marco 9: provisório (lajotas clareadas pelo SNOW_TINT) até a arte da fase 4
 };
+const SNOW_TINT = 0xdfe9f5;
+const PINES = ['tree_pineRoundA']; // provisório até a arte da fase 4
 const WATER_FRAMES = [9, 10, 11];
 const WATER_MS = 420; // tempo de cada quadro da água
 // ruínas (atlas props-ruinas): o que aparece em cada tile 'pillar' (bloqueado) e enfeites soltos no chão
@@ -70,10 +73,11 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
   const water: Phaser.GameObjects.Image[] = [];
   const ground = (name: string, i: number, j: number, x: number, y: number) => {
     const frames = GROUND[name] ?? GROUND.grass; // tipo de piso sem arte: grama (não deixa buraco no mapa)
-    return scene.add
+    const img = scene.add
       .image(x, y, 'pisos', pick(frames, hash(i, j, 1)))
       .setScale(SPRITE_SCALE)
       .setDepth(DEPTH.GROUND);
+    return name === 'snow' ? img.setTint(SNOW_TINT) : img;
   };
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
@@ -89,7 +93,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         continue;
       }
       if (name === 'pillar') {
-        out.push(ground('ruin', i, j, pos.x, pos.y));
+        out.push(ground(MAPS_CONFIG[map.id]?.trees === 'snow' ? 'snow' : 'ruin', i, j, pos.x, pos.y));
         const arena = MAPS_CONFIG[map.id]?.arena;
         const inArena = !!arena && Math.hypot(i + 0.5 - arena.x, j + 0.5 - arena.y) < arena.r;
         const frame = inArena ? 'braseiro' : pick(PILLARS, hash(i, j, 12));
@@ -102,11 +106,15 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         out.push(p);
         continue;
       }
-      if (name === 'tree') {
-        out.push(ground('grass', i, j, pos.x, pos.y));
+      if (name === 'tree' || name === 'pine') {
+        out.push(ground(name === 'pine' ? 'snow' : 'grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
         const [atlas, frame] =
-          MAPS_CONFIG[map.id]?.trees === 'city' ? pick(CITY_TREES, r) : ['props-floresta', pick(TREES, r)];
+          name === 'pine'
+            ? ['props-floresta', pick(PINES, r)]
+            : MAPS_CONFIG[map.id]?.trees === 'city'
+              ? pick(CITY_TREES, r)
+              : ['props-floresta', pick(TREES, r)];
         const tree = scene.add
           .image(pos.x, pos.y, atlas, frame)
           .setScale(SPRITE_SCALE * (0.9 + 0.2 * hash(i, j, 3)))

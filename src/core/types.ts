@@ -125,6 +125,7 @@ export type GameEvent =
   | { type: 'levelup'; level: number }
   | { type: 'playerDeath' }
   | { type: 'mapChange'; mapId: string }
+  | { type: 'portalLocked'; name: string; minLevel: number }
   | {
       type: 'skillCast';
       skillId: string;

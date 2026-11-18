@@ -18,7 +18,7 @@ import {
 } from './skills';
 import { BAG_SIZE, SLOTS, STARTING_KIT, STARTING_WEAPON, makeEquipment, makePotion, maxDurability } from './items';
 import { AutoCombat } from './auto';
-import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
+import { HOME_MAP, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { Rng } from './rng';
 import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
@@ -728,6 +728,13 @@ export class World {
     const p = this.player;
     for (const o of this.map.objects) {
       if (o.type !== 'portal' || p.x < o.x || p.x >= o.x + o.w || p.y < o.y || p.y >= o.y + o.h) continue;
+      const minLevel = portalMinLevel(o);
+      if (p.level < minLevel) {
+        // portal trancado: avisa e espera um pouco antes de avisar de novo (o jogador pode continuar em cima dele)
+        this.portalCd = 3;
+        this.emit({ type: 'portalLocked', name: tn(o.name), minLevel });
+        return;
+      }
       this.changeMap(String(o.props.target), Number(o.props.targetX), Number(o.props.targetY));
       return;
     }
