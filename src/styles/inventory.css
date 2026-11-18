@@ -41,6 +41,23 @@
   object-fit: contain;
   opacity: 1;
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
+  /* respira como os NPCs parados: o peito sobe e desce, pés fixos no chão */
+  transform-origin: 50% 100%;
+  animation: body-breathe 3.2s ease-in-out infinite;
+}
+@keyframes body-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.012, 1.025);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .body-img {
+    animation: none;
+  }
 }
 .inv-tabs {
   clear: both;
