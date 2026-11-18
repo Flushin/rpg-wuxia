@@ -42,13 +42,13 @@ real ficam **fora do escopo** por decisão: é o que separa um jogo lançável d
 | # | Prioridade | Por quê | Quem | Marco |
 | :-: | --- | --- | :-: | :-: |
 | **1** | **Preparar o core para o servidor e escolher o backend gerenciado:** relógio injetável no lugar dos 12 `Date.now()`, core rodando em Node na CI, protótipo Supabase × Firebase, `CLAUDE.md` | Tudo o que é online depende disto. Com o simulador, dá para provar que nada mudou no jogo. | 🤖 (você só escolhe o backend) | M0 |
-| **2** | **Aprender a Play Store agora, com o jogo atual:** nome/appId, conta de desenvolvedor, AAB assinado, teste fechado com 12+ testadores por 14 dias | É a parte que você nunca fez e a que mais depende de calendário (verificação, 14 dias, respostas do Google). Teste fechado não é publicação. **Precisa da sua decisão:** muda a ordem decidida em 18/11/2026. | 👤 🤝 | M0 |
+| **2** | **Conteúdo e polimento offline (Trilha C):** música das zonas, vibração, viagem rápida, talentos, conquistas, Provação local, nível 20–30 | Você quer criar mais e jogar mais offline antes da loja. Nada disso depende do servidor: pode vir antes do M0, em paralelo ou intercalado. Cada mês aqui adia o online na mesma medida. | 🤖 (você escolhe a ordem e aprova) | Agora |
 | **3** | **Conta convidado + save na nuvem** (com migração dos saves locais e tela de conflito) | Elimina o maior risco atual: perder o progresso ao trocar de celular ou limpar os dados. Entrega o progresso cruzado web ↔ Android. | 🤖 | M1 |
 | **4** | **O servidor como juiz, com backups testados e telemetria:** offline e mercador pelo relógio do servidor, plausibilidade com limites do simulador, backup com ensaio de restauração, funil e retenção | Sem isso, ranking e compras viram trapaça, e um incidente pode apagar todo mundo. Os manuais ficam escritos para você pedir à IA "siga o manual". | 🤖 🤝 | M1 |
 | **5** | **Loop de retorno:** diárias, recompensa de login e a **Provação da Seita** (torre solo com semente semanal e ranking verificado) | O jogo hoje "acaba" em ~3 h. A Provação dá um fim de jogo infinito com monstros e arenas que já existem. | 🤖 (você decide o design) | M2 |
 
-**Decisões que só você pode tomar e que destravam o começo:** nome final e appId · antecipar ou não o teste fechado ·
-backend (depois do protótipo).
+**Decisões já tomadas (18/11/2026):** appId `io.github.flushin.mistpeak` · a loja **não** é antecipada: a conta na Play e
+o teste fechado começam no início do M3. **Ainda em aberto:** a ordem entre a Trilha C e o M0 · o backend (depois do protótipo).
 
 **O que ficou de fora de propósito** (precisa de uma pessoa operando todo dia): chat de texto livre, mercado e troca
 entre jogadores. Voltam no M5+ se houver moderadores ou orçamento. Guildas usam frases prontas e uma guilda NPC da seita.
@@ -59,4 +59,5 @@ entre jogadores. Voltam no M5+ se houver moderadores ou orçamento. Guildas usam
 **M3** Beta (5–7 sem) → **M4** Lançamento (3–4 sem) → **M5+** Live ops.
 
 São ~4 a 6 meses de calendário até o lançamento, com a IA implementando. Seu tempo estimado vai de ~5 a ~10 h por semana,
-conforme o marco (detalhes em `04-marcos.md`). A trilha da loja corre em paralelo desde o M0.
+conforme o marco (detalhes em `04-marcos.md`). A trilha da loja começa no início do M3. A Trilha C (conteúdo offline)
+pode entrar antes ou em paralelo e soma ao calendário o tempo que você dedicar a ela.

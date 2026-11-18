@@ -16,9 +16,9 @@
    para o pós-lançamento ou ganharam uma versão "sem operação" (frases prontas, guilda NPC).
 3. **Tudo como código e documentado**, para qualquer sessão de IA retomar o trabalho: migrações do banco no repositório,
    scripts de deploy, manual de incidentes escrito como passo a passo que a IA executa com o Lucas.
-4. **Aprender a loja cedo e sem risco.** Conta na Play, verificação de identidade e teste fechado de 14 dias levam tempo de
-   calendário e são justamente o que o Lucas nunca fez. Começar com o jogo atual, que já funciona, antes de existir servidor
-   (ver `05-guia-lancamento.md`).
+4. **Começar a loja com folga.** Conta na Play, verificação de identidade e teste fechado de 14 dias levam tempo de
+   calendário e são justamente o que o Lucas nunca fez. O Lucas decidiu (18/11/2026) não antecipar: a trilha da loja
+   começa no início do M3, ~5 semanas antes do lançamento (ver `05-guia-lancamento.md`).
 5. **Custo fixo baixo e previsível**, com limite de gastos ligado em todo serviço pago.
 6. **Cada tarefa diz quem faz** em `04-marcos.md`: 🤖 a IA faz e o Lucas revisa jogando · 🤝 juntos (a IA guia passo a
    passo, o Lucas clica) · 👤 só o Lucas (identidade, pagamento, assinatura de contrato, decisão de jogabilidade).
@@ -78,7 +78,7 @@ operar. A IA escreve e versiona as migrações do banco e as funções no reposi
 | E6 | **Telemetria mínima com consentimento** | Não existe (decisão de privacidade) | Sem funil e retenção, não dá para saber se o alpha e o beta funcionam. | E2 (ID anônimo); atualizar a política e o Data Safety | P/M | Coletar demais. Mitigação: lista fechada de ~15 eventos, sem PII. |
 | E7 | **Backups, logs e alertas do servidor** | Não existe | Online sem backup testado é perda de progresso em massa esperando acontecer. | Backend | P/M | Backup nunca testado. Mitigação: ensaio de restauração a cada marco. |
 | E8 | **Loop repetível de fim de jogo** | Parcial: no nível 20 só resta farmar o Abade e forjar | Online assíncrono vive de motivo para voltar. Hoje o jogo "acaba" em ~3 h ativas. | Pode começar antes do backend; o ranking vem depois de E4 | G | Virar grind sem sentido. Mitigação: recompensa cosmética/título e ranking semanal. |
-| E9 | **Processo da loja aprendido cedo:** conta no Play Console, verificação de identidade e teste fechado (12 testadores por 14 dias) feitos **com o jogo atual**, antes do servidor existir | Não começado (adiado para "depois de todos os marcos") | O Lucas nunca publicou. Essas etapas levam dias ou semanas de calendário, têm regras que mudam e podem dar recusa. Descobrir isso no fim atrasa o lançamento inteiro. Teste fechado **não é publicação**. | Nome e appId definitivos; build AAB assinado (a IA prepara) | P (trabalho) / 3–5 sem (calendário) | Precisa de decisão do Lucas (muda a ordem decidida em 18/11/2026). Recrutar 12 testadores reais. |
+| E9 | **Processo da loja com folga:** conta no Play Console, verificação de identidade e teste fechado (12 testadores por 14 dias) começando no **início do M3**, ~5 semanas antes do lançamento | Não começado. O Lucas decidiu não antecipar (18/11/2026): primeiro criar mais e jogar mais offline. | O Lucas nunca publicou. Essas etapas levam dias ou semanas de calendário, têm regras que mudam e podem dar recusa. Deixar para a semana do lançamento atrasa tudo. | Build AAB assinado (a IA prepara); appId já decidido (`io.github.flushin.mistpeak`) | P (trabalho) / 3–5 sem (calendário) | Verificação demorar; testadores sumirem. Mitigação: convidar 15–20 pessoas. |
 
 ## Importantes
 

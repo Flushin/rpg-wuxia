@@ -33,19 +33,42 @@ e testers jogando. Cada marco traz uma estimativa de horas por semana do Lucas.
 
 ---
 
-## M0 · Fundação técnica + trilha da loja
+## Trilha C · Conteúdo e polimento offline (pode começar agora)
 
-**Objetivo:** deixar o core pronto para rodar no servidor, escolher o backend e, **em paralelo**, aprender o processo da
-Play Store com o jogo que já existe, sem publicar nada.
+O Lucas quer **criar mais e jogar mais offline antes da loja** (18/11/2026). Estes itens **não dependem do servidor**:
+podem ser feitos antes do M0, em paralelo a qualquer marco ou intercalados, no ritmo que o Lucas quiser. Quando um deles
+aparece também num marco abaixo, vale o que for feito primeiro (marque nos dois lugares).
+
+- [ ] 👤 **Escolher a ordem** (a IA propõe em múltipla escolha a cada rodada)
+- [ ] 🤖 **I15** Música das Ruínas, da Montanha e de luta contra chefe; 👤 aprovar ouvindo
+- [ ] 🤖 **I18** Vibração nos golpes, críticos e subida de nível
+- [ ] 🤖 **I16** Viagem rápida entre mapas visitados
+- [ ] 🤖 **I5** Talentos (2 opções a cada 5 níveis) + respec, depois que o 👤 aprovar as propostas simuladas
+- [ ] 🤖 **I3** Conquistas e bestiário (versão local; sincronizam quando houver conta)
+- [ ] 🤖 **I10** Mural de contratos (missões secundárias repetíveis)
+- [ ] 🤖 **D1** Provação da Seita, versão local (andares e recompensas; o ranking verificado entra no M2)
+- [ ] 🤖 **I11** Conteúdo do nível 20 ao 30 (mapa, monstros, chefe, equipamentos, missões); 👤 escolher o tema
+- [ ] 🤖 **I12** Tutorial interativo dos primeiros 10 minutos
+- [ ] 🤖 **I17** Acessibilidade (modo daltônico, reduzir efeitos)
+- [ ] 🤖 **A6** Tom de cor por hora do dia e neve caindo na Montanha
+- [ ] 🤖 **I4** Baú da conta, versão local (compartilhado entre os 4 personagens do aparelho)
+
+**Cuidado:** cada mês de conteúdo offline adia o online na mesma medida. O risco de perder o save (só no aparelho) continua
+até o M1. O `navigator.storage.persist()` (item do M0) é barato e pode vir antes, para proteger quem testa.
+
+---
+
+## M0 · Fundação técnica
+
+**Objetivo:** deixar o core pronto para rodar no servidor e escolher o backend, sem mudar nada no jogo. A loja fica para
+o M3 (decidido pelo Lucas em 18/11/2026: primeiro criar mais e jogar mais offline).
 
 **Pronto quando:**
 - um teste na CI carrega um save, aplica o ganho offline com um relógio "de servidor" injetado e dá **exatamente** o mesmo
   resultado que o navegador;
-- o backend está escolhido e registrado;
-- o teste fechado da Play **começou** com 12+ testadores.
+- o backend está escolhido e registrado.
 
-**Esforço:** 2 a 3 semanas de código. A trilha da loja corre em paralelo e leva de 3 a 5 semanas de calendário.
-**Tempo do Lucas:** ~5 h/semana (testar e decidir), mais ~4 h no total para as contas.
+**Esforço:** 2 a 3 semanas. **Tempo do Lucas:** ~5 h/semana (testar e decidir), mais ~1 h para criar a conta no Supabase.
 
 **Código e arquitetura:**
 - [ ] 🤖 **I20** `CLAUDE.md` com as regras do projeto (decisões, múltipla escolha, testes, como rodar), para qualquer sessão de IA começar sabendo o contexto
@@ -62,26 +85,13 @@ Play Store com o jogo que já existe, sem publicar nada.
 - [ ] 🤖 Protótipo do backend: login convidado, salvar/ler o save e uma função TS importando o core, em Supabase e, para comparar, Firebase
 - [ ] 👤 Escolher o backend com base no relatório do protótipo (múltipla escolha); a IA registra a decisão e o modelo de dados
 
-**Trilha da loja** (detalhes e armadilhas em `05-guia-lancamento.md`):
-- [ ] 👤 **Decidir:** antecipar o teste fechado da Play com o jogo atual? Muda a decisão de 18/11/2026 ("Play só depois de todos os marcos"). Teste fechado não é publicação.
-- [ ] 👤 Decidir o **nome final e o appId** (o appId nunca muda depois do primeiro envio)
-- [ ] 👤 Criar o e-mail do jogo (já decidido) e pôr na política de privacidade (🤖 atualiza a página)
-- [ ] 👤 Criar a conta de desenvolvedor no Play Console (taxa única, documento de identidade, verificação), com 🤝 a IA guiando
-- [ ] 🤖 Preparar o build de loja: AAB assinado, `versionCode`, ícones, textos da ficha, Data Safety e classificação indicativa (rascunhos já em `docs/lojas.md`)
-- [ ] 🤝 Criar o app no Play Console e preencher os formulários com os textos que a IA preparou
-- [ ] 👤 Recrutar 12+ testadores (amigos e família com Android) e mandar o link de convite
-- [ ] 🤝 Subir o AAB na faixa de **teste fechado** e acompanhar os 14 dias seguidos
-
 **Métricas de validação:**
 - `check:headless` verde na CI
 - 0 usos de `Date.now()` no `src/core` fora do `Clock`
 - `sim:balance` com **saída idêntica** antes e depois (a mesma régua da refatoração C7)
-- Teste fechado rodando com ≥ 12 testadores opt-in
 
 **Riscos:**
 - A refatoração do relógio mudar o balanceamento sem querer. Mitigação: a comparação do simulador.
-- Verificação de identidade demorar ou pedir documentos de novo. Mitigação: começar no primeiro dia do M0.
-- Testadores desistirem antes dos 14 dias. Mitigação: chamar 15–20 pessoas e lembrá-las na metade.
 
 ---
 
@@ -133,7 +143,7 @@ resultado impossível.
 ## M2 · Alpha fechado
 
 **Objetivo:** criar o **loop de retenção** (motivo para voltar todo dia e toda semana) e o social mais leve, e medir com
-30 a 50 testers. Os testadores do teste fechado do M0 são o começo dessa lista.
+30 a 50 testers (amigos e conhecidos, pelo site e pelo APK de teste da CI; ainda sem loja).
 
 **Pronto quando:** o alpha roda 2 semanas com 30+ testers, o funil está medido e há uma lista priorizada do que corrigir
 (a IA monta a lista a partir dos dados e dos reports).
@@ -182,7 +192,7 @@ moderação e vigilância contínuas.
 **Pronto quando:** 200 a 500 beta testers por 3+ semanas, o backend aguenta 500 jogadores simulados com folga e a
 economia fecha no livro-razão (todo ouro e material tem origem registrada).
 
-**Esforço:** 5 a 7 semanas. **Tempo do Lucas:** ~8–10 h/semana (jogar o conteúdo novo, aprovar arte, acompanhar a comunidade).
+**Esforço:** 5 a 7 semanas. **Tempo do Lucas:** ~8–10 h/semana (jogar o conteúdo novo, aprovar arte, acompanhar a comunidade), mais ~4 h para as contas da loja.
 
 **Funcionalidades:**
 - [ ] 👤 Passar o Supabase para o plano pago (backup diário, sem pausa), com limite de gastos
@@ -199,7 +209,16 @@ economia fecha no livro-razão (todo ouro e material tem origem registrada).
 - [ ] 🤖 **I19** Painel de admin simples (buscar conta, ver eventos, marcar e banir, restaurar save), para o Lucas atender suporte sem mexer no banco
 - [ ] 🤖 **E4d** Verificação de plausibilidade passa a **bloquear** casos claros (com caminho de recurso pelo report)
 - [ ] 🤖 Teste de carga: 500 bots headless (o core em Node) jogando contra o backend, com o relatório de custo projetado
-- [ ] 🤝 Pedir o **acesso à produção** na Play (questionário depois do teste fechado), se ainda não foi feito
+
+**Trilha da loja** (começa no **início do M3**, ~5 semanas antes do M4, por causa da verificação de identidade e dos 14 dias
+de teste fechado; detalhes e armadilhas em `05-guia-lancamento.md`). O appId já está decidido: `io.github.flushin.mistpeak`.
+- [ ] 👤 Criar o e-mail do jogo (já decidido) e pôr na política de privacidade (🤖 atualiza a página)
+- [ ] 👤 Criar a conta de desenvolvedor no Play Console (taxa única, documento de identidade, verificação), com 🤝 a IA guiando
+- [ ] 🤖 Preparar o build de loja: AAB assinado, `versionCode`, ícones, textos da ficha, Data Safety e classificação indicativa (rascunhos já em `docs/lojas.md`, atualizados para conta e telemetria)
+- [ ] 🤝 Criar o app no Play Console e preencher os formulários com os textos que a IA preparou
+- [ ] 👤 Escolher 12+ testadores entre os beta testers com Android e mandar o convite
+- [ ] 🤝 Subir o AAB na faixa de **teste fechado** e acompanhar os 14 dias seguidos
+- [ ] 🤝 Pedir o **acesso à produção** na Play (questionário sobre o teste fechado)
 
 **Métricas de validação:**
 - D7 ≥ 15% e D30 medido
@@ -211,6 +230,8 @@ economia fecha no livro-razão (todo ouro e material tem origem registrada).
 **Riscos:**
 - **Arte do nível 20–30** sem modelo CC0 adequado. Mitigação: escolher o tema pelos modelos disponíveis.
 - Base de testers pequena deixar as guildas vazias. Mitigação: a guilda NPC da seita.
+- Verificação de identidade da Play demorar ou pedir documentos de novo. Mitigação: criar a conta no primeiro dia do M3.
+- Testadores desistirem antes dos 14 dias. Mitigação: convidar 15–20 e lembrá-los na metade.
 - Esgotamento do Lucas com suporte e comunidade. Mitigação: FAQ e respostas prontas (🤖), horário fixo de atendimento.
 
 ---
@@ -249,7 +270,7 @@ mais de 1 h, exploit de economia) com os primeiros ~1.000 jogadores.
 **Riscos:**
 - Pico de jogadores estourar o plano do backend. Mitigação: o teste de carga do M3 e o limite de gastos.
 - Review ruim por bug da primeira sessão. Mitigação: o lançamento escalonado e respostas rápidas às reviews.
-- Recusa da loja por política. Mitigação: o teste fechado do M0 já passou pelos formulários; a IA revisa as políticas vigentes antes do envio.
+- Recusa da loja por política. Mitigação: o teste fechado do M3 já passou pelos formulários; a IA revisa as políticas vigentes antes do envio.
 
 ---
 
@@ -303,10 +324,11 @@ o custo do servidor.
 
 | Marco | Foco | Calendário | Tempo do Lucas | Validação principal |
 | --- | --- | --- | --- | --- |
-| **M0** | Core no servidor, backend, **teste fechado da Play com o jogo atual** | 2–3 sem (loja: 3–5 sem em paralelo) | ~5 h/sem + contas | Saída idêntica Node × navegador; teste fechado rodando |
+| **Trilha C** | Conteúdo e polimento offline (sem servidor) | No seu ritmo, antes ou em paralelo | O que você quiser | Você jogando e aprovando cada item |
+| **M0** | Core no servidor, backend | 2–3 sem | ~5 h/sem | Saída idêntica Node × navegador; teste fechado rodando |
 | **M1** | Conta, nuvem, relógio do servidor, 1º ranking | 3–5 sem | ~5–8 h/sem | 10 amigos × 7 dias, 0 save perdido |
 | **M2** | Diárias, conquistas, Provação, talentos, amigos | 4–6 sem | ~8 h/sem | 30+ testers, D1 ≥ 35%, D7 ≥ 12% |
-| **M3** | Guildas, frases prontas, ajudante, nv 30 | 5–7 sem | ~8–10 h/sem | 500 bots p95 < 300 ms, livro-razão 100% |
+| **M3** | Guildas, frases prontas, ajudante, nv 30, **conta na Play e teste fechado** | 5–7 sem | ~8–10 h/sem | 500 bots p95 < 300 ms, livro-razão 100% |
 | **M4** | Loja, operação, lançamento | 3–4 sem | ~10 h/sem no lançamento | 2 semanas sem P0, crash-free ≥ 99,5% |
 | **M5+** | Monetização ética, eventos, temporadas | Contínuo | ~5–8 h/sem | D30 ≥ 5%, receita ≥ custo |
 
@@ -320,11 +342,11 @@ gantt
   title Roadmap indicativo (IA implementando, Lucas testando e decidindo)
   section Fundação
   M0 Fundação técnica        :m0, 2026-11-23, 3w
-  Trilha da loja (teste fechado) :loja, 2026-11-23, 5w
   section Online
   M1 Vertical slice online   :m1, after m0, 5w
   M2 Alpha fechado           :m2, after m1, 6w
   M3 Beta                    :m3, after m2, 7w
+  Trilha da loja (teste fechado) :loja, after m2, 5w
   section Lançamento
   M4 Lançamento MVP          :m4, after m3, 4w
   M5 Live ops                :m5, after m4, 8w

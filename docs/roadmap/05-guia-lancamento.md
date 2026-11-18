@@ -11,7 +11,7 @@
 | Termo | O que é |
 | --- | --- |
 | **Play Console** | O site do Google onde você cadastra o app, sobe as versões e responde aos formulários. |
-| **appId** (nome do pacote) | O "RG" do app, por exemplo `io.github.flushin.wanderers`. **Nunca muda** depois do primeiro envio. |
+| **appId** (nome do pacote) | O "RG" do app, no Mistpeak, `io.github.flushin.mistpeak` (já decidido e configurado). **Nunca muda** depois do primeiro envio. |
 | **AAB** | O formato de arquivo que a Play exige para enviar o app (o APK que a CI gera hoje serve só para teste direto). |
 | **Assinatura do app** | A chave criptográfica que prova que a atualização veio de você. Com o *Play App Signing*, o Google guarda a chave principal e você guarda a de envio. |
 | **versionCode** | Número inteiro que precisa subir a cada envio. O projeto já calcula a partir do `package.json` (`tools/android-version.mjs`). |
@@ -26,7 +26,7 @@
 
 | # | Etapa | Quem | Tempo de calendário | Observações |
 | :-: | --- | :-: | --- | --- |
-| 1 | Decidir o **nome final** e o **appId** | 👤 | — | A IA pode listar opções e checar conflitos óbvios na loja. A busca de marca formal vem depois (M4). |
+| 1 | ~~Decidir o nome e o appId~~ | — | — | **Feito:** Mistpeak, `io.github.flushin.mistpeak`. Falta só a busca de marca formal (M4). |
 | 2 | Criar o **e-mail do jogo** | 👤 | 1 dia | Vai na ficha da loja e na política de privacidade. |
 | 3 | Criar a **conta de desenvolvedor** no Play Console (conta pessoal) | 👤 🤝 | 1 dia + verificação (dias, às vezes semanas) | Taxa única, documento de identidade, verificação de telefone e endereço. **Comece cedo.** |
 | 4 | Gerar o **AAB assinado** e ativar o Play App Signing | 🤖 🤝 | 1 dia | A IA prepara o build e o passo a passo da chave. **Guarde a chave de envio e a senha em dois lugares seguros** (por exemplo, um gerenciador de senhas e um pendrive). |
@@ -35,10 +35,9 @@
 | 7 | Pedir **acesso à produção** (questionário sobre o teste) | 🤝 | Dias para a resposta | A IA ajuda a responder com base no que aconteceu no teste. |
 | 8 | **Produção** com lançamento escalonado | 🤝 | Revisão de horas a dias por versão | Só no M4. Até lá, as versões continuam nas faixas de teste. |
 
-**Por que fazer as etapas 1 a 7 já no M0:** não dependem do servidor, usam o jogo que já existe e são exatamente o que
-você nunca fez. Se algo travar (verificação de identidade, recusa de formulário, testadores sumindo), você descobre com
-meses de folga, e não na semana do lançamento. Isso muda a decisão de 18/11/2026 ("Play só depois de todos os marcos"), por
-isso está no M0 como pergunta para você.
+**Quando começar:** no **início do M3** (decidido em 18/11/2026: primeiro criar mais e jogar mais offline). As etapas 2 a 7
+levam ~3 a 5 semanas de calendário, então começar no M3 deixa folga antes do lançamento do M4. Se algo travar
+(verificação de identidade, recusa de formulário, testadores sumindo), ainda dá tempo de resolver sem adiar a data.
 
 ## Custos esperados
 
@@ -81,6 +80,7 @@ isso está no M0 como pergunta para você.
 
 ## Frases prontas para pedir à IA
 
+- "Faça a próxima tarefa da Trilha C (conteúdo offline) do roadmap."
 - "Faça a próxima tarefa 🤖 do M0 do roadmap."
 - "Me guie passo a passo para criar a conta no Play Console. Eu nunca fiz isso."
 - "Confira as regras atuais da Play para teste fechado e me diga se mudou algo no guia."
