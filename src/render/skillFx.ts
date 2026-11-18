@@ -12,6 +12,12 @@ const THUNDER_CORE = 0xfffbe0;
 const ICE = [0xe8fbff, 0x9ee8ff, 0x6ab8f0];
 const ICE_DEEP = 0x4a8fd0;
 const BLOOD = [0xffd0a0, 0xff6a3a, 0xc03a3a];
+// Titã = fogo e terra, Víbora = veneno e jade (marco 8)
+const EMBER = [0xfff0a0, 0xffa030, 0xe05020];
+const DUST = [0xc8a070, 0xa07a4a, 0x7a5a3a];
+const POISON = [0xd8ff90, 0x8ae05a, 0x4ca040];
+const POISON_DEEP = 0x2f7a3a;
+const JADE = [0xe0fff0, 0x90f0b8, 0x40c080];
 
 type Pt = { x: number; y: number };
 
@@ -142,6 +148,21 @@ export class SkillFx {
         break;
       case 'bubble':
         this.mistVeil(c);
+        break;
+      case 'quake':
+        this.quake(c, radius);
+        break;
+      case 'fistfire':
+        this.fistFire(t);
+        break;
+      case 'needle':
+        this.needles(c, t, d.hits?.length ?? 1);
+        break;
+      case 'toxic':
+        this.toxicCloud(t, radius);
+        break;
+      case 'sap':
+        this.jadeSap(c);
         break;
       default:
         break;
@@ -504,6 +525,194 @@ export class SkillFx {
       alpha: { start: 0.5, end: 0 },
       tint: [0xffffff, 0xd8e8f8, 0xaad0ff],
       blendMode: 'NORMAL',
+    });
+  }
+
+  /** Tremor: ondas de choque no chão em volta do jogador, rachaduras e um pouco de poeira. */
+  private quake(c: Pt, radius: number) {
+    const r = this.iso(radius);
+    for (let k = 0; k < 2; k++) {
+      const w = this.gfx(FX - 1);
+      w.setPosition(c.x, c.y);
+      w.lineStyle(5 - k * 2, k ? 0xe0b070 : 0xa0703a, 0.9);
+      w.strokeEllipse(0, 0, r.w, r.h);
+      w.setScale(0.15);
+      this.scene.tweens.add({ targets: w, scaleX: 1, scaleY: 1, duration: 300, delay: k * 110, ease: 'Cubic.easeOut' });
+      this.fade(w, 450, { delay: k * 110 + 120 });
+    }
+    const cr = this.gfx(FX - 2);
+    cr.lineStyle(2, 0x2a1a10, 0.8);
+    for (let k = 0; k < 7; k++) {
+      const a = (k / 7) * Math.PI * 2 + Math.random() * 0.4;
+      let px = c.x,
+        py = c.y;
+      cr.beginPath();
+      cr.moveTo(px, py);
+      for (let i = 0; i < 4; i++) {
+        px += Math.cos(a + (Math.random() - 0.5) * 0.8) * (r.w * 0.11);
+        py += Math.sin(a + (Math.random() - 0.5) * 0.8) * (r.h * 0.11);
+        cr.lineTo(px, py);
+      }
+      cr.strokePath();
+    }
+    this.fade(cr, 800, { delay: 400 });
+    this.burst(c.x, c.y, 14, {
+      emitZone: {
+        type: 'edge',
+        source: new Phaser.Geom.Ellipse(0, 0, r.w * 0.7, r.h * 0.7),
+        quantity: 14,
+      } as Phaser.Types.GameObjects.Particles.EmitZoneData,
+      speedY: { min: -60, max: -25 },
+      speedX: { min: -12, max: 12 },
+      lifespan: 600,
+      scale: { start: 0.7, end: 0.2 },
+      alpha: { start: 0.6, end: 0 },
+      tint: DUST,
+      blendMode: 'NORMAL',
+    });
+  }
+
+  /** Punho Vulcânico: clarão de fogo no alvo, anel de brasa e brasas subindo. */
+  private fistFire(t: Pt) {
+    const y = t.y - 22;
+    const g = this.gfx();
+    g.setPosition(t.x, y).setBlendMode(Phaser.BlendModes.ADD);
+    g.fillStyle(0xe05020, 0.45);
+    g.fillCircle(0, 0, 22);
+    g.fillStyle(0xffa030, 0.85);
+    g.fillCircle(0, 0, 13);
+    g.fillStyle(0xfff0c0, 1);
+    g.fillCircle(0, 0, 6);
+    g.setScale(0.4);
+    this.scene.tweens.add({ targets: g, scaleX: 1.3, scaleY: 1.3, duration: 200, ease: 'Cubic.easeOut' });
+    this.fade(g, 300);
+    const ring = this.gfx(FX - 1);
+    ring.setPosition(t.x, t.y);
+    ring.lineStyle(3, 0xff7a30, 0.9);
+    ring.strokeEllipse(0, 0, 70, 35);
+    ring.setScale(0.2);
+    this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 240, ease: 'Cubic.easeOut' });
+    this.fade(ring, 400, { delay: 60 });
+    this.burst(t.x, y, 14, {
+      speed: { min: 60, max: 150 },
+      angle: { min: 200, max: 340 },
+      gravityY: -60,
+      lifespan: 600,
+      scale: { start: 0.5, end: 0 },
+      tint: EMBER,
+    });
+  }
+
+  /** Agulhas: fios finos de jade voando do jogador ao alvo, uma após a outra. */
+  private needles(c: Pt, t: Pt, n: number) {
+    const from = { x: c.x, y: c.y - 24 },
+      to = { x: t.x, y: t.y - 22 };
+    const ang = Math.atan2(to.y - from.y, to.x - from.x);
+    const dist = Math.hypot(to.x - from.x, to.y - from.y);
+    const dur = Math.max(90, Math.min(200, dist * 0.7));
+    const step = n > 1 ? 90 : 0;
+    for (let i = 0; i < n; i++) {
+      const jy = n > 1 ? (i - (n - 1) / 2) * 5 : 0; // espalha um pouco
+      this.scene.time.delayedCall(i * step, () => {
+        const g = this.gfx();
+        g.setBlendMode(Phaser.BlendModes.ADD).setRotation(ang);
+        g.lineStyle(5, POISON_DEEP, 0.4);
+        g.lineBetween(-26, 0, 0, 0);
+        g.lineStyle(2, 0xd8ffd8, 1);
+        g.lineBetween(-20, 0, 4, 0);
+        g.fillStyle(0xffffff, 1);
+        g.fillCircle(4, 0, 1.6);
+        g.setPosition(from.x, from.y + jy);
+        this.scene.tweens.add({
+          targets: g,
+          x: to.x,
+          y: to.y + jy * 0.4,
+          duration: dur,
+          ease: 'Quad.easeIn',
+          onComplete: () => {
+            g.destroy();
+            this.burst(to.x, to.y + jy * 0.4, n > 1 ? 3 : 6, {
+              speed: { min: 30, max: 90 },
+              lifespan: 260,
+              scale: { start: 0.35, end: 0 },
+              tint: POISON,
+            });
+          },
+        });
+      });
+    }
+  }
+
+  /** Névoa Tóxica: nuvem verde no chão em volta do alvo por cerca de 1,5 s. */
+  private toxicCloud(t: Pt, radius: number) {
+    const r = this.iso(radius);
+    const g = this.gfx(FX - 1);
+    g.setPosition(t.x, t.y);
+    g.fillStyle(POISON_DEEP, 0.32);
+    g.fillEllipse(0, 0, r.w, r.h);
+    g.lineStyle(2, 0x8ae05a, 0.6);
+    g.strokeEllipse(0, 0, r.w, r.h);
+    const puffs = [
+      [-0.28, -0.1, 0.3],
+      [0.05, -0.22, 0.34],
+      [0.3, 0.02, 0.28],
+      [-0.1, 0.18, 0.32],
+      [0.2, 0.22, 0.24],
+    ];
+    for (const [u, v, k] of puffs) {
+      g.fillStyle(0x7ac85a, 0.42);
+      g.fillEllipse(u * r.w, v * r.h, k * r.w, k * r.h * 1.1);
+    }
+    g.setScale(0.4).setAlpha(0);
+    this.scene.tweens.add({ targets: g, scaleX: 1, scaleY: 1, alpha: 1, duration: 260, ease: 'Cubic.easeOut' });
+    this.fade(g, 450, { delay: 1050 });
+    const gas = this.scene.add
+      .particles(t.x, t.y, 'fx-dot', {
+        x: { min: -r.w * 0.38, max: r.w * 0.38 },
+        y: { min: -r.h * 0.3, max: r.h * 0.3 },
+        speedY: { min: -26, max: -10 },
+        lifespan: 800,
+        scale: { start: 0.8, end: 0.3 },
+        alpha: { start: 0.45, end: 0 },
+        tint: POISON,
+        frequency: 110,
+        blendMode: 'NORMAL',
+      })
+      .setDepth(FX);
+    this.scene.time.delayedCall(1100, () => {
+      gas.stop();
+      this.scene.time.delayedCall(900, () => gas.destroy());
+    });
+  }
+
+  /** Seiva de Jade: anéis e brilho verde subindo do chão em volta do jogador. */
+  private jadeSap(c: Pt) {
+    for (let k = 0; k < 2; k++) {
+      const w = this.gfx(FX - 1);
+      w.setPosition(c.x, c.y);
+      w.lineStyle(3, k ? 0x90f0b8 : 0x40c080, 0.9);
+      w.strokeEllipse(0, 0, 54, 27);
+      w.setScale(1.3).setAlpha(0);
+      this.scene.tweens.add({
+        targets: w,
+        scaleX: 0.7,
+        scaleY: 0.7,
+        y: c.y - 30 - k * 10,
+        alpha: 1,
+        duration: 500,
+        delay: k * 160,
+        ease: 'Cubic.easeOut',
+      });
+      this.fade(w, 400, { delay: 500 + k * 160 });
+    }
+    this.burst(c.x, c.y, 16, {
+      x: { min: -22, max: 22 },
+      y: { min: -4, max: 6 },
+      speedY: { min: -90, max: -40 },
+      speedX: { min: -10, max: 10 },
+      lifespan: 800,
+      scale: { start: 0.5, end: 0 },
+      tint: JADE,
     });
   }
 }

@@ -2,7 +2,7 @@
 
 Desenhados por script (formas vetoriais com degradê, contorno escuro e brilho), em 4x e reduzidos para 128 px.
 Itens: fundo transparente (a célula da mochila já tem o fundo na cor da raridade).
-Skills: ícone quadrado completo com fundo no tom do elemento (trovão = Tormenta, gelo = Geada).
+Skills: ícone quadrado completo com fundo no tom do elemento (trovão = Tormenta, gelo = Geada, fogo = Titã, veneno = Víbora).
 
 Uso: python tools/sprites/icons.py
 Saída: public/sprites/icones.png (grade de 8 colunas de 128 px) + src/data/sprites/icones.json ({nome: índice}).
@@ -332,6 +332,8 @@ def i_botas(im):
 # ---------- skills ----------
 THUNDER_BG = ((110, 70, 150), (30, 18, 48))
 ICE_BG = ((80, 150, 210), (14, 34, 70))
+FIRE_BG = ((220, 110, 40), (70, 14, 10))
+POISON_BG = ((90, 170, 70), (14, 44, 24))
 
 
 def bolt_mask(pts, w=34):
@@ -446,6 +448,203 @@ def s_mente(im):
     fill(im, mask_line([(120, 420), (190, 380), (256, 420), (322, 380), (392, 420)], 18), (170, 150, 240), outline=0)
 
 
+# ---------- armas das seitas Titã e Víbora (marco 8) ----------
+def staff(im, shaft, cap, glow_c=None, band=(70, 50, 40)):
+    """Bastão curto na diagonal com tampas de metal; opcionalmente com veios de brasa."""
+    ang = 0.7
+    cx, cy = S / 2, S / 2
+    L = 190
+    body = mask_poly(rot_pts([(cx - 24, cy - L), (cx + 24, cy - L), (cx + 24, cy + L), (cx - 24, cy + L)], ang))
+    layer = new()
+    fill(layer, body, lighten(shaft, 0.2), shade_of(shaft, 0.6), angle=0)
+    for dy in (-L, L - 56):
+        fill(layer, mask_poly(rot_pts([(cx - 32, cy + dy), (cx + 32, cy + dy), (cx + 32, cy + dy + 56), (cx - 32, cy + dy + 56)], ang)), cap, outline=8)
+    for dy in (-60, 60):
+        fill(layer, mask_poly(rot_pts([(cx - 27, cy + dy), (cx + 27, cy + dy), (cx + 27, cy + dy + 24), (cx - 27, cy + dy + 24)], ang)), band, outline=5, shade=False)
+    if glow_c:
+        for dy in (-130, -20, 90, 150):  # veios de brasa
+            fill(layer, mask_poly(rot_pts([(cx - 8, cy + dy - 20), (cx + 8, cy + dy - 20), (cx + 6, cy + dy + 24), (cx - 6, cy + dy + 24)], ang)), (255, 210, 90), (255, 110, 30), outline=0, shade=False)
+        layer = glow(layer, body, glow_c, 24, 1.3)
+    im.alpha_composite(layer)
+
+
+def i_bastao_ferro(im):
+    staff(im, (110, 112, 124), (170, 174, 184))
+
+
+def i_bastao_brasa(im):
+    staff(im, (70, 40, 34), (200, 90, 40), glow_c=(255, 110, 40), band=(40, 24, 20))
+
+
+def needles(im, metal, head, glow_c=None):
+    """Três agulhas longas em leque, ponta para cima, cabecinha redonda embaixo."""
+    layer = new()
+    px0, py0 = S / 2, S - 30
+    for ang in (-0.42, 0.0, 0.42):
+        m = mask_poly(rot_pts([(px0, 40), (px0 + 11, 120), (px0 + 11, 400), (px0 - 11, 400), (px0 - 11, 120)], ang, px0, py0))
+        fill(layer, m, lighten(metal, 0.4), shade_of(metal, 0.65), angle=0, outline=8)
+        (px, py), = rot_pts([(px0, 420)], ang, px0, py0)
+        fill(layer, mask_ellipse((px - 28, py - 28, px + 28, py + 28)), head, outline=8)
+    if glow_c:
+        layer = glow(layer, layer.getchannel('A'), glow_c, 20, 1.0)
+    im.alpha_composite(layer)
+
+
+def i_agulhas_bronze(im):
+    needles(im, (200, 140, 70), (150, 70, 40))
+
+
+def i_agulhas_jade(im):
+    needles(im, (170, 240, 190), (40, 150, 90), glow_c=(90, 230, 140))
+
+
+# ---------- skills do Titã (fogo) e da Víbora (veneno) ----------
+def fist(layer, col, col2, cx=256, cy=270, k=1.0):
+    """Punho fechado visto de frente: bloco com quatro nós dos dedos e o polegar."""
+    body = mask_poly([(cx - 110 * k, cy - 30 * k), (cx + 110 * k, cy - 30 * k), (cx + 120 * k, cy + 90 * k), (cx + 70 * k, cy + 150 * k), (cx - 70 * k, cy + 150 * k), (cx - 120 * k, cy + 90 * k)])
+    fill(layer, body, col, col2)
+    for i in range(4):
+        x = cx - 82 * k + i * 55 * k
+        fill(layer, mask_ellipse((x - 30 * k, cy - 80 * k, x + 30 * k, cy - 10 * k)), lighten(col, 0.1), col2, outline=7)
+    fill(layer, mask_poly([(cx - 110 * k, cy + 10 * k), (cx - 30 * k, cy + 60 * k), (cx - 40 * k, cy + 100 * k), (cx - 120 * k, cy + 70 * k)]), col, col2, outline=6, shade=False)
+    return body
+
+
+def s_punho_montanha(im):
+    mtn = mask_poly([(60, 440), (190, 190), (250, 290), (340, 120), (460, 440)])
+    fill(im, mtn, (150, 120, 90), (70, 50, 40))
+    fill(im, mask_poly([(340, 120), (300, 200), (340, 190), (370, 215), (392, 190)]), (250, 240, 225), (200, 190, 175), outline=5, shade=False)
+    layer = new(); fist(layer, (240, 170, 80), (170, 80, 30), 256, 300, 0.85)
+    im.alpha_composite(layer)
+
+
+def s_tremor(im):
+    fill(im, mask_poly([(60, 330), (452, 330), (470, 440), (42, 440)]), (130, 96, 70), (60, 40, 34))
+    crack = mask_line([(256, 440), (240, 400), (276, 350), (236, 300), (270, 240), (250, 170)], 22)
+    im.paste(Image.new('RGBA', (S, S), (255, 150, 50, 255)), (0, 0), crack.filter(ImageFilter.MaxFilter(15)))
+    im.paste(Image.new('RGBA', (S, S), (20, 8, 8, 255)), (0, 0), crack)
+    for (x, y, w, h) in [(90, 250, 50, 70), (370, 230, 60, 90), (150, 190, 36, 50), (330, 150, 40, 56)]:
+        fill(im, mask_poly([(x, y + h), (x + w * 0.2, y), (x + w, y + h * 0.15), (x + w, y + h)]), (170, 130, 96), (90, 66, 50), outline=6)
+    for x in (80, 430):
+        im.paste(Image.new('RGBA', (S, S), (230, 190, 130, 130)), (0, 0), mask_ellipse((x - 40, 300, x + 40, 350)))
+
+
+def s_pele_ferro(im):
+    sh = mask_poly([(256, 70), (410, 120), (400, 290), (256, 450), (112, 290), (102, 120)])
+    layer = new(); fill(layer, sh, (200, 204, 214), (90, 96, 112))
+    inner = mask_poly([(256, 120), (362, 154), (354, 276), (256, 392), (158, 276), (150, 154)])
+    fill(layer, inner, (130, 136, 150), (70, 76, 92), outline=6, shade=False)
+    d = ImageDraw.Draw(layer)
+    for y in (200, 270, 340):
+        d.line([(170, y), (342, y)], fill=(210, 214, 224, 255), width=8)
+    for x in (206, 256, 306):
+        d.line([(x, 150), (x, 380)], fill=(210, 214, 224, 140), width=5)
+    for (x, y) in [(150, 140), (362, 140), (180, 290), (332, 290), (256, 400)]:
+        d.ellipse((x - 11, y - 11, x + 11, y + 11), fill=(60, 64, 76, 255))
+    im.alpha_composite(glow(layer, sh, (255, 150, 60), 22, 0.9))
+
+
+def flame(layer, cx, cy, k, c1=(255, 240, 150), c2=(255, 90, 30)):
+    pts = [(cx, cy - 190 * k), (cx + 50 * k, cy - 80 * k), (cx + 110 * k, cy), (cx + 70 * k, cy + 110 * k), (cx, cy + 140 * k), (cx - 70 * k, cy + 110 * k), (cx - 110 * k, cy), (cx - 40 * k, cy - 90 * k)]
+    fill(layer, mask_poly(pts), c1, c2, outline=8)
+
+
+def s_punho_vulcanico(im):
+    layer = new()
+    flame(layer, 256, 200, 0.95)
+    flame(layer, 140, 250, 0.5); flame(layer, 372, 250, 0.5)
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (255, 120, 40), 26, 1.0))
+    l2 = new(); fist(l2, (250, 190, 120), (190, 60, 30), 256, 300, 0.82)
+    im.alpha_composite(l2)
+    for (x, y) in [(90, 120), (430, 140), (60, 330), (450, 360)]:
+        fill(im, mask_ellipse((x - 14, y - 14, x + 14, y + 14)), (255, 210, 90), outline=0, shade=False)
+
+
+def s_corpo_bronze(im):
+    layer = new()
+    fill(layer, mask_ellipse((196, 70, 316, 190)), (214, 150, 90), (140, 80, 40))
+    fill(layer, mask_poly([(120, 215), (392, 215), (420, 300), (360, 450), (152, 450), (92, 300)]), (220, 156, 92), (130, 76, 38))
+    fill(layer, mask_ellipse((90, 215, 190, 335)), (230, 166, 100), (140, 80, 40))
+    fill(layer, mask_ellipse((322, 215, 422, 335)), (230, 166, 100), (140, 80, 40))
+    d = ImageDraw.Draw(layer)
+    d.line([(256, 225), (256, 440)], fill=(110, 60, 30, 255), width=8)
+    for y in (300, 360, 420):
+        d.line([(190, y), (322, y)], fill=(110, 60, 30, 255), width=7)
+    d.arc((150, 230, 256, 300), 200, 340, fill=(110, 60, 30, 255), width=8)
+    d.arc((256, 230, 362, 300), 200, 340, fill=(110, 60, 30, 255), width=8)
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (255, 190, 90), 20, 0.9))
+
+
+def drop(im, x, y, r, c1=(150, 255, 90), c2=(50, 170, 50)):
+    fill(im, mask_poly([(x, y - r * 1.8), (x + r, y), (x, y + r * 0.9), (x - r, y)]), c1, c2, outline=6, shade=False)
+
+
+def s_agulha_venenosa(im):
+    ndl = mask_poly(rot_pts([(256, 40), (272, 120), (272, 380), (240, 380), (240, 120)], 0.7))
+    layer = new(); fill(layer, ndl, (230, 255, 230), (120, 190, 130), angle=0)
+    fill(layer, mask_ellipse(_rot_box(256, 400, 34, 0.7)), (40, 120, 70), outline=8)
+    im.alpha_composite(glow(layer, ndl, (120, 255, 120), 18, 1.0))
+    drop(im, 130, 150, 38)
+    drop(im, 90, 260, 26)
+    drop(im, 190, 300, 22)
+
+
+def s_chuva_agulhas(im):
+    layer = new()
+    for x, y, l in [(110, 60, 260), (190, 20, 330), (270, 50, 300), (350, 10, 340), (430, 70, 250)]:
+        mm = mask_poly(rot_pts([(x, y + l), (x + 11, y + 40), (x + 11, y), (x - 11, y), (x - 11, y + 40)], 0.2, x, y))
+        fill(layer, mm, (235, 255, 235), (100, 180, 120), angle=0, outline=7)
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (130, 255, 130), 16, 1.0))
+    for (x, y) in [(90, 440), (200, 462), (330, 450), (430, 440)]:
+        drop(im, x, y, 20)
+
+
+def s_nevoa_toxica(im):
+    puffs = [(150, 330, 100), (260, 290, 120), (370, 340, 96), (210, 400, 90), (330, 410, 84), (256, 360, 100)]
+    layer = new()
+    for (x, y, r) in puffs:
+        fill(layer, mask_ellipse((x - r, y - r * 0.72, x + r, y + r * 0.72)), (150, 235, 110), (40, 120, 60), outline=8)
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (120, 255, 90), 24, 0.9))
+    sk = new()
+    fill(sk, mask_ellipse((196, 80, 316, 200)), (240, 244, 232), (170, 180, 160))
+    fill(sk, mask_poly([(220, 186), (292, 186), (286, 250), (226, 250)]), (240, 244, 232), (170, 180, 160), outline=8)
+    for x in (226, 286):
+        fill(sk, mask_ellipse((x - 26, 120, x + 26, 172)), (20, 40, 20), outline=0, shade=False)
+    fill(sk, mask_poly([(256, 176), (244, 204), (268, 204)]), (20, 40, 20), outline=0, shade=False)
+    d = ImageDraw.Draw(sk)
+    for x in (236, 256, 276):
+        d.line([(x, 222), (x, 248)], fill=(40, 60, 40, 255), width=6)
+    im.alpha_composite(sk)
+
+
+def s_seiva_jade(im):
+    leaf = mask_poly([(256, 60), (350, 140), (390, 250), (330, 360), (256, 400), (182, 360), (122, 250), (162, 140)])
+    layer = new(); fill(layer, leaf, (170, 245, 190), (40, 150, 90))
+    d = ImageDraw.Draw(layer)
+    d.line([(256, 90), (256, 440)], fill=(30, 100, 60, 255), width=12)
+    for y in (170, 240, 310):
+        d.line([(256, y + 40), (190, y)], fill=(30, 100, 60, 255), width=8)
+        d.line([(256, y + 40), (322, y)], fill=(30, 100, 60, 255), width=8)
+    im.alpha_composite(glow(layer, leaf, (130, 255, 170), 22, 1.0))
+    drop(im, 256, 470, 22, (210, 255, 230), (90, 210, 140))
+    drop(im, 110, 400, 18, (210, 255, 230), (90, 210, 140))
+    drop(im, 410, 410, 18, (210, 255, 230), (90, 210, 140))
+
+
+def s_sangue_serpente(im):
+    pts = [(120, 440), (120, 340), (230, 300), (330, 330), (260, 230), (150, 190), (170, 110), (300, 90), (390, 150)]
+    body = mask_line(pts, 54)
+    layer = new(); fill(layer, body, (90, 200, 100), (24, 96, 52))
+    d = ImageDraw.Draw(layer)
+    d.line(pts, fill=(200, 255, 120, 255), width=10, joint='curve')
+    fill(layer, mask_ellipse((350, 100, 450, 200)), (110, 220, 110), (24, 96, 52))
+    fill(layer, mask_ellipse((395, 128, 417, 150)), (255, 230, 60), outline=0, shade=False)
+    fill(layer, mask_line([(440, 180), (470, 230), (450, 250)], 8), (230, 40, 40), outline=0, shade=False)
+    im.alpha_composite(layer)
+    drop(im, 100, 120, 24, (255, 90, 90), (150, 20, 30))
+    drop(im, 60, 230, 18, (255, 90, 90), (150, 20, 30))
+
+
 ITEMS = {
     'colar_jade': i_colar_jade, 'colar_dragao': i_colar_dragao,
     'tunica_algodao': i_tunica, 'manto_seda': i_manto,
@@ -454,6 +653,8 @@ ITEMS = {
     'faixa_linho': i_faixa, 'coroa_monge': i_coroa,
     'calca_algodao': i_calca_algodao, 'calca_couro': i_calca_couro,
     'sandalia_palha': i_sandalia, 'botas_andarilho': i_botas,
+    'bastao_ferro': i_bastao_ferro, 'bastao_brasa': i_bastao_brasa,
+    'agulhas_bronze': i_agulhas_bronze, 'agulhas_jade': i_agulhas_jade,
     'pocao_hp_p': lambda im: potion(im, (220, 40, 40)), 'pocao_hp_g': lambda im: potion(im, (255, 30, 30), True),
     'pocao_mp_p': lambda im: potion(im, (50, 120, 230)), 'pocao_mp_g': lambda im: potion(im, (40, 90, 255), True),
 }
@@ -463,6 +664,11 @@ SKILLS = {
     'fluxo_lamina': (s_fluxo, THUNDER_BG),
     'esfera_qi': (s_orbe, ICE_BG), 'lotus_congelante': (s_lotus, ICE_BG), 'chuva_qi': (s_nevasca, ICE_BG),
     'escudo_nuvem': (s_veu, ICE_BG), 'meditacao_celeste': (s_mente, ((120, 100, 190), (26, 20, 60))),
+    'punho_montanha': (s_punho_montanha, FIRE_BG), 'tremor': (s_tremor, FIRE_BG), 'pele_ferro': (s_pele_ferro, FIRE_BG),
+    'punho_vulcanico': (s_punho_vulcanico, FIRE_BG), 'corpo_bronze': (s_corpo_bronze, FIRE_BG),
+    'agulha_venenosa': (s_agulha_venenosa, POISON_BG), 'chuva_agulhas': (s_chuva_agulhas, POISON_BG),
+    'nevoa_toxica': (s_nevoa_toxica, POISON_BG), 'seiva_jade': (s_seiva_jade, POISON_BG),
+    'sangue_serpente': (s_sangue_serpente, POISON_BG),
 }
 
 
