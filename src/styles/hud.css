@@ -39,7 +39,8 @@ label,
 }
 .ui-size {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax(0, 1fr): sem isso a coluna não encolhe abaixo do rótulo ("Automático") e "Grande" saía do cartão */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   width: 100%;
 }
@@ -47,9 +48,12 @@ label,
   flex: none;
   width: auto;
   margin: 0;
-  padding: 6px 4px;
+  padding: 6px 2px;
   min-height: 36px;
   height: 100%;
+  font-size: 12px;
+  /* último recurso: se o rótulo ainda não couber, quebra dentro do botão em vez de sair do cartão */
+  overflow-wrap: anywhere;
 }
 #hud > * {
   pointer-events: auto;
