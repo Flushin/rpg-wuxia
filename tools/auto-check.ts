@@ -173,9 +173,10 @@ console.log('\n== escolha de alvo (15/11/2026) ==');
   run(w, 5);
   ok(first === a.id && w.targetId === b.id, 'alvo que não fica mais perto é largado e troca por outro');
 }
-{
+for (const crowd of ['low', 'off'] as const) {
   // evita caminho com monstros: dois alvos ~8 tiles; no caminho até o mais perto há 2 lobos
   const w = mk('lamina', 5);
+  w.auto.cfg.crowdAvoid = crowd;
   spawnAll(w);
   const ms = w.monsters;
   ms.slice(4).forEach((m) => {
@@ -232,7 +233,12 @@ console.log('\n== escolha de alvo (15/11/2026) ==');
   }
   w.auto.toggle();
   run(w, 0.1);
-  ok(ok2 && w.targetId === b.id, 'prefere o alvo sem monstros no caminho (não atrai vários)');
+  if (crowd === 'low') ok(ok2 && w.targetId === b.id, 'prefere o alvo sem monstros no caminho (não atrai vários)');
+  else
+    ok(
+      ok2 && w.targetId !== null && w.targetId !== b.id,
+      "opção 'Evitar grupos: Não': vai no mais perto, mesmo no meio dos outros",
+    );
 }
 
 console.log('\n== filtro nível +2 ==');
@@ -265,6 +271,234 @@ console.log('\n== filtro nível +2 ==');
   w.autoAttack = false;
   run(w, 0.3);
   ok(w.targetId === null, 'sem alvo elegível não ataca ninguém');
+}
+
+console.log('\n== opções de alvo e revide (18/11/2026) ==');
+// cenário: personagem parado numa clareira, só os monstros pedidos vivos, parados e sem atacar
+const scene = (level: number, mons: { level: number; dx: number; dy: number; chase?: boolean }[], moving = false) => {
+  const w = mk('lamina', level);
+  spawnAll(w);
+  const S = openSpot(w, 4)!;
+  w.player.x = S.x;
+  w.player.y = S.y;
+  w.player.path = [];
+  if (!moving) {
+    const sm = (w as any).speedMul.bind(w); // eslint-disable-line
+    (w as any).speedMul = (e: unknown) => (e === w.player ? 0 : sm(e)); // eslint-disable-line
+  }
+  const list = w.monsters.slice(0, mons.length);
+  w.monsters.slice(mons.length).forEach((m) => {
+    m.dead = true;
+    m.respawnAt = 1e9;
+  });
+  mons.forEach((o, i) => {
+    const m = list[i];
+    m.level = o.level;
+    m.x = S.x + o.dx;
+    m.y = S.y + o.dy;
+    m.home = { x: m.x, y: m.y };
+    if (o.chase) m.ai = 'chase';
+  });
+  return { w, ms: list };
+};
+{
+  const d = World.fromSave(maps, {
+    version: 1,
+    name: 'T',
+    classId: 'lamina',
+    level: 1,
+    xp: 0,
+    freePoints: 0,
+    attributes: { ...CLASSES.lamina.baseAttributes },
+    mapId: 'floresta',
+    lastSeen: 0,
+  }).auto.cfg;
+  ok(
+    d.maxLevelAbove === 2 &&
+      d.grayMode === 'last' &&
+      d.retaliate === 'always' &&
+      d.onStrongAggro === 'keep' &&
+      d.crowdAvoid === 'low',
+    'padrões reproduzem o comportamento antigo (+2, cinzas por último, revida sempre, evita grupos pouco)',
+  );
+  const w = mk('lamina', 5, 'floresta', {
+    auto: { active: false, mapId: 'floresta', config: { hpThreshold: 50 } as never },
+  });
+  ok(
+    w.auto.cfg.maxLevelAbove === 2 && w.auto.cfg.retaliate === 'always' && w.auto.cfg.hpThreshold === 50,
+    'save antigo sem as opções novas: padrões',
+  );
+  const bad = mk('lamina', 5, 'floresta', {
+    auto: {
+      active: false,
+      mapId: 'floresta',
+      config: { maxLevelAbove: 99, grayMode: 'x', retaliate: 7, onStrongAggro: null, crowdAvoid: 'high' } as never,
+    },
+  });
+  const bc = bad.auto.cfg;
+  ok(
+    bc.maxLevelAbove === 5 &&
+      bc.grayMode === 'last' &&
+      bc.retaliate === 'always' &&
+      bc.onStrongAggro === 'keep' &&
+      bc.crowdAvoid === 'high',
+    'valores inválidos no save: limitados ou padrão; válidos mantidos',
+  );
+  bad.auto.cfg.retaliate = 'never';
+  bad.auto.cfg.onStrongAggro = 'flee';
+  const re = World.fromSave(maps, JSON.parse(JSON.stringify(bad.serialize())));
+  ok(re.auto.cfg.retaliate === 'never' && re.auto.cfg.onStrongAggro === 'flee', 'opções sobrevivem ao save/load');
+}
+{
+  // nível máximo: +3 aceita o nível 4 mais perto; +0 recusa o nível 2
+  const { w, ms } = scene(1, [
+    { level: 4, dx: -3.6, dy: 0 },
+    { level: 1, dx: 3.9, dy: 0 },
+  ]);
+  w.auto.cfg.maxLevelAbove = 3;
+  w.auto.toggle();
+  run(w, 0.2);
+  ok(w.targetId === ms[0].id, 'nível máximo +3: ataca o nível 4 (personagem nível 1)');
+  const z = scene(1, [
+    { level: 2, dx: -3.6, dy: 0 },
+    { level: 1, dx: 3.9, dy: 0 },
+  ]);
+  z.w.auto.cfg.maxLevelAbove = 0;
+  z.w.auto.toggle();
+  run(z.w, 0.2);
+  ok(z.w.targetId === z.ms[1].id, 'nível máximo +0: ignora o nível 2, ataca o nível 1 mais longe');
+}
+for (const [mode, want, msg] of [
+  ['last', 1, 'cinzas por último: prefere o nível 5 mais longe ao cinza mais perto'],
+  ['normal', 0, 'cinzas normais: vai no cinza mais perto'],
+  ['ignore', 1, 'ignorar cinzas: vai no nível 5'],
+] as const) {
+  const { w, ms } = scene(5, [
+    { level: 3, dx: -3.6, dy: 0 },
+    { level: 5, dx: 3.9, dy: 0 },
+  ]);
+  w.auto.cfg.grayMode = mode;
+  w.auto.toggle();
+  run(w, 0.2);
+  ok(w.targetId === ms[want].id, msg);
+}
+{
+  const { w } = scene(5, [{ level: 3, dx: -3.6, dy: 0 }]);
+  w.auto.cfg.grayMode = 'ignore';
+  w.auto.toggle();
+  run(w, 0.3);
+  ok(w.targetId === null, 'ignorar cinzas: só cinza no mapa, não ataca ninguém');
+  w.auto.cfg.grayMode = 'last';
+  run(w, 0.3);
+  ok(w.targetId !== null, 'cinzas por último: só cinza no mapa, ataca o cinza');
+}
+{
+  // revide: alvo escolhido a (fora da visão); b (nível 4, acima do limite +2) ou c (nível 1) ataca
+  const setup = (ret: 'always' | 'inRange' | 'never', aggLevel: number) => {
+    const { w, ms } = scene(1, [
+      { level: 1, dx: 0, dy: 3.8 },
+      { level: aggLevel, dx: 30, dy: 30 },
+    ]);
+    w.auto.cfg.retaliate = ret;
+    w.auto.toggle();
+    run(w, 0.1);
+    const [a, b] = ms;
+    b.x = w.player.x + 1;
+    b.y = w.player.y;
+    b.home = { x: b.x, y: b.y };
+    b.ai = 'chase';
+    run(w, 0.1);
+    return { w, a, b };
+  };
+  let r = setup('always', 4);
+  ok(r.w.targetId === r.b.id, 'revidar sempre: revida o nível 4 (acima do limite)');
+  r = setup('inRange', 4);
+  ok(r.w.targetId === r.a.id, 'revidar só até o nível máximo: não revida o nível 4, segue no alvo');
+  r = setup('inRange', 1);
+  ok(r.w.targetId === r.b.id, 'revidar só até o nível máximo: revida o nível 1');
+  r = setup('never', 1);
+  ok(r.w.targetId === r.a.id, 'nunca revidar: segue no alvo escolhido');
+}
+{
+  // monstro forte atacando, opção "se afastar": larga o alvo e se afasta até ele desistir (leash)
+  const { w, ms } = scene(
+    1,
+    [
+      { level: 1, dx: 0, dy: 3.5 },
+      { level: 6, dx: 1, dy: 0, chase: true },
+    ],
+    true,
+  );
+  const strong = ms[1];
+  strong.attackCd = 0; // ataca (dano pequeno no nível 1 com stamina extra)
+  strong.moveSpeed = 2;
+  w.auto.cfg.retaliate = 'inRange';
+  w.auto.cfg.onStrongAggro = 'flee';
+  addPotions(w, 10, 0);
+  w.auto.toggle();
+  run(w, 0.5);
+  ok(w.targetId === null && w.auto.status.includes('Fug'), `se afastar: sem alvo, fugindo (${w.auto.status})`);
+  const gaveUp = run(w, 40, () => strong.ai !== 'chase');
+  ok(gaveUp && !w.player.dead, 'monstro forte desiste (leash) e o personagem sobrevive');
+  run(w, 2);
+  ok(w.auto.status === 'Caçando' || w.auto.status === 'Hunting', `volta a caçar (${w.auto.status})`);
+
+  // sem revidar sempre, evita alvo na visão de um monstro forte (parado, sem atacar)
+  for (const ret of ['always', 'inRange'] as const) {
+    const v = scene(1, [
+      { level: 1, dx: -3.6, dy: 0 },
+      { level: 1, dx: 3.9, dy: 0 },
+      { level: 6, dx: -6, dy: 0 },
+    ]);
+    v.w.auto.cfg.retaliate = ret;
+    v.w.auto.cfg.crowdAvoid = 'off'; // isola o efeito do monstro forte
+    v.w.auto.toggle();
+    run(v.w, 0.2);
+    if (ret === 'always')
+      ok(
+        v.w.targetId === v.ms[0].id,
+        'revidar sempre (sem evitar grupos): vai no alvo mais perto, mesmo perto do forte',
+      );
+    else ok(v.w.targetId === v.ms[1].id, 'sem revidar sempre: prefere o alvo longe do monstro forte');
+  }
+
+  // "continuar caçando": segue no alvo mesmo com o forte batendo
+  const k = scene(1, [
+    { level: 1, dx: 0, dy: 3.8 },
+    { level: 6, dx: 1, dy: 0, chase: true },
+  ]);
+  k.w.auto.cfg.retaliate = 'never';
+  k.w.auto.toggle();
+  run(k.w, 0.2);
+  ok(k.w.targetId === k.ms[0].id, 'continuar caçando: ignora o forte e ataca o alvo escolhido');
+
+  // "voltar à vila": vai para a cidade e depois volta
+  const t = scene(
+    1,
+    [
+      { level: 1, dx: 0, dy: 3.8 },
+      { level: 6, dx: 1, dy: 0, chase: true },
+    ],
+    true,
+  );
+  addPotions(t.w, 10, 10);
+  t.w.auto.cfg.retaliate = 'inRange';
+  t.w.auto.cfg.onStrongAggro = 'town';
+  t.w.auto.toggle();
+  ok(
+    run(t.w, 90, () => t.w.mapId === 'cidade'),
+    'voltar à vila: foi para a cidade',
+  );
+  ok(run(t.w, 120, () => t.w.mapId === 'floresta') && t.w.auto.state === 'on', 'voltar à vila: depois volta a caçar');
+  // revidar sempre: a opção do monstro forte não vale (revida)
+  const s2 = scene(1, [
+    { level: 1, dx: 0, dy: 3.8 },
+    { level: 6, dx: 1, dy: 0, chase: true },
+  ]);
+  s2.w.auto.cfg.onStrongAggro = 'town';
+  s2.w.auto.toggle();
+  run(s2.w, 0.2);
+  ok(s2.w.targetId === s2.ms[1].id && s2.w.mapId === 'floresta', 'revidar sempre: ignora a opção e revida o forte');
 }
 
 console.log('\n== skills habilitadas ==');

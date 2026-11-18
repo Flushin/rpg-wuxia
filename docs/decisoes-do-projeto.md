@@ -379,7 +379,21 @@ Decidido pelo Lucas em 16/11/2026.
 - **Menu do auto-combate:** o jogador escolhe quais habilidades o auto-combate usa.
 - **Poções no auto-combate:** usa poções de HP e mana sozinho, com limites configuráveis no menu (padrão sugerido: HP abaixo de 40%, mana abaixo de 30%).
 - **Morte no auto-combate:** o personagem volta para a cidade e retorna ao mapa para continuar caçando **somente se todos os itens equipados ainda tiverem durabilidade**. Se algum item chegar a 0, o auto-combate para e espera o jogador.
-- **Área do auto-combate:** o mapa inteiro; ataca o monstro mais próximo **com nível até 2 acima do personagem**.
+- **Área do auto-combate:** o mapa inteiro; ataca o monstro mais próximo dentro da faixa de nível escolhida no menu (padrão: **até 2 acima do personagem**).
+- **Opções de alvo e revide (aprovadas pelo Lucas em 18/11/2026; substituem a ideia de só "não revidar monstros 3+ níveis acima"):**
+  seção **Alvos** no menu do auto-combate. Os padrões reproduzem o comportamento de antes, então saves antigos não mudam.
+  - **Nível máximo acima do seu:** slider de +0 a +5 (padrão +2). Vale para escolher alvo e para o revide "só até o nível máximo".
+  - **Monstros fracos (2+ níveis abaixo, "cinzas"):** só se não houver outro (padrão) / ignorar / normal.
+  - **Revidar quem ataca:** sempre (padrão) / só até o nível máximo (os mais fracos são sempre revidados, mesmo com cinzas
+    ignorados) / nunca.
+  - **Se um monstro acima do nível máximo atacar** (só aparece se o revide não for "sempre"): continuar caçando (padrão) /
+    se afastar (anda para longe dele e da casa dele até ele desistir pelo leash; nunca atravessa portal; se ficar
+    encurralado, revida) / voltar à vila (mesma saída da compra de poções; depois volta a caçar).
+  - **Evitar atrair grupos:** não / pouco (padrão, o `CROWD_PENALTY` aprovado em 15/11) / muito (peso ×3).
+  - Com o revide diferente de "sempre", alvos na visão de um monstro acima do nível máximo ficam em último caso
+    (para não voltar logo para perto do monstro do qual fugiu).
+  - Chefes e monstros na arena continuam proibidos (não é opção). A seleção manual de alvo não muda.
+  - Ganho offline: não precisa de ajuste, porque usa o ritmo medido com as opções em uso. O simulador de balanceamento usa os padrões.
 - **Ligar:** botão "Auto" no HUD + tecla Z; botão de engrenagem ao lado abre o menu (skills usadas, limites de poção, quantidade de poções a comprar, vender Incomuns). Qualquer movimento manual pausa o auto.
 - **Sem poções (online):** volta à cidade, compra a quantidade definida no menu (se tiver ouro) e retorna a caçar; sem ouro, continua sem poção.
 - **Mochila cheia (online):** vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).

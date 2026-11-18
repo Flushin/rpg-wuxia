@@ -206,6 +206,46 @@
 #auto-panel .sld {
   grid-template-columns: 118px 1fr 36px;
 }
+#auto-panel .seg-row {
+  margin: 6px 0;
+  font-size: 15px;
+}
+#auto-panel .seg-row.hidden {
+  display: none;
+}
+#auto-panel .seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+#auto-panel .seg label {
+  margin: 0;
+}
+#auto-panel .seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+#auto-panel .seg span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #556;
+  border-radius: 18px;
+  color: #aab;
+  font-size: 14px;
+  cursor: pointer;
+}
+#auto-panel .seg input:checked + span {
+  border-color: #d4a017;
+  color: #f2e2b5;
+  background: rgba(212, 160, 23, 0.15);
+}
+#auto-panel .seg input:focus-visible + span {
+  outline: 2px solid #d4a017;
+}
 #auto-panel h3 {
   margin: 12px 0 2px;
 }

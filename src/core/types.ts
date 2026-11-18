@@ -185,7 +185,17 @@ export interface AutoConfig {
   buyHp: number;
   buyMp: number; // quantidade comprada por viagem à vila
   sellIncomum: boolean;
+  // escolha de alvo e revide (18/11/2026); os padrões reproduzem o comportamento antigo
+  maxLevelAbove: number; // nível máximo dos alvos acima do personagem (0..5)
+  grayMode: AutoGrayMode; // monstros 2+ níveis abaixo
+  retaliate: AutoRetaliate; // revidar quem ataca
+  onStrongAggro: AutoStrongAggro; // monstro acima do limite atacando (se não revida sempre)
+  crowdAvoid: AutoCrowdAvoid; // peso de evitar atrair grupos
 }
+export type AutoGrayMode = 'last' | 'ignore' | 'normal';
+export type AutoRetaliate = 'always' | 'inRange' | 'never';
+export type AutoStrongAggro = 'keep' | 'flee' | 'town';
+export type AutoCrowdAvoid = 'off' | 'low' | 'high';
 // Balde de ~60 s de auto-combate ativo em mapa de caça (janela móvel de ~30 min)
 export interface AutoBucket {
   sec: number;
