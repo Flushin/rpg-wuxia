@@ -1,5 +1,5 @@
 import { L } from '../core/i18n';
-import { BUCKET_SEC, MAX_BUCKETS, RATE_MIN_SEC, SHIELD_HP } from '../core/auto';
+import { AUTO_MAX_LEVEL_LIMIT, BUCKET_SEC, MAX_BUCKETS, RATE_MIN_SEC, SHIELD_HP } from '../core/auto';
 import { GROUND_SECONDS, RARITIES } from '../core/items';
 import { OFFLINE_TIERS } from '../core/offline';
 import { initials } from '../core/skills';
@@ -43,7 +43,8 @@ export class AutoPanel {
       if (!i.dataset.k) return;
       const v = +i.value,
         o = i.nextElementSibling as HTMLElement | null;
-      if (o) o.textContent = i.dataset.k.startsWith('buy') ? String(v) : `${v}%`;
+      if (o)
+        o.textContent = i.dataset.k.startsWith('buy') ? String(v) : i.dataset.k === 'maxLevelAbove' ? `+${v}` : `${v}%`;
       (c as unknown as Record<string, number>)[i.dataset.k] = v;
     });
     el.addEventListener('change', (e) => {
@@ -52,6 +53,9 @@ export class AutoPanel {
       if (i.dataset.skill) {
         c.skillsOff = c.skillsOff.filter((x) => x !== i.dataset.skill);
         if (!i.checked) c.skillsOff.push(i.dataset.skill);
+      } else if (i.dataset.r) {
+        (c as unknown as Record<string, string>)[i.dataset.r] = i.value;
+        if (i.dataset.r === 'retaliate') byId('auto-strong').classList.toggle('hidden', i.value === 'always');
       } else if (i.id === 'auto-sell-inc') c.sellIncomum = i.checked;
       audio.ui('ui_click');
     });
@@ -77,12 +81,49 @@ export class AutoPanel {
         return `<label class="opt"><input type="checkbox" data-skill="${d.id}" ${unlocked && !c.skillsOff.includes(d.id) ? 'checked' : ''} ${unlocked ? '' : 'disabled'}/> <span class="opt-ic">${skillIconHtml(d.id, initials(d.name))}</span> ${d.name}${unlocked ? '' : ` <small class="muted">(${L(`nível ${d.unlock}`, `level ${d.unlock}`)})</small>`}</label>`;
       })
       .join('');
-    const sld = (label: string, k: string, min: number, max: number, v: number, pct: boolean) =>
-      `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${v}${pct ? '%' : ''}</output></label>`;
+    const sld = (label: string, k: string, min: number, max: number, v: number, pct: boolean, pre = '') =>
+      `<label class="sld">${label}<input type="range" data-k="${k}" min="${min}" max="${max}" step="1" value="${v}"/><output>${pre}${v}${pct ? '%' : ''}</output></label>`;
+    // grupo de escolha única (botões de rádio em forma de chips)
+    const seg = (label: string, k: keyof typeof c, opts: [string, string][], id = '', hidden = false) =>
+      `<div class="seg-row${hidden ? ' hidden' : ''}"${id ? ` id="${id}"` : ''}><span>${label}</span><div class="seg">${opts
+        .map(
+          ([v, t]) =>
+            `<label><input type="radio" name="auto-${k}" data-r="${k}" value="${v}" ${c[k] === v ? 'checked' : ''}/><span>${t}</span></label>`,
+        )
+        .join('')}</div></div>`;
     byId('auto-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
       <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de ${pct(SHIELD_HP)} em combate.`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below ${pct(SHIELD_HP)} in combat.`)}</small>
+      <h3>${L('Alvos', 'Targets')}</h3>
+      ${sld(L('Nível máximo acima do seu', 'Max level above yours'), 'maxLevelAbove', 0, AUTO_MAX_LEVEL_LIMIT, c.maxLevelAbove, false, '+')}
+      ${seg(L('Monstros fracos (2+ níveis abaixo)', 'Weak monsters (2+ levels below)'), 'grayMode', [
+        ['last', L('Só se não houver outro', 'Only if nothing else')],
+        ['ignore', L('Ignorar', 'Ignore')],
+        ['normal', L('Normal', 'Normal')],
+      ])}
+      ${seg(L('Revidar quem ataca', 'Fight back when attacked'), 'retaliate', [
+        ['always', L('Sempre', 'Always')],
+        ['inRange', L('Só até o nível máximo', 'Only up to max level')],
+        ['never', L('Nunca', 'Never')],
+      ])}
+      ${seg(
+        L('Se um monstro acima do nível máximo atacar', 'If a monster above max level attacks'),
+        'onStrongAggro',
+        [
+          ['keep', L('Continuar caçando', 'Keep hunting')],
+          ['flee', L('Se afastar', 'Move away')],
+          ['town', L('Voltar à vila', 'Return to village')],
+        ],
+        'auto-strong',
+        c.retaliate === 'always',
+      )}
+      ${seg(L('Evitar atrair grupos', 'Avoid pulling groups'), 'crowdAvoid', [
+        ['off', L('Não', 'No')],
+        ['low', L('Pouco', 'A little')],
+        ['high', L('Muito', 'A lot')],
+      ])}
+      <small class="muted">${L('Chefes e monstros na arena nunca são atacados pelo Auto.', 'Bosses and monsters in the arena are never attacked by Auto.')}</small>
       <h3>${L('Poções', 'Potions')}</h3>
       ${sld(L('Beber vida abaixo de', 'Drink health below'), 'hpThreshold', 5, 95, c.hpThreshold, true)}
       ${sld(L('Beber mana abaixo de', 'Drink mana below'), 'mpThreshold', 0, 95, c.mpThreshold, true)}

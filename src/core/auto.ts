@@ -1,13 +1,17 @@
 import { MONSTERS } from './data';
 import { L } from './i18n';
 import { buyPrice, BASES, SLOTS } from './items';
-import { findPath } from './pathfinding';
+import { findPath, isWalkable } from './pathfinding';
 import type {
   AutoBucket,
   AutoConfig,
+  AutoCrowdAvoid,
+  AutoGrayMode,
   AutoRate,
+  AutoRetaliate,
   AutoSave,
   AutoState,
+  AutoStrongAggro,
   Entity,
   GameEvent,
   ItemInstance,
@@ -16,13 +20,17 @@ import type {
 import type { World } from './world';
 import { MAPS_CONFIG, TOWN_MAPS } from './mapsConfig';
 
-export const AUTO_MAX_LEVEL_GAP = 2; // ataca só monstros até 2 níveis acima do personagem
-export const AUTO_GRAY_GAP = 1; // monstro com nível < personagem - 2 é "cinza": só se não houver outro
-const GRAY_PENALTY = 60;
+export const AUTO_MAX_LEVEL_GAP = 2; // padrão da opção maxLevelAbove: alvos até 2 níveis acima do personagem
+export const AUTO_MAX_LEVEL_LIMIT = 5; // máximo da opção no menu
+export const AUTO_GRAY_GAP = 1; // monstro com nível < personagem - 1 (2+ abaixo) é "cinza" (opção grayMode)
+const GRAY_PENALTY = 60; // grayMode 'last': cinza só se não houver outro
 // escolha de alvo (aprovado pelo Lucas em 15/11/2026):
 const NEAR_RANGE = 12; // prefere monstros até 12 tiles de caminho
 const FAR_PENALTY = 100; // além disso, só se não houver nenhum perto
 const CROWD_PENALTY = 10; // por monstro que o caminho (ou o alvo) atrairia junto
+const CROWD_MUL: Record<AutoCrowdAvoid, number> = { off: 0, low: 1, high: 3 }; // opção crowdAvoid (padrão 'low')
+const STRONG_PENALTY = 200; // se não revida sempre: alvo perto de monstro acima do nível máximo só em último caso
+const FLEE_DIST = 6; // opção onStrongAggro 'flee': anda até ~6 tiles para longe do monstro forte
 const MAX_PATH_CHECKS = 16; // candidatos com caminho conferido (antes eram 4: às vezes nenhum tinha caminho e o auto parava)
 const STUCK_SEC = 4,
   IGNORE_SEC = 15; // alvo que não fica mais perto em 4 s é ignorado por 15 s
@@ -56,7 +64,17 @@ export const defaultAutoConfig = (classId: string): AutoConfig => ({
   buyHp: 10,
   buyMp: classId === 'lamina' ? 5 : 10,
   sellIncomum: false,
+  maxLevelAbove: AUTO_MAX_LEVEL_GAP,
+  grayMode: 'last',
+  retaliate: 'always',
+  onStrongAggro: 'keep',
+  crowdAvoid: 'low',
 });
+export const AUTO_GRAY_MODES: readonly AutoGrayMode[] = ['last', 'ignore', 'normal'];
+export const AUTO_RETALIATE: readonly AutoRetaliate[] = ['always', 'inRange', 'never'];
+export const AUTO_STRONG_AGGRO: readonly AutoStrongAggro[] = ['keep', 'flee', 'town'];
+export const AUTO_CROWD: readonly AutoCrowdAvoid[] = ['off', 'low', 'high'];
+const pick = <T extends string>(v: unknown, all: readonly T[], d: T): T => (all.includes(v as T) ? (v as T) : d);
 const clampN = (v: unknown, a: number, b: number, d: number) => {
   const n = Math.round(Number(v));
   return Number.isFinite(n) ? Math.max(a, Math.min(b, n)) : d;
@@ -72,7 +90,7 @@ export class AutoCombat {
   private buckets: AutoBucket[] = [];
   private cur: AutoBucket = emptyBucket();
   private deathPending = false;
-  private leaving = false; // no mapa de caça, indo à vila comprar poções
+  private leaving: false | 'shop' | 'flee' = false; // no mapa de caça, indo à vila (comprar poções / fugir de monstro forte)
   private visit: { shop: boolean | null; shopped: boolean } = { shop: null, shopped: false };
   private lastShop = -Infinity;
   private blocked: Record<string, number> = {};
@@ -80,6 +98,7 @@ export class AutoCombat {
   private ignore: Record<number, number> = {}; // monstro -> até quando ignorar (sem caminho / travado)
   private chase = { id: -1, best: Infinity, since: 0 }; // progresso até o alvo atual
   private restSec = 0;
+  private fleeUntil = 0; // fugindo: até quando seguir o caminho atual antes de escolher outro
 
   constructor(
     private w: World,
@@ -217,6 +236,11 @@ export class AutoCombat {
       buyHp: clampN(c.buyHp, 0, 60, d.buyHp),
       buyMp: clampN(c.buyMp, 0, 60, d.buyMp),
       sellIncomum: !!c.sellIncomum,
+      maxLevelAbove: clampN(c.maxLevelAbove, 0, AUTO_MAX_LEVEL_LIMIT, d.maxLevelAbove),
+      grayMode: pick(c.grayMode, AUTO_GRAY_MODES, d.grayMode),
+      retaliate: pick(c.retaliate, AUTO_RETALIATE, d.retaliate),
+      onStrongAggro: pick(c.onStrongAggro, AUTO_STRONG_AGGRO, d.onStrongAggro),
+      crowdAvoid: pick(c.crowdAvoid, AUTO_CROWD, d.crowdAvoid),
     };
     this.huntMap = typeof s.mapId === 'string' ? s.mapId : '';
     const num = (v: unknown) => (Number.isFinite(Number(v)) ? Math.max(0, Number(v)) : 0);
@@ -277,18 +301,83 @@ export class AutoCombat {
       ((this.shouldShop() && w.time - this.lastShop > SHOP_COOLDOWN) || this.needsRest()) &&
       this.exitPortal()
     ) {
-      this.leaving = true;
+      this.leaving = 'shop';
+      w.targetId = null;
+      w.autoAttack = false;
+    }
+    const strong = this.cfg.retaliate === 'always' ? [] : this.strongAggressors();
+    if (!this.leaving && strong.length && this.cfg.onStrongAggro === 'town' && this.exitPortal()) {
+      this.leaving = 'flee';
       w.targetId = null;
       w.autoAttack = false;
     }
     if (this.leaving) {
-      this.status = L('Indo comprar poções', 'Buying potions');
+      this.status =
+        this.leaving === 'flee'
+          ? L('Fugindo para a vila', 'Fleeing to the village')
+          : L('Indo comprar poções', 'Buying potions');
       const p = this.exitPortal();
       if (p) this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
       return;
     }
+    if (strong.length && this.cfg.onStrongAggro === 'flee') {
+      if (this.flee(strong)) {
+        this.status = L('Fugindo de monstro forte', 'Fleeing a strong monster');
+        return;
+      }
+      // encurralado: revida o forte mais perto
+      const t = w.getTarget();
+      if (!t || !strong.includes(t)) {
+        const n = strong.reduce((a, b) => (dist(b, w.player) < dist(a, w.player) ? b : a));
+        w.setTarget(n.id);
+      }
+      this.status = L('Encurralado: revidando', 'Cornered: fighting back');
+      this.combat();
+      return;
+    }
     this.status = L('Caçando', 'Hunting');
     this.combat();
+  }
+
+  /** Nível máximo que o auto escolhe/revida (opção maxLevelAbove). */
+  private get maxLevel() {
+    return this.w.player.level + this.cfg.maxLevelAbove;
+  }
+  private isGray(m: Entity) {
+    return m.level < this.w.player.level - AUTO_GRAY_GAP;
+  }
+  /** Monstros acima do limite de nível atacando o personagem (chefes/arena ficam de fora, como no resto do auto). */
+  private strongAggressors(): Entity[] {
+    return this.w.monsters.filter((m) => m.ai === 'chase' && !m.dead && m.level > this.maxLevel && !this.forbidden(m));
+  }
+  /** Anda para longe dos monstros fortes (e da casa deles) até eles desistirem pelo leash.
+   *  Retorna false se não há para onde ir (encurralado). Nunca atravessa portal. */
+  private flee(from: Entity[]): boolean {
+    const w = this.w,
+      p = w.player;
+    w.targetId = null;
+    w.autoAttack = false;
+    if (p.path.length && w.time < this.fleeUntil) return true; // segue o caminho escolhido (não fica trocando de direção)
+    const away = (q: Point) => Math.min(...from.map((m) => dist(q, m.home) + dist(q, m)));
+    let best: Point | null = null,
+      bs = away(p) + 1; // precisa ganhar pelo menos 1 tile
+    for (const r of [FLEE_DIST, FLEE_DIST / 2])
+      for (let i = 0; i < 16; i++) {
+        const ang = (i / 16) * Math.PI * 2;
+        const q = { x: p.x + Math.cos(ang) * r, y: p.y + Math.sin(ang) * r };
+        if (!isWalkable(w.map, q.x, q.y)) continue;
+        const path = w.pathFromPlayer(q);
+        if (!path.length) continue;
+        const s = away(path[path.length - 1]);
+        if (s > bs) {
+          bs = s;
+          best = q;
+        }
+      }
+    if (!best) return false;
+    this.fleeUntil = w.time + 2;
+    w.autoMove(best.x, best.y);
+    return true;
   }
 
   private needsHp() {
@@ -402,23 +491,27 @@ export class AutoCombat {
   }
 
   private eligible(m: Entity): boolean {
-    const p = this.w.player;
     return (
       !m.dead &&
-      m.level <= p.level + AUTO_MAX_LEVEL_GAP &&
+      m.level <= this.maxLevel &&
+      !(this.cfg.grayMode === 'ignore' && this.isGray(m)) &&
       !this.forbidden(m) &&
       (this.ignore[m.id] ?? 0) <= this.w.time
     );
   }
 
-  /** Monstros que já estão atacando o personagem: revida primeiro (o mais perto). */
+  /** Monstros que já estão atacando o personagem: revida primeiro (o mais perto), conforme a opção retaliate.
+   *  'inRange' revida só até o nível máximo (mais fracos sempre, mesmo com cinzas ignorados). */
   private nearestAggressor(): Entity | null {
     const w = this.w,
-      p = w.player;
+      p = w.player,
+      r = this.cfg.retaliate;
+    if (r === 'never') return null;
     let best: Entity | null = null,
       bd = Infinity;
     for (const m of w.monsters) {
       if (m.ai !== 'chase' || m.dead || this.forbidden(m)) continue;
+      if (r === 'inRange' && m.level > this.maxLevel) continue;
       const d = dist(m, p);
       if (d < bd) {
         bd = d;
@@ -439,6 +532,16 @@ export class AutoCombat {
     return n;
   }
 
+  /** Se não revida sempre: o alvo (ou o caminho) fica na visão de um monstro acima do nível máximo? */
+  private nearStrong(t: Entity, path: Point[]): boolean {
+    for (const m of this.w.monsters) {
+      if (m === t || m.dead || m.level <= this.maxLevel || this.forbidden(m)) continue;
+      const r = (MONSTERS[m.monsterId]?.aggroRange ?? 3) + 1;
+      if (dist(m, t) <= r || path.some((q) => dist(m, q) <= r)) return true;
+    }
+    return false;
+  }
+
   /** Alvo novo: perto pelo caminho real, sem atrair outros monstros no caminho; cinzas e longe só em último caso. */
   private pickTarget(): Entity | null {
     const w = this.w,
@@ -447,6 +550,8 @@ export class AutoCombat {
       .filter((m) => this.eligible(m))
       .map((m) => ({ m, d: dist(m, p) }))
       .sort((a, b) => a.d - b.d);
+    const crowdW = CROWD_PENALTY * CROWD_MUL[this.cfg.crowdAvoid],
+      avoidStrong = this.cfg.retaliate !== 'always';
     let best: Entity | null = null,
       bs = Infinity;
     for (const c of cands.slice(0, MAX_PATH_CHECKS)) {
@@ -464,9 +569,10 @@ export class AutoCombat {
       }
       const score =
         len +
-        (c.m.level < p.level - AUTO_GRAY_GAP ? GRAY_PENALTY : 0) +
+        (this.cfg.grayMode === 'last' && this.isGray(c.m) ? GRAY_PENALTY : 0) +
         (len > NEAR_RANGE ? FAR_PENALTY : 0) +
-        this.crowdOn(c.m, path) * CROWD_PENALTY;
+        (crowdW ? this.crowdOn(c.m, path) * crowdW : 0) +
+        (avoidStrong && this.nearStrong(c.m, path) ? STRONG_PENALTY : 0);
       if (score < bs) {
         bs = score;
         best = c.m;
