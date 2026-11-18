@@ -1,7 +1,7 @@
 import { L } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import type { World } from '../core/world';
-import { uiRect, uiScale } from './uiScale';
+import { uiRect, uiScale, uiW } from './uiScale';
 import { byId, escapeHtml } from './dom';
 
 /** Nome de exibição de um NPC pelo id ('anciao', 'mestre_lamina'...). */
@@ -54,5 +54,16 @@ export class QuestTracker {
     // logo abaixo do bloco do topo direito (que muda de altura conforme a tela)
     const r = uiRect(byId('top-right'));
     el.style.top = `${Math.round(r.bottom + 6)}px`;
+    // celular deitado baixo (Fold fechado): se encostar num botão de skill do arco, desvia para a esquerda dele
+    if (el.classList.contains('hidden')) return;
+    el.style.right = '';
+    const t = uiRect(el);
+    let right = 0;
+    for (const b of document.querySelectorAll('#hotbar .slot')) {
+      const s = uiRect(b);
+      if (s.left < t.right && s.right > t.left && s.top < t.bottom && s.bottom > t.top)
+        right = Math.max(right, uiW() - s.left + 6);
+    }
+    if (right) el.style.right = `${Math.round(right)}px`;
   }
 }

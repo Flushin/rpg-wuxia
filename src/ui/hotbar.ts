@@ -8,7 +8,11 @@ import { byId } from './dom';
 import { onPress } from './press';
 
 const SIZE = 56,
-  R = 118;
+  R = 118,
+  // distância mínima (px do HUD) entre a skill e a borda direita da tela: encostado na borda, o toque cai na faixa
+  // do gesto de voltar do Android / Painel Edge da Samsung e, com outro dedo no joystick, o sistema fica com ele
+  // (no Fold fechado deitado o 4º botão ficava a 1 px da borda e o escudo não saía andando)
+  EDGE_GAP = 24;
 
 // Barra de skills: PC (embaixo, centro, teclas 1-4) e celular (arco em volta do botão Atacar).
 export class Hotbar {
@@ -90,13 +94,15 @@ export class Hotbar {
     const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
     const size = short ? 46 : SIZE,
-      r = short ? 84 : R,
+      r = short ? 92 : R,
       cx = short ? 53 : 72,
       cy = short ? 51 : 78;
     // passo mínimo para os botões não encostarem: corda do arco ≥ tamanho + 6 px (antes, deitado, ficavam um em cima do outro)
     const minStep = (2 * Math.asin(Math.min(1, (size + 6) / (2 * r))) * 180) / Math.PI;
-    const step = short ? Math.max(28, minStep) : narrow ? 28 : 30,
-      start = short ? 178 : narrow ? 152 : 165;
+    const step = short ? Math.max(28, minStep) : narrow ? 28 : 30;
+    // ângulo mínimo do último botão para ele ficar a EDGE_GAP da borda; se precisar, o arco todo gira para a esquerda
+    const lastMin = (Math.acos(Math.max(-1, Math.min(1, (cx - size / 2 - EDGE_GAP) / r))) * 180) / Math.PI;
+    const start = Math.max(short ? 178 : narrow ? 152 : 165, lastMin + (this.slots.length - 1) * step);
     this.slots.forEach((s, i) => {
       const a = ((start - i * step) * Math.PI) / 180;
       s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
