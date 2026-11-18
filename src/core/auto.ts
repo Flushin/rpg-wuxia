@@ -30,7 +30,8 @@ export const RATE_MIN_SEC = 120; // mínimo de dados para o ritmo valer
 export const BUCKET_SEC = 60,
   MAX_BUCKETS = 30;
 const SHOP_COOLDOWN = 120; // s entre viagens à vila (evita laço se a compra falhar)
-export const SHIELD_HP = 0.7; // Véu de Névoa: usado com a vida abaixo de 70% em combate
+export const SHIELD_HP = 0.7; // Véu de Névoa / Pele de Ferro: usado com a vida abaixo de 70% em combate
+export const HEAL_HP = 0.6; // Seiva de Jade: usada com a vida abaixo de 60% em combate
 const REST_HP = 0.35,
   REST_DONE = 0.9,
   REST_MAX_SEC = 50; // descanso na vila (regenera 3%/s após 5 s sem dano)
@@ -532,6 +533,8 @@ export class AutoCombat {
         continue;
       if (def.shield) {
         if (!(aggroed && p.hp < p.derived.maxHp * SHIELD_HP) || w.hasBuff(p, 'shield')) continue;
+      } else if (def.heal) {
+        if (!(aggroed && p.hp < p.derived.maxHp * HEAL_HP) || w.hasBuff(p, 'regen')) continue;
       } else if (def.area === 'self') {
         if (!w.monsters.some((m) => !m.dead && dist(m, p) <= (def.radius ?? 0))) continue;
       } else if (def.area === 'target') {

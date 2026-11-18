@@ -98,5 +98,104 @@
       "intelligence": 2,
       "willpower": 1
     }
+  },
+  "tita": {
+    "id": "tita",
+    "name": "Titã",
+    "description": "Monges da Montanha de Ferro que aguentam qualquer golpe e respondem com punhos de fogo.",
+    "rangeLabel": "Corpo a corpo - tanque",
+    "damageType": "physical",
+    "element": "fire",
+    "attackRange": 1.6,
+    "attackInterval": 1.0,
+    "moveSpeed": 4.3,
+    "color": "#c48028",
+    "baseAttributes": {
+      "strength": 8,
+      "intelligence": 3,
+      "stamina": 12,
+      "agility": 3,
+      "willpower": 4
+    },
+    "levelUpAttributes": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 1,
+      "agility": 0,
+      "willpower": 0
+    },
+    "elementAttack": {
+      "fire": 4
+    },
+    "recommended": [
+      {
+        "attr": "strength",
+        "reason": "seu dano é físico"
+      },
+      {
+        "attr": "stamina",
+        "reason": "vida e defesa são a sua força"
+      }
+    ],
+    "optional": [
+      {
+        "attr": "agility",
+        "reason": "se você está errando muitos golpes"
+      }
+    ],
+    "recommendedRatio": {
+      "strength": 1,
+      "stamina": 1
+    }
+  },
+  "vibora": {
+    "id": "vibora",
+    "name": "Víbora",
+    "description": "Assassinas da Agulha Esmeralda que atacam à distância com agulhas envenenadas.",
+    "rangeLabel": "À distância - veneno",
+    "damageType": "physical",
+    "element": "poison",
+    "attackRange": 6,
+    "attackWhileMoving": true,
+    "attackInterval": 1.1,
+    "moveSpeed": 4.6,
+    "color": "#34804a",
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 3,
+      "stamina": 9,
+      "agility": 8,
+      "willpower": 4
+    },
+    "levelUpAttributes": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 1,
+      "willpower": 0
+    },
+    "elementAttack": {
+      "poison": 4
+    },
+    "recommended": [
+      {
+        "attr": "strength",
+        "reason": "seu dano é físico"
+      },
+      {
+        "attr": "agility",
+        "reason": "acerto e crítico combinam com agulhas"
+      }
+    ],
+    "optional": [
+      {
+        "attr": "stamina",
+        "reason": "se você está morrendo muito"
+      }
+    ],
+    "recommendedRatio": {
+      "strength": 1,
+      "agility": 1
+    }
   }
 }

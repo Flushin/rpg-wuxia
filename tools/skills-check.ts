@@ -218,10 +218,15 @@ for (const classId of Object.keys(CLASSES)) {
       );
     }
     if (def.area === 'target') {
-      const hitIds = new Set(evs.filter((e) => e.type === 'hit').map((e) => (e as { targetId: number }).targetId));
+      // skill sem golpe (Névoa Tóxica) não gera 'hit' na hora: conta quem ganhou o efeito
+      const hitIds = new Set(
+        def.hits?.length
+          ? evs.filter((e) => e.type === 'hit').map((e) => (e as { targetId: number }).targetId)
+          : evs.filter((e) => e.type === 'buffApplied').map((e) => (e as { targetId: number }).targetId),
+      );
       ok(
         hitIds.has(others[0].id) && hitIds.has(others[1].id) && hitIds.has(target.id) && !hitIds.has(w.monsters[3].id),
-        'Chuva: acerta vizinhos do alvo',
+        'área no alvo: acerta vizinhos do alvo',
       );
     }
     if (def.debuff) {
@@ -230,7 +235,7 @@ for (const classId of Object.keys(CLASSES)) {
       if (b && b.kind === 'slow') {
         target.moveSpeed = 4;
         const sp = (w as unknown as { speedMul: (e: Entity) => number }).speedMul(target);
-        ok(Math.abs(sp - 0.6) < 1e-9, 'lentidão reduz velocidade em 40%');
+        ok(Math.abs(sp - (1 - def.debuff.value)) < 1e-9, `lentidão reduz velocidade em ${def.debuff.value * 100}%`);
       }
       run(w, def.debuff.duration + 0.2);
       ok(!target.buffs.length && drain(w).some((e) => e.type === 'buffExpired'), 'debuff expira');
@@ -257,8 +262,11 @@ for (const classId of Object.keys(CLASSES)) {
     }
     if (def.shield) {
       const b = p.buffs.find((x) => x.kind === 'shield');
-      const expect = p.derived.maxHp * 0.25;
-      ok(!!b && Math.abs(b.value - expect) < 1, `escudo = 25% do HP máx (${b?.value.toFixed(1)} / ${expect})`);
+      const expect = p.derived.maxHp * def.shield.percent;
+      ok(
+        !!b && Math.abs(b.value - expect) < 1,
+        `escudo = ${def.shield.percent * 100}% do HP máx (${b?.value.toFixed(1)} / ${expect})`,
+      );
       const hp = p.hp;
       (w as unknown as { attack: (a: Entity, t: Entity) => unknown }).attack(target, p);
       const abs = drain(w).some((e) => e.type === 'shieldAbsorb');
@@ -359,5 +367,112 @@ for (const classId of Object.keys(CLASSES)) {
     'skill bloqueada não é usada',
   );
 }
+// ---------- mecânicas do Marco 8 (Titã e Víbora) ----------
+console.log('\n== veneno (Víbora) ==');
+{
+  const w = mk('vibora');
+  const p = w.player;
+  const [m] = wolfNear(w, 3);
+  freezeMonsters(w);
+  m.hp = m.derived.maxHp = 100000;
+  w.addBuff(m, 'teste', 'poison', 10, 6);
+  drain(w);
+  run(w, 3.05);
+  const ticks = drain(w).filter((e) => e.type === 'hit' && e.targetId === m.id && (e as { poison?: boolean }).poison);
+  ok(ticks.length === 3 && m.hp === 100000 - 30, `3 tiques de 10 em 3 s (${ticks.length}, hp ${m.hp})`);
+  run(w, 3.2);
+  ok(!w.hasBuff(m, 'poison') && m.hp === 100000 - 60, 'veneno acaba depois de 6 s (60 no total)');
+  m.hp = 5;
+  const xp0 = w.xp + p.level * 1e9;
+  w.addBuff(m, 'teste', 'poison', 10, 6);
+  run(w, 1.05);
+  ok(m.dead && w.xp + p.level * 1e9 > xp0, 'veneno mata e dá experiência');
+  // Sangue de Serpente: +15% em alvo envenenado
+  const [t] = wolfNear(w, 3);
+  freezeMonsters(w);
+  t.derived.evasion = -1000;
+  const atk = (w as unknown as { attack: (a: Entity, t: Entity, m: number, s: boolean) => { amount: number } }).attack;
+  const sample = (poisoned: boolean) => {
+    let tot = 0;
+    t.buffs = [];
+    if (poisoned) w.addBuff(t, 'x', 'poison', 0.0001, 999);
+    for (let i = 0; i < 400; i++) {
+      t.hp = t.derived.maxHp = 1e9;
+      tot += atk.call(w, p, t, 1, true).amount;
+    }
+    return tot;
+  };
+  const r = sample(true) / sample(false);
+  ok(r > 1.1 && r < 1.2, `Sangue de Serpente: ~+15% em envenenado (${r.toFixed(3)})`);
+}
+
+console.log('\n== atordoar (Titã) ==');
+{
+  const w = mk('tita');
+  const p = w.player;
+  const [m] = wolfNear(w, 1.2);
+  freezeMonsters(w); // só este lobo age
+  m.attackCd = 0;
+  m.moveSpeed = 3;
+  m.derived.hit = 1e4;
+  m.hp = m.derived.maxHp = 1e6;
+  w.addBuff(m, 'teste', 'stun', 0, 1.5);
+  const hp0 = p.hp,
+    x0 = m.x;
+  run(w, 1.4);
+  ok(
+    p.hp === hp0 && m.x === x0,
+    `atordoado não anda nem ataca (hp ${hp0}→${p.hp}, x ${x0}→${m.x}, stun ${w.isStunned(m)})`,
+  );
+  run(w, 2);
+  ok(!w.isStunned(m) && p.hp < hp0, 'depois de 1,5 s volta a atacar');
+}
+
+console.log('\n== Corpo de Bronze (Titã) ==');
+{
+  const t = mk('tita');
+  const v = mk('vibora');
+  const hpT = t.player.derived.maxHp;
+  const c = CLASSES.tita;
+  const base = 50 + (c.baseAttributes.stamina + c.levelUpAttributes.stamina * 8) * 10;
+  ok(Math.abs(hpT - Math.round(base * 1.1)) <= 1, `+10% de HP máximo (${hpT} / ${Math.round(base * 1.1)})`);
+  const [m] = wolfNear(t, 1.2);
+  freezeMonsters(t);
+  m.derived.hit = 1e4;
+  const atk = (t as unknown as { attack: (a: Entity, t: Entity, m: number, s: boolean) => { amount: number } }).attack;
+  let got = 0;
+  for (let i = 0; i < 300; i++) {
+    t.player.hp = 1e9;
+    got += atk.call(t, m, t.player, 1, false).amount;
+  }
+  const [m2] = wolfNear(v, 1.2);
+  freezeMonsters(v);
+  m2.derived = { ...m.derived };
+  m2.attrs = { ...m.attrs };
+  v.player.derived = { ...v.player.derived, physDef: t.player.derived.physDef, evasion: t.player.derived.evasion };
+  let got2 = 0;
+  for (let i = 0; i < 300; i++) {
+    v.player.hp = 1e9;
+    got2 += atk.call(v, m2, v.player, 1, false).amount;
+  }
+  const r = got / got2;
+  ok(r > 0.85 && r < 0.95, `recebe ~10% menos dano (${r.toFixed(3)})`);
+}
+
+console.log('\n== Seiva de Jade (Víbora) ==');
+{
+  const w = mk('vibora');
+  const p = w.player;
+  const sap = w.activeSkills().find((s) => s.heal)!;
+  refill(w);
+  wolfNear(w, 3);
+  freezeMonsters(w);
+  p.hp = 1;
+  w.useSkill(w.activeSkills().indexOf(sap));
+  run(w, 6.2);
+  const expect = 1 + p.derived.maxHp * sap.heal!.percent;
+  ok(Math.abs(p.hp - expect) < 2, `cura 20% do HP máx em 6 s (${p.hp.toFixed(1)} / ${expect.toFixed(1)})`);
+}
+
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

@@ -1,7 +1,7 @@
 import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
-import { rollAttack, type AttackResult } from './combat';
+import { expectedDamage, rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
 import { findPath, isWalkable, type Avoid } from './pathfinding';
@@ -12,6 +12,7 @@ import {
   classActives,
   skillScale,
   skillXpToNext,
+  type PassiveBonus,
   type SkillDef,
   type SkillState,
 } from './skills';
@@ -54,6 +55,7 @@ export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
 
 const TOWN_REGEN = 0.03; // 3% por segundo
+const POISON_TICK = 1; // segundos entre os tiques de veneno
 const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
@@ -323,7 +325,7 @@ export class World {
     const l = this.skillLevel(def);
     return l >= SKILL_MAX_LEVEL ? null : skillXpToNext(l);
   }
-  passiveValue(key: 'attackSpeed' | 'crit' | 'manaRegen'): number {
+  passiveValue(key: keyof PassiveBonus): number {
     let v = 0;
     for (const d of this.classSkills()) {
       const base = d.type === 'passive' ? d.passive?.[key] : undefined;
@@ -345,11 +347,40 @@ export class World {
   }
   private tickBuffs(e: Entity, dt: number) {
     if (!e.buffs.length) return;
-    for (const b of e.buffs) b.remaining -= dt;
+    for (const b of e.buffs) {
+      b.remaining -= dt;
+      if (b.kind === 'regen' && !e.dead) e.hp = Math.min(e.derived.maxHp, e.hp + b.value * dt);
+      if (b.kind === 'poison' && !e.dead) {
+        b.tick = (b.tick ?? POISON_TICK) - dt;
+        if (b.tick <= 0) {
+          b.tick += POISON_TICK;
+          this.poisonTick(e, b.value * POISON_TICK);
+        }
+      }
+    }
     const gone = e.buffs.filter((b) => b.remaining <= 0 || (b.kind === 'shield' && b.value <= 0));
     if (!gone.length) return;
     e.buffs = e.buffs.filter((b) => !gone.includes(b));
     for (const b of gone) this.emit({ type: 'buffExpired', targetId: e.id, id: b.id, kind: b.kind });
+  }
+  /** Um tique de veneno: dano direto (sem acerto/erro nem defesa; já foi calculado ao aplicar). */
+  private poisonTick(e: Entity, amount: number) {
+    const dealt = Math.max(1, Math.round(amount));
+    e.hp -= dealt;
+    this.emit({
+      type: 'hit',
+      targetId: e.id,
+      targetKind: e.kind,
+      x: e.x,
+      y: e.y,
+      amount: dealt,
+      crit: false,
+      poison: true,
+    });
+    if (e.kind === 'monster' && e.hp <= 0) this.killMonster(e);
+  }
+  isStunned(e: Entity) {
+    return e.buffs.some((b) => b.kind === 'stun');
   }
   private speedMul(e: Entity) {
     let m = 1;
@@ -487,16 +518,40 @@ export class World {
       p.path = [];
     }
     for (const v of victims) {
-      for (const pct of def.hits ?? []) {
+      if (!def.hits?.length) {
+        // sem golpe (Névoa Tóxica): os efeitos pegam em todos da área, sem rolar acerto
+        this.applyOnHit(def, v, scale);
+        if (!v.dead && v.ai !== 'return') this.aggro(v);
+        continue;
+      }
+      for (const pct of def.hits) {
         if (v.dead) break;
         const r = this.attack(p, v, pct * scale, true);
-        if (r.hit && !v.dead && def.debuff)
-          this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
+        if (r.hit && !v.dead) this.applyOnHit(def, v, scale);
       }
     }
     if (def.shield)
       this.addBuff(p, def.id, 'shield', p.derived.maxHp * def.shield.percent * scale, def.shield.duration);
-    if (victims.length || def.shield) this.gainSkillXp(def, st); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
+    if (def.heal)
+      this.addBuff(
+        p,
+        def.id,
+        'regen',
+        (p.derived.maxHp * def.heal.percent * scale) / def.heal.duration,
+        def.heal.duration,
+      );
+    if (victims.length || def.shield || def.heal) this.gainSkillXp(def, st); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
+  }
+
+  /** Efeitos de uma skill num alvo atingido: enfraquecer/lentidão, veneno e atordoar. */
+  private applyOnHit(def: SkillDef, v: Entity, scale: number) {
+    if (v.dead) return;
+    if (def.debuff) this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
+    if (def.poison) {
+      const total = expectedDamage(this.player, this.defender(v)) * def.poison.percent * scale;
+      this.addBuff(v, def.id, 'poison', total / def.poison.duration, def.poison.duration);
+    }
+    if (def.stun) this.addBuff(v, def.id, 'stun', 0, def.stun);
   }
 
   private gainSkillXp(def: SkillDef, st: SkillState) {
@@ -518,6 +573,11 @@ export class World {
     const p = this.player;
     p.derived = { ...p.derived, critChance: Math.min(0.95, p.derived.critChance + this.passiveValue('crit')) };
     p.attackInterval = CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed'));
+    const hpBonus = this.passiveValue('maxHp');
+    if (hpBonus) {
+      p.derived = { ...p.derived, maxHp: Math.round(p.derived.maxHp * (1 + hpBonus)) };
+      p.hp = Math.min(p.hp, p.derived.maxHp);
+    }
   }
 
   xpToNext(): number | null {
@@ -681,6 +741,7 @@ export class World {
       return;
     }
     m.attackCd = Math.max(0, m.attackCd - dt);
+    if (this.isStunned(m)) return; // atordoado (Titã): não anda nem ataca
     const pd = p.dead ? Infinity : dist(m, p);
     const boss = def.boss;
     if (boss) this.tickBossExtras(m, def, dt);
@@ -843,7 +904,15 @@ export class World {
 
   private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
     const r = rollAttack(a, this.defender(t), this.rng);
+    if (r.hit && a.kind === 'player' && this.hasBuff(t, 'poison')) {
+      const bonus = this.passiveValue('poisonedBonus');
+      if (bonus) mult *= 1 + bonus;
+    }
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
+    if (r.hit && t.kind === 'player') {
+      const red = this.passiveValue('damageTaken');
+      if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
+    }
     if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
     if (a.kind === 'monster' && MONSTERS[a.monsterId]?.projectile)
       this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: 'arrow' });

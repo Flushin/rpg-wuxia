@@ -20,7 +20,24 @@ export interface SkillDef {
   hits?: number[];
   debuff?: { kind: BuffKind; value: number; duration: number };
   shield?: { percent: number; duration: number };
-  passive?: { attackSpeed?: number; crit?: number; manaRegen?: number };
+  /** veneno: `percent` do dano normal, espalhado em tiques de 1 s durante `duration` (Víbora) */
+  poison?: { percent: number; duration: number };
+  /** atordoa o alvo atingido por estes segundos: não anda nem ataca (Titã) */
+  stun?: number;
+  /** cura `percent` do HP máximo ao longo de `duration` segundos (Víbora) */
+  heal?: { percent: number; duration: number };
+  passive?: PassiveBonus;
+}
+export interface PassiveBonus {
+  attackSpeed?: number;
+  crit?: number;
+  manaRegen?: number;
+  /** fração a menos de dano recebido (Titã) */
+  damageTaken?: number;
+  /** fração a mais de HP máximo (Titã) */
+  maxHp?: number;
+  /** fração a mais de dano em alvos envenenados (Víbora) */
+  poisonedBonus?: number;
 }
 export interface SkillState {
   level: number;

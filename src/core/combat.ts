@@ -29,3 +29,13 @@ export function rollAttack(att: Combatant, def: Combatant, rng: Rng): AttackResu
   if (crit) dmg *= att.derived.critDamage;
   return { hit: true, crit, amount: Math.max(1, Math.round(dmg)) };
 }
+
+/** Dano médio de um golpe normal que acerta, sem sorteio nem crítico (base do veneno). */
+export function expectedDamage(att: Combatant, def: Combatant): number {
+  const physical = att.damageType === 'physical';
+  const atk = physical ? att.derived.physAtk : att.derived.spiritAtk;
+  const df = physical ? def.derived.physDef : def.derived.spiritDef;
+  let dmg = atk * (1 - df / (df + 100));
+  if (att.element) dmg += att.elemAtk[att.element] * (1 - clamp(def.elemRes[att.element], 0, 90) / 100);
+  return Math.max(1, dmg);
+}

@@ -161,7 +161,7 @@ export class NpcWindow {
     return '';
   }
 
-  /** Mestre da seita: apresenta a seita (o mesmo texto da criação) e dá dicas; Titã e Víbora ainda fechadas. */
+  /** Mestre da seita: apresenta a seita (o mesmo texto da criação) e dá dicas. */
   private master(sect: string): { sub: string; body: string } {
     const m = NPC_TEXT.masters[sect];
     if (!m) return { sub: '', body: '' };

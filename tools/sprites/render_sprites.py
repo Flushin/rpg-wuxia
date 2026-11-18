@@ -233,10 +233,64 @@ def make_mask(a):
     return o
 
 
+def _cyl(bm, r0, r1, y0, y1, n=10, cap=True, mi=0):
+    """Tronco de cone ao longo de Y (de y0 a y1), raios r0 -> r1."""
+    a = [bm.verts.new((math.cos(2 * math.pi * i / n) * r0, y0, math.sin(2 * math.pi * i / n) * r0)) for i in range(n)]
+    b = [bm.verts.new((math.cos(2 * math.pi * i / n) * r1, y1, math.sin(2 * math.pi * i / n) * r1)) for i in range(n)]
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((a[i], a[j], b[j], b[i])).material_index = mi
+    if cap:
+        bm.faces.new(b[::-1]).material_index = mi
+        bm.faces.new(a).material_index = mi
+
+
+def make_staff(a):
+    """Bastão de duas mãos (bo): haste de madeira com faixas e ponteiras de metal. Eixo = Y do osso; empunhadura perto de y=0."""
+    import bmesh
+    L, r = a.get('length', 1.5), a.get('radius', 0.032)
+    g = a.get('grip', 0.45)  # distância da empunhadura até a ponta de baixo
+    me = bpy.data.meshes.new('Staff'); bm = bmesh.new()
+    me.materials.append(_mat('StaffWood', a.get('color', [120, 78, 42])))
+    me.materials.append(_mat('StaffBand', a.get('band', [60, 40, 28])))
+    me.materials.append(_mat('StaffCap', a.get('cap', [170, 150, 90])))
+    _cyl(bm, r, r, -g, L - g, 10, True, 0)
+    for y in (-g * 0.8, L * 0.5 - g, L - g - 0.12):  # faixas de pano
+        _cyl(bm, r * 1.45, r * 1.45, y, y + 0.07, 10, True, 1)
+    for y0, y1 in ((-g - 0.02, -g + 0.13), (L - g - 0.13, L - g + 0.02)):  # ponteiras
+        _cyl(bm, r * 1.55, r * 1.55, y0, y1, 10, True, 2)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    return bpy.data.objects.new('Staff', me)
+
+
+def make_needles(a):
+    """Agulhas finas de arremesso (count, em leque curto) presas entre os dedos. Eixo = Y do osso."""
+    import bmesh
+    n, L, r = a.get('count', 3), a.get('length', 0.3), a.get('radius', 0.007)
+    me = bpy.data.meshes.new('Needles'); bm = bmesh.new()
+    me.materials.append(_mat('NeedleSteel', a.get('color', [205, 215, 205])))
+    me.materials.append(_mat('NeedleTip', a.get('tip', [90, 170, 70])))
+    for i in range(n):
+        t = (i - (n - 1) / 2) * math.radians(a.get('spread', 14))
+        for y0, y1, r0, r1, mi in ((-0.04, L * 0.7, r, r, 0), (L * 0.7, L, r, r * 0.2, 1)):
+            vs = []
+            for k in range(2):
+                for ang in (0, math.pi / 2, math.pi, 3 * math.pi / 2):
+                    y, rr = (y0, r0) if k == 0 else (y1, r1)
+                    x, z = math.cos(ang) * rr, math.sin(ang) * rr
+                    vs.append(bm.verts.new((x * math.cos(t) + y * math.sin(t), y * math.cos(t) - x * math.sin(t), z)))
+            for q in range(4):
+                bm.faces.new((vs[q], vs[(q + 1) % 4], vs[4 + (q + 1) % 4], vs[4 + q])).material_index = mi
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    return bpy.data.objects.new('Needles', me)
+
+
 def attach(a, arm):
     """Objeto extra preso a um osso (ex.: leque na mão). a = {kind, bone, offset, rot (graus), scale, ...}.
-    kind: fan (leque), hat (chapéu de palha), mask (lenço no rosto)."""
-    o = {'fan': make_fan, 'hat': make_hat, 'mask': make_mask}[a['kind']](a)
+    kind: fan (leque), hat (chapéu de palha), mask (lenço no rosto), staff (bastão), needles (agulhas)."""
+    o = {'fan': make_fan, 'hat': make_hat, 'mask': make_mask, 'staff': make_staff, 'needles': make_needles}[a['kind']](a)
     bpy.context.scene.collection.objects.link(o)
     o.parent = arm; o.parent_type = 'BONE'; o.parent_bone = a['bone']
     # parent_type BONE prende na ponta do osso; volta para a cabeça do osso + ajuste

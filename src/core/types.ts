@@ -50,14 +50,17 @@ export interface Derived {
   critDamage: number;
 }
 
-export type BuffKind = 'defReduction' | 'slow' | 'shield';
-// value: fração (defReduction/slow) ou pontos de absorção restantes (shield)
+export type BuffKind = 'defReduction' | 'slow' | 'shield' | 'poison' | 'stun' | 'regen';
+// value: fração (defReduction/slow), pontos de absorção restantes (shield), dano por segundo (poison),
+// vida por segundo (regen); stun não usa value
 export interface Buff {
   id: string;
   kind: BuffKind;
   value: number;
   remaining: number;
   duration: number;
+  /** poison: segundos até o próximo tique de dano */
+  tick?: number;
 }
 export type SkillFailReason = 'mana' | 'cooldown' | 'notarget' | 'locked' | 'blocked';
 
@@ -103,7 +106,17 @@ export interface Entity {
 
 export type GameEvent =
   | { type: 'attack'; fromId: number; toId: number; ranged: boolean }
-  | { type: 'hit'; targetId: number; targetKind: Entity['kind']; x: number; y: number; amount: number; crit: boolean }
+  | {
+      type: 'hit';
+      targetId: number;
+      targetKind: Entity['kind'];
+      x: number;
+      y: number;
+      amount: number;
+      crit: boolean;
+      /** tique de veneno (número verde) */
+      poison?: boolean;
+    }
   | { type: 'miss'; targetId: number; targetKind: Entity['kind']; x: number; y: number }
   | { type: 'death'; id: number }
   | { type: 'kill'; monsterId: string; level?: number }

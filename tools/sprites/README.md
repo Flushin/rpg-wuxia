@@ -27,7 +27,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água) → `public/sprites/pisos.png` |
 | `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |
 | `bandido_*.json`, `terracota.json`, `general.json` | Monstros KayKit recoloridos (lenço/chapéu gerados com `attach`) |
-| `tormenta.json`, `geada.json`, `lobo.json`, `floresta.json` | Configuração de cada folha |
+| `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
 | `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |
 | `fetch-assets.sh` | Baixa só os modelos usados (espelhos no GitHub) |
 
@@ -41,7 +41,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 - **Folhas:** quadros recortados e empacotados (atlas do Phaser, máx. 2048×4096), paleta de 256 cores.
 - **Recolorir:** `texture.cells` troca blocos da paleta de texturas estilo KayKit (grade 8×4);
   `recolor` troca a cor de materiais por nome (modelos Kenney/Quaternius).
-- **Objetos presos a ossos:** `attach` cria um objeto e prende num osso: `kind: "fan"` (leque de qi da Geada, na
+- **Objetos presos a ossos:** `attach` cria um objeto e prende num osso: `kind: "fan"` (leque de qi da Geada, bastão `"staff"` da Titã e agulhas `"needles"` da Víbora, na
   `handslot.r`; `rot` em graus, `scale`, `color`, `rib`), `"mask"` (lenço no rosto, osso `head`; `radius`, `height`, `color`)
   e `"hat"` (chapéu de palha cônico, osso `head`; `radius`, `height`, `color`, `band`).
 - **Cores do cenário x inimigos:** o cenário não usa as cores dos monstros do mesmo mapa (ex.: ruínas em pedra
