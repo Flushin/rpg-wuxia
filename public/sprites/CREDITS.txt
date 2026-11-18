@@ -5,6 +5,10 @@ Personagens:
   Recolorido (cabelo, túnica, capa e cinto) para a seita Tormenta.
 - Geada: "Mage" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (branco e azul-gelo, cabelo prateado),
   sem chapéu, cajado ou livro; o leque de qi é gerado pelo script (tools/sprites/render_sprites.py).
+- Titã: "Barbarian" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (ocre/laranja), sem cabelo, machado, escudo
+  ou chapéu; o bastão é gerado pelo script (tools/sprites/render_sprites.py).
+- Víbora: "Rogue_Hooded" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (verde), sem facas nem besta;
+  as agulhas são geradas pelo script.
 
 - NPCs da cidade (ferreiro, vendedor, ancião, guarda, mercador, 4 mestres das seitas e 4 moradores):
   "Rogue", "Rogue_Hooded", "Mage", "Knight" e "Barbarian" do mesmo pacote KayKit — Kay Lousberg, CC0. Recoloridos.

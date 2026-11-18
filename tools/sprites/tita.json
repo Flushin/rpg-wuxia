@@ -1,0 +1,101 @@
+{
+ "name": "tita",
+ "model": ".cache/kaykit/Characters/gltf/Barbarian.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Axe",
+  "1H_Axe_Offhand",
+  "2H_Axe",
+  "Barbarian_Round_Shield",
+  "Icosphere",
+  "Mug",
+  "Barbarian_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "barbarian_texture",
+  "cells": {
+   "0,1": [
+    200,
+    110,
+    40
+   ],
+   "1,1": [
+    160,
+    80,
+    30
+   ],
+   "2,2": [
+    200,
+    110,
+    40
+   ],
+   "1,2": [
+    40,
+    34,
+    30
+   ],
+   "2,1": [
+    235,
+    220,
+    190
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "2H_Melee_Attack_Chop",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "portrait_png": true,
+ "attach": [
+  {
+   "kind": "staff",
+   "bone": "handslot.r",
+   "offset": [
+    0,
+    0,
+    0
+   ],
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "length": 1.9,
+   "radius": 0.05,
+   "grip": 0.6
+  }
+ ]
+}

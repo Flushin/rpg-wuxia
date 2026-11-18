@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import tormenta from '../data/sprites/tormenta.json';
 import geada from '../data/sprites/geada.json';
+import tita from '../data/sprites/tita.json';
+import vibora from '../data/sprites/vibora.json';
 import lobo from '../data/sprites/lobo.json';
 import banditSword from '../data/sprites/bandido_espadachim.json';
 import banditArcher from '../data/sprites/bandido_arqueiro.json';
@@ -45,6 +47,8 @@ export interface SheetMeta {
 const SHEETS: Record<string, SheetMeta> = {
   tormenta: tormenta as SheetMeta,
   geada: geada as SheetMeta,
+  tita: tita as SheetMeta,
+  vibora: vibora as SheetMeta,
   lobo: lobo as SheetMeta,
   bandido_espadachim: banditSword as SheetMeta,
   bandido_arqueiro: banditArcher as SheetMeta,
@@ -57,6 +61,8 @@ const SHEETS: Record<string, SheetMeta> = {
 const BY_TEXTURE: Record<string, string> = {
   'player-lamina': 'tormenta',
   'player-pavilhao': 'geada',
+  'player-tita': 'tita',
+  'player-vibora': 'vibora',
   wolf: 'lobo',
   'bandit-sword': 'bandido_espadachim',
   'bandit-archer': 'bandido_arqueiro',
@@ -68,6 +74,8 @@ const BY_TEXTURE: Record<string, string> = {
 export const PORTRAITS: Record<string, string> = {
   lamina: 'sprites/tormenta_retrato.png',
   pavilhao: 'sprites/geada_retrato.png',
+  tita: 'sprites/tita_retrato.png',
+  vibora: 'sprites/vibora_retrato.png',
 };
 
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
