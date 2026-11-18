@@ -526,8 +526,10 @@ console.log('\n== auto-combate ignora o chefe e a arena ==');
   // caminhos: com o auto ligado não cruzam a arena; manual cruza
   const w2 = mk('lamina', 10, 'ruinas');
   const pl = (
-    w2 as unknown as { pf: (a: { x: number; y: number }, b: { x: number; y: number }, v?: boolean) => unknown[] }
-  ).pf.bind(w2);
+    w2 as unknown as {
+      findPathFor: (a: { x: number; y: number }, b: { x: number; y: number }, v?: boolean) => unknown[];
+    }
+  ).findPathFor.bind(w2);
   const inside = { x: b.home.x, y: b.home.y };
   ok(findPath(w2.map, { x: 14, y: 16.5 }, inside).length > 0, 'manual: caminho até dentro da arena existe');
   w2.auto.toggle();

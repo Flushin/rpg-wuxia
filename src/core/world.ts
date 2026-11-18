@@ -18,34 +18,27 @@ import {
 import {
   BAG_SIZE,
   BASES,
-  GROUND_SECONDS,
   POTIONS,
   SLOTS,
-  STACK_MAX,
   STARTING_KIT,
   STARTING_WEAPON,
-  baseOf,
   buyPrice,
-  equipmentBaseIds,
-  isBroken,
   isPotionId,
   itemColor,
   itemName,
-  itemStats,
   makeEquipment,
   makePotion,
   maxDurability,
   repairCost,
-  rollRarity,
   sanitizeItem,
   sellValue,
-  sortedBag,
-  WEAR_PER_HIT,
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import { dist } from './world/geometry';
+import * as inventory from './world/inventory';
 import {
   QUESTS,
   questGoalCount,
@@ -77,7 +70,6 @@ import {
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
-const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const TOWN_REGEN = 0.03; // 3% por segundo
 const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
@@ -146,11 +138,12 @@ export class World {
   // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
   respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
+  quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
   private bossSummoned = false;
   private arenaSeen = false;
   private nextTelegraph = 1;
   private npcGoal: number | null = null;
-  private nextGround = 1;
+  nextGround = 1;
   private pendingSkill: number | null = null;
   autoAttack = false;
   private chasing = false;
@@ -160,7 +153,7 @@ export class World {
   private lastDamaged = -99;
   private acc = 0;
   private nextId = 2;
-  private rng = new Rng((Date.now() & 0xffffffff) >>> 0);
+  rng = new Rng((Date.now() & 0xffffffff) >>> 0);
   private npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   private constructor(
@@ -266,10 +259,10 @@ export class World {
   // ---------- comandos ----------
   // andar do auto-combate (não pausa o auto)
   autoMove(x: number, y: number, viaPortal = false) {
-    if (!this.player.dead) this.player.path = this.pf(this.player, { x, y }, viaPortal);
+    if (!this.player.dead) this.player.path = this.findPathFor(this.player, { x, y }, viaPortal);
   }
   // o auto-combate nunca entra na área do chefe e só atravessa portais de propósito (viaPortal)
-  private pf(from: Point, to: Point, viaPortal = false): Point[] {
+  private findPathFor(from: Point, to: Point, viaPortal = false): Point[] {
     if (this.auto.state !== 'on') return findPath(this.map, from, to);
     const avoid: Avoid[] = this.arenas.map((a) => ({ ...a, r: a.r + 1.5 }));
     if (!viaPortal)
@@ -280,10 +273,10 @@ export class World {
   // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
   /** Caminho do jogador até `to` (lista de pontos; vazia = sem caminho ou já está lá). */
   pathFromPlayer(to: Point): Point[] {
-    return this.pf(this.player, to);
+    return this.findPathFor(this.player, to);
   }
   pathLength(to: Point): number {
-    const path = this.pf(this.player, to);
+    const path = this.findPathFor(this.player, to);
     if (!path.length) return dist(this.player, to) < 1 ? 0 : Infinity;
     let len = 0,
       a: Point = this.player;
@@ -507,7 +500,7 @@ export class World {
     p.repathCd -= dt;
     if (p.repathCd <= 0 || !p.path.length) {
       p.repathCd = 0.3;
-      p.path = this.pf(p, t);
+      p.path = this.findPathFor(p, t);
     }
     this.chasing = true;
     this.followPath(p, dt, 1);
@@ -691,7 +684,7 @@ export class World {
         p.repathCd -= dt;
         if (p.repathCd <= 0 || !p.path.length) {
           p.repathCd = 0.3;
-          p.path = this.pf(p, n);
+          p.path = this.findPathFor(p, n);
         }
         this.followPath(p, dt, 1);
         return;
@@ -723,7 +716,7 @@ export class World {
       p.repathCd -= dt;
       if (p.repathCd <= 0 || !p.path.length) {
         p.repathCd = 0.3;
-        p.path = this.pf(p, t);
+        p.path = this.findPathFor(p, t);
       }
       this.chasing = true;
     }
@@ -929,14 +922,60 @@ export class World {
       ) ?? null
     );
   }
-  private wearGear() {
-    if (WEAR_PER_HIT <= 0) return;
-    const worn = SLOTS.map((sl) => this.equipment[sl]).filter((i): i is ItemInstance => !!i && i.durability > 0);
-    if (!worn.length) return;
-    const it = worn[Math.min(worn.length - 1, Math.floor(this.rng.next() * worn.length))];
-    it.durability = Math.max(0, it.durability - WEAR_PER_HIT);
-    if (it.durability <= 0) this.recalc(this.player, false);
-    this.bumpInv();
+  // ---------- inventário: src/core/world/inventory.ts ----------
+  wearGear() {
+    return inventory.wearGear(this);
+  }
+  gearStats(): Record<string, number> {
+    return inventory.gearStats(this);
+  }
+  sortBag() {
+    return inventory.sortBag(this);
+  }
+  freeSlots(): number {
+    return inventory.freeSlots(this);
+  }
+  canFit(baseId: string, qty = 1): boolean {
+    return inventory.canFit(this, baseId, qty);
+  }
+  addItem(item: ItemInstance): boolean {
+    return inventory.addItem(this, item);
+  }
+  potionCount(baseId: string): number {
+    return inventory.potionCount(this, baseId);
+  }
+  kindCount(kind: PotionKind): number {
+    return inventory.kindCount(this, kind);
+  }
+  removeFromBag(i: number, qty = 1) {
+    return inventory.removeFromBag(this, i, qty);
+  }
+  collect(item: ItemInstance, x: number, y: number) {
+    return inventory.collect(this, item, x, y);
+  }
+  tickGround() {
+    return inventory.tickGround(this);
+  }
+  dropLoot(m: Entity, def: MonsterDef) {
+    return inventory.dropLoot(this, m, def);
+  }
+  canEquip(it: ItemInstance): string | null {
+    return inventory.canEquip(this, it);
+  }
+  equip(bagIndex: number): string | null {
+    return inventory.equip(this, bagIndex);
+  }
+  unequip(slot: Slot): string | null {
+    return inventory.unequip(this, slot);
+  }
+  usePotion(kind: PotionKind, baseId?: string): boolean {
+    return inventory.usePotion(this, kind, baseId);
+  }
+  tickPotions(dt: number) {
+    return inventory.tickPotions(this, dt);
+  }
+  lowDurability(): boolean {
+    return inventory.lowDurability(this);
   }
 
   private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
@@ -968,8 +1007,6 @@ export class World {
   }
 
   // ---------- missões (marco 7) ----------
-  quest: QuestState = { stage: 0, status: 'pending', progress: 0 };
-
   /** Missão atual da cadeia e em que fase ela está para a interface. */
   questView(): {
     def: QuestDef | null;
@@ -1142,7 +1179,7 @@ export class World {
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
   }
 
-  private recalc(e: Entity, keepGain: boolean) {
+  recalc(e: Entity, keepGain: boolean) {
     const old = e.derived;
     if (e.kind === 'player') this.applyGear(e);
     else e.derived = computeDerived(e.attrs);
@@ -1153,17 +1190,6 @@ export class World {
     e.hp = Math.min(e.hp, e.derived.maxHp);
     e.mana = Math.min(e.mana, e.derived.maxMana);
     if (e.kind === 'player') this.applyPassives();
-  }
-
-  // stats dos equipamentos (só itens com durabilidade > 0)
-  gearStats(): Record<string, number> {
-    const out: Record<string, number> = {};
-    for (const sl of SLOTS) {
-      const it = this.equipment[sl];
-      if (!it || isBroken(it)) continue;
-      for (const [k, v] of Object.entries(itemStats(it))) out[k] = (out[k] ?? 0) + v;
-    }
-    return out;
   }
 
   private applyGear(e: Entity) {
@@ -1191,245 +1217,8 @@ export class World {
   }
 
   // ---------- inventário ----------
-  private bumpInv() {
+  bumpInv() {
     this.invVersion++;
-  }
-
-  sortBag() {
-    this.bag = sortedBag(this.bag);
-    this.bumpInv();
-  }
-
-  freeSlots(): number {
-    return this.bag.filter((b) => !b).length;
-  }
-  canFit(baseId: string, qty = 1): boolean {
-    if (!isPotionId(baseId)) return this.freeSlots() >= 1;
-    let room = this.freeSlots() * STACK_MAX;
-    for (const b of this.bag) if (b && b.baseId === baseId) room += STACK_MAX - (b.qty ?? 1);
-    return room >= qty;
-  }
-  // adiciona na mochila (potions empilham até 99). Sem eventos.
-  addItem(item: ItemInstance): boolean {
-    const qty = item.qty ?? 1;
-    if (!this.canFit(item.baseId, qty)) return false;
-    if (isPotionId(item.baseId)) {
-      let rem = qty;
-      for (const b of this.bag) {
-        if (rem <= 0) break;
-        if (b && b.baseId === item.baseId && (b.qty ?? 1) < STACK_MAX) {
-          const a = Math.min(rem, STACK_MAX - (b.qty ?? 1));
-          b.qty = (b.qty ?? 1) + a;
-          rem -= a;
-        }
-      }
-      while (rem > 0) {
-        const i = this.bag.findIndex((b) => !b),
-          a = Math.min(rem, STACK_MAX);
-        this.bag[i] = { ...item, uid: i === 0 && a === qty ? item.uid : makePotion(item.baseId).uid, qty: a };
-        rem -= a;
-      }
-    } else this.bag[this.bag.findIndex((b) => !b)] = item;
-    this.bumpInv();
-    return true;
-  }
-  potionCount(baseId: string): number {
-    return this.bag.reduce((a, b) => a + (b && b.baseId === baseId ? (b.qty ?? 1) : 0), 0);
-  }
-  kindCount(kind: PotionKind): number {
-    return Object.keys(POTIONS)
-      .filter((id) => POTIONS[id].kind === kind)
-      .reduce((a, id) => a + this.potionCount(id), 0);
-  }
-
-  private removeFromBag(i: number, qty = 1) {
-    const b = this.bag[i];
-    if (!b) return;
-    if (b.qty && b.qty > qty) b.qty -= qty;
-    else this.bag[i] = null;
-    this.bumpInv();
-  }
-
-  private collect(item: ItemInstance, x: number, y: number) {
-    this.auto.recordDrop(item);
-    let placed = this.addItem(item);
-    if (!placed && this.auto.sellingActive) {
-      // auto-combate: mochila cheia vende o que a regra permite
-      this.auto.makeRoom();
-      placed = this.addItem(item);
-      if (!placed && this.auto.sellable(item)) {
-        this.sellValueNow(item);
-        return;
-      }
-    }
-    if (placed) {
-      this.emit({
-        type: 'itemPickup',
-        baseId: item.baseId,
-        name: itemName(item),
-        color: itemColor(item),
-        qty: item.qty ?? 1,
-        potion: isPotionId(item.baseId),
-        rarity: item.rarity,
-      });
-    } else {
-      this.ground.push({ id: this.nextGround++, x, y, item, expires: this.time + GROUND_SECONDS });
-      this.emit({ type: 'bagFull' });
-    }
-  }
-
-  private tickGround() {
-    if (!this.ground.length) return;
-    const p = this.player;
-    for (const g of [...this.ground]) {
-      if (this.time >= g.expires) {
-        this.ground = this.ground.filter((x) => x !== g);
-        this.emit({ type: 'groundGone', id: g.id });
-        continue;
-      }
-      if (g.item && dist(g, p) < 0.9 && this.addItem(g.item)) {
-        const it = g.item;
-        this.ground = this.ground.filter((x) => x !== g);
-        this.emit({ type: 'groundGone', id: g.id });
-        this.emit({
-          type: 'itemPickup',
-          baseId: it.baseId,
-          name: itemName(it),
-          color: itemColor(it),
-          qty: it.qty ?? 1,
-          potion: isPotionId(it.baseId),
-          rarity: it.rarity,
-        });
-      }
-    }
-  }
-
-  private dropLoot(m: Entity, def: MonsterDef) {
-    const L = def.loot;
-    if (!L) return;
-    const spot = () => ({ x: m.x + this.rng.range(-0.4, 0.4), y: m.y + this.rng.range(-0.4, 0.4) });
-    if (L.gold) {
-      const add = (L.gold.perLevel ?? 0) * (m.level - 1);
-      const g = this.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add));
-      if (g > 0) {
-        this.gold += g;
-        this.bumpInv();
-        this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
-        this.emit({ type: 'goldPickup', amount: g });
-      }
-    }
-    for (const pd of L.potions ?? []) {
-      if (pd.minMonsterLevel && m.level < pd.minMonsterLevel) continue;
-      if (this.rng.next() >= pd.chance) continue;
-      const s = spot();
-      this.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
-      this.collect(makePotion(pd.id, 1), s.x, s.y);
-    }
-    const sectOk = (id: string) => !BASES[id].sect || BASES[id].sect === this.classId;
-    const give = (id: string, rarity: Rarity, ilvl = m.level) => {
-      const it = makeEquipment(id, rarity, CLASSES[this.classId].element, this.rng, ilvl);
-      const s = spot();
-      this.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
-      this.collect(it, s.x, s.y);
-    };
-    const eqs = L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [];
-    for (const eq of eqs) {
-      if (eq.minMonsterLevel && m.level < eq.minMonsterLevel) continue;
-      if (this.rng.next() >= eq.chance) continue;
-      const ids = equipmentBaseIds().filter(
-        (id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id),
-      );
-      if (ids.length)
-        give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], rollRarity(this.rng));
-    }
-    if (L.guaranteed) {
-      // 1 item garantido de slot aleatório (arma só da seita do jogador)
-      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel === L.guaranteed!.reqLevel && sectOk(id));
-      if (ids.length)
-        give(
-          ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))],
-          L.guaranteed.rarity,
-          L.guaranteed.reqLevel,
-        );
-    }
-  }
-
-  // retorna mensagem de erro (PT-BR) ou null se deu certo
-  canEquip(it: ItemInstance): string | null {
-    const b = baseOf(it);
-    if (!b) return L('Este item não é equipável', 'This item cannot be equipped');
-    if (this.player.level < b.reqLevel) return L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`);
-    if (b.sect && b.sect !== this.classId)
-      return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
-    return null;
-  }
-  equip(bagIndex: number): string | null {
-    const it = this.bag[bagIndex];
-    if (!it) return null;
-    const err = this.canEquip(it);
-    if (err) return err;
-    const slot = BASES[it.baseId].slot;
-    this.bag[bagIndex] = this.equipment[slot];
-    this.equipment[slot] = it;
-    this.afterEquip();
-    return null;
-  }
-  unequip(slot: Slot): string | null {
-    const it = this.equipment[slot];
-    if (!it) return null;
-    const i = this.bag.findIndex((b) => !b);
-    if (i < 0) return L('Mochila cheia', 'Bag full');
-    this.bag[i] = it;
-    this.equipment[slot] = null;
-    this.afterEquip();
-    return null;
-  }
-  private afterEquip() {
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'equipChange' });
-  }
-
-  // ---------- poções ----------
-  usePotion(kind: PotionKind, baseId?: string): boolean {
-    const p = this.player;
-    if (p.dead) return false;
-    if (this.potionCd[kind] > 0) {
-      this.emit({ type: 'potionFail', kind, reason: 'cooldown' });
-      return false;
-    }
-    const ids = baseId ? [baseId] : Object.keys(POTIONS).filter((id) => POTIONS[id].kind === kind);
-    const id = ids.find((x) => POTIONS[x]?.kind === kind && this.potionCount(x) > 0);
-    if (!id) {
-      this.emit({ type: 'potionFail', kind, reason: 'none' });
-      return false;
-    }
-    const full = kind === 'hp' ? p.hp >= p.derived.maxHp - 0.01 : p.mana >= p.derived.maxMana - 0.01;
-    if (full) {
-      this.emit({ type: 'potionFail', kind, reason: 'full' });
-      return false;
-    }
-    const d = POTIONS[id];
-    this.removeFromBag(this.bag.findIndex((b) => b && b.baseId === id));
-    const max = kind === 'hp' ? p.derived.maxHp : p.derived.maxMana;
-    this.potionFx[kind] = { id, remaining: d.duration, rate: (max * d.percent) / d.duration }; // reinicia o efeito
-    this.potionCd[kind] = d.cooldown;
-    this.emit({ type: 'potionUsed', id, kind });
-    return true;
-  }
-
-  private tickPotions(dt: number) {
-    const p = this.player;
-    for (const kind of ['hp', 'mp'] as PotionKind[]) {
-      const fx = this.potionFx[kind];
-      if (!fx) continue;
-      const step = Math.min(dt, fx.remaining),
-        amt = fx.rate * step;
-      if (kind === 'hp') p.hp = Math.min(p.derived.maxHp, p.hp + amt);
-      else p.mana = Math.min(p.derived.maxMana, p.mana + amt);
-      fx.remaining -= dt;
-      if (fx.remaining <= 0) this.potionFx[kind] = null;
-    }
   }
 
   // ---------- NPCs ----------
@@ -1605,12 +1394,6 @@ export class World {
     this.bumpInv();
     this.emit({ type: 'repair', gold: cost });
     return null;
-  }
-  lowDurability(): boolean {
-    return SLOTS.some((s) => {
-      const i = this.equipment[s];
-      return !!i && i.durability <= maxDurability(i) * 0.2;
-    });
   }
 
   // ---------- mapa / entidades ----------
