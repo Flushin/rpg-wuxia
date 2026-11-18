@@ -351,3 +351,19 @@ button.primary {
   font-weight: 700;
   touch-action: none;
 }
+/* ⚙ Diagnóstico de toque (src/ui/touchDebug.ts) */
+#touch-debug {
+  position: fixed;
+  left: 22%;
+  top: 6px;
+  z-index: 9999;
+  margin: 0;
+  padding: 4px 6px;
+  max-width: 56%;
+  background: rgba(0, 0, 0, 0.78);
+  color: #9f9;
+  font: 10px/1.25 monospace;
+  white-space: pre-wrap;
+  pointer-events: none;
+  border-radius: 4px;
+}

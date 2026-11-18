@@ -1,3 +1,4 @@
+import { touchDebug } from '../ui/touchDebug';
 import Phaser from 'phaser';
 import { L } from '../core/i18n';
 import { TILE_H, TILE_W, screenToTile, tileToScreen } from '../core/iso';
@@ -83,6 +84,7 @@ export class GameScene extends Phaser.Scene {
     audio.bind(this, sound, () => saveDeviceAudio(sound));
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
+    touchDebug.attach(this.world);
     this.fx = new SkillFx(this);
     this.feedback = new EventFeedback(this, this.world, this.hud, this.views, this.fx);
     setupControls(this.world, this.hud, (x, y) => this.tapAt(x, y));
