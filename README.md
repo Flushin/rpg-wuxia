@@ -26,7 +26,7 @@ Trailer (vídeo promocional gravado do próprio jogo): veja [`tools/trailer/READ
 
 ## Controles
 
-- PC: clique no chão para andar, clique no monstro para selecionar, `Tab` alterna alvos, `Espaço` ataca o mais próximo,
+- PC: `WASD`/setas ou clique no chão para andar, clique no monstro para selecionar, `Tab` alterna alvos, `Espaço` ataca o mais próximo,
   `1`–`4` skills, `Q`/`E` poções, `Z` auto-combate, `C` atributos, `K` skills, `I` mochila, `M` mapa, `Esc` fecha janelas.
 - Celular: joystick flutuante na metade esquerda, toque no monstro para mirar, botão Atacar e skills em arco à direita.
 

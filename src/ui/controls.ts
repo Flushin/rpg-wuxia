@@ -25,6 +25,7 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
       world.attackNearest();
     }
   });
+  setupKeyMove(world);
   byId('btn-attrs').addEventListener('click', () => hud.togglePanel());
   byId('btn-skills').addEventListener('click', () => hud.toggleSkills());
   byId('btn-bag').addEventListener('click', () => hud.toggleInventory());
@@ -36,6 +37,57 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
   atk.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     world.attackNearest();
+  });
+}
+
+/** Direção na tela de cada tecla de movimento (por e.code, então funciona com Caps Lock e em AZERTY/QWERTZ). */
+const MOVE_KEYS: Record<string, readonly [number, number]> = {
+  KeyW: [0, -1],
+  KeyS: [0, 1],
+  KeyA: [-1, 0],
+  KeyD: [1, 0],
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+};
+
+/** WASD/setas (18/11/2026): mesma entrada do joystick, direção relativa à tela (W sobe na tela).
+ *  Fica ligado sempre (não só com !isTouch) para tablets e notebooks touch com teclado também andarem pelo teclado. */
+function setupKeyMove(world: World) {
+  const held = new Set<string>();
+  let last = '0,0';
+  const apply = () => {
+    let x = 0,
+      y = 0;
+    for (const c of held) {
+      x += MOVE_KEYS[c][0];
+      y += MOVE_KEYS[c][1];
+    }
+    const k = `${x},${y}`;
+    if (k === last) return; // só mexe no movimento quando a direção muda (não briga com o joystick nem com o clique)
+    last = k;
+    world.setMoveInput(x, y);
+  };
+  window.addEventListener('keydown', (e) => {
+    if (!(e.code in MOVE_KEYS) || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+    e.preventDefault(); // setas não rolam a página
+    held.add(e.code);
+    apply();
+  });
+  window.addEventListener('keyup', (e) => {
+    if (!held.delete(e.code)) return;
+    apply();
+  });
+  // Alt+Tab com a tecla apertada: o keyup nunca chega, então solta tudo
+  const release = () => {
+    held.clear();
+    apply();
+  };
+  window.addEventListener('blur', release);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) release();
   });
 }
 

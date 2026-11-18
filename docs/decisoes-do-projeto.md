@@ -369,7 +369,7 @@ Decidido pelo Lucas em 16/11/2026.
 - Save local em IndexedDB, com horário da última sessão (para calcular o ganho offline)
 
 ### Controles
-- **PC:** clique para mover/selecionar alvo; Tab troca alvo; Espaço ataca o mais próximo; C abre atributos; skills na hotbar (teclado + clique).
+- **PC:** WASD/setas ou clique para mover (WASD é relativo à tela, como o joystick); clique seleciona alvo; Tab troca alvo; Espaço ataca o mais próximo; C abre atributos; skills na hotbar (teclado + clique).
 - **Celular:** joystick virtual para mover; tocar no inimigo para selecionar; skills em botões na tela.
 - Notebooks com tela touch: o mouse continua com clique-para-mover.
 - **NPCs:** clicar/tocar no NPC → o personagem anda até ele e a janela de diálogo/loja abre sozinha (como no Dragon Oath).
