@@ -45,7 +45,7 @@
   - Polimento: tela de carregamento, instalar como app no celular (PWA) e versão na tela inicial — **feitos**.
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
 - **Marco 8: Titã e Víbora (em andamento, 18/11/2026).** Skills aprovadas pelo Lucas em 18/11/2026 — ver "Titã e Víbora (marco 8)" abaixo. Sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas.
-- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo. **Fases 3 a 9 feitas em 18/11/2026 (concluído, em teste).**
+- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo. **Fases 3 a 9 feitas em 18/11/2026. Concluído em 18/11/2026** (pontos ⚠ confirmados pelo Lucas; só o ouro da forja mudou: agora é sempre cobrado).
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
 - **Publicação na Play Store: depois de todos os marcos** (decidido pelo Lucas em 18/11/2026: primeiro a jogabilidade). O que falta está em "Pendências das auditorias (18/11/2026)".
 - **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
@@ -153,7 +153,7 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
 
 **Fases 3 a 9 feitas (18/11/2026): monstros, arte, equipamentos, forja, mercador, missões e balanceamento.**
 Números calibrados com o simulador (`npm run sim:balance -- --m9 --seeds=3`). Pontos marcados com ⚠ foram escolhidos por
-mim (Claude) dentro das decisões da fase 0 e **precisam da confirmação do Lucas**.
+mim (Claude) dentro das decisões da fase 0 e **confirmados pelo Lucas em 18/11/2026** (exceto o ouro da forja, alterado).
 - **Monstros (fase 3):**
   - **Espectro de Gelo** (`espectro_gelo`): à distância (alcance 5,5), dano **espiritual**, golpe a cada 2,4 s que deixa o
     alvo **25% mais lento por 2 s**; não recua (⚠ recuar como o arqueiro tornava a caça impossível para Tormenta e Titã).
@@ -184,8 +184,8 @@ mim (Claude) dentro das decisões da fase 0 e **precisam da confirmação do Luc
     discípulo 25%, Abade 3–4) e **Essência de Qi Ancestral** (especial: General 1, Abade 2).
   - **Melhorar +1 a +10:** cada nível soma **6% dos stats da base** (não dos bônus; inteiros sobem pelo menos 1 a cada
     3 níveis). Chance 100/95/90/80/70/60/50/40/30/20%. Custo: 2+2n minérios, cristais a partir do +5 (1 a 6) e
-    1 essência do +8 em diante; ouro (30+30n) × (1 + nível do item/5). **Falhou: perde só os materiais** (⚠ o ouro só é
-    cobrado se der certo; o item não quebra nem volta).
+    1 essência do +8 em diante; ouro (30+30n) × (1 + nível do item/5). **Falhou: perde os materiais e o ouro** (o ouro é
+    sempre cobrado, decidido pelo Lucas em 18/11/2026; o item não quebra nem volta).
   - **Subir raridade:** Comum→Incomum (12 minérios, 1 cristal, ouro) e Incomum→Raro (20 minérios, 4 cristais,
     1 essência, ouro): ganha um bônus aleatório novo (sem repetir) e mantém os que tinha.
   - **Trocar bônus** de Incomum/Raro: sorteia todos de novo (6–10 minérios, 1–2 cristais, ouro).

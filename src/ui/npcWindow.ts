@@ -415,8 +415,8 @@ export class NpcWindow {
         up,
         up
           ? L(
-              `Chance ${Math.round(up.chance * 100)}%. Se falhar, perde só os materiais.`,
-              `${Math.round(up.chance * 100)}% chance. On failure you lose only the materials.`,
+              `Chance ${Math.round(up.chance * 100)}%. Se falhar, perde os materiais e o ouro; o item não muda.`,
+              `${Math.round(up.chance * 100)}% chance. On failure you lose the materials and gold; the item stays the same.`,
             )
           : '',
         L('Já está no máximo (+10).', 'Already at the maximum (+10).'),

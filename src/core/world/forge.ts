@@ -19,7 +19,7 @@ export type ForgeKind = 'upgrade' | 'rarity' | 'reroll' | 'salvage';
 export const FORGE = {
   /** chance de sucesso de +n para +n+1 (índice n) */
   upgradeChance: [1, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2],
-  /** ouro da melhoria de +n: (base + porNível × n) × fator do nível do item; só é cobrado se der certo */
+  /** ouro da melhoria de +n: (base + porNível × n) × fator do nível do item; cobrado mesmo se falhar */
   upgradeGold: { base: 30, perPlus: 30 },
   rarityGold: { incomum: 200, raro: 600 } as Record<Rarity, number>,
   rerollGold: { incomum: 100, raro: 200 } as Record<Rarity, number>,
@@ -109,17 +109,15 @@ function done(w: World, it: ItemInstance, kind: ForgeKind, success: boolean) {
   w.emit({ type: 'forge', kind, success, plus: it.plus ?? 0, rarity: it.rarity });
 }
 
-/** Melhorar (+1). Falhou: perde só os materiais (o item fica como estava e o ouro não é cobrado). */
+/** Melhorar (+1). Cobra materiais e ouro antes de sortear; falhou: o item fica como estava (não quebra nem volta). */
 export function upgrade(w: World, it: ItemInstance, force = false): ActionError | null {
   const cost = upgradeCost(it),
     err = check(w, it, cost, force);
   if (err || !cost) return err;
   takeMats(w, cost.mats);
+  w.gold -= cost.gold;
   const ok = w.rng.next() < cost.chance;
-  if (ok) {
-    w.gold -= cost.gold;
-    it.plus = (it.plus ?? 0) + 1;
-  }
+  if (ok) it.plus = (it.plus ?? 0) + 1;
   done(w, it, 'upgrade', ok);
   return null;
 }
