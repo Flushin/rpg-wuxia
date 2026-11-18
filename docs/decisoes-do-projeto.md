@@ -129,6 +129,14 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   de skill) saiu da `GameScene` para `src/render/eventFeedback.ts` (`EventFeedback`), com uma função por grupo: combate,
   skills, recompensas e avisos. A cena ficou com 426 linhas (eram 694). `skillById()` em `core/skills.ts` substitui as
   buscas repetidas, e `TEXT_RES` foi para `render/display.ts`. Conferido disparando os 33 tipos de evento: mesmo resultado.
+- **C7 (18/11/2026):** o `World` (1.841 linhas) virou fachada (~1.270) e o corpo de cada assunto foi para
+  `src/core/world/`: `inventory.ts`, `shop.ts`, `quests.ts`, `boss.ts`, `npcs.ts`, `offlineApply.ts`, `saveCodec.ts`
+  (e `geometry.ts` com `dist`). São funções que recebem o `World` como `w`; **o `World` continua com os mesmos métodos**
+  (só repassam), então UI, Auto e testes não mudaram. Os corpos foram movidos sem mudança, e o simulador deu saída
+  idêntica em cada passo (mesma ordem de sorteios). Campos que os módulos precisam deixaram de ser `private` e estão
+  agrupados como "estado interno"; métodos internos têm comentário. `pf` → `findPathFor`; `quest` declarado com os campos.
+  **Regras devolvem códigos de erro** (`ActionError` em `core/types.ts`: `noGold`, `bagFull`, `needLevel`, `sectOnly`…)
+  e a interface traduz em `src/ui/actionError.ts` (mesmos textos de antes).
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

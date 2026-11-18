@@ -23,6 +23,7 @@ import {
   WEAR_PER_HIT,
 } from '../items';
 import { type Entity, type ItemInstance, type PotionKind, type Rarity, type Slot } from '../types';
+import type { ActionError } from '../types';
 import type { World } from '../world';
 import { dist } from './geometry';
 
@@ -209,17 +210,16 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
   }
 }
 
-// retorna mensagem de erro (PT-BR) ou null se deu certo
-export function canEquip(w: World, it: ItemInstance): string | null {
+// devolve o motivo (código) ou null se pode equipar
+export function canEquip(w: World, it: ItemInstance): ActionError | null {
   const b = baseOf(it);
-  if (!b) return L('Este item não é equipável', 'This item cannot be equipped');
-  if (w.player.level < b.reqLevel) return L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`);
-  if (b.sect && b.sect !== w.classId)
-    return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
+  if (!b) return { code: 'notEquippable' };
+  if (w.player.level < b.reqLevel) return { code: 'needLevel', level: b.reqLevel };
+  if (b.sect && b.sect !== w.classId) return { code: 'sectOnly', sect: b.sect };
   return null;
 }
 
-export function equip(w: World, bagIndex: number): string | null {
+export function equip(w: World, bagIndex: number): ActionError | null {
   const it = w.bag[bagIndex];
   if (!it) return null;
   const err = canEquip(w, it);
@@ -231,11 +231,11 @@ export function equip(w: World, bagIndex: number): string | null {
   return null;
 }
 
-export function unequip(w: World, slot: Slot): string | null {
+export function unequip(w: World, slot: Slot): ActionError | null {
   const it = w.equipment[slot];
   if (!it) return null;
   const i = w.bag.findIndex((b) => !b);
-  if (i < 0) return L('Mochila cheia', 'Bag full');
+  if (i < 0) return { code: 'bagFull' };
   w.bag[i] = it;
   w.equipment[slot] = null;
   afterEquip(w);

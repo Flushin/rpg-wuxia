@@ -33,6 +33,7 @@ import {
   ATTR_KEYS,
   ELEMENTS,
   type AttrKey,
+  type ActionError,
   type Attributes,
   type BuffKind,
   type Entity,
@@ -119,22 +120,26 @@ export class World {
   respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
+  autoAttack = false;
+
+  // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
   bossSummoned = false;
-  private arenaSeen = false;
   nextTelegraph = 1;
   npcGoal: number | null = null;
   nextGround = 1;
   pendingSkill: number | null = null;
-  autoAttack = false;
   chasing = false;
   moveInput: Point = { x: 0, y: 0 };
-  private respawnTimer = 0;
-  private portalCd = 0;
   lastDamaged = -99;
-  private acc = 0;
-  private nextId = 2;
   rng = new Rng((Date.now() & 0xffffffff) >>> 0);
   npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
+
+  // ---- privados do World
+  private arenaSeen = false;
+  private respawnTimer = 0;
+  private portalCd = 0;
+  private acc = 0;
+  private nextId = 2;
 
   private constructor(
     readonly maps: Record<string, GameMap>,
@@ -356,6 +361,7 @@ export class World {
     const k = Math.max(0, 1 - red);
     return { ...t, derived: { ...t.derived, physDef: t.derived.physDef * k, spiritDef: t.derived.spiritDef * k } };
   }
+  /** Interno: usado pelos módulos de src/core/world/. */
   absorb(e: Entity, amount: number): number {
     let rem = amount;
     for (const b of e.buffs) {
@@ -815,13 +821,13 @@ export class World {
   dropLoot(m: Entity, def: MonsterDef) {
     return inventory.dropLoot(this, m, def);
   }
-  canEquip(it: ItemInstance): string | null {
+  canEquip(it: ItemInstance): ActionError | null {
     return inventory.canEquip(this, it);
   }
-  equip(bagIndex: number): string | null {
+  equip(bagIndex: number): ActionError | null {
     return inventory.equip(this, bagIndex);
   }
-  unequip(slot: Slot): string | null {
+  unequip(slot: Slot): ActionError | null {
     return inventory.unequip(this, slot);
   }
   usePotion(kind: PotionKind, baseId?: string): boolean {
@@ -921,6 +927,7 @@ export class World {
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
 
+  /** Interno: usado pelos módulos de src/core/world/. */
   killPlayer() {
     const p = this.player;
     p.dead = true;
@@ -944,6 +951,7 @@ export class World {
     this.changeMap(HOME_MAP);
   }
 
+  /** Interno: usado pelos módulos de src/core/world/. */
   gainXp(n: number) {
     const p = this.player;
     if (p.level >= PROGRESSION.levelCap) return;
@@ -964,6 +972,7 @@ export class World {
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
   }
 
+  /** Interno: usado pelos módulos de src/core/world/. */
   recalc(e: Entity, keepGain: boolean) {
     const old = e.derived;
     if (e.kind === 'player') this.applyGear(e);
@@ -1002,6 +1011,7 @@ export class World {
   }
 
   // ---------- inventário ----------
+  /** Interno: usado pelos módulos de src/core/world/. */
   bumpInv() {
     this.invVersion++;
   }
@@ -1024,13 +1034,13 @@ export class World {
   }
 
   // ---------- shop: src/core/world/shop.ts ----------
-  buy(potionId: string, qty: number): string | null {
+  buy(potionId: string, qty: number): ActionError | null {
     return shop.buy(this, potionId, qty);
   }
-  purchase(potionId: string, qty: number): string | null {
+  purchase(potionId: string, qty: number): ActionError | null {
     return shop.purchase(this, potionId, qty);
   }
-  sell(bagIndex: number, qty = 1): string | null {
+  sell(bagIndex: number, qty = 1): ActionError | null {
     return shop.sell(this, bagIndex, qty);
   }
   sellRaw(bagIndex: number, qty = 1): number {
@@ -1039,13 +1049,13 @@ export class World {
   sellValueNow(it: ItemInstance): number {
     return shop.sellValueNow(this, it);
   }
-  repair(it: ItemInstance): string | null {
+  repair(it: ItemInstance): ActionError | null {
     return shop.repair(this, it);
   }
   repairAllCost(): number {
     return shop.repairAllCost(this);
   }
-  repairAll(): string | null {
+  repairAll(): ActionError | null {
     return shop.repairAll(this);
   }
 
@@ -1179,6 +1189,7 @@ export class World {
     return e;
   }
 
+  /** Interno: usado pelos módulos de src/core/world/. */
   applyMonsterLevel(e: Entity, def: MonsterDef, level: number) {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
@@ -1190,6 +1201,7 @@ export class World {
     e.hp = e.derived.maxHp;
   }
 
+  /** Interno: usado pelos módulos de src/core/world/. */
   makeMonster(def: MonsterDef, home: Point): Entity {
     const e = this.blank('monster', def.name, 1);
     e.monsterId = def.id;
@@ -1223,6 +1235,7 @@ export class World {
   }
 
   // ---------- movimento ----------
+  /** Interno: usado pelos módulos de src/core/world/. */
   followPath(e: Entity, dt: number, mul: number) {
     let rem = e.moveSpeed * mul * this.speedMul(e) * dt;
     while (rem > 0 && e.path.length) {

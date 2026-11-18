@@ -1,3 +1,5 @@
+import { actionErrorText } from './actionError';
+import type { ActionError } from '../core/types';
 import { CLASSES } from '../core/data';
 import { PORTRAITS } from '../render/sprites';
 import { L } from '../core/i18n';
@@ -158,7 +160,7 @@ export class InventoryPanel {
       return;
     }
     if (!s) return;
-    let err: string | null = null;
+    let err: ActionError | null = null;
     if (a === 'equip' && s.kind === 'bag') {
       const it = w.bag[s.i];
       if (!it) return;
@@ -173,7 +175,7 @@ export class InventoryPanel {
         d = it && POTIONS[it.baseId];
       if (it && d) w.usePotion(d.kind, it.baseId);
     }
-    if (err) this.toast(err, '#ff8a80');
+    if (err) this.toast(actionErrorText(err), '#ff8a80');
   }
 
   update() {
@@ -211,7 +213,7 @@ export class InventoryPanel {
       else if (pot) btn = `<button class="primary" data-act="use">${L('Usar', 'Use')}</button>`;
       else {
         const err = w.canEquip(it);
-        btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>${L('Equipar', 'Equip')}</button>${err ? `<small class="muted">${err}</small>` : ''}`;
+        btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>${L('Equipar', 'Equip')}</button>${err ? `<small class="muted">${actionErrorText(err)}</small>` : ''}`;
       }
       detail = `<div class="tipbody">${itemTipHtml(w, it, s.kind === 'bag')}</div>${btn}`;
     }

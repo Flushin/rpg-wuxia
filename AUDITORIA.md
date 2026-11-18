@@ -416,6 +416,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo. Teste: RT + ver textos de dano, crítico, errou, sem mana, escudo, missão aceita.
 
 **C7. Dividir o `World` por assunto (várias PRs)** — G no total, M cada
+> ✅ **Feita em 18/11/2026** (7 commits, um por assunto, + códigos de erro).
 - Objetivo: o `World` continua sendo a fachada (os outros arquivos não mudam), mas cada assunto vai para um módulo em `src/core/world/` com funções que recebem o estado:
   1. `inventory.ts` (mochila, equipar, poções, chão, coleta) · 2. `shop.ts` (comprar, vender, consertar) · 3. `quests.ts` (as funções `quest*`, com o campo `quest` declarado junto aos outros) ·
   4. `boss.ts` (telegraph, invocação, arena) · 5. `npcs.ts` (janela, moradores andando) · 6. `offlineApply.ts` · 7. `saveCodec.ts` (`serialize` e a parte de `fromSave`).

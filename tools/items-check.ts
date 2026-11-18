@@ -142,8 +142,8 @@ console.log('\n== equipar / durabilidade ==');
   const w2 = mk('lamina', 1);
   w2.addItem(equipOf(w2, 'espadas_vento'));
   w2.addItem(equipOf(w2, 'leque_bambu'));
-  ok(w2.equip(0) !== null && w2.equipment.arma === null, 'nível insuficiente bloqueia');
-  ok(w2.equip(1) !== null && /Geada|Apenas/.test(w2.equip(1)!), 'arma de outra seita bloqueada');
+  ok(w2.equip(0)?.code === 'needLevel' && w2.equipment.arma === null, 'nível insuficiente bloqueia');
+  ok(w2.equip(1) !== null && w2.equip(1)?.code === 'sectOnly', 'arma de outra seita bloqueada');
   // atributos de equipamento afetam derivados
   const w3 = mk('lamina', 5);
   const hp0 = w3.player.derived.maxHp;
@@ -461,14 +461,14 @@ console.log('\n== ferreiro ==');
   bagIt.durability = 90;
   w.addItem(bagIt);
   ok(repairCost(it) === Math.ceil(40 * 5 * 0.5), `custo = faltante x nível x 0,5 (${repairCost(it)})`);
-  ok(w.repair(it) === 'Ouro insuficiente' && it.durability === 60, 'sem ouro: não conserta');
+  ok(w.repair(it)?.code === 'noGold' && it.durability === 60, 'sem ouro: não conserta');
   w.gold = 100;
   const c1 = repairCost(it);
   ok(w.repair(it) === null && it.durability === 100 && w.gold === 100 - c1, `conserta e desconta (${c1})`);
   it.durability = 0;
   ok(w.repairAllCost() === repairCost(it) + repairCost(bagIt), 'consertar tudo soma equipado + mochila');
   w.gold = 5;
-  ok(w.repairAll() === 'Ouro insuficiente', 'consertar tudo sem ouro falha');
+  ok(w.repairAll()?.code === 'noGold', 'consertar tudo sem ouro falha');
   w.gold = 1000;
   const tot = w.repairAllCost();
   ok(
@@ -476,7 +476,7 @@ console.log('\n== ferreiro ==');
     'consertar tudo',
   );
   w.closeNpc();
-  ok(w.repairAll() !== null, 'só conserta com o ferreiro aberto');
+  ok(w.repairAll()?.code === 'talkToBlacksmith', 'só conserta com o ferreiro aberto');
   // item quebrado volta a dar stats após conserto
   const w2 = mk('lamina', 5, 'cidade');
   const s = equipOf(w2, 'espadas_vento');
@@ -494,7 +494,7 @@ console.log('\n== vendedor: comprar e vender ==');
 {
   const w = mk('lamina', 5, 'cidade');
   near(w, 'vendedor');
-  ok(w.buy('pocao_hp_p', 1) === 'Ouro insuficiente', 'compra sem ouro falha');
+  ok(w.buy('pocao_hp_p', 1)?.code === 'noGold', 'compra sem ouro falha');
   w.gold = 200;
   ok(
     w.buy('pocao_hp_p', 5) === null &&
@@ -502,7 +502,7 @@ console.log('\n== vendedor: comprar e vender ==');
       w.potionCount('pocao_hp_p') === 5,
     'compra 5 poções',
   );
-  ok(w.buy('pocao_mp_g', 10) === 'Ouro insuficiente', 'compra 10 sem ouro suficiente falha');
+  ok(w.buy('pocao_mp_g', 10)?.code === 'noGold', 'compra 10 sem ouro suficiente falha');
   w.gold = 5000;
   w.buy('pocao_mp_g', 10);
   ok(w.potionCount('pocao_mp_g') === 10, 'compra 10 grandes');
@@ -528,9 +528,9 @@ console.log('\n== vendedor: comprar e vender ==');
   near(w2, 'vendedor');
   w2.gold = 999;
   for (let k = 0; k < 30; k++) w2.addItem(equipOf(w2, 'colar_jade'));
-  ok(w2.buy('pocao_hp_p', 1) === 'Mochila cheia' && w2.gold === 999, 'compra com mochila cheia falha sem cobrar');
+  ok(w2.buy('pocao_hp_p', 1)?.code === 'bagFull' && w2.gold === 999, 'compra com mochila cheia falha sem cobrar');
   w2.closeNpc();
-  ok(w2.buy('pocao_hp_p', 1) !== null, 'só compra com vendedor aberto');
+  ok(w2.buy('pocao_hp_p', 1)?.code === 'talkToSeller', 'só compra com vendedor aberto');
   ok(
     drain(w).some((e) => e.type === 'trade'),
     'eventos de trade',

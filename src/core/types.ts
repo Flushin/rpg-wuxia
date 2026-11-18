@@ -223,3 +223,13 @@ export interface SaveData {
   respawns?: Record<string, number>; // "mapa#índice" → ms (relógio real) em que o monstro comum renasce
   quest?: { stage: number; status: string; progress: number }; // cadeia principal de missões (marco 7)
 }
+
+/** Por que uma ação de inventário/loja/ferreiro não aconteceu. A interface traduz (src/ui/actionError.ts). */
+export type ActionError =
+  | { code: 'notEquippable' }
+  | { code: 'needLevel'; level: number }
+  | { code: 'sectOnly'; sect: string }
+  | { code: 'bagFull' }
+  | { code: 'noGold' }
+  | { code: 'talkToSeller' }
+  | { code: 'talkToBlacksmith' };
