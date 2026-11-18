@@ -369,6 +369,44 @@ def render_portrait(cfg, sc, arm, root):
     out = os.path.join(cfg['out'], cfg['name'] + '_retrato.png')
     im.save(out, optimize=True)
     print('retrato', im.size, '->', out, flush=True)
+    if cfg.get('portrait_anim'):
+        render_portrait_anim(cfg, sc, act, ps)
+
+
+def render_portrait_anim(cfg, sc, act, ps):
+    """Retrato animado da mochila: a animação parada inteira (a mesma "respiração" do sprite no jogo), em alta
+    resolução. Todos os quadros com o mesmo recorte (pés no mesmo lugar) numa tira horizontal
+    <nome>_retrato_idle.png; o jogo lê quantos quadros e o fps em <out_json>/<nome>_retrato_idle.json."""
+    from PIL import Image
+    n = cfg.get('portrait_frames', 12)
+    f0, f1 = act.frame_range
+    tmp = tempfile.mkdtemp()
+    ims = []
+    for i in range(n):
+        fr = f0 + i / n * (f1 - f0)
+        sc.frame_set(int(fr), subframe=fr - int(fr))
+        fp = os.path.join(tmp, f'p{i}.png')
+        sc.render.filepath = fp
+        bpy.ops.render.render(write_still=True)
+        ims.append(Image.open(fp).convert('RGBA'))
+    boxes = [im.getchannel('A').point(lambda v: 255 if v > 4 else 0).getbbox() for im in ims]
+    pad = ps * 2
+    bb = (max(0, min(b[0] for b in boxes) - pad), max(0, min(b[1] for b in boxes) - pad),
+          min(ims[0].width, max(b[2] for b in boxes) + pad), min(ims[0].height, max(b[3] for b in boxes) + pad))
+    fw, fh = bb[2] - bb[0], bb[3] - bb[1]
+    strip = Image.new('RGBA', (fw * n, fh), (0, 0, 0, 0))
+    for i, im in enumerate(ims):
+        strip.paste(im.crop(bb), (i * fw, 0))
+    out = os.path.join(cfg['out'], cfg['name'] + '_retrato_idle.png')
+    save_png(strip, out, cfg.get('portrait_colors', 256))
+    # mesma duração do ciclo que no jogo (quadros do sprite / fps do sprite)
+    a = cfg['anims'][cfg['portrait']]
+    fps = round(n * a.get('fps', 10) / a['frames'], 2)
+    jdir = cfg.get('out_json', cfg['out'])
+    os.makedirs(jdir, exist_ok=True)
+    with open(os.path.join(jdir, cfg['name'] + '_retrato_idle.json'), 'w') as f:
+        json.dump({'frames': n, 'fps': fps, 'w': fw, 'h': fh}, f, indent=1)
+    print('retrato animado', strip.size, n, 'quadros', fps, 'fps ->', out, flush=True)
 
 
 def assemble(cfg, rows, meta_anims, rs):

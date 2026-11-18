@@ -1,7 +1,7 @@
 import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
 import { CLASSES } from '../core/data';
-import { PORTRAITS } from '../render/sprites';
+import { PORTRAIT_ANIMS, PORTRAITS } from '../render/sprites';
 import { L } from '../core/i18n';
 import { BASES, CONSUMABLES, MATERIALS, POTIONS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
@@ -25,6 +25,14 @@ const BODY_LEFT: Slot[] = ['cabeca', 'colar', 'tronco'],
 
 // retrato do personagem (sprite do marco 6); seitas ainda sem arte usam a silhueta na cor da seita
 function bodyFigure(classId: string, color: string): string {
+  const a = PORTRAIT_ANIMS[classId];
+  if (a) {
+    // respiração igual à dos NPCs: troca de quadros em CSS. O atraso negativo segue o relógio, então redesenhar a
+    // mochila não faz a animação voltar ao começo.
+    const dur = a.frames / a.fps,
+      delay = -((performance.now() / 1000) % dur);
+    return `<div class="body-fig body-anim" style="aspect-ratio:${a.w}/${a.h}" aria-hidden="true"><img src="${a.src}" alt="" style="--n:${a.frames};animation-duration:${dur.toFixed(3)}s;animation-delay:${delay.toFixed(3)}s;animation-timing-function:steps(${a.frames})"></div>`;
+  }
   const src = PORTRAITS[classId];
   return src ? `<img class="body-fig body-img" src="${src}" alt="" aria-hidden="true">` : silhouette(color);
 }
