@@ -3,7 +3,7 @@ import type { World } from '../core/world';
 import { CLASSES } from '../core/data';
 import { closeX } from './labels';
 import { audio } from '../render/audio';
-import { isTouch } from './controls';
+import { isTouch } from '../platform/input';
 import { perf } from './perf';
 import { PREF, getPref, setPref } from '../platform/prefs';
 

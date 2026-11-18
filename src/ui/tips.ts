@@ -5,7 +5,7 @@ import tipsJson from '../data/tips.json';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
-import { isTouch } from './controls';
+import { isTouch } from '../platform/input';
 import { MONSTERS } from '../core/data';
 import { TOWN_MAPS } from '../core/mapsConfig';
 import { byId } from './dom';
