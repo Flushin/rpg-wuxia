@@ -102,6 +102,23 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
   retorno** (teleporta para a vila).
 - **Missões:** **sim**, cadeia curta (5–6 missões) do nível 11 ao 20 guiando pela montanha até o Abade (fase 8).
 
+**Fase 1 feita (18/11/2026): progressão até o nível 20.**
+- `progression.json`: nível máximo **20**. Curva do 10 ao 20 **provisória**: 24000 / 28000 / 33000 / 38000 / 44000 /
+  50000 / 57000 / 65000 / 74000 / 84000 (nível 10→11 até 19→20; total ~497 mil XP, ~8× o trecho 1–10). Pensada para
+  ~2 h com os monstros da montanha; será calibrada no simulador na fase 9, quando eles existirem.
+- Skills: nível máximo **15** (`SKILL_MAX_LEVEL`). A curva de XP das skills continua a mesma (`20 × 1,5^(nível−1)` usos),
+  então 11–15 é um objetivo de longo prazo: no simulador, as ativas chegam ao nível 10 do personagem entre o nível 3 e o 7.
+  Passivas acompanham o nível do personagem (a do nível 9 chega ao 12 no nível 20). Painel de skills mostra "x/15" e a
+  dica fala em "máximo 15".
+- Até a fase 2/3, quem passa do nível 10 continua caçando terracota (127–199 XP por abate) e o General: sobe devagar.
+  Saves antigos no nível 10 (XP zerado) continuam de onde estão.
+- **Simulador consertado:** desde a mudança "Auto volta ao mapa de caça certo", o `sim:balance` parava no nível 7 — ele
+  teleportava para as Ruínas, mas o Auto lembrava a Floresta e voltava. Agora o simulador marca as Ruínas como mapa de
+  caça (como o jogador que liga o Auto lá). O jogo não mudou.
+  Medição (5 execuções, até o nível 10): Tormenta ~53 min / 0 mortes, Geada ~43 / 0,6, Titã ~62 / 0,2, Víbora ~61 / 1,2;
+  chefe 10/10 para todas com Incomum.
+- Testes ajustados para o nível máximo vir do `progression.json` (offline, missões, robô do caos).
+
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).
 - **Geada:** Stamina inicial é **10** (não 8 como estava escrito no fechamento do marco 7; o código e o simulador usam 10).
@@ -511,7 +528,7 @@ Decidido pelo Lucas em 16/11/2026.
 5. Mente Serena · Serene Mind (nv 9, passiva) — regeneração de mana
 
 ### Progressão (v1)
-- Nível de personagem — **nível máximo 10** na v1.
+- Nível de personagem — **nível máximo 10** na v1 (**20** desde o marco 9, fase 1).
 - Nível de skills (ativas pelo uso, passivas pelo nível do personagem).
 - Equipamentos: só alguns de cada tipo, para teste.
 

@@ -875,13 +875,18 @@ console.log('\n== offline: faixas de eficiência ==');
       computeOffline({ elapsedMs: 24 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 }).kills,
     '30 h rende o mesmo que 24 h',
   );
-  const cap = computeOffline({ elapsedMs: 20 * HOUR, rate, level: 9, xp: 100, potions: { hp: 0, mp: 0 }, seed: 1 });
-  ok(
-    cap.newLevel === PROGRESSION.levelCap && cap.newXp === 0 && cap.levelsGained === 1,
-    'respeita o nível máximo (10)',
-  );
-  const atCap = computeOffline({ elapsedMs: 5 * HOUR, rate, level: 10, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
-  ok(atCap.xp === 0 && atCap.newLevel === 10, 'já no nível máximo: sem XP');
+  const CAP = PROGRESSION.levelCap;
+  const cap = computeOffline({
+    elapsedMs: 20 * HOUR,
+    rate,
+    level: CAP - 1,
+    xp: 100,
+    potions: { hp: 0, mp: 0 },
+    seed: 1,
+  });
+  ok(cap.newLevel === CAP && cap.newXp === 0 && cap.levelsGained === 1, `respeita o nível máximo (${CAP})`);
+  const atCap = computeOffline({ elapsedMs: 5 * HOUR, rate, level: CAP, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
+  ok(atCap.xp === 0 && atCap.newLevel === CAP, 'já no nível máximo: sem XP');
   ok(
     computeOffline({ elapsedMs: -HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 }).kills === 0,
     'relógio atrasado: 0 abates',
@@ -911,14 +916,12 @@ console.log('\n== offline: aplicando no jogo ==');
   ok(!!rep, 'gera relatório');
   if (rep) {
     ok(rep.kills === Math.floor(3 * 216), `abates = taxa × minutos efetivos (${rep.kills})`);
-    ok(
-      w.player.level === PROGRESSION.levelCap && rep.levelsGained === 9,
-      `XP sobe até o nível máximo (nv ${w.player.level})`,
-    );
-    ok(w.freePoints === 9 * PROGRESSION.freePointsPerLevel, `pontos livres acumulam (${w.freePoints})`);
+    const gained = w.player.level - 1;
+    ok(gained >= 5 && rep.levelsGained === gained, `XP sobe vários níveis (nv ${w.player.level})`);
+    ok(w.freePoints === gained * PROGRESSION.freePointsPerLevel, `pontos livres acumulam (${w.freePoints})`);
     ok(
       w.player.attrs.strength ===
-        CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * 9,
+        CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * gained,
       'pontos automáticos aplicados',
     );
     ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);

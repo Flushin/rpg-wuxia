@@ -53,7 +53,7 @@ const BY_ID = new Map(
 );
 /** Skill de qualquer seita pelo id. */
 export const skillById = (id: string): SkillDef | undefined => BY_ID.get(id);
-export const SKILL_MAX_LEVEL = 10;
+export const SKILL_MAX_LEVEL = 15;
 export const GLOBAL_COOLDOWN = 0.5;
 export const LEVEL_BONUS = 0.08;
 

@@ -712,10 +712,10 @@ console.log('\n== dicas e dados ==');
   ok(!!tips.bandidos && !!tips.terracota && !!tips.chefe, 'dicas bandidos, terracota e chefe existem');
   ok(/Quebra-Guarda/.test(JSON.stringify(tips.terracota)), 'dica da terracota recomenda o Quebra-Guarda (Tormenta)');
   ok(
-    PROGRESSION.levelCap === 10 &&
-      PROGRESSION.xpToNext.length === 9 &&
+    PROGRESSION.levelCap === 20 &&
+      PROGRESSION.xpToNext.length === 19 &&
       PROGRESSION.xpToNext.every((v, i, a) => i === 0 || v > a[i - 1]),
-    'curva de XP crescente até o nível 10',
+    'curva de XP crescente até o nível 20',
   );
 }
 
