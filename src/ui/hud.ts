@@ -81,13 +81,22 @@ export class Hud {
     this.minimap.toggle(show);
   }
 
-  closeAll() {
+  /** Fecha as janelas do HUD. Devolve true se havia alguma aberta. */
+  closeAll(): boolean {
+    const wasOpen =
+      this.minimap.open ||
+      this.attrs.open ||
+      this.skills.open ||
+      this.inv.open ||
+      this.autoPanel.open ||
+      !!this.world.openNpc;
     this.toggleMap(false);
     this.togglePanel(false);
     this.toggleSkills(false);
     this.toggleInventory(false);
     this.autoPanel.set(false);
     this.world.closeNpc();
+    return wasOpen;
   }
 
   showOffline(rep: OfflineReport, onClose: () => void) {

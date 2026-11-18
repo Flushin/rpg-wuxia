@@ -164,6 +164,10 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   - Implementações nativas em `src/platform/`: save em arquivo JSON (gravação atômica + 1 backup), pause/resume e
     botão Voltar pelo `@capacitor/app`, barra de status escondida, vibração pelo `@capacitor/haptics` (ainda sem uso).
   - Licenças do Capacitor (MIT) na tela de créditos e em `docs/licencas/`.
+- **D3 (18/11/2026):** botão/gesto de voltar fecha a janela de cima (Sair do jogo? → créditos → report → ⚙ → resumo
+  offline → dica → janelas do HUD), em `src/ui/backAction.ts`. Sem janela aberta: no app Android aparece **"Sair do
+  jogo?"** (salva antes de fechar); na web/PWA continua o aviso + segundo voltar para sair. Também vale na web: antes
+  o voltar com uma janela aberta mostrava o aviso de saída em vez de fechá-la.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

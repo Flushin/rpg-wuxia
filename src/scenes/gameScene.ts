@@ -19,9 +19,10 @@ import { DPR, TEXT_RES, cssSize } from '../render/display';
 import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
 import { PREF, getPref, setPref } from '../platform/prefs';
-import { onBackButton } from '../platform/backButton';
+import { exitApp, onBackButton } from '../platform/backButton';
+import { askExit, closeTopWindow } from '../ui/backAction';
 import { onPause } from '../platform/lifecycle';
-import { restartApp } from '../platform';
+import { isNative, restartApp } from '../platform';
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
@@ -123,10 +124,15 @@ export class GameScene extends Phaser.Scene {
     };
     const timer = window.setInterval(save, 30000);
     const offPause = onPause(save);
-    // gesto de voltar: o primeiro só avisa (e já salva, caso o jogador confirme a saída)
-    const disarmBack = onBackButton(() => {
-      save();
-      this.hud.toast(L('Faça o gesto de voltar de novo para sair', 'Go back again to exit'), '#ffd23f');
+    // voltar: fecha a janela de cima; sem janela, no app pergunta se quer sair e na web avisa
+    // (salva já, caso o jogador saia de verdade)
+    const disarmBack = onBackButton({
+      closeSomething: () => closeTopWindow(this.hud),
+      onExitAttempt: () => {
+        save();
+        if (isNative) askExit(() => void writeSave(this.world.serialize()).finally(exitApp));
+        else this.hud.toast(L('Faça o gesto de voltar de novo para sair', 'Go back again to exit'), '#ffd23f');
+      },
     });
     this.events.once('shutdown', () => {
       disarmBack();

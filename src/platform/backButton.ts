@@ -1,29 +1,28 @@
-// Botão ou gesto de voltar. O primeiro "voltar" chama `fn` (avisar, salvar); outro logo em seguida fecha o jogo.
-// - Web/PWA: proteção pelo histórico do navegador (backGuard.ts).
-// - App Android (Capacitor): evento backButton do App; o segundo toque dentro de EXIT_WINDOW_MS chama exitApp.
-//   A D3 troca o primeiro toque por "fechar a janela aberta" e, no mapa, perguntar se quer sair.
+// Botão ou gesto de voltar.
+// `closeSomething()` é chamado primeiro: se fechou uma janela, o voltar termina aí (o jogo continua).
+// Se não havia nada aberto, `onExitAttempt()` é chamado:
+// - Web/PWA: o jogo mostra um aviso; um segundo "voltar" logo em seguida fecha o app (backGuard.ts, pelo histórico).
+// - App Android (Capacitor): o jogo pergunta "Sair do jogo?" e, se o jogador confirmar, chama exitApp().
 import { App } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { armBackGuard } from './backGuard';
 import { isNative } from './index';
 
-const EXIT_WINDOW_MS = 2500;
+export interface BackHandlers {
+  /** Fecha a janela de cima, se houver. true = fechou algo. */
+  closeSomething(): boolean;
+  /** Não havia janela aberta: o jogador quer sair. */
+  onExitAttempt(): void;
+}
 
-function nativeBackButton(fn: () => void): () => void {
-  let lastBack = 0;
+function nativeBackButton(h: BackHandlers): () => void {
   let handle: PluginListenerHandle | null = null;
   let off = false;
   void App.addListener('backButton', () => {
-    const now = Date.now();
-    if (now - lastBack < EXIT_WINDOW_MS) {
-      void App.exitApp();
-      return;
-    }
-    lastBack = now;
-    fn();
-  }).then((h) => {
-    if (off) void h.remove();
-    else handle = h;
+    if (!h.closeSomething()) h.onExitAttempt();
+  }).then((x) => {
+    if (off) void x.remove();
+    else handle = x;
   });
   return () => {
     off = true;
@@ -32,6 +31,11 @@ function nativeBackButton(fn: () => void): () => void {
 }
 
 /** Liga o tratamento do voltar. Devolve a função que desliga. */
-export function onBackButton(fn: () => void): () => void {
-  return isNative ? nativeBackButton(fn) : armBackGuard(fn);
+export function onBackButton(h: BackHandlers): () => void {
+  return isNative ? nativeBackButton(h) : armBackGuard(() => h.closeSomething(), h.onExitAttempt);
+}
+
+/** Fecha o app (só no nativo; na web não há como, e não faz nada). */
+export function exitApp() {
+  if (isNative) void App.exitApp();
 }
