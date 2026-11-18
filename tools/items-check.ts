@@ -95,7 +95,12 @@ console.log('\n== dados ==');
     ),
     'cada slot tem base nv 1 e nv 5',
   );
-  ok(Object.values(BASES).filter((b) => b.slot === 'arma').length === 4, '4 armas');
+  ok(
+    Object.keys(CLASSES).every((c) =>
+      [1, 5].every((lv) => Object.values(BASES).some((b) => b.slot === 'arma' && b.sect === c && b.reqLevel === lv)),
+    ),
+    'cada seita tem arma nv 1 e nv 5',
+  );
   const rng = new Rng(7);
   let good = true;
   for (const r of ['comum', 'incomum', 'raro'] as const)

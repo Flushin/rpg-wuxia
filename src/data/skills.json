@@ -34,5 +34,41 @@
     { "id": "meditacao_celeste", "name": "Mente Serena", "type": "passive", "unlock": 9, "color": "#b0a0e8",
       "description": "Passiva: regenera 1% da mana máxima por segundo fora da cidade. Sobe junto com seu nível.",
       "passive": { "manaRegen": 0.01 } }
+  ],
+  "tita": [
+    { "id": "punho_montanha", "name": "Punho da Montanha", "type": "active", "unlock": 1, "color": "#c48028", "fx": "heavy",
+      "description": "Um golpe pesado que causa 180% do seu dano normal.",
+      "mana": 8, "cooldown": 4, "target": "target", "range": "melee", "hits": [1.8] },
+    { "id": "tremor", "name": "Tremor", "type": "active", "unlock": 3, "color": "#a0703a", "fx": "storm",
+      "description": "Bate no chão: 120% do dano a todos os monstros num raio de 2,5 tiles e lentidão de 30% por 4 s. Não precisa de alvo.",
+      "mana": 14, "cooldown": 10, "target": "none", "area": "self", "radius": 2.5, "hits": [1.2],
+      "debuff": { "kind": "slow", "value": 0.3, "duration": 4 } },
+    { "id": "pele_ferro", "name": "Pele de Ferro", "type": "active", "unlock": 5, "color": "#b8a080", "fx": "bubble",
+      "description": "Endurece o corpo: absorve dano equivalente a 30% da vida máxima por 8 s. Não precisa de alvo.",
+      "mana": 18, "cooldown": 18, "target": "none", "shield": { "percent": 0.3, "duration": 8 } },
+    { "id": "punho_vulcanico", "name": "Punho Vulcânico", "type": "active", "unlock": 7, "color": "#e05020", "fx": "heavy",
+      "description": "Soco em brasa que causa 260% do dano e atordoa o alvo por 1,5 s.",
+      "mana": 20, "cooldown": 15, "target": "target", "range": "melee", "hits": [2.6], "stun": 1.5 },
+    { "id": "corpo_bronze", "name": "Corpo de Bronze", "type": "passive", "unlock": 9, "color": "#c09050",
+      "description": "Passiva: recebe 10% menos dano e tem 10% mais vida máxima. Sobe junto com seu nível.",
+      "passive": { "damageTaken": 0.1, "maxHp": 0.1 } }
+  ],
+  "vibora": [
+    { "id": "agulha_venenosa", "name": "Agulha Venenosa", "type": "active", "unlock": 1, "color": "#34804a", "fx": "orb",
+      "description": "Agulha que causa 90% do dano e envenena: mais 60% do dano ao longo de 6 s. Alcance 6.",
+      "mana": 8, "cooldown": 3, "target": "target", "range": 6, "hits": [0.9], "poison": { "percent": 0.6, "duration": 6 } },
+    { "id": "chuva_agulhas", "name": "Chuva de Agulhas", "type": "active", "unlock": 3, "color": "#58a060", "fx": "slash2",
+      "description": "Cinco agulhas seguidas no alvo, cada uma com 40% do dano. Alcance 6.",
+      "mana": 16, "cooldown": 10, "target": "target", "range": 6, "hits": [0.4, 0.4, 0.4, 0.4, 0.4] },
+    { "id": "nevoa_toxica", "name": "Névoa Tóxica", "type": "active", "unlock": 5, "color": "#6ab04a", "fx": "rain",
+      "description": "Névoa venenosa num raio de 2,5 tiles em volta do alvo: veneno de 150% do dano ao longo de 6 s e lentidão de 20%.",
+      "mana": 16, "cooldown": 12, "target": "target", "range": 6, "area": "target", "radius": 2.5,
+      "poison": { "percent": 1.5, "duration": 6 }, "debuff": { "kind": "slow", "value": 0.2, "duration": 6 } },
+    { "id": "seiva_jade", "name": "Seiva de Jade", "type": "active", "unlock": 7, "color": "#60d090", "fx": "bubble",
+      "description": "Cura 20% da vida máxima ao longo de 6 s. Não precisa de alvo.",
+      "mana": 20, "cooldown": 20, "target": "none", "heal": { "percent": 0.2, "duration": 6 } },
+    { "id": "sangue_serpente", "name": "Sangue de Serpente", "type": "passive", "unlock": 9, "color": "#2a6a3a",
+      "description": "Passiva: causa 15% mais dano em alvos envenenados. Sobe junto com seu nível.",
+      "passive": { "poisonedBonus": 0.15 } }
   ]
 }

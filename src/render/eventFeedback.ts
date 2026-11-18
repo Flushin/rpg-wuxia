@@ -26,6 +26,9 @@ const FLOAT_COLOR = {
   INFO: '#dddddd', // avisos (recarga, sem poção…)
   SHIELD: '#bfe0ff',
   ABSORB: '#9fd0ff', // dano absorvido pelo escudo
+  POISON: '#8be06a', // tique de veneno (Víbora)
+  STUN: '#ffd23f', // alvo atordoado (Titã)
+  HEAL: '#7ff0a8', // cura ao longo do tempo (Víbora)
 };
 
 type Ev<T extends GameEvent['type']> = Extract<GameEvent, { type: T }>;
@@ -54,8 +57,14 @@ export class EventFeedback {
           s.x,
           s.y - 40,
           ev.crit ? `${ev.amount}!` : String(ev.amount),
-          toPlayer ? FLOAT_COLOR.HURT : ev.crit ? FLOAT_COLOR.CRIT : FLOAT_COLOR.DAMAGE,
-          ev.crit ? 22 : 16,
+          ev.poison
+            ? FLOAT_COLOR.POISON
+            : toPlayer
+              ? FLOAT_COLOR.HURT
+              : ev.crit
+                ? FLOAT_COLOR.CRIT
+                : FLOAT_COLOR.DAMAGE,
+          ev.crit ? 22 : ev.poison ? 13 : 16,
         );
         this.views.get(ev.targetId)?.flash();
         return true;
@@ -82,6 +91,15 @@ export class EventFeedback {
       case 'buffApplied':
         if (ev.kind === 'shield' && ev.targetId === this.world.player.id)
           this.overPlayer(64, L('Escudo', 'Shield'), FLOAT_COLOR.SHIELD);
+        else if (ev.kind === 'regen' && ev.targetId === this.world.player.id)
+          this.overPlayer(64, L('Cura', 'Heal'), FLOAT_COLOR.HEAL);
+        else if (ev.kind === 'stun') {
+          const m = this.world.monsters.find((x) => x.id === ev.targetId);
+          if (m) {
+            const s = tileToScreen(m.x, m.y);
+            this.floatText(s.x, s.y - 56, L('Atordoado', 'Stunned'), FLOAT_COLOR.STUN, 14);
+          }
+        }
         return true;
       case 'shieldAbsorb': {
         const s = tileToScreen(ev.x, ev.y);

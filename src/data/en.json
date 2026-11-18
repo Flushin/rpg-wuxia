@@ -23,6 +23,30 @@
       "optional": [
         { "reason": "if you keep dying" }
       ]
+    },
+    "tita": {
+      "name": "Titan",
+      "description": "Monks of the Iron Mountain who can take any blow and answer with fists of fire.",
+      "rangeLabel": "Melee - tank",
+      "recommended": [
+        { "reason": "your damage is physical" },
+        { "reason": "health and defense are your strength" }
+      ],
+      "optional": [
+        { "reason": "if you keep missing" }
+      ]
+    },
+    "vibora": {
+      "name": "Viper",
+      "description": "Emerald Needle assassins who strike from afar with poisoned needles.",
+      "rangeLabel": "Ranged - poison",
+      "recommended": [
+        { "reason": "your damage is physical" },
+        { "reason": "accuracy and crits suit needles" }
+      ],
+      "optional": [
+        { "reason": "if you keep dying" }
+      ]
     }
   },
   "skills": {
@@ -39,6 +63,20 @@
       { "name": "Blizzard", "description": "A blizzard that deals 180% damage to all monsters within 2.5 tiles of the target." },
       { "name": "Mist Veil", "description": "Wrap yourself in mist that absorbs damage equal to 25% of max health for 8 s. No target needed." },
       { "name": "Serene Mind", "description": "Passive: regenerates 1% of max mana per second outside town. Grows with your level." }
+    ],
+    "tita": [
+      { "name": "Mountain Fist", "description": "A heavy blow that deals 180% of your normal damage." },
+      { "name": "Quake", "description": "Slam the ground: 120% damage to all monsters within 2.5 tiles and a 30% slow for 4 s. No target needed." },
+      { "name": "Iron Skin", "description": "Harden your body: absorbs damage equal to 30% of max health for 8 s. No target needed." },
+      { "name": "Volcanic Fist", "description": "A blazing punch that deals 260% damage and stuns the target for 1.5 s." },
+      { "name": "Bronze Body", "description": "Passive: take 10% less damage and gain 10% more max health. Grows with your level." }
+    ],
+    "vibora": [
+      { "name": "Venom Needle", "description": "A needle that deals 90% damage and poisons: another 60% damage over 6 s. Range 6." },
+      { "name": "Needle Rain", "description": "Five needles in a row at the target, each dealing 40% damage. Range 6." },
+      { "name": "Toxic Mist", "description": "Poison mist within 2.5 tiles of the target: poison for 150% damage over 6 s and a 20% slow." },
+      { "name": "Jade Sap", "description": "Heals 20% of max health over 6 s. No target needed." },
+      { "name": "Serpent Blood", "description": "Passive: deal 15% more damage to poisoned targets. Grows with your level." }
     ]
   },
   "items": {
@@ -57,6 +95,10 @@
       "espadas_vento": { "name": "Twin Cutting Wind Swords" },
       "leque_bambu": { "name": "Bamboo Qi Fan" },
       "leque_nuvens": { "name": "White Cloud Qi Fan" },
+      "bastao_ferro": { "name": "Iron Staff" },
+      "bastao_brasa": { "name": "Staff of Eternal Embers" },
+      "agulhas_bronze": { "name": "Bronze Needles" },
+      "agulhas_jade": { "name": "Emerald Jade Needles" },
       "faixa_linho": { "name": "Linen Headband" },
       "coroa_monge": { "name": "Bronze Monk Crown" },
       "calca_algodao": { "name": "Cotton Pants" },
@@ -192,14 +234,14 @@
         "title": "Titan Master",
         "greeting": "Hm. Even the mountain knows how to wait.",
         "intro": "In the Titan sect, we hold the front line with staff or fists, taking the blows for everyone. We are the wall that shields our companions. Ours is a path of endurance and raw strength.",
-        "locked": "The gates of the Titan are not yet open to new disciples; return when the mountain is ready."
+        "tips": ["Cast Iron Skin before pulling a group of bandits: the shield soaks the first hit from all of them.", "Volcanic Fist stuns the target; use it on an archer or on the boss right before it strikes.", "Quake slows your enemies. Those who choose this path should favor Strength and Stamina."]
       },
       "vibora": {
         "name": "Mistress Du",
         "title": "Viper Mistress",
         "greeting": "Quiet as a shadow, patient as venom.",
-        "intro": "In the Viper sect, we strike from afar with poisoned needles. Venom wears the enemy down little by little, and our arts even mend allies a bit. Here, the patient prevail.",
-        "locked": "The gates of the Viper are still closed to new disciples; return in another season."
+        "intro": "In the Viper sect, we strike from afar with poisoned needles. Venom wears the enemy down little by little, and our arts also heal little by little. Here, the patient prevail.",
+        "tips": ["Poison first: Serpent Blood makes your needles hit harder on targets that are already poisoned.", "Toxic Mist poisons a whole group at once and slows them all so you can back away.", "Jade Sap heals over time; use it before your health gets low. Favor Strength and Agility."]
       }
     },
     "npcs": {

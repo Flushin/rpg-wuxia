@@ -44,13 +44,37 @@
   - **Missões: feitas (16/11/2026).** Falta: jogar 1→10 com as duas seitas e fechar os itens de "Em aberto".
   - Polimento: tela de carregamento, instalar como app no celular (PWA) e versão na tela inicial — **feitos**.
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
-- **Marco 8: Titã e Víbora.** 4 ativas + 1 passiva cada (níveis 1, 3, 5, 7, 9), balanceadas com o simulador. Sugestão de sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas. Skills e números: **a decidir com o Lucas**.
+- **Marco 8: Titã e Víbora (em andamento, 18/11/2026).** Skills aprovadas pelo Lucas em 18/11/2026 — ver "Titã e Víbora (marco 8)" abaixo. Sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas.
 - **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
 - **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os 7 `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
 
 
 ## Decididas
+
+### Titã e Víbora (marco 8, 18/11/2026)
+Aprovado pelo Lucas em 18/11/2026 (skills como propostas; Titã = Fogo; Víbora = físico com Agilidade). Números ajustados
+com o simulador (6 execuções por seita): até o nível 10 — Tormenta ~61 min / 1,7 morte, Geada ~43 / 0,3,
+**Titã ~66 / 0,2**, **Víbora ~59 / 0,7**; chefe 12/12 para as duas novas com equipamento Incomum.
+- **Titã:** corpo a corpo, tanque, físico, **Fogo**. Força 8, Inteligência 3, Vigor 12, Agilidade 3, Vontade 4;
+  por nível +1 Força e +1 Vigor; golpe a cada 1,0 s. Arma: Bastão de Ferro (nv 1) / Bastão da Brasa Eterna (nv 5).
+  1. Punho da Montanha · Mountain Fist (nv 1): 180% · cd 4 s · 8 mana (era 150%/5 s na proposta; subiu no balanceamento)
+  2. Tremor · Quake (nv 3): 120% em volta, raio 2,5, lentidão 30% por 4 s · cd 10 s · 14 mana
+  3. Pele de Ferro · Iron Skin (nv 5): escudo de 30% do HP máx. por 8 s · cd 18 s · 18 mana
+  4. Punho Vulcânico · Volcanic Fist (nv 7): 260% e **atordoa 1,5 s** · cd 15 s · 20 mana
+  5. Corpo de Bronze · Bronze Body (nv 9, passiva): −10% de dano recebido, +10% HP máx.
+- **Víbora:** à distância (alcance 6, ataca andando), físico, **Veneno**. Força 6, Inteligência 3, Vigor 9,
+  Agilidade 8, Vontade 4; por nível +1 Força e +1 Agilidade; golpe a cada 1,1 s. Arma: Agulhas de Bronze (nv 1) /
+  Agulhas de Jade Esmeralda (nv 5).
+  1. Agulha Venenosa · Venom Needle (nv 1): 90% + veneno de 60% em 6 s · cd 3 s · 8 mana
+  2. Chuva de Agulhas · Needle Rain (nv 3): 5 × 40% · cd 10 s · 16 mana
+  3. Névoa Tóxica · Toxic Mist (nv 5): veneno de 150% em 6 s e lentidão 20% num raio de 2,5 no alvo · cd 12 s · 16 mana
+  4. Seiva de Jade · Jade Sap (nv 7): cura 20% do HP máx. em 6 s · cd 20 s · 20 mana
+  5. Sangue de Serpente · Serpent Blood (nv 9, passiva): +15% de dano em alvos envenenados
+- **Mecânicas novas:** veneno (tiques de 1 s, calculado ao aplicar com o dano médio do golpe contra o alvo, sem
+  acerto/erro; número verde), atordoar (o monstro não anda nem ataca), cura ao longo do tempo e passivas de redução
+  de dano, HP máximo e bônus contra envenenado. Auto-combate usa a cura com a vida abaixo de 60% em combate.
+- Os mestres Gang e Du passam a dar 3 dicas, como os outros; as duas seitas saem do "Em breve" na criação.
 
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).

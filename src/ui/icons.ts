@@ -1,3 +1,4 @@
+import { STARTING_WEAPON } from '../core/items';
 import atlas from '../data/sprites/icones.json';
 import type { Slot } from '../core/types';
 
@@ -23,7 +24,7 @@ export function slotIconHtml(slot: Slot, sect?: string): string {
   const id: Record<Slot, string> = {
     colar: 'colar_jade',
     tronco: 'tunica_algodao',
-    arma: sect === 'pavilhao' ? 'leque_bambu' : 'espadas_ferro',
+    arma: (sect && STARTING_WEAPON[sect]) || 'espadas_ferro',
     cabeca: 'faixa_linho',
     calca: 'calca_algodao',
     bota: 'sandalia_palha',

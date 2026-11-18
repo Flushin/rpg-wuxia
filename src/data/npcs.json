@@ -27,14 +27,14 @@
       "title": "Mestre do Titã",
       "greeting": "Hm. A montanha também sabe esperar.",
       "intro": "No Titã, ficamos firmes na linha de frente, de cajado ou punhos, aguentando os golpes por todos. Somos a muralha que protege os companheiros. Nosso caminho é de resistência e força bruta.",
-      "locked": "Os portões do Titã ainda não se abriram a novos discípulos; volte quando a montanha estiver pronta."
+      "tips": ["Pele de Ferro antes de puxar um grupo de bandidos: o escudo aguenta o primeiro ataque de todos.", "Punho Vulcânico atordoa o alvo; use no arqueiro ou no chefe na hora em que ele for atacar.", "Tremor deixa os inimigos lentos. Quem escolhe este caminho deve favorecer Força e Vigor."]
     },
     "vibora": {
       "name": "Mestra Du",
       "title": "Mestra da Víbora",
       "greeting": "Quieta como a sombra, paciente como o veneno.",
-      "intro": "Na Víbora, atacamos de longe com agulhas envenenadas. O veneno corrói o inimigo aos poucos, e nossas artes ainda curam um pouco os aliados. Aqui vence quem tem paciência.",
-      "locked": "Os portões da Víbora ainda estão fechados a novos discípulos; volte em outra estação."
+      "intro": "Na Víbora, atacamos de longe com agulhas envenenadas. O veneno corrói o inimigo aos poucos, e nossas artes também curam aos poucos. Aqui vence quem tem paciência.",
+      "tips": ["Envenene primeiro: Sangue de Serpente faz suas agulhas baterem mais forte em quem já está envenenado.", "Névoa Tóxica envenena um grupo inteiro de uma vez e deixa todos lentos para você recuar.", "Seiva de Jade cura aos poucos; use antes de a vida ficar baixa. Favoreça Força e Agilidade."]
     }
   },
   "npcs": {
