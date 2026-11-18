@@ -345,22 +345,39 @@
   border-radius: 4px;
 }
 @media (min-width: 600px) {
+  /* Duas colunas com rolagem independente: personagem + bolsa à esquerda, detalhe do item (e o botão Equipar) à direita.
+     O cartão não rola; cada coluna tem a sua barra (no celular deitado não é preciso descer a janela toda até o botão). */
   .inv-card {
     width: min(720px, 100%);
-    display: grid;
-    grid-template-columns: 1fr 250px;
+    display: flex;
+    align-items: stretch;
     gap: 16px;
+    overflow: hidden;
+  }
+  .inv-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 4px 0 0;
+  }
+  .inv-main .win-x {
+    margin-top: 0; /* dentro da coluna que rola, a margem negativa cortava o título */
   }
   .inv-detail {
+    flex: 0 0 250px;
+    min-height: 0;
     margin: 0;
-    position: sticky;
-    top: 0;
-    bottom: auto;
-    align-self: start;
+    position: static;
     border-top: 0;
     border-left: 1px solid #445;
-    padding: 0 0 0 14px;
+    padding: 0 4px 0 14px;
     max-height: none;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 }
 /* melhoria do ferreiro (+N, marco 9) */

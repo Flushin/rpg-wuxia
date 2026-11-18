@@ -25,24 +25,212 @@
   padding: max(12px, var(--sa-top)) max(12px, var(--sa-right)) max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
   pointer-events: none !important;
 }
+/* Janela de NPC: topo fixo (nome, ouro, abas), corpo que rola e rodapé fixo. O cartão em si não rola. */
 #npc-panel .card {
   pointer-events: auto;
   width: min(380px, 100%);
   max-height: calc(100% - 24px);
   border-color: #d4a017;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px 14px;
 }
 @media (pointer: coarse) {
   #npc-panel .card {
     width: min(320px, 100%);
   }
 }
+.npc-top {
+  flex: none;
+}
+.npc-cols {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+.npc-side {
+  border-top: 1px solid #445;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+.npc-foot {
+  flex: none;
+  padding-top: 8px;
+  border-top: 1px solid #445;
+  margin-top: 4px;
+}
+.npc-foot button {
+  width: 100%;
+  min-height: 44px;
+}
+.npc-foot button.danger {
+  background: #8a2a2a;
+  border-color: #f66;
+}
 .npc-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 .npc-head h2 {
   margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+.npc-head .gold {
+  white-space: nowrap;
+}
+.npc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  align-items: center;
+}
+.npc-bar .tabs {
+  flex: 1 1 200px;
+}
+.npc-mats {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+.sfilters {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 6px;
+  flex: 1 1 100%;
+}
+.sfilters button {
+  flex: 1;
+  min-height: 36px;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+.sfilters button small {
+  opacity: 0.7;
+}
+.sfilters button.on {
+  background: #2a3146;
+  border-color: #aab;
+  color: #fff;
+}
+.sbtns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sbtns button {
+  min-height: 36px;
+}
+.cell.mini {
+  flex: none;
+  display: block;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+}
+.cell.mini .ic.sym {
+  font-size: 18px;
+}
+/* tela larga (celular deitado, PC): cartão maior; com duas partes, cada coluna rola sozinha */
+@media (min-width: 600px) {
+  #npc-panel .card.npc-wide {
+    width: min(760px, 100%);
+  }
+  .npc-wide .srows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 14px;
+  }
+  .npc-wide .npc-bar .tabs {
+    flex: 0 1 260px;
+  }
+  .npc-wide .npc-bar .sfilters,
+  .npc-wide .npc-bar .qty-pick {
+    flex: 1 1 300px;
+    margin: 4px 0;
+  }
+  .npc-split .npc-cols {
+    display: flex;
+    gap: 14px;
+    overflow: hidden;
+  }
+  .npc-split .npc-list,
+  .npc-split .npc-side {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
+  .npc-split .npc-side {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-left: 1px solid #445;
+    padding-left: 12px;
+  }
+  .npc-split .fpick {
+    max-height: none;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    margin-top: 0;
+  }
+}
+/* celular deitado: pouca altura, então tudo um pouco mais compacto */
+@media (orientation: landscape) and (max-height: 500px) {
+  #npc-panel .card {
+    padding: 8px 12px;
+    max-height: calc(100% - 8px);
+  }
+  #npc-panel .card h2 {
+    font-size: 16px;
+  }
+  .npc-head .x {
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+  #npc-panel .tabs {
+    margin: 4px 0;
+  }
+  #npc-panel .tabs button,
+  #npc-panel .qty-pick button {
+    min-height: 36px;
+  }
+  #npc-panel .srow {
+    padding: 4px 0;
+  }
+  #npc-panel .srow button {
+    min-height: 38px;
+  }
+  #npc-panel .npc-foot {
+    padding-top: 6px;
+  }
+  #npc-panel .npc-foot button {
+    min-height: 38px;
+  }
+  .sbtns {
+    flex-direction: row;
+  }
+  .sbtns button {
+    min-width: 52px;
+  }
+  .sfilters {
+    margin: 4px 0;
+  }
+  .sfilters button {
+    min-height: 34px;
+  }
+  .npc-mats {
+    margin: 2px 0;
+    font-size: 12px;
+  }
 }
 .npc-head .x {
   min-width: 44px;
@@ -83,7 +271,7 @@
   margin: 3px 0;
 }
 .tabs,
-.qty {
+.qty-pick {
   display: flex;
   gap: 6px;
   align-items: center;
@@ -93,12 +281,12 @@
   flex: 1;
   min-height: 44px;
 }
-.qty button {
+.qty-pick button {
   min-width: 44px;
   min-height: 44px;
 }
 .tabs button.on,
-.qty button.on {
+.qty-pick button.on {
   background: #8a3b2a;
   border-color: #c66;
 }
@@ -357,12 +545,26 @@
   overflow-y: auto;
 }
 .fchip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
   border: 1px solid #555;
   border-radius: 6px;
   background: #1b1d24;
   padding: 4px 8px;
   font-size: 12px;
   text-align: left;
+}
+.fchip small {
+  display: block;
+  color: #99a;
+  font-size: 10px;
+}
+.fchip .cell.mini {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
 }
 .fchip.on {
   background: #33384a;
@@ -378,4 +580,8 @@
 .srow .si small .mat i {
   font-style: normal;
   opacity: 0.7;
+}
+.ftip {
+  margin-top: 8px;
+  font-size: 13px;
 }
