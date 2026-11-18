@@ -218,7 +218,10 @@ console.log('== forja ==');
     if (it.plus === 9) {
       failed = true;
       ok(w.potionCount('minerio_ferro') === ore1 - c9.mats.minerio_ferro, 'falhou: materiais gastos');
-      ok(w.gold === gold1 - c9.gold && it.plus === 9 && w.equipment.arma === it, 'falhou: ouro cobrado, item igual (não quebra)');
+      ok(
+        w.gold === gold1 - c9.gold && it.plus === 9 && w.equipment.arma === it,
+        'falhou: ouro cobrado, item igual (não quebra)',
+      );
       void ore;
       void gold;
     }
