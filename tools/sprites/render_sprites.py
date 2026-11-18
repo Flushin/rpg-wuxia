@@ -5,6 +5,7 @@ Uso: veja tools/sprites/README.md (Blender como módulo Python: `pip install bpy
 
 Câmera: ortográfica, isométrica 2:1 (igual aos tiles 64x32 do jogo).
 Direções: 0=S (para baixo na tela), 1=SE, 2=E, 3=NE, 4=N, 5=NW, 6=W, 7=SW.
+Só o retrato (portrait_png): PORTRAIT_ONLY=1 SPRITE_CFG=... python tools/sprites/render_sprites.py
 Saída: <out>/<nome>.png + <nome>.json (atlas do Phaser) e <out_json>/<nome>.json (animações, âncora).
 """
 import json, math, os, sys, tempfile
@@ -336,7 +337,38 @@ def render(cfg):
                 files.append(fp)
             rows.append(files)
         print('ok', anim_name, flush=True)
+    if cfg.get('portrait_png'):
+        render_portrait(cfg, sc, arm, root)
     return rows, meta_anims, rs
+
+
+def render_portrait(cfg, sc, arm, root):
+    """Retrato para a interface (mochila, criação, diálogo): mesmo enquadramento do 1º quadro parado de frente,
+    mas renderizado em alta resolução. O quadro do sprite (~70x100 px) ficava borrado esticado na tela."""
+    from PIL import Image
+    ps = cfg.get('portrait_scale', 10)  # px do retrato por px do jogo (zoom 100%): ~500 px de altura
+    w, h = cfg['frame']
+    act = bpy.data.actions[cfg['anims'][cfg['portrait']]['action']]
+    arm.animation_data.action = act
+    if hasattr(arm.animation_data, 'action_slot') and act.slots:
+        arm.animation_data.action_slot = act.slots[0]
+    root.rotation_euler = (0, 0, facing_rot(0))
+    sc.frame_set(int(act.frame_range[0]))
+    # a câmera é ortográfica e ortho_scale/shift são proporcionais: só a resolução muda
+    sc.render.resolution_x, sc.render.resolution_y = w * ps, h * ps
+    if sc.render.engine == 'CYCLES':
+        sc.cycles.samples = max(cfg.get('samples', 32), 64)
+    fp = os.path.join(tempfile.mkdtemp(), 'retrato.png')
+    sc.render.filepath = fp
+    bpy.ops.render.render(write_still=True)
+    im = Image.open(fp).convert('RGBA')
+    bb = im.getchannel('A').point(lambda v: 255 if v > 4 else 0).getbbox()
+    pad = ps * 2  # respiro para a sombra (drop-shadow) do CSS não cortar
+    im = im.crop((max(0, bb[0] - pad), max(0, bb[1] - pad), min(im.width, bb[2] + pad), min(im.height, bb[3] + pad)))
+    os.makedirs(cfg['out'], exist_ok=True)
+    out = os.path.join(cfg['out'], cfg['name'] + '_retrato.png')
+    im.save(out, optimize=True)
+    print('retrato', im.size, '->', out, flush=True)
 
 
 def assemble(cfg, rows, meta_anims, rs):
@@ -378,10 +410,6 @@ def assemble(cfg, rows, meta_anims, rs):
     os.makedirs(jdir, exist_ok=True)
     with open(os.path.join(jdir, name + '.json'), 'w') as f:
         json.dump(meta, f, indent=1)
-    if cfg.get('portrait_png'):
-        # um quadro parado, de frente, para a interface (mochila)
-        im = next(p for n, p, b in pieces if n == cfg['portrait'] + '_0_0')
-        im.save(os.path.join(cfg['out'], name + '_retrato.png'), optimize=True)
     print('folha', sheet.size, '->', os.path.join(cfg['out'], name + '.png'))
 
 
@@ -434,5 +462,11 @@ def add_outline(im, rgba):
 
 if __name__ == '__main__':
     c = load_cfg()
+    if os.environ.get('PORTRAIT_ONLY'):  # só o retrato da interface, sem refazer a folha do jogo
+        _, a, ro = setup_scene(c)
+        if a.animation_data is None:
+            a.animation_data_create()
+        render_portrait(c, bpy.context.scene, a, ro)
+        sys.exit(0)
     r, m, s = render(c)
     assemble(c, r, m, s)

@@ -59,17 +59,28 @@ export class AttrsPanel {
       d = p.derived;
     const cls = CLASSES[w.classId];
     const parts = attrBreakdown(p.attrs, cls.baseAttributes, w.gearStats());
+    const free = w.freePoints;
     const rows = ATTR_KEYS.map((k) => {
       const rec = cls.recommended?.find((r) => r.attr === k),
         opt = cls.optional?.find((r) => r.attr === k);
-      const badge = rec
-        ? `<span class="badge rec">${L('Recomendado', 'Recommended')}</span>`
+      const kind = rec ? 'rec' : opt ? 'opt' : '';
+      const tag = rec
+        ? `<span class="at-tag rec">★ ${L('Recomendado', 'Recommended')}</span>`
         : opt
-          ? `<span class="badge opt">${L('Opcional', 'Optional')}</span>`
+          ? `<span class="at-tag opt">${L('Opcional', 'Optional')}</span>`
           : '';
       const why = rec ?? opt;
-      return `<tr class="${rec ? 'rec' : opt ? 'opt' : ''}"><td><b>${ATTR_LABELS[k]}</b> ${badge}<small>${ATTR_HINTS[k]}</small>${why ? `<small class="why">${why.reason}</small>` : ''}</td><td class="num">${parts[k].total}<small class="parts">${parts[k].base} ${L('base', 'base')} + ${parts[k].levels} ${L('níveis', 'levels')} + ${parts[k].equip} ${L('equip.', 'equip.')}</small></td>
-      <td class="plus">${w.freePoints > 0 ? `<button data-attr="${k}">+</button>` : ''}</td></tr>`;
+      const pt = parts[k];
+      // origem do valor: só mostra o que soma (níveis/equipamento zerados somem)
+      const src = [`${pt.base} ${L('base', 'base')}`];
+      if (pt.levels) src.push(`+${pt.levels} ${L('nív.', 'lvl')}`);
+      if (pt.equip) src.push(`${pt.equip > 0 ? '+' : ''}${pt.equip} ${L('equip.', 'gear')}`);
+      return `<div class="at-row ${kind}">
+        <div class="at-info"><div class="at-name">${ATTR_LABELS[k]}${tag}</div>
+          <div class="at-hint">${ATTR_HINTS[k]}${why ? ` <span class="at-why">· ${escapeHtml(why.reason)}</span>` : ''}</div></div>
+        <div class="at-val"><b>${pt.total}</b>${src.length > 1 ? `<span>${src.join(' ')}</span>` : ''}</div>
+        ${free > 0 ? `<button class="at-plus" data-attr="${k}" aria-label="+1 ${ATTR_LABELS[k]}">+</button>` : ''}
+      </div>`;
     }).join('');
     const der: [string, string][] = [
       [L('Vida máxima', 'Max health'), String(d.maxHp)],
@@ -85,15 +96,17 @@ export class AttrsPanel {
     ];
     const els = ELEMENTS.map(
       (e) =>
-        `<tr><td>${ELEMENT_LABELS[e]}</td><td class="num">${p.elemAtk[e]}</td><td class="num">${p.elemRes[e]}</td></tr>`,
+        `<div class="at-el el-${e}"><span>${ELEMENT_LABELS[e]}</span><b class="${p.elemAtk[e] ? '' : 'zero'}">${p.elemAtk[e]}</b><b class="${p.elemRes[e] ? '' : 'zero'}">${p.elemRes[e]}</b></div>`,
     ).join('');
-    byId('attrs-panel').innerHTML =
-      `<div class="card">${closeX('data-close="1"')}<h2>${escapeHtml(p.name)} - ${L(`Nível ${p.level}`, `Level ${p.level}`)}</h2>
-      <div class="pts">${L('Pontos livres', 'Free points')}: <b>${w.freePoints}</b></div>
-      <table>${rows}</table>
-      <button class="primary" data-dist="1" ${w.freePoints > 0 ? '' : 'disabled'}>${L('Distribuir recomendado', 'Distribute recommended')}</button>
-      <h3>${L('Derivados', 'Derived stats')}</h3><table class="two">${der.map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}</table>
-      <h3>${L('Elementos', 'Elements')}</h3><table><tr><th></th><th>${L('Ataque', 'Attack')}</th><th>${L('Resist.', 'Resist.')}</th></tr>${els}</table>
-      <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`;
+    byId('attrs-panel').innerHTML = `<div class="card at-card" style="--c:${cls.color}">${closeX('data-close="1"')}
+      <h2>${escapeHtml(p.name)}</h2>
+      <div class="at-sub">${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
+      <div class="at-pts ${free > 0 ? 'has' : ''}"><span>${L('Pontos livres', 'Free points')}</span><b>${free}</b>
+        ${free > 0 ? `<button class="at-dist" data-dist="1">${L('Distribuir recomendado', 'Distribute recommended')}</button>` : ''}</div>
+      <div class="at-list">${rows}</div>
+      <h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
+      <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
+      <h3 class="at-h">${L('Elementos', 'Elements')}</h3>
+      <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div>`;
   }
 }
