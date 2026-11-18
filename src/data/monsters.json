@@ -381,36 +381,35 @@
     "maxLevel": 17,
     "baseAttributes": {
       "strength": 0,
-      "intelligence": 7,
-      "stamina": 3,
+      "intelligence": 3.5,
+      "stamina": 6,
       "agility": 6,
       "willpower": 8
     },
     "perLevel": {
       "strength": 0,
-      "intelligence": 0.8,
-      "stamina": 2.5,
+      "intelligence": 0.55,
+      "stamina": 4.5,
       "agility": 0.6,
       "willpower": 1
     },
     "damageType": "spiritual",
-    "aggroRange": 6,
+    "aggroRange": 4,
     "leashRange": 15,
     "attackRange": 5.5,
-    "attackInterval": 2.1,
+    "attackInterval": 2.4,
     "moveSpeed": 3.2,
-    "keepDistance": 3,
     "projectile": "ice",
     "onHit": {
-      "slow": 0.3,
-      "duration": 2.5
+      "slow": 0.25,
+      "duration": 2
     },
     "defMul": {
-      "phys": 1.3,
-      "spirit": 1.0
+      "phys": 0.55,
+      "spirit": 2.6
     },
-    "xpBase": 150,
-    "xpPerLevel": 30,
+    "xpBase": 80,
+    "xpPerLevel": 18,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -471,16 +470,16 @@
     "maxLevel": 18,
     "scale": 1.4,
     "baseAttributes": {
-      "strength": 8,
+      "strength": 6,
       "intelligence": 0,
-      "stamina": 6,
+      "stamina": 10,
       "agility": 3,
       "willpower": 4
     },
     "perLevel": {
-      "strength": 1.2,
+      "strength": 1.1,
       "intelligence": 0,
-      "stamina": 3.2,
+      "stamina": 5.5,
       "agility": 0.5,
       "willpower": 0.6
     },
@@ -497,11 +496,11 @@
       "interval": 9
     },
     "defMul": {
-      "phys": 1.3,
-      "spirit": 0.9
+      "phys": 0.5,
+      "spirit": 2.0
     },
-    "xpBase": 200,
-    "xpPerLevel": 40,
+    "xpBase": 110,
+    "xpPerLevel": 22,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -604,9 +603,9 @@
     "maxLevel": 20,
     "scale": 1.5,
     "baseAttributes": {
-      "strength": 14,
+      "strength": 25,
       "intelligence": 0,
-      "stamina": 560,
+      "stamina": 1100,
       "agility": 16,
       "willpower": 120
     },

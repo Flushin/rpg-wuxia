@@ -9,7 +9,7 @@ import { World } from '../src/core/world';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -19,6 +19,8 @@ const SEEDS = arg('seeds', 3),
   MAX_MIN = arg('max', 120),
   RUINS_LEVEL = arg('ruinas', 7);
 const DT = 1 / 30;
+const fmt = (n: number, d = 1) => (Number.isFinite(n) ? n.toFixed(d) : '-');
+const mean = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
 const DEBUG_DEATHS = process.argv.includes('--deaths');
 const QUESTS_ON = !process.argv.includes('--sem-missoes'); // marco 7: cadeia de missões (aceita/entrega na hora)
 const priv = (w: World) => w as unknown as { rng: Rng; recalc: (e: unknown, k: boolean) => void };
@@ -220,6 +222,11 @@ function bossFight(classId: string, seed: number, rarity: Rarity, trace = false)
   priv(w).recalc(w.player, false);
   w.player.hp = w.player.derived.maxHp;
   w.player.mana = w.player.derived.maxMana;
+  return fightBoss(w, classId, rarity, trace);
+}
+
+function fightBoss(w: World, classId: string, rarity: Rarity, trace: boolean): BossRun {
+  const c = CLASSES[classId];
   w.addItem(makePotion('pocao_hp_g', 8));
   w.addItem(makePotion('pocao_hp_p', 10));
   w.addItem(makePotion('pocao_mp_g', 4));
@@ -324,14 +331,153 @@ function bossFight(classId: string, seed: number, rarity: Rarity, trace = false)
   };
 }
 
+// ---------- marco 9: do nível 10 ao 20 na Montanha Nevada ----------
+// Personagem pronto no nível 10 (pontos pelo recomendado, skills no nível 5, equipamento nv 5 Incomum, missões
+// do marco 9 liberadas), Auto ligado na vila. O jogador médio do policy() veste o que cair, conserta e vende.
+function highWorld(classId: string, level: number, seed: number, gearLevel: number, rarity: Rarity): World {
+  const c = CLASSES[classId],
+    attrs = { ...c.baseAttributes };
+  for (const k of Object.keys(attrs) as (keyof typeof attrs)[]) attrs[k] += c.levelUpAttributes[k] * (level - 1);
+  const s: SaveData = {
+    version: 1,
+    name: 'Sim',
+    classId,
+    level,
+    xp: 0,
+    freePoints: 3 * (level - 1),
+    attributes: attrs,
+    mapId: 'cidade',
+    lastSeen: 0,
+    gold: 500,
+    quest: { stage: 8, status: 'pending', progress: 0 },
+  };
+  const w = World.fromSave(maps, s, SIM_EPOCH_MS, false);
+  priv(w).rng = new Rng(seed * 7919 + 101);
+  useSimClock(w);
+  w.distributeRecommended();
+  for (const st of Object.values(w.skills)) st.level = Math.max(st.level, level >= 20 ? 10 : 5);
+  for (const sl of SLOTS) {
+    const id = equipmentBaseIds(sl).find(
+      (b) => BASES[b].reqLevel === gearLevel && (!BASES[b].sect || BASES[b].sect === classId),
+    )!;
+    w.equipment[sl] = makeEquipment(id, rarity, c.element, priv(w).rng, gearLevel);
+  }
+  priv(w).recalc(w.player, false);
+  w.player.hp = w.player.derived.maxHp;
+  w.player.mana = w.player.derived.maxMana;
+  w.addItem(makePotion('pocao_hp_g', 10));
+  w.addItem(makePotion('pocao_mp_g', 6));
+  return w;
+}
+
+function highRun(classId: string, seed: number): Run {
+  const w = highWorld(classId, 10, seed, 5, 'incomum');
+  const run: Run = {
+    classId,
+    levelAt: Array(20).fill(NaN),
+    deaths: 0,
+    goldEarned: 0,
+    goldSpent: { potions: 0, repair: 0 },
+    kills: 0,
+    minutes: 0,
+    levelDeaths: Array(21).fill(0),
+    ruinsAt: 0,
+    levelKills: Array(21).fill(0),
+    levelXp: Array(21).fill(0),
+    levelGold: Array(21).fill(0),
+    quests: 0,
+  };
+  run.levelAt[9] = 0;
+  w.auto.toggle();
+  let nextPolicy = 0;
+  for (let i = 0; i < (MAX_MIN * 60) / DT; i++) {
+    w.tick(DT);
+    for (const ev of w.events.splice(0)) {
+      if (ev.type === 'levelup') run.levelAt[ev.level - 1] = w.time / 60;
+      else if (ev.type === 'playerDeath') {
+        run.deaths++;
+        run.levelDeaths[w.player.level]++;
+        if (DEBUG_DEATHS)
+          console.log(
+            `morte ${classId} nv${w.player.level} t=${(w.time / 60).toFixed(1)}m perto: ${w.monsters
+              .filter((m) => !m.dead && Math.hypot(m.x - w.player.x, m.y - w.player.y) < 8)
+              .map((m) => m.monsterId + m.level + m.ai[0])
+              .join(',')}`,
+          );
+      } else if (ev.type === 'goldPickup') {
+        run.goldEarned += ev.amount;
+        run.levelGold[w.player.level] += ev.amount;
+      } else if (ev.type === 'xp') run.levelXp[w.player.level] += ev.amount;
+      else if (ev.type === 'trade') {
+        if (ev.kind === 'buy') run.goldSpent.potions += ev.gold;
+        else run.goldEarned += ev.gold;
+      } else if (ev.type === 'repair') run.goldSpent.repair += ev.gold;
+      else if (ev.type === 'kill') {
+        run.kills++;
+        run.levelKills[w.player.level]++;
+      }
+    }
+    if (w.time < nextPolicy) continue;
+    nextPolicy = w.time + 1;
+    if (process.argv.includes('--status') && Math.round(w.time) % 30 === 0)
+      console.log(
+        `${classId} ${(w.time / 60).toFixed(1)}m nv${w.player.level} ${w.mapId} [${w.auto.status}] hp ${Math.round(w.player.hp)}/${w.player.derived.maxHp} pos ${w.player.x.toFixed(1)},${w.player.y.toFixed(1)} alvo ${w.getTarget()?.monsterId ?? '-'}${w.getTarget()?.level ?? ''} pots ${w.kindCount('hp')} ouro ${w.gold}`,
+      );
+    policy(w, run);
+    if (w.player.level >= 20) break;
+  }
+  run.minutes = w.time / 60;
+  return run;
+}
+
+function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
+  const w = highWorld(classId, 20, seed, 15, rarity);
+  w.changeMap('montanha');
+  return fightBoss(w, classId, rarity, false);
+}
+
+if (process.argv.includes('--m9')) {
+  const N = SEEDS;
+  console.log(
+    '| Seita | ' + [11, 12, 13, 14, 15, 16, 17, 18, 19, 20].join(' | ') + ' | Mortes | Ouro ganho | Conserto |',
+  );
+  console.log('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+  for (const classId of Object.keys(CLASSES)) {
+    const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1));
+    const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
+    console.log(
+      `| ${CLASSES[classId].name} | ${[11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(lv).join(' | ')} | ${fmt(mean(rs.map((r) => r.deaths)))} | ${fmt(mean(rs.map((r) => r.goldEarned)), 0)} | ${fmt(mean(rs.map((r) => r.goldSpent.repair)), 0)} |`,
+    );
+    if (process.argv.includes('--detail'))
+      for (let L = 10; L < 20; L++) {
+        const k = mean(rs.map((r) => r.levelKills[L])),
+          x = mean(rs.map((r) => r.levelXp[L]));
+        console.log(
+          `   nv ${L}: abates ${fmt(k, 0)}, XP/abate ${fmt(x / k, 0)}, mortes ${fmt(mean(rs.map((r) => r.levelDeaths[L])))}`,
+        );
+      }
+  }
+  console.log('\nTempo (min) a partir do nível 10 para chegar a cada nível; média de ' + N + ' execuções.');
+  console.log('\n| Seita | Equipamento nv 15 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
+  console.log('|---|---|---|---|---|---|');
+  for (const classId of Object.keys(CLASSES))
+    for (const tier of ['incomum', 'raro'] as Rarity[]) {
+      const bs = Array.from({ length: Math.max(5, N * 2) }, (_, i) => abbotFight(classId, i + 1, tier));
+      const wins = bs.filter((b) => b.win),
+        lost = bs.filter((b) => !b.win);
+      console.log(
+        `| ${CLASSES[classId].name} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
+      );
+    }
+  process.exit(0);
+}
+
 if (process.argv.includes('--trace')) {
   const c = process.argv.find((x) => x.startsWith('--class='))?.split('=')[1] ?? 'lamina';
   console.log(bossFight(c, 1, 'incomum', true));
   process.exit(0);
 }
 // ---------- relatório ----------
-const fmt = (n: number, d = 1) => (Number.isFinite(n) ? n.toFixed(d) : '-');
-const mean = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
 const lines: string[] = [];
 const out = (s = '') => {
   lines.push(s);

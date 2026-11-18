@@ -538,6 +538,8 @@ function montanha() {
   gr.rect(5, 15, 5, 2, SN); // ligação da clareira oeste com a trilha
   gr.disc(16, 20.5, 2.6, SN);
   gr.disc(26, 15, 2.6, SN);
+  gr.disc(4, 13.5, 2.4, SN); // encosta alta: cantos noroeste e nordeste (monstros nv 15–18)
+  gr.disc(27, 13.5, 2.4, SN);
   gr.disc(6, 21, 2.2, WA); // lago (congelado na arte da fase 4), na beira da clareira oeste
   gr.disc(6, 21, 0.9, WA);
   // templo: muro de pilares do y 1 ao 11 com portão no sul; pátio de lajes (ruin) com 6 braseiros em volta
@@ -555,7 +557,7 @@ function montanha() {
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 4.5 }),
   ];
-  // monstros (fase 3): encosta baixa nv 11–14, encosta alta nv 15–18 (faixa por ponto: minLevel/maxLevel)
+  // monstros (fase 3): encosta baixa nv 11–14 (sul), encosta alta nv 15–18 (norte) (faixa por ponto: minLevel/maxLevel)
   const used = [];
   const free = (cx, cy, r) => {
     const out = [];
@@ -567,9 +569,9 @@ function montanha() {
   };
   const place = (name, monster, cx, cy, r, minLevel, maxLevel) => {
     const c = free(cx, cy, r);
-    for (let tries = 0; tries < 60 && c.length; tries++) {
+    for (let tries = 0; tries < 200 && c.length; tries++) {
       const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
-      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2)) continue;
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2.3)) continue;
       used.push([i, j]);
       objs.push(point(name, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel }));
       return;
@@ -578,18 +580,17 @@ function montanha() {
   };
   const spectre = (cx, cy, r, a, b) => place('Espectro de Gelo', 'espectro_gelo', cx, cy, r, a, b);
   const yeti = (cx, cy, r, a, b) => place('Yeti', 'yeti', cx, cy, r, a, b);
-  // encosta baixa: clareira leste, margem do lago (oeste) e o meio da trilha
-  for (let n = 0; n < 3; n++) spectre(23, 23, 3.2, 11, 13);
-  yeti(23, 23, 3.2, 12, 14);
-  for (let n = 0; n < 2; n++) spectre(6, 21, 3.6, 11, 13);
-  yeti(6, 21, 3.6, 12, 14);
-  for (let n = 0; n < 2; n++) spectre(16, 20.5, 2.6, 12, 14);
-  // encosta alta: clareira oeste de cima, clareira leste de cima e a curva da trilha
-  for (let n = 0; n < 2; n++) spectre(5, 15, 2.8, 15, 17);
-  yeti(5, 15, 2.8, 16, 18);
-  for (let n = 0; n < 2; n++) spectre(26, 15, 2.8, 15, 17);
-  yeti(26, 15, 2.8, 16, 18);
-  yeti(14, 16.5, 2, 15, 17);
+  // encosta baixa (y 20–26): clareira leste, margem do lago (oeste) e o meio, abaixo da trilha
+  for (let n = 0; n < 2; n++) spectre(22.5, 23, 3, 11, 13);
+  yeti(22.5, 23, 3, 12, 14);
+  for (let n = 0; n < 2; n++) spectre(6, 22, 3.4, 11, 13);
+  yeti(6, 22, 3.4, 12, 14);
+  for (let n = 0; n < 2; n++) spectre(16, 21.5, 2.4, 12, 14);
+  // encosta alta (y 12–15): cantos noroeste e nordeste, longe da trilha (que passa no y 16–17)
+  for (let n = 0; n < 2; n++) spectre(4, 13.5, 2.8, 15, 17);
+  yeti(4, 13.5, 2.8, 16, 18);
+  for (let n = 0; n < 2; n++) spectre(27, 13.5, 2.8, 15, 17);
+  yeti(27, 13.5, 2.8, 16, 18);
   objs.push(point('Abade Caído', 'monsterSpawn', MONTANHA_ARENA.x, MONTANHA_ARENA.y, { monster: 'abade_caido' }));
   console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável, ${used.length} monstros + Abade`);
   return tiled('Montanha Nevada', gr, objs);

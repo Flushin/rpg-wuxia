@@ -1,0 +1,119 @@
+{
+ "name": "montanha",
+ "dir": ".cache/kenney-nature",
+ "out": "../../public/sprites",
+ "samples": 6,
+ "props": {
+  "pinheiro": {
+   "file": "tree_pineRoundA.glb",
+   "scale": 2.1,
+   "recolor": {
+    "leafsGreen": [
+     58,
+     98,
+     88
+    ],
+    "leafsDark": [
+     40,
+     74,
+     70
+    ],
+    "woodBark": [
+     96,
+     74,
+     60
+    ],
+    "woodBarkDark": [
+     72,
+     56,
+     46
+    ]
+   }
+  },
+  "pinheiro_gelo": {
+   "file": "tree_pineRoundA.glb",
+   "scale": 2.0,
+   "recolor": {
+    "leafsGreen": [
+     150,
+     186,
+     192
+    ],
+    "leafsDark": [
+     104,
+     146,
+     156
+    ],
+    "woodBark": [
+     96,
+     74,
+     60
+    ],
+    "woodBarkDark": [
+     72,
+     56,
+     46
+    ]
+   }
+  },
+  "pinheiro_neve": {
+   "file": "tree_pineRoundA.glb",
+   "scale": 1.8,
+   "recolor": {
+    "leafsGreen": [
+     214,
+     228,
+     236
+    ],
+    "leafsDark": [
+     120,
+     160,
+     166
+    ],
+    "woodBark": [
+     96,
+     74,
+     60
+    ],
+    "woodBarkDark": [
+     72,
+     56,
+     46
+    ]
+   }
+  },
+  "rocha_neve": {
+   "file": "rock_largeA.glb",
+   "scale": 1.2,
+   "recolor": {
+    "dirt": [
+     188,
+     198,
+     210
+    ],
+    "dirtDark": [
+     150,
+     160,
+     174
+    ]
+   }
+  },
+  "pedra_neve": {
+   "file": "rock_smallA.glb",
+   "recolor": {
+    "dirt": [
+     196,
+     206,
+     218
+    ],
+    "dirtDark": [
+     160,
+     170,
+     184
+    ]
+   }
+  }
+ },
+ "recolor": {},
+ "out_json": "../../public/sprites"
+}

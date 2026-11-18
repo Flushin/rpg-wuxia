@@ -645,6 +645,129 @@ def s_sangue_serpente(im):
     drop(im, 60, 230, 18, (255, 90, 90), (150, 20, 30))
 
 
+# ---------- marco 9: equipamentos nv 10 e 15, materiais e pergaminho ----------
+def colar_gema(im, chain, gem_in, gem_out, glow_c):
+    fill(im, mask_line([(110, 100), (170, 260), (256, 300), (342, 260), (402, 100)], 14), chain, outline=6)
+    m = mask_poly([(256, 290), (330, 380), (256, 470), (182, 380)])
+    part = new(); fill(part, m, gem_in, gem_out)
+    im.alpha_composite(glow(part, m, glow_c, 24, 1.2))
+
+
+def i_colar_cristal(im):
+    colar_gema(im, (190, 200, 214), (230, 248, 255), (90, 170, 230), (160, 220, 255))
+
+
+def i_colar_lotus(im):
+    fill(im, mask_line([(110, 100), (170, 260), (256, 300), (342, 260), (402, 100)], 14), (230, 190, 80), outline=6)
+    layer = new()
+    for ang in (-0.9, -0.45, 0, 0.45, 0.9):
+        fill(layer, mask_poly(rot_pts([(256, 280), (290, 360), (256, 440), (222, 360)], ang, 256, 430)), (255, 200, 230), (200, 80, 150))
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (255, 170, 220), 22, 1.1))
+
+
+def i_manto_yeti(im):
+    robe(im, (230, 234, 240), (170, 186, 204), (110, 120, 140))
+
+
+def i_armadura_templo(im):
+    robe(im, (120, 40, 70), (220, 176, 70), (60, 24, 40))
+
+
+def i_espadas_trovao_nevado(im):
+    for a in (-0.55, 0.55):
+        jian(im, a, blade=(220, 236, 250), guard=(150, 170, 200), glow_c=(200, 180, 255), tassel=(150, 120, 230))
+
+
+def i_espadas_ceu_partido(im):
+    for a in (-0.55, 0.55):
+        jian(im, a, blade=(255, 246, 210), guard=(230, 180, 70), glow_c=(255, 220, 120), tassel=(220, 60, 60))
+
+
+def i_leque_lua_fria(im):
+    fan(im, (220, 232, 248), (70, 90, 130), accent=(150, 190, 240), cloud=(230, 240, 255))
+
+
+def i_leque_fenix(im):
+    fan(im, (250, 236, 210), (150, 40, 40), accent=(240, 120, 60), cloud=(120, 220, 170))
+
+
+def i_bastao_granito(im):
+    staff(im, (120, 124, 132), (200, 210, 224), band=(90, 96, 110))
+
+
+def i_bastao_vulcao(im):
+    staff(im, (50, 30, 30), (230, 120, 40), glow_c=(255, 140, 50), band=(30, 18, 16))
+
+
+def i_agulhas_prata(im):
+    needles(im, (210, 216, 230), (70, 60, 90), glow_c=(150, 140, 200))
+
+
+def i_agulhas_escorpiao(im):
+    needles(im, (250, 220, 120), (150, 40, 60), glow_c=(255, 200, 90))
+
+
+def i_capuz_la(im):
+    fill(im, mask_ellipse((120, 110, 392, 400)), (200, 190, 176), (130, 120, 108))
+    fill(im, mask_ellipse((176, 200, 336, 370)), (60, 50, 44), outline=0, shade=False)
+    fill(im, mask_poly([(120, 330), (392, 330), (420, 440), (92, 440)]), (190, 178, 160), (120, 110, 96))
+
+
+def i_elmo_guardiao(im):
+    fill(im, mask_ellipse((130, 120, 382, 380)), (210, 170, 80), (120, 84, 36))
+    fill(im, mask_poly([(120, 280), (392, 280), (372, 420), (140, 420)]), (190, 150, 70), (110, 76, 34))
+    fill(im, mask_poly([(240, 70), (272, 70), (266, 170), (246, 170)]), (200, 50, 50), outline=6)
+    fill(im, mask_poly([(196, 300), (316, 300), (300, 330), (212, 330)]), (40, 30, 30), outline=0, shade=False)
+
+
+def i_calca_la(im):
+    pants(im, (150, 160, 176), strap=(90, 96, 110), belt=(70, 70, 80))
+
+
+def i_calca_escamas(im):
+    pants(im, (190, 140, 70), strap=(120, 80, 40), belt=(80, 50, 30))
+
+
+def i_botas_pico(im):
+    boot(im, (226, 228, 232), (90, 80, 70), trim=(170, 180, 196))
+
+
+def i_botas_passo_celeste(im):
+    boot(im, (90, 60, 140), (40, 30, 50), trim=(240, 200, 90))
+
+
+def i_minerio(im):
+    m = mask_poly([(120, 300), (190, 170), (310, 150), (400, 250), (370, 380), (220, 410)])
+    fill(im, m, (150, 140, 130), (80, 72, 66))
+    for x, y in ((210, 240), (300, 220), (260, 320), (330, 300)):
+        fill(im, mask_ellipse((x - 22, y - 16, x + 22, y + 16)), (230, 200, 160), (170, 120, 80), outline=4)
+
+
+def i_cristal(im):
+    layer = new()
+    for pts in ([(256, 80), (320, 220), (256, 440), (192, 220)], [(170, 200), (210, 290), (170, 420), (130, 290)], [(342, 190), (382, 280), (342, 420), (302, 280)]):
+        fill(layer, mask_poly(pts), (240, 252, 255), (80, 170, 230))
+    im.alpha_composite(glow(layer, layer.getchannel('A'), (150, 220, 255), 26, 1.3))
+
+
+def i_essencia(im):
+    m = mask_ellipse((150, 150, 362, 362))
+    part = new(); fill(part, m, (250, 220, 255), (150, 60, 200))
+    im.alpha_composite(glow(part, m, (210, 140, 255), 40, 1.6))
+    fill(im, mask_ellipse((220, 200, 260, 240)), (255, 255, 255), outline=0, shade=False)
+
+
+def i_pergaminho(im):
+    fill(im, mask_poly([(130, 150), (382, 150), (382, 380), (130, 380)]), (246, 230, 180), (200, 170, 110))
+    for y in (150, 380):
+        fill(im, mask_ellipse((100, y - 30, 160, y + 30)), (150, 90, 50), outline=6)
+        fill(im, mask_ellipse((352, y - 30, 412, y + 30)), (150, 90, 50), outline=6)
+    d = ImageDraw.Draw(im)
+    for y in (210, 250, 290, 330):
+        d.line([(180, y), (332, y)], fill=(120, 80, 50, 255), width=8)
+    fill(im, mask_ellipse((300, 300, 360, 360)), (200, 40, 40), outline=5)
+
+
 ITEMS = {
     'colar_jade': i_colar_jade, 'colar_dragao': i_colar_dragao,
     'tunica_algodao': i_tunica, 'manto_seda': i_manto,
@@ -657,6 +780,17 @@ ITEMS = {
     'agulhas_bronze': i_agulhas_bronze, 'agulhas_jade': i_agulhas_jade,
     'pocao_hp_p': lambda im: potion(im, (220, 40, 40)), 'pocao_hp_g': lambda im: potion(im, (255, 30, 30), True),
     'pocao_mp_p': lambda im: potion(im, (50, 120, 230)), 'pocao_mp_g': lambda im: potion(im, (40, 90, 255), True),
+    'colar_cristal': i_colar_cristal, 'colar_lotus': i_colar_lotus,
+    'manto_yeti': i_manto_yeti, 'armadura_templo': i_armadura_templo,
+    'espadas_trovao_nevado': i_espadas_trovao_nevado, 'espadas_ceu_partido': i_espadas_ceu_partido,
+    'leque_lua_fria': i_leque_lua_fria, 'leque_fenix': i_leque_fenix,
+    'bastao_granito': i_bastao_granito, 'bastao_vulcao': i_bastao_vulcao,
+    'agulhas_prata': i_agulhas_prata, 'agulhas_escorpiao': i_agulhas_escorpiao,
+    'capuz_la': i_capuz_la, 'elmo_guardiao': i_elmo_guardiao,
+    'calca_la': i_calca_la, 'calca_escamas': i_calca_escamas,
+    'botas_pico': i_botas_pico, 'botas_passo_celeste': i_botas_passo_celeste,
+    'minerio_ferro': i_minerio, 'cristal_gelo': i_cristal, 'essencia_qi': i_essencia,
+    'pergaminho_retorno': i_pergaminho,
 }
 SKILLS = {
     'corte_duplo': (s_corte_duplo, THUNDER_BG), 'passo_fantasma': (s_passo, THUNDER_BG),

@@ -45,7 +45,7 @@
   - Polimento: tela de carregamento, instalar como app no celular (PWA) e versão na tela inicial — **feitos**.
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
 - **Marco 8: Titã e Víbora (em andamento, 18/11/2026).** Skills aprovadas pelo Lucas em 18/11/2026 — ver "Titã e Víbora (marco 8)" abaixo. Sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas.
-- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo.
+- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo. **Fases 3 a 9 feitas em 18/11/2026 (concluído, em teste).**
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
 - **Publicação na Play Store: depois de todos os marcos** (decidido pelo Lucas em 18/11/2026: primeiro a jogabilidade). O que falta está em "Pendências das auditorias (18/11/2026)".
 - **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
@@ -134,6 +134,63 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
   floresta = 1, montanha = 10 —, **desde que o mapa tenha monstros**. Até a fase 3 continua indo para a floresta.
   Ligado fora da vila, continua caçando onde foi ligado (como antes). O Auto não usa portais trancados.
 - Testes em `check:auto` (portal trancado/aberto, chegada andável, templo alcançável, escolha do mapa pelo Auto).
+
+**Fases 3 a 9 feitas (18/11/2026): monstros, arte, equipamentos, forja, mercador, missões e balanceamento.**
+Números calibrados com o simulador (`npm run sim:balance -- --m9 --seeds=3`). Pontos marcados com ⚠ foram escolhidos por
+mim (Claude) dentro das decisões da fase 0 e **precisam da confirmação do Lucas**.
+- **Monstros (fase 3):**
+  - **Espectro de Gelo** (`espectro_gelo`): à distância (alcance 5,5), dano **espiritual**, golpe a cada 2,4 s que deixa o
+    alvo **25% mais lento por 2 s**; não recua (⚠ recuar como o arqueiro tornava a caça impossível para Tormenta e Titã).
+    Defesa física baixa (×0,55) e espiritual alta (×2,6): fraco contra físico.
+  - **Yeti** (`yeti`): corpo a corpo, grande (×1,4), lento (2,3), golpe forte a cada 2,6 s e **golpe em área marcado no
+    chão em volta dele** (raio 2,3, 1,3 s de aviso, 180% do ataque, a cada 9 s). Defesa física ×0,5, espiritual ×2,0:
+    fraco contra físico também, mas aguenta mais (bastante vida). ⚠ O **Auto sai do círculo** (qualquer círculo).
+  - **Níveis por ponto do mapa** (propriedades `minLevel`/`maxLevel` do spawn): encosta baixa (sul) espectros 11–13 /
+    yetis 12–14; encosta alta (cantos noroeste e nordeste, longe da trilha) espectros 15–17 / yetis 16–18. 14 monstros.
+  - **Abade Caído** (nv 20, ×1,5) no pátio do templo: golpes marcados no chão (raio 2,6, 200%, a cada 6,5 s; 4,5 s com
+    metade da vida) e, com metade da vida, chama **2 Discípulos Caídos** (nv 18, rápidos, só aparecem nessa luta).
+    ~11 mil de vida; renasce em **15 min** (⚠). Solta 900–1200 de ouro, 1 Raro nv 15 garantido, 3–4 cristais e 2 essências.
+    No simulador (nv 20, equipamento nv 15): 47/48 vitórias, 63–142 s.
+  - **Renascimento por chefe**: cada chefe tem o seu relógio (`bossRespawns` no save); save antigo (`bossRespawnAt`)
+    vale para o General.
+- **Arte (fase 4):** Espectro (Mage azul-gelo), Yeti (Barbarian de pelagem branca, sem armas, soco), Discípulo (Rogue de
+  roupa escura, chute) e Abade (Mage com cajado, manto vinho), todos KayKit CC0 recoloridos no Blender. Pinheiros
+  (3 tons: escuro, com geada e com neve) e rochas nevadas do Nature Kit recoloridos; piso de neve (3 variações) e lago
+  congelado gerados em 2D. Pedras soltas da encosta viram rochas nevadas; os pilares do templo continuam colunas.
+  Estilhaço de gelo no lugar da flecha para o espectro. Ícones novos para os 18 equipamentos, materiais e pergaminho.
+  ⚠ Não há modelo CC0 de yeti/macaco: o Yeti é um humanoide grande e branco.
+- **Equipamentos (fase 5):** conjuntos **nv 10** ("da montanha") e **nv 15** ("do templo") nos 6 slots, arma de cada seita.
+  Valores ~1,9× e ~2,9× o conjunto nv 5 (ex.: arma 26 e 40 de ataque contra 14). Caem dos monstros da montanha (nv 15 só
+  de monstros nv 15+); o Abade garante um Raro nv 15.
+- **Forja (fase 6), aba "Forjar" no Ferreiro:**
+  - **Materiais** (empilham, aba "Materiais" da mochila): **Minério de Ferro** (comum: lobos 10%, bandidos 14%,
+    terracota 20%, General 4–6; espectro/yeti 25–30%), **Cristal de Gelo Eterno** (raro: espectro 8%, yeti 12%,
+    discípulo 25%, Abade 3–4) e **Essência de Qi Ancestral** (especial: General 1, Abade 2).
+  - **Melhorar +1 a +10:** cada nível soma **6% dos stats da base** (não dos bônus; inteiros sobem pelo menos 1 a cada
+    3 níveis). Chance 100/95/90/80/70/60/50/40/30/20%. Custo: 2+2n minérios, cristais a partir do +5 (1 a 6) e
+    1 essência do +8 em diante; ouro (30+30n) × (1 + nível do item/5). **Falhou: perde só os materiais** (⚠ o ouro só é
+    cobrado se der certo; o item não quebra nem volta).
+  - **Subir raridade:** Comum→Incomum (12 minérios, 1 cristal, ouro) e Incomum→Raro (20 minérios, 4 cristais,
+    1 essência, ouro): ganha um bônus aleatório novo (sem repetir) e mantém os que tinha.
+  - **Trocar bônus** de Incomum/Raro: sorteia todos de novo (6–10 minérios, 1–2 cristais, ouro).
+  - **Desmontar** (só da mochila): 1 + nível/5 minérios (+2 Incomum, +3 Raro, +metade do +N) e cristal para itens nv 10+,
+    Raros e itens +6 ou mais.
+- **Mercador Ambulante (fase 7):** o NPC que já existia ("Mercador Ambulante") virou loja. **4–6 equipamentos** sorteados
+  do maior nível de base que o personagem pode usar (1, 5, 10 ou 15), **85% Raros** (resto Incomum), arma só da própria
+  seita, preço = valor × raridade × 2 (⚠ ~2,5 mil por um Raro nv 15). Renova **a cada hora cheia do relógio real**
+  (conta com o jogo fechado; o estoque fica no save). Sempre vende **Cristal de Gelo** (450) e **Pergaminho de Retorno**
+  (80: usar na mochila leva à vila; não funciona na vila). As falas dele mudaram (antes "não tenho nada à venda").
+- **Missões (fase 8):** 6 etapas novas na cadeia (14 no total): Ancião "A trilha do norte" (nv 10, chegar à montanha) →
+  Guarda "Vultos na neve" (nv 11, 10 espectros) → Mestre "A fera branca" (nv 13, 6 yetis, arma Incomum nv 10) →
+  Mercador "Cristais perdidos" (nv 14, 12 espectros) → Mestre "Guardiões do templo" (nv 16, 10 yetis, tronco Incomum
+  nv 15) → Ancião "O Abade Caído" (nv 18). XP das 6: ~136 mil (~24% do trecho 10–20).
+- **Balanceamento (fase 9):** curva do 10 ao 20 = a provisória **+12%**: 27000 / 31500 / 37000 / 42500 / 49500 / 56000 /
+  64000 / 73000 / 83000 / 94000 (total ~558 mil). Simulador do 10 ao 20 (3 execuções, começando no nível 10 com
+  equipamento Incomum nv 5, Auto ligado e missões): **Tormenta ~110 min, Geada ~109, Titã ~148, Víbora ~111** (média
+  ~2 h, como decidido), mortes 0–6 no trecho todo. Ouro ganho ~50 mil; conserto 1–19% dele (corpo a corpo gasta mais).
+  O trecho 1–10 não mudou (Tormenta ~57 min, Geada ~44, Titã ~60, Víbora ~63; General 48/48).
+  Novos botões no `npm run balance`: `drop.materiais`, `forja.ouro`, `forja.chance`, `mercador.precos`.
+- Testes: `npm run check:m9` (monstros, Abade, equipamentos, forja, materiais, mercador, pergaminho e save).
 
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).

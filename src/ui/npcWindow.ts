@@ -276,7 +276,7 @@ export class NpcWindow {
       .map(([id, n]) => {
         const have = matCount(w, id),
           d = MATERIALS[id];
-        return `<span style="color:${have >= n ? d.color : '#ff8a80'}">${n} ${escapeHtml(d.name)} <small>(${have})</small></span>`;
+        return `<span class="mat" style="color:${have >= n ? d.color : '#ff8a80'}">${n} ${escapeHtml(d.name)} <i>(${have})</i></span>`;
       })
       .join(' · ');
   }
@@ -356,7 +356,7 @@ export class NpcWindow {
           L('Sorteia de novo todos os bônus.', 'Rerolls all bonuses.'),
           L('Só itens Incomuns ou Raros têm bônus.', 'Only Uncommon or Rare items have bonuses.'),
         )}
-        <div class="srow"><div class="si"><b>${L('Desmontar', 'Salvage')}</b><small>${L('Recebe', 'Get')}: ${this.matsHtml(salv).replace(/<small>\([^)]*\)<\/small>/g, '')}</small>
+        <div class="srow"><div class="si"><b>${L('Desmontar', 'Salvage')}</b><small>${L('Recebe', 'Get')}: ${this.matsHtml(salv).replace(/ <i>\([^)]*\)<\/i>/g, '')}</small>
           ${inBag ? '' : `<small class="muted">${L('Desequipe antes de desmontar.', 'Unequip it before salvaging.')}</small>`}</div>
           <button class="${this.salvageAsk ? 'danger' : ''}" data-a="forge" data-v="salvage" ${inBag ? '' : 'disabled'}>${this.salvageAsk ? L('Confirmar?', 'Confirm?') : L('Desmontar', 'Salvage')}</button></div>`;
     }

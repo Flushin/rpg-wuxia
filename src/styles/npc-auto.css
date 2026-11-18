@@ -374,3 +374,10 @@
   cursor: pointer;
   color: #aab;
 }
+.srow .si small .mat {
+  white-space: nowrap;
+}
+.srow .si small .mat i {
+  font-style: normal;
+  opacity: 0.7;
+}

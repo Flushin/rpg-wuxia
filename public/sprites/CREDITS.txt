@@ -21,11 +21,16 @@ Monstros:
   gerados pelo script.
 - Guerreiro de Terracota e General de Terracota: "Knight" do KayKit Adventurers (espada de duas mãos) — Kay Lousberg, CC0.
   Recoloridos em barro alaranjado; o General com elmo, capa e detalhes dourados.
+- Montanha Nevada (marco 9), todos do KayKit Adventurers — Kay Lousberg, CC0, recoloridos:
+  Espectro de Gelo ("Mage", azul-gelo, sem chapéu), Yeti ("Barbarian", pelagem branca, sem armas),
+  Discípulo Caído ("Rogue", roupa escura) e Abade Caído ("Mage" com o cajado, manto vinho).
 
 Cenário:
 - Árvores, pedras, plantas, flores, cogumelos, toco e tronco: Nature Kit — Kenney (https://kenney.nl), CC0.
   Cores trocadas para a paleta da floresta.
 - Cerejeiras da cidade: árvores do Nature Kit — Kenney, CC0, com as folhas recoloridas.
+- Pinheiros e pedras nevadas da Montanha Nevada: Nature Kit — Kenney, CC0, recoloridos.
+  Neve e lago congelado: pisos 2D gerados por tools/sprites/ground_tiles.py.
 - Casas, portão, lanternas, estandartes, incensário, poço, carroça e enfeites da cidade: gerados por
   tools/sprites/render_town.py (sem modelos de terceiros).
 - Ruínas (colunas, entulho, cacos, braseiros) e o portal de pedra: gerados por tools/sprites/render_ruins.py

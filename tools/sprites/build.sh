@@ -4,8 +4,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 PY=${PY:-python3}
 [ -d .cache/kaykit ] || ./fetch-assets.sh
-for c in tormenta geada tita vibora lobo bandido_espadachim bandido_arqueiro terracota general npc_*; do SPRITE_CFG=${c%.json}.json $PY render_sprites.py; done
+for c in tormenta geada tita vibora lobo bandido_espadachim bandido_arqueiro terracota general espectro_gelo yeti discipulo_caido abade_caido npc_*; do SPRITE_CFG=${c%.json}.json $PY render_sprites.py; done
 SPRITE_CFG=floresta.json $PY render_props.py
+SPRITE_CFG=montanha.json $PY render_props.py
 $PY render_town.py
 $PY render_ruins.py
 $PY icons.py

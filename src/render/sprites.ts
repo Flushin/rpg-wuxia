@@ -8,6 +8,10 @@ import banditSword from '../data/sprites/bandido_espadachim.json';
 import banditArcher from '../data/sprites/bandido_arqueiro.json';
 import terracota from '../data/sprites/terracota.json';
 import general from '../data/sprites/general.json';
+import espectro from '../data/sprites/espectro_gelo.json';
+import yeti from '../data/sprites/yeti.json';
+import discipulo from '../data/sprites/discipulo_caido.json';
+import abade from '../data/sprites/abade_caido.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -54,6 +58,10 @@ const SHEETS: Record<string, SheetMeta> = {
   bandido_arqueiro: banditArcher as SheetMeta,
   terracota: terracota as SheetMeta,
   general: general as SheetMeta,
+  espectro_gelo: espectro as SheetMeta,
+  yeti: yeti as SheetMeta,
+  discipulo_caido: discipulo as SheetMeta,
+  abade_caido: abade as SheetMeta,
   ...npcSheets,
 };
 
@@ -68,6 +76,10 @@ const BY_TEXTURE: Record<string, string> = {
   'bandit-archer': 'bandido_arqueiro',
   terracotta: 'terracota',
   general: 'general',
+  'ice-spectre': 'espectro_gelo',
+  yeti: 'yeti',
+  'fallen-disciple': 'discipulo_caido',
+  'fallen-abbot': 'abade_caido',
 };
 
 // retrato parado de frente, usado na mochila (por seita)
@@ -95,6 +107,7 @@ export function preloadSprites(scene: Phaser.Scene) {
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
+  scene.load.atlas('props-montanha', 'sprites/montanha.png', 'sprites/montanha.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 
