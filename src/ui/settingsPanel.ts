@@ -7,6 +7,7 @@ import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
+import { touchDebug } from './touchDebug';
 import { BugReport } from './bugReport';
 import { credits } from './credits';
 import { openPrivacyPolicy } from './privacy';
@@ -91,6 +92,9 @@ export class SettingsPanel {
       case 'opt-fps':
         perf.setEnabled(el.checked);
         break;
+      case 'opt-touchdbg':
+        touchDebug.setEnabled(el.checked);
+        break;
       case 'opt-mute':
         audio.setSettings({ muted: el.checked });
         audio.ui('ui_click');
@@ -127,6 +131,7 @@ export class SettingsPanel {
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
+      <label class="opt"><input type="checkbox" id="opt-touchdbg" ${touchDebug.enabled ? 'checked' : ''}/> ${L('Diagnóstico de toque (mostra na tela cada toque e o que a skill fez)', 'Touch diagnostics (shows each touch and what the skill did)')}</label>
       <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
       <label class="sld">${L('Efeitos', 'Effects')}<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
       <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>

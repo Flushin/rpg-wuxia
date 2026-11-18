@@ -10,6 +10,8 @@ export const PREF = {
   UI_SIZE: 'rpg-ui-size',
   /** contador de FPS: '1' ligado */
   FPS: 'rpg-fps',
+  /** diagnóstico de toque na tela: '1' ligado */
+  TOUCH_DEBUG: 'rpg-touch-debug',
   /** avisos de itens coletados: 'all' | 'rare' */
   LOOT_FEED: 'rpg.lootFeed',
   /** horário (ms) do último report de bug enviado */
