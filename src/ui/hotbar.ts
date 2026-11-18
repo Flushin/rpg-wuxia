@@ -57,29 +57,23 @@ export class Hotbar {
       e.preventDefault();
       this.longPressed = false;
       if (e.pointerType === 'mouse') return;
+      // toque: lança ao encostar o dedo (igual ao Atacar). Antes lançava só ao soltar, e com o outro dedo no
+      // joystick o celular às vezes cancelava o toque (pointercancel) e a skill não saía andando.
+      this.use(i);
       clearTimeout(this.pressTimer);
       this.pressTimer = window.setTimeout(() => {
         this.longPressed = true;
-        this.showTip(i);
+        this.showTip(i); // segurar mostra a descrição
       }, 450);
     });
-    const end = () => {
+    const end = (e: PointerEvent) => {
       clearTimeout(this.pressTimer);
-    };
-    b.addEventListener('pointercancel', () => {
-      end();
+      if (e.pointerType === 'mouse' || !this.longPressed) return;
+      this.longPressed = false;
       this.hideTip();
-    });
-    b.addEventListener('pointerup', (e) => {
-      end();
-      if (e.pointerType === 'mouse') return;
-      if (this.longPressed) {
-        this.longPressed = false;
-        this.hideTip();
-        return;
-      }
-      this.use(i);
-    });
+    };
+    b.addEventListener('pointercancel', end);
+    b.addEventListener('pointerup', end);
     b.addEventListener('click', (e) => {
       if ((e as PointerEvent).pointerType === 'mouse') this.use(i);
     });
