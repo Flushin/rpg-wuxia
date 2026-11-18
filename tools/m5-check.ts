@@ -351,13 +351,35 @@ console.log('\n== chefe: leash na arena ==');
   b.hp = b.derived.maxHp * 0.7;
   w.player.x = b.home.x - 12;
   w.player.y = b.home.y; // fora da arena
+  w.player.path = [];
   run(w, 1);
-  ok(b.ai !== 'chase', 'jogador saiu da arena: chefe desiste do combate');
+  ok(b.ai === 'chase', 'saiu da arena há 1 s: chefe ainda não desiste');
+  run(w, 3);
+  ok(b.ai !== 'chase', 'jogador ficou fora da arena: chefe desiste do combate');
   run(w, 40);
   ok(
     b.hp === b.derived.maxHp && b.ai === 'idle' && Math.hypot(b.x - b.home.x, b.y - b.home.y) < 0.5,
     'chefe volta ao ponto de origem e cura tudo',
   );
+  // desviar de golpe marcado perto dos braseiros (um pouco além do raio da arena) não reseta a luta
+  {
+    const { w, b } = bossSetup();
+    run(w, 1);
+    b.hp = b.derived.maxHp * 0.6;
+    w.player.x = b.home.x + 8.5;
+    w.player.y = b.home.y;
+    w.player.path = [];
+    run(w, 5);
+    ok(b.ai === 'chase' && b.hp < b.derived.maxHp, 'jogador na borda da arena (8,5 tiles): luta continua');
+    // saiu de vez e voltou enquanto o chefe recuava: retoma a luta sem curar tudo
+    w.player.x = b.home.x - 14;
+    run(w, 3.1);
+    ok(b.ai === 'return', 'longe por 3 s: chefe recua');
+    w.player.x = b.home.x - 4;
+    w.player.path = [];
+    run(w, 0.2);
+    ok(b.ai === 'chase' && b.hp < b.derived.maxHp, 'voltou à arena: chefe retoma a luta sem curar tudo');
+  }
   const w2 = mk('lamina', 10, 'ruinas'),
     b2 = boss(w2);
   w2.player.x = b2.home.x - 10;

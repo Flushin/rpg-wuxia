@@ -62,6 +62,8 @@ const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 const DEATH_DURABILITY_LOSS = 0.1;
 const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
+const BOSS_LEASH_SLACK = 3; // chefe só larga o jogador além do raio da arena + isto (tiles)
+const BOSS_LEASH_GRACE = 3; // ...e depois de tantos segundos seguidos lá fora
 export interface PotionFx {
   id: string;
   remaining: number;
@@ -119,6 +121,8 @@ export class World {
   offlineReport: OfflineReport | null = null;
   telegraphs: Telegraph[] = [];
   arenas: Avoid[] = []; // áreas de chefe do mapa atual
+  /** segundos seguidos com o jogador fora da arena (com folga) durante a luta com o chefe */
+  private bossAwayT = 0;
   bossRespawnAtMs = 0; // relógio real (ms) em que o chefe renasce; 0 = vivo
   // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
   respawnAtMs: Record<string, number> = {};
@@ -758,7 +762,15 @@ export class World {
     const pd = p.dead ? Infinity : dist(m, p);
     const boss = def.boss;
     if (boss) this.tickBossExtras(m, def, dt);
-    const wake = !boss || (!p.dead && dist(p, m.home) <= boss.arenaRadius); // chefe só acorda com o jogador na arena
+    const fromHome = p.dead ? Infinity : dist(p, m.home);
+    const wake = !boss || fromHome <= boss.arenaRadius; // chefe só acorda com o jogador na arena
+    // chefe em combate só desiste com o jogador bem fora da arena (folga + alguns segundos): desviar de um golpe
+    // marcado perto dos braseiros não reseta mais a luta
+    let gaveUp = false;
+    if (boss && m.ai === 'chase') {
+      this.bossAwayT = fromHome > boss.arenaRadius + BOSS_LEASH_SLACK ? this.bossAwayT + dt : 0;
+      gaveUp = p.dead || this.bossAwayT >= BOSS_LEASH_GRACE;
+    }
     if (m.ai === 'idle') {
       if (pd < def.aggroRange && wake) {
         this.aggro(m);
@@ -785,7 +797,8 @@ export class World {
         m.aiTimer = this.rng.range(2, 5);
       }
     } else if (m.ai === 'chase') {
-      if (p.dead || dist(m, m.home) > def.leashRange || (boss && !wake)) {
+      if (boss ? gaveUp : p.dead || dist(m, m.home) > def.leashRange) {
+        this.bossAwayT = 0;
         m.ai = 'return';
         m.path = findPath(this.map, m, m.home);
         return;
@@ -818,6 +831,11 @@ export class World {
         this.followPath(m, dt, 1);
       }
     } else {
+      if (boss && wake) {
+        // voltou para a arena enquanto o chefe recuava: a luta continua (sem curar tudo)
+        this.aggro(m);
+        return;
+      }
       m.hp = Math.min(m.derived.maxHp, m.hp + m.derived.maxHp * 0.25 * dt);
       this.followPath(m, dt, 1.3);
       if (!m.path.length || dist(m, m.home) < 0.3) {
