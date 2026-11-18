@@ -24,9 +24,11 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_props.py` | Objetos parados (árvores, pedras…) → atlas `public/sprites/floresta.*` com o ponto do chão (pivot) |
 | `render_town.py` | Cidade: casas wuxia, portão, lanternas, estandartes, incensário… gerados por script + cerejeiras → `public/sprites/cidade.*` |
 | `render_ruins.py` | Ruínas e portais: colunas de pedra, entulho, cacos, braseiros e a porta-lua do portal → `public/sprites/ruinas.*` |
-| `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água) → `public/sprites/pisos.png` |
+| `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água, neve e lago congelado) → `public/sprites/pisos.png` |
 | `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |
 | `bandido_*.json`, `terracota.json`, `general.json` | Monstros KayKit recoloridos (lenço/chapéu gerados com `attach`) |
+| `espectro_gelo.json`, `yeti.json`, `discipulo_caido.json`, `abade_caido.json` | Montanha Nevada (marco 9): Mage, Barbarian, Rogue e Mage (com cajado) recoloridos |
+| `montanha.json` | Objetos da montanha (`render_props.py`): pinheiros em 3 tons e rochas nevadas → `public/sprites/montanha.*` |
 | `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
 | `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |
 | `fetch-assets.sh` | Baixa só os modelos usados (KayKit oficial; lobo e natureza de espelhos no GitHub fixados por commit) e confere com `models.sha256`. Aceita os pacotes oficiais em `QUATERNIUS_ANIMALS_DIR` / `KENNEY_NATURE_DIR` |

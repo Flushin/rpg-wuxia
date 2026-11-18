@@ -29,6 +29,28 @@ export interface RarityDef {
   bonuses: number;
   valueMul: number;
 }
+export type MaterialTier = 'comum' | 'raro' | 'especial';
+export interface MaterialDef {
+  name: string;
+  tier: MaterialTier;
+  value: number;
+  color: string;
+  desc: string;
+}
+export interface ConsumableDef {
+  name: string;
+  price: number;
+  color: string;
+  desc: string;
+}
+export interface MerchantDef {
+  stockMin: number;
+  stockMax: number;
+  refreshMinutes: number;
+  rareChance: number;
+  priceMul: number;
+  materials: Record<string, number>;
+}
 interface BonusDef {
   stat: string;
   min: number;
@@ -50,6 +72,10 @@ const J = localize('items', itemsJson) as unknown as {
   bonusPool: BonusDef[];
   bases: Record<string, ItemBase>;
   potions: Record<string, PotionDef>;
+  materials: Record<string, MaterialDef>;
+  consumables: Record<string, ConsumableDef>;
+  merchant: MerchantDef;
+  upgradeStep: number;
 };
 balanceItems(J); // multiplicadores de src/data/balance.json
 export const SLOTS = J.slots,
@@ -62,9 +88,19 @@ export const GROUND_SECONDS = J.groundSeconds,
   STARTING_WEAPON = J.startingWeapon;
 export const RARITIES = J.rarities,
   BASES = J.bases,
-  POTIONS = J.potions;
+  POTIONS = J.potions,
+  MATERIALS = J.materials,
+  CONSUMABLES = J.consumables,
+  MERCHANT = J.merchant;
+/** Melhoria máxima (+10) e quanto cada nível soma aos stats da base (marco 9, craft). */
+export const MAX_PLUS = 10;
+export const UPGRADE_STEP = J.upgradeStep;
 export const RARITY_ORDER: Rarity[] = ['comum', 'incomum', 'raro'];
 export const isPotionId = (id: string) => id in POTIONS;
+export const isMaterialId = (id: string) => id in MATERIALS;
+/** Empilha na mochila (até STACK_MAX): poções e materiais de forja. */
+export const isConsumableId = (id: string) => id in CONSUMABLES;
+export const isStackId = (id: string) => id in POTIONS || id in MATERIALS || id in CONSUMABLES;
 
 export const STAT_LABELS: Record<string, string> = {
   strength: L('Força', 'Strength'),
@@ -95,8 +131,16 @@ export const fmtStat = (stat: string, v: number) =>
 
 export const baseOf = (it: ItemInstance): ItemBase | undefined => BASES[it.baseId];
 export const potionOf = (it: ItemInstance): PotionDef | undefined => POTIONS[it.baseId];
-export const itemName = (it: ItemInstance) => (BASES[it.baseId] ?? POTIONS[it.baseId])?.name ?? it.baseId;
-export const itemColor = (it: ItemInstance) => POTIONS[it.baseId]?.color ?? RARITIES[it.rarity].color;
+export const itemName = (it: ItemInstance) => {
+  const n =
+    (BASES[it.baseId] ?? POTIONS[it.baseId] ?? MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId])?.name ?? it.baseId;
+  return it.plus ? `${n} +${it.plus}` : n;
+};
+export const itemColor = (it: ItemInstance) =>
+  POTIONS[it.baseId]?.color ??
+  MATERIALS[it.baseId]?.color ??
+  CONSUMABLES[it.baseId]?.color ??
+  RARITIES[it.rarity].color;
 export const maxDurability = (it: ItemInstance) => BASES[it.baseId]?.durability ?? 0;
 export const isBroken = (it: ItemInstance) => !!BASES[it.baseId] && it.durability <= 0;
 
@@ -108,6 +152,8 @@ export const newUid = () =>
 export function makePotion(baseId: string, qty = 1): ItemInstance {
   return { uid: newUid(), baseId, rarity: 'comum', bonuses: [], ilvl: 1, durability: 0, qty };
 }
+/** Pilha de poção ou de material. */
+export const makeStack = makePotion;
 
 export function rollRarity(rng: Rng): Rarity {
   const total = RARITY_ORDER.reduce((a, r) => a + RARITIES[r].weight, 0);
@@ -119,8 +165,16 @@ export function rollRarity(rng: Rng): Rarity {
   return 'comum';
 }
 
-export function rollBonuses(count: number, ilvl: number, element: string | null, rng: Rng): Bonus[] {
-  const pool = [...J.bonusPool],
+export function rollBonuses(
+  count: number,
+  ilvl: number,
+  element: string | null,
+  rng: Rng,
+  exclude: string[] = [],
+): Bonus[] {
+  const pool = J.bonusPool.filter(
+      (d) => !exclude.includes(d.stat === 'elemAtk' ? `elem_${element ?? 'fire'}` : d.stat),
+    ),
     out: Bonus[] = [],
     scale = 1 + 0.2 * (Math.max(1, ilvl) - 1);
   while (out.length < count && pool.length) {
@@ -157,9 +211,17 @@ export function itemStats(it: ItemInstance): Record<string, number> {
   const out: Record<string, number> = {};
   const b = BASES[it.baseId];
   if (!b) return out;
-  for (const [k, v] of Object.entries(b.stats)) out[k] = (out[k] ?? 0) + v;
+  for (const [k, v] of Object.entries(b.stats)) out[k] = (out[k] ?? 0) + upgraded(v, it.plus ?? 0);
   for (const bo of it.bonuses) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
   return out;
+}
+
+/** Stat da base com a melhoria: frações com 3 casas; inteiros arredondados, subindo pelo menos 1 a cada 3 níveis
+ *  (senão um +1 de Vontade nunca mudaria). */
+function upgraded(v: number, plus: number): number {
+  if (!plus) return v;
+  if (Math.abs(v) >= 1) return v + Math.max(Math.round(v * UPGRADE_STEP * plus), Math.floor(plus / 3));
+  return Math.round(v * (1 + UPGRADE_STEP * plus) * 1000) / 1000;
 }
 
 export const buyPrice = (id: string) => POTIONS[id]?.price ?? 0;
@@ -167,6 +229,10 @@ export const buyPrice = (id: string) => POTIONS[id]?.price ?? 0;
 export function sellValue(it: ItemInstance): number {
   const p = POTIONS[it.baseId];
   if (p) return Math.max(1, Math.floor(p.price * J.sellRatio + 1e-9));
+  const m = MATERIALS[it.baseId];
+  if (m) return Math.max(1, Math.floor(m.value * J.sellRatio + 1e-9));
+  const c = CONSUMABLES[it.baseId];
+  if (c) return Math.max(1, Math.floor(c.price * J.sellRatio + 1e-9));
   const b = BASES[it.baseId];
   return b ? Math.max(1, Math.floor(b.value * RARITIES[it.rarity].valueMul * J.sellRatio + 1e-9)) : 0;
 }
@@ -184,7 +250,7 @@ export function sanitizeItem(raw: unknown): ItemInstance | null {
   const r = raw as Partial<ItemInstance> | null;
   if (!r || typeof r.baseId !== 'string') return null;
   const rarity: Rarity = r.rarity && r.rarity in RARITIES ? r.rarity : 'comum';
-  if (POTIONS[r.baseId])
+  if (isStackId(r.baseId))
     return {
       uid: String(r.uid ?? newUid()),
       baseId: r.baseId,
@@ -207,6 +273,7 @@ export function sanitizeItem(raw: unknown): ItemInstance | null {
     bonuses,
     ilvl: Math.max(b.reqLevel, Math.floor(Number(r.ilvl) || 1)),
     durability: dur,
+    ...(Number(r.plus) >= 1 ? { plus: Math.min(MAX_PLUS, Math.floor(Number(r.plus))) } : {}),
   };
 }
 
@@ -216,7 +283,7 @@ export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[]
   const stacks = new Map<string, ItemInstance>();
   for (const it of bag) {
     if (!it) continue;
-    if (!isPotionId(it.baseId)) {
+    if (!isStackId(it.baseId)) {
       items.push(it);
       continue;
     }
@@ -237,14 +304,23 @@ export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[]
       }
     }
   }
-  const potKeys = Object.keys(POTIONS);
+  const potKeys = Object.keys(POTIONS),
+    conKeys = Object.keys(CONSUMABLES),
+    matKeys = Object.keys(MATERIALS);
   const rank = (it: ItemInstance) =>
-    isPotionId(it.baseId) ? 100 + potKeys.indexOf(it.baseId) : SLOTS.indexOf(BASES[it.baseId].slot);
+    isPotionId(it.baseId)
+      ? 100 + potKeys.indexOf(it.baseId)
+      : isConsumableId(it.baseId)
+        ? 150 + conKeys.indexOf(it.baseId)
+        : isMaterialId(it.baseId)
+          ? 200 + matKeys.indexOf(it.baseId)
+          : SLOTS.indexOf(BASES[it.baseId].slot);
   const all = [...items, ...stacks.values()].sort(
     (a, b) =>
       rank(a) - rank(b) ||
       RARITY_ORDER.indexOf(b.rarity) - RARITY_ORDER.indexOf(a.rarity) ||
       b.ilvl - a.ilvl ||
+      (b.plus ?? 0) - (a.plus ?? 0) ||
       (BASES[a.baseId]?.name ?? '').localeCompare(BASES[b.baseId]?.name ?? ''),
   );
   return [...all, ...Array(Math.max(0, bag.length - all.length)).fill(null)];

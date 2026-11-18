@@ -654,9 +654,30 @@ export class AutoCombat {
     return !!MONSTERS[m.monsterId]?.boss || this.w.inArena(m);
   }
 
+  /** Círculo de golpe em área (Yeti) em cima do personagem: sai dele pelo lado oposto ao centro. */
+  private dodge(): boolean {
+    const w = this.w,
+      p = w.player;
+    const tg = w.telegraphs.find((t) => dist(p, t) <= t.radius + 0.3);
+    if (!tg) return false;
+    for (const turn of [0, 0.6, -0.6, 1.2, -1.2, Math.PI / 2, -Math.PI / 2]) {
+      const a = (Math.atan2(p.y - tg.y, p.x - tg.x) || 0) + turn,
+        r = tg.radius + 1.1;
+      const q = { x: tg.x + Math.cos(a) * r, y: tg.y + Math.sin(a) * r };
+      if (!isWalkable(w.map, q.x, q.y)) continue;
+      w.autoAttack = false; // senão o ataque parado no alcance apaga o caminho (o alvo continua; volta depois)
+      w.pendingSkill = null;
+      w.autoMove(q.x, q.y);
+      this.status = L('Desviando', 'Dodging');
+      return true;
+    }
+    return false;
+  }
+
   private combat() {
     const w = this.w,
       p = w.player;
+    if (this.dodge()) return;
     let t = w.getTarget();
     if (t && (this.forbidden(t) || this.stuckOn(t))) {
       w.setTarget(null);

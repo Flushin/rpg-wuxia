@@ -32,6 +32,30 @@ export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number)
   }
 }
 
+// Golpe em área de monstro comum (Yeti, marco 9): com o jogador perto, marca um círculo em volta de si e bate
+// depois do aviso. O ataque normal continua. O círculo some se o monstro morrer antes (tickTelegraphs).
+export function tickSlam(w: World, m: Entity, def: MonsterDef, dt: number) {
+  const s = def.slam!,
+    p = w.player;
+  if (m.ai !== 'chase' || p.dead) return; // o tempo do primeiro golpe é marcado ao entrar em combate (World.aggro)
+  m.aiTimer -= dt;
+  if (m.aiTimer > 0 || dist(m, p) > s.radius + 0.5) return;
+  if (w.telegraphs.some((t) => t.ownerId === m.id)) return;
+  m.aiTimer = s.interval;
+  const t: Telegraph = {
+    id: w.nextTelegraph++,
+    x: m.x,
+    y: m.y,
+    radius: s.radius,
+    delay: s.delay,
+    remaining: s.delay,
+    ownerId: m.id,
+    mult: s.mult,
+  };
+  w.telegraphs.push(t);
+  w.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
+}
+
 export function summonAdds(w: World, boss: Entity, sm: { monsterId: string; count: number; level: number }) {
   w.bossSummoned = true;
   const sdef = MONSTERS[sm.monsterId],

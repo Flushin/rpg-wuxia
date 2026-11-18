@@ -84,6 +84,20 @@ def water(frame, seed=40):
     out = np.zeros((H, W, 4), np.uint8)
     out[..., :3] = np.clip(col, 0, 255); out[..., 3] = diamond_mask() * 255
     return Image.fromarray(out)
+def ice(seed):
+    """Lago congelado: azul-claro com rachaduras finas."""
+    rng = np.random.default_rng(seed)
+    col = np.array(tile((150, 196, 226), 0.05, seed), np.float32)[..., :3]
+    for _ in range(5):
+        x, y = rng.uniform(W * 0.25, W * 0.75), rng.uniform(H * 0.3, H * 0.7)
+        ang = rng.uniform(0, 6.28)
+        for _ in range(30):
+            ang += rng.normal(0, 0.4); x += np.cos(ang) * 1.4; y += np.sin(ang) * 0.7
+            xi, yi = int(x), int(y)
+            if 0 <= xi < W and 0 <= yi < H: col[yi, xi] = col[yi, xi] * 0.5 + np.array((235, 245, 252)) * 0.5
+    out = np.zeros((H, W, 4), np.uint8)
+    out[..., :3] = np.clip(col, 0, 255); out[..., 3] = diamond_mask() * 255
+    return Image.fromarray(out)
 out = sys.argv[1]
 tiles = {
   'grass1': tile((96, 150, 72), 0.16, 1),
@@ -96,6 +110,11 @@ tiles = {
   'ruin2':  ruin((140, 144, 142), 8, moss=0.3),
   'ruin3':  ruin((150, 150, 148), 9, moss=0.15),
   'water1': water(0), 'water2': water(1), 'water3': water(2),
+  # marco 9 (Montanha Nevada): neve e lago congelado, sempre no fim (não muda os índices de cima)
+  'snow1':  tile((226, 234, 242), 0.05, 41),
+  'snow2':  tile((222, 230, 240), 0.06, 42, [((200, 214, 230), 0.3)]),
+  'snow3':  tile((230, 236, 244), 0.05, 43, [((240, 246, 252), 0.3)]),
+  'ice':    ice(44),
 }
 sheet = Image.new('RGBA', (W * len(tiles), H))
 for i, im in enumerate(tiles.values()): sheet.paste(im, (i * W, 0))

@@ -7,7 +7,7 @@ import { MAPS_CONFIG } from '../core/mapsConfig';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
-// 9-11 água (3 quadros em ciclo).
+// 9-11 água (3 quadros em ciclo), 12-14 neve e 15 lago congelado (marco 9).
 // Casas ('house') só bloqueiam: o desenho vem dos objetos "building" do mapa (atlas props-cidade).
 const GROUND: Record<string, number[]> = {
   grass: [0, 0, 0, 1, 2],
@@ -15,10 +15,13 @@ const GROUND: Record<string, number[]> = {
   plaza: [4, 5],
   house: [0, 0, 0, 1, 2],
   ruin: [6, 6, 7, 8],
-  snow: [4, 5], // marco 9: provisório (lajotas clareadas pelo SNOW_TINT) até a arte da fase 4
+  snow: [12, 12, 13, 14],
 };
-const SNOW_TINT = 0xdfe9f5;
-const PINES = ['tree_pineRoundA']; // provisório até a arte da fase 4
+const ICE_FRAME = 15; // água na montanha: lago congelado (parado)
+// Montanha Nevada (atlas props-montanha): pinheiros (mais escuros, com geada e com neve) e pedras nevadas
+const PINES = ['pinheiro', 'pinheiro', 'pinheiro_gelo', 'pinheiro_neve', 'pinheiro', 'pinheiro_gelo'];
+const SNOW_DECOR = ['pedra_neve', 'pedra_neve', 'rocha_neve'];
+const SNOW_DECOR_CHANCE = 0.035;
 const WATER_FRAMES = [9, 10, 11];
 const WATER_MS = 420; // tempo de cada quadro da água
 // ruínas (atlas props-ruinas): o que aparece em cada tile 'pillar' (bloqueado) e enfeites soltos no chão
@@ -60,6 +63,16 @@ const DECOR = [
 ];
 const SPRITE_SCALE = 0.5; // folhas geradas em 2x
 
+/** Algum vizinho (4 direções) do tile é do tipo `name`? (pilares do templo ficam em lajes, os da encosta na neve) */
+function inside(map: GameMap, i: number, j: number, name: string): boolean {
+  return [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ].some(([dx, dy]) => map.tiles[(j + dy) * map.width + i + dx] === name);
+}
+
 /** Número pseudoaleatório fixo por tile (o mapa fica sempre igual). */
 function hash(i: number, j: number, salt: number): number {
   let h = (i * 374761393 + j * 668265263 + salt * 2147483647) | 0;
@@ -73,16 +86,20 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
   const water: Phaser.GameObjects.Image[] = [];
   const ground = (name: string, i: number, j: number, x: number, y: number) => {
     const frames = GROUND[name] ?? GROUND.grass; // tipo de piso sem arte: grama (não deixa buraco no mapa)
-    const img = scene.add
+    return scene.add
       .image(x, y, 'pisos', pick(frames, hash(i, j, 1)))
       .setScale(SPRITE_SCALE)
       .setDepth(DEPTH.GROUND);
-    return name === 'snow' ? img.setTint(SNOW_TINT) : img;
   };
+  const snowy = MAPS_CONFIG[map.id]?.trees === 'snow';
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
       const name = map.tiles[j * map.width + i],
         pos = tileToScreen(i + 0.5, j + 0.5);
+      if (name === 'water' && snowy) {
+        out.push(scene.add.image(pos.x, pos.y, 'pisos', ICE_FRAME).setScale(SPRITE_SCALE).setDepth(DEPTH.GROUND));
+        continue;
+      }
       if (name === 'water') {
         const w = scene.add.image(pos.x, pos.y, 'pisos', WATER_FRAMES[0]).setScale(SPRITE_SCALE).setDepth(DEPTH.GROUND);
         w.setData('phase', Math.floor(hash(i, j, 11) * WATER_FRAMES.length));
@@ -93,12 +110,14 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         continue;
       }
       if (name === 'pillar') {
-        out.push(ground(MAPS_CONFIG[map.id]?.trees === 'snow' ? 'snow' : 'ruin', i, j, pos.x, pos.y));
+        // montanha: pedra solta na encosta vira rocha nevada; os pilares do templo (junto às lajes) continuam colunas
+        const rock = snowy && !inside(map, i, j, 'ruin');
+        out.push(ground(rock ? 'snow' : 'ruin', i, j, pos.x, pos.y));
         const arena = MAPS_CONFIG[map.id]?.arena;
         const inArena = !!arena && Math.hypot(i + 0.5 - arena.x, j + 0.5 - arena.y) < arena.r;
-        const frame = inArena ? 'braseiro' : pick(PILLARS, hash(i, j, 12));
+        const frame = rock ? 'rocha_neve' : inArena ? 'braseiro' : pick(PILLARS, hash(i, j, 12));
         const p = scene.add
-          .image(pos.x, pos.y, 'props-ruinas', frame)
+          .image(pos.x, pos.y, rock ? 'props-montanha' : 'props-ruinas', frame)
           .setScale(SPRITE_SCALE)
           .setFlipX(hash(i, j, 13) < 0.5)
           .setDepth(i + j + 1);
@@ -111,7 +130,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         const r = hash(i, j, 2);
         const [atlas, frame] =
           name === 'pine'
-            ? ['props-floresta', pick(PINES, r)]
+            ? ['props-montanha', pick(PINES, r)]
             : MAPS_CONFIG[map.id]?.trees === 'city'
               ? pick(CITY_TREES, r)
               : ['props-floresta', pick(TREES, r)];
@@ -124,6 +143,14 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         out.push(tree);
       } else {
         out.push(ground(name, i, j, pos.x, pos.y));
+        if (name === 'snow' && hash(i, j, 21) < SNOW_DECOR_CHANCE) {
+          const d = scene.add
+            .image(pos.x + (hash(i, j, 22) - 0.5) * 16, pos.y, 'props-montanha', pick(SNOW_DECOR, hash(i, j, 23)))
+            .setScale(SPRITE_SCALE * 0.8)
+            .setFlipX(hash(i, j, 24) < 0.5)
+            .setDepth(i + j + 1);
+          out.push(d);
+        }
         if (name === 'ruin' && hash(i, j, 15) < RUIN_DECOR_CHANCE) {
           const d = scene.add
             .image(

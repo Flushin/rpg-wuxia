@@ -1034,24 +1034,14 @@ console.log('\n== montanha nevada (marco 9, fase 2) ==');
     }
   }
   ok(seen.has(6 * m.width + 16), 'montanha: pátio do templo alcançável');
-  // Auto ligado na vila: sem monstros na montanha (fase 3) continua indo para a floresta, mesmo no nível 10
+  // Auto ligado na vila: mapa sem monstros não conta; com eles (fase 3), nível 10 vai para a montanha
+  const noMobs = { ...maps.montanha, objects: maps.montanha.objects.filter((o) => o.type !== 'monsterSpawn') };
+  const saved = maps.montanha;
+  maps.montanha = noMobs;
   const a10 = mk('lamina', 10, 'cidade');
   a10.auto.toggle();
   ok(a10.auto.huntMap === 'floresta', 'auto nível 10, montanha sem monstros: caça na floresta');
-  // com monstros na montanha: nível 10 vai para lá; nível 9 não passa pelo portal trancado
-  const withMobs = { ...maps.montanha, objects: [...maps.montanha.objects] };
-  withMobs.objects.push({
-    id: 9999,
-    name: 'Lobo',
-    type: 'monsterSpawn',
-    x: 16.5,
-    y: 20.5,
-    w: 0,
-    h: 0,
-    props: { monster: 'lobo' },
-  });
-  const saved = maps.montanha;
-  maps.montanha = withMobs;
+  maps.montanha = saved;
   const b10 = mk('lamina', 10, 'cidade');
   b10.auto.toggle();
   ok(b10.auto.huntMap === 'montanha', 'auto nível 10 com monstros na montanha: vai para a montanha');
@@ -1062,7 +1052,6 @@ console.log('\n== montanha nevada (marco 9, fase 2) ==');
   const b9 = mk('lamina', 9, 'cidade');
   b9.auto.toggle();
   ok(b9.auto.huntMap === 'floresta', 'auto nível 9: continua na floresta');
-  maps.montanha = saved;
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

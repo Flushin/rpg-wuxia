@@ -514,7 +514,6 @@ function ruinas() {
 // Entrada pelo sul (vinda da saída norte da vila); trilha sobe em zigue-zague entre pinheiros e pedras até o
 // Templo Abandonado no topo (norte). Encosta baixa (y 19–27) e encosta alta (y 12–18) ficam livres para os
 // monstros da fase 3 (Espectro de gelo e Yeti); o pátio do templo é a arena do Abade Caído (centro 16,6).
-// Sem monsterSpawn por enquanto: os monstros entram na fase 3.
 const MONTANHA_ARENA = { x: 16, y: 6, r: 5.5 };
 function montanha() {
   const rnd = rngFn(2026);
@@ -539,6 +538,8 @@ function montanha() {
   gr.rect(5, 15, 5, 2, SN); // ligação da clareira oeste com a trilha
   gr.disc(16, 20.5, 2.6, SN);
   gr.disc(26, 15, 2.6, SN);
+  gr.disc(4, 13.5, 2.4, SN); // encosta alta: cantos noroeste e nordeste (monstros nv 15–18)
+  gr.disc(27, 13.5, 2.4, SN);
   gr.disc(6, 21, 2.2, WA); // lago (congelado na arte da fase 4), na beira da clareira oeste
   gr.disc(6, 21, 0.9, WA);
   // templo: muro de pilares do y 1 ao 11 com portão no sul; pátio de lajes (ruin) com 6 braseiros em volta
@@ -556,7 +557,42 @@ function montanha() {
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 4.5 }),
   ];
-  console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável`);
+  // monstros (fase 3): encosta baixa nv 11–14 (sul), encosta alta nv 15–18 (norte) (faixa por ponto: minLevel/maxLevel)
+  const used = [];
+  const free = (cx, cy, r) => {
+    const out = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r && seen.has(j * W + i) && walkable(gr.get(i, j)) && j < 27)
+          out.push([i, j]);
+    return out;
+  };
+  const place = (name, monster, cx, cy, r, minLevel, maxLevel) => {
+    const c = free(cx, cy, r);
+    for (let tries = 0; tries < 200 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2.3)) continue;
+      used.push([i, j]);
+      objs.push(point(name, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel }));
+      return;
+    }
+    throw new Error(`montanha: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  const spectre = (cx, cy, r, a, b) => place('Espectro de Gelo', 'espectro_gelo', cx, cy, r, a, b);
+  const yeti = (cx, cy, r, a, b) => place('Yeti', 'yeti', cx, cy, r, a, b);
+  // encosta baixa (y 20–26): clareira leste, margem do lago (oeste) e o meio, abaixo da trilha
+  for (let n = 0; n < 2; n++) spectre(22.5, 23, 3, 11, 13);
+  yeti(22.5, 23, 3, 12, 14);
+  for (let n = 0; n < 2; n++) spectre(6, 22, 3.4, 11, 13);
+  yeti(6, 22, 3.4, 12, 14);
+  for (let n = 0; n < 2; n++) spectre(16, 21.5, 2.4, 12, 14);
+  // encosta alta (y 12–15): cantos noroeste e nordeste, longe da trilha (que passa no y 16–17)
+  for (let n = 0; n < 2; n++) spectre(4, 13.5, 2.8, 15, 17);
+  yeti(4, 13.5, 2.8, 16, 18);
+  for (let n = 0; n < 2; n++) spectre(27, 13.5, 2.8, 15, 17);
+  yeti(27, 13.5, 2.8, 16, 18);
+  objs.push(point('Abade Caído', 'monsterSpawn', MONTANHA_ARENA.x, MONTANHA_ARENA.y, { monster: 'abade_caido' }));
+  console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável, ${used.length} monstros + Abade`);
   return tiled('Montanha Nevada', gr, objs);
 }
 

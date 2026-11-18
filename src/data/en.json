@@ -5,11 +5,17 @@
       "description": "Wandering swordsmen who fight up close with the fury of thunder. Every hit restores a little health.",
       "rangeLabel": "Melee",
       "recommended": [
-        { "reason": "your damage is physical" },
-        { "reason": "accuracy and crits suit fast strikes" }
+        {
+          "reason": "your damage is physical"
+        },
+        {
+          "reason": "accuracy and crits suit fast strikes"
+        }
       ],
       "optional": [
-        { "reason": "if you keep dying" }
+        {
+          "reason": "if you keep dying"
+        }
       ]
     },
     "pavilhao": {
@@ -17,11 +23,17 @@
       "description": "Masters of spiritual energy who strike from afar with the ice of the mountains.",
       "rangeLabel": "Ranged",
       "recommended": [
-        { "reason": "your damage is spiritual" },
-        { "reason": "mana to sustain area skills" }
+        {
+          "reason": "your damage is spiritual"
+        },
+        {
+          "reason": "mana to sustain area skills"
+        }
       ],
       "optional": [
-        { "reason": "if you keep dying" }
+        {
+          "reason": "if you keep dying"
+        }
       ]
     },
     "tita": {
@@ -29,11 +41,17 @@
       "description": "Monks of the Iron Mountain who can take any blow and answer with fists of fire.",
       "rangeLabel": "Melee - tank",
       "recommended": [
-        { "reason": "your damage is physical" },
-        { "reason": "health and defense are your strength" }
+        {
+          "reason": "your damage is physical"
+        },
+        {
+          "reason": "health and defense are your strength"
+        }
       ],
       "optional": [
-        { "reason": "if you keep missing" }
+        {
+          "reason": "if you keep missing"
+        }
       ]
     },
     "vibora": {
@@ -41,84 +59,303 @@
       "description": "Emerald Needle assassins who strike from afar with poisoned needles.",
       "rangeLabel": "Ranged - poison",
       "recommended": [
-        { "reason": "your damage is physical" },
-        { "reason": "accuracy and crits suit needles" }
+        {
+          "reason": "your damage is physical"
+        },
+        {
+          "reason": "accuracy and crits suit needles"
+        }
       ],
       "optional": [
-        { "reason": "if you keep dying" }
+        {
+          "reason": "if you keep dying"
+        }
       ]
     }
   },
   "skills": {
     "lamina": [
-      { "name": "Twin Fangs", "description": "Two quick strikes on the target, each for 80% of your normal damage." },
-      { "name": "Lightning Step", "description": "Dash to the target (up to 8 tiles, needs a clear path) and hit it for 120% damage." },
-      { "name": "Blade Storm", "description": "Spin your blades to deal 170% damage to all monsters within 2.5 tiles. No target needed." },
-      { "name": "Guardbreak", "description": "Heavy strike for 280% damage that lowers the target's defense by 40% for 6 s." },
-      { "name": "Blade Flow", "description": "Passive: +10% attack speed and +5% crit chance. Grows with your level." }
+      {
+        "name": "Twin Fangs",
+        "description": "Two quick strikes on the target, each for 80% of your normal damage."
+      },
+      {
+        "name": "Lightning Step",
+        "description": "Dash to the target (up to 8 tiles, needs a clear path) and hit it for 120% damage."
+      },
+      {
+        "name": "Blade Storm",
+        "description": "Spin your blades to deal 170% damage to all monsters within 2.5 tiles. No target needed."
+      },
+      {
+        "name": "Guardbreak",
+        "description": "Heavy strike for 280% damage that lowers the target's defense by 40% for 6 s."
+      },
+      {
+        "name": "Blade Flow",
+        "description": "Passive: +10% attack speed and +5% crit chance. Grows with your level."
+      }
     ],
     "pavilhao": [
-      { "name": "Frost Orb", "description": "Hurl an ice orb that deals 130% of your normal damage. Range 7." },
-      { "name": "Icebloom", "description": "An ice flower that deals 110% damage and slows the target by 40% for 4 s." },
-      { "name": "Blizzard", "description": "A blizzard that deals 180% damage to all monsters within 2.5 tiles of the target." },
-      { "name": "Mist Veil", "description": "Wrap yourself in mist that absorbs damage equal to 25% of max health for 8 s. No target needed." },
-      { "name": "Serene Mind", "description": "Passive: regenerates 1% of max mana per second outside town. Grows with your level." }
+      {
+        "name": "Frost Orb",
+        "description": "Hurl an ice orb that deals 130% of your normal damage. Range 7."
+      },
+      {
+        "name": "Icebloom",
+        "description": "An ice flower that deals 110% damage and slows the target by 40% for 4 s."
+      },
+      {
+        "name": "Blizzard",
+        "description": "A blizzard that deals 180% damage to all monsters within 2.5 tiles of the target."
+      },
+      {
+        "name": "Mist Veil",
+        "description": "Wrap yourself in mist that absorbs damage equal to 25% of max health for 8 s. No target needed."
+      },
+      {
+        "name": "Serene Mind",
+        "description": "Passive: regenerates 1% of max mana per second outside town. Grows with your level."
+      }
     ],
     "tita": [
-      { "name": "Mountain Fist", "description": "A heavy blow that deals 180% of your normal damage." },
-      { "name": "Quake", "description": "Slam the ground: 120% damage to all monsters within 2.5 tiles and a 30% slow for 4 s. No target needed." },
-      { "name": "Iron Skin", "description": "Harden your body: absorbs damage equal to 30% of max health for 8 s. No target needed." },
-      { "name": "Volcanic Fist", "description": "A blazing punch that deals 260% damage and stuns the target for 1.5 s." },
-      { "name": "Bronze Body", "description": "Passive: take 10% less damage and gain 10% more max health. Grows with your level." }
+      {
+        "name": "Mountain Fist",
+        "description": "A heavy blow that deals 180% of your normal damage."
+      },
+      {
+        "name": "Quake",
+        "description": "Slam the ground: 120% damage to all monsters within 2.5 tiles and a 30% slow for 4 s. No target needed."
+      },
+      {
+        "name": "Iron Skin",
+        "description": "Harden your body: absorbs damage equal to 30% of max health for 8 s. No target needed."
+      },
+      {
+        "name": "Volcanic Fist",
+        "description": "A blazing punch that deals 260% damage and stuns the target for 1.5 s."
+      },
+      {
+        "name": "Bronze Body",
+        "description": "Passive: take 10% less damage and gain 10% more max health. Grows with your level."
+      }
     ],
     "vibora": [
-      { "name": "Venom Needle", "description": "A needle that deals 90% damage and poisons: another 60% damage over 6 s. Range 6." },
-      { "name": "Needle Rain", "description": "Five needles in a row at the target, each dealing 40% damage. Range 6." },
-      { "name": "Toxic Mist", "description": "Poison mist within 2.5 tiles of the target: poison for 150% damage over 6 s and a 20% slow." },
-      { "name": "Jade Sap", "description": "Heals 20% of max health over 6 s. No target needed." },
-      { "name": "Serpent Blood", "description": "Passive: deal 15% more damage to poisoned targets. Grows with your level." }
+      {
+        "name": "Venom Needle",
+        "description": "A needle that deals 90% damage and poisons: another 60% damage over 6 s. Range 6."
+      },
+      {
+        "name": "Needle Rain",
+        "description": "Five needles in a row at the target, each dealing 40% damage. Range 6."
+      },
+      {
+        "name": "Toxic Mist",
+        "description": "Poison mist within 2.5 tiles of the target: poison for 150% damage over 6 s and a 20% slow."
+      },
+      {
+        "name": "Jade Sap",
+        "description": "Heals 20% of max health over 6 s. No target needed."
+      },
+      {
+        "name": "Serpent Blood",
+        "description": "Passive: deal 15% more damage to poisoned targets. Grows with your level."
+      }
     ]
   },
   "items": {
-    "slotNames": { "colar": "Necklace", "tronco": "Chest", "arma": "Weapon", "cabeca": "Head", "calca": "Legs", "bota": "Boots" },
+    "slotNames": {
+      "colar": "Necklace",
+      "tronco": "Chest",
+      "arma": "Weapon",
+      "cabeca": "Head",
+      "calca": "Legs",
+      "bota": "Boots"
+    },
     "rarities": {
-      "comum": { "name": "Common" },
-      "incomum": { "name": "Uncommon" },
-      "raro": { "name": "Rare" }
+      "comum": {
+        "name": "Common"
+      },
+      "incomum": {
+        "name": "Uncommon"
+      },
+      "raro": {
+        "name": "Rare"
+      }
     },
     "bases": {
-      "colar_jade": { "name": "Plain Jade Necklace" },
-      "colar_dragao": { "name": "Serene Dragon Necklace" },
-      "tunica_algodao": { "name": "Cotton Tunic" },
-      "manto_seda": { "name": "Blue Silk Robe" },
-      "espadas_ferro": { "name": "Twin Iron Swords" },
-      "espadas_vento": { "name": "Twin Cutting Wind Swords" },
-      "leque_bambu": { "name": "Bamboo Qi Fan" },
-      "leque_nuvens": { "name": "White Cloud Qi Fan" },
-      "bastao_ferro": { "name": "Iron Staff" },
-      "bastao_brasa": { "name": "Staff of Eternal Embers" },
-      "agulhas_bronze": { "name": "Bronze Needles" },
-      "agulhas_jade": { "name": "Emerald Jade Needles" },
-      "faixa_linho": { "name": "Linen Headband" },
-      "coroa_monge": { "name": "Bronze Monk Crown" },
-      "calca_algodao": { "name": "Cotton Pants" },
-      "calca_couro": { "name": "Reinforced Leather Pants" },
-      "sandalia_palha": { "name": "Straw Sandals" },
-      "botas_andarilho": { "name": "Wanderer's Silk Boots" }
+      "colar_jade": {
+        "name": "Plain Jade Necklace"
+      },
+      "colar_dragao": {
+        "name": "Serene Dragon Necklace"
+      },
+      "tunica_algodao": {
+        "name": "Cotton Tunic"
+      },
+      "manto_seda": {
+        "name": "Blue Silk Robe"
+      },
+      "espadas_ferro": {
+        "name": "Twin Iron Swords"
+      },
+      "espadas_vento": {
+        "name": "Twin Cutting Wind Swords"
+      },
+      "leque_bambu": {
+        "name": "Bamboo Qi Fan"
+      },
+      "leque_nuvens": {
+        "name": "White Cloud Qi Fan"
+      },
+      "bastao_ferro": {
+        "name": "Iron Staff"
+      },
+      "bastao_brasa": {
+        "name": "Staff of Eternal Embers"
+      },
+      "agulhas_bronze": {
+        "name": "Bronze Needles"
+      },
+      "agulhas_jade": {
+        "name": "Emerald Jade Needles"
+      },
+      "faixa_linho": {
+        "name": "Linen Headband"
+      },
+      "coroa_monge": {
+        "name": "Bronze Monk Crown"
+      },
+      "calca_algodao": {
+        "name": "Cotton Pants"
+      },
+      "calca_couro": {
+        "name": "Reinforced Leather Pants"
+      },
+      "sandalia_palha": {
+        "name": "Straw Sandals"
+      },
+      "botas_andarilho": {
+        "name": "Wanderer's Silk Boots"
+      },
+      "colar_cristal": {
+        "name": "Snow Crystal Necklace"
+      },
+      "manto_yeti": {
+        "name": "Yeti Fur Cloak"
+      },
+      "espadas_trovao_nevado": {
+        "name": "Snowy Thunder Twin Swords"
+      },
+      "leque_lua_fria": {
+        "name": "Cold Moon Qi Fan"
+      },
+      "bastao_granito": {
+        "name": "Granite Peak Staff"
+      },
+      "agulhas_prata": {
+        "name": "Shadow Silver Needles"
+      },
+      "capuz_la": {
+        "name": "Mountain Wool Hood"
+      },
+      "calca_la": {
+        "name": "Wool-Lined Trousers"
+      },
+      "botas_pico": {
+        "name": "Peak Fur Boots"
+      },
+      "colar_lotus": {
+        "name": "Celestial Lotus Necklace"
+      },
+      "armadura_templo": {
+        "name": "Fallen Temple Armor"
+      },
+      "espadas_ceu_partido": {
+        "name": "Sky-Splitting Twin Swords"
+      },
+      "leque_fenix": {
+        "name": "Jade Phoenix Qi Fan"
+      },
+      "bastao_vulcao": {
+        "name": "Dormant Volcano Staff"
+      },
+      "agulhas_escorpiao": {
+        "name": "Celestial Scorpion Needles"
+      },
+      "elmo_guardiao": {
+        "name": "Temple Guardian Helm"
+      },
+      "calca_escamas": {
+        "name": "Bronze Scale Trousers"
+      },
+      "botas_passo_celeste": {
+        "name": "Celestial Step Boots"
+      }
     },
     "potions": {
-      "pocao_hp_p": { "name": "Small Health Potion" },
-      "pocao_hp_g": { "name": "Large Health Potion" },
-      "pocao_mp_p": { "name": "Small Mana Potion" },
-      "pocao_mp_g": { "name": "Large Mana Potion" }
+      "pocao_hp_p": {
+        "name": "Small Health Potion"
+      },
+      "pocao_hp_g": {
+        "name": "Large Health Potion"
+      },
+      "pocao_mp_p": {
+        "name": "Small Mana Potion"
+      },
+      "pocao_mp_g": {
+        "name": "Large Mana Potion"
+      }
+    },
+    "materials": {
+      "minerio_ferro": {
+        "name": "Iron Ore",
+        "desc": "Common forging material. Dropped by forest and ruins monsters and obtained by salvaging items."
+      },
+      "cristal_gelo": {
+        "name": "Eternal Ice Crystal",
+        "desc": "Rare forging material. Dropped by Snowy Mountain monsters and by salvaging rare items."
+      },
+      "essencia_qi": {
+        "name": "Ancestral Qi Essence",
+        "desc": "Special forging material. Only bosses drop it."
+      }
+    },
+    "consumables": {
+      "pergaminho_retorno": {
+        "name": "Return Scroll",
+        "desc": "Takes you back to Cloud Village at once."
+      }
     }
   },
   "monsters": {
-    "lobo": { "name": "Wolf" },
-    "bandido_espadachim": { "name": "Bandit Swordsman" },
-    "bandido_arqueiro": { "name": "Bandit Archer" },
-    "guerreiro_terracota": { "name": "Terracotta Warrior" },
-    "general_terracota": { "name": "Terracotta General" }
+    "lobo": {
+      "name": "Wolf"
+    },
+    "bandido_espadachim": {
+      "name": "Bandit Swordsman"
+    },
+    "bandido_arqueiro": {
+      "name": "Bandit Archer"
+    },
+    "guerreiro_terracota": {
+      "name": "Terracotta Warrior"
+    },
+    "general_terracota": {
+      "name": "Terracotta General"
+    },
+    "espectro_gelo": {
+      "name": "Ice Specter"
+    },
+    "yeti": {
+      "name": "Yeti"
+    },
+    "discipulo_caido": {
+      "name": "Fallen Disciple"
+    },
+    "abade_caido": {
+      "name": "Fallen Abbot"
+    }
   },
   "tips": {
     "inicio": {
@@ -234,14 +471,22 @@
         "title": "Titan Master",
         "greeting": "Hm. Even the mountain knows how to wait.",
         "intro": "In the Titan sect, we hold the front line with staff or fists, taking the blows for everyone. We are the wall that shields our companions. Ours is a path of endurance and raw strength.",
-        "tips": ["Cast Iron Skin before pulling a group of bandits: the shield soaks the first hit from all of them.", "Volcanic Fist stuns the target; use it on an archer or on the boss right before it strikes.", "Quake slows your enemies. Those who choose this path should favor Strength and Stamina."]
+        "tips": [
+          "Cast Iron Skin before pulling a group of bandits: the shield soaks the first hit from all of them.",
+          "Volcanic Fist stuns the target; use it on an archer or on the boss right before it strikes.",
+          "Quake slows your enemies. Those who choose this path should favor Strength and Stamina."
+        ]
       },
       "vibora": {
         "name": "Mistress Du",
         "title": "Viper Mistress",
         "greeting": "Quiet as a shadow, patient as venom.",
         "intro": "In the Viper sect, we strike from afar with poisoned needles. Venom wears the enemy down little by little, and our arts also heal little by little. Here, the patient prevail.",
-        "tips": ["Poison first: Serpent Blood makes your needles hit harder on targets that are already poisoned.", "Toxic Mist poisons a whole group at once and slows them all so you can back away.", "Jade Sap heals over time; use it before your health gets low. Favor Strength and Agility."]
+        "tips": [
+          "Poison first: Serpent Blood makes your needles hit harder on targets that are already poisoned.",
+          "Toxic Mist poisons a whole group at once and slows them all so you can back away.",
+          "Jade Sap heals over time; use it before your health gets low. Favor Strength and Agility."
+        ]
       }
     },
     "npcs": {
@@ -268,10 +513,10 @@
       "mercador": {
         "name": "Traveling Merchant",
         "lines": [
-          "Ah, traveler! I have walked a thousand roads, yet my carts are still empty for now.",
-          "I have nothing to sell today. I await rare goods from distant lands, and they say the wait is worth it.",
-          "Silk from the south, spices from the desert, relics from forgotten monasteries... all of it may arrive someday.",
-          "Come back later, friend. Perhaps I will have something worthy of a warrior like you."
+          "Ah, traveler! My carts have finally arrived: relics from forgotten monasteries and weapons from distant lands. Take a look!",
+          "My stock changes every hour: whatever is not sold moves on with the next caravan.",
+          "Eternal ice crystals come from the northern mountains. Expensive, I know, but the blacksmith knows what to do with them.",
+          "A return scroll takes you back to the village in the blink of an eye. Never leave without one."
         ]
       },
       "morador1": {
@@ -321,7 +566,10 @@
     "Bandido Espadachim": "Bandit Swordsman",
     "Bandido Arqueiro": "Bandit Archer",
     "Guerreiro de Terracota": "Terracotta Warrior",
-    "General de Terracota": "Terracotta General"
+    "General de Terracota": "Terracotta General",
+    "Espectro de Gelo": "Ice Specter",
+    "Yeti": "Yeti",
+    "Abade Caído": "Fallen Abbot"
   },
   "quests": {
     "chain": [
@@ -372,6 +620,42 @@
         "offer": "The Terracotta General commands everything from the depths of the ruins. While he stands, the village will have no peace. Defeat him. Step out of the red circle when he raises his blade.",
         "goal": "Defeat the Terracotta General",
         "done": "The General has fallen! Cloud Village will remember your name for generations. This gold is little next to what you did."
+      },
+      {
+        "name": "The northern trail",
+        "offer": "Now that the General has fallen, the village's northern gate is open to you. Up there lies the Snowy Mountain and, at its peak, a temple no one has visited in decades. Climb up and see it with your own eyes.",
+        "goal": "Reach the Snowy Mountain",
+        "done": "Snow that never melts and a heavy silence... The monks of that temple were our friends. Something went very wrong up there."
+      },
+      {
+        "name": "Shapes in the snow",
+        "offer": "Travelers coming down the mountain speak of icy shapes that hurl shards and freeze the legs of anyone who runs. Defeat 10 Ice Specters. Close in quickly or they will slow you down.",
+        "goal": "Defeat ice specters",
+        "done": "Ten fewer. The merchants are already talking about using the northern trail again. Thank you, warrior."
+      },
+      {
+        "name": "The white beast",
+        "offer": "Yetis are slow, but one of their blows can fell a tree. When the beast raises its arms, a circle marks the ground: step out before the impact. Defeat 6 yetis and come back.",
+        "goal": "Defeat yetis",
+        "done": "You have learned to read the beast. Take this weapon: it was forged for those who walk in the snow."
+      },
+      {
+        "name": "Lost crystals",
+        "offer": "My caravan of ice crystals was attacked on the upper slope. The specters guard the crystals as if they were theirs! Defeat 12 specters and maybe I can recover part of the cargo.",
+        "goal": "Defeat ice specters",
+        "done": "I recovered half of the crystals! Not all of it, but the blacksmith will be happy. Accept this gold."
+      },
+      {
+        "name": "Temple guardians",
+        "offer": "The yetis on the upper slope are not hunting: they are guarding the path to the temple. Someone sent them there. Defeat 10 of them and open the way.",
+        "goal": "Defeat yetis",
+        "done": "The path is open. Wear this armor: what awaits in the temple is worse than any beast."
+      },
+      {
+        "name": "The Fallen Abbot",
+        "offer": "Now I know the truth. The temple's abbot sought a forbidden power and lost himself in it. His disciples followed him in his fall. Climb to the temple courtyard and free him. Beware: at half health he will call his disciples.",
+        "goal": "Defeat the Fallen Abbot",
+        "done": "The temple bell has rung again after so many years... The mountain is at peace, and so is the village. You have become a legend, warrior."
       }
     ]
   }

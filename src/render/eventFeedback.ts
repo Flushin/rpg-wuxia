@@ -265,12 +265,22 @@ export class EventFeedback {
       b = tileToScreen(ev.toX, ev.toY);
     const g = this.scene.add.graphics().setDepth(DEPTH.HIT_LINE);
     const ang = Math.atan2(b.y - a.y, b.x - a.x);
-    g.lineStyle(2, 0xe8d8a8, 1);
-    g.lineBetween(-9, 0, 9, 0);
-    g.fillStyle(0xcccccc, 1);
-    g.fillTriangle(9, 0, 4, -3, 4, 3);
-    g.fillStyle(0xc02828, 1);
-    g.fillTriangle(-9, 0, -12, -3, -12, 3);
+    if (ev.kind === 'ice') {
+      // estilhaço de gelo (Espectro de gelo, marco 9)
+      g.fillStyle(0x9ee0ff, 0.35);
+      g.fillEllipse(-4, 0, 18, 7);
+      g.fillStyle(0xe6f7ff, 1);
+      g.fillTriangle(9, 0, -5, -3.5, -5, 3.5);
+      g.lineStyle(1, 0x5fb6f0, 1);
+      g.strokeTriangle(9, 0, -5, -3.5, -5, 3.5);
+    } else {
+      g.lineStyle(2, 0xe8d8a8, 1);
+      g.lineBetween(-9, 0, 9, 0);
+      g.fillStyle(0xcccccc, 1);
+      g.fillTriangle(9, 0, 4, -3, 4, 3);
+      g.fillStyle(0xc02828, 1);
+      g.fillTriangle(-9, 0, -12, -3, -12, 3);
+    }
     g.setPosition(a.x, a.y - 20).setRotation(ang);
     this.scene.tweens.add({
       targets: g,

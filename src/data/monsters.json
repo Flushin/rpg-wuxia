@@ -56,7 +56,13 @@
       "equipment": {
         "chance": 0.08,
         "maxReqLevel": 1
-      }
+      },
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.1
+        }
+      ]
     }
   },
   "bandido_espadachim": {
@@ -125,6 +131,12 @@
           "minReqLevel": 5,
           "maxReqLevel": 5,
           "minMonsterLevel": 5
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.14
         }
       ]
     }
@@ -197,6 +209,12 @@
           "minReqLevel": 5,
           "maxReqLevel": 5,
           "minMonsterLevel": 5
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.14
         }
       ]
     }
@@ -271,6 +289,14 @@
           "maxReqLevel": 5,
           "minMonsterLevel": 5
         }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.2,
+          "min": 1,
+          "max": 2
+        }
       ]
     }
   },
@@ -332,7 +358,316 @@
       "guaranteed": {
         "rarity": "raro",
         "reqLevel": 5
+      },
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 1,
+          "min": 4,
+          "max": 6
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1
+        }
+      ]
+    }
+  },
+  "espectro_gelo": {
+    "id": "espectro_gelo",
+    "name": "Espectro de Gelo",
+    "sprite": "ice-spectre",
+    "minLevel": 11,
+    "maxLevel": 17,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 3.5,
+      "stamina": 6,
+      "agility": 6,
+      "willpower": 8
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.55,
+      "stamina": 4.5,
+      "agility": 0.6,
+      "willpower": 1
+    },
+    "damageType": "spiritual",
+    "aggroRange": 4,
+    "leashRange": 15,
+    "attackRange": 5.5,
+    "attackInterval": 2.4,
+    "moveSpeed": 3.2,
+    "projectile": "ice",
+    "onHit": {
+      "slow": 0.25,
+      "duration": 2
+    },
+    "defMul": {
+      "phys": 0.55,
+      "spirit": 2.6
+    },
+    "xpBase": 80,
+    "xpPerLevel": 18,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 8,
+        "max": 12,
+        "perLevel": 1.2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.06
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.05
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.14
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.09
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 10,
+          "maxReqLevel": 10
+        },
+        {
+          "chance": 0.06,
+          "minReqLevel": 15,
+          "maxReqLevel": 15,
+          "minMonsterLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "cristal_gelo",
+          "chance": 0.08
+        }
+      ]
+    }
+  },
+  "yeti": {
+    "id": "yeti",
+    "name": "Yeti",
+    "sprite": "yeti",
+    "minLevel": 12,
+    "maxLevel": 18,
+    "scale": 1.4,
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 0,
+      "stamina": 10,
+      "agility": 3,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1.1,
+      "intelligence": 0,
+      "stamina": 5.5,
+      "agility": 0.5,
+      "willpower": 0.6
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 13,
+    "attackRange": 1.8,
+    "attackInterval": 2.6,
+    "moveSpeed": 2.3,
+    "slam": {
+      "radius": 2.3,
+      "delay": 1.3,
+      "mult": 1.8,
+      "interval": 9
+    },
+    "defMul": {
+      "phys": 0.5,
+      "spirit": 2.0
+    },
+    "xpBase": 110,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 10,
+        "max": 16,
+        "perLevel": 1.5
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.06
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.05
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.14
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.09
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 10,
+          "maxReqLevel": 10
+        },
+        {
+          "chance": 0.06,
+          "minReqLevel": 15,
+          "maxReqLevel": 15,
+          "minMonsterLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "cristal_gelo",
+          "chance": 0.12
+        }
+      ]
+    }
+  },
+  "discipulo_caido": {
+    "id": "discipulo_caido",
+    "name": "Discípulo Caído",
+    "sprite": "fallen-disciple",
+    "minLevel": 18,
+    "maxLevel": 18,
+    "baseAttributes": {
+      "strength": 4,
+      "intelligence": 0,
+      "stamina": 3,
+      "agility": 8,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 2,
+      "agility": 0.6,
+      "willpower": 0.5
+    },
+    "damageType": "physical",
+    "aggroRange": 6,
+    "leashRange": 14,
+    "attackRange": 1.5,
+    "attackInterval": 1.5,
+    "moveSpeed": 3.6,
+    "xpBase": 300,
+    "xpPerLevel": 0,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 15,
+        "max": 25
+      },
+      "materials": [
+        {
+          "id": "cristal_gelo",
+          "chance": 0.25
+        }
+      ]
+    }
+  },
+  "abade_caido": {
+    "id": "abade_caido",
+    "name": "Abade Caído",
+    "sprite": "fallen-abbot",
+    "minLevel": 20,
+    "maxLevel": 20,
+    "scale": 1.5,
+    "baseAttributes": {
+      "strength": 25,
+      "intelligence": 0,
+      "stamina": 1100,
+      "agility": 16,
+      "willpower": 120
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.4,
+    "moveSpeed": 2.2,
+    "defMul": {
+      "phys": 0.25,
+      "spirit": 1.0
+    },
+    "xpBase": 20000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 900,
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.6,
+        "delay": 1.4,
+        "mult": 2.0,
+        "interval": 6.5,
+        "intervalPhase2": 4.5
+      },
+      "summon": {
+        "monsterId": "discipulo_caido",
+        "count": 2,
+        "level": 18,
+        "atHpPct": 0.5
       }
+    },
+    "loot": {
+      "gold": {
+        "min": 900,
+        "max": 1200
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 15
+      },
+      "materials": [
+        {
+          "id": "cristal_gelo",
+          "chance": 1,
+          "min": 3,
+          "max": 4
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1,
+          "min": 2,
+          "max": 2
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,132 @@
+{
+ "frames": {
+  "pinheiro": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 244
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 244
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 244
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9303
+   }
+  },
+  "pinheiro_gelo": {
+   "frame": {
+    "x": 134,
+    "y": 0,
+    "w": 125,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 125,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 125,
+    "h": 232
+   },
+   "pivot": {
+    "x": 0.496,
+    "y": 0.931
+   }
+  },
+  "pinheiro_neve": {
+   "frame": {
+    "x": 261,
+    "y": 0,
+    "w": 113,
+    "h": 209
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 113,
+    "h": 209
+   },
+   "sourceSize": {
+    "w": 113,
+    "h": 209
+   },
+   "pivot": {
+    "x": 0.4956,
+    "y": 0.933
+   }
+  },
+  "rocha_neve": {
+   "frame": {
+    "x": 376,
+    "y": 0,
+    "w": 79,
+    "h": 65
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 79,
+    "h": 65
+   },
+   "sourceSize": {
+    "w": 79,
+    "h": 65
+   },
+   "pivot": {
+    "x": 0.3418,
+    "y": 0.5846
+   }
+  },
+  "pedra_neve": {
+   "frame": {
+    "x": 457,
+    "y": 0,
+    "w": 35,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 35,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 35,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.4286,
+    "y": 0.6
+   }
+  }
+ },
+ "meta": {
+  "image": "montanha.png",
+  "size": {
+   "w": 1024,
+   "h": 244
+  },
+  "scale": "0.5"
+ }
+}

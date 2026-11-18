@@ -1,7 +1,7 @@
 // Ganho offline: aplica no personagem o resultado calculado em core/offline.ts e monta o resumo.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { CLASSES } from '../data';
-import { POTIONS, isPotionId, itemColor, itemName, makeEquipment, makePotion } from '../items';
+import { POTIONS, isStackId, itemColor, itemName, makeEquipment, makePotion } from '../items';
 import { computeOffline, type OfflineResult } from '../offline';
 import { type ItemInstance, type PotionKind, type SaveData } from '../types';
 import type { OfflineReport, World } from '../world';
@@ -33,7 +33,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     soldGold += w.sellValueNow(it);
   };
   for (const d of res.drops) {
-    const isPot = isPotionId(d.baseId);
+    const isPot = isStackId(d.baseId); // poção ou material: uma pilha só
     for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
       const it = isPot
         ? makePotion(d.baseId, d.qty)

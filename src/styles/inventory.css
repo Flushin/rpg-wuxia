@@ -363,3 +363,14 @@
     max-height: none;
   }
 }
+/* melhoria do ferreiro (+N, marco 9) */
+.cell .plus {
+  position: absolute;
+  right: 3px;
+  top: 1px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd86b;
+  text-shadow: 0 0 3px #000;
+}

@@ -21,5 +21,13 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o vendedor', 'Talk to the seller');
     case 'talkToBlacksmith':
       return L('Fale com o ferreiro', 'Talk to the blacksmith');
+    case 'cannotForge':
+      return L('O ferreiro não pode fazer isso neste item', 'The blacksmith cannot do that to this item');
+    case 'noMaterials':
+      return L('Materiais insuficientes', 'Not enough materials');
+    case 'talkToMerchant':
+      return L('Fale com o Mercador Ambulante', 'Talk to the Traveling Merchant');
+    case 'soldOut':
+      return L('Já vendido', 'Already sold');
   }
 }

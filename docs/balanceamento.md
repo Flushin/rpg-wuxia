@@ -54,10 +54,14 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Bandido Arqueiro | 4–6 | 26 + 7 | 3–5 (+0,8 por nível) | 30 s |
 | Guerreiro de Terracota | 7–9 | 55 + 9 | 5–8 (+1 por nível) | 30 s |
 | General de Terracota | 10 | 600 | 260–340 | 600 s |
+| Espectro de Gelo | 11–13 / 15–17 (por ponto) | 80 + 18 | 8–12 (+1,2 por nível) | 30 s |
+| Yeti | 12–14 / 16–18 (por ponto) | 110 + 22 | 10–16 (+1,5 por nível) | 30 s |
+| Discípulo Caído (só na luta do Abade) | 18 | 300 | 15–25 | — |
+| Abade Caído | 20 | 20000 | 900–1200 | 900 s |
 
 Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
-Desde o marco 9 (fase 1) o nível máximo é 20, com 24000 / 28000 / 33000 / 38000 / 44000 / 50000 / 57000 / 65000 /
-74000 / 84000 do 10→11 ao 19→20 (**provisório**, calibrar na fase 9 com os monstros da montanha). Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
+Desde o marco 9 o nível máximo é 20, com 27000 / 31500 / 37000 / 42500 / 49500 / 56000 / 64000 / 73000 / 83000 /
+94000 do 10→11 ao 19→20 (calibrado na fase 9: ~2 h jogando ativo; `npm run sim:balance -- --m9`). Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
 
 ## Situação atual (17/11/2026)
 

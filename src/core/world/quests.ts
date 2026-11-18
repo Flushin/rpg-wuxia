@@ -67,10 +67,11 @@ export function questTurnIn(w: World, force = false): boolean {
     w.emit({ type: 'goldPickup', amount: r.gold });
   }
   if (r.item) {
+    const lv = r.itemLevel ?? 5;
     const base = Object.entries(BASES).find(
-      ([, b]) => b.slot === r.item && b.reqLevel === 5 && (!b.sect || b.sect === w.classId),
+      ([, b]) => b.slot === r.item && b.reqLevel === lv && (!b.sect || b.sect === w.classId),
     );
-    if (base) w.collect(makeEquipment(base[0], 'incomum', null, w.rng, 5), w.player.x, w.player.y);
+    if (base) w.collect(makeEquipment(base[0], 'incomum', null, w.rng, lv), w.player.x, w.player.y);
   }
   if (r.xp) w.gainXp(r.xp);
   return true;

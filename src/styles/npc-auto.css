@@ -349,3 +349,35 @@
     font-size: 12px;
   }
 }
+/* forja do ferreiro (marco 9): escolha do item */
+.fpick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 10px;
+  max-height: 132px;
+  overflow-y: auto;
+}
+.fchip {
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #1b1d24;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-align: left;
+}
+.fchip.on {
+  background: #33384a;
+  box-shadow: 0 0 0 2px #ffd86b inset;
+}
+.srow details summary {
+  cursor: pointer;
+  color: #aab;
+}
+.srow .si small .mat {
+  white-space: nowrap;
+}
+.srow .si small .mat i {
+  font-style: normal;
+  opacity: 0.7;
+}
