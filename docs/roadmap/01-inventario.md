@@ -13,7 +13,7 @@
 | **Gênero/estilo** | ARPG isométrico wuxia com combate tab-target, **auto-combate e ganho offline** (inspiração: Dragon Oath). Hoje é **single-player**. |
 | **Plataforma** | Web/PWA (GitHub Pages) e Android (Capacitor 8, com APK de teste gerado na CI). iOS só como PWA por enquanto. |
 | **Público-alvo** | Casual PvE mobile: sessões curtas, Auto e ganho offline como pilares, PvP opcional e tardio. |
-| **Time** | Solo dev (Lucas), com apoio de IA. |
+| **Time** | Solo dev (Lucas), **sem experiência de lançar jogos ou apps nas lojas**. A IA faz quase tudo (código, arte por script, testes, documentação, textos de loja); o Lucas decide, testa jogando e cuida do que exige uma pessoa (contas, identidade, pagamentos, assinaturas). |
 | **Monetização** | A v1 sai grátis, sem anúncios e sem compras. F2P (anúncio com recompensa e diamantes/cosméticos) fica para o pós-lançamento. |
 | **Modelo online alvo** | **Online assíncrono:** conta e save na nuvem com servidor validando, ranking, guilda/chat e mercado entre jogadores, mas cada jogador no seu próprio mundo. Sem mundo compartilhado em tempo real. |
 | **Tamanho** | ~12,3 mil linhas de TS em `src/`, ~3,2 mil de CSS, ~13 mil linhas em `tools/` (testes, simulador, robô do caos, geradores) |

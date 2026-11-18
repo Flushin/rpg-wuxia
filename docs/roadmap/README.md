@@ -3,13 +3,18 @@
 > Análise de 18/11/2026: inventário do código, benchmark com 12 RPGs online, lacunas e marcos.
 > É uma **proposta**. Pela regra do `docs/decisoes-do-projeto.md`, cada item que muda a jogabilidade precisa da
 > aprovação do Lucas antes de ser feito.
+>
+> **Premissa:** solo dev **sem experiência de lançar jogos ou apps nas lojas**; a **IA faz quase tudo** (código, testes,
+> documentação, textos de loja, guias passo a passo) e o Lucas decide, testa jogando e cuida do que exige uma pessoa
+> (contas, identidade, pagamentos, chaves). Cada tarefa do roadmap diz quem faz: 🤖 IA · 🤝 juntos · 👤 só o Lucas.
 
 | Documento | Conteúdo |
 | --- | --- |
 | [`01-inventario.md`](01-inventario.md) | Tudo o que existe no código, com arquivos, status e dívida técnica |
 | [`02-benchmark.md`](02-benchmark.md) | Matriz ✅/🟡/❌ contra WoW, FF14, GW2, ESO, OSRS, Tibia, RO, MapleStory, Albion, BDO, Lost Ark e PoE |
 | [`03-lacunas.md`](03-lacunas.md) | O que falta: essencial, importante, diferencial ou adiar, com complexidade e riscos |
-| [`04-marcos.md`](04-marcos.md) | M0 → M5+, com o critério de "pronto", métricas e checklist |
+| [`04-marcos.md`](04-marcos.md) | M0 → M5+, com o critério de "pronto", métricas e checklist marcado com quem faz cada tarefa |
+| [`05-guia-lancamento.md`](05-guia-lancamento.md) | Guia do primeiro lançamento: glossário, a jornada na Play Store em ordem, custos e armadilhas |
 
 ## Onde o jogo está
 
@@ -34,20 +39,24 @@ real ficam **fora do escopo** por decisão: é o que separa um jogo lançável d
 
 ## As 5 prioridades mais urgentes
 
-| # | Prioridade | Por quê | Marco | Compl. |
+| # | Prioridade | Por quê | Quem | Marco |
 | :-: | --- | --- | :-: | :-: |
-| **1** | **Preparar o core para o servidor e escolher o backend:** relógio injetável no lugar dos 12 `Date.now()`, core rodando em Node na CI, protótipo Supabase × Nakama | Tudo o que é online depende disto. Fazer agora, enquanto o código está fresco, e garantir com o simulador que nada mudou no jogo. | M0 | M |
-| **2** | **Conta convidado + save na nuvem** (com migração dos saves locais e tela de conflito) | Elimina o maior risco atual: perder o progresso ao trocar de celular ou limpar os dados. De quebra, entrega o progresso cruzado web ↔ Android. | M1 | G |
-| **3** | **O servidor como juiz:** ganho offline e mercador pelo relógio do servidor, e plausibilidade de XP/ouro/itens com limites tirados do simulador | Sem isso, ranking, mercado e compras viram trapaça (relógio adiantado, save editado). Precisa existir **antes** de qualquer recurso competitivo ou pago. | M1 | G |
-| **4** | **Telemetria mínima com consentimento + backups testados** | Sem dados de funil e retenção, não dá para saber se o alpha funciona. Sem um ensaio de restauração, o primeiro incidente pode apagar todo mundo. | M1 | P/M |
-| **5** | **Loop de retorno:** diárias, recompensa de login e a **Provação da Seita** (torre solo com semente semanal e ranking verificado) | O jogo hoje "acaba" em ~3 h. A Provação dá um fim de jogo infinito reaproveitando monstros e arenas que já existem, e usa o diferencial técnico do core determinístico. | M2 | G |
+| **1** | **Preparar o core para o servidor e escolher o backend gerenciado:** relógio injetável no lugar dos 12 `Date.now()`, core rodando em Node na CI, protótipo Supabase × Firebase, `CLAUDE.md` | Tudo o que é online depende disto. Com o simulador, dá para provar que nada mudou no jogo. | 🤖 (você só escolhe o backend) | M0 |
+| **2** | **Aprender a Play Store agora, com o jogo atual:** nome/appId, conta de desenvolvedor, AAB assinado, teste fechado com 12+ testadores por 14 dias | É a parte que você nunca fez e a que mais depende de calendário (verificação, 14 dias, respostas do Google). Teste fechado não é publicação. **Precisa da sua decisão:** muda a ordem decidida em 18/11/2026. | 👤 🤝 | M0 |
+| **3** | **Conta convidado + save na nuvem** (com migração dos saves locais e tela de conflito) | Elimina o maior risco atual: perder o progresso ao trocar de celular ou limpar os dados. Entrega o progresso cruzado web ↔ Android. | 🤖 | M1 |
+| **4** | **O servidor como juiz, com backups testados e telemetria:** offline e mercador pelo relógio do servidor, plausibilidade com limites do simulador, backup com ensaio de restauração, funil e retenção | Sem isso, ranking e compras viram trapaça, e um incidente pode apagar todo mundo. Os manuais ficam escritos para você pedir à IA "siga o manual". | 🤖 🤝 | M1 |
+| **5** | **Loop de retorno:** diárias, recompensa de login e a **Provação da Seita** (torre solo com semente semanal e ranking verificado) | O jogo hoje "acaba" em ~3 h. A Provação dá um fim de jogo infinito com monstros e arenas que já existem. | 🤖 (você decide o design) | M2 |
 
-**Pendência de decisão que trava o M1:** **nome final e appId** (`io.github.flushin.wanderers` é provisório). Depois que
-houver contas reais e um envio à Play Store, o appId não muda mais.
+**Decisões que só você pode tomar e que destravam o começo:** nome final e appId · antecipar ou não o teste fechado ·
+backend (depois do protótipo).
+
+**O que ficou de fora de propósito** (precisa de uma pessoa operando todo dia): chat de texto livre, mercado e troca
+entre jogadores. Voltam no M5+ se houver moderadores ou orçamento. Guildas usam frases prontas e uma guilda NPC da seita.
 
 ## Linha do tempo indicativa
 
 **M0** Fundação (2–3 sem) → **M1** Vertical slice online (3–5 sem) → **M2** Alpha fechado (4–6 sem) →
-**M3** Beta (6–8 sem) → **M4** Lançamento (3–4 sem) → **M5+** Live ops.
+**M3** Beta (5–7 sem) → **M4** Lançamento (3–4 sem) → **M5+** Live ops.
 
-São ~4 a 6 meses de trabalho focado até o lançamento, mais o tempo de calendário dos testes com jogadores e das lojas.
+São ~4 a 6 meses de calendário até o lançamento, com a IA implementando. Seu tempo estimado vai de ~5 a ~10 h por semana,
+conforme o marco (detalhes em `04-marcos.md`). A trilha da loja corre em paralelo desde o M0.

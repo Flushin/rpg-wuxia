@@ -1,12 +1,29 @@
 # 03 · Análise de lacunas
 
 > Base: inventário (`01-inventario.md`) e matriz (`02-benchmark.md`). Premissas confirmadas pelo Lucas em 18/11/2026:
-> **online assíncrono**, **casual PvE mobile**, **v1 grátis e F2P depois**, **solo dev**.
+> **online assíncrono**, **casual PvE mobile**, **v1 grátis e F2P depois**, **solo dev sem experiência de lançamento, com a IA
+> fazendo quase tudo**.
 >
 > ⚠️ Pela regra do `docs/decisoes-do-projeto.md`, **nada aqui está decidido**. Toda funcionalidade que mexe na jogabilidade
 > precisa da aprovação do Lucas antes de entrar.
 
-**Complexidade** (1 dev com apoio de IA, contando teste e polimento):
+## O que a premissa "solo dev sem experiência + IA faz quase tudo" muda
+
+1. **Nenhum servidor para cuidar.** Só serviços gerenciados (o provedor cuida de atualização, disco, segurança e backup).
+   Nada de máquina virtual própria, Docker em produção ou banco hospedado por conta própria.
+2. **Evitar sistemas que exigem uma pessoa todo dia.** Chat de texto livre (moderação), economia entre jogadores
+   (fraude, inflação, RMT) e suporte manual não escalam para quem joga, desenvolve e opera sozinho. Esses itens foram
+   para o pós-lançamento ou ganharam uma versão "sem operação" (frases prontas, guilda NPC).
+3. **Tudo como código e documentado**, para qualquer sessão de IA retomar o trabalho: migrações do banco no repositório,
+   scripts de deploy, manual de incidentes escrito como passo a passo que a IA executa com o Lucas.
+4. **Aprender a loja cedo e sem risco.** Conta na Play, verificação de identidade e teste fechado de 14 dias levam tempo de
+   calendário e são justamente o que o Lucas nunca fez. Começar com o jogo atual, que já funciona, antes de existir servidor
+   (ver `05-guia-lancamento.md`).
+5. **Custo fixo baixo e previsível**, com limite de gastos ligado em todo serviço pago.
+6. **Cada tarefa diz quem faz** em `04-marcos.md`: 🤖 a IA faz e o Lucas revisa jogando · 🤝 juntos (a IA guia passo a
+   passo, o Lucas clica) · 👤 só o Lucas (identidade, pagamento, assinatura de contrato, decisão de jogabilidade).
+
+**Complexidade** (com a IA implementando e o Lucas testando e decidindo; inclui teste e polimento):
 **P** = até 3 dias · **M** = 1 a 2 semanas · **G** = 3 a 6 semanas · **GG** = mais de 6 semanas, ou exige outra pessoa/serviço contínuo.
 
 **Classes:**
@@ -31,16 +48,21 @@ semente, passo fixo de 1/60 s) e **não depende do Phaser**. Por isso o servidor
 
 Para um solo dev, isso dá ~80% da segurança de um servidor autoritativo com ~20% do custo.
 
-**Opções de backend** (decidir no M0 com um protótipo curto):
+**Opções de backend** (decidir no M0 com um protótipo curto; nesta premissa só entram serviços **gerenciados**):
 
 | Opção | Prós | Contras |
 | --- | --- | --- |
 | **Supabase** (Postgres + Auth + Edge Functions em TS/Deno) | Plano grátis generoso; as funções em TS podem importar o `src/core` direto; SQL para a economia (livro-razão) | Ranking, chat e guildas são feitos à mão (tabelas + Realtime) |
-| **Nakama** (servidor de jogo open source) | Já vem com contas, armazenamento, ranking, torneios, grupos (guildas), chat, amigos e notificações | Hospedar sozinho exige operar servidor e banco; o runtime JS (goja) pode não aceitar o bundle do core sem ajustes; a nuvem oficial é cara |
+| **Nakama** (servidor de jogo open source) | Já vem com contas, armazenamento, ranking, torneios, grupos (guildas), chat, amigos e notificações | **Não recomendado nesta premissa:** hospedar sozinho é operar servidor e banco (atualização, segurança, disco, backup); a nuvem oficial é cara; o runtime JS (goja) pode não aceitar o bundle do core |
 | **Firebase** (Auth + Firestore + Functions) | Integração Android fácil; Auth com Google/Apple pronta | Firestore é ruim para economia transacional; risco de custo por leitura |
 
-Recomendação inicial: **Supabase**, por causa do TS no servidor, do SQL e do custo. A escolha só vira decisão depois do
-protótipo do M0.
+Recomendação: **Supabase gerenciado**, por causa do TS no servidor, do SQL, do custo e de não haver servidor para
+operar. A IA escreve e versiona as migrações do banco e as funções no repositório. O protótipo do M0 serve para confirmar
+(Supabase × Firebase), não para abrir mais opções.
+
+> **Atenção ao plano grátis do Supabase:** o projeto grátis é pausado após ~1 semana sem uso e tem backup limitado. Serve
+> para desenvolvimento e alpha. Do beta em diante, conte com o plano pago (~US$ 25/mês, com backup diário). Confira os
+> valores vigentes antes de assinar.
 
 ---
 
@@ -56,6 +78,7 @@ protótipo do M0.
 | E6 | **Telemetria mínima com consentimento** | Não existe (decisão de privacidade) | Sem funil e retenção, não dá para saber se o alpha e o beta funcionam. | E2 (ID anônimo); atualizar a política e o Data Safety | P/M | Coletar demais. Mitigação: lista fechada de ~15 eventos, sem PII. |
 | E7 | **Backups, logs e alertas do servidor** | Não existe | Online sem backup testado é perda de progresso em massa esperando acontecer. | Backend | P/M | Backup nunca testado. Mitigação: ensaio de restauração a cada marco. |
 | E8 | **Loop repetível de fim de jogo** | Parcial: no nível 20 só resta farmar o Abade e forjar | Online assíncrono vive de motivo para voltar. Hoje o jogo "acaba" em ~3 h ativas. | Pode começar antes do backend; o ranking vem depois de E4 | G | Virar grind sem sentido. Mitigação: recompensa cosmética/título e ranking semanal. |
+| E9 | **Processo da loja aprendido cedo:** conta no Play Console, verificação de identidade e teste fechado (12 testadores por 14 dias) feitos **com o jogo atual**, antes do servidor existir | Não começado (adiado para "depois de todos os marcos") | O Lucas nunca publicou. Essas etapas levam dias ou semanas de calendário, têm regras que mudam e podem dar recusa. Descobrir isso no fim atrasa o lançamento inteiro. Teste fechado **não é publicação**. | Nome e appId definitivos; build AAB assinado (a IA prepara) | P (trabalho) / 3–5 sem (calendário) | Precisa de decisão do Lucas (muda a ordem decidida em 18/11/2026). Recrutar 12 testadores reais. |
 
 ## Importantes
 
@@ -68,8 +91,7 @@ protótipo do M0.
 | I5 | **Talentos simples + respec** | Não existe; todos da mesma seita ficam iguais | Escolha de build é padrão e dá rejogabilidade. Proposta enxuta: 1 escolha entre 2 opções a cada 5 níveis. | `skills.json`, `stats.ts`, simulador | M | Quebrar o balanceamento. Mitigação: simulador com cada combinação. |
 | I6 | **Amigos** (código de amigo, ver perfil e equipamento, presentear energia/item leve) | Não existe | Base do social assíncrono. | E2 | M | Spam. Mitigação: limite diário. |
 | I7 | **Guildas assíncronas** (entrar, doar, chefe semanal com dano somado, loja da guilda) | Não existe | Principal retenção de médio prazo em MMOs mobile. | E2, E4, I6 | G | Guildas mortas com poucos jogadores. Mitigação: entrada automática numa "guilda da seita" (NPC) até haver guildas de jogadores. |
-| I8 | **Chat** (guilda com filtro + mensagens rápidas no global) | Não existe | O jogador espera, mas chat livre exige moderação contínua, e para um solo dev é um risco alto. | E2, I7; filtro de palavrões; denúncia/bloqueio | M/G | Moderação, assédio, divulgação de RMT. Mitigação: o global só com frases prontas; texto livre só na guilda. |
-| I9 | **Mercado de materiais** (compra e venda pelo servidor, com taxa) | Não existe | A economia entre jogadores é padrão. Começar **só com materiais** (minério, cristal, essência) reduz o risco de duplicação e de RMT. | E3, E4, livro-razão de ouro e materiais no servidor | G | Inflação, bots, RMT. Mitigação: taxa que retira ouro do jogo, limites diários, só materiais na fase 1. |
+| I8 | **Comunicação sem moderação:** frases e emojis prontos na guilda e nos amigos ("Bom trabalho!", "Chefe da guilda às 20h"), sem texto livre | Não existe | Dá o mínimo de conversa que o jogador espera **sem exigir moderação humana**. Chat de texto livre foi para o Adiar (A14). | E2, I7 | P/M | Parecer limitado. Mitigação: um Discord da comunidade para conversa livre, moderado por voluntários. |
 | I10 | **Missões secundárias repetíveis** ("mural de contratos") | Não existe | Dá variedade ao farm e conteúdo fora da cadeia principal. | `quests.json` (precisa aceitar missões repetíveis) | M | — |
 | I11 | **Mais conteúdo de progressão** (nível 20 → 30: 1 mapa, 2 monstros, 1 chefe) | O conteúdo atual dura ~3 h ativas | Precisa haver o que fazer entre o lançamento e a primeira temporada. | Pipeline de arte (o gargalo é haver modelo CC0), gerador de mapas, simulador | G | Arte genérica por falta de modelo (como aconteceu com o Yeti). |
 | I12 | **Tutorial interativo** (primeiros 10 min) + medição do funil | Parcial: dicas e primeira missão | Primeira impressão decide a retenção D1 no celular. | E6 | M | — |
@@ -80,6 +102,7 @@ protótipo do M0.
 | I17 | **Acessibilidade** (modo daltônico nas raridades/áreas, reduzir efeitos e tremor) | Parcial | Barato, e as lojas valorizam. | CSS e paletas do `skillFx` | P | — |
 | I18 | **Vibração nos golpes** (o `haptics.ts` já existe e não é usado) | Esboço | Sensação de impacto no celular, quase de graça. | `src/platform/haptics.ts` | P | Bateria. Mitigação: opção para desligar. |
 | I19 | **Ferramenta de admin mínima** (buscar conta, ver logs, banir, restaurar save) | Não existe | Sem ela, cada ticket de suporte vira acesso direto ao banco. | E2, E3, E7 | M | — |
+| I20 | **Documentação operacional para a IA** (`CLAUDE.md` com as regras do projeto, manual de incidentes, como fazer deploy e migração, onde ficam os segredos) | Parcial: o `docs/decisoes-do-projeto.md` é ótimo, mas não há `CLAUDE.md` nem manual de operação | Com a IA fazendo quase tudo, cada sessão nova precisa achar o contexto sem o Lucas explicar de novo. Num incidente às 23h, o Lucas abre uma sessão e diz "siga o manual". | Nenhuma | P (contínuo) | Documento desatualizado. Mitigação: atualizar no mesmo PR da mudança (regra já usada no projeto). |
 
 ## Diferenciais (oportunidades de destaque)
 
@@ -105,12 +128,14 @@ protótipo do M0.
 | A5 | **Montarias** | Mapas de 32×32 não pedem montaria. | M | Quando houver mapas grandes. |
 | A6 | **Ciclo dia/noite e clima** | Bonito, mas não retém. Uma versão barata seria um tom de cor por hora e neve na Montanha. | P (só cor) / M (com efeitos) | Pode entrar como polimento barato no M4. |
 | A7 | **Profissões de coleta** (minerar, ervas, pesca) | Duplica o loop de materiais da forja e pede arte e UI novas. | G | Pós-lançamento, como mais uma atividade idle. |
-| A8 | **Troca direta entre jogadores** | Principal vetor de RMT e golpes. O mercado de materiais (I9) cobre a necessidade. | M | Talvez nunca. Se vier, só entre amigos e com limite. |
+| A8 | **Troca direta entre jogadores** | Principal vetor de RMT e golpes, e exige a mesma vigilância do mercado (A15). | M | Talvez nunca. Se vier, só entre amigos e com limite. |
 | A9 | **Battle pass** | Exige conteúdo sazonal constante. Antes disso, vira vitrine vazia. | M | M5, junto das temporadas (D6). |
 | A10 | **App iOS nativo** | O Lucas usa Windows; seria preciso um runner macOS na CI e a conta Apple (US$ 99/ano). O iOS pode jogar pela PWA. | M | Depois do lançamento na Play Store, se houver demanda. |
 | A11 | **Aparência customizável completa** | O pipeline de sprites recolore modelos CC0. Rosto e corpo customizáveis multiplicam as folhas de sprite. | G | Versão barata no M3/M5: **2–3 paletas de cor por seita** (recolor), que já vira cosmético. |
 | A12 | **Remapeamento de teclas** | O público principal é mobile. | P | Quando houver demanda do PC. |
 | A13 | **Trocar de seita no mesmo personagem** (estilo FF14) | Muda a estrutura do save e o balanceamento. Os 4 espaços de personagem já resolvem. | G | Pós-lançamento. |
+| A14 | **Chat de texto livre** (global ou de guilda) | Exige moderação humana contínua (assédio, golpes, RMT, conteúdo ilegal) e obrigações de denúncia nas lojas. Inviável para um solo dev que também desenvolve. | M (código) / contínuo (moderação) | Quando houver moderadores voluntários ou orçamento para um serviço de moderação. |
+| A15 | **Mercado entre jogadores** (mesmo só de materiais) | Precisa de vigilância contínua da economia (bots, inflação, duplicação, RMT). Um erro vira problema público no dia seguinte. | G | Pós-lançamento (M5), com o livro-razão do servidor rodando há meses e alertas automáticos de anomalia. |
 
 ---
 
@@ -126,8 +151,7 @@ flowchart LR
   E4 --> I1[I1 ranking] --> D1[D1 Provação da Seita]
   E4 --> I2[I2 diárias]
   E2 --> I6[I6 amigos] --> D2[D2 ajudante] --> D3[D3 arena assíncrona]
-  I6 --> I7[I7 guildas] --> I8[I8 chat]
-  E4 --> I9[I9 mercado de materiais]
+  I6 --> I7[I7 guildas] --> I8[I8 frases prontas]
   E2 --> I14[I14 config remota] --> D6[D6 ligas] & D8[D8 chefe de campo]
 ```
 
@@ -135,6 +159,6 @@ flowchart LR
 
 | | Custo baixo (P/M) | Custo alto (G/GG) |
 | --- | --- | --- |
-| **Valor alto** | E1, E2, E5, E6, E7, I1, I2, I3, I14, I15, I18 | E3, E4, E8/D1, I7, I11 |
-| **Valor médio** | I4, I5, I6, I10, I12, I13, I16, I17, I19, D3, D7 | I8, I9, D2, D6 |
-| **Valor baixo agora** | A6, A12 | A1, A2, A3, A4, A7, A13 |
+| **Valor alto** | E1, E2, E5, E6, E7, E9, I1, I2, I3, I14, I15, I18, I20 | E3, E4, E8/D1, I7, I11 |
+| **Valor médio** | I4, I5, I6, I8, I10, I12, I13, I16, I17, I19, D3, D7 | D2, D6 |
+| **Valor baixo agora** | A6, A12 | A1, A2, A3, A4, A7, A13, A14, A15 |

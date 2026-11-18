@@ -53,6 +53,20 @@
 
 ## Decididas
 
+### Roadmap online (18/11/2026)
+Respondido pelo Lucas em 18/11/2026, ao pedir o roadmap em `docs/roadmap/` (o roadmap é uma proposta; cada item de
+jogabilidade continua passando por pergunta antes de ser feito).
+- **Modelo online:** **assíncrono**: conta e save na nuvem com o servidor validando, ranking, amigos e guildas, cada jogador
+  no seu próprio mundo. Mundo compartilhado em tempo real, raids e PvP em tempo real ficam fora do escopo.
+- **Monetização:** a v1 sai grátis, sem anúncios e sem compras (confirma a decisão de 18/11/2026); F2P ético depois do lançamento.
+- **Público-alvo:** casual PvE mobile (Auto e ganho offline como pilares; PvP opcional e tardio).
+- **Premissa de trabalho:** o Lucas é solo dev **sem experiência de lançar jogos ou apps nas lojas** e precisa da IA para
+  quase tudo. Consequências no roadmap: só serviços gerenciados (nenhum servidor para operar), nada que exija moderação
+  ou vigilância diária antes do pós-lançamento (chat de texto livre, mercado e troca entre jogadores), manuais escritos
+  para a IA seguir com o Lucas, e cada tarefa marcada com quem faz (🤖 IA · 🤝 juntos · 👤 só o Lucas).
+- **Em aberto (pergunta do M0):** antecipar o teste fechado da Play Store com o jogo atual (não é publicação), em vez de
+  deixar toda a parte de loja para depois de todos os marcos.
+
 ### Titã e Víbora (marco 8, 18/11/2026)
 Aprovado pelo Lucas em 18/11/2026 (skills como propostas; Titã = Fogo; Víbora = físico com Agilidade). Números ajustados
 com o simulador (6 execuções por seita): até o nível 10 — Tormenta ~61 min / 1,7 morte, Geada ~43 / 0,3,
