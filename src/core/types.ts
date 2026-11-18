@@ -1,3 +1,4 @@
+import type { CHARACTER_SAVE_VERSION } from './saveFormat';
 export type Element = 'fire' | 'ice' | 'thunder' | 'poison';
 export const ELEMENTS: Element[] = ['fire', 'ice', 'thunder', 'poison'];
 export type AttrKey = 'strength' | 'intelligence' | 'stamina' | 'agility' | 'willpower';
@@ -201,7 +202,7 @@ export interface AutoSave {
 }
 
 export interface SaveData {
-  version: 1;
+  version: typeof CHARACTER_SAVE_VERSION; // ver core/saveFormat.ts
   name: string;
   classId: string;
   level: number;

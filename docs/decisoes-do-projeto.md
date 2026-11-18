@@ -105,7 +105,7 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   preservadas). **Volumes agora são por aparelho** (decisão P6): ficam em `rpg-audio`; na primeira vez, herdam os volumes
   do personagem que entrar. O campo `audio` do save continua igual (formato não muda), mas só é lido nessa primeira vez.
 
-**Fase B concluída em 17/11/2026** (B1–B6). Fase C (estrutura) em andamento:
+**Fase B concluída em 17/11/2026** (B1–B6). Fase C (estrutura):
 - **C1 (17/11/2026):** o painel ⚙ saiu de `src/ui/tips.ts` para `src/ui/settingsPanel.ts` (`SettingsPanel`).
   `TipManager` ficou só com as dicas e ganhou `setEnabled()` e `resetSeen()`, que o painel chama. O comportamento é o mesmo.
 - **C2 (18/11/2026):** o painel de Atributos (C) saiu de `src/ui/hud.ts` para `src/ui/attrsPanel.ts` (`AttrsPanel`, com
@@ -137,6 +137,14 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   agrupados como "estado interno"; métodos internos têm comentário. `pf` → `findPathFor`; `quest` declarado com os campos.
   **Regras devolvem códigos de erro** (`ActionError` em `core/types.ts`: `noGold`, `bagFull`, `needLevel`, `sectOnly`…)
   e a interface traduz em `src/ui/actionError.ts` (mesmos textos de antes).
+- **C8 (18/11/2026):** versões do save com nome, em `src/core/saveFormat.ts`. `SAVE_FILE_VERSION = 2` é o arquivo
+  inteiro (4 espaços); `CHARACTER_SAVE_VERSION = 1` é um personagem (`SaveData`). Ao carregar, cada personagem passa
+  por `migrateCharacter`, que aplica em ordem as funções de `CHARACTER_MIGRATIONS` (hoje vazia: nada muda nos saves
+  atuais). Save sem versão conta como 1; save de versão mais nova (app mais novo em outro aparelho) não é mexido.
+  **Regra:** campo novo opcional não precisa de versão (a leitura corrige o que falta); campo que muda de sentido,
+  nome ou formato sobe `CHARACTER_SAVE_VERSION` e ganha uma migração. Necessário antes do marco online.
+
+**Fase C concluída em 18/11/2026** (C1–C8). Próxima: Fase D (preparação para as lojas), quando o Lucas pedir.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

@@ -5,11 +5,12 @@ import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
 import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
+import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 
 export function serialize(w: World): SaveData {
   return {
-    version: 1,
+    version: CHARACTER_SAVE_VERSION,
     name: w.player.name,
     classId: w.classId,
     level: w.player.level,

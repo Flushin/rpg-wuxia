@@ -379,6 +379,8 @@ As etapas dentro de cada fase são independentes entre si.
 
 ### Fase C — estrutura
 
+> ✅ **Concluída em 18/11/2026** (C1–C8, PRs #33, #35 e a desta etapa).
+
 **C1. Separar o painel de Configurações das Dicas** — M
 > ✅ **Feita em 17/11/2026.**
 - Objetivo: `src/ui/settingsPanel.ts` sai de `tips.ts:29-88`; `TipManager` fica só com dicas.
@@ -426,6 +428,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Teste: RT com **saída do simulador idêntica** (ponto 3) + os 7 checks; o `check:items` e `check:quests` cobrem bem inventário e missões.
 
 **C8. Versão do save explícita** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `SAVE_FORMAT_VERSION` e uma lista de migrações (hoje é "sanitizar tudo na carga"), resolvendo a confusão `SaveData.version: 1` × `SaveFile.version: 2`. Necessário antes do marco online.
 - Arquivos: `src/core/saves.ts`, `src/core/types.ts`, `src/save.ts`.
 - Risco: baixo se a migração for identidade. Teste: RT + carregar um save antigo exportado do IndexedDB.
