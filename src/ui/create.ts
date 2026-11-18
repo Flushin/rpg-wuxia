@@ -12,27 +12,59 @@ export interface TitleHandlers {
   onDelete: (slot: number) => Promise<SaveFile> | SaveFile;
 }
 
+type View = 'slots' | 'create' | 'del';
+
+/** Estado da tela inicial, compartilhado pelas três partes (lista, criação, exclusão). */
+interface TitleState {
+  root: HTMLElement;
+  h: TitleHandlers;
+  file: SaveFile;
+  /** espaço que está sendo criado ou apagado */
+  slot: number;
+  /** seita escolhida na criação */
+  selected: string;
+  show: (v: View) => void;
+}
+
 // Tela inicial: 4 espaços de personagem + criação + confirmação de exclusão (digitar o nome).
 export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (id: string) => string) {
   const root = byId('create');
   root.classList.remove('hidden');
-  let file = initial,
-    selected = Object.keys(CLASSES)[0],
-    slot = 0;
-  const views = { slots: byId('slots-view'), create: byId('create-view'), del: byId('del-view') };
-  const show = (v: keyof typeof views) => {
-    for (const [k, el] of Object.entries(views)) el.classList.toggle('hidden', k !== v);
-    root.scrollTop = 0;
+  const views: Record<View, HTMLElement> = {
+    slots: byId('slots-view'),
+    create: byId('create-view'),
+    del: byId('del-view'),
   };
+  const st: TitleState = {
+    root,
+    h,
+    file: initial,
+    slot: 0,
+    selected: Object.keys(CLASSES)[0],
+    show: (v) => {
+      for (const [k, el] of Object.entries(views)) el.classList.toggle('hidden', k !== v);
+      root.scrollTop = 0;
+    },
+  };
+  const renderSlots = setupSlotList(st, mapName);
+  setupCreateView(st);
+  setupDeleteView(st, renderSlots);
+  byId('lang-slot').innerHTML = langButtons();
+  bindLangButtons(byId('lang-slot'));
+  renderSlots();
+  st.show('slots');
+}
 
+/** Lista dos 4 espaços (Jogar, Criar, Apagar). Devolve a função que redesenha a lista. */
+function setupSlotList(st: TitleState, mapName: (id: string) => string) {
   const list = byId('slot-list');
-  const renderSlots = () => {
+  const render = () => {
     list.innerHTML = Array.from({ length: SLOT_COUNT }, (_, i) => {
-      const s = file.slots[i];
+      const s = st.file.slots[i];
       if (!s)
         return `<div class="slot-card empty"><div class="slot-info"><b>${L(`Espaço ${i + 1}`, `Slot ${i + 1}`)}</b><small>${L('Vazio', 'Empty')}</small></div><div class="slot-btns"><button data-act="new" data-i="${i}" class="primary">${L('Criar personagem', 'Create character')}</button></div></div>`;
       const c = CLASSES[s.classId];
-      return `<div class="slot-card${i === file.lastPlayedSlot ? ' last' : ''}" style="--c:${c?.color ?? '#667'}"><div class="slot-info"><b>${escapeHtml(s.name)}</b>
+      return `<div class="slot-card${i === st.file.lastPlayedSlot ? ' last' : ''}" style="--c:${c?.color ?? '#667'}"><div class="slot-info"><b>${escapeHtml(s.name)}</b>
         <small>${c?.name ?? s.classId} - ${L(`Nível ${s.level}`, `Level ${s.level}`)}</small><small>${mapName(s.mapId)} - ${relativeTime(s.lastSeen)}</small></div>
         <div class="slot-btns"><button data-act="play" data-i="${i}" class="primary">${L('Jogar', 'Play')}</button><button data-act="del" data-i="${i}" class="danger">${L('Apagar', 'Delete')}</button></div></div>`;
     }).join('');
@@ -41,41 +73,46 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
     const t = (e.target as HTMLElement).closest('button[data-act]') as HTMLElement | null;
     if (!t) return;
     const i = Number(t.dataset.i),
-      s = file.slots[i];
+      s = st.file.slots[i];
     if (t.dataset.act === 'play' && s) {
-      root.classList.add('hidden');
-      h.onPlay(i, i === file.lastPlayedSlot);
+      st.root.classList.add('hidden');
+      st.h.onPlay(i, i === st.file.lastPlayedSlot);
     } else if (t.dataset.act === 'new') {
-      slot = i;
+      st.slot = i;
       (byId('char-name') as HTMLInputElement).value = '';
-      show('create');
+      st.show('create');
     } else if (t.dataset.act === 'del' && s) {
-      slot = i;
+      st.slot = i;
       byId('del-msg').textContent = L(
         `Apagar "${s.name}" (Nv ${s.level}) para sempre? Digite o nome do personagem para confirmar.`,
         `Delete "${s.name}" (Lv ${s.level}) forever? Type the character name to confirm.`,
       );
-      const inp = byId('del-name') as HTMLInputElement;
-      inp.value = '';
+      (byId('del-name') as HTMLInputElement).value = '';
       (byId('btn-del-ok') as HTMLButtonElement).disabled = true;
-      show('del');
+      st.show('del');
     }
   };
+  return render;
+}
 
-  // criação
-  const cards = byId('class-cards');
-  // cada seita é apresentada pelo seu mestre (o mesmo que fica na praça da cidade);
-  // Titã e Víbora aparecem bloqueadas ("em breve")
-  const LOCKED: Record<string, { name: string; color: string; range: string }> = {
-    tita: { name: L('Titã', 'Titan'), color: '#c48028', range: L('Corpo a corpo - tanque', 'Melee - tank') },
-    vibora: { name: L('Víbora', 'Viper'), color: '#34804a', range: L('À distância - veneno', 'Ranged - poison') },
-  };
-  const masterBlock = (id: string, color: string) => {
-    const m = NPC_TEXT.masters[id];
-    if (!m) return '';
-    return `<div class="master" style="--c:${color}"><img src="${MASTER_PORTRAITS[id] ?? ''}" alt="" loading="lazy"><div><strong>${escapeHtml(m.name)}</strong><i>${escapeHtml(m.title)}</i></div></div>
+// cada seita é apresentada pelo seu mestre (o mesmo que fica na praça da cidade);
+// Titã e Víbora aparecem bloqueadas ("em breve")
+const lockedSects = (): Record<string, { name: string; color: string; range: string }> => ({
+  tita: { name: L('Titã', 'Titan'), color: '#c48028', range: L('Corpo a corpo - tanque', 'Melee - tank') },
+  vibora: { name: L('Víbora', 'Viper'), color: '#34804a', range: L('À distância - veneno', 'Ranged - poison') },
+});
+
+function masterBlock(id: string, color: string) {
+  const m = NPC_TEXT.masters[id];
+  if (!m) return '';
+  return `<div class="master" style="--c:${color}"><img src="${MASTER_PORTRAITS[id] ?? ''}" alt="" loading="lazy"><div><strong>${escapeHtml(m.name)}</strong><i>${escapeHtml(m.title)}</i></div></div>
       <q>${escapeHtml(m.intro)}</q>`;
-  };
+}
+
+/** Criação: cartões das seitas, nome e "Começar". */
+function setupCreateView(st: TitleState) {
+  const cards = byId('class-cards');
+  const locked = lockedSects();
   cards.innerHTML = SECT_ORDER.map((id) => {
     const c = CLASSES[id];
     if (c)
@@ -83,7 +120,7 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
     <b>${c.name}</b><span>${c.rangeLabel} - ${L('dano', 'damage:')} ${DAMAGE_LABELS[c.damageType].toLowerCase()} - ${ELEMENT_LABELS[c.element]}</span>
     ${masterBlock(id, c.color)}
     <small>${ATTR_KEYS.map((k) => `${ATTR_LABELS[k].slice(0, 3)} ${c.baseAttributes[k]}`).join(' / ')}</small></button>`;
-    const lk = LOCKED[id];
+    const lk = locked[id];
     return lk
       ? `<button class="class-card locked" data-locked="1" disabled aria-disabled="true" style="--c:${lk.color}">
     <b>${lk.name}</b><span>${lk.range}</span><span class="soon">${L('Em breve', 'Coming soon')}</span>
@@ -93,11 +130,11 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
   const refresh = () =>
     cards
       .querySelectorAll<HTMLElement>('.class-card')
-      .forEach((el) => el.classList.toggle('sel', el.dataset.id === selected));
+      .forEach((el) => el.classList.toggle('sel', el.dataset.id === st.selected));
   cards.onclick = (e) => {
     const t = (e.target as HTMLElement).closest('.class-card') as HTMLElement | null;
     if (t && !t.dataset.locked) {
-      selected = t.dataset.id!;
+      st.selected = t.dataset.id!;
       refresh();
     }
   };
@@ -111,29 +148,26 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
       input.classList.add('err');
       return;
     }
-    root.classList.add('hidden');
-    h.onCreate(slot, name, selected);
+    st.root.classList.add('hidden');
+    st.h.onCreate(st.slot, name, st.selected);
   };
-  byId('btn-back').onclick = () => show('slots');
+  byId('btn-back').onclick = () => st.show('slots');
+}
 
-  // exclusão
+/** Exclusão: só libera "Apagar" quando o nome digitado é igual ao do personagem. */
+function setupDeleteView(st: TitleState, renderSlots: () => void) {
   const del = byId('del-name') as HTMLInputElement,
     ok = byId('btn-del-ok') as HTMLButtonElement;
   del.oninput = () => {
-    ok.disabled = del.value.trim() !== (file.slots[slot]?.name ?? '\u0000');
+    ok.disabled = del.value.trim() !== (st.file.slots[st.slot]?.name ?? '\u0000');
   };
-  byId('btn-del-cancel').onclick = () => show('slots');
+  byId('btn-del-cancel').onclick = () => st.show('slots');
   ok.onclick = async () => {
     if (ok.disabled) return;
-    file = await h.onDelete(slot);
+    st.file = await st.h.onDelete(st.slot);
     renderSlots();
-    show('slots');
+    st.show('slots');
   };
-
-  byId('lang-slot').innerHTML = langButtons();
-  bindLangButtons(byId('lang-slot'));
-  renderSlots();
-  show('slots');
 }
 
 /** Tela inicial quando os personagens não puderam ser lidos: aviso + "Tentar de novo" (nada é gravado até ler). */

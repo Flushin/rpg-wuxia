@@ -386,11 +386,13 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo. Teste: RT + cada controle de ⚙ (mudo, volumes, idioma, tamanho, FPS, feed, dicas, report, voltar ao título).
 
 **C2. Separar o painel de Atributos do HUD** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `src/ui/attrsPanel.ts` com `renderPanel` (`hud.ts:156`) e os cliques (`hud.ts:52-58`).
 - Arquivos: `src/ui/hud.ts`, novo arquivo.
 - Risco: baixo. Teste: RT + gastar ponto, "Distribuir recomendado", fechar pelo X e por C.
 
 **C3. Quebrar a tela inicial** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `showTitleScreen` (86 linhas) em três funções: lista de espaços, criação, exclusão.
 - Arquivos: `src/ui/create.ts`.
 - Risco: baixo. Teste: RT + criar, jogar, apagar (com nome errado e certo), trocar idioma na tela inicial.

@@ -108,6 +108,10 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 **Fase B concluída em 17/11/2026** (B1–B6). Fase C (estrutura) em andamento:
 - **C1 (17/11/2026):** o painel ⚙ saiu de `src/ui/tips.ts` para `src/ui/settingsPanel.ts` (`SettingsPanel`).
   `TipManager` ficou só com as dicas e ganhou `setEnabled()` e `resetSeen()`, que o painel chama. O comportamento é o mesmo.
+- **C2 (18/11/2026):** o painel de Atributos (C) saiu de `src/ui/hud.ts` para `src/ui/attrsPanel.ts` (`AttrsPanel`, com
+  `open`, `set()` e `update()`, no mesmo molde do painel de skills). O `Hud` continua com `togglePanel()` e o som de abrir/fechar.
+- **C3 (18/11/2026):** `showTitleScreen` (`src/ui/create.ts`) foi dividida em `setupSlotList`, `setupCreateView` e
+  `setupDeleteView`, que dividem um estado único (`TitleState`: arquivo de saves, espaço e seita escolhidos).
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
