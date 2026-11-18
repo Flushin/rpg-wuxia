@@ -15,20 +15,11 @@ import {
   type SkillDef,
   type SkillState,
 } from './skills';
-import {
-  BAG_SIZE,
-  BASES,
-  SLOTS,
-  STARTING_KIT,
-  STARTING_WEAPON,
-  makeEquipment,
-  makePotion,
-  maxDurability,
-  sanitizeItem,
-} from './items';
+import { BAG_SIZE, SLOTS, STARTING_KIT, STARTING_WEAPON, makeEquipment, makePotion, maxDurability } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { Rng } from './rng';
+import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
 import * as npcs from './world/npcs';
 import * as boss from './world/boss';
@@ -36,7 +27,7 @@ import * as quests from './world/quests';
 import * as shop from './world/shop';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
-import { sanitizeQuest, type QuestDef, type QuestPhase, type QuestState } from './quests';
+import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { computeDerived, emptyElements } from './stats';
 import {
   ATTR_KEYS,
@@ -176,68 +167,14 @@ export class World {
   // offline=false: não aplica ganho offline (só o último personagem jogado recebe)
   static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now(), offline = true): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
-    w.xp = s.xp;
-    w.freePoints = s.freePoints;
-    w.ratioCursor = s.ratioCursor ?? 0;
-    w.seenTips = [...(s.seenTips ?? [])];
-    w.tipsEnabled = s.tipsEnabled ?? true;
-    w.audio = { sfx: s.audio?.sfx ?? 80, music: s.audio?.music ?? 50, muted: s.audio?.muted ?? false };
-    for (const [id, st] of Object.entries(s.skills ?? {})) {
-      const cur = w.skills[id];
-      if (!cur) continue;
-      cur.level = Math.max(1, Math.min(SKILL_MAX_LEVEL, Math.floor(Number(st.level) || 1)));
-      cur.xp = cur.level >= SKILL_MAX_LEVEL ? 0 : Math.max(0, Number(st.xp) || 0);
-    }
-    w.gold = Math.max(0, Math.floor(Number(s.gold) || 0));
-    (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
-      w.bag[i] = sanitizeItem(raw);
-    });
-    for (const sl of SLOTS) {
-      const it = sanitizeItem(s.equipment?.[sl]);
-      if (it && BASES[it.baseId]?.slot === sl) w.equipment[sl] = it;
-    }
-    w.recalc(w.player, false);
-    w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
-    w.clock = () => now;
-    w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
-    for (const [k, v] of Object.entries(s.respawns ?? {}))
-      if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
-    w.changeMap(maps[s.mapId] ? s.mapId : HOME_MAP);
-    w.clock = () => Date.now();
-    w.auto.load(s.auto);
-    w.quest = sanitizeQuest(s.quest);
+    saveCodec.restore(w, s, now);
     w.offlineReport = offline ? w.applyOffline(now, s.lastSeen, s.auto) : null;
     return w;
   }
 
+  // ---------- saveCodec: src/core/world/saveCodec.ts ----------
   serialize(): SaveData {
-    return {
-      version: 1,
-      name: this.player.name,
-      classId: this.classId,
-      level: this.player.level,
-      xp: this.xp,
-      freePoints: this.freePoints,
-      attributes: { ...this.player.attrs },
-      mapId: this.mapId,
-      lastSeen: Date.now(),
-      skills: Object.fromEntries(Object.entries(this.skills).map(([id, st]) => [id, { level: st.level, xp: st.xp }])),
-      ratioCursor: this.ratioCursor,
-      seenTips: [...this.seenTips],
-      tipsEnabled: this.tipsEnabled,
-      audio: { ...this.audio },
-      gold: this.gold,
-      bag: JSON.parse(JSON.stringify(this.bag)),
-      equipment: JSON.parse(
-        JSON.stringify(
-          Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])),
-        ),
-      ),
-      auto: this.auto.serialize(),
-      bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
-      respawns: Object.fromEntries(Object.entries(this.respawnAtMs).filter(([, t]) => t > this.clock())),
-      quest: { ...this.quest },
-    };
+    return saveCodec.serialize(this);
   }
 
   emit(ev: GameEvent) {
