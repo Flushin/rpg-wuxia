@@ -19,6 +19,9 @@ Não escreva uma licença de memória e não copie de outro pacote: se não cons
 | `eventemitter3-5.0.4-LICENSE.txt` | eventemitter3 5.0.4 — **MIT**, © 2014 Arnout Kazemier | Dependência do Phaser (vai no bundle) | Pacote npm `eventemitter3@5.0.4` | `3aecc12b1cb2` |
 | `idb-keyval-6.3.0-LICENCE.txt` | idb-keyval 6.3.0 — **Apache-2.0**, © 2016 Jake Archibald | Saves no IndexedDB (vai no bundle) | Pacote npm `idb-keyval@6.3.0` (o pacote não tem arquivo NOTICE) | `20c27d633961` |
 | `Apache-2.0.txt` | Texto completo da Apache License 2.0 (o arquivo do idb-keyval só traz o cabeçalho) | idb-keyval | SPDX: `https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt` | `074e6e32c86a` |
+| `capacitor-8.6.2-LICENSE.txt` | Capacitor 8.6.2 (`@capacitor/core` e `@capacitor/android`) — **MIT**, © 2017-present Drifty Co. | App das lojas: ponte entre o jogo e o Android (core vai no bundle; android vai no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/core@8.6.2` (o de `@capacitor/android@8.6.2` é idêntico) | `9c6ebf3e5ab8` |
+| `capacitor-plugins-app-haptics-status-bar-LICENSE.txt` | `@capacitor/app` 8.1.2, `@capacitor/haptics` 8.0.2, `@capacitor/status-bar` 8.0.4 — **MIT**, © 2020-present Ionic | App das lojas (vão no bundle e no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/app@8.1.2` (os outros dois são idênticos) | `de884404585e` |
+| `capacitor-filesystem-8.1.5-LICENSE.txt` | `@capacitor/filesystem` 8.1.5 — **MIT**, © 2025 Ionic | Save em arquivo no app (vai no bundle e no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/filesystem@8.1.5` | `e8f989836e88` |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 

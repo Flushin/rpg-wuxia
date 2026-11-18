@@ -20,13 +20,22 @@
     "check:quests": "esbuild tools/quests-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/quests-check.mjs && node /tmp/quests-check.mjs",
     "check:respawn": "esbuild tools/respawn-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/respawn-check.mjs && node /tmp/respawn-check.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "android:prepare": "npm run build && (test -d android || npx cap add android) && npx cap sync android",
+    "android:apk": "npm run android:prepare && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "idb-keyval": "^6.3.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
     "esbuild": "^0.21.5",
     "prettier": "3.6.2",
     "typescript": "^5.9.3",

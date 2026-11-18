@@ -1,0 +1,31 @@
+# Gera o APK de teste (debug) do app Android em todo PR e sob demanda (aba Actions → "APK Android" → Run workflow).
+# O APK fica no fim da página da execução, em "Artifacts" (wanderers-debug-apk). Instalar no celular: ver docs/android.md.
+# A pasta android/ não está no repositório: é gerada aqui a partir do capacitor.config.ts.
+name: APK Android
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run android:prepare
+      - run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wanderers-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14

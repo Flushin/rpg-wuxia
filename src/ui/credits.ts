@@ -7,6 +7,9 @@ import phaserLicense from '../../docs/licencas/phaser-3.90.0-LICENSE.md?raw';
 import eventemitterLicense from '../../docs/licencas/eventemitter3-5.0.4-LICENSE.txt?raw';
 import idbHeader from '../../docs/licencas/idb-keyval-6.3.0-LICENCE.txt?raw';
 import apacheLicense from '../../docs/licencas/Apache-2.0.txt?raw';
+import capacitorLicense from '../../docs/licencas/capacitor-8.6.2-LICENSE.txt?raw';
+import capacitorPluginsLicense from '../../docs/licencas/capacitor-plugins-app-haptics-status-bar-LICENSE.txt?raw';
+import capacitorFilesystemLicense from '../../docs/licencas/capacitor-filesystem-8.1.5-LICENSE.txt?raw';
 
 // Créditos e licenças: aberto em ⚙ (no jogo) e no link da tela inicial. Fica no <body> (fora do HUD) para funcionar
 // nas duas telas. Créditos de assets CC0 são cortesia; os avisos MIT/Apache-2.0 das bibliotecas são obrigatórios.
@@ -78,6 +81,14 @@ const LIBRARIES: Library[] = [
     license: 'Apache License 2.0',
     text: `${idbHeader.trim()}\n\n${apacheLicense}`,
   },
+  { name: 'Capacitor 8.6.2', notice: '© 2017-present Drifty Co.', license: 'MIT', text: capacitorLicense },
+  {
+    name: 'Capacitor App 8.1.2, Haptics 8.0.2, Status Bar 8.0.4',
+    notice: '© 2020-present Ionic',
+    license: 'MIT',
+    text: capacitorPluginsLicense,
+  },
+  { name: 'Capacitor Filesystem 8.1.5', notice: '© 2025 Ionic', license: 'MIT', text: capacitorFilesystemLicense },
 ];
 
 const creditList = (items: Credit[]) =>
