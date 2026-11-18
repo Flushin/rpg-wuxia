@@ -106,8 +106,10 @@ Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exat
 - `progression.json`: nível máximo **20**. Curva do 10 ao 20 **provisória**: 24000 / 28000 / 33000 / 38000 / 44000 /
   50000 / 57000 / 65000 / 74000 / 84000 (nível 10→11 até 19→20; total ~497 mil XP, ~8× o trecho 1–10). Pensada para
   ~2 h com os monstros da montanha; será calibrada no simulador na fase 9, quando eles existirem.
-- Skills: nível máximo **15** (`SKILL_MAX_LEVEL`). A curva de XP das skills continua a mesma (`20 × 1,5^(nível−1)` usos),
-  então 11–15 é um objetivo de longo prazo: no simulador, as ativas chegam ao nível 10 do personagem entre o nível 3 e o 7.
+- Skills: nível máximo **15** (`SKILL_MAX_LEVEL`). Curva de XP das skills: até o 10 continua `20 × 1,5^(nível−1)` usos;
+  **do 10 ao 15 cresce ×1,4 por nível** em vez de ×1,5 (decidido pelo Lucas em 18/11/2026: "levemente mais rápido, mas não
+  tanto"): 718 / 1005 / 1407 / 1969 / 2757 usos (total 7856, ~22% menos que os 10139 da curva antiga). No simulador, as
+  ativas estão entre os níveis 3 e 7 quando o personagem chega ao nível 10.
   Passivas acompanham o nível do personagem (a do nível 9 chega ao 12 no nível 20). Painel de skills mostra "x/15" e a
   dica fala em "máximo 15".
 - Até a fase 2/3, quem passa do nível 10 continua caçando terracota (127–199 XP por abate) e o General: sobe devagar.
