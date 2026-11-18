@@ -112,6 +112,14 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   `open`, `set()` e `update()`, no mesmo molde do painel de skills). O `Hud` continua com `togglePanel()` e o som de abrir/fechar.
 - **C3 (18/11/2026):** `showTitleScreen` (`src/ui/create.ts`) foi dividida em `setupSlotList`, `setupCreateView` e
   `setupDeleteView`, que dividem um estado único (`TitleState`: arquivo de saves, espaço e seita escolhidos).
+- **C4 (18/11/2026):** o `<style>` do `index.html` (2.200 linhas) foi para `src/styles/`, em 10 arquivos por assunto,
+  ligados por `src/styles/index.css` (`<link>` no `<head>`, então a tela de carregamento continua com estilo antes do JS).
+  **A ordem dos arquivos é a ordem original das regras e importa.** Conferido no navegador: as 405 regras carregadas são
+  as mesmas, na mesma ordem. A folha de ícones passou a `url(/sprites/icones.png)` (o Vite reescreve para relativo no
+  build). O build agora minifica o CSS (antes ia sem minificar dentro do HTML). Juntar regras do mesmo elemento que estão
+  espalhadas fica para depois, uma de cada vez, porque aí a ordem muda.
+- **Defeito visto e não corrigido na C4:** no celular deitado baixo (Fold fechado, 920×316), os botões de "Tamanho da
+  interface" no ⚙ não cabem e "Grande" fica cortado. Já era assim antes.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

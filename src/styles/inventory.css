@@ -1,0 +1,365 @@
+/* Mochila (I) e ícones dos itens; medidor de FPS; acompanhamento de missões. */
+.inv-card {
+  width: min(440px, 100%);
+  display: block;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+.inv-card h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.gold {
+  color: #ffd23f;
+  font-weight: 700;
+  font-size: 14px;
+}
+.eq-body {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.eq-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.body-fig {
+  width: 100%;
+  max-height: 190px;
+  justify-self: center;
+  opacity: 0.9;
+}
+.body-img {
+  width: auto;
+  max-width: 100%;
+  height: 170px;
+  object-fit: contain;
+  opacity: 1;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
+}
+.inv-tabs {
+  clear: both;
+  display: flex;
+  gap: 4px;
+  margin: 0 0 6px;
+  border-bottom: 1px solid #445;
+}
+.inv-tab {
+  flex: 1;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid #445;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: #10141c;
+  color: #aab;
+  font-size: 13px;
+}
+.inv-tab.on {
+  background: #2a3146;
+  color: #fff;
+  border-color: #778;
+}
+.inv-tab small {
+  opacity: 0.7;
+}
+.eqs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.eqs small {
+  color: #99a;
+  font-size: 11px;
+}
+.bag-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 48px);
+  gap: 4px;
+  justify-content: center;
+}
+.cell {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0;
+  border-radius: 8px;
+  border: 2px solid #445;
+  background: #10141c;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+.cell.sel {
+  outline: 2px solid #d4a017;
+  outline-offset: 1px;
+}
+.cell .ic {
+  position: absolute;
+  inset: 3px 3px 8px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--rc) 55%, #000), color-mix(in srgb, var(--rc) 25%, #000));
+}
+.cell .qty {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  text-shadow: 0 0 3px #000;
+}
+.cell .dur {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 2px;
+  height: 4px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cell .dur u,
+.dbar u {
+  display: block;
+  height: 100%;
+  background: #4cd964;
+}
+.cell .dur.low u,
+.dbar.low u {
+  background: #f1a02e;
+}
+.cell .dur.zero u,
+.dbar.zero u {
+  background: #e04848;
+}
+.inv-detail {
+  margin-top: 12px;
+  font-size: 13px;
+  position: sticky;
+  bottom: -16px;
+  background: #1a1f2e;
+  border-top: 1px solid #445;
+  padding: 8px 0;
+  max-height: 46vh;
+  overflow: auto;
+}
+.inv-detail .tipbody > div {
+  margin: 1px 0;
+}
+.inv-detail small {
+  color: #99a;
+}
+.tip-sell {
+  color: #ffd23f;
+}
+.tip-cmp {
+  margin-top: 6px;
+  border-top: 1px dashed #445;
+  padding-top: 4px;
+}
+.inv-detail .primary {
+  margin-top: 8px;
+  min-height: 44px;
+}
+.close-btn {
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+}
+.win-x {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: block;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  margin: -6px -6px -40px auto;
+  font-size: 18px;
+  line-height: 1;
+  touch-action: manipulation;
+}
+.parts {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: #889;
+  white-space: nowrap;
+}
+.win-x + h2 {
+  padding-right: 44px;
+}
+.sort-btn {
+  min-height: 32px;
+  padding: 2px 10px;
+  font-size: 12px;
+  float: right;
+}
+.cell .ic.empty {
+  background: none;
+  opacity: 0.25;
+  font-size: 22px;
+  font-weight: 400;
+  text-shadow: none;
+}
+.cell .ic.sym {
+  font-size: 22px;
+  font-weight: 400;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  text-shadow: none;
+}
+.ico {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url(/sprites/icones.png);
+  background-repeat: no-repeat;
+  border-radius: inherit;
+}
+.slot .ic .ico,
+.sk-row .ic .ico {
+  position: absolute;
+  inset: 0;
+}
+.sk-row .ic {
+  position: relative;
+  overflow: hidden;
+}
+.cell .ic.img {
+  padding: 2px;
+}
+.cell .ic.empty.img .ico {
+  filter: grayscale(1);
+}
+.pot .lb .ico {
+  width: 40px;
+  height: 40px;
+}
+.pot .lb:has(.ico) {
+  filter: none;
+}
+#fps-meter {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 2px;
+  z-index: 40;
+  font:
+    11px/1.2 ui-monospace,
+    monospace;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#quest-tracker {
+  position: absolute;
+  right: 8px;
+  top: 300px;
+  max-width: 230px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(10, 14, 24, 0.72);
+  border: 1px solid #d4a01766;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: right;
+  pointer-events: none;
+}
+#quest-tracker .qt-name {
+  color: #f0d070;
+  font-weight: 700;
+  font-size: 12px;
+}
+#quest-tracker .qt-line b {
+  color: #fff;
+}
+.qm {
+  font-style: normal;
+  font-weight: 900;
+  color: #ffd23f;
+}
+.quest-box {
+  border: 1px solid #d4a017aa;
+  background: rgba(212, 160, 23, 0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin: 6px 0 10px;
+}
+.quest-box.ready {
+  border-color: #4cd964aa;
+  background: rgba(76, 217, 100, 0.08);
+}
+.q-head {
+  margin-bottom: 4px;
+}
+.q-tag {
+  font-size: 11px;
+  color: #f0d070;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.quest-box.ready .q-tag {
+  color: #4cd964;
+}
+.q-goal,
+.q-rew {
+  font-size: 12px;
+  margin: 3px 0;
+}
+.q-rew {
+  color: #cdb;
+}
+.quest-box button {
+  margin-top: 6px;
+  width: 100%;
+}
+@media (orientation: landscape) and (max-height: 450px) {
+  #quest-tracker {
+    max-width: 190px;
+    font-size: 11px;
+    padding: 3px 7px;
+  }
+}
+.opt-ic .ico {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+@media (min-width: 600px) {
+  .inv-card {
+    width: min(720px, 100%);
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 16px;
+  }
+  .inv-detail {
+    margin: 0;
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    align-self: start;
+    border-top: 0;
+    border-left: 1px solid #445;
+    padding: 0 0 0 14px;
+    max-height: none;
+  }
+}

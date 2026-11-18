@@ -1,0 +1,34 @@
+/* Base: reset, página, canvas do jogo e a classe .hidden. */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #10141c;
+  color: #eee;
+  font:
+    14px/1.3 system-ui,
+    sans-serif;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+#game {
+  position: fixed;
+  inset: 0;
+}
+#game canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.hidden {
+  display: none !important;
+}

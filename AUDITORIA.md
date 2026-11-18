@@ -398,6 +398,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo. Teste: RT + criar, jogar, apagar (com nome errado e certo), trocar idioma na tela inicial.
 
 **C4. CSS fora do `index.html`** — M
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: mover o `<style>` para `src/styles/` (ex.: `base.css`, `hud.css`, `panels.css`, `create.css`, `mobile.css`), importados no `main.ts` (o Vite junta). Mesma ordem das regras → mesmo resultado. Depois, juntar as regras do mesmo elemento que estão espalhadas.
 - Arquivos: `index.html`, `src/main.ts`, novos `.css`.
 - Risco: médio (ordem/especificidade; o `url(sprites/icones.png)` precisa continuar relativo à página). Teste: RT com **`check:layout` obrigatório** + capturas antes/depois nos 7 tamanhos.
