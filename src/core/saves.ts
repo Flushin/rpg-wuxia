@@ -1,14 +1,19 @@
 import { L } from './i18n';
 import type { SaveData } from './types';
+import { SAVE_FILE_VERSION, migrateCharacter } from './saveFormat';
 
 export const SLOT_COUNT = 4;
 export interface SaveFile {
-  version: 2;
+  version: typeof SAVE_FILE_VERSION; // ver core/saveFormat.ts
   slots: (SaveData | null)[];
   lastPlayedSlot: number;
 }
 
-export const emptySaveFile = (): SaveFile => ({ version: 2, slots: Array(SLOT_COUNT).fill(null), lastPlayedSlot: 0 });
+export const emptySaveFile = (): SaveFile => ({
+  version: SAVE_FILE_VERSION,
+  slots: Array(SLOT_COUNT).fill(null),
+  lastPlayedSlot: 0,
+});
 
 const isSave = (s: unknown): s is SaveData =>
   !!s &&
@@ -17,11 +22,15 @@ const isSave = (s: unknown): s is SaveData =>
   typeof (s as SaveData).classId === 'string';
 
 // Aceita o formato novo (slots) ou um save antigo de personagem único (vira o espaço 0).
+// Cada personagem passa pelas migrações de versão (core/saveFormat.ts).
 export function migrateSaves(raw: unknown, legacy?: unknown): SaveFile {
   const out = emptySaveFile();
   const r = raw as Partial<SaveFile> | undefined;
   if (r && Array.isArray(r.slots)) {
-    for (let i = 0; i < SLOT_COUNT; i++) out.slots[i] = isSave(r.slots[i]) ? r.slots[i] : null;
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const s: unknown = r.slots[i];
+      out.slots[i] = isSave(s) ? migrateCharacter(s) : null;
+    }
     const l = Math.floor(Number(r.lastPlayedSlot));
     out.lastPlayedSlot =
       l >= 0 && l < SLOT_COUNT && out.slots[l]
@@ -33,14 +42,14 @@ export function migrateSaves(raw: unknown, legacy?: unknown): SaveFile {
     return out;
   }
   const old = isSave(raw) ? raw : isSave(legacy) ? legacy : null;
-  if (old) out.slots[0] = old;
+  if (old) out.slots[0] = migrateCharacter(old);
   return out;
 }
 
 export function setSlot(f: SaveFile, i: number, s: SaveData | null, played = true): SaveFile {
   const slots = [...f.slots];
   slots[i] = s;
-  return { version: 2, slots, lastPlayedSlot: played && s ? i : f.lastPlayedSlot };
+  return { version: SAVE_FILE_VERSION, slots, lastPlayedSlot: played && s ? i : f.lastPlayedSlot };
 }
 export function deleteSlot(f: SaveFile, i: number): SaveFile {
   const n = setSlot(f, i, null, false);

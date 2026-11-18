@@ -1,0 +1,81 @@
+// Ganho offline: aplica no personagem o resultado calculado em core/offline.ts e monta o resumo.
+// Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
+import { CLASSES } from '../data';
+import { POTIONS, isPotionId, itemColor, itemName, makeEquipment, makePotion } from '../items';
+import { computeOffline, type OfflineResult } from '../offline';
+import { type ItemInstance, type PotionKind, type SaveData } from '../types';
+import type { OfflineReport, World } from '../world';
+import { TOWN_MAPS } from '../mapsConfig';
+
+// ---------- ganho offline ----------
+export function applyOffline(w: World, now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
+  if (!saved?.active || !saved.mapId || TOWN_MAPS.has(saved.mapId) || !w.maps[saved.mapId]) return null;
+  const rate = w.auto.rate();
+  if (!rate) return null;
+  const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0
+  const res: OfflineResult = computeOffline({
+    elapsedMs,
+    rate,
+    level: w.player.level,
+    xp: w.xp,
+    potions: { hp: w.kindCount('hp'), mp: w.kindCount('mp') },
+    seed: (now ^ Math.floor(w.xp * 7919)) >>> 0,
+  });
+  if (res.kills < 1) return null;
+  const lvl0 = w.player.level;
+  w.gold += res.gold;
+  w.gainXp(res.xp);
+  const items: OfflineReport['items'] = [];
+  let soldCount = 0,
+    soldGold = 0;
+  const sell = (it: ItemInstance) => {
+    soldCount += it.qty ?? 1;
+    soldGold += w.sellValueNow(it);
+  };
+  for (const d of res.drops) {
+    const isPot = isPotionId(d.baseId);
+    for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
+      const it = isPot
+        ? makePotion(d.baseId, d.qty)
+        : makeEquipment(d.baseId, d.rarity, CLASSES[w.classId].element, w.rng, rate.monLevel);
+      let placed = w.addItem(it);
+      if (!placed) {
+        w.auto.makeRoom();
+        placed = w.addItem(it);
+      }
+      if (!placed) {
+        sell(it);
+        continue;
+      }
+      const e = items.find((x) => x.name === itemName(it) && x.rarity === it.rarity);
+      if (e) e.qty += it.qty ?? 1;
+      else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
+    }
+  }
+  const used: Record<PotionKind, number> = { hp: 0, mp: 0 };
+  for (const k of ['hp', 'mp'] as PotionKind[]) {
+    for (let n = res.potionsUsed[k]; n > 0; n--) {
+      const i = w.bag.findIndex((b) => b && POTIONS[b.baseId]?.kind === k);
+      if (i < 0) break;
+      w.removeFromBag(i);
+      used[k]++;
+    }
+  }
+  w.player.hp = w.player.derived.maxHp;
+  w.player.mana = w.player.derived.maxMana;
+  w.events.length = 0; // sem toasts de nível/skill atrás do resumo
+  return {
+    elapsedMs,
+    effMin: res.effMin,
+    efficiency: res.efficiency,
+    kills: res.kills,
+    xp: res.xp,
+    levelsGained: w.player.level - lvl0,
+    newLevel: w.player.level,
+    gold: res.gold,
+    items,
+    potionsUsed: used,
+    soldCount,
+    soldGold,
+  };
+}

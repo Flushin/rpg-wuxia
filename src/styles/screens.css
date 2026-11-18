@@ -1,0 +1,127 @@
+/* Tela de carregamento, rodapé da tela inicial, créditos e licenças, versão. */
+/* Tela de carregamento (some quando o BootScene termina) */
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: radial-gradient(circle at 50% 30%, #2a3350, #0c0f18);
+  transition: opacity 0.25s;
+}
+#loading.out {
+  opacity: 0;
+  pointer-events: none;
+}
+#loading h1 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+#loading .ld-bar {
+  width: min(280px, 70vw);
+  height: 10px;
+  background: #222;
+  border: 1px solid #556;
+  border-radius: 6px;
+  overflow: hidden;
+}
+#loading .ld-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #d4a017;
+  transition: width 0.15s;
+}
+#loading .ld-txt {
+  font-size: 12px;
+  color: #99a;
+}
+@media (orientation: landscape) and (max-height: 450px) {
+  #loading {
+    gap: 6px;
+  }
+}
+/* Versão discreta no canto do card inicial */
+#create-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 10px 0 -6px;
+}
+#create-foot #ver-label {
+  margin: 0;
+}
+button.link {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-size: 11px;
+  color: #99a;
+  text-decoration: underline;
+}
+/* Créditos e licenças (tela inicial e ⚙) */
+#credits-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 35; /* acima da tela inicial (10) e das dicas de item (30); abaixo do carregamento (50) */
+  display: flex;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 12px;
+  overflow: auto;
+  touch-action: pan-y;
+}
+#credits-panel .card {
+  width: min(460px, 100%);
+  max-height: none;
+  margin: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#credits-panel p {
+  margin: 0;
+  font-size: 13px;
+}
+.cr-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+.cr-list li {
+  margin: 0 0 6px;
+}
+.cr-lib {
+  font-size: 13px;
+  border: 1px solid #445;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+.cr-lib summary {
+  cursor: pointer;
+}
+.cr-lib pre {
+  margin: 8px 0 0;
+  max-height: 40vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 11px;
+  color: #bbc;
+}
+#ver-label {
+  margin: 10px 0 -6px;
+  text-align: right;
+  font-size: 10px;
+  color: #667;
+  pointer-events: none;
+}

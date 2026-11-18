@@ -8,6 +8,7 @@ import { parseTiledMap, type GameMap } from '../src/core/map';
 import { findPath } from '../src/core/pathfinding';
 import { Rng } from '../src/core/rng';
 import { SLOT_COUNT, deleteSlot, emptySaveFile, migrateSaves, relativeTime, setSlot } from '../src/core/saves';
+import { CHARACTER_MIGRATIONS, CHARACTER_SAVE_VERSION, migrateCharacter } from '../src/core/saveFormat';
 import { computeDerived } from '../src/core/stats';
 import { World } from '../src/core/world';
 import type { AutoBucket, Entity, GameEvent, SaveData } from '../src/core/types';
@@ -526,8 +527,10 @@ console.log('\n== auto-combate ignora o chefe e a arena ==');
   // caminhos: com o auto ligado não cruzam a arena; manual cruza
   const w2 = mk('lamina', 10, 'ruinas');
   const pl = (
-    w2 as unknown as { pf: (a: { x: number; y: number }, b: { x: number; y: number }, v?: boolean) => unknown[] }
-  ).pf.bind(w2);
+    w2 as unknown as {
+      findPathFor: (a: { x: number; y: number }, b: { x: number; y: number }, v?: boolean) => unknown[];
+    }
+  ).findPathFor.bind(w2);
   const inside = { x: b.home.x, y: b.home.y };
   ok(findPath(w2.map, { x: 14, y: 16.5 }, inside).length > 0, 'manual: caminho até dentro da arena existe');
   w2.auto.toggle();
@@ -588,6 +591,31 @@ console.log('\n== vários personagens: save ==');
   ok(
     n1.slots[2]?.name === 'B' && n1.slots[3]?.name === 'C' && n1.lastPlayedSlot === 3,
     'formato novo faz round-trip (JSON)',
+  );
+}
+
+console.log('\n== versão do save e migrações (C8) ==');
+{
+  const base = { name: 'V', classId: 'pavilhao', level: 2 };
+  ok(migrateCharacter({ ...base }).version === CHARACTER_SAVE_VERSION, 'sem versão: vira a versão atual');
+  ok(
+    migrateSaves({ slots: [{ ...base }] }).slots[0]?.version === CHARACTER_SAVE_VERSION,
+    'migrateSaves passa cada espaço pela migração',
+  );
+  const future = { ...base, version: CHARACTER_SAVE_VERSION + 5, novo: 1 };
+  ok(migrateCharacter(future) === future, 'save de versão mais nova não é mexido');
+  // migrações de exemplo (as reais ficam em CHARACTER_MIGRATIONS): 1→2 renomeia, 2→3 dobra; aplicadas em ordem
+  const steps = {
+    1: (s: Record<string, unknown>) => ({ ...s, gold: s.ouro, ouro: undefined }),
+    2: (s: Record<string, unknown>) => ({ ...s, gold: Number(s.gold) * 2 }),
+  };
+  const m = migrateCharacter({ ...base, ouro: 7 } as Record<string, unknown>, steps, 3);
+  ok(m.gold === 14 && m.ouro === undefined && m.version === 3, 'migrações aplicadas em ordem até a versão pedida');
+  const m2 = migrateCharacter({ ...base, version: 2, gold: 5 } as Record<string, unknown>, steps, 3);
+  ok(m2.gold === 10, 'começa da versão do save (pula as anteriores)');
+  ok(
+    Object.keys(CHARACTER_MIGRATIONS).every((k) => Number(k) < CHARACTER_SAVE_VERSION),
+    'toda migração leva a uma versão que existe',
   );
 }
 

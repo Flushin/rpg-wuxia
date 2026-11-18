@@ -5,8 +5,7 @@ import { createSpriteAnims, preloadSprites } from '../render/sprites';
 import { sfxFiles } from '../render/audio';
 import { loadAll } from '../save';
 import { showLoadError } from '../ui/create';
-
-export const MAP_IDS = ['cidade', 'floresta', 'ruinas'];
+import { MAP_IDS } from '../core/mapsConfig';
 
 export class BootScene extends Phaser.Scene {
   constructor() {

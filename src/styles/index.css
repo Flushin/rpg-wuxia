@@ -1,0 +1,12 @@
+/* Todo o CSS do jogo. A ORDEM importa (regras posteriores vencem as anteriores com a mesma especificidade):
+   mantenha os arquivos nesta sequência. Saiu do <style> do index.html na etapa C4, sem mudar nenhuma regra. */
+@import './base.css';
+@import './hud.css';
+@import './panels.css';
+@import './create.css';
+@import './hotbar.css';
+@import './inventory.css';
+@import './npc-auto.css';
+@import './map.css';
+@import './compact.css';
+@import './screens.css';

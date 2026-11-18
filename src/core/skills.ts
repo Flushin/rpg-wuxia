@@ -29,6 +29,13 @@ export interface SkillState {
 }
 
 export const SKILLS = localize('skills', skillsJson) as unknown as Record<string, SkillDef[]>;
+const BY_ID = new Map(
+  Object.values(SKILLS)
+    .flat()
+    .map((d) => [d.id, d]),
+);
+/** Skill de qualquer seita pelo id. */
+export const skillById = (id: string): SkillDef | undefined => BY_ID.get(id);
 export const SKILL_MAX_LEVEL = 10;
 export const GLOBAL_COOLDOWN = 0.5;
 export const LEVEL_BONUS = 0.08;

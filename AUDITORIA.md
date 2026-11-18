@@ -379,6 +379,8 @@ As etapas dentro de cada fase são independentes entre si.
 
 ### Fase C — estrutura
 
+> ✅ **Concluída em 18/11/2026** (C1–C8, PRs #33, #35 e a desta etapa).
+
 **C1. Separar o painel de Configurações das Dicas** — M
 > ✅ **Feita em 17/11/2026.**
 - Objetivo: `src/ui/settingsPanel.ts` sai de `tips.ts:29-88`; `TipManager` fica só com dicas.
@@ -398,21 +400,25 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo. Teste: RT + criar, jogar, apagar (com nome errado e certo), trocar idioma na tela inicial.
 
 **C4. CSS fora do `index.html`** — M
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: mover o `<style>` para `src/styles/` (ex.: `base.css`, `hud.css`, `panels.css`, `create.css`, `mobile.css`), importados no `main.ts` (o Vite junta). Mesma ordem das regras → mesmo resultado. Depois, juntar as regras do mesmo elemento que estão espalhadas.
 - Arquivos: `index.html`, `src/main.ts`, novos `.css`.
 - Risco: médio (ordem/especificidade; o `url(sprites/icones.png)` precisa continuar relativo à página). Teste: RT com **`check:layout` obrigatório** + capturas antes/depois nos 7 tamanhos.
 
 **C5. Conhecimento de mapa num só lugar** — P
+> ✅ **Feita em 18/11/2026** (em `src/core/mapsConfig.ts`).
 - Objetivo: `src/data/maps.json` (ou `core/mapsConfig.ts`) com: ids carregados (`bootScene.ts:8`), quais são cidade (`auto.ts:8`), destino do auto (`auto.ts:168`), braseiros da arena (`mapView.ts:18`), densidade de enfeites (`mapView.ts:26`), música (`audio.json`). Prepara o mapa novo do marco 9.
 - Arquivos: os citados.
 - Risco: baixo (mesmos valores). Teste: RT + Auto ligado na cidade vai à floresta; braseiros no lugar.
 
 **C6. Feedback de eventos fora da cena** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: o `switch` de 66 linhas (`gameScene.ts:285`) vira `src/render/eventFeedback.ts` (textos flutuantes, toasts, efeitos), com uma função por grupo; busca de skill por id via mapa (`skillById`).
 - Arquivos: `src/scenes/gameScene.ts`, novo arquivo, `src/core/skills.ts`.
 - Risco: baixo. Teste: RT + ver textos de dano, crítico, errou, sem mana, escudo, missão aceita.
 
 **C7. Dividir o `World` por assunto (várias PRs)** — G no total, M cada
+> ✅ **Feita em 18/11/2026** (7 commits, um por assunto, + códigos de erro).
 - Objetivo: o `World` continua sendo a fachada (os outros arquivos não mudam), mas cada assunto vai para um módulo em `src/core/world/` com funções que recebem o estado:
   1. `inventory.ts` (mochila, equipar, poções, chão, coleta) · 2. `shop.ts` (comprar, vender, consertar) · 3. `quests.ts` (as funções `quest*`, com o campo `quest` declarado junto aos outros) ·
   4. `boss.ts` (telegraph, invocação, arena) · 5. `npcs.ts` (janela, moradores andando) · 6. `offlineApply.ts` · 7. `saveCodec.ts` (`serialize` e a parte de `fromSave`).
@@ -422,6 +428,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Teste: RT com **saída do simulador idêntica** (ponto 3) + os 7 checks; o `check:items` e `check:quests` cobrem bem inventário e missões.
 
 **C8. Versão do save explícita** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `SAVE_FORMAT_VERSION` e uma lista de migrações (hoje é "sanitizar tudo na carga"), resolvendo a confusão `SaveData.version: 1` × `SaveFile.version: 2`. Necessário antes do marco online.
 - Arquivos: `src/core/saves.ts`, `src/core/types.ts`, `src/save.ts`.
 - Risco: baixo se a migração for identidade. Teste: RT + carregar um save antigo exportado do IndexedDB.

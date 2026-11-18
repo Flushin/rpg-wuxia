@@ -1,5 +1,5 @@
 import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
-import { L, tn } from './i18n';
+import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
@@ -15,50 +15,25 @@ import {
   type SkillDef,
   type SkillState,
 } from './skills';
-import {
-  BAG_SIZE,
-  BASES,
-  GROUND_SECONDS,
-  POTIONS,
-  SLOTS,
-  STACK_MAX,
-  STARTING_KIT,
-  STARTING_WEAPON,
-  baseOf,
-  buyPrice,
-  equipmentBaseIds,
-  isBroken,
-  isPotionId,
-  itemColor,
-  itemName,
-  itemStats,
-  makeEquipment,
-  makePotion,
-  maxDurability,
-  repairCost,
-  rollRarity,
-  sanitizeItem,
-  sellValue,
-  sortedBag,
-  WEAR_PER_HIT,
-} from './items';
-import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
-import { computeOffline, type OfflineResult } from './offline';
+import { BAG_SIZE, SLOTS, STARTING_KIT, STARTING_WEAPON, makeEquipment, makePotion, maxDurability } from './items';
+import { AutoCombat } from './auto';
+import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { Rng } from './rng';
-import {
-  QUESTS,
-  questGoalCount,
-  resolveNpc,
-  sanitizeQuest,
-  type QuestDef,
-  type QuestPhase,
-  type QuestState,
-} from './quests';
+import * as saveCodec from './world/saveCodec';
+import * as offlineApply from './world/offlineApply';
+import * as npcs from './world/npcs';
+import * as boss from './world/boss';
+import * as quests from './world/quests';
+import * as shop from './world/shop';
+import { dist } from './world/geometry';
+import * as inventory from './world/inventory';
+import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { computeDerived, emptyElements } from './stats';
 import {
   ATTR_KEYS,
   ELEMENTS,
   type AttrKey,
+  type ActionError,
   type Attributes,
   type BuffKind,
   type Entity,
@@ -76,9 +51,7 @@ import {
 
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
-const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
-const TOWN_MAPS = AUTO_TOWNS;
 const TOWN_REGEN = 0.03; // 3% por segundo
 const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
@@ -106,7 +79,7 @@ export interface OfflineReport {
 }
 
 export class World {
-  mapId = 'cidade';
+  mapId = HOME_MAP;
   map: GameMap;
   player!: Entity;
   classId: string;
@@ -146,25 +119,30 @@ export class World {
   // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
   respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
-  private bossSummoned = false;
-  private arenaSeen = false;
-  private nextTelegraph = 1;
-  private npcGoal: number | null = null;
-  private nextGround = 1;
-  private pendingSkill: number | null = null;
+  quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
   autoAttack = false;
-  private chasing = false;
-  private moveInput: Point = { x: 0, y: 0 };
+
+  // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
+  bossSummoned = false;
+  nextTelegraph = 1;
+  npcGoal: number | null = null;
+  nextGround = 1;
+  pendingSkill: number | null = null;
+  chasing = false;
+  moveInput: Point = { x: 0, y: 0 };
+  lastDamaged = -99;
+  rng = new Rng((Date.now() & 0xffffffff) >>> 0);
+  npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
+
+  // ---- privados do World
+  private arenaSeen = false;
   private respawnTimer = 0;
   private portalCd = 0;
-  private lastDamaged = -99;
   private acc = 0;
   private nextId = 2;
-  private rng = new Rng((Date.now() & 0xffffffff) >>> 0);
-  private npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   private constructor(
-    private maps: Record<string, GameMap>,
+    readonly maps: Record<string, GameMap>,
     name: string,
     classId: string,
     level: number,
@@ -186,7 +164,7 @@ export class World {
     w.recalc(w.player, false);
     w.player.hp = w.player.derived.maxHp;
     w.player.mana = w.player.derived.maxMana;
-    w.changeMap('cidade');
+    w.changeMap(HOME_MAP);
     for (const s of SKILLS[classId] ?? []) if (s.unlock <= 1) w.events.push({ type: 'skillUnlocked', skillId: s.id });
     return w;
   }
@@ -194,68 +172,14 @@ export class World {
   // offline=false: não aplica ganho offline (só o último personagem jogado recebe)
   static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now(), offline = true): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
-    w.xp = s.xp;
-    w.freePoints = s.freePoints;
-    w.ratioCursor = s.ratioCursor ?? 0;
-    w.seenTips = [...(s.seenTips ?? [])];
-    w.tipsEnabled = s.tipsEnabled ?? true;
-    w.audio = { sfx: s.audio?.sfx ?? 80, music: s.audio?.music ?? 50, muted: s.audio?.muted ?? false };
-    for (const [id, st] of Object.entries(s.skills ?? {})) {
-      const cur = w.skills[id];
-      if (!cur) continue;
-      cur.level = Math.max(1, Math.min(SKILL_MAX_LEVEL, Math.floor(Number(st.level) || 1)));
-      cur.xp = cur.level >= SKILL_MAX_LEVEL ? 0 : Math.max(0, Number(st.xp) || 0);
-    }
-    w.gold = Math.max(0, Math.floor(Number(s.gold) || 0));
-    (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
-      w.bag[i] = sanitizeItem(raw);
-    });
-    for (const sl of SLOTS) {
-      const it = sanitizeItem(s.equipment?.[sl]);
-      if (it && BASES[it.baseId]?.slot === sl) w.equipment[sl] = it;
-    }
-    w.recalc(w.player, false);
-    w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
-    w.clock = () => now;
-    w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
-    for (const [k, v] of Object.entries(s.respawns ?? {}))
-      if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
-    w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
-    w.clock = () => Date.now();
-    w.auto.load(s.auto);
-    w.quest = sanitizeQuest(s.quest);
+    saveCodec.restore(w, s, now);
     w.offlineReport = offline ? w.applyOffline(now, s.lastSeen, s.auto) : null;
     return w;
   }
 
+  // ---------- saveCodec: src/core/world/saveCodec.ts ----------
   serialize(): SaveData {
-    return {
-      version: 1,
-      name: this.player.name,
-      classId: this.classId,
-      level: this.player.level,
-      xp: this.xp,
-      freePoints: this.freePoints,
-      attributes: { ...this.player.attrs },
-      mapId: this.mapId,
-      lastSeen: Date.now(),
-      skills: Object.fromEntries(Object.entries(this.skills).map(([id, st]) => [id, { level: st.level, xp: st.xp }])),
-      ratioCursor: this.ratioCursor,
-      seenTips: [...this.seenTips],
-      tipsEnabled: this.tipsEnabled,
-      audio: { ...this.audio },
-      gold: this.gold,
-      bag: JSON.parse(JSON.stringify(this.bag)),
-      equipment: JSON.parse(
-        JSON.stringify(
-          Object.fromEntries(SLOTS.filter((sl) => this.equipment[sl]).map((sl) => [sl, this.equipment[sl]])),
-        ),
-      ),
-      auto: this.auto.serialize(),
-      bossRespawnAt: this.bossRespawnAtMs > this.clock() ? this.bossRespawnAtMs : undefined,
-      respawns: Object.fromEntries(Object.entries(this.respawnAtMs).filter(([, t]) => t > this.clock())),
-      quest: { ...this.quest },
-    };
+    return saveCodec.serialize(this);
   }
 
   emit(ev: GameEvent) {
@@ -266,10 +190,10 @@ export class World {
   // ---------- comandos ----------
   // andar do auto-combate (não pausa o auto)
   autoMove(x: number, y: number, viaPortal = false) {
-    if (!this.player.dead) this.player.path = this.pf(this.player, { x, y }, viaPortal);
+    if (!this.player.dead) this.player.path = this.findPathFor(this.player, { x, y }, viaPortal);
   }
   // o auto-combate nunca entra na área do chefe e só atravessa portais de propósito (viaPortal)
-  private pf(from: Point, to: Point, viaPortal = false): Point[] {
+  private findPathFor(from: Point, to: Point, viaPortal = false): Point[] {
     if (this.auto.state !== 'on') return findPath(this.map, from, to);
     const avoid: Avoid[] = this.arenas.map((a) => ({ ...a, r: a.r + 1.5 }));
     if (!viaPortal)
@@ -280,10 +204,10 @@ export class World {
   // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
   /** Caminho do jogador até `to` (lista de pontos; vazia = sem caminho ou já está lá). */
   pathFromPlayer(to: Point): Point[] {
-    return this.pf(this.player, to);
+    return this.findPathFor(this.player, to);
   }
   pathLength(to: Point): number {
-    const path = this.pf(this.player, to);
+    const path = this.findPathFor(this.player, to);
     if (!path.length) return dist(this.player, to) < 1 ? 0 : Infinity;
     let len = 0,
       a: Point = this.player;
@@ -437,7 +361,8 @@ export class World {
     const k = Math.max(0, 1 - red);
     return { ...t, derived: { ...t.derived, physDef: t.derived.physDef * k, spiritDef: t.derived.spiritDef * k } };
   }
-  private absorb(e: Entity, amount: number): number {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  absorb(e: Entity, amount: number): number {
     let rem = amount;
     for (const b of e.buffs) {
       if (b.kind !== 'shield' || rem <= 0) continue;
@@ -507,7 +432,7 @@ export class World {
     p.repathCd -= dt;
     if (p.repathCd <= 0 || !p.path.length) {
       p.repathCd = 0.3;
-      p.path = this.pf(p, t);
+      p.path = this.findPathFor(p, t);
     }
     this.chasing = true;
     this.followPath(p, dt, 1);
@@ -691,7 +616,7 @@ export class World {
         p.repathCd -= dt;
         if (p.repathCd <= 0 || !p.path.length) {
           p.repathCd = 0.3;
-          p.path = this.pf(p, n);
+          p.path = this.findPathFor(p, n);
         }
         this.followPath(p, dt, 1);
         return;
@@ -723,7 +648,7 @@ export class World {
       p.repathCd -= dt;
       if (p.repathCd <= 0 || !p.path.length) {
         p.repathCd = 0.3;
-        p.path = this.pf(p, t);
+        p.path = this.findPathFor(p, t);
       }
       this.chasing = true;
     }
@@ -845,98 +770,74 @@ export class World {
     }
   }
 
-  // ---------- chefe ----------
-  private tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
-    const b = def.boss!,
-      p = this.player;
-    if (m.ai === 'chase') {
-      m.aiTimer -= dt;
-      if (m.aiTimer <= 0 && !p.dead) {
-        m.aiTimer = m.hp <= m.derived.maxHp * b.summon.atHpPct ? b.aoe.intervalPhase2 : b.aoe.interval;
-        const t: Telegraph = {
-          id: this.nextTelegraph++,
-          x: p.x,
-          y: p.y,
-          radius: b.aoe.radius,
-          delay: b.aoe.delay,
-          remaining: b.aoe.delay,
-          ownerId: m.id,
-          mult: b.aoe.mult,
-        };
-        this.telegraphs.push(t);
-        this.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
-      }
-      if (!this.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) this.summonAdds(m, b.summon);
-    }
+  // ---------- boss: src/core/world/boss.ts ----------
+  tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
+    return boss.tickBossExtras(this, m, def, dt);
   }
-  private summonAdds(boss: Entity, sm: { monsterId: string; count: number; level: number }) {
-    this.bossSummoned = true;
-    const sdef = MONSTERS[sm.monsterId],
-      ids: number[] = [];
-    for (let i = 0; i < sm.count; i++) {
-      const a = (i / sm.count) * Math.PI * 2 + 0.7;
-      let pos: Point = { x: boss.x + Math.cos(a) * 2.2, y: boss.y + Math.sin(a) * 2.2 };
-      if (!isWalkable(this.map, pos.x, pos.y)) pos = { x: boss.x, y: boss.y };
-      const e = this.makeMonster(sdef, pos);
-      this.applyMonsterLevel(e, sdef, sm.level);
-      e.home = { ...boss.home };
-      e.summoned = true;
-      e.ai = 'chase';
-      e.respawnAt = Infinity;
-      this.monsters.push(e);
-      ids.push(e.id);
-    }
-    this.emit({ type: 'bossSummon', ids });
+  resetBoss(m: Entity) {
+    return boss.resetBoss(this, m);
   }
-  private resetBoss(m: Entity) {
-    this.bossSummoned = false;
-    this.telegraphs = this.telegraphs.filter((t) => t.ownerId !== m.id);
-    this.monsters = this.monsters.filter((x) => !x.summoned);
-    m.aiTimer = 0;
+  tickTelegraphs(dt: number) {
+    return boss.tickTelegraphs(this, dt);
   }
-  private tickTelegraphs(dt: number) {
-    if (!this.telegraphs.length) return;
-    const p = this.player;
-    for (const t of [...this.telegraphs]) {
-      t.remaining -= dt;
-      if (t.remaining > 0) continue;
-      this.telegraphs = this.telegraphs.filter((x) => x !== t);
-      const owner = this.monsters.find((e) => e.id === t.ownerId);
-      const hit = !!owner && !owner.dead && !p.dead && dist(p, t) <= t.radius;
-      this.emit({ type: 'telegraphResolved', id: t.id, x: t.x, y: t.y, radius: t.radius, hit });
-      if (hit && owner) this.directDamage(owner, p, t.mult);
-    }
-  }
-  // dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa
-  private directDamage(a: Entity, t: Entity, mult: number) {
-    const physical = a.damageType === 'physical';
-    const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
-      df = physical ? t.derived.physDef : t.derived.spiritDef;
-    const amount = Math.max(1, Math.round(atk * mult * (1 - df / (df + 100))));
-    const dealt = this.absorb(t, amount);
-    t.hp -= dealt;
-    if (dealt > 0)
-      this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
-    this.lastDamaged = this.time;
-    this.wearGear();
-    if (t.hp <= 0) this.killPlayer();
-  }
-  // chefe engajado (para a barra grande no topo)
   engagedBoss(): Entity | null {
-    return (
-      this.monsters.find(
-        (m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && (m.ai === 'chase' || m.hp < m.derived.maxHp),
-      ) ?? null
-    );
+    return boss.engagedBoss(this);
   }
-  private wearGear() {
-    if (WEAR_PER_HIT <= 0) return;
-    const worn = SLOTS.map((sl) => this.equipment[sl]).filter((i): i is ItemInstance => !!i && i.durability > 0);
-    if (!worn.length) return;
-    const it = worn[Math.min(worn.length - 1, Math.floor(this.rng.next() * worn.length))];
-    it.durability = Math.max(0, it.durability - WEAR_PER_HIT);
-    if (it.durability <= 0) this.recalc(this.player, false);
-    this.bumpInv();
+
+  // ---------- inventário: src/core/world/inventory.ts ----------
+  wearGear() {
+    return inventory.wearGear(this);
+  }
+  gearStats(): Record<string, number> {
+    return inventory.gearStats(this);
+  }
+  sortBag() {
+    return inventory.sortBag(this);
+  }
+  freeSlots(): number {
+    return inventory.freeSlots(this);
+  }
+  canFit(baseId: string, qty = 1): boolean {
+    return inventory.canFit(this, baseId, qty);
+  }
+  addItem(item: ItemInstance): boolean {
+    return inventory.addItem(this, item);
+  }
+  potionCount(baseId: string): number {
+    return inventory.potionCount(this, baseId);
+  }
+  kindCount(kind: PotionKind): number {
+    return inventory.kindCount(this, kind);
+  }
+  removeFromBag(i: number, qty = 1) {
+    return inventory.removeFromBag(this, i, qty);
+  }
+  collect(item: ItemInstance, x: number, y: number) {
+    return inventory.collect(this, item, x, y);
+  }
+  tickGround() {
+    return inventory.tickGround(this);
+  }
+  dropLoot(m: Entity, def: MonsterDef) {
+    return inventory.dropLoot(this, m, def);
+  }
+  canEquip(it: ItemInstance): ActionError | null {
+    return inventory.canEquip(this, it);
+  }
+  equip(bagIndex: number): ActionError | null {
+    return inventory.equip(this, bagIndex);
+  }
+  unequip(slot: Slot): ActionError | null {
+    return inventory.unequip(this, slot);
+  }
+  usePotion(kind: PotionKind, baseId?: string): boolean {
+    return inventory.usePotion(this, kind, baseId);
+  }
+  tickPotions(dt: number) {
+    return inventory.tickPotions(this, dt);
+  }
+  lowDurability(): boolean {
+    return inventory.lowDurability(this);
   }
 
   private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
@@ -967,10 +868,7 @@ export class World {
     return r;
   }
 
-  // ---------- missões (marco 7) ----------
-  quest: QuestState = { stage: 0, status: 'pending', progress: 0 };
-
-  /** Missão atual da cadeia e em que fase ela está para a interface. */
+  // ---------- quests: src/core/world/quests.ts ----------
   questView(): {
     def: QuestDef | null;
     phase: QuestPhase;
@@ -979,98 +877,28 @@ export class World {
     giver: string;
     turnIn: string;
   } {
-    const def = QUESTS[this.quest.stage] ?? null;
-    if (!def) return { def: null, phase: 'complete', progress: 0, count: 0, giver: '', turnIn: '' };
-    const giver = resolveNpc(def.giver, this.classId),
-      turnIn = resolveNpc(def.turnIn, this.classId);
-    const phase: QuestPhase =
-      this.quest.status === 'pending'
-        ? this.player.level >= def.minLevel
-          ? 'available'
-          : 'locked'
-        : this.quest.status;
-    return { def, phase, progress: this.quest.progress, count: questGoalCount(def), giver, turnIn };
+    return quests.questView(this);
   }
-  /** Marca sobre o NPC: "!" = tem missão para dar; "?" = missão para entregar (ou falar com ele cumpre o objetivo). */
   questMark(npcId: string): '!' | '?' | null {
-    const v = this.questView();
-    if (!v.def) return null;
-    if (v.phase === 'available' && v.giver === npcId) return '!';
-    if (v.phase === 'ready' && v.turnIn === npcId) return '?';
-    if (
-      v.phase === 'active' &&
-      v.def.objective.type === 'talk' &&
-      resolveNpc(v.def.objective.npc, this.classId) === npcId
-    )
-      return '?';
-    return null;
+    return quests.questMark(this, npcId);
   }
-  /** NPC com quem falar numa missão de conversa ('' se não for). */
   questTalkTarget(): string {
-    const o = QUESTS[this.quest.stage]?.objective;
-    return o?.type === 'talk' ? resolveNpc(o.npc, this.classId) : '';
+    return quests.questTalkTarget(this);
   }
-  /** Aceita a missão atual (precisa estar falando com quem dá; force = simulador/testes). */
   questAccept(force = false): boolean {
-    const v = this.questView();
-    if (!v.def || v.phase !== 'available' || (!force && this.npcRole() !== v.giver)) return false;
-    this.quest.status = 'active';
-    this.quest.progress = 0;
-    this.emit({ type: 'quest', kind: 'accepted', questId: v.def.id, name: v.def.name });
-    // objetivo já cumprido na hora de aceitar (ex.: falar com quem está aberto, já estar no mapa)
-    const o = v.def.objective;
-    if (o.type === 'reach' && this.mapId === o.map) this.questReady(v.def);
-    if (o.type === 'talk' && this.npcRole() === resolveNpc(o.npc, this.classId)) this.questReady(v.def);
-    return true;
+    return quests.questAccept(this, force);
   }
-  /** Entrega a missão pronta e dá as recompensas (precisa estar falando com quem recebe; force = simulador/testes). */
   questTurnIn(force = false): boolean {
-    const v = this.questView();
-    if (!v.def || v.phase !== 'ready' || (!force && this.npcRole() !== v.turnIn)) return false;
-    const r = v.def.reward;
-    this.quest = { stage: this.quest.stage + 1, status: 'pending', progress: 0 };
-    this.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });
-    if (r.gold) {
-      this.gold += r.gold;
-      this.bumpInv();
-      this.emit({ type: 'goldPickup', amount: r.gold });
-    }
-    if (r.item) {
-      const base = Object.entries(BASES).find(
-        ([, b]) => b.slot === r.item && b.reqLevel === 5 && (!b.sect || b.sect === this.classId),
-      );
-      if (base) this.collect(makeEquipment(base[0], 'incomum', null, this.rng, 5), this.player.x, this.player.y);
-    }
-    if (r.xp) this.gainXp(r.xp);
-    return true;
+    return quests.questTurnIn(this, force);
   }
-  private questReady(def: QuestDef) {
-    this.quest.status = 'ready';
-    this.quest.progress = questGoalCount(def);
-    this.emit({ type: 'quest', kind: 'ready', questId: def.id, name: def.name });
+  questKill(monsterId: string) {
+    return quests.questKill(this, monsterId);
   }
-  private questKill(monsterId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (!def || this.quest.status !== 'active' || def.objective.type !== 'kill' || def.objective.monster !== monsterId)
-      return;
-    this.quest.progress = Math.min(def.objective.count, this.quest.progress + 1);
-    if (this.quest.progress >= def.objective.count) this.questReady(def);
-    else this.emit({ type: 'quest', kind: 'progress', questId: def.id, name: def.name });
+  questTalk(npcId: string) {
+    return quests.questTalk(this, npcId);
   }
-  private questTalk(npcId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (
-      def &&
-      this.quest.status === 'active' &&
-      def.objective.type === 'talk' &&
-      resolveNpc(def.objective.npc, this.classId) === npcId
-    )
-      this.questReady(def);
-  }
-  private questReach(mapId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (def && this.quest.status === 'active' && def.objective.type === 'reach' && def.objective.map === mapId)
-      this.questReady(def);
+  questReach(mapId: string) {
+    return quests.questReach(this, mapId);
   }
 
   private killMonster(m: Entity) {
@@ -1099,7 +927,8 @@ export class World {
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
 
-  private killPlayer() {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  killPlayer() {
     const p = this.player;
     p.dead = true;
     p.hp = 0;
@@ -1119,10 +948,11 @@ export class World {
     p.dead = false;
     p.hp = p.derived.maxHp;
     p.mana = p.derived.maxMana;
-    this.changeMap('cidade');
+    this.changeMap(HOME_MAP);
   }
 
-  private gainXp(n: number) {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  gainXp(n: number) {
     const p = this.player;
     if (p.level >= PROGRESSION.levelCap) return;
     this.xp += n;
@@ -1142,7 +972,8 @@ export class World {
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
   }
 
-  private recalc(e: Entity, keepGain: boolean) {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  recalc(e: Entity, keepGain: boolean) {
     const old = e.derived;
     if (e.kind === 'player') this.applyGear(e);
     else e.derived = computeDerived(e.attrs);
@@ -1153,17 +984,6 @@ export class World {
     e.hp = Math.min(e.hp, e.derived.maxHp);
     e.mana = Math.min(e.mana, e.derived.maxMana);
     if (e.kind === 'player') this.applyPassives();
-  }
-
-  // stats dos equipamentos (só itens com durabilidade > 0)
-  gearStats(): Record<string, number> {
-    const out: Record<string, number> = {};
-    for (const sl of SLOTS) {
-      const it = this.equipment[sl];
-      if (!it || isBroken(it)) continue;
-      for (const [k, v] of Object.entries(itemStats(it))) out[k] = (out[k] ?? 0) + v;
-    }
-    return out;
   }
 
   private applyGear(e: Entity) {
@@ -1191,426 +1011,57 @@ export class World {
   }
 
   // ---------- inventário ----------
-  private bumpInv() {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  bumpInv() {
     this.invVersion++;
   }
 
-  sortBag() {
-    this.bag = sortedBag(this.bag);
-    this.bumpInv();
-  }
-
-  freeSlots(): number {
-    return this.bag.filter((b) => !b).length;
-  }
-  canFit(baseId: string, qty = 1): boolean {
-    if (!isPotionId(baseId)) return this.freeSlots() >= 1;
-    let room = this.freeSlots() * STACK_MAX;
-    for (const b of this.bag) if (b && b.baseId === baseId) room += STACK_MAX - (b.qty ?? 1);
-    return room >= qty;
-  }
-  // adiciona na mochila (potions empilham até 99). Sem eventos.
-  addItem(item: ItemInstance): boolean {
-    const qty = item.qty ?? 1;
-    if (!this.canFit(item.baseId, qty)) return false;
-    if (isPotionId(item.baseId)) {
-      let rem = qty;
-      for (const b of this.bag) {
-        if (rem <= 0) break;
-        if (b && b.baseId === item.baseId && (b.qty ?? 1) < STACK_MAX) {
-          const a = Math.min(rem, STACK_MAX - (b.qty ?? 1));
-          b.qty = (b.qty ?? 1) + a;
-          rem -= a;
-        }
-      }
-      while (rem > 0) {
-        const i = this.bag.findIndex((b) => !b),
-          a = Math.min(rem, STACK_MAX);
-        this.bag[i] = { ...item, uid: i === 0 && a === qty ? item.uid : makePotion(item.baseId).uid, qty: a };
-        rem -= a;
-      }
-    } else this.bag[this.bag.findIndex((b) => !b)] = item;
-    this.bumpInv();
-    return true;
-  }
-  potionCount(baseId: string): number {
-    return this.bag.reduce((a, b) => a + (b && b.baseId === baseId ? (b.qty ?? 1) : 0), 0);
-  }
-  kindCount(kind: PotionKind): number {
-    return Object.keys(POTIONS)
-      .filter((id) => POTIONS[id].kind === kind)
-      .reduce((a, id) => a + this.potionCount(id), 0);
-  }
-
-  private removeFromBag(i: number, qty = 1) {
-    const b = this.bag[i];
-    if (!b) return;
-    if (b.qty && b.qty > qty) b.qty -= qty;
-    else this.bag[i] = null;
-    this.bumpInv();
-  }
-
-  private collect(item: ItemInstance, x: number, y: number) {
-    this.auto.recordDrop(item);
-    let placed = this.addItem(item);
-    if (!placed && this.auto.sellingActive) {
-      // auto-combate: mochila cheia vende o que a regra permite
-      this.auto.makeRoom();
-      placed = this.addItem(item);
-      if (!placed && this.auto.sellable(item)) {
-        this.sellValueNow(item);
-        return;
-      }
-    }
-    if (placed) {
-      this.emit({
-        type: 'itemPickup',
-        baseId: item.baseId,
-        name: itemName(item),
-        color: itemColor(item),
-        qty: item.qty ?? 1,
-        potion: isPotionId(item.baseId),
-        rarity: item.rarity,
-      });
-    } else {
-      this.ground.push({ id: this.nextGround++, x, y, item, expires: this.time + GROUND_SECONDS });
-      this.emit({ type: 'bagFull' });
-    }
-  }
-
-  private tickGround() {
-    if (!this.ground.length) return;
-    const p = this.player;
-    for (const g of [...this.ground]) {
-      if (this.time >= g.expires) {
-        this.ground = this.ground.filter((x) => x !== g);
-        this.emit({ type: 'groundGone', id: g.id });
-        continue;
-      }
-      if (g.item && dist(g, p) < 0.9 && this.addItem(g.item)) {
-        const it = g.item;
-        this.ground = this.ground.filter((x) => x !== g);
-        this.emit({ type: 'groundGone', id: g.id });
-        this.emit({
-          type: 'itemPickup',
-          baseId: it.baseId,
-          name: itemName(it),
-          color: itemColor(it),
-          qty: it.qty ?? 1,
-          potion: isPotionId(it.baseId),
-          rarity: it.rarity,
-        });
-      }
-    }
-  }
-
-  private dropLoot(m: Entity, def: MonsterDef) {
-    const L = def.loot;
-    if (!L) return;
-    const spot = () => ({ x: m.x + this.rng.range(-0.4, 0.4), y: m.y + this.rng.range(-0.4, 0.4) });
-    if (L.gold) {
-      const add = (L.gold.perLevel ?? 0) * (m.level - 1);
-      const g = this.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add));
-      if (g > 0) {
-        this.gold += g;
-        this.bumpInv();
-        this.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
-        this.emit({ type: 'goldPickup', amount: g });
-      }
-    }
-    for (const pd of L.potions ?? []) {
-      if (pd.minMonsterLevel && m.level < pd.minMonsterLevel) continue;
-      if (this.rng.next() >= pd.chance) continue;
-      const s = spot();
-      this.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
-      this.collect(makePotion(pd.id, 1), s.x, s.y);
-    }
-    const sectOk = (id: string) => !BASES[id].sect || BASES[id].sect === this.classId;
-    const give = (id: string, rarity: Rarity, ilvl = m.level) => {
-      const it = makeEquipment(id, rarity, CLASSES[this.classId].element, this.rng, ilvl);
-      const s = spot();
-      this.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
-      this.collect(it, s.x, s.y);
-    };
-    const eqs = L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [];
-    for (const eq of eqs) {
-      if (eq.minMonsterLevel && m.level < eq.minMonsterLevel) continue;
-      if (this.rng.next() >= eq.chance) continue;
-      const ids = equipmentBaseIds().filter(
-        (id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id),
-      );
-      if (ids.length)
-        give(ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))], rollRarity(this.rng));
-    }
-    if (L.guaranteed) {
-      // 1 item garantido de slot aleatório (arma só da seita do jogador)
-      const ids = equipmentBaseIds().filter((id) => BASES[id].reqLevel === L.guaranteed!.reqLevel && sectOk(id));
-      if (ids.length)
-        give(
-          ids[Math.min(ids.length - 1, Math.floor(this.rng.next() * ids.length))],
-          L.guaranteed.rarity,
-          L.guaranteed.reqLevel,
-        );
-    }
-  }
-
-  // retorna mensagem de erro (PT-BR) ou null se deu certo
-  canEquip(it: ItemInstance): string | null {
-    const b = baseOf(it);
-    if (!b) return L('Este item não é equipável', 'This item cannot be equipped');
-    if (this.player.level < b.reqLevel) return L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`);
-    if (b.sect && b.sect !== this.classId)
-      return L(`Apenas para ${CLASSES[b.sect]?.name ?? b.sect}`, `Only for ${CLASSES[b.sect]?.name ?? b.sect}`);
-    return null;
-  }
-  equip(bagIndex: number): string | null {
-    const it = this.bag[bagIndex];
-    if (!it) return null;
-    const err = this.canEquip(it);
-    if (err) return err;
-    const slot = BASES[it.baseId].slot;
-    this.bag[bagIndex] = this.equipment[slot];
-    this.equipment[slot] = it;
-    this.afterEquip();
-    return null;
-  }
-  unequip(slot: Slot): string | null {
-    const it = this.equipment[slot];
-    if (!it) return null;
-    const i = this.bag.findIndex((b) => !b);
-    if (i < 0) return L('Mochila cheia', 'Bag full');
-    this.bag[i] = it;
-    this.equipment[slot] = null;
-    this.afterEquip();
-    return null;
-  }
-  private afterEquip() {
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'equipChange' });
-  }
-
-  // ---------- poções ----------
-  usePotion(kind: PotionKind, baseId?: string): boolean {
-    const p = this.player;
-    if (p.dead) return false;
-    if (this.potionCd[kind] > 0) {
-      this.emit({ type: 'potionFail', kind, reason: 'cooldown' });
-      return false;
-    }
-    const ids = baseId ? [baseId] : Object.keys(POTIONS).filter((id) => POTIONS[id].kind === kind);
-    const id = ids.find((x) => POTIONS[x]?.kind === kind && this.potionCount(x) > 0);
-    if (!id) {
-      this.emit({ type: 'potionFail', kind, reason: 'none' });
-      return false;
-    }
-    const full = kind === 'hp' ? p.hp >= p.derived.maxHp - 0.01 : p.mana >= p.derived.maxMana - 0.01;
-    if (full) {
-      this.emit({ type: 'potionFail', kind, reason: 'full' });
-      return false;
-    }
-    const d = POTIONS[id];
-    this.removeFromBag(this.bag.findIndex((b) => b && b.baseId === id));
-    const max = kind === 'hp' ? p.derived.maxHp : p.derived.maxMana;
-    this.potionFx[kind] = { id, remaining: d.duration, rate: (max * d.percent) / d.duration }; // reinicia o efeito
-    this.potionCd[kind] = d.cooldown;
-    this.emit({ type: 'potionUsed', id, kind });
-    return true;
-  }
-
-  private tickPotions(dt: number) {
-    const p = this.player;
-    for (const kind of ['hp', 'mp'] as PotionKind[]) {
-      const fx = this.potionFx[kind];
-      if (!fx) continue;
-      const step = Math.min(dt, fx.remaining),
-        amt = fx.rate * step;
-      if (kind === 'hp') p.hp = Math.min(p.derived.maxHp, p.hp + amt);
-      else p.mana = Math.min(p.derived.maxMana, p.mana + amt);
-      fx.remaining -= dt;
-      if (fx.remaining <= 0) this.potionFx[kind] = null;
-    }
-  }
-
-  // ---------- NPCs ----------
+  // ---------- npcs: src/core/world/npcs.ts ----------
   interactNpc(entityId: number) {
-    const n = this.npcs.find((e) => e.id === entityId);
-    if (!n || this.player.dead) return;
-    this.auto.manualMove();
-    this.pendingSkill = null;
-    this.chasing = false;
-    this.autoAttack = false;
-    this.targetId = null;
-    this.moveInput = { x: 0, y: 0 };
-    this.player.path = [];
-    this.npcGoal = entityId;
+    return npcs.interactNpc(this, entityId);
   }
-  /** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'... */
   npcRole(n: Entity | null = this.openNpc): string {
-    return n?.npcId ?? '';
+    return npcs.npcRole(this, n);
   }
-  private openNpcWindow(n: Entity) {
-    if (this.openNpc === n) return;
-    this.openNpc = n;
-    this.questTalk(this.npcRole(n));
-    this.emit({ type: 'npcOpen', npcId: this.npcRole(n), entityId: n.id });
+  openNpcWindow(n: Entity) {
+    return npcs.openNpcWindow(this, n);
   }
   closeNpc() {
-    if (!this.openNpc) return;
-    this.openNpc = null;
-    this.emit({ type: 'npcClose' });
+    return npcs.closeNpc(this);
+  }
+  tickWalker(n: Entity, dt: number) {
+    return npcs.tickWalker(this, n, dt);
   }
 
-  buy(potionId: string, qty: number): string | null {
-    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
-    return this.purchase(potionId, qty);
+  // ---------- shop: src/core/world/shop.ts ----------
+  buy(potionId: string, qty: number): ActionError | null {
+    return shop.buy(this, potionId, qty);
   }
-  // compra sem exigir a janela do NPC aberta (usado pelo auto-combate ao chegar no vendedor)
-  purchase(potionId: string, qty: number): string | null {
-    if (!POTIONS[potionId] || qty < 1) return null;
-    const cost = buyPrice(potionId) * qty;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    if (!this.canFit(potionId, qty)) return L('Mochila cheia', 'Bag full');
-    this.gold -= cost;
-    this.addItem(makePotion(potionId, qty));
-    this.emit({ type: 'trade', kind: 'buy', gold: cost });
-    return null;
+  purchase(potionId: string, qty: number): ActionError | null {
+    return shop.purchase(this, potionId, qty);
   }
-  sell(bagIndex: number, qty = 1): string | null {
-    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
-    this.sellRaw(bagIndex, qty);
-    return null;
+  sell(bagIndex: number, qty = 1): ActionError | null {
+    return shop.sell(this, bagIndex, qty);
   }
-  // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
   sellRaw(bagIndex: number, qty = 1): number {
-    const it = this.bag[bagIndex];
-    if (!it) return 0;
-    const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
-      gold = sellValue(it) * n;
-    this.removeFromBag(bagIndex, n);
-    this.gold += gold;
-    this.bumpInv();
-    this.emit({ type: 'trade', kind: 'sell', gold });
-    return gold;
+    return shop.sellRaw(this, bagIndex, qty);
   }
-  // vende um item que nem chegou a entrar na mochila
   sellValueNow(it: ItemInstance): number {
-    const gold = sellValue(it) * (it.qty ?? 1);
-    this.gold += gold;
-    this.bumpInv();
-    this.emit({ type: 'trade', kind: 'sell', gold });
-    return gold;
+    return shop.sellValueNow(this, it);
   }
-
-  // ---------- ganho offline ----------
-  private applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
-    if (!saved?.active || !saved.mapId || TOWN_MAPS.has(saved.mapId) || !this.maps[saved.mapId]) return null;
-    const rate = this.auto.rate();
-    if (!rate) return null;
-    const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0
-    const res: OfflineResult = computeOffline({
-      elapsedMs,
-      rate,
-      level: this.player.level,
-      xp: this.xp,
-      potions: { hp: this.kindCount('hp'), mp: this.kindCount('mp') },
-      seed: (now ^ Math.floor(this.xp * 7919)) >>> 0,
-    });
-    if (res.kills < 1) return null;
-    const lvl0 = this.player.level;
-    this.gold += res.gold;
-    this.gainXp(res.xp);
-    const items: OfflineReport['items'] = [];
-    let soldCount = 0,
-      soldGold = 0;
-    const sell = (it: ItemInstance) => {
-      soldCount += it.qty ?? 1;
-      soldGold += this.sellValueNow(it);
-    };
-    for (const d of res.drops) {
-      const isPot = isPotionId(d.baseId);
-      for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
-        const it = isPot
-          ? makePotion(d.baseId, d.qty)
-          : makeEquipment(d.baseId, d.rarity, CLASSES[this.classId].element, this.rng, rate.monLevel);
-        let placed = this.addItem(it);
-        if (!placed) {
-          this.auto.makeRoom();
-          placed = this.addItem(it);
-        }
-        if (!placed) {
-          sell(it);
-          continue;
-        }
-        const e = items.find((x) => x.name === itemName(it) && x.rarity === it.rarity);
-        if (e) e.qty += it.qty ?? 1;
-        else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
-      }
-    }
-    const used: Record<PotionKind, number> = { hp: 0, mp: 0 };
-    for (const k of ['hp', 'mp'] as PotionKind[]) {
-      for (let n = res.potionsUsed[k]; n > 0; n--) {
-        const i = this.bag.findIndex((b) => b && POTIONS[b.baseId]?.kind === k);
-        if (i < 0) break;
-        this.removeFromBag(i);
-        used[k]++;
-      }
-    }
-    this.player.hp = this.player.derived.maxHp;
-    this.player.mana = this.player.derived.maxMana;
-    this.events.length = 0; // sem toasts de nível/skill atrás do resumo
-    return {
-      elapsedMs,
-      effMin: res.effMin,
-      efficiency: res.efficiency,
-      kills: res.kills,
-      xp: res.xp,
-      levelsGained: this.player.level - lvl0,
-      newLevel: this.player.level,
-      gold: res.gold,
-      items,
-      potionsUsed: used,
-      soldCount,
-      soldGold,
-    };
-  }
-  private repairTargets(): ItemInstance[] {
-    return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter(
-      (i): i is ItemInstance => !!i && !!BASES[i.baseId],
-    );
-  }
-  repair(it: ItemInstance): string | null {
-    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
-    const cost = repairCost(it);
-    if (cost <= 0) return null;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    this.gold -= cost;
-    it.durability = maxDurability(it);
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'repair', gold: cost });
-    return null;
+  repair(it: ItemInstance): ActionError | null {
+    return shop.repair(this, it);
   }
   repairAllCost(): number {
-    return this.repairTargets().reduce((a, i) => a + repairCost(i), 0);
+    return shop.repairAllCost(this);
   }
-  repairAll(): string | null {
-    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
-    const cost = this.repairAllCost();
-    if (cost <= 0) return null;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    this.gold -= cost;
-    for (const i of this.repairTargets()) i.durability = maxDurability(i);
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'repair', gold: cost });
-    return null;
+  repairAll(): ActionError | null {
+    return shop.repairAll(this);
   }
-  lowDurability(): boolean {
-    return SLOTS.some((s) => {
-      const i = this.equipment[s];
-      return !!i && i.durability <= maxDurability(i) * 0.2;
-    });
+
+  // ---------- offlineApply: src/core/world/offlineApply.ts ----------
+  applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
+    return offlineApply.applyOffline(this, now, lastSeen, saved);
   }
 
   // ---------- mapa / entidades ----------
@@ -1738,7 +1189,8 @@ export class World {
     return e;
   }
 
-  private applyMonsterLevel(e: Entity, def: MonsterDef, level: number) {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  applyMonsterLevel(e: Entity, def: MonsterDef, level: number) {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
@@ -1749,7 +1201,8 @@ export class World {
     e.hp = e.derived.maxHp;
   }
 
-  private makeMonster(def: MonsterDef, home: Point): Entity {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  makeMonster(def: MonsterDef, home: Point): Entity {
     const e = this.blank('monster', def.name, 1);
     e.monsterId = def.id;
     e.home = { ...home };
@@ -1781,35 +1234,9 @@ export class World {
     m.attackCd = 1;
   }
 
-  /** Morador: anda até um ponto perto de casa, para um pouco e escolhe outro. Para quando o jogador conversa com ele. */
-  private tickWalker(n: Entity, dt: number) {
-    if (this.openNpc === n || (this.npcGoal === n.id && dist(n, this.player) < 2.5)) {
-      n.path = [];
-      return;
-    }
-    if (n.path.length) {
-      this.followPath(n, dt, 1);
-      if (!n.path.length) n.aiTimer = this.npcRng.range(2, 6);
-      return;
-    }
-    n.aiTimer -= dt;
-    if (n.aiTimer > 0) return;
-    n.aiTimer = 1;
-    for (let k = 0; k < 6; k++) {
-      const a = this.npcRng.range(0, Math.PI * 2),
-        r = this.npcRng.range(1.5, n.wander);
-      const t = { x: n.home.x + Math.cos(a) * r, y: n.home.y + Math.sin(a) * r };
-      if (!isWalkable(this.map, t.x, t.y)) continue;
-      const path = findPath(this.map, n, t);
-      if (path.length && path.length < n.wander * 3) {
-        n.path = path;
-        return;
-      }
-    }
-  }
-
   // ---------- movimento ----------
-  private followPath(e: Entity, dt: number, mul: number) {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  followPath(e: Entity, dt: number, mul: number) {
     let rem = e.moveSpeed * mul * this.speedMul(e) * dt;
     while (rem > 0 && e.path.length) {
       const w = e.path[0],

@@ -14,8 +14,8 @@ import type {
   Point,
 } from './types';
 import type { World } from './world';
+import { MAPS_CONFIG, TOWN_MAPS } from './mapsConfig';
 
-export const TOWN_MAPS = new Set(['cidade']);
 export const AUTO_MAX_LEVEL_GAP = 2; // ataca só monstros até 2 níveis acima do personagem
 export const AUTO_GRAY_GAP = 1; // monstro com nível < personagem - 2 é "cinza": só se não houver outro
 const GRAY_PENALTY = 60;
@@ -299,9 +299,10 @@ export class AutoCombat {
     return this.needsHp() || this.needsMp();
   }
 
-  // saída para a vila; fora da floresta (ex.: ruínas) usa o portal de volta ao mapa anterior
+  // saída para a vila; sem portal direto (ex.: ruínas), sai pelo mapa de MAPS_CONFIG.autoExitVia
   private exitPortal() {
-    return this.portalTo(TOWN_TARGET) ?? this.portalTo('floresta');
+    const via = MAPS_CONFIG[this.w.mapId]?.autoExitVia;
+    return this.portalTo(TOWN_TARGET) ?? (via ? this.portalTo(via) : null);
   }
 
   private portalTo(target: string | null) {

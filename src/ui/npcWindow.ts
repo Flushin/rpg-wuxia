@@ -1,3 +1,5 @@
+import { actionErrorText } from './actionError';
+import type { ActionError } from '../core/types';
 import { L, tn } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import {
@@ -43,7 +45,7 @@ export class NpcWindow {
       a = t.dataset.a!,
       v = t.dataset.v ?? '';
     this.sig = '';
-    let err: string | null = null;
+    let err: ActionError | null = null;
     if (a === 'close') {
       w.closeNpc();
       return;
@@ -90,7 +92,7 @@ export class NpcWindow {
       const it = kind === 'eq' ? w.equipment[ref as keyof typeof w.equipment] : w.bag[+ref];
       if (it) err = w.repair(it);
     } else if (a === 'repall') err = w.repairAll();
-    if (err) this.toast(err, '#ff8a80');
+    if (err) this.toast(actionErrorText(err), '#ff8a80');
   }
 
   update() {
