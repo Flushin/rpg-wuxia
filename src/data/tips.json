@@ -28,7 +28,7 @@
   },
   "skill_nivel": {
     "title": "Skill subiu de nível!",
-    "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 10). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K)."
+    "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 15). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K)."
   },
   "primeiro_item": {
     "title": "Você achou um equipamento!",

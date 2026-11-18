@@ -176,6 +176,7 @@ function policy(w: World, run: Run) {
   } else if (w.mapId === 'floresta' && w.player.level >= RUINS_LEVEL && !w.player.dead && w.auto.status === 'Caçando') {
     if (!run.ruinsAt) run.ruinsAt = w.time / 60;
     w.changeMap('ruinas', 4.5, 16.5); // atravessar a floresta leva ~20 s; ignorado
+    w.auto.huntMap = 'ruinas'; // como o jogador que liga o Auto nas Ruínas (senão ele volta para a floresta)
   }
 }
 

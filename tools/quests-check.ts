@@ -1,6 +1,6 @@
 // Verificação headless das missões (marco 7). Uso: npm run check:quests
 import { readFileSync } from 'node:fs';
-import { CLASSES, MONSTERS } from '../src/core/data';
+import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
 import { BASES, BAG_SIZE, makePotion } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { QUESTS, sanitizeQuest } from '../src/core/quests';
@@ -162,15 +162,16 @@ console.log('== mochila cheia ==');
   );
 }
 
-console.log('== nível 10 ==');
+console.log('== nível máximo ==');
 {
+  const cap = PROGRESSION.levelCap;
   const w = World.create(maps, 'Teste', 'lamina');
-  setLevel(w, 10);
+  setLevel(w, cap);
   w.xp = 0;
   w.quest = { stage: 7, status: 'ready', progress: 1 };
   const g0 = w.gold;
   ok(
-    w.questTurnIn(true) && w.player.level === 10 && w.xp === 0 && w.gold === g0 + QUESTS[7].reward.gold,
+    w.questTurnIn(true) && w.player.level === cap && w.xp === 0 && w.gold === g0 + QUESTS[7].reward.gold,
     'no nível máximo: só o ouro (sem XP extra)',
   );
 }

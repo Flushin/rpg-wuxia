@@ -53,12 +53,15 @@ const BY_ID = new Map(
 );
 /** Skill de qualquer seita pelo id. */
 export const skillById = (id: string): SkillDef | undefined => BY_ID.get(id);
-export const SKILL_MAX_LEVEL = 10;
+export const SKILL_MAX_LEVEL = 15;
 export const GLOBAL_COOLDOWN = 0.5;
 export const LEVEL_BONUS = 0.08;
 
 export const skillScale = (level: number) => 1 + LEVEL_BONUS * (Math.max(1, level) - 1);
-export const skillXpToNext = (level: number) => Math.round(20 * Math.pow(1.5, level - 1));
+// usos para subir do nível `level` para o próximo: ×1,5 por nível até o 10; do 10 ao 15 cresce ×1,4 (um pouco mais
+// rápido que manter ×1,5, decidido pelo Lucas em 18/11/2026)
+export const skillXpToNext = (level: number) =>
+  Math.round(level < 10 ? 20 * Math.pow(1.5, level - 1) : 20 * Math.pow(1.5, 8) * Math.pow(1.4, level - 9));
 export const classActives = (classId: string) => (SKILLS[classId] ?? []).filter((s) => s.type === 'active');
 export const initials = (name: string) =>
   name
