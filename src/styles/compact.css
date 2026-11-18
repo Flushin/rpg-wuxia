@@ -127,4 +127,9 @@
     transform: translateX(-50%);
     width: min(300px, 40%);
   }
+  /* ⚙: os 4 botões de "Tamanho da interface" ("Automático"…"Grande") não cabiam em 320px e o último
+     saía do cartão. Deitado sobra largura (falta é altura), então o cartão fica mais largo aqui. */
+  #settings-panel .card {
+    width: min(440px, 100%);
+  }
 }
