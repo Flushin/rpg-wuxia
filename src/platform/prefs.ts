@@ -18,6 +18,8 @@ export const PREF = {
   BUG_LAST: 'rpg-bug-last',
   /** volumes e mudo, em JSON (antes ficavam no save de cada personagem) */
   AUDIO: 'rpg-audio',
+  /** layout do HUD no toque: 'novo' (padrão) | 'classico' (o de antes de 18/11/2026) */
+  HUD_LAYOUT: 'rpg-hud-layout',
 } as const;
 export type PrefKey = (typeof PREF)[keyof typeof PREF];
 

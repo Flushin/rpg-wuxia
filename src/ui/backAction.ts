@@ -13,6 +13,7 @@ const OVERLAYS: { id: string; close: string | null }[] = [
   { id: 'settings-panel', close: null },
   { id: 'offline-panel', close: '.primary' },
   { id: 'tip-card', close: '#tip-ok' },
+  { id: 'hud-menu', close: null }, // menu ☰ do HUD novo do celular
 ];
 
 /** Fecha a janela de cima. true = fechou algo. */

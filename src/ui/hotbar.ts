@@ -6,6 +6,7 @@ import { skillIconHtml } from './icons';
 import { uiRect, uiW } from './uiScale';
 import { byId } from './dom';
 import { onPress } from './press';
+import { hudV2 } from './hudLayout';
 
 const SIZE = 56,
   R = 118,
@@ -90,6 +91,7 @@ export class Hotbar {
 
   private layout() {
     if (!isTouch) return;
+    if (hudV2()) return this.layoutV2();
     // celular deitado com pouca altura (ex.: Fold fechado): arco baixo e compacto, para não subir até os botões do topo
     const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
@@ -103,6 +105,25 @@ export class Hotbar {
     // ângulo mínimo do último botão para ele ficar a EDGE_GAP da borda; se precisar, o arco todo gira para a esquerda
     const lastMin = (Math.acos(Math.max(-1, Math.min(1, (cx - size / 2 - EDGE_GAP) / r))) * 180) / Math.PI;
     const start = Math.max(short ? 178 : narrow ? 152 : 165, lastMin + (this.slots.length - 1) * step);
+    this.slots.forEach((s, i) => {
+      const a = ((start - i * step) * Math.PI) / 180;
+      s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
+      s.btn.style.bottom = `${cy + r * Math.sin(a) - size / 2}px`;
+    });
+  }
+
+  /** HUD novo do celular: as 4 skills num arco por cima do Atacar, todas à mesma distância dele, começando
+   *  um pouco acima da horizontal para deixar o canto de baixo livre para as poções (hud-mobile.css).
+   *  Centro do Atacar e tamanhos batem com o CSS: normal 96px em right 24/bottom 30; deitado baixo 78px em 14/12. */
+  private layoutV2() {
+    const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
+    const size = short ? 46 : SIZE,
+      r = short ? 96 : R,
+      cx = short ? 53 : 72,
+      cy = short ? 51 : 78;
+    const minStep = (2 * Math.asin(Math.min(1, (size + 6) / (2 * r))) * 180) / Math.PI;
+    const step = Math.max(31, minStep),
+      start = 168;
     this.slots.forEach((s, i) => {
       const a = ((start - i * step) * Math.PI) / 180;
       s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
