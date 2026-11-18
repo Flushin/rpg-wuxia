@@ -43,6 +43,9 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 - **Retratos** (`portrait_png`, `<nome>_retrato.png`: mochila, criação, diálogo): renderização à parte em alta resolução
   (`portrait_scale`, padrão 10 px por px do jogo, ~550 px de altura), nítida em tela de DPR 3. Só os retratos:
   `PORTRAIT_ONLY=1 SPRITE_CFG=tita.json .venv-blender/bin/python render_sprites.py` (dentro de `tools/sprites`).
+- **Retrato animado** (`portrait_anim`, só as 4 seitas): a animação parada inteira (`portrait_frames`, padrão 12) na mesma
+  resolução do retrato, numa tira `<nome>_retrato_idle.png` + `src/data/sprites/<nome>_retrato_idle.json` (quadros, fps com o
+  mesmo ciclo do sprite). É a respiração do personagem na mochila. Sai junto com o retrato (`PORTRAIT_ONLY=1`).
 - **Tamanho:** personagem ~48 px de altura no zoom 100%. Escala dos objetos: 1 unidade do modelo = 1 tile.
 - **Folhas:** quadros recortados e empacotados (atlas do Phaser, máx. 2048×4096), paleta de 256 cores.
 - **Recolorir:** `texture.cells` troca blocos da paleta de texturas estilo KayKit (grade 8×4);

@@ -117,5 +117,6 @@
    "radius": 0.05,
    "grip": 0.6
   }
- ]
+ ],
+ "portrait_anim": true
 }

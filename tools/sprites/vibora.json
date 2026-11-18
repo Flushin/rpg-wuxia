@@ -92,5 +92,6 @@
    "radius": 0.028,
    "spread": 16
   }
- ]
+ ],
+ "portrait_anim": true
 }

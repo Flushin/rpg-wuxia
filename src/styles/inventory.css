@@ -41,21 +41,31 @@
   object-fit: contain;
   opacity: 1;
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
-  /* respira como os NPCs parados: o peito sobe e desce, pés fixos no chão */
-  transform-origin: 50% 100%;
-  animation: body-breathe 3.2s ease-in-out infinite;
 }
-@keyframes body-breathe {
-  0%,
-  100% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.012, 1.025);
+/* retrato animado (respiração, a mesma animação parada dos NPCs): só um quadro da tira aparece por vez */
+.body-anim {
+  width: auto;
+  height: 170px;
+  max-width: 100%;
+  overflow: hidden;
+  opacity: 1;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
+}
+.body-anim img {
+  display: block;
+  height: 100%;
+  width: calc(100% * var(--n));
+  max-width: none;
+  animation-name: body-idle;
+  animation-iteration-count: infinite;
+}
+@keyframes body-idle {
+  to {
+    transform: translateX(-100%);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .body-img {
+  .body-anim img {
     animation: none;
   }
 }
@@ -375,13 +385,14 @@
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden auto; /* só rola na vertical */
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     padding: 4px 4px 0 0;
   }
   .inv-main .win-x {
     margin-top: 0; /* dentro da coluna que rola, a margem negativa cortava o título */
+    margin-right: 0; /* e a da direita (-6px) passava da coluna: rolagem lateral e o ✕ cortado */
   }
   .inv-detail {
     flex: 0 0 250px;

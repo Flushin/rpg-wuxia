@@ -90,6 +90,26 @@ export const PORTRAITS: Record<string, string> = {
   vibora: 'sprites/vibora_retrato.png',
 };
 
+// retrato animado da mochila: a animação parada em alta resolução, numa tira horizontal (tools/sprites, portrait_anim)
+export interface PortraitAnim {
+  src: string;
+  frames: number;
+  fps: number;
+  w: number;
+  h: number;
+}
+const PORTRAIT_ANIM_META = import.meta.glob('../data/sprites/*_retrato_idle.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, Omit<PortraitAnim, 'src'>>;
+export const PORTRAIT_ANIMS: Record<string, PortraitAnim> = Object.fromEntries(
+  Object.entries(PORTRAITS).flatMap(([cls, still]) => {
+    const name = still.replace(/^sprites\/(.*)_retrato\.png$/, '$1');
+    const m = PORTRAIT_ANIM_META[`../data/sprites/${name}_retrato_idle.json`];
+    return m ? [[cls, { ...m, src: `sprites/${name}_retrato_idle.png` }]] : [];
+  }),
+);
+
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
   Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),
