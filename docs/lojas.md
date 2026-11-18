@@ -60,14 +60,14 @@ Observações:
 
 ### Português (pt-BR)
 
-**Título:** Wanderers
+**Título:** Mistpeak: Idle RPG
 
 **Descrição curta (≤ 80 caracteres):**
 `RPG de ação wuxia: combate, auto-combate e ganho offline.` (57)
 
 **Descrição longa:**
 
-Wanderers é um RPG de ação em visão isométrica inspirado nos contos de artes marciais da China antiga. Escolha o seu
+Mistpeak é um RPG de ação em visão isométrica inspirado nos contos de artes marciais da China antiga. Escolha o seu
 personagem entre as seitas disponíveis e viaje pela Vila das Nuvens, pela floresta e pelas ruínas até enfrentar o
 General de Terracota.
 
@@ -83,14 +83,14 @@ encontrar um problema, o botão Reportar bug (em ⚙) envia o relato para o dese
 
 ### English
 
-**Title:** Wanderers
+**Title:** Mistpeak: Idle RPG
 
 **Short description (≤ 80 characters):**
 `Wuxia action RPG: tab-target combat, auto-combat and offline gains.` (66)
 
 **Long description:**
 
-Wanderers is an isometric action RPG inspired by ancient Chinese martial-arts tales. Pick your character from the
+Mistpeak is an isometric action RPG inspired by ancient Chinese martial-arts tales. Pick your character from the
 available sects and travel through Cloud Village, the forest and the ruins until you face the Terracotta General.
 
 Combat is target-based: tap a monster to aim, use the Attack button and the skills arranged in an arc on screen (on a

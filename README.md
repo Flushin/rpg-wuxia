@@ -1,4 +1,4 @@
-# Wanderers
+# Mistpeak
 
 RPG de ação wuxia no navegador (PC e celular), isométrico, com combate tab-target, auto-combate e ganho offline.
 TypeScript + Vite + Phaser 3. Versão atual: ver `package.json` (aparece no canto da tela inicial).

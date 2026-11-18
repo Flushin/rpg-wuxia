@@ -1,6 +1,6 @@
 // Service worker mínimo: rede primeiro, cache só como reserva (offline).
 // Assim um deploy novo é pego na hora e nunca serve JS velho com internet.
-const CACHE = 'wanderers-v1';
+const CACHE = 'mistpeak-v1';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(

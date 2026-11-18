@@ -7,7 +7,7 @@ Tudo o que muda entre web e app fica em `src/platform/` (ver `src/platform/index
 
 1. Em todo PR o GitHub Actions roda **"APK Android"** e gera um APK de teste (debug).
    Para gerar sem PR: aba **Actions → APK Android → Run workflow**.
-2. Abra a execução e baixe **`wanderers-debug-apk`** em "Artifacts", no fim da página (vem num `.zip`).
+2. Abra a execução e baixe **`mistpeak-debug-apk`** em "Artifacts", no fim da página (vem num `.zip`).
 3. No celular: copie o `app-debug.apk` para o aparelho e abra. O Android pede para permitir
    "instalar apps desconhecidos" para o app que abriu o arquivo (Arquivos, Chrome, Drive…).
 4. O APK de teste é assinado com uma chave de debug: para trocar por um APK de outra máquina, desinstale antes
@@ -37,8 +37,8 @@ O APK sai em `android/app/build/outputs/apk/debug/app-debug.apk`. Para abrir no 
 
 ## Como está montado
 
-- `capacitor.config.ts`: `appId` (**provisório**: o nome do jogo pode mudar; depois do primeiro envio à Play Store
-  nunca mais muda), nome do app e `webDir: 'dist'`.
+- `capacitor.config.ts`: `appId` `io.github.flushin.mistpeak` (depois do primeiro envio à Play Store nunca mais
+  muda), nome do app (Mistpeak) e `webDir: 'dist'`.
 - A pasta `android/` **não** está no repositório: `npm run android:prepare` a gera a partir do `capacitor.config.ts`
   (`npx cap add android`) e copia o `dist/` para dentro (`npx cap sync`). Assim o `appId` fica num lugar só.
   Se um dia for preciso mexer à mão em arquivos nativos, a pasta passa a ser versionada.

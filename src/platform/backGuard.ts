@@ -8,9 +8,9 @@
 // botão de voltar). Como o jogador toca na tela o tempo todo (joystick), a entrada vale assim que ele tocar.
 
 const EXIT_WINDOW_MS = 2500;
-const GUARD_STATE = { wanderersBackGuard: true };
+const GUARD_STATE = { mistpeakBackGuard: true };
 
-const hasGuard = () => !!(history.state as Record<string, unknown> | null)?.wanderersBackGuard;
+const hasGuard = () => !!(history.state as Record<string, unknown> | null)?.mistpeakBackGuard;
 
 /**
  * Liga a proteção. A cada "voltar", `closeSomething` tenta fechar uma janela do jogo: se fechou, a entrada extra
