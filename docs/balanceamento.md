@@ -5,6 +5,21 @@
 > Os valores atuais estão nos JSON de `src/data/` e as decisões em `docs/decisoes-do-projeto.md`.
 > A seção "Situação atual" logo abaixo traz a última medição.
 
+## Números atuais (v1, conferidos com `src/data/` em 18/11/2026)
+
+Resumo para não ler os valores antigos do registro do marco 5 por engano. A fonte é sempre o JSON.
+
+| Monstro | Níveis | XP por abate (`xpBase + xpPerLevel × (nível − 1)`) | Ouro | Respawn |
+|---|---|---|---|---|
+| Lobo | 1–3 | 8 + 5 | 2–5 | 30 s |
+| Bandido Espadachim | 4–6 | 23 + 6 | 3–5 (+0,8 por nível) | 30 s |
+| Bandido Arqueiro | 4–6 | 26 + 7 | 3–5 (+0,8 por nível) | 30 s |
+| Guerreiro de Terracota | 7–9 | 55 + 9 | 5–8 (+1 por nível) | 30 s |
+| General de Terracota | 10 | 600 | 260–340 | 600 s |
+
+Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10),
+nível máximo 10. Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
+
 ## Situação atual (17/11/2026)
 
 `npm run sim:balance -- --seeds=5` com os dados do marco 7 e o **simulador corrigido** (auditoria, etapa A2):

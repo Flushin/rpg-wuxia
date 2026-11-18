@@ -22,8 +22,26 @@ Não escreva uma licença de memória e não copie de outro pacote: se não cons
 | `capacitor-8.6.2-LICENSE.txt` | Capacitor 8.6.2 (`@capacitor/core` e `@capacitor/android`) — **MIT**, © 2017-present Drifty Co. | App das lojas: ponte entre o jogo e o Android (core vai no bundle; android vai no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/core@8.6.2` (o de `@capacitor/android@8.6.2` é idêntico) | `9c6ebf3e5ab8` |
 | `capacitor-plugins-app-haptics-status-bar-LICENSE.txt` | `@capacitor/app` 8.1.2, `@capacitor/haptics` 8.0.2, `@capacitor/status-bar` 8.0.4 — **MIT**, © 2020-present Ionic | App das lojas (vão no bundle e no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/app@8.1.2` (os outros dois são idênticos) | `de884404585e` |
 | `capacitor-filesystem-8.1.5-LICENSE.txt` | `@capacitor/filesystem` 8.1.5 — **MIT**, © 2025 Ionic | Save em arquivo no app (vai no bundle e no APK). Obtido em 18/11/2026 | Pacote npm `@capacitor/filesystem@8.1.5` | `e8f989836e88` |
+| `ionfilesystem-android-1.1.1-LICENSE.txt` | `io.ionic.libs:ionfilesystem-android` 1.1.1 — **MIT**, © 2025 Ionic | Puxada pelo `@capacitor/filesystem` (vai no APK). Obtido em 18/11/2026 | `https://raw.githubusercontent.com/ionic-team/ion-android-filesystem/1.1.1/LICENSE` (o POM no Maven Central aponta para esse arquivo) | `de884404585e` |
+| `cordova-android-14.0.1-NOTICE.txt` | `org.apache.cordova:framework` 14.0.1 — **Apache-2.0** (POM no Maven Central), com o NOTICE exigido pela licença | Puxada pelo `@capacitor/android` (vai no APK). Obtido em 18/11/2026; texto da licença: `Apache-2.0.txt` | `https://raw.githubusercontent.com/apache/cordova-android/rel/14.0.1/NOTICE` | `e94707080ab2` |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
+
+## Bibliotecas nativas do APK (Android)
+
+Levantadas em 18/11/2026 nos `build.gradle` do `@capacitor/android` 8.6.2, dos plugins e do modelo de app do
+`@capacitor/cli` (a pasta `android/` é gerada na hora). Todas aparecem na tela de créditos (`src/ui/credits.ts`).
+
+| Biblioteca | Versão | Licença | Quem puxa | Prova |
+|---|---|---|---|---|
+| AndroidX appcompat, core, core-splashscreen, activity, fragment, coordinatorlayout, webkit | 1.7.1, 1.17.0, 1.2.0, 1.11.0, 1.8.9, 1.3.0, 1.14.0 | Apache-2.0 | Capacitor e modelo de app | `Apache-2.0.txt` (sem NOTICE nos pacotes) |
+| Apache Cordova Android (`org.apache.cordova:framework`) | 14.0.1 | Apache-2.0 | `@capacitor/android` | `cordova-android-14.0.1-NOTICE.txt` + `Apache-2.0.txt` |
+| ionfilesystem-android | 1.1.1 | MIT | `@capacitor/filesystem` | `ionfilesystem-android-1.1.1-LICENSE.txt` |
+| Kotlin stdlib, kotlinx-coroutines-core | ~2.2, 1.10.2 | Apache-2.0 (POM no Maven Central; os .jar não têm NOTICE) | `@capacitor/filesystem` | `Apache-2.0.txt` |
+
+As dependências transitivas das bibliotecas AndroidX (lifecycle, savedstate, collection, annotation…) também são
+Apache-2.0, sem NOTICE, e ficam cobertas pela entrada "AndroidX" dos créditos. Ao subir a versão do Capacitor ou
+de um plugin, refazer esta tabela.
 
 ## Falta guardar
 
@@ -40,4 +58,7 @@ Baixe no seu computador e coloque aqui:
 | Página oficial do **Quaternius Ultimate Animated Animals** (CC0) | `https://quaternius.com/packs/ultimateanimatedanimals.html` → print/PDF | `quaternius-animals.pdf` |
 | Os **arquivos originais das duas músicas**, que você guarda | Guardar aqui ou num lugar fora do repositório com backup (são ~5 MB). Se ficarem fora, anote onde | — |
 
-Quando o Capacitor e o SDK de anúncios/Billing entrarem, guarde também as licenças deles (MIT/Apache-2.0) aqui.
+| Lista exata das dependências do APK (com as transitivas) | Rodar `./gradlew app:dependencies --configuration releaseRuntimeClasspath` na pasta `android/` (precisa do Android SDK; não roda nesta sessão). Conferir com a tabela "Bibliotecas nativas do APK" | — |
+| POMs das bibliotecas AndroidX (licença Apache-2.0) | `https://maven.google.com` (bloqueado nesta sessão) | — |
+
+Se um dia entrar SDK de anúncios ou Billing, guarde também as licenças deles aqui.

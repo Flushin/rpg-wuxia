@@ -10,6 +10,8 @@ import apacheLicense from '../../docs/licencas/Apache-2.0.txt?raw';
 import capacitorLicense from '../../docs/licencas/capacitor-8.6.2-LICENSE.txt?raw';
 import capacitorPluginsLicense from '../../docs/licencas/capacitor-plugins-app-haptics-status-bar-LICENSE.txt?raw';
 import capacitorFilesystemLicense from '../../docs/licencas/capacitor-filesystem-8.1.5-LICENSE.txt?raw';
+import ionFilesystemLicense from '../../docs/licencas/ionfilesystem-android-1.1.1-LICENSE.txt?raw';
+import cordovaNotice from '../../docs/licencas/cordova-android-14.0.1-NOTICE.txt?raw';
 
 // Créditos e licenças: aberto em ⚙ (no jogo) e no link da tela inicial. Fica no <body> (fora do HUD) para funcionar
 // nas duas telas. Créditos de assets CC0 são cortesia; os avisos MIT/Apache-2.0 das bibliotecas são obrigatórios.
@@ -89,6 +91,26 @@ const LIBRARIES: Library[] = [
     text: capacitorPluginsLicense,
   },
   { name: 'Capacitor Filesystem 8.1.5', notice: '© 2025 Ionic', license: 'MIT', text: capacitorFilesystemLicense },
+  // Bibliotecas nativas que entram no APK (Android), puxadas pelo Capacitor e pelos plugins. Ver docs/licencas/README.md.
+  { name: 'ionfilesystem-android 1.1.1', notice: '© 2025 Ionic', license: 'MIT', text: ionFilesystemLicense },
+  {
+    name: 'Apache Cordova Android 14.0.1',
+    notice: '© 2015-2020 The Apache Software Foundation',
+    license: 'Apache License 2.0',
+    text: `${cordovaNotice.trim()}\n\n${apacheLicense}`,
+  },
+  {
+    name: 'AndroidX (appcompat, core, core-splashscreen, activity, fragment, coordinatorlayout, webkit)',
+    notice: '© The Android Open Source Project',
+    license: 'Apache License 2.0',
+    text: apacheLicense,
+  },
+  {
+    name: 'Kotlin standard library, kotlinx.coroutines 1.10.2',
+    notice: '© JetBrains s.r.o. and Kotlin Programming Language contributors',
+    license: 'Apache License 2.0',
+    text: apacheLicense,
+  },
 ];
 
 const creditList = (items: Credit[]) =>

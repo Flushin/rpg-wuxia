@@ -145,7 +145,7 @@ Legenda: ✅ respeitada · ⚠️ divergência · ℹ️ não verificável no c�
 | Dados em JSON (data-driven) (§Tecnologia). | ✅ com exceções: mapas conhecidos em código (`bootScene.ts:8`, `auto.ts:8`, `mapView.ts:18,26`). |
 | Save local em IndexedDB com horário da última sessão; separado por aparelho até o marco online (§Base, §Marco 7). | ✅ |
 | Publicação no GitHub Pages a cada push (§Repositório). | ✅ `deploy.yml`. |
-| Contínuo (proposto): rodar checks no Actions. | ⚠️ ainda não feito (o workflow só faz build). |
+| Contínuo (proposto): rodar checks no Actions. | ✅ feito na A1 (era ⚠️: o workflow só fazia build). |
 
 ### Idioma e nomes
 | Decisão | Status |
@@ -190,6 +190,7 @@ Legenda: ✅ respeitada · ⚠️ divergência · ℹ️ não verificável no c�
 | Volumes separados de efeitos e música (padrão 80/50). | ✅ — mas ficam **no save do personagem**, enquanto zoom/UI/FPS ficam no aparelho (ver P6). |
 
 ### Documentos que contradizem o código hoje (não são decisões novas, só texto velho)
+> ✅ **Corrigidos** (README e `items.json` na Fase B; `docs/balanceamento.md` ganhou o aviso de registro histórico e, em 18/11/2026, a tabela "Números atuais").
 - `README.md:1` "Marco 1"; `README.md:35` "TODO: perda de durabilidade" (já existe em `world.ts:405`); lista só 2 mapas.
 - `docs/balanceamento.md`: XP por abate "lobo 10+6", respawn "lobo 15 s, bandido 35 s", resultados do marco 5 — valores atuais estão no doc de decisões.
 - `src/data/items.json:3` "BALANCEAMENTO PROVISORIO - placeholders" — os números já foram fechados para a v1.
@@ -435,7 +436,10 @@ As etapas dentro de cada fase são independentes entre si.
 
 ### Fase D — preparação para as lojas
 
+> ✅ **Concluída em 18/11/2026** (D1–D8). Detalhes e pendências que dependem do Lucas: doc de decisões, seção "Fase D".
+
 **D1. Módulo `src/platform/`** — M
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: um único ponto para o que muda entre web e nativo, com implementação web igual ao que existe hoje:
   `platform.isNative`, `storage` (save), `prefs` (B6), `lifecycle.onPause/onResume`, `backButton.on()`, `haptics.light()` (vazio na web),
   `registerServiceWorker()` (só web), `restartApp()` (hoje `location.reload()`), `purchases` (interface vazia para IAP futuro).
@@ -443,30 +447,37 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo (só indireção). Teste: RT.
 
 **D2. Projeto Capacitor (Android primeiro)** — G
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `npx cap add android`, `capacitor.config.ts` com `webDir: 'dist'`, implementação nativa do `platform` (Filesystem para o save, App para pause/resume/voltar, StatusBar escondida, Haptics). iOS exige um Mac com Xcode (ver P8).
 - Risco: médio (projeto novo). Teste: RT na web + rodar no Android real: jogar, sair pelo botão home, voltar, matar o app e abrir de novo (save intacto).
 
 **D3. Botão Voltar do Android** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: fecha a janela aberta; no mapa, pergunta "Sair do jogo?" (salva antes). Comportamento novo só no Android.
 - Arquivos: `src/platform/`, `src/ui/hud.ts` (`closeAll` devolve se fechou algo).
 
 **D4. Safe areas nas telas cheias** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: `env(safe-area-inset-*)` em `#create`, `#loading`, `#bug-panel`, `#bigmap` e painéis.
 - Risco: baixo. Teste: `check:layout` + simulador de iPhone com notch.
 
 **D5. Ganho offline ao voltar do segundo plano** — M · 🎮 muda jogabilidade (P3)
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: em `onResume`, se ficou fora mais que X minutos com o Auto ligado, aplicar o mesmo cálculo offline e mostrar o resumo.
 - Arquivos: `src/core/world.ts` (expor `applyOffline`), `src/scenes/gameScene.ts`, `src/platform/lifecycle`.
 
 **D6. Memória: atlas por mapa e só a seita do jogador** — M/G
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: carregar no boot só UI/ícones/pisos; ao entrar num mapa, carregar os atlas dele (com a barra de carregamento) e liberar os do mapa anterior; um formato de áudio por plataforma no pacote nativo.
 - Arquivos: `bootScene.ts`, `render/sprites.ts`, `gameScene.ts` (troca de mapa), `render/audio.ts`.
 - Risco: médio (trocar de mapa fica com uma pequena espera). Teste: RT + medir memória no Chrome DevTools antes/depois e FPS no celular mais fraco disponível.
 
 **D7. Ícones, splash e versão do app** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: fonte 1024×1024 em `make_app_icons.py`; gerar com `@capacitor/assets`; regra `versionCode = MAJOR*10000 + MINOR*100 + PATCH` lida do `package.json`.
 
 **D8. Política de privacidade e textos das lojas** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: página PT/EN publicada no GitHub Pages, link em ⚙ e na tela inicial; respostas do Data Safety e das privacy labels anotadas em `docs/`.
 
 **Resumo de esforço:** Fase A ≈ P+P+P+P · Fase B ≈ M+P×5 · Fase C ≈ M+P+P+M+P+P+G+P · Fase D ≈ M+G+P+P+M+M/G+P+P.
