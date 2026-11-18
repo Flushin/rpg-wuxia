@@ -2,13 +2,13 @@
 #attrs-panel,
 #create {
   position: fixed;
-  inset: 0;
+  inset: 0 0 var(--fix-b, 0px) 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
+    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
   overflow: auto;
 }
 .card {
@@ -51,13 +51,13 @@ button[disabled] {
 }
 #settings-panel {
   position: fixed;
-  inset: 0;
+  inset: 0 0 var(--fix-b, 0px) 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
+    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
   overflow: auto;
 }
 #settings-panel .card {
@@ -69,12 +69,12 @@ button[disabled] {
 }
 #bug-panel {
   position: fixed;
-  inset: 0;
+  inset: 0 0 var(--fix-b, 0px) 0;
   z-index: 6;
   display: flex;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
+    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
   overflow: auto;
   touch-action: pan-y;
 }
@@ -174,7 +174,7 @@ button[disabled] {
 @media (orientation: landscape) and (max-height: 450px) {
   #tip-card {
     top: auto;
-    bottom: calc(6px + env(safe-area-inset-bottom));
+    bottom: calc(6px + var(--sa-bottom));
     width: min(360px, calc(100% - 470px));
     min-width: 240px;
     max-height: calc(100% - 140px);
@@ -202,14 +202,14 @@ button[disabled] {
 /* "Sair do jogo?" do botão Voltar no app Android (ui/backAction.ts) */
 #exit-panel {
   position: fixed;
-  inset: 0;
+  inset: 0 0 var(--fix-b, 0px) 0;
   z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
+    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
 }
 #exit-panel .card {
   width: min(320px, 100%);

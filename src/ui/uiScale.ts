@@ -13,13 +13,26 @@ function load(): UiSize {
 }
 
 let mode: UiSize = load();
+
+/** Área onde o HUD fica (tela menos barra de status, notch e barra do home), em px da tela real. */
+let probe: HTMLElement | null = null;
+function safeArea() {
+  if (!probe) {
+    probe = document.createElement('div');
+    probe.id = 'safe-probe';
+    document.body.appendChild(probe);
+  }
+  const r = probe.getBoundingClientRect();
+  return r.width && r.height
+    ? { x: r.left, y: r.top, w: r.width, h: r.height }
+    : { x: 0, y: 0, w: innerWidth, h: innerHeight };
+}
 let scale = 1;
 
 /** Automático: só no toque e com o aparelho deitado (em pé e no PC continua 100%). */
 export function autoScale(): number {
   if (!matchMedia('(pointer:coarse)').matches) return 1;
-  const w = innerWidth,
-    h = innerHeight;
+  const { w, h } = safeArea();
   if (w <= h) return 1;
   if (h < 360) return 1.15; // Galaxy Z Fold fechado deitado (~920×316): pouca altura, cresce menos
   if (h < 600) return 1.2; // celulares grandes deitados (iPhone Pro Max ~932×430)
@@ -31,8 +44,7 @@ export function autoScale(): number {
 const MIN_H = 270,
   MIN_W = 360;
 export function maxScale(): number {
-  const w = innerWidth,
-    h = innerHeight;
+  const { w, h } = safeArea();
   return Math.max(1, w > h ? h / MIN_H : w / MIN_W);
 }
 
@@ -53,22 +65,23 @@ export function setUiSize(m: UiSize) {
 }
 /** px da tela real → px do HUD */
 export const toUi = (px: number) => px / scale;
-/** retângulo de um elemento em px do HUD */
+/** retângulo de um elemento em px do HUD (a origem é o canto do #hud, já dentro da área segura) */
 export function uiRect(el: Element) {
   const r = el.getBoundingClientRect(),
+    a = safeArea(),
     s = scale;
   return {
-    left: r.left / s,
-    top: r.top / s,
-    right: r.right / s,
-    bottom: r.bottom / s,
+    left: (r.left - a.x) / s,
+    top: (r.top - a.y) / s,
+    right: (r.right - a.x) / s,
+    bottom: (r.bottom - a.y) / s,
     width: r.width / s,
     height: r.height / s,
   };
 }
 /** largura/altura da tela em px do HUD */
-export const uiW = () => innerWidth / scale;
-export const uiH = () => innerHeight / scale;
+export const uiW = () => safeArea().w / scale;
+export const uiH = () => safeArea().h / scale;
 
 export function initUiScale() {
   apply();

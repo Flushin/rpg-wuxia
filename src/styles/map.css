@@ -19,14 +19,14 @@
 }
 #bigmap {
   position: fixed;
-  inset: 0;
+  inset: 0 0 var(--fix-b, 0px) 0;
   z-index: 7;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
+    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
 }
 #bigmap.hidden {
   display: none;

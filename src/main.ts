@@ -9,11 +9,13 @@ import { captureErrors } from './ui/bugReport';
 import { credits } from './ui/credits';
 import { openPrivacyPolicy } from './ui/privacy';
 import { initUiScale } from './ui/uiScale';
+import { initViewport } from './ui/viewport';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
 import { registerServiceWorker } from './platform';
 import { initNativeApp } from './platform/native';
 
 captureErrors();
+initViewport();
 initNativeApp();
 initUiScale();
 initNoBrowserZoom();
