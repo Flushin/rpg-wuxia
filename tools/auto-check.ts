@@ -669,6 +669,26 @@ console.log('\n== offline: aplicando no jogo ==');
   ok(none.offlineReport === null, 'menos de 2 min de dados: sem ganhos');
   const b24 = mk('lamina', 1, 'floresta', base({ lastSeen: NOW - 40 * HOUR }), NOW);
   ok(b24.offlineReport?.kills === Math.floor(3 * 648), 'ausência de 40 h rende o teto de 24 h');
+
+  // voltar do segundo plano (D5): mesmo cálculo, só a partir de 5 min fora
+  const autoAt = { active: true, mapId: 'floresta', buckets: [bucket()] };
+  const r4 = mk('lamina', 1, 'floresta', { lastSeen: NOW }, NOW);
+  ok(r4.applyResumeOffline(NOW + 4 * 60_000, NOW, autoAt) === null, 'voltou após 4 min: sem ganhos');
+  const r10 = mk('lamina', 1, 'floresta', base({ lastSeen: NOW }), NOW); // auto com histórico de caça
+  r10.auto.resume(); // ligado, como no meio do jogo
+  const rep10 = r10.applyResumeOffline(NOW + 10 * 60_000, NOW, autoAt);
+  ok(
+    !!rep10 && rep10.kills > 0 && r10.gold >= rep10.gold,
+    `voltou após 10 min com auto: ganha (${rep10?.kills} abates)`,
+  );
+  ok(r10.auto.state === 'off' && r10.auto.pendingResume, 'auto espera o resumo ser fechado');
+  r10.auto.resume();
+  ok(r10.auto.state === 'on', 'fechar o resumo retoma o auto');
+  const rOff = mk('lamina', 1, 'floresta', { lastSeen: NOW }, NOW);
+  ok(
+    rOff.applyResumeOffline(NOW + HOUR, NOW, { ...autoAt, active: false }) === null,
+    'voltou após 1 h com auto desligado: sem ganhos',
+  );
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

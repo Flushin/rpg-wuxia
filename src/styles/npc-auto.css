@@ -22,7 +22,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   pointer-events: none !important;
 }
 #npc-panel .card {
@@ -186,7 +187,8 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   overflow: auto;
   touch-action: pan-y;
 }

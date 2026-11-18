@@ -21,6 +21,7 @@ import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { Rng } from './rng';
 import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
+import { RESUME_OFFLINE_MIN_MS } from './offline';
 import * as npcs from './world/npcs';
 import * as boss from './world/boss';
 import * as quests from './world/quests';
@@ -1062,6 +1063,17 @@ export class World {
   // ---------- offlineApply: src/core/world/offlineApply.ts ----------
   applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
     return offlineApply.applyOffline(this, now, lastSeen, saved);
+  }
+  /**
+   * Voltou do segundo plano: mesmo cálculo de quando o jogo abre, se ficou fora RESUME_OFFLINE_MIN_MS ou mais
+   * com o auto ligado. `autoAtPause` é o auto.serialize() do momento em que saiu. Com relatório, o auto fica
+   * esperando o resumo ser fechado (auto.resume()).
+   */
+  applyResumeOffline(now: number, pausedAt: number, autoAtPause: SaveData['auto']): OfflineReport | null {
+    if (now - pausedAt < RESUME_OFFLINE_MIN_MS) return null;
+    const rep = this.applyOffline(now, pausedAt, autoAtPause);
+    if (rep) this.auto.holdForReport();
+    return rep;
   }
 
   // ---------- mapa / entidades ----------

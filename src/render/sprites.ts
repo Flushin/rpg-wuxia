@@ -82,29 +82,47 @@ export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | nu
   return key ? { key, meta: SHEETS[key] } : null;
 };
 
+/** Boot: só o que é leve e vale para todos os mapas (cenários e pisos). As folhas de personagens são por mapa (sheetLoader). */
 export function preloadSprites(scene: Phaser.Scene) {
-  for (const key of Object.keys(SHEETS)) scene.load.atlas('sp-' + key, `sprites/${key}.png`, `sprites/${key}.json`);
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 
-export function createSpriteAnims(scene: Phaser.Scene) {
-  for (const [key, meta] of Object.entries(SHEETS)) {
-    for (const [anim, a] of Object.entries(meta.anims)) {
-      for (const d of meta.dirList ?? Array.from({ length: meta.dirs }, (_, k) => k)) {
-        const id = animKey(key, anim, d);
-        if (scene.anims.exists(id)) continue;
-        scene.anims.create({
-          key: id,
-          frames: Array.from({ length: a.frames }, (_, i) => ({ key: 'sp-' + key, frame: `${anim}_${d}_${i}` })),
-          frameRate: a.fps,
-          repeat: a.loop ? -1 : 0,
-        });
-      }
+export const sheetTexture = (key: string) => 'sp-' + key;
+
+/** Põe a folha na fila do loader (quem chama dá o start). */
+export function queueSheet(scene: Phaser.Scene, key: string) {
+  scene.load.atlas(sheetTexture(key), `sprites/${key}.png`, `sprites/${key}.json`);
+}
+
+/** Cria as animações de uma folha já carregada. */
+export function createSheetAnims(scene: Phaser.Scene, key: string) {
+  const meta = SHEETS[key];
+  if (!meta) return;
+  for (const [anim, a] of Object.entries(meta.anims)) {
+    for (const d of meta.dirList ?? Array.from({ length: meta.dirs }, (_, k) => k)) {
+      const id = animKey(key, anim, d);
+      if (scene.anims.exists(id)) continue;
+      scene.anims.create({
+        key: id,
+        frames: Array.from({ length: a.frames }, (_, i) => ({ key: sheetTexture(key), frame: `${anim}_${d}_${i}` })),
+        frameRate: a.fps,
+        repeat: a.loop ? -1 : 0,
+      });
     }
   }
+}
+
+/** Libera a memória de uma folha (textura e animações). Ninguém pode estar usando. */
+export function releaseSheet(scene: Phaser.Scene, key: string) {
+  const meta = SHEETS[key];
+  if (meta)
+    for (const anim of Object.keys(meta.anims))
+      for (const d of meta.dirList ?? Array.from({ length: meta.dirs }, (_, k) => k))
+        scene.anims.remove(animKey(key, anim, d));
+  if (scene.textures.exists(sheetTexture(key))) scene.textures.remove(sheetTexture(key));
 }
 
 export const animKey = (sheet: string, anim: string, dir: number) => `${sheet}:${anim}:${dir}`;

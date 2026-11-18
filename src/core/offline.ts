@@ -10,6 +10,8 @@ export const OFFLINE_TIERS: { untilH: number; eff: number }[] = [
   { untilH: 24, eff: 0.2 },
 ];
 export const MAX_OFFLINE_DROPS = 2000;
+/** Ao voltar do segundo plano (app minimizado, aba escondida): ganho offline só se ficou fora pelo menos isto (P3). */
+export const RESUME_OFFLINE_MIN_MS = 5 * 60_000;
 
 export interface OfflineInput {
   elapsedMs: number;

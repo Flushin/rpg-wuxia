@@ -164,6 +164,33 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   - Implementações nativas em `src/platform/`: save em arquivo JSON (gravação atômica + 1 backup), pause/resume e
     botão Voltar pelo `@capacitor/app`, barra de status escondida, vibração pelo `@capacitor/haptics` (ainda sem uso).
   - Licenças do Capacitor (MIT) na tela de créditos e em `docs/licencas/`.
+- **D3 (18/11/2026):** botão/gesto de voltar fecha a janela de cima (Sair do jogo? → créditos → report → ⚙ → resumo
+  offline → dica → janelas do HUD), em `src/ui/backAction.ts`. Sem janela aberta: no app Android aparece **"Sair do
+  jogo?"** (salva antes de fechar); na web/PWA continua o aviso + segundo voltar para sair. Também vale na web: antes
+  o voltar com uma janela aberta mostrava o aviso de saída em vez de fechá-la.
+- **D4 (18/11/2026):** telas cheias (`#create`, `#loading`, `#bigmap`, painéis, créditos, report, offline) respeitam
+  o notch e os cantos arredondados (`max(12px, env(safe-area-inset-*))`). Sem notch, igual a antes.
+- **D5 (18/11/2026):** **ganho offline ao voltar do segundo plano** (P3): se o jogo ficou fora da tela 5 min ou mais
+  (`RESUME_OFFLINE_MIN_MS` em `core/offline.ts`) com o auto ligado, aplica o mesmo cálculo de quando o jogo abre
+  (`World.applyResumeOffline`) e mostra o resumo; o auto espera o resumo ser fechado. Vale no app e na web (aba escondida).
+- **D6 (18/11/2026):** memória. As folhas de personagens e monstros (as imagens mais pesadas) são carregadas **por
+  mapa** (`src/render/sheetLoader.ts`): ficam só a seita do jogador e quem aparece no mapa (monstros, invocação do
+  chefe, NPCs); as do mapa anterior são liberadas. Na troca de mapa o jogo espera as folhas chegarem (fração de
+  segundo; nada anda nesse meio-tempo). Medido no navegador: folhas na memória de ~81 MB (todas) para 27–33 MB por
+  mapa. Cenários, pisos e ícones continuam carregados no início. No APK vão só os sons `.ogg` (−1,8 MB;
+  `tools/android-trim-audio.mjs`).
+- **D8 (18/11/2026):** política de privacidade PT/EN em `public/privacidade.html` (publicada em
+  `https://flushin.github.io/rpg-wuxia/privacidade.html`), com link na tela inicial e em ⚙ (no app abre no navegador do
+  celular). Declara o report de bug pelo Web3Forms (P10) com a lista exata do que é enviado. Respostas do Data Safety
+  (Play) e das privacy labels (Apple) e rascunho da descrição da loja em `docs/lojas.md`.
+  **Pendente com o Lucas:** e-mail de contato (a Play exige; `TODO` na página) e público-alvo (a página diz que o
+  jogo não é direcionado a crianças).
+
+**Fase D concluída em 18/11/2026** (D1–D8). Pendências antes da Play Store: nome do jogo e appId definitivo, e-mail de
+contato, público-alvo, chave de assinatura do app de produção, lista de licenças das bibliotecas Android do APK.
+- **D7 (18/11/2026):** ícone e tela de abertura do app gerados de `assets/` (`tools/icons/make_app_icons.py` →
+  `@capacitor/assets`). Versão do app lida do `package.json`: `versionCode = MAJOR*10000 + MINOR*100 + PATCH`
+  (`tools/android-version.mjs`). **Regra:** subir a `version` do `package.json` antes de cada envio à loja.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

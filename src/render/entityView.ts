@@ -4,7 +4,7 @@ import { tileToScreen } from '../core/iso';
 import { MONSTERS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
-import { animKey, dirFromDelta, sheetFor, type AnimName, type SheetMeta } from './sprites';
+import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type SheetMeta } from './sprites';
 import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 
@@ -51,7 +51,9 @@ export class EntityView {
   ) {
     const shadow = scene.add.image(0, 0, 'shadow');
     this.sc = e.kind === 'monster' ? (MONSTERS[e.monsterId]?.scale ?? 1) : 1;
-    this.sheet = sheetFor(texture);
+    const sheet = sheetFor(texture);
+    // folha que não carregou (rede/arquivo): figura genérica em vez de travar
+    this.sheet = sheet && scene.textures.exists(sheetTexture(sheet.key)) ? sheet : null;
     if (this.sheet) {
       const m = this.sheet.meta;
       const sp = scene.add

@@ -7,7 +7,8 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   overflow: auto;
 }
 .card {
@@ -117,7 +118,8 @@ button[disabled] {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   overflow: auto;
 }
 #settings-panel .card {
@@ -133,7 +135,8 @@ button[disabled] {
   z-index: 6;
   display: flex;
   background: rgba(0, 0, 0, 0.6);
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   overflow: auto;
   touch-action: pan-y;
 }
@@ -259,5 +262,33 @@ button[disabled] {
 /* o botão escolhido em "Tamanho da interface" é .primary: sem isto ganhava a margem acima e descia ~14px */
 .card .ui-size button {
   width: auto;
+  margin: 0;
+}
+
+/* "Sair do jogo?" do botão Voltar no app Android (ui/backAction.ts) */
+#exit-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+#exit-panel .card {
+  width: min(320px, 100%);
+  text-align: center;
+}
+#exit-panel .exit-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+#exit-panel .exit-btns button {
+  flex: 1;
+  min-height: 44px;
   margin: 0;
 }
