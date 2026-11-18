@@ -3,6 +3,7 @@ import type { PotionKind } from '../core/types';
 import type { World } from '../core/world';
 import { isTouch } from '../platform/input';
 import { byId } from './dom';
+import { onPress } from './press';
 
 const KEYS: Record<PotionKind, string> = { hp: 'Q', mp: 'E' };
 
@@ -13,10 +14,7 @@ export class PotionBar {
     byId('potion-bar').classList.toggle('touch', isTouch);
     for (const k of ['hp', 'mp'] as PotionKind[]) {
       const b = byId(`pot-${k}`);
-      b.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        this.world.usePotion(k);
-      });
+      onPress(b, () => this.world.usePotion(k));
       b.addEventListener('contextmenu', (e) => e.preventDefault());
       b.addEventListener('focus', () => b.blur());
     }

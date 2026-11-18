@@ -5,6 +5,7 @@ import { isTouch } from '../platform/input';
 import { skillIconHtml } from './icons';
 import { uiRect, uiW } from './uiScale';
 import { byId } from './dom';
+import { onPress } from './press';
 
 const SIZE = 56,
   R = 118;
@@ -53,13 +54,11 @@ export class Hotbar {
     b.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'mouse') this.hideTip();
     });
+    // toque: lança ao encostar o dedo, mesmo com o outro dedo no joystick (ver press.ts); mouse usa o click
+    onPress(b, () => this.use(i), false);
     b.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
       this.longPressed = false;
       if (e.pointerType === 'mouse') return;
-      // toque: lança ao encostar o dedo (igual ao Atacar). Antes lançava só ao soltar, e com o outro dedo no
-      // joystick o celular às vezes cancelava o toque (pointercancel) e a skill não saía andando.
-      this.use(i);
       clearTimeout(this.pressTimer);
       this.pressTimer = window.setTimeout(() => {
         this.longPressed = true;
