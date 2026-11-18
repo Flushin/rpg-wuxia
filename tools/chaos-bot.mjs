@@ -37,7 +37,7 @@ function parseArgs(argv) {
   const o = {
     url: 'http://localhost:5173/',
     minutos: 60, // 0 = sem fim (até Ctrl+C)
-    semente: (Date.now() % 1_000_000_000) >>> 0,
+    semente: Date.now() % 1_000_000_000 >>> 0,
     janela: false, // true = mostra o navegador
     saida: join(ROOT, 'chaos-reports'),
     sessaoMin: 15, // a cada N minutos, fecha tudo e começa do zero com outro aparelho
