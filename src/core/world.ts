@@ -34,18 +34,11 @@ import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import * as quests from './world/quests';
 import * as shop from './world/shop';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
-import {
-  QUESTS,
-  questGoalCount,
-  resolveNpc,
-  sanitizeQuest,
-  type QuestDef,
-  type QuestPhase,
-  type QuestState,
-} from './quests';
+import { sanitizeQuest, type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { computeDerived, emptyElements } from './stats';
 import {
   ATTR_KEYS,
@@ -1004,8 +997,7 @@ export class World {
     return r;
   }
 
-  // ---------- missões (marco 7) ----------
-  /** Missão atual da cadeia e em que fase ela está para a interface. */
+  // ---------- quests: src/core/world/quests.ts ----------
   questView(): {
     def: QuestDef | null;
     phase: QuestPhase;
@@ -1014,98 +1006,28 @@ export class World {
     giver: string;
     turnIn: string;
   } {
-    const def = QUESTS[this.quest.stage] ?? null;
-    if (!def) return { def: null, phase: 'complete', progress: 0, count: 0, giver: '', turnIn: '' };
-    const giver = resolveNpc(def.giver, this.classId),
-      turnIn = resolveNpc(def.turnIn, this.classId);
-    const phase: QuestPhase =
-      this.quest.status === 'pending'
-        ? this.player.level >= def.minLevel
-          ? 'available'
-          : 'locked'
-        : this.quest.status;
-    return { def, phase, progress: this.quest.progress, count: questGoalCount(def), giver, turnIn };
+    return quests.questView(this);
   }
-  /** Marca sobre o NPC: "!" = tem missão para dar; "?" = missão para entregar (ou falar com ele cumpre o objetivo). */
   questMark(npcId: string): '!' | '?' | null {
-    const v = this.questView();
-    if (!v.def) return null;
-    if (v.phase === 'available' && v.giver === npcId) return '!';
-    if (v.phase === 'ready' && v.turnIn === npcId) return '?';
-    if (
-      v.phase === 'active' &&
-      v.def.objective.type === 'talk' &&
-      resolveNpc(v.def.objective.npc, this.classId) === npcId
-    )
-      return '?';
-    return null;
+    return quests.questMark(this, npcId);
   }
-  /** NPC com quem falar numa missão de conversa ('' se não for). */
   questTalkTarget(): string {
-    const o = QUESTS[this.quest.stage]?.objective;
-    return o?.type === 'talk' ? resolveNpc(o.npc, this.classId) : '';
+    return quests.questTalkTarget(this);
   }
-  /** Aceita a missão atual (precisa estar falando com quem dá; force = simulador/testes). */
   questAccept(force = false): boolean {
-    const v = this.questView();
-    if (!v.def || v.phase !== 'available' || (!force && this.npcRole() !== v.giver)) return false;
-    this.quest.status = 'active';
-    this.quest.progress = 0;
-    this.emit({ type: 'quest', kind: 'accepted', questId: v.def.id, name: v.def.name });
-    // objetivo já cumprido na hora de aceitar (ex.: falar com quem está aberto, já estar no mapa)
-    const o = v.def.objective;
-    if (o.type === 'reach' && this.mapId === o.map) this.questReady(v.def);
-    if (o.type === 'talk' && this.npcRole() === resolveNpc(o.npc, this.classId)) this.questReady(v.def);
-    return true;
+    return quests.questAccept(this, force);
   }
-  /** Entrega a missão pronta e dá as recompensas (precisa estar falando com quem recebe; force = simulador/testes). */
   questTurnIn(force = false): boolean {
-    const v = this.questView();
-    if (!v.def || v.phase !== 'ready' || (!force && this.npcRole() !== v.turnIn)) return false;
-    const r = v.def.reward;
-    this.quest = { stage: this.quest.stage + 1, status: 'pending', progress: 0 };
-    this.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });
-    if (r.gold) {
-      this.gold += r.gold;
-      this.bumpInv();
-      this.emit({ type: 'goldPickup', amount: r.gold });
-    }
-    if (r.item) {
-      const base = Object.entries(BASES).find(
-        ([, b]) => b.slot === r.item && b.reqLevel === 5 && (!b.sect || b.sect === this.classId),
-      );
-      if (base) this.collect(makeEquipment(base[0], 'incomum', null, this.rng, 5), this.player.x, this.player.y);
-    }
-    if (r.xp) this.gainXp(r.xp);
-    return true;
+    return quests.questTurnIn(this, force);
   }
-  private questReady(def: QuestDef) {
-    this.quest.status = 'ready';
-    this.quest.progress = questGoalCount(def);
-    this.emit({ type: 'quest', kind: 'ready', questId: def.id, name: def.name });
+  questKill(monsterId: string) {
+    return quests.questKill(this, monsterId);
   }
-  private questKill(monsterId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (!def || this.quest.status !== 'active' || def.objective.type !== 'kill' || def.objective.monster !== monsterId)
-      return;
-    this.quest.progress = Math.min(def.objective.count, this.quest.progress + 1);
-    if (this.quest.progress >= def.objective.count) this.questReady(def);
-    else this.emit({ type: 'quest', kind: 'progress', questId: def.id, name: def.name });
+  questTalk(npcId: string) {
+    return quests.questTalk(this, npcId);
   }
-  private questTalk(npcId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (
-      def &&
-      this.quest.status === 'active' &&
-      def.objective.type === 'talk' &&
-      resolveNpc(def.objective.npc, this.classId) === npcId
-    )
-      this.questReady(def);
-  }
-  private questReach(mapId: string) {
-    const def = QUESTS[this.quest.stage];
-    if (def && this.quest.status === 'active' && def.objective.type === 'reach' && def.objective.map === mapId)
-      this.questReady(def);
+  questReach(mapId: string) {
+    return quests.questReach(this, mapId);
   }
 
   private killMonster(m: Entity) {
@@ -1157,7 +1079,7 @@ export class World {
     this.changeMap(HOME_MAP);
   }
 
-  private gainXp(n: number) {
+  gainXp(n: number) {
     const p = this.player;
     if (p.level >= PROGRESSION.levelCap) return;
     this.xp += n;
