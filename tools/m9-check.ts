@@ -198,7 +198,7 @@ console.log('== forja ==');
   ok(w.forgeUpgrade(it) === null && it.plus === 1, 'melhora para +1');
   ok(w.gold === g0 - c0.gold && itemStats(it).physAtk > atk0, 'cobra o ouro e o ataque sobe');
   ok(itemName(it).endsWith('+1'), 'nome mostra +1');
-  // falha: perde só os materiais
+  // falha: perde os materiais e o ouro, item igual
   it.plus = 9;
   const c9 = upgradeCost(it)!;
   ok(Math.abs(c9.chance - FORGE.upgradeChance[9]) < 1e-9 && c9.mats.essencia_qi === 1, '+9→+10: 20% e pede essência');
@@ -211,13 +211,16 @@ console.log('== forja ==');
     if (ore < c9.mats.minerio_ferro) w.addItem(makeStack('minerio_ferro', 99));
     if (w.potionCount('cristal_gelo') < 10) w.addItem(makeStack('cristal_gelo', 20));
     if (w.potionCount('essencia_qi') < 2) w.addItem(makeStack('essencia_qi', 5));
+    if (w.gold < c9.gold) w.gold += c9.gold * 5;
+    const gold1 = w.gold;
     const ore1 = w.potionCount('minerio_ferro');
     w.forgeUpgrade(it);
     if (it.plus === 9) {
       failed = true;
       ok(w.potionCount('minerio_ferro') === ore1 - c9.mats.minerio_ferro, 'falhou: materiais gastos');
-      ok(w.gold === gold && it.plus === 9 && w.equipment.arma === it, 'falhou: ouro intacto, item igual (não quebra)');
+      ok(w.gold === gold1 - c9.gold && it.plus === 9 && w.equipment.arma === it, 'falhou: ouro cobrado, item igual (não quebra)');
       void ore;
+      void gold;
     }
   }
   ok(failed, 'alguma tentativa a 20% falhou');
