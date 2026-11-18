@@ -1,5 +1,5 @@
 import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
-import { L, tn } from './i18n';
+import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
@@ -22,21 +22,19 @@ import {
   SLOTS,
   STARTING_KIT,
   STARTING_WEAPON,
-  buyPrice,
   isPotionId,
   itemColor,
   itemName,
   makeEquipment,
   makePotion,
   maxDurability,
-  repairCost,
   sanitizeItem,
-  sellValue,
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import * as shop from './world/shop';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import {
@@ -1250,45 +1248,30 @@ export class World {
     this.emit({ type: 'npcClose' });
   }
 
+  // ---------- shop: src/core/world/shop.ts ----------
   buy(potionId: string, qty: number): string | null {
-    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
-    return this.purchase(potionId, qty);
+    return shop.buy(this, potionId, qty);
   }
-  // compra sem exigir a janela do NPC aberta (usado pelo auto-combate ao chegar no vendedor)
   purchase(potionId: string, qty: number): string | null {
-    if (!POTIONS[potionId] || qty < 1) return null;
-    const cost = buyPrice(potionId) * qty;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    if (!this.canFit(potionId, qty)) return L('Mochila cheia', 'Bag full');
-    this.gold -= cost;
-    this.addItem(makePotion(potionId, qty));
-    this.emit({ type: 'trade', kind: 'buy', gold: cost });
-    return null;
+    return shop.purchase(this, potionId, qty);
   }
   sell(bagIndex: number, qty = 1): string | null {
-    if (this.npcRole() !== 'vendedor') return L('Fale com o vendedor', 'Talk to the seller');
-    this.sellRaw(bagIndex, qty);
-    return null;
+    return shop.sell(this, bagIndex, qty);
   }
-  // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
   sellRaw(bagIndex: number, qty = 1): number {
-    const it = this.bag[bagIndex];
-    if (!it) return 0;
-    const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
-      gold = sellValue(it) * n;
-    this.removeFromBag(bagIndex, n);
-    this.gold += gold;
-    this.bumpInv();
-    this.emit({ type: 'trade', kind: 'sell', gold });
-    return gold;
+    return shop.sellRaw(this, bagIndex, qty);
   }
-  // vende um item que nem chegou a entrar na mochila
   sellValueNow(it: ItemInstance): number {
-    const gold = sellValue(it) * (it.qty ?? 1);
-    this.gold += gold;
-    this.bumpInv();
-    this.emit({ type: 'trade', kind: 'sell', gold });
-    return gold;
+    return shop.sellValueNow(this, it);
+  }
+  repair(it: ItemInstance): string | null {
+    return shop.repair(this, it);
+  }
+  repairAllCost(): number {
+    return shop.repairAllCost(this);
+  }
+  repairAll(): string | null {
+    return shop.repairAll(this);
   }
 
   // ---------- ganho offline ----------
@@ -1362,38 +1345,6 @@ export class World {
       soldCount,
       soldGold,
     };
-  }
-  private repairTargets(): ItemInstance[] {
-    return [...SLOTS.map((s) => this.equipment[s]), ...this.bag].filter(
-      (i): i is ItemInstance => !!i && !!BASES[i.baseId],
-    );
-  }
-  repair(it: ItemInstance): string | null {
-    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
-    const cost = repairCost(it);
-    if (cost <= 0) return null;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    this.gold -= cost;
-    it.durability = maxDurability(it);
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'repair', gold: cost });
-    return null;
-  }
-  repairAllCost(): number {
-    return this.repairTargets().reduce((a, i) => a + repairCost(i), 0);
-  }
-  repairAll(): string | null {
-    if (this.npcRole() !== 'ferreiro') return L('Fale com o ferreiro', 'Talk to the blacksmith');
-    const cost = this.repairAllCost();
-    if (cost <= 0) return null;
-    if (this.gold < cost) return L('Ouro insuficiente', 'Not enough gold');
-    this.gold -= cost;
-    for (const i of this.repairTargets()) i.durability = maxDurability(i);
-    this.recalc(this.player, false);
-    this.bumpInv();
-    this.emit({ type: 'repair', gold: cost });
-    return null;
   }
 
   // ---------- mapa / entidades ----------
