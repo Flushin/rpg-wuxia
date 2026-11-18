@@ -45,7 +45,7 @@
   - Polimento: tela de carregamento, instalar como app no celular (PWA) e versão na tela inicial — **feitos**.
   - **Save continua separado por aparelho** (sem exportar/importar e sem nuvem); resolver só no marco online.
 - **Marco 8: Titã e Víbora (em andamento, 18/11/2026).** Skills aprovadas pelo Lucas em 18/11/2026 — ver "Titã e Víbora (marco 8)" abaixo. Sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas.
-- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
+- **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo.
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
 - **Publicação na Play Store: depois de todos os marcos** (decidido pelo Lucas em 18/11/2026: primeiro a jogabilidade). O que falta está em "Pendências das auditorias (18/11/2026)".
 - **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os 7 `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
@@ -76,6 +76,31 @@ com o simulador (6 execuções por seita): até o nível 10 — Tormenta ~61 min
   acerto/erro; número verde), atordoar (o monstro não anda nem ataca), cura ao longo do tempo e passivas de redução
   de dano, HP máximo e bônus contra envenenado. Auto-combate usa a cura com a vida abaixo de 60% em combate.
 - Os mestres Gang e Du passam a dar 3 dicas, como os outros; as duas seitas saem do "Em breve" na criação.
+
+### Pós-nível-10 (marco 9, 18/11/2026)
+Fase 0 (decisões de design), respondida pelo Lucas em 18/11/2026. Números exatos saem do simulador nas fases seguintes.
+- **Fases:** 0 decisões · 1 progressão até o nível 20 · 2 mapa novo (lógica) · 3 monstros e chefe · 4 arte · 5 bases de
+  equipamento · 6 craft · 7 mercador · 8 missões 11–20 · 9 balanceamento e fechamento. O Lucas decide quando cada uma é feita.
+- **Progressão:** nível máximo 20; do 10 ao 20 leva **~2 horas** jogando ativo (o dobro do trecho 1–10).
+- **Skills:** **nenhuma skill nova**; o nível máximo das skills sobe de 10 para **15** (continua +8% de efeito por nível).
+- **Mapa novo:** **montanha nevada com templo abandonado** no topo (neve, pinheiros). Entrada por um **portal novo na
+  cidade (saída norte), liberado no nível 10**; o Auto vai para lá a partir do nível 10.
+- **Monstros (nv 11–18):** **Espectro de gelo** (à distância, dano espiritual, deixa lento) e **Yeti / Macaco da neve**
+  (grande, lento, golpe forte em área).
+- **Chefe (nv 20):** **Abade Caído**, mestre de artes marciais corrompido no templo. Com metade da vida chama
+  **Discípulos** (monstro que só aparece na luta do chefe).
+- **Novas bases de equipamento:** conjuntos nos **níveis 10 e 15** (6 slots, arma de cada uma das 4 seitas).
+- **Craft (no Ferreiro, aba "Forjar"):**
+  - **Melhorar item (+1 a +10):** gasta materiais e ouro; a chance de sucesso cai a cada nível; **ao falhar perde só os
+    materiais** (o item não quebra nem volta de nível).
+  - **Subir raridade:** Comum → Incomum → Raro, com custo alto.
+  - **Trocar bônus aleatórios** de um item Incomum ou Raro.
+  - **Materiais de todos os monstros, por tier:** mapas antigos dão material comum, a montanha dá material raro, os
+    chefes dão material especial; desmontar itens também dá material.
+- **Mercador Ambulante:** estoque de 4–6 itens sorteados (quase todos Raros, do nível do jogador) que **renova a cada
+  1 hora real** (conta também com o jogo fechado). Vende ainda **materiais raros de craft** (caros) e **pergaminho de
+  retorno** (teleporta para a vila).
+- **Missões:** **sim**, cadeia curta (5–6 missões) do nível 11 ao 20 guiando pela montanha até o Abade (fase 8).
 
 ### Auditoria do código (17/11/2026)
 Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plano de refatoração).
