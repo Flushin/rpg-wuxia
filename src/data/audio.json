@@ -84,13 +84,11 @@
   "music": {
     "music_cidade": {
       "file": "cidade",
-      "volume": 0.6,
-      "map": "cidade"
+      "volume": 0.6
     },
     "music_floresta": {
       "file": "floresta",
-      "volume": 0.6,
-      "map": "floresta"
+      "volume": 0.6
     }
   }
 }

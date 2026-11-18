@@ -42,7 +42,8 @@ import {
   sortedBag,
   WEAR_PER_HIT,
 } from './items';
-import { AutoCombat, TOWN_MAPS as AUTO_TOWNS } from './auto';
+import { AutoCombat } from './auto';
+import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
 import {
@@ -78,7 +79,6 @@ export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
-const TOWN_MAPS = AUTO_TOWNS;
 const TOWN_REGEN = 0.03; // 3% por segundo
 const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
@@ -106,7 +106,7 @@ export interface OfflineReport {
 }
 
 export class World {
-  mapId = 'cidade';
+  mapId = HOME_MAP;
   map: GameMap;
   player!: Entity;
   classId: string;
@@ -186,7 +186,7 @@ export class World {
     w.recalc(w.player, false);
     w.player.hp = w.player.derived.maxHp;
     w.player.mana = w.player.derived.maxMana;
-    w.changeMap('cidade');
+    w.changeMap(HOME_MAP);
     for (const s of SKILLS[classId] ?? []) if (s.unlock <= 1) w.events.push({ type: 'skillUnlocked', skillId: s.id });
     return w;
   }
@@ -220,7 +220,7 @@ export class World {
     w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
     for (const [k, v] of Object.entries(s.respawns ?? {}))
       if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
-    w.changeMap(maps[s.mapId] ? s.mapId : 'cidade');
+    w.changeMap(maps[s.mapId] ? s.mapId : HOME_MAP);
     w.clock = () => Date.now();
     w.auto.load(s.auto);
     w.quest = sanitizeQuest(s.quest);
@@ -1119,7 +1119,7 @@ export class World {
     p.dead = false;
     p.hp = p.derived.maxHp;
     p.mana = p.derived.maxMana;
-    this.changeMap('cidade');
+    this.changeMap(HOME_MAP);
   }
 
   private gainXp(n: number) {

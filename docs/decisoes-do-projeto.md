@@ -120,6 +120,11 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   espalhadas fica para depois, uma de cada vez, porque aí a ordem muda.
 - **Defeito visto e não corrigido na C4:** no celular deitado baixo (Fold fechado, 920×316), os botões de "Tamanho da
   interface" no ⚙ não cabem e "Grande" fica cortado. Já era assim antes.
+- **C5 (18/11/2026):** o que o código sabe de cada mapa está em `src/core/mapsConfig.ts` (`MAPS_CONFIG`): mapas
+  carregados, quais são cidade, música, tipo de árvore, enfeites na grama, arena do chefe (braseiros) e por onde o Auto
+  sai quando não há portal direto para a cidade (`autoExitVia`, ruínas → floresta). `HOME_MAP` é onde o personagem começa
+  e renasce. O campo `map` das músicas saiu do `audio.json`. **Mapa novo = JSON gerado + uma entrada no `MAPS_CONFIG`.**
+  Conferido: mesmos enfeites, braseiros e música em cada mapa, e simulador idêntico.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

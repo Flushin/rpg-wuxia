@@ -7,6 +7,7 @@ import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { isTouch } from './controls';
 import { MONSTERS } from '../core/data';
+import { TOWN_MAPS } from '../core/mapsConfig';
 import { byId } from './dom';
 
 interface TipDef {
@@ -109,7 +110,7 @@ export class TipManager {
       this.trigger('primeira_skill');
     if (w.player.level >= 2) this.trigger('auto_combate');
     if (!w.player.dead && w.lowDurability()) this.trigger('durabilidade_baixa');
-    if (w.mapId !== 'cidade' && w.kindCount('hp') + w.kindCount('mp') > 0) this.trigger('primeira_pocao');
+    if (!TOWN_MAPS.has(w.mapId) && w.kindCount('hp') + w.kindCount('mp') > 0) this.trigger('primeira_pocao');
     if (
       !w.player.dead &&
       !w.seenTips.includes('bandidos') &&
@@ -118,7 +119,7 @@ export class TipManager {
       )
     )
       this.trigger('bandidos');
-    if (w.player.dead || w.mapId !== 'cidade') return;
+    if (w.player.dead || !TOWN_MAPS.has(w.mapId)) return;
     if (
       !w.seenTips.includes('primeiro_npc') &&
       w.npcs.some((n) => Math.hypot(w.player.x - n.x, w.player.y - n.y) < 7)

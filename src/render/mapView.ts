@@ -3,6 +3,7 @@ import { tn } from '../core/i18n';
 import { tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
 import { DEPTH } from './depth';
+import { MAPS_CONFIG } from '../core/mapsConfig';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
@@ -32,7 +33,6 @@ const PILLARS = [
 ];
 const RUIN_DECOR = ['cacos', 'pedras', 'mato_seco', 'pedras', 'mato_seco'];
 const RUIN_DECOR_CHANCE = 0.07;
-const ARENA = { x: 24.5, y: 16.5, r: 6.2 }; // pilares em volta do General viram braseiros
 const TREES = ['tree_oak', 'tree_default', 'tree_fat', 'tree_oak', 'tree_default', 'tree_pineRoundA'];
 // cidade: mais cerejeiras (atlas props-cidade) que árvores comuns
 const CITY_TREES: [string, string][] = [
@@ -55,7 +55,6 @@ const DECOR = [
   'plant_bush',
   'stump_round',
 ];
-const DECOR_MAPS: Record<string, number> = { floresta: 0.09, cidade: 0.035 }; // chance por tile de grama
 const SPRITE_SCALE = 0.5; // folhas geradas em 2x
 
 /** Número pseudoaleatório fixo por tile (o mapa fica sempre igual). */
@@ -91,7 +90,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       }
       if (name === 'pillar') {
         out.push(ground('ruin', i, j, pos.x, pos.y));
-        const inArena = Math.hypot(i + 0.5 - ARENA.x, j + 0.5 - ARENA.y) < ARENA.r && map.id === 'ruinas';
+        const arena = MAPS_CONFIG[map.id]?.arena;
+        const inArena = !!arena && Math.hypot(i + 0.5 - arena.x, j + 0.5 - arena.y) < arena.r;
         const frame = inArena ? 'braseiro' : pick(PILLARS, hash(i, j, 12));
         const p = scene.add
           .image(pos.x, pos.y, 'props-ruinas', frame)
@@ -105,7 +105,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (name === 'tree') {
         out.push(ground('grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
-        const [atlas, frame] = map.id === 'cidade' ? pick(CITY_TREES, r) : ['props-floresta', pick(TREES, r)];
+        const [atlas, frame] =
+          MAPS_CONFIG[map.id]?.trees === 'city' ? pick(CITY_TREES, r) : ['props-floresta', pick(TREES, r)];
         const tree = scene.add
           .image(pos.x, pos.y, atlas, frame)
           .setScale(SPRITE_SCALE * (0.9 + 0.2 * hash(i, j, 3)))
@@ -128,7 +129,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
             .setDepth(i + j + 1);
           out.push(d);
         }
-        if (name === 'grass' && hash(i, j, 5) < (DECOR_MAPS[map.id] ?? 0)) {
+        if (name === 'grass' && hash(i, j, 5) < (MAPS_CONFIG[map.id]?.grassDecor ?? 0)) {
           const d = scene.add
             .image(
               pos.x + (hash(i, j, 6) - 0.5) * 20,

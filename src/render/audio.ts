@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import data from '../data/audio.json';
+import { MAPS_CONFIG } from '../core/mapsConfig';
 import { PREF, getPref, setPref } from '../platform/prefs';
 
 export interface AudioSettings {
@@ -33,7 +34,7 @@ export const saveDeviceAudio = (s: AudioSettings) =>
   setPref(PREF.AUDIO, JSON.stringify({ sfx: s.sfx, music: s.music, muted: s.muted }));
 
 type SfxDef = { file: string; volume: number };
-type MusicDef = { file: string; volume: number; map: string };
+type MusicDef = { file: string; volume: number };
 const SFX = data.sfx as Record<string, SfxDef>;
 const MUSIC = data.music as Record<string, MusicDef>;
 const MAX_INSTANCES = 3;
@@ -178,7 +179,7 @@ class AudioManager {
   }
 
   playMusicForMap(mapId: string) {
-    const key = Object.keys(MUSIC).find((k) => MUSIC[k].map === mapId);
+    const key = MAPS_CONFIG[mapId]?.music;
     if (key) this.playMusic(key);
   }
 

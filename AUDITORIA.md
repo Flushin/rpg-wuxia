@@ -404,6 +404,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: médio (ordem/especificidade; o `url(sprites/icones.png)` precisa continuar relativo à página). Teste: RT com **`check:layout` obrigatório** + capturas antes/depois nos 7 tamanhos.
 
 **C5. Conhecimento de mapa num só lugar** — P
+> ✅ **Feita em 18/11/2026** (em `src/core/mapsConfig.ts`).
 - Objetivo: `src/data/maps.json` (ou `core/mapsConfig.ts`) com: ids carregados (`bootScene.ts:8`), quais são cidade (`auto.ts:8`), destino do auto (`auto.ts:168`), braseiros da arena (`mapView.ts:18`), densidade de enfeites (`mapView.ts:26`), música (`audio.json`). Prepara o mapa novo do marco 9.
 - Arquivos: os citados.
 - Risco: baixo (mesmos valores). Teste: RT + Auto ligado na cidade vai à floresta; braseiros no lugar.
