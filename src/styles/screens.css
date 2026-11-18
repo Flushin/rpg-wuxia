@@ -9,7 +9,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   background: radial-gradient(circle at 50% 30%, #2a3350, #0c0f18);
   transition: opacity 0.25s;
 }
@@ -73,7 +74,8 @@ button.link {
   z-index: 35; /* acima da tela inicial (10) e das dicas de item (30); abaixo do carregamento (50) */
   display: flex;
   background: rgba(0, 0, 0, 0.6);
-  padding: 12px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   overflow: auto;
   touch-action: pan-y;
 }
