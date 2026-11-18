@@ -34,6 +34,7 @@ import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import * as npcs from './world/npcs';
 import * as boss from './world/boss';
 import * as quests from './world/quests';
 import * as shop from './world/shop';
@@ -134,19 +135,19 @@ export class World {
   bossSummoned = false;
   private arenaSeen = false;
   nextTelegraph = 1;
-  private npcGoal: number | null = null;
+  npcGoal: number | null = null;
   nextGround = 1;
-  private pendingSkill: number | null = null;
+  pendingSkill: number | null = null;
   autoAttack = false;
-  private chasing = false;
-  private moveInput: Point = { x: 0, y: 0 };
+  chasing = false;
+  moveInput: Point = { x: 0, y: 0 };
   private respawnTimer = 0;
   private portalCd = 0;
   lastDamaged = -99;
   private acc = 0;
   private nextId = 2;
   rng = new Rng((Date.now() & 0xffffffff) >>> 0);
-  private npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
+  npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   private constructor(
     private maps: Record<string, GameMap>,
@@ -1072,33 +1073,21 @@ export class World {
     this.invVersion++;
   }
 
-  // ---------- NPCs ----------
+  // ---------- npcs: src/core/world/npcs.ts ----------
   interactNpc(entityId: number) {
-    const n = this.npcs.find((e) => e.id === entityId);
-    if (!n || this.player.dead) return;
-    this.auto.manualMove();
-    this.pendingSkill = null;
-    this.chasing = false;
-    this.autoAttack = false;
-    this.targetId = null;
-    this.moveInput = { x: 0, y: 0 };
-    this.player.path = [];
-    this.npcGoal = entityId;
+    return npcs.interactNpc(this, entityId);
   }
-  /** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'... */
   npcRole(n: Entity | null = this.openNpc): string {
-    return n?.npcId ?? '';
+    return npcs.npcRole(this, n);
   }
-  private openNpcWindow(n: Entity) {
-    if (this.openNpc === n) return;
-    this.openNpc = n;
-    this.questTalk(this.npcRole(n));
-    this.emit({ type: 'npcOpen', npcId: this.npcRole(n), entityId: n.id });
+  openNpcWindow(n: Entity) {
+    return npcs.openNpcWindow(this, n);
   }
   closeNpc() {
-    if (!this.openNpc) return;
-    this.openNpc = null;
-    this.emit({ type: 'npcClose' });
+    return npcs.closeNpc(this);
+  }
+  tickWalker(n: Entity, dt: number) {
+    return npcs.tickWalker(this, n, dt);
   }
 
   // ---------- shop: src/core/world/shop.ts ----------
@@ -1368,35 +1357,8 @@ export class World {
     m.attackCd = 1;
   }
 
-  /** Morador: anda até um ponto perto de casa, para um pouco e escolhe outro. Para quando o jogador conversa com ele. */
-  private tickWalker(n: Entity, dt: number) {
-    if (this.openNpc === n || (this.npcGoal === n.id && dist(n, this.player) < 2.5)) {
-      n.path = [];
-      return;
-    }
-    if (n.path.length) {
-      this.followPath(n, dt, 1);
-      if (!n.path.length) n.aiTimer = this.npcRng.range(2, 6);
-      return;
-    }
-    n.aiTimer -= dt;
-    if (n.aiTimer > 0) return;
-    n.aiTimer = 1;
-    for (let k = 0; k < 6; k++) {
-      const a = this.npcRng.range(0, Math.PI * 2),
-        r = this.npcRng.range(1.5, n.wander);
-      const t = { x: n.home.x + Math.cos(a) * r, y: n.home.y + Math.sin(a) * r };
-      if (!isWalkable(this.map, t.x, t.y)) continue;
-      const path = findPath(this.map, n, t);
-      if (path.length && path.length < n.wander * 3) {
-        n.path = path;
-        return;
-      }
-    }
-  }
-
   // ---------- movimento ----------
-  private followPath(e: Entity, dt: number, mul: number) {
+  followPath(e: Entity, dt: number, mul: number) {
     let rem = e.moveSpeed * mul * this.speedMul(e) * dt;
     while (rem > 0 && e.path.length) {
       const w = e.path[0],
