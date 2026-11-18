@@ -41,7 +41,14 @@ O APK sai em `android/app/build/outputs/apk/debug/app-debug.apk`. Para abrir no 
   nunca mais muda), nome do app e `webDir: 'dist'`.
 - A pasta `android/` **não** está no repositório: `npm run android:prepare` a gera a partir do `capacitor.config.ts`
   (`npx cap add android`) e copia o `dist/` para dentro (`npx cap sync`). Assim o `appId` fica num lugar só.
-  Quando for preciso mexer em arquivos nativos (ícones, splash, versionCode — D7), a pasta passa a ser versionada.
+  Se um dia for preciso mexer à mão em arquivos nativos, a pasta passa a ser versionada.
+- Ícones e splash: `python3 tools/icons/make_app_icons.py` gera `public/icons/` (PWA) e `assets/` (formato do
+  `@capacitor/assets`: `icon-only`, `icon-foreground`/`icon-background` do ícone adaptativo, `splash` e `splash-dark`).
+  Para trocar o ícone, mude a arte no script (ou substitua os PNGs de `assets/`) e rode o `android:prepare`,
+  que chama `capacitor-assets generate --android` e espalha os tamanhos em `android/app/src/main/res/`.
+- Versão: `tools/android-version.mjs` copia a `version` do `package.json` para o `build.gradle` (`versionName`) e calcula
+  `versionCode = MAJOR*10000 + MINOR*100 + PATCH` (0.1.0 → 100; minor e patch até 99). Suba a versão no `package.json`
+  antes de cada envio à loja: a Play Store recusa um `versionCode` igual ou menor que o já enviado.
 - Save no app: arquivo JSON na pasta de dados do app (`@capacitor/filesystem`), com gravação atômica
   (`.tmp` → atual) e 1 backup (`.bak`). Ver `src/platform/storage.ts`.
 - Segundo plano: eventos `pause`/`resume` do `@capacitor/app` (salva ao sair da tela).

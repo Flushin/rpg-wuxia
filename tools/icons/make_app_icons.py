@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Gera os ícones do app (PWA) em public/icons/: duas lâminas cruzadas sobre uma lua, dourado/carmesim.
+"""Gera os ícones do app (PWA) em public/icons/ e os insumos do @capacitor/assets em assets/:
+duas lâminas cruzadas sobre uma lua, dourado/carmesim.
 Uso: python3 tools/icons/make_app_icons.py   (precisa de Pillow)"""
 import math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
-OUT = Path(__file__).resolve().parents[2] / 'public' / 'icons'
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / 'public' / 'icons'
+ASSETS = ROOT / 'assets'  # formato do @capacitor/assets
 BG, GOLD, CRIMSON, STEEL = (16, 20, 28), (212, 160, 23), (170, 40, 40), (222, 226, 236)
 S = 1024  # desenha grande e reduz (antialias)
 
@@ -64,6 +67,31 @@ def save(im, name, size):
     im.convert('RGB').resize((size, size), Image.LANCZOS).save(OUT / name, optimize=True)
 
 
+def make_capacitor_assets():
+    """assets/: icon-only (sem alfa), ícone adaptativo (frente na zona segura ~66%), splash claro/escuro."""
+    ASSETS.mkdir(parents=True, exist_ok=True)
+    full = art(1.0).convert('RGB')
+    full.resize((1024, 1024), Image.LANCZOS).save(ASSETS / 'icon-only.png', optimize=True)
+    # frente: a arte reduzida a 66%, centrada, com máscara circular suave (sem borda quadrada)
+    small = full.convert('RGBA').resize((int(S * .66), int(S * .66)), Image.LANCZOS)
+    front = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    mask = Image.new('L', small.size, 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, small.size[0] - 1, small.size[1] - 1], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(S * .01))
+    off = (S - small.size[0]) // 2
+    front.paste(small, (off, off), mask)
+    front.save(ASSETS / 'icon-foreground.png', optimize=True)
+    Image.new('RGB', (S, S), BG).save(ASSETS / 'icon-background.png', optimize=True)
+    # splash: logo pequena centralizada sobre #10141c (mesmo fundo no claro e no escuro)
+    for name in ('splash.png', 'splash-dark.png'):
+        sp = Image.new('RGB', (2732, 2732), BG)
+        logo = full.resize((640, 640), Image.LANCZOS)
+        lmask = Image.new('L', (640, 640), 0)
+        ImageDraw.Draw(lmask).rounded_rectangle([0, 0, 639, 639], radius=140, fill=255)
+        sp.paste(logo, ((2732 - 640) // 2, (2732 - 640) // 2), lmask)
+        sp.save(ASSETS / name, optimize=True)
+
+
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
     normal = art(1.0)
@@ -71,4 +99,5 @@ if __name__ == '__main__':
     save(normal, 'icon-512.png', 512)
     save(normal, 'apple-touch-icon.png', 180)
     save(art(.72), 'icon-512-maskable.png', 512)  # motivo dentro da zona segura (~80%)
-    print('ícones gerados em', OUT)
+    make_capacitor_assets()
+    print('ícones gerados em', OUT, 'e', ASSETS)
