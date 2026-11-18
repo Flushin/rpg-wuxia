@@ -63,7 +63,7 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Ordem do plano:** Fase A (rede de segurança) → B (legibilidade) → C (estrutura) → D (lojas). Nenhuma etapa começa sem o Lucas pedir.
 - **Lojas:** **só Android por enquanto** (Google Play); o código fica preparado para iOS.
 - **Política de privacidade:** página PT/EN no GitHub Pages do jogo, com link em ⚙ e na tela inicial.
-- **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety.
+- **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety. Confirmado pelo Lucas em 18/11/2026 (a auditoria de direitos dizia que seria substituído; vale esta decisão).
 
 **Fase A feita (17/11/2026, sem mudar regras do jogo):**
 - **A1:** testes no GitHub Actions (ver "Contínuo" no roteiro); `esbuild` declarado no `package.json`; `npm test` roda os 7 checks.

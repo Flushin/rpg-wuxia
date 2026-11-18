@@ -29,7 +29,8 @@ para o pacote do app (`public/` + o JS gerado pelo build). Nenhum arquivo de có
 
 > Atualizado em 17/11/2026 com as suas respostas (seção 8): músicas confirmadas com originais guardados; nenhum uso de IA
 > generativa; nome será trocado; público 13+; **anúncio com recompensa e diamantes (itens fixos) já na 1ª versão**; conta
-> pessoal ainda a criar; desenvolvedor com nome pessoal; o report por Web3Forms será substituído no app da loja.
+> pessoal ainda a criar; desenvolvedor com nome pessoal; o report por Web3Forms será substituído no app da loja
+> (**revisto em 18/11/2026: o Lucas decidiu manter o Web3Forms no app**, declarado na política de privacidade e no Data Safety).
 
 A parte de direitos autorais está em situação boa para um projeto indie: toda a arte é renderizada por scripts próprios a
 partir de modelos 3D **CC0** (KayKit, Quaternius, Kenney) ou desenhada por código; os sons são Kenney **CC0**; as duas músicas
