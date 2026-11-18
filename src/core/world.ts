@@ -4,7 +4,7 @@ import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
-import { findPath, isWalkable, type Avoid } from './pathfinding';
+import { findPath, insideAvoid, isWalkable, type Avoid } from './pathfinding';
 import {
   GLOBAL_COOLDOWN,
   SKILLS,
@@ -199,9 +199,9 @@ export class World {
   private findPathFor(from: Point, to: Point, viaPortal = false): Point[] {
     if (this.auto.state !== 'on') return findPath(this.map, from, to);
     const avoid: Avoid[] = this.arenas.map((a) => ({ ...a, r: a.r + 1.5 }));
+    // só os tiles do próprio portal (antes era um círculo largo em volta: monstro parado ali ficava inalcançável)
     if (!viaPortal)
-      for (const o of this.map.objects)
-        if (o.type === 'portal') avoid.push({ x: o.x + o.w / 2, y: o.y + o.h / 2, r: Math.max(o.w, o.h) / 2 + 0.6 });
+      for (const o of this.map.objects) if (o.type === 'portal') avoid.push({ x: o.x, y: o.y, w: o.w, h: o.h, r: 0 });
     return findPath(this.map, from, to, avoid.length ? avoid : undefined);
   }
   // comprimento do caminho até o ponto (Infinity se inalcançável); usado pelo auto para escolher o alvo "mais perto" de verdade
@@ -756,7 +756,7 @@ export class World {
         const a = this.rng.range(0, Math.PI * 2),
           r = this.rng.range(1, 3.5);
         const w = { x: m.home.x + Math.cos(a) * r, y: m.home.y + Math.sin(a) * r };
-        if (isWalkable(this.map, w.x, w.y)) {
+        if (isWalkable(this.map, w.x, w.y) && !this.nearPortal(w)) {
           m.path = [w];
           m.ai = 'wander';
         } else m.aiTimer = 1;
@@ -1340,10 +1340,21 @@ export class World {
   private step(e: Entity, dx: number, dy: number, d: number) {
     const nx = e.x + dx * d,
       ny = e.y + dy * d;
-    if (isWalkable(this.map, nx, ny)) {
+    // monstro recuando (arqueiro) não entra na área do portal: lá o personagem corpo a corpo não o alcança
+    const ok =
+      e === this.player || this.nearPortal(e)
+        ? isWalkable
+        : (m: GameMap, x: number, y: number) => isWalkable(m, x, y) && !this.nearPortal({ x, y });
+    if (ok(this.map, nx, ny)) {
       e.x = nx;
       e.y = ny;
-    } else if (isWalkable(this.map, nx, e.y)) e.x = nx;
-    else if (isWalkable(this.map, e.x, ny)) e.y = ny;
+    } else if (ok(this.map, nx, e.y)) e.x = nx;
+    else if (ok(this.map, e.x, ny)) e.y = ny;
+  }
+  /** Ponto na área de um portal (o retângulo + 1 tile em volta). Monstros não param nem recuam para lá. */
+  nearPortal(pt: Point): boolean {
+    return this.map.objects.some(
+      (o) => o.type === 'portal' && insideAvoid({ x: o.x, y: o.y, w: o.w, h: o.h, r: 1 }, pt.x, pt.y),
+    );
   }
 }

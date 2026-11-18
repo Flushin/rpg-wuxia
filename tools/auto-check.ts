@@ -1,13 +1,13 @@
 // Verificação headless do auto-combate e do ganho offline (não vai para o build do jogo).
 // Uso: npm run check:auto
 import { readFileSync } from 'node:fs';
-import { CLASSES, PROGRESSION } from '../src/core/data';
+import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { effectiveMinutes, computeOffline } from '../src/core/offline';
 import { BAG_SIZE, makeEquipment, makePotion } from '../src/core/items';
 import { World } from '../src/core/world';
 import { Rng } from '../src/core/rng';
-import type { AutoBucket, GameEvent, Rarity, SaveData } from '../src/core/types';
+import type { AutoBucket, GameEvent, Point, Rarity, SaveData } from '../src/core/types';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -61,6 +61,8 @@ const addPotions = (w: World, hp: number, mp: number) => {
   if (hp) w.addItem(makePotion('pocao_hp_p', hp));
   if (mp) w.addItem(makePotion('pocao_mp_p', mp));
 };
+const insideRect = (p: Point, o: { x: number; y: number; w: number; h: number }) =>
+  p.x >= o.x && p.x < o.x + o.w && p.y >= o.y && p.y < o.y + o.h;
 const clearPotions = (w: World) => {
   w.bag = w.bag.map((b) => (b && b.baseId.startsWith('pocao') ? null : b));
 };
@@ -72,22 +74,29 @@ const spawnAll = (w: World) => {
 };
 
 // centro de uma clareira: todos os tiles num raio r andáveis
-const openSpot = (w: World, r: number) => {
+// clareira de raio r longe dos portais (monstro posto dentro do portal fica inalcançável: o auto não pisa nele)
+// e o mais longe possível de onde nascem os monstros de `far` (senão eles atacam e o auto revida)
+const openSpot = (w: World, r: number, far: { home: Point }[] = w.monsters): Point | null => {
   const M = w.map,
     walk = (i: number, j: number) => i >= 0 && j >= 0 && i < M.width && j < M.height && M.walkable[j * M.width + i];
-  let best: { x: number; y: number } | null = null;
+  let best: Point | null = null,
+    bd = -1;
   for (let j = 0; j < M.height; j++)
     for (let i = 0; i < M.width; i++) {
       let all = true;
       for (let y = -r; y <= r && all; y++)
         for (let x = -r; x <= r; x++)
-          if (Math.hypot(x, y) <= r && !walk(i + x, j + y)) {
+          if (Math.hypot(x, y) <= r && (!walk(i + x, j + y) || w.nearPortal({ x: i + x + 0.5, y: j + y + 0.5 }))) {
             all = false;
             break;
           }
-      if (all) {
-        best = { x: i + 0.5, y: j + 0.5 };
-        return best;
+      if (!all) continue;
+      const q = { x: i + 0.5, y: j + 0.5 };
+      const d = Math.min(8, ...far.map((m) => Math.hypot(m.home.x - q.x, m.home.y - q.y)));
+      if (d >= 8) return q;
+      if (d > bd) {
+        bd = d;
+        best = q;
       }
     }
   return best;
@@ -248,6 +257,8 @@ console.log('\n== filtro nível +2 ==');
   const [a, b, ...rest] = w.monsters;
   rest.forEach((m) => {
     m.level = 9;
+    m.dead = true; // fora de cena: só a e b importam (vivos, atacariam e o auto revidaria)
+    m.respawnAt = 1e9;
   });
   a.level = 3;
   b.level = 4; // b (alto demais) fica mais perto
@@ -659,6 +670,58 @@ for (const [cls, hp, mp] of [
   t.auto.toggle();
   run(t, 60, () => t.mapId === 'floresta');
   ok(t.mapId === 'floresta', 'ligado na cidade: vai sozinho para o mapa de caça');
+}
+{
+  // caçando nas ruínas (sem portal direto para a vila): vai pela floresta e volta para as ruínas, não para a floresta
+  const w = mk('lamina', 8, 'ruinas');
+  clearPotions(w);
+  w.gold = 500;
+  spawnAll(w);
+  w.auto.toggle();
+  const seen: string[] = [];
+  const town = run(w, 120, () => {
+    if (seen[seen.length - 1] !== w.mapId) seen.push(w.mapId);
+    return w.mapId === 'cidade';
+  });
+  ok(town && seen.join('>') === 'ruinas>floresta>cidade', `ruínas: foi à vila pela floresta (${seen.join('>')})`);
+  const back = run(w, 240, () => {
+    if (seen[seen.length - 1] !== w.mapId) seen.push(w.mapId);
+    return w.mapId === 'ruinas';
+  });
+  ok(back && w.kindCount('hp') > 0, `ruínas: comprou e voltou para as ruínas (${seen.join('>')})`);
+  ok(w.auto.huntMap === 'ruinas', 'ruínas: mapa de caça continua as ruínas');
+}
+
+console.log('\n== monstro perto do portal ==');
+{
+  // arqueiro na frente do portal das ruínas (floresta): recua do corpo a corpo, mas não entra no portal; o auto o mata
+  const w = mk('lamina', 8);
+  spawnAll(w);
+  const portal = w.map.objects.find((o) => o.type === 'portal' && o.props.target === 'ruinas')!;
+  const m = w.makeMonster(MONSTERS.bandido_arqueiro, { x: portal.x - 2.5, y: portal.y + 1.5 });
+  m.level = 6;
+  w.monsters.forEach((o) => {
+    o.dead = true;
+    o.respawnAt = 1e9;
+  });
+  w.monsters.push(m);
+  w.player.x = portal.x - 6.5;
+  w.player.y = portal.y + 1.5;
+  w.auto.toggle();
+  let entered = false;
+  const killed = run(w, 40, () => {
+    if (!m.dead && insideRect(m, portal)) entered = true;
+    return m.dead;
+  });
+  ok(!entered, 'arqueiro não recua para dentro do portal');
+  ok(killed && w.mapId === 'floresta', 'auto mata o arqueiro na frente do portal sem atravessar');
+  // monstro que já está no tile ao lado do portal: o auto chega nele (antes o círculo em volta do portal o escondia)
+  const n = w.makeMonster(MONSTERS.lobo, { x: portal.x - 0.5, y: portal.y + 1.5 });
+  n.level = 6;
+  w.monsters.push(n);
+  w.player.x = portal.x - 6.5;
+  w.player.y = portal.y + 1.5;
+  ok(run(w, 40, () => n.dead) && w.mapId === 'floresta', 'auto mata o monstro colado no portal sem atravessar');
 }
 
 console.log('\n== mochila cheia: auto-vende ==');
