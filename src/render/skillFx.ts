@@ -1,15 +1,10 @@
 import Phaser from 'phaser';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
-import { SKILLS } from '../core/skills';
+import { skillById } from '../core/skills';
 import type { GameEvent } from '../core/types';
 import { DEPTH } from './depth';
 
 const FX: number = DEPTH.SKILL_FX;
-const DEFS = Object.fromEntries(
-  Object.values(SKILLS)
-    .flat()
-    .map((d) => [d.id, d]),
-);
 
 // cores dos elementos (marco 6): Tormenta = trovão (amarelo/violeta), Geada = gelo (azul/branco)
 const THUNDER = [0xfff3a0, 0xffe14a, 0xc8a8ff];
@@ -119,7 +114,7 @@ export class SkillFx {
 
   // ---------- skills ----------
   private cast(ev: Extract<GameEvent, { type: 'skillCast' }>) {
-    const d = DEFS[ev.skillId];
+    const d = skillById(ev.skillId);
     if (!d) return;
     const t = tileToScreen(ev.tx, ev.ty),
       c = tileToScreen(ev.x, ev.y);

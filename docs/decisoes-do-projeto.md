@@ -125,6 +125,10 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   sai quando não há portal direto para a cidade (`autoExitVia`, ruínas → floresta). `HOME_MAP` é onde o personagem começa
   e renasce. O campo `map` das músicas saiu do `audio.json`. **Mapa novo = JSON gerado + uma entrada no `MAPS_CONFIG`.**
   Conferido: mesmos enfeites, braseiros e música em cada mapa, e simulador idêntico.
+- **C6 (18/11/2026):** a reação aos eventos do mundo (textos que sobem, toasts, golpes, flechas, brilho de drop, efeitos
+  de skill) saiu da `GameScene` para `src/render/eventFeedback.ts` (`EventFeedback`), com uma função por grupo: combate,
+  skills, recompensas e avisos. A cena ficou com 426 linhas (eram 694). `skillById()` em `core/skills.ts` substitui as
+  buscas repetidas, e `TEXT_RES` foi para `render/display.ts`. Conferido disparando os 33 tipos de evento: mesmo resultado.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).

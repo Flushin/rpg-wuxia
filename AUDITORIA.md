@@ -410,6 +410,7 @@ As etapas dentro de cada fase são independentes entre si.
 - Risco: baixo (mesmos valores). Teste: RT + Auto ligado na cidade vai à floresta; braseiros no lugar.
 
 **C6. Feedback de eventos fora da cena** — P
+> ✅ **Feita em 18/11/2026.**
 - Objetivo: o `switch` de 66 linhas (`gameScene.ts:285`) vira `src/render/eventFeedback.ts` (textos flutuantes, toasts, efeitos), com uma função por grupo; busca de skill por id via mapa (`skillById`).
 - Arquivos: `src/scenes/gameScene.ts`, novo arquivo, `src/core/skills.ts`.
 - Risco: baixo. Teste: RT + ver textos de dano, crítico, errou, sem mana, escudo, missão aceita.

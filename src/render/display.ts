@@ -2,6 +2,9 @@
 // Sem isso o celular (devicePixelRatio 2–3) amplia o canvas e o jogo fica embaçado. Limitado a 2× por desempenho.
 export const DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
 
+/** Resolução dos textos do Phaser (2× a da tela, para ficarem nítidos ao ampliar com o zoom). */
+export const TEXT_RES = DPR * 2;
+
 export function cssSize(): { w: number; h: number } {
   const el = document.getElementById('game');
   return {

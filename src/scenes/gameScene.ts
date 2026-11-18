@@ -8,7 +8,6 @@ import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
-import { SKILLS } from '../core/skills';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
@@ -16,7 +15,8 @@ import { TipManager } from '../ui/tips';
 import { SettingsPanel } from '../ui/settingsPanel';
 import { MONSTERS } from '../core/data';
 import { itemColor } from '../core/items';
-import { DPR, cssSize } from '../render/display';
+import { DPR, TEXT_RES, cssSize } from '../render/display';
+import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
 import { PREF, getPref, setPref } from '../platform/prefs';
 import { armBackGuard } from '../platform/backGuard';
@@ -24,7 +24,6 @@ import { armBackGuard } from '../platform/backGuard';
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
   ZOOM_MAX = 2;
-const TEXT_RES = DPR * 2;
 // Área de clique/toque para escolher alvo (px do mundo, em volta do ponto acima dos pés)
 const PICK = {
   TOUCH_SCALE: 1.5, // dedo é menos preciso que o mouse: área de toque maior
@@ -37,18 +36,6 @@ const PICK = {
 // Elipse do aviso do chefe: um raio de 1 tile vira meia diagonal do losango (TILE/2 × √2)
 const TELEGRAPH_RX = (TILE_W / 2) * Math.SQRT2,
   TELEGRAPH_RY = (TILE_H / 2) * Math.SQRT2;
-// Cores dos textos que sobem do mapa
-const FLOAT_COLOR = {
-  DAMAGE: '#ffffff', // dano normal
-  CRIT: '#ffd23f', // crítico e skill subindo de nível
-  HURT: '#ff5555', // dano no jogador
-  MISS: '#aaaaaa',
-  WARNING: '#ff6a50', // golpe em área do chefe
-  MANA: '#6aa8ff', // sem mana
-  INFO: '#dddddd', // avisos (recarga, sem poção…)
-  SHIELD: '#bfe0ff',
-  ABSORB: '#9fd0ff', // dano absorvido pelo escudo
-};
 const loadZoom = () => {
   const v = Number(getPref(PREF.ZOOM));
   return v >= ZOOM_MIN && v <= ZOOM_MAX ? v : 1;
@@ -59,6 +46,7 @@ export class GameScene extends Phaser.Scene {
   private hud!: Hud;
   private tips!: TipManager;
   private fx!: SkillFx;
+  private feedback!: EventFeedback;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
   private trees: Phaser.GameObjects.Image[] | null = null;
   private views = new Map<number, EntityView>();
@@ -85,6 +73,7 @@ export class GameScene extends Phaser.Scene {
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
     this.fx = new SkillFx(this);
+    this.feedback = new EventFeedback(this, this.world, this.hud, this.views, this.fx);
     setupControls(this.world, this.hud, (x, y) => this.tapAt(x, y));
     const persist = () => {
       void writeSave(this.world.serialize());
@@ -372,28 +361,6 @@ export class GameScene extends Phaser.Scene {
       }
   }
 
-  private arrowFx(ev: Extract<GameEvent, { type: 'projectile' }>) {
-    const a = tileToScreen(ev.fromX, ev.fromY),
-      b = tileToScreen(ev.toX, ev.toY);
-    const g = this.add.graphics().setDepth(DEPTH.HIT_LINE);
-    const ang = Math.atan2(b.y - a.y, b.x - a.x);
-    g.lineStyle(2, 0xe8d8a8, 1);
-    g.lineBetween(-9, 0, 9, 0);
-    g.fillStyle(0xcccccc, 1);
-    g.fillTriangle(9, 0, 4, -3, 4, 3);
-    g.fillStyle(0xc02828, 1);
-    g.fillTriangle(-9, 0, -12, -3, -12, 3);
-    g.setPosition(a.x, a.y - 20).setRotation(ang);
-    this.tweens.add({
-      targets: g,
-      x: b.x,
-      y: b.y - 20,
-      duration: Math.max(120, Math.hypot(b.x - a.x, b.y - a.y) * 1.6),
-      ease: 'Linear',
-      onComplete: () => g.destroy(),
-    });
-  }
-
   private syncAutoText() {
     const a = this.world.auto,
       p = this.world.player,
@@ -450,245 +417,10 @@ export class GameScene extends Phaser.Scene {
       }
   }
 
-  // drop coletado: brilho que voa até o jogador
-  private dropFx(x: number, y: number, color: string) {
-    const col = Phaser.Display.Color.HexStringToColor(color).color;
-    const a = tileToScreen(x, y),
-      b = tileToScreen(this.world.player.x, this.world.player.y);
-    const g = this.add.graphics().setDepth(DEPTH.DROP_FX);
-    g.fillStyle(col, 1);
-    g.fillCircle(0, 0, 5);
-    g.lineStyle(1, 0xffffff, 1);
-    g.strokeCircle(0, 0, 5);
-    g.setPosition(a.x, a.y - 10);
-    this.tweens.add({
-      targets: g,
-      y: a.y - 34,
-      duration: 250,
-      ease: 'Cubic.easeOut',
-      onComplete: () => {
-        this.tweens.add({
-          targets: g,
-          x: b.x,
-          y: b.y - 24,
-          alpha: 0,
-          duration: 300,
-          ease: 'Cubic.easeIn',
-          onComplete: () => g.destroy(),
-        });
-      },
-    });
-  }
-
   private handle(ev: GameEvent) {
     this.tips.onEvent(ev);
     audio.onEvent(ev, this.world.player.id);
-    switch (ev.type) {
-      case 'mapChange':
-        this.rebuildMap();
-        break;
-      case 'hit': {
-        const s = tileToScreen(ev.x, ev.y),
-          toPlayer = ev.targetKind === 'player';
-        this.floatText(
-          s.x,
-          s.y - 40,
-          ev.crit ? `${ev.amount}!` : String(ev.amount),
-          toPlayer ? FLOAT_COLOR.HURT : ev.crit ? FLOAT_COLOR.CRIT : FLOAT_COLOR.DAMAGE,
-          ev.crit ? 22 : 16,
-        );
-        this.views.get(ev.targetId)?.flash();
-        break;
-      }
-      case 'miss': {
-        const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), FLOAT_COLOR.MISS, 13);
-        break;
-      }
-      case 'attack':
-        this.swing(ev.fromId, ev.toId);
-        if (!this.isArcher(ev.fromId)) this.beam(ev);
-        break;
-      case 'projectile':
-        this.arrowFx(ev);
-        break;
-      case 'bossSummon':
-        this.hud.toast(L('O General invoca guerreiros!', 'The General summons warriors!'), '#ff8a60');
-        break;
-      case 'bossDefeated':
-        this.hud.toast(L('General de Terracota derrotado!', 'Terracotta General defeated!'), '#ffd23f');
-        break;
-      case 'telegraphResolved':
-        if (ev.hit) {
-          const s = tileToScreen(ev.x, ev.y);
-          this.cameras.main.shake(180, 0.006);
-          this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), FLOAT_COLOR.WARNING, 15);
-        }
-        break;
-      case 'skillCast': {
-        const c = this.entityById(ev.casterId);
-        if (c) this.views.get(c.id)?.attack(ev.tx, ev.ty, c.x, c.y); // sem alvo: tx,ty = posição dele (mantém a direção)
-        this.fx.onEvent(ev);
-        break;
-      }
-      case 'dash':
-        this.fx.onEvent(ev);
-        break;
-      case 'skillFail': {
-        const msg = {
-          mana: L('Sem mana', 'No mana'),
-          cooldown: L('Recarregando', 'On cooldown'),
-          notarget: L('Sem alvo', 'No target'),
-          blocked: L('Caminho bloqueado', 'Path blocked'),
-          locked: L('Bloqueada', 'Locked'),
-        }[ev.reason];
-        const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(s.x, s.y - 64, msg, ev.reason === 'mana' ? FLOAT_COLOR.MANA : FLOAT_COLOR.INFO, 15);
-        break;
-      }
-      case 'skillUnlocked':
-        this.hud.toast(
-          L('Nova skill desbloqueada: ', 'New skill unlocked: ') +
-            (Object.values(SKILLS)
-              .flat()
-              .find((d) => d.id === ev.skillId)?.name ?? ''),
-        );
-        break;
-      case 'skillLevelUp': {
-        const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(
-          s.x,
-          s.y - 80,
-          `${
-            Object.values(SKILLS)
-              .flat()
-              .find((d) => d.id === ev.skillId)?.name
-          } ${L('nv', 'lv')} ${ev.level}!`,
-          FLOAT_COLOR.CRIT,
-          15,
-        );
-        break;
-      }
-      case 'buffApplied':
-        if (ev.kind === 'shield' && ev.targetId === this.world.player.id) {
-          const s = tileToScreen(this.world.player.x, this.world.player.y);
-          this.floatText(s.x, s.y - 64, L('Escudo', 'Shield'), FLOAT_COLOR.SHIELD, 15);
-        }
-        break;
-      case 'shieldAbsorb': {
-        const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, FLOAT_COLOR.ABSORB, 14);
-        break;
-      }
-      case 'drop':
-        this.dropFx(ev.x, ev.y, ev.color);
-        break;
-      case 'itemPickup':
-        this.hud.rewards.item(ev.name, ev.color, ev.qty, ev.rarity, ev.potion);
-        break;
-      case 'goldPickup':
-        this.hud.rewards.gold(ev.amount);
-        break;
-      case 'xp':
-        this.hud.rewards.xp();
-        break;
-      case 'bagFull':
-        this.hud.toast(L('Mochila cheia', 'Bag full'), '#ff8a80');
-        break;
-      case 'autoStopped':
-        this.hud.toast(
-          L(
-            'Auto-combate parado: item quebrado. Conserte no Ferreiro.',
-            'Auto-battle stopped: broken item. Repair it with the Blacksmith.',
-          ),
-          '#ff8a80',
-        );
-        break;
-      case 'durabilityLost':
-        this.hud.toast(L('Seus equipamentos perderam durabilidade', 'Your equipment lost durability'), '#f1a02e');
-        break;
-      case 'potionFail': {
-        const msg = {
-          none: L('Sem poção', 'No potion'),
-          cooldown: L('Recarregando', 'On cooldown'),
-          full: ev.kind === 'hp' ? L('Vida cheia', 'Health full') : L('Mana cheia', 'Mana full'),
-        }[ev.reason];
-        const s = tileToScreen(this.world.player.x, this.world.player.y);
-        this.floatText(s.x, s.y - 64, msg, FLOAT_COLOR.INFO, 15);
-        break;
-      }
-      case 'quest':
-        if (ev.kind === 'accepted')
-          this.hud.toast(L(`Missão aceita: ${ev.name}`, `Quest accepted: ${ev.name}`), '#f0d070');
-        else if (ev.kind === 'ready') {
-          this.hud.toast(L(`Objetivo cumprido: ${ev.name}`, `Objective complete: ${ev.name}`), '#9fe8a0');
-          audio.ui('tip');
-        } else if (ev.kind === 'completed')
-          this.hud.toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
-        break;
-      case 'levelup':
-        this.hud.toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`));
-        break;
-      case 'playerDeath':
-        this.hud.toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'));
-        break;
-      default:
-        break;
-    }
-  }
-
-  private entityById(id: number): Entity | undefined {
-    const w = this.world;
-    return id === w.player.id ? w.player : (w.monsters.find((m) => m.id === id) ?? w.npcs.find((n) => n.id === id));
-  }
-
-  /** Animação de golpe virada para o alvo (sprites do marco 6). */
-  private swing(fromId: number, toId: number) {
-    const a = this.entityById(fromId),
-      t = this.entityById(toId);
-    if (a && t) this.views.get(fromId)?.attack(t.x, t.y, a.x, a.y);
-  }
-
-  private isArcher(id: number) {
-    const m = this.world.monsters.find((e) => e.id === id);
-    return !!m && !!MONSTERS[m.monsterId]?.projectile;
-  }
-
-  private beam(ev: Extract<GameEvent, { type: 'attack' }>) {
-    const a = this.views.get(ev.fromId),
-      t = this.views.get(ev.toId);
-    if (!a || !t) return;
-    const fromPlayer = ev.fromId === this.world.player.id;
-    const color = !fromPlayer ? 0xffffff : this.world.player.element === 'ice' ? 0x9ee0ff : 0xffe14a;
-    const g = this.add.graphics().setDepth(DEPTH.HIT_LINE);
-    g.lineStyle(ev.ranged ? 3 : 4, color, 1);
-    const x1 = a.container.x,
-      y1 = a.container.y - 18,
-      x2 = t.container.x,
-      y2 = t.container.y - 18;
-    if (ev.ranged) g.lineBetween(x1, y1, x2, y2);
-    else {
-      const mx = (x1 + x2) / 2,
-        my = (y1 + y2) / 2;
-      g.lineBetween(mx - 10, my - 10, mx + 10, my + 10);
-    }
-    this.tweens.add({ targets: g, alpha: 0, duration: 160, onComplete: () => g.destroy() });
-  }
-
-  private floatText(x: number, y: number, text: string, color: string, size: number) {
-    x += Phaser.Math.Between(-8, 8);
-    const t = this.add
-      .text(x, y, text, { fontSize: `${size}px`, color, fontStyle: 'bold', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.FLOAT_TEXT)
-      .setResolution(TEXT_RES);
-    this.tweens.add({
-      targets: t,
-      y: y - 36,
-      alpha: 0,
-      duration: 900,
-      ease: 'Cubic.easeOut',
-      onComplete: () => t.destroy(),
-    });
+    if (ev.type === 'mapChange') this.rebuildMap();
+    else this.feedback.handle(ev);
   }
 }
