@@ -41,3 +41,23 @@ body {
 .hidden {
   display: none !important;
 }
+/* Barras de rolagem invisíveis; só aparecem enquanto a área está rolando (ui/scrollbars.ts põe .is-scrolling). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.is-scrolling {
+  scrollbar-color: rgba(220, 200, 150, 0.45) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.is-scrolling::-webkit-scrollbar-thumb {
+  background: rgba(220, 200, 150, 0.45);
+}

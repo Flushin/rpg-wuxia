@@ -11,6 +11,7 @@ import { openPrivacyPolicy } from './ui/privacy';
 import { initUiScale } from './ui/uiScale';
 import { initViewport } from './ui/viewport';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
+import { initScrollbars } from './ui/scrollbars';
 import { registerServiceWorker } from './platform';
 import { initNativeApp } from './platform/native';
 
@@ -19,6 +20,7 @@ initViewport();
 initNativeApp();
 initUiScale();
 initNoBrowserZoom();
+initScrollbars();
 
 fillIcons();
 
