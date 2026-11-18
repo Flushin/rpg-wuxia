@@ -21,7 +21,7 @@ import { DEPTH } from '../render/depth';
 import { PREF, getPref, setPref } from '../platform/prefs';
 import { exitApp, onBackButton } from '../platform/backButton';
 import { askExit, closeTopWindow } from '../ui/backAction';
-import { onPause } from '../platform/lifecycle';
+import { onPause, onResume } from '../platform/lifecycle';
 import { isNative, restartApp } from '../platform';
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
@@ -123,7 +123,24 @@ export class GameScene extends Phaser.Scene {
       void writeSave(this.world.serialize());
     };
     const timer = window.setInterval(save, 30000);
-    const offPause = onPause(save);
+    // segundo plano: salva ao sair; ao voltar depois de 5 min ou mais com o auto ligado, aplica o ganho offline (D5)
+    let pausedAt = 0;
+    let autoAtPause = this.world.auto.serialize();
+    const offPause = onPause(() => {
+      save();
+      if (pausedAt) return; // web: visibilitychange e pagehide chegam juntos
+      pausedAt = Date.now();
+      autoAtPause = this.world.auto.serialize();
+    });
+    const offResume = onResume(() => {
+      const at = pausedAt;
+      pausedAt = 0;
+      if (!at || this.hud.offlineOpen) return;
+      const rep = this.world.applyResumeOffline(Date.now(), at, autoAtPause);
+      if (!rep) return;
+      save();
+      this.hud.showOffline(rep, () => this.world.auto.resume());
+    });
     // voltar: fecha a janela de cima; sem janela, no app pergunta se quer sair e na web avisa
     // (salva já, caso o jogador saia de verdade)
     const disarmBack = onBackButton({
@@ -138,6 +155,7 @@ export class GameScene extends Phaser.Scene {
       disarmBack();
       clearInterval(timer);
       offPause();
+      offResume();
     });
   }
 

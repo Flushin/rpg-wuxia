@@ -104,6 +104,12 @@ export class AutoCombat {
       if (this.state === 'off') this.toggle();
     }
   }
+  /** Para o auto enquanto o resumo offline está aberto; resume() o religa. */
+  holdForReport() {
+    if (this.state !== 'on') return;
+    this.setState('off');
+    this.pendingResume = true;
+  }
   manualMove() {
     if (this.state === 'on') this.setState('pausado');
   }

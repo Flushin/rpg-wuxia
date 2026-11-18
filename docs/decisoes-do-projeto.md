@@ -168,6 +168,14 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   offline → dica → janelas do HUD), em `src/ui/backAction.ts`. Sem janela aberta: no app Android aparece **"Sair do
   jogo?"** (salva antes de fechar); na web/PWA continua o aviso + segundo voltar para sair. Também vale na web: antes
   o voltar com uma janela aberta mostrava o aviso de saída em vez de fechá-la.
+- **D4 (18/11/2026):** telas cheias (`#create`, `#loading`, `#bigmap`, painéis, créditos, report, offline) respeitam
+  o notch e os cantos arredondados (`max(12px, env(safe-area-inset-*))`). Sem notch, igual a antes.
+- **D5 (18/11/2026):** **ganho offline ao voltar do segundo plano** (P3): se o jogo ficou fora da tela 5 min ou mais
+  (`RESUME_OFFLINE_MIN_MS` em `core/offline.ts`) com o auto ligado, aplica o mesmo cálculo de quando o jogo abre
+  (`World.applyResumeOffline`) e mostra o resumo; o auto espera o resumo ser fechado. Vale no app e na web (aba escondida).
+- **D7 (18/11/2026):** ícone e tela de abertura do app gerados de `assets/` (`tools/icons/make_app_icons.py` →
+  `@capacitor/assets`). Versão do app lida do `package.json`: `versionCode = MAJOR*10000 + MINOR*100 + PATCH`
+  (`tools/android-version.mjs`). **Regra:** subir a `version` do `package.json` antes de cada envio à loja.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
