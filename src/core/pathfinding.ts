@@ -38,18 +38,24 @@ const DIRS = [
 ];
 
 // A* em grade com 8 direções, sem cortar quinas. Retorna centros de tiles.
+// Círculo (x, y = centro, raio r) ou, com w/h, retângulo (x, y = canto) aumentado de r em volta.
 export interface Avoid {
   x: number;
   y: number;
   r: number;
+  w?: number;
+  h?: number;
 }
+export const insideAvoid = (a: Avoid, px: number, py: number) =>
+  a.w !== undefined
+    ? px >= a.x - a.r && px <= a.x + a.w + a.r && py >= a.y - a.r && py <= a.y + (a.h ?? 0) + a.r
+    : Math.hypot(px - a.x, py - a.y) <= a.r;
 
-// avoid: círculos proibidos (cada círculo que já contém o ponto de partida é ignorado, para dar para sair dele)
+// avoid: áreas proibidas (cada área que já contém o ponto de partida é ignorado, para dar para sair dele)
 export function findPath(m: GameMap, from: Point, to: Point, avoid?: Avoid[]): Point[] {
   const W = m.width;
-  if (avoid) avoid = avoid.filter((a) => Math.hypot(from.x - a.x, from.y - a.y) > a.r);
-  const blocked = (x: number, y: number) =>
-    !!avoid && avoid.some((a) => Math.hypot(x + 0.5 - a.x, y + 0.5 - a.y) <= a.r);
+  if (avoid) avoid = avoid.filter((a) => !insideAvoid(a, from.x, from.y));
+  const blocked = (x: number, y: number) => !!avoid && avoid.some((a) => insideAvoid(a, x + 0.5, y + 0.5));
   const sx = Math.floor(from.x),
     sy = Math.floor(from.y);
   let gx = Math.floor(to.x),

@@ -160,7 +160,8 @@ export class AutoCombat {
     if (ev.type === 'playerDeath' && this.state === 'on') this.deathPending = true;
     else if (ev.type === 'mapChange') {
       this.visit = { shop: null, shopped: false };
-      this.leaving = false;
+      // indo à vila por um mapa intermediário (ruínas -> floresta -> vila): continua indo
+      if (TOWN_MAPS.has(ev.mapId)) this.leaving = false;
     }
     if (!this.counting) return;
     const c = this.cur;
@@ -288,7 +289,7 @@ export class AutoCombat {
       this.tickTown(dt);
       return;
     }
-    this.huntMap = w.mapId;
+    if (!this.huntMap || !this.nextHop(w.mapId, this.huntMap)) this.huntMap = w.mapId;
     this.cur.sec += dt;
     if (this.cur.sec >= BUCKET_SEC) {
       this.buckets.push(this.cur);
@@ -310,6 +311,18 @@ export class AutoCombat {
       this.leaving = 'flee';
       w.targetId = null;
       w.autoAttack = false;
+    }
+    // de passagem por outro mapa a caminho do mapa de caça: só revida quem atacar
+    if (!this.leaving && w.mapId !== this.huntMap) {
+      const p = this.portalTo(this.nextHop(w.mapId, this.huntMap));
+      if (p && !this.nearestAggressor()) {
+        w.targetId = null;
+        w.autoAttack = false;
+        this.status = L('Voltando para caçar', 'Heading back to hunt');
+        this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
+        return;
+      }
+      if (!p) this.huntMap = w.mapId;
     }
     if (this.leaving) {
       this.status =
@@ -401,6 +414,26 @@ export class AutoCombat {
     return this.portalTo(TOWN_TARGET) ?? (via ? this.portalTo(via) : null);
   }
 
+  /** Próximo mapa no caminho de `from` até `to` pelos portais (busca em largura); null se não há caminho. */
+  private nextHop(from: string, to: string): string | null {
+    if (from === to) return to;
+    const maps = this.w.maps,
+      first: Record<string, string> = {};
+    const queue = [from];
+    while (queue.length) {
+      const cur = queue.shift()!;
+      for (const o of maps[cur]?.objects ?? []) {
+        if (o.type !== 'portal') continue;
+        const t = String(o.props.target);
+        if (t === from || first[t] || !maps[t]) continue;
+        first[t] = cur === from ? t : first[cur];
+        if (t === to) return first[t];
+        queue.push(t);
+      }
+    }
+    return null;
+  }
+
   private portalTo(target: string | null) {
     for (const o of this.w.map.objects) {
       if (o.type !== 'portal') continue;
@@ -456,9 +489,10 @@ export class AutoCombat {
       return;
     }
     this.status = L('Voltando para caçar', 'Heading back to hunt');
-    const p = this.portalTo(this.huntMap || null) ?? this.portalTo(null);
+    const hop = this.huntMap ? this.nextHop(w.mapId, this.huntMap) : null;
+    const p = (hop ? this.portalTo(hop) : null) ?? this.portalTo(null);
     if (p) {
-      this.huntMap = p.target;
+      if (!hop) this.huntMap = p.target;
       this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
     }
   }
