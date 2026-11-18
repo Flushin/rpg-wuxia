@@ -27,6 +27,19 @@ para o pacote do app (`public/` + o JS gerado pelo build). Nenhum arquivo de có
 
 **Veredito: PRONTO COM AJUSTES — hoje BLOQUEADO até resolver os itens abaixo.**
 
+> **Situação em 18/11/2026 (antes do marco 9):**
+> - **B1 resolvido:** política de privacidade PT/EN publicada, com link na tela inicial e em ⚙ (etapa D8).
+> - **B2 resolvido:** respostas do Data Safety e rascunho da classificação indicativa (IARC) em `docs/lojas.md`.
+> - **B3 em parte:** nome escolhido ("Mistpeak"); falta o Lucas conferir a marca no INPI/USPTO/EUIPO.
+> - **B4 deixou de valer:** o Lucas decidiu lançar a **1ª versão sem anúncios e sem compras**; a monetização foi para
+>   "Futuro" (se voltar, refazer a seção 4.5, a política, o Data Safety e o IARC antes).
+> - **Licenças:** todas as bibliotecas do bundle e do APK estão na tela de créditos; os espelhos de modelos 3D estão
+>   fixados por commit e conferidos por SHA-256 (`tools/sprites/models.sha256`).
+> - **Fica para depois de todos os marcos** (decisão do Lucas: primeiro a jogabilidade): e-mail de contato do jogo (será
+>   criado um só para o Mistpeak), busca de marca, conta no Play Console e verificação de identidade, chave de
+>   assinatura, provas de licença que faltam baixar (`docs/licencas/README.md`), imagens da loja, revisão por advogado,
+>   teste fechado (12 testadores, 14 dias) e conferir a lista exata de bibliotecas do APK com o Gradle.
+
 > Atualizado em 17/11/2026 com as suas respostas (seção 8): músicas confirmadas com originais guardados; nenhum uso de IA
 > generativa; nome será trocado; público 13+; **anúncio com recompensa e diamantes (itens fixos) já na 1ª versão**; conta
 > pessoal ainda a criar; desenvolvedor com nome pessoal; o report por Web3Forms será substituído no app da loja
@@ -207,7 +220,7 @@ anúncios de política de 15/04/2026 e 29/10/2026 na Ajuda do Play Console, pág
 
 Legenda: ✅ ok · ⚠️ exige ação · ❌ falta / bloqueia.
 
-### 4.1 Política de privacidade — ❌
+### 4.1 Política de privacidade — ✅ feita em 18/11/2026 (D8; falta só o e-mail de contato)
 
 - **Situação:** não existe. A decisão já tomada (`docs/decisoes-do-projeto.md`, "Auditoria do código") é publicar uma página
   PT/EN no GitHub Pages com link em ⚙ e na tela inicial — **ainda não feito**.
@@ -228,7 +241,7 @@ Legenda: ✅ ok · ⚠️ exige ação · ❌ falta / bloqueia.
   - Link para a política do Web3Forms como operador.
   - Menores de idade (de acordo com o público-alvo que você escolher).
 
-### 4.2 Segurança dos dados (Data Safety) — ❌ (preencher)
+### 4.2 Segurança dos dados (Data Safety) — ✅ respostas em `docs/lojas.md` (18/11/2026)
 
 O que declarar, com base em `src/ui/bugReport.ts` (único ponto que envia dados para fora do aparelho):
 
@@ -286,7 +299,7 @@ formulário) — não declare de memória. Os dados de pagamento (cartão) ficam
   para menores, controle de compras). O Google lançou globalmente em out/2026 a **Play Age Signals API**, que pode
   informar a faixa etária ao app.
 
-### 4.4 Classificação indicativa (questionário IARC) — ⚠️ (preencher)
+### 4.4 Classificação indicativa (questionário IARC) — ✅ rascunho em `docs/lojas.md` (18/11/2026, sem anúncios nem compras)
 
 Conteúdo relevante encontrado:
 
@@ -305,7 +318,9 @@ Conteúdo relevante encontrado:
 
 Expectativa (não garantida): algo como ClassInd 10–12 / PEGI 7–12 / ESRB E10+–T. Responda pelo que o jogo tem, sem minimizar.
 
-### 4.5 Monetização — ❌ (decidido: anúncio com recompensa + diamantes **na 1ª versão**)
+### 4.5 Monetização — ⏸️ fora da 1ª versão (decisão de 18/11/2026; antes: anúncio com recompensa + diamantes na 1ª versão)
+
+> Mantido como referência para quando a monetização voltar. Na 1ª versão o jogo é gratuito, sem anúncios e sem compras.
 
 Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar algo** e **pode comprar pacotes de
 "diamantes"** para comprar **itens fixos** na loja do jogo (sem baús/sorteios pagos). Nada disso existe no código ainda.
@@ -436,6 +451,10 @@ Decisão de 17/11/2026: o jogador **pode escolher ver um anúncio para ganhar al
    - capturas das duas páginas do **OpenGameArt** e um link do **Wayback Machine** (web.archive.org/save) com data.
 7. **Corrigir a origem** do `tools/sprites/fetch-assets.sh` para fontes oficiais (download do kenney.nl / quaternius.com) ou,
    no mínimo, documentar que os espelhos foram conferidos byte a byte com os pacotes oficiais.
+   **Em parte (18/11/2026):** os sites oficiais estavam bloqueados na sessão, então os espelhos foram **fixados em commits
+   exatos** e cada modelo é conferido pelo SHA-256 (`tools/sprites/models.sha256`). Para fechar: baixar os .zip oficiais
+   e rodar `QUATERNIUS_ANIMALS_DIR=… KENNEY_NATURE_DIR=… tools/sprites/fetch-assets.sh`; se passar, os espelhos são
+   idênticos aos oficiais (anotar a data em `docs/licencas/README.md`).
 8. ~~Identificar a origem de `point_spent`, `tip` e `ui_click`~~ — **feito** (Kenney UI Audio `click3`, `rollover3`,
    `click1`; seção 2.2.1). Nomes originais já registrados em `public/audio/CREDITS.txt` e em `ASSETS_LICENCAS.md`.
 9. ~~Começar o `ASSETS_LICENCAS.md`~~ — **feito (17/11/2026)**, na raiz do repositório, com todos os itens da tabela 2.
@@ -542,10 +561,11 @@ Regras
 | Q10 | Retenção dos reports de bug | **O report por Web3Forms será trocado no app da loja** | Definir a nova forma e a retenção na política |
 | Q11 | O repositório é público? | Não perguntado: o GitHub Pages grátis exige repositório público, então ele deve ser | Manter em `docs/` a linguagem de "inspiração em mecânicas" ao citar Dragon Oath |
 
-### Ainda em aberto
-- Novo nome do jogo (e resultado das buscas de marca).
-- Rede de anúncios e forma de proteger os diamantes pagos (servidor/nuvem).
-- Nova forma de reportar bug no app e por quanto tempo os reports serão guardados.
+### Ainda em aberto (atualizado em 18/11/2026)
+- ~~Novo nome do jogo~~ — **Mistpeak** (18/11/2026); falta o resultado das buscas de marca.
+- ~~Rede de anúncios e forma de proteger os diamantes pagos~~ — **sem monetização na 1ª versão** (18/11/2026).
+- ~~Nova forma de reportar bug no app~~ — **continua o Web3Forms**, declarado na política (18/11/2026).
+- E-mail de contato: será criado um e-mail só do jogo, perto da publicação.
 
 ---
 

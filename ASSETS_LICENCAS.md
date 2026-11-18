@@ -36,8 +36,8 @@ Copie a linha-modelo para a tabela do tipo certo e preencha todas as colunas:
 | Pacote | Autor | Link oficial | Licença | Crédito exigido? | Como foi baixado | Prova em `docs/licencas/` | Risco |
 |---|---|---|---|---|---|---|---|
 | KayKit Adventurers Character Pack 1.0 | Kay Lousberg | https://kaylousberg.com · https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 | Não (cortesia) | `tools/sprites/fetch-assets.sh`, do repositório oficial | `kaykit-adventurers-1.0-LICENSE.txt` | 🟢 |
-| Ultimate Animated Animal Pack | Quaternius | https://quaternius.com/packs/ultimateanimatedanimals.html | CC0 1.0 | Não (cortesia) | `fetch-assets.sh`, do **espelho não oficial** `trebeljahr/quaternius-showcase` (cópia de dez/2022) | `quaternius-espelho-trebeljahr-LICENSES.md` · **falta:** print da página oficial | 🟡 |
-| Nature Kit | Kenney | https://kenney.nl/assets/nature-kit | CC0 1.0 | Não (cortesia) | `fetch-assets.sh`, do **espelho não oficial** `shorepine/kenney` | **falta:** `kenney-nature-kit-License.txt` | 🟡 |
+| Ultimate Animated Animal Pack | Quaternius | https://quaternius.com/packs/ultimateanimatedanimals.html | CC0 1.0 | Não (cortesia) | `fetch-assets.sh`, do **espelho não oficial** `trebeljahr/quaternius-showcase` (cópia de dez/2022), fixado por commit e conferido por SHA-256 (`tools/sprites/models.sha256`); para provar que é igual ao oficial, rodar com `QUATERNIUS_ANIMALS_DIR` | `quaternius-espelho-trebeljahr-LICENSES.md` · **falta:** print da página oficial | 🟡 |
+| Nature Kit | Kenney | https://kenney.nl/assets/nature-kit | CC0 1.0 | Não (cortesia) | `fetch-assets.sh`, do **espelho não oficial** `shorepine/kenney`, fixado por commit e conferido por SHA-256 (`tools/sprites/models.sha256`); para provar que é igual ao oficial, rodar com `KENNEY_NATURE_DIR` | **falta:** `kenney-nature-kit-License.txt` | 🟡 |
 | UI Audio ("UI SFX Set") | Kenney (Kenney Vleugels) | https://kenney.nl/assets/ui-audio | CC0 1.0 | Não (cortesia) | Original não registrado; os 3 sons foram identificados em 17/11/2026 comparando o áudio com `github.com/Calinou/kenney-ui-audio` (commit `8c3d81b`) | `kenney-ui-audio-LICENSE.txt` | 🟢 |
 | RPG Audio | Kenney | https://kenney.nl/assets/rpg-audio | CC0 1.0 | Não (cortesia) | Não registrado; os títulos gravados nos arquivos batem com o pacote | **falta:** `kenney-rpg-audio-License.txt` | 🟡 |
 | Impact Sounds | Kenney | https://kenney.nl/assets/impact-sounds | CC0 1.0 | Não (cortesia) | Não registrado; os arquivos têm `ARTIST=Kenney` | **falta:** `kenney-impact-sounds-License.txt` | 🟡 |
@@ -110,10 +110,14 @@ As dependências só de desenvolvimento (Vite, TypeScript, esbuild, Prettier) **
 | Capacitor (`@capacitor/core`, `@capacitor/android`) | 8.6.2 | MIT | © 2017-present Drifty Co. | idem | `capacitor-8.6.2-LICENSE.txt` | 🟢 (na tela de créditos) |
 | `@capacitor/app`, `/haptics`, `/status-bar` | 8.1.2, 8.0.2, 8.0.4 | MIT | © 2020-present Ionic | idem | `capacitor-plugins-app-haptics-status-bar-LICENSE.txt` | 🟢 (na tela de créditos) |
 | `@capacitor/filesystem` | 8.1.5 | MIT | © 2025 Ionic | idem | `capacitor-filesystem-8.1.5-LICENSE.txt` | 🟢 (na tela de créditos) |
-| AndroidX e demais bibliotecas Android que o Capacitor puxa no APK | — | Apache-2.0 (a conferir) | Google / AOSP | Licenças das dependências do APK | — | 🟡 só no APK: levantar a lista exata do build antes de publicar (D8) |
+| AndroidX (appcompat, core, core-splashscreen, activity, fragment, coordinatorlayout, webkit e transitivas) | 1.7.1, 1.17.0, 1.2.0, 1.11.0, 1.8.9, 1.3.0, 1.14.0 | Apache-2.0 | © The Android Open Source Project | Cópia da licença Apache-2.0 (sem NOTICE) | `Apache-2.0.txt` | 🟢 só no APK (na tela de créditos); confirmar a lista exata com o Gradle antes de publicar (`docs/licencas/README.md`) |
+| Apache Cordova Android (`org.apache.cordova:framework`) | 14.0.1 | Apache-2.0 | © 2015-2020 The Apache Software Foundation | Licença + NOTICE | `cordova-android-14.0.1-NOTICE.txt` + `Apache-2.0.txt` | 🟢 só no APK (na tela de créditos) |
+| ionfilesystem-android | 1.1.1 | MIT | © 2025 Ionic | Aviso + licença | `ionfilesystem-android-1.1.1-LICENSE.txt` | 🟢 só no APK (na tela de créditos) |
+| Kotlin stdlib, kotlinx-coroutines-core | ~2.2, 1.10.2 | Apache-2.0 | © JetBrains s.r.o. | Cópia da licença Apache-2.0 (sem NOTICE) | `Apache-2.0.txt` | 🟢 só no APK (na tela de créditos) |
 
-Ao atualizar a versão de uma biblioteca, troque a linha e o arquivo da licença. SDK de anúncios e Billing
-entram aqui quando forem adicionados.
+Ao atualizar a versão de uma biblioteca (inclusive o Capacitor e os plugins, que mudam as do APK), troque a linha e o
+arquivo da licença. SDK de anúncios e Billing entram aqui se um dia forem adicionados (fora da 1ª versão, decisão de
+18/11/2026).
 
 ## Serviços externos usados pelo jogo
 

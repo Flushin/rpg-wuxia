@@ -47,6 +47,7 @@
 - **Marco 8: Titã e Víbora (em andamento, 18/11/2026).** Skills aprovadas pelo Lucas em 18/11/2026 — ver "Titã e Víbora (marco 8)" abaixo. Sprites: Titã = Barbarian do KayKit com bastão; Víbora = Rogue encapuzado com agulhas.
 - **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Detalhes: a decidir com o Lucas.
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
+- **Publicação na Play Store: depois de todos os marcos** (decidido pelo Lucas em 18/11/2026: primeiro a jogabilidade). O que falta está em "Pendências das auditorias (18/11/2026)".
 - **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os 7 `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
 
 
@@ -215,10 +216,26 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
   **Pendente com o Lucas:** e-mail de contato (a Play exige; `TODO` na página) e público-alvo (a página diz que o
   jogo não é direcionado a crianças).
 
-**Fase D concluída em 18/11/2026** (D1–D8). Pendências antes da Play Store: e-mail de contato, público-alvo, chave de assinatura do app de produção, lista de licenças das bibliotecas Android do APK.
+**Fase D concluída em 18/11/2026** (D1–D8). Pendências antes da Play Store: ver "Pendências das auditorias (18/11/2026)" logo abaixo.
 - **D7 (18/11/2026):** ícone e tela de abertura do app gerados de `assets/` (`tools/icons/make_app_icons.py` →
   `@capacitor/assets`). Versão do app lida do `package.json`: `versionCode = MAJOR*10000 + MINOR*100 + PATCH`
   (`tools/android-version.mjs`). **Regra:** subir a `version` do `package.json` antes de cada envio à loja.
+
+**Pendências das auditorias (18/11/2026, antes do marco 9).** Decidido pelo Lucas em 18/11/2026:
+- **Monetização:** a **1ª versão sai sem anúncios e sem compras** (substitui a resposta de 17/11/2026 na auditoria de
+  direitos, que previa anúncio com recompensa + diamantes). A política de privacidade e o Data Safety continuam dizendo
+  "sem anúncios". A monetização foi para "Melhorias — Futuro".
+- **E-mail de contato:** será criado um e-mail só do jogo (não o pessoal); o `TODO` em `public/privacidade.html` fica
+  até lá.
+- **Tarefas de loja fora do código ficam para depois de todos os marcos:** busca de marca "Mistpeak" (INPI/USPTO/EUIPO),
+  conta no Play Console e verificação de identidade, chave de assinatura, teste fechado (12 testadores por 14 dias),
+  provas de licença que faltam baixar (`docs/licencas/README.md`), imagens da loja, revisão por advogado, conferir a
+  lista exata de bibliotecas do APK com o Gradle. O público-alvo continua **13+** (resposta de 17/11/2026).
+- **Feito no PR desta data:** bibliotecas nativas do APK (AndroidX, Apache Cordova, ionfilesystem, Kotlin) na tela de
+  créditos e em `docs/licencas/`; `tools/sprites/fetch-assets.sh` com os espelhos fixados por commit e cada modelo
+  conferido por SHA-256 (`tools/sprites/models.sha256`), aceitando os pacotes oficiais para provar que são iguais;
+  rascunho do questionário de classificação indicativa (IARC) em `docs/lojas.md`; tabela "Números atuais" em
+  `docs/balanceamento.md`; `AUDITORIA.md` e `AUDITORIA_DIREITOS.md` atualizados.
 
 ### Fechamento do marco 7 (16/11/2026)
 Decidido pelo Lucas em 16/11/2026, com base no simulador (`npm run sim:balance`, 6 execuções por seita).
@@ -641,4 +658,6 @@ Implementadas a pedido do Lucas e publicadas no site.
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 
-*(nenhuma pendente)*
+- **Monetização (18/11/2026):** anúncio com recompensa opcional e pacotes de diamantes para itens fixos da loja. Fora da
+  1ª versão. Antes de fazer: Google Play Billing, consentimento (UMP), proteger os diamantes pagos (save só no aparelho)
+  e refazer política, Data Safety e classificação indicativa (`AUDITORIA_DIREITOS.md` §4.5).

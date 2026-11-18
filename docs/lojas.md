@@ -56,6 +56,29 @@ Observações:
   - Contact Info → Name / Other (apenas se o jogador preencher o contato opcional).
 - Privacy Policy URL: a mesma acima.
 
+## Google Play — Classificação indicativa (questionário IARC)
+
+Rascunho de 18/11/2026, para o jogo **sem anúncios e sem compras** (decisão do Lucas na mesma data). O questionário
+muda de perguntas com o tempo: responda pelo que o jogo tem na versão enviada, sem minimizar. Categoria: **Jogo**.
+
+| Tema | O que existe no jogo | Resposta sugerida |
+| --- | --- | --- |
+| Violência | Combate corpo a corpo e mágico contra animais (lobos), humanos (bandidos) e guerreiros de terracota; monstros caem e somem; o personagem do jogador morre e volta à cidade. Visual cartunesco, câmera de cima | **Sim**: violência de fantasia contra personagens humanos e animais, sem detalhes realistas |
+| Sangue e mutilação | Não há (efeitos são faíscas, raios, gelo, névoa, veneno verde) | **Não** |
+| Medo / horror | Não há | **Não** |
+| Linguagem imprópria | Não há nos textos do jogo | **Não** |
+| Temas sexuais, nudez | Não há | **Não** |
+| Drogas, álcool, tabaco | Não há (poções de vida e mana são itens de cura; o veneno da Víbora é uma skill de dano) | **Não** |
+| Jogo de azar (simulado ou real) | Drops aleatórios de monstros, sem dinheiro real e sem compra | **Não** |
+| Compras digitais | Não há | **Não** |
+| Anúncios | Não há | **Não** (no Play Console: "Não contém anúncios") |
+| Interação entre usuários, chat, conteúdo de outros jogadores | Não há (single-player) | **Não** |
+| Compartilha a localização | Não | **Não** |
+| Compartilha informações pessoais com terceiros | Só o report de bug opcional (ver Data Safety acima); nada é mostrado a outros jogadores | **Não** (a pergunta é sobre compartilhar com outros usuários) |
+
+Expectativa (não garantida): ClassInd 10 ou 12 / PEGI 7 / ESRB E10+. Se entrar anúncio, compra, chat ou
+multiplayer (marco 10), refazer o questionário antes de enviar a atualização.
+
 ## Rascunho de descrição da loja
 
 ### Português (pt-BR)
