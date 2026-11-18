@@ -10,3 +10,5 @@
 @import './map.css';
 @import './compact.css';
 @import './screens.css';
+/* HUD novo do celular (só com body.hud-v2; a opção "Clássico" no ⚙ desliga). Tem que ser o último. */
+@import './hud-mobile.css';

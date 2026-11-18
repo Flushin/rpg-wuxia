@@ -15,6 +15,7 @@ import { Rewards } from './rewards';
 import { QuestTracker } from './questTracker';
 import { AttrsPanel } from './attrsPanel';
 import { byId } from './dom';
+import { applyHudLayout, updateHudMenu } from './hudLayout';
 
 const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
 
@@ -34,6 +35,7 @@ export class Hud {
   readonly rewards = new Rewards();
   private questTracker = new QuestTracker();
   constructor(private world: World) {
+    applyHudLayout(); // antes da Hotbar: o arco das skills depende do layout (novo/clássico)
     this.minimap = new Minimap(world);
     this.attrs = new AttrsPanel(world, () => this.togglePanel(false));
     this.hotbar = new Hotbar(world);
@@ -151,6 +153,7 @@ export class Hud {
     const badge = byId('pts-badge');
     badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
     badge.classList.toggle('hidden', w.freePoints <= 0);
+    updateHudMenu(w.freePoints > 0);
 
     const boss = w.engagedBoss(),
       bb = byId('boss-bar');

@@ -14,6 +14,8 @@ import { openPrivacyPolicy } from './privacy';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import type { TipManager } from './tips';
 import { byId } from './dom';
+import { hudLayout, setHudLayout, type HudLayout } from './hudLayout';
+import { isTouch } from '../platform/input';
 
 export class SettingsPanel {
   private bug: BugReport;
@@ -35,6 +37,13 @@ export class SettingsPanel {
   private onClick(e: MouseEvent, panel: HTMLElement) {
     const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
     const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
+    const hl = (e.target as HTMLElement).closest('[data-hud]') as HTMLElement | null;
+    if (hl) {
+      audio.ui('ui_click');
+      setHudLayout(hl.dataset.hud as HudLayout);
+      this.render();
+      return;
+    }
     if (ui) {
       audio.ui('ui_click');
       setUiSize(ui.dataset.ui as UiSize);
@@ -127,7 +136,18 @@ export class SettingsPanel {
         ] as [UiSize, string][]
       )
         .map(([k, t]) => `<button data-ui="${k}" class="${uiSize() === k ? 'primary' : ''}">${t}</button>`)
-        .join('')}</div></div>
+        .join('')}</div></div>${
+        isTouch
+          ? `<div class="opt ui-size-row"><span>${L('Layout do HUD no celular', 'Mobile HUD layout')}</span><div class="ui-size hud-layout">${(
+              [
+                ['novo', L('Novo', 'New')],
+                ['classico', L('Clássico', 'Classic')],
+              ] as [HudLayout, string][]
+            )
+              .map(([k, t]) => `<button data-hud="${k}" class="${hudLayout() === k ? 'primary' : ''}">${t}</button>`)
+              .join('')}</div></div>`
+          : ''
+      }
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>

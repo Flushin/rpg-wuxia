@@ -1,0 +1,371 @@
+/* HUD novo do celular (18/11/2026). Só vale com body.hud-v2, que src/ui/hudLayout.ts liga em aparelhos de toque
+   quando a opção "Layout do HUD no celular" (⚙) está em "Novo". Em "Clássico", nada daqui se aplica.
+   PC não é afetado (hud-v2 nunca liga sem toque).
+   Ideia: topo enxuto (Auto, ▾, ☰ e minimapa no canto), alvo ao lado da vida, polegar direito com Atacar + arco
+   de skills + poções, polegar esquerdo só com o joystick flutuante. Em pé, os controles ficam numa faixa embaixo.
+   Os números do Atacar/poções batem com Hotbar.layoutV2() (src/ui/hotbar.ts). */
+
+/* ⚙: os 2 botões Novo/Clássico (vale nos dois layouts, para dar para voltar) */
+.ui-size.hud-layout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ---------- Topo: [Auto][▾][☰][⚠] [minimapa] ---------- */
+body.hud-v2 #hud #top-right {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: none;
+}
+body.hud-v2 #hud #map-name {
+  display: none;
+}
+body.hud-v2 #hud #auto-row {
+  order: 1;
+}
+body.hud-v2 #hud #btn-menu {
+  order: 2;
+}
+body.hud-v2 #hud #dur-warn {
+  order: 3;
+}
+body.hud-v2 #hud #minimap {
+  order: 9;
+  width: 132px;
+  height: 72px;
+}
+body.hud-v2 #hud #auto-row > button,
+body.hud-v2 #hud #top-right > #btn-menu,
+body.hud-v2 #hud #top-right > #dur-warn {
+  min-height: 44px;
+  height: 44px;
+  padding: 0 10px;
+}
+body.hud-v2 #hud #btn-auto {
+  min-width: 72px;
+  font-size: 13px;
+}
+body.hud-v2 #hud #btn-auto-cfg,
+body.hud-v2 #hud #top-right > #btn-menu,
+body.hud-v2 #hud #top-right > #dur-warn {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+}
+/* o ▾ ao lado do Auto abre o menu do auto-combate (o ☰ agora é o menu geral) */
+body.hud-v2 #hud #btn-auto-cfg {
+  font-size: 0;
+}
+body.hud-v2 #hud #btn-auto-cfg::before {
+  content: '▾';
+  font-size: 20px;
+  line-height: 44px;
+}
+body.hud-v2 #hud #btn-menu {
+  position: relative;
+  font-size: 20px;
+}
+body.hud-v2 #hud #btn-menu.open {
+  background: #3b4360;
+  border-color: #d4a017;
+}
+/* bolinha: tem ponto de atributo para distribuir */
+body.hud-v2 #hud #btn-menu.alert::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d4a017;
+  box-shadow: 0 0 6px #ffd23f;
+}
+body.hud-v2 #hud #top-right > #dur-warn {
+  font-size: 0;
+}
+body.hud-v2 #hud #top-right > #dur-warn::before {
+  content: '⚠';
+  font-size: 19px;
+  line-height: 44px;
+}
+
+/* ---------- Menu ☰ (Skills, Atributos, Mochila, Configurações) ---------- */
+body.hud-v2 #hud #hud-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  padding: 8px;
+  background: rgba(14, 18, 30, 0.96);
+  border: 1px solid #d4a01788;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+body.hud-v2 #hud #hud-menu.hidden {
+  display: none;
+}
+body.hud-v2 #hud #hud-menu > button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  min-height: 46px;
+  padding: 0 14px;
+  font-size: 0;
+  text-align: left;
+}
+body.hud-v2 #hud #hud-menu > button::before {
+  font-size: 20px;
+  line-height: 1;
+  width: 24px;
+  text-align: center;
+}
+body.hud-v2 #hud #hud-menu > button::after {
+  content: attr(data-label);
+  font-size: 15px;
+  font-weight: 600;
+}
+body.hud-v2 #hud #hud-menu > #btn-skills::before {
+  content: '📜';
+}
+body.hud-v2 #hud #hud-menu > #btn-attrs::before {
+  content: '💪';
+}
+body.hud-v2 #hud #hud-menu > #btn-bag::before {
+  content: '🎒';
+}
+body.hud-v2 #hud #hud-menu > #btn-settings::before {
+  content: '⚙';
+}
+body.hud-v2 #hud #hud-menu #pts-badge {
+  top: 50%;
+  right: 12px;
+  margin-top: -10px;
+  font-size: 12px;
+}
+
+/* ---------- Alvo ao lado da vida ---------- */
+body.hud-v2 #hud #target-frame {
+  top: 8px;
+  left: 186px;
+  transform: none;
+  width: 180px;
+}
+
+/* ---------- Polegar direito: Atacar + arco de skills + poções ---------- */
+body.hud-v2 #hud #btn-attack {
+  right: 24px;
+  bottom: 30px;
+  width: 96px;
+  height: 96px;
+}
+body.hud-v2 #hud #potion-bar.touch {
+  left: auto;
+  right: 132px;
+  bottom: 12px;
+}
+body.hud-v2 #hud #potion-bar.touch .pot {
+  width: 52px;
+  height: 52px;
+}
+/* skill ainda bloqueada: menor e apagada, com cadeado (não rouba a atenção das que dá para usar) */
+body.hud-v2 #hud #hotbar.touch .slot.locked {
+  opacity: 0.5;
+  transform: scale(0.8);
+  border-color: #445;
+}
+body.hud-v2 #hud #hotbar.touch .slot.locked .lock {
+  flex-direction: column;
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.45);
+}
+body.hud-v2 #hud #hotbar.touch .slot.locked .lock::before {
+  content: '🔒';
+  font-size: 13px;
+  line-height: 1.1;
+}
+/* joystick flutuante: parado, o círculo-guia fica bem discreto */
+body.hud-v2 #hud #joystick:not(.live) {
+  opacity: 0.28;
+}
+
+/* ---------- Chefe e dica ---------- */
+body.hud-v2 #hud #boss-bar {
+  top: auto;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-60%);
+  width: min(300px, 36%);
+  min-width: 200px;
+}
+/* dica no meio da área de jogo, nunca em cima dos controles */
+body.hud-v2 #hud #tip-card {
+  top: 50%;
+  bottom: auto;
+  left: calc(50% - 40px);
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 380px));
+  min-width: 240px;
+  max-height: calc(100% - 120px);
+  overflow: auto;
+}
+
+/* deitado sobra largura e falta altura: menu em grade 2×2, sem descer até o Atacar */
+@media (orientation: landscape) {
+  body.hud-v2 #hud #hud-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 340px;
+  }
+}
+
+/* ---------- Deitado com pouca altura (Fold fechado, iPhone deitado) ---------- */
+@media (orientation: landscape) and (max-height: 450px) {
+  /* minimapa mais baixo: a missão logo abaixo dele não encosta no arco das skills (Fold fechado, interface Grande) */
+  body.hud-v2 #hud #minimap {
+    width: 100px;
+    height: 46px;
+  }
+  body.hud-v2 #hud #auto-row > button,
+  body.hud-v2 #hud #top-right > #btn-menu,
+  body.hud-v2 #hud #top-right > #dur-warn {
+    min-height: 40px;
+    height: 40px;
+  }
+  body.hud-v2 #hud #btn-auto-cfg,
+  body.hud-v2 #hud #top-right > #btn-menu,
+  body.hud-v2 #hud #top-right > #dur-warn {
+    width: 40px;
+    min-width: 40px;
+  }
+  body.hud-v2 #hud #btn-auto-cfg::before,
+  body.hud-v2 #hud #top-right > #dur-warn::before {
+    line-height: 40px;
+  }
+  body.hud-v2 #hud #hud-menu > button {
+    height: 40px;
+    min-height: 40px;
+  }
+  body.hud-v2 #hud #target-frame {
+    left: 166px;
+    width: 170px;
+    padding: 4px 6px;
+  }
+  body.hud-v2 #hud #btn-attack {
+    width: 78px;
+    height: 78px;
+    right: 14px;
+    bottom: 12px;
+  }
+  body.hud-v2 #hud #potion-bar.touch {
+    right: 100px;
+    bottom: 4px;
+    gap: 4px;
+  }
+  body.hud-v2 #hud #potion-bar.touch .pot {
+    width: 40px;
+    height: 40px;
+  }
+  body.hud-v2 #hud #tip-card {
+    width: min(340px, calc(100% - 380px));
+    max-height: calc(100% - 90px);
+    padding: 6px 10px;
+  }
+}
+
+/* ---------- Em pé: topo em duas linhas, controles numa faixa embaixo ---------- */
+@media (orientation: portrait) {
+  /* [Auto][▾][☰] numa linha, minimapa embaixo, tudo à direita */
+  body.hud-v2 #hud #top-right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 200px;
+  }
+  /* um pouco mais estreitos para caber ao lado dos botões do topo num celular de 360px */
+  body.hud-v2 #hud #player-frame {
+    width: 160px;
+  }
+  body.hud-v2 #hud #top-right {
+    max-width: 176px;
+  }
+  body.hud-v2 #hud #btn-auto {
+    min-width: 64px;
+    padding: 0 8px;
+  }
+  body.hud-v2 #hud #auto-row > button,
+  body.hud-v2 #hud #top-right > #btn-menu,
+  body.hud-v2 #hud #top-right > #dur-warn {
+    min-height: 42px;
+    height: 42px;
+  }
+  body.hud-v2 #hud #btn-auto-cfg,
+  body.hud-v2 #hud #top-right > #btn-menu,
+  body.hud-v2 #hud #top-right > #dur-warn {
+    width: 42px;
+    min-width: 42px;
+  }
+  body.hud-v2 #hud #btn-auto-cfg::before,
+  body.hud-v2 #hud #top-right > #dur-warn::before {
+    line-height: 42px;
+  }
+  /* alvo embaixo da vida (do lado não cabe) */
+  body.hud-v2 #hud #target-frame {
+    top: 104px;
+    left: 8px;
+    width: 160px;
+  }
+  /* círculo-guia do joystick menor e poções um pouco menores: não se encostam em 360px */
+  body.hud-v2 #hud #joystick {
+    width: 110px;
+    height: 110px;
+    left: 12px;
+    bottom: 14px;
+  }
+  body.hud-v2 #hud #potion-bar.touch {
+    gap: 6px;
+  }
+  body.hud-v2 #hud #potion-bar.touch .pot {
+    width: 46px;
+    height: 46px;
+  }
+  /* faixa dos controles: um degradê escuro embaixo separa o jogo dos botões */
+  body.hud-v2 #hud::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 230px;
+    background: linear-gradient(to top, rgba(8, 10, 16, 0.6), rgba(8, 10, 16, 0));
+    pointer-events: none;
+  }
+  /* chefe logo acima da faixa dos controles */
+  body.hud-v2 #hud #boss-bar {
+    top: auto;
+    bottom: 236px;
+    left: 8px;
+    right: 8px;
+    transform: none;
+    width: auto;
+    min-width: 0;
+  }
+  body.hud-v2 #hud #toast {
+    top: 22%;
+  }
+  body.hud-v2 #hud #tip-card {
+    top: 54%;
+    left: 50%;
+    width: min(380px, calc(100% - 24px));
+    min-width: 0;
+    max-height: 40%;
+  }
+}
