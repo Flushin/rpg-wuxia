@@ -25,8 +25,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
-  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right))
-    max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
+  padding: max(12px, var(--sa-top)) max(12px, var(--sa-right)) max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
 }
 #bigmap.hidden {
   display: none;

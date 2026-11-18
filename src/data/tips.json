@@ -2,7 +2,7 @@
   "inicio": {
     "title": "Bem-vindo!",
     "text": "Clique no chão para mover. Clique em um monstro para selecioná-lo e seu personagem ataca sozinho. Tab troca de alvo e Espaço ataca o mais próximo.",
-    "textTouch": "Use o joystick à esquerda para mover. Toque em um monstro para selecioná-lo e use o botão Atacar à direita."
+    "textTouch": "Toque e arraste em qualquer ponto da metade esquerda da tela para mover (o joystick aparece embaixo do dedo). Toque em um monstro para selecioná-lo e use o botão Atacar no canto direito, embaixo."
   },
   "portal": {
     "title": "Portal",
@@ -15,7 +15,8 @@
   "primeiro_nivel": {
     "title": "Subiu de nível!",
     "text": "Você ganhou pontos livres de atributo. Abra o painel com a tecla C (ou botão Atributos) e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
-    "textTouch": "Você ganhou pontos livres de atributo. Toque no botão Atributos e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez."
+    "textTouch": "Você ganhou pontos livres de atributo (a bolinha dourada no botão ☰ avisa). Toque em ☰ › Atributos e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
+    "textTouchClassic": "Você ganhou pontos livres de atributo. Toque no botão Atributos, no topo da tela, e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez."
   },
   "primeira_morte": {
     "title": "De volta à vila",
@@ -24,21 +25,25 @@
   "primeira_skill": {
     "title": "Nova skill!",
     "text": "Use suas skills com as teclas 1 a 4 ou clicando nos botões da barra embaixo. Cada skill gasta mana e tem um tempo de recarga. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. Abra o painel de skills com a tecla K (ou botão Skills) para ver todas.",
-    "textTouch": "Use suas skills nos botões em arco ao redor do botão Atacar. Cada skill gasta mana e tem um tempo de recarga. Segure um botão para ver os detalhes. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. O botão Skills mostra todas elas."
+    "textTouch": "Use suas skills nos botões em arco por cima do botão Atacar. Cada skill gasta mana e tem um tempo de recarga; as que ainda estão bloqueadas aparecem menores, com cadeado. Segure um botão para ver os detalhes. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. Veja todas em ☰ › Skills.",
+    "textTouchClassic": "Use suas skills nos botões em arco ao redor do botão Atacar. Cada skill gasta mana e tem um tempo de recarga. Segure um botão para ver os detalhes. Quanto mais você usa uma skill, mais ela sobe de nível e fica mais forte. O botão Skills, no topo da tela, mostra todas elas."
   },
   "skill_nivel": {
     "title": "Skill subiu de nível!",
-    "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 15). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K)."
+    "text": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 15). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills (K).",
+    "textTouch": "Skills ativas ganham experiência a cada uso e ficam 8% mais fortes por nível (máximo 15). Passivas sobem junto com o seu nível de personagem. Veja o progresso no painel de skills."
   },
   "primeiro_item": {
     "title": "Você achou um equipamento!",
     "text": "Abra a mochila com a tecla I (ou botão Mochila). A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Clique duas vezes em um item para equipá-lo; passe o mouse para ver os detalhes e comparar com o que você usa.",
-    "textTouch": "Abra a mochila no botão Mochila. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar."
+    "textTouch": "Abra a mochila em ☰ › Mochila. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar.",
+    "textTouchClassic": "Abra a mochila no botão Mochila, no topo da tela. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar."
   },
   "primeira_pocao": {
     "title": "Poções",
     "text": "Use a tecla Q para poção de vida e E para poção de mana. Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila.",
-    "textTouch": "Use os botões de poção acima do joystick: vida (HP) e mana (MP). Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila."
+    "textTouch": "Use os botões de poção à esquerda do botão Atacar: vida (HP) e mana (MP). Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila.",
+    "textTouchClassic": "Use os botões de poção acima do joystick: vida (HP) e mana (MP). Elas curam aos poucos, durante 8 segundos, e usar outra do mesmo tipo reinicia o efeito. Compre mais com o Vendedor de Poções na vila."
   },
   "primeiro_npc": {
     "title": "Moradores da vila",
@@ -47,7 +52,8 @@
   },
   "durabilidade_baixa": {
     "title": "Equipamento gastando",
-    "text": "Algum item equipado está com pouca durabilidade. Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some)."
+    "text": "Algum item equipado está com pouca durabilidade (o aviso ⚠ Reparar aparece no topo da tela e abre a mochila). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some).",
+    "textTouch": "Algum item equipado está com pouca durabilidade (o aviso ⚠ aparece no topo da tela e abre a mochila). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some)."
   },
   "mochila_cheia": {
     "title": "Mochila cheia",
@@ -59,8 +65,9 @@
   },
   "auto_combate": {
     "title": "Auto-combate",
-    "text": "O botão Auto (ou a tecla Z) faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pausa o auto; aperte Z de novo para retomar. A engrenagem ao lado do botão abre o menu: escolha as skills, os limites de poção e quanto comprar na vila.",
-    "textTouch": "O botão Auto faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pelo joystick pausa o auto; toque em Auto de novo para retomar. A engrenagem ao lado abre o menu: escolha as skills, os limites de poção e quanto comprar na vila."
+    "text": "O botão Auto (ou a tecla Z) faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pausa o auto; aperte Z de novo para retomar. O botão ☰ ao lado do Auto abre o menu: escolha as skills, os limites de poção e quanto comprar na vila.",
+    "textTouch": "O botão Auto, no topo da tela, faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pelo joystick pausa o auto; toque em Auto de novo para retomar. O botão ▾ ao lado do Auto abre o menu dele: escolha as skills, os limites de poção e quanto comprar na vila.",
+    "textTouchClassic": "O botão Auto, no topo da tela, faz seu personagem caçar sozinho: escolhe o monstro mais próximo (até 2 níveis acima de você), usa suas skills e bebe poções. Mover o personagem pelo joystick pausa o auto; toque em Auto de novo para retomar. O botão ☰ ao lado do Auto abre o menu dele: escolha as skills, os limites de poção e quanto comprar na vila."
   },
   "ganho_offline": {
     "title": "Ganhos enquanto você está fora",

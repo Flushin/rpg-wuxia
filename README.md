@@ -29,7 +29,9 @@ Trailer (vídeo promocional gravado do próprio jogo): veja [`tools/trailer/READ
 
 - PC: `WASD`/setas ou clique no chão para andar, clique no monstro para selecionar, `Tab` alterna alvos, `Espaço` ataca o mais próximo,
   `1`–`4` skills, `Q`/`E` poções, `Z` auto-combate, `C` atributos, `K` skills, `I` mochila, `M` mapa, `Esc` fecha janelas.
-- Celular: joystick flutuante na metade esquerda, toque no monstro para mirar, botão Atacar e skills em arco à direita.
+- Celular (HUD Novo, padrão): joystick flutuante na metade esquerda, toque no monstro para mirar; à direita, Atacar com as skills
+  em arco por cima e as poções ao lado. No topo: Auto, ▾ (menu do auto-combate) e ☰ (Skills, Atributos, Mochila e ⚙ Configurações).
+  O layout Clássico (⚙ › Layout do HUD no celular) deixa esses botões soltos no topo e as poções acima do joystick.
 
 ## Estrutura
 

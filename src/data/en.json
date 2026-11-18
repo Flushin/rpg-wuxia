@@ -361,7 +361,7 @@
     "inicio": {
       "title": "Welcome!",
       "text": "Click the ground to move. Click a monster to select it and your character attacks on its own. Tab switches target and Space attacks the nearest one.",
-      "textTouch": "Use the joystick on the left to move. Tap a monster to select it and use the Attack button on the right."
+      "textTouch": "Touch and drag anywhere on the left half of the screen to move (the joystick appears under your finger). Tap a monster to select it and use the Attack button in the bottom-right corner."
     },
     "portal": {
       "title": "Portal",
@@ -374,7 +374,8 @@
     "primeiro_nivel": {
       "title": "Level up!",
       "text": "You gained free attribute points. Open the panel with the C key (or the Attributes button) and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
-      "textTouch": "You gained free attribute points. Tap the Attributes button and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once."
+      "textTouch": "You gained free attribute points (the gold dot on the ☰ button lets you know). Tap ☰ › Attributes and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
+      "textTouchClassic": "You gained free attribute points. Tap the Attributes button at the top of the screen and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once."
     },
     "primeira_morte": {
       "title": "Back to the village",
@@ -383,21 +384,25 @@
     "primeira_skill": {
       "title": "New skill!",
       "text": "Use your skills with keys 1 to 4 or by clicking the buttons on the bar below. Each skill costs mana and has a cooldown. The more you use a skill, the higher it levels and the stronger it gets. Open the skills panel with the K key (or the Skills button) to see them all.",
-      "textTouch": "Use your skills with the buttons arcing around the Attack button. Each skill costs mana and has a cooldown. Hold a button to see its details. The more you use a skill, the higher it levels and the stronger it gets. The Skills button shows them all."
+      "textTouch": "Use your skills with the buttons arcing over the Attack button. Each skill costs mana and has a cooldown; skills still locked show up smaller, with a padlock. Hold a button to see its details. The more you use a skill, the higher it levels and the stronger it gets. See them all in ☰ › Skills.",
+      "textTouchClassic": "Use your skills with the buttons arcing around the Attack button. Each skill costs mana and has a cooldown. Hold a button to see its details. The more you use a skill, the higher it levels and the stronger it gets. The Skills button at the top of the screen shows them all."
     },
     "skill_nivel": {
       "title": "Skill level up!",
-      "text": "Active skills gain experience with every use and get 8% stronger per level (max 15). Passives level up along with your character level. See the progress in the skills panel (K)."
+      "text": "Active skills gain experience with every use and get 8% stronger per level (max 15). Passives level up along with your character level. See the progress in the skills panel (K).",
+      "textTouch": "Active skills gain experience with every use and get 8% stronger per level (max 15). Passives level up along with your character level. See the progress in the skills panel."
     },
     "primeiro_item": {
       "title": "You found equipment!",
       "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
-      "textTouch": "Open the bag with the Bag button. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button."
+      "textTouch": "Open the bag in ☰ › Bag. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button.",
+      "textTouchClassic": "Open the bag with the Bag button at the top of the screen. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button."
     },
     "primeira_pocao": {
       "title": "Potions",
       "text": "Use the Q key for a health potion and E for a mana potion. They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village.",
-      "textTouch": "Use the potion buttons above the joystick: health (HP) and mana (MP). They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village."
+      "textTouch": "Use the potion buttons to the left of the Attack button: health (HP) and mana (MP). They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village.",
+      "textTouchClassic": "Use the potion buttons above the joystick: health (HP) and mana (MP). They heal gradually over 8 seconds, and using another of the same type restarts the effect. Buy more from the Potion Seller in the village."
     },
     "primeiro_npc": {
       "title": "Villagers",
@@ -406,7 +411,8 @@
     },
     "durabilidade_baixa": {
       "title": "Gear wearing out",
-      "text": "An equipped item is low on durability. Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost)."
+      "text": "An equipped item is low on durability (the ⚠ Repair warning shows up at the top of the screen and opens the bag). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost).",
+      "textTouch": "An equipped item is low on durability (the ⚠ warning shows up at the top of the screen and opens the bag). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost)."
     },
     "mochila_cheia": {
       "title": "Bag full",
@@ -418,8 +424,9 @@
     },
     "auto_combate": {
       "title": "Auto-battle",
-      "text": "The Auto button (or the Z key) makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving your character pauses auto; press Z again to resume. The gear next to the button opens the menu: choose skills, potion limits and how much to buy in the village.",
-      "textTouch": "The Auto button makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving with the joystick pauses auto; tap Auto again to resume. The gear next to it opens the menu: choose skills, potion limits and how much to buy in the village."
+      "text": "The Auto button (or the Z key) makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving your character pauses auto; press Z again to resume. The ☰ button next to Auto opens its menu: choose skills, potion limits and how much to buy in the village.",
+      "textTouch": "The Auto button at the top of the screen makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving with the joystick pauses auto; tap Auto again to resume. The ▾ button next to Auto opens its menu: choose skills, potion limits and how much to buy in the village.",
+      "textTouchClassic": "The Auto button at the top of the screen makes your character hunt on its own: it picks the nearest monster (up to 2 levels above you), uses your skills and drinks potions. Moving with the joystick pauses auto; tap Auto again to resume. The ☰ button next to Auto opens its menu: choose skills, potion limits and how much to buy in the village."
     },
     "ganho_offline": {
       "title": "Earnings while you are away",

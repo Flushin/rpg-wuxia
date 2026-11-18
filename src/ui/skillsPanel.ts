@@ -4,6 +4,7 @@ import { skillIconHtml } from './icons';
 import type { World } from '../core/world';
 import { closeX } from './labels';
 import { byId } from './dom';
+import { isTouch } from '../platform/input';
 
 // Painel de skills (tecla K): ensina o que cada skill faz e como ela evolui.
 export class SkillsPanel {
@@ -42,7 +43,9 @@ export class SkillsPanel {
           st = w.skills[d.id];
         const key =
           d.type === 'active'
-            ? ` <small>· ${L('tecla', 'key')} ${i + 1}</small>`
+            ? isTouch
+              ? ''
+              : ` <small>· ${L('tecla', 'key')} ${i + 1}</small>`
             : ` <span class="badge passive">${L('Passiva', 'Passive')}</span>`;
         const stats =
           d.type === 'active' ? `<small>Mana ${d.mana} · ${L('Recarga', 'Cooldown')} ${d.cooldown}s</small>` : '';

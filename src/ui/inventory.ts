@@ -11,6 +11,7 @@ import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import { slotIconHtml } from './icons';
 import { uiH, uiRect, uiW } from './uiScale';
 import { byId } from './dom';
+import { isTouch } from '../platform/input';
 
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
 const selKey = (s: Sel | null) => (s ? (s.kind === 'bag' ? `b${s.i}` : `e${s.slot}`) : '');
@@ -210,7 +211,7 @@ export class InventoryPanel {
     const tabs = `<div class="inv-tabs" role="tablist">${tabBtn('equip', L('Equipamento', 'Equipment'))}${tabBtn('pot', L('Consumíveis', 'Consumables'))}${tabBtn('mat', L('Materiais', 'Materials'))}</div>`;
     const it = this.selItem(),
       s = this.sel;
-    let detail = `<div class="muted">${L('Toque em um item para ver os detalhes. Duplo toque equipa ou usa.', 'Tap an item to see details. Double tap equips or uses.')}</div>`;
+    let detail = `<div class="muted">${isTouch ? L('Toque em um item para ver os detalhes. Duplo toque equipa ou usa.', 'Tap an item to see details. Double tap equips or uses.') : L('Clique em um item para ver os detalhes. Duplo clique equipa ou usa.', 'Click an item to see details. Double-click equips or uses.')}</div>`;
     if (it && s) {
       let btn = '';
       if (s.kind === 'eq') btn = `<button class="primary" data-act="unequip">${L('Desequipar', 'Unequip')}</button>`;
