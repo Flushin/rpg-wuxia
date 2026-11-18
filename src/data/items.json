@@ -6,61 +6,632 @@
     "Bonus aleatorios: valor = sorteio(min..max) * (1 + 0.2 * (nivelDoItem - 1)); ints arredondados (minimo 1). 'elemAtk' vira o elemento da seita de quem recebeu o drop.",
     "value = valor de referencia em ouro; venda = value * multiplicador da raridade * sellRatio (15%). Pocoes: price = preco de compra; venda = price * sellRatio.",
     "Conserto: ceil(durabilidade faltando * nivelDoItem * repairCostPerPoint).",
-    "Pocoes: curam percent do maximo ao longo de duration s; um efeito por tipo (hp/mp), usar outra do mesmo tipo reinicia; cooldown por tipo."
+    "Pocoes: curam percent do maximo ao longo de duration s; um efeito por tipo (hp/mp), usar outra do mesmo tipo reinicia; cooldown por tipo.",
+    "Materiais (marco 9): empilham como poções; tier comum (mapas antigos), raro (montanha) e especial (chefes). value = referência; venda = value * sellRatio.",
+    "Melhorar (+1 a +10): cada nível soma upgradeStep (fração) aos stats da base, não aos bônus.",
+    "Consumíveis (marco 9): empilham; price = preço no Mercador Ambulante. Mercador: merchant (estoque, preços e renovação)."
   ],
-  "slots": ["colar", "tronco", "arma", "cabeca", "calca", "bota"],
-  "slotNames": { "colar": "Colar", "tronco": "Tronco", "arma": "Arma", "cabeca": "Cabeça", "calca": "Calça", "bota": "Bota" },
+  "slots": [
+    "colar",
+    "tronco",
+    "arma",
+    "cabeca",
+    "calca",
+    "bota"
+  ],
+  "slotNames": {
+    "colar": "Colar",
+    "tronco": "Tronco",
+    "arma": "Arma",
+    "cabeca": "Cabeça",
+    "calca": "Calça",
+    "bota": "Bota"
+  },
   "bagSize": 30,
   "stackMax": 99,
   "sellRatio": 0.15,
   "repairCostPerPoint": 0.5,
   "groundSeconds": 60,
   "wearPerHit": 0.3,
-  "startingKit": { "pocao_hp_p": 3 },
-  "startingWeapon": { "lamina": "espadas_ferro", "pavilhao": "leque_bambu", "tita": "bastao_ferro", "vibora": "agulhas_bronze" },
+  "startingKit": {
+    "pocao_hp_p": 3
+  },
+  "startingWeapon": {
+    "lamina": "espadas_ferro",
+    "pavilhao": "leque_bambu",
+    "tita": "bastao_ferro",
+    "vibora": "agulhas_bronze"
+  },
   "rarities": {
-    "comum": { "name": "Comum", "color": "#ffffff", "weight": 75, "bonuses": 0, "valueMul": 1 },
-    "incomum": { "name": "Incomum", "color": "#4cd964", "weight": 20, "bonuses": 1, "valueMul": 1.6 },
-    "raro": { "name": "Raro", "color": "#4aa3ff", "weight": 5, "bonuses": 2, "valueMul": 2.6 }
+    "comum": {
+      "name": "Comum",
+      "color": "#ffffff",
+      "weight": 75,
+      "bonuses": 0,
+      "valueMul": 1
+    },
+    "incomum": {
+      "name": "Incomum",
+      "color": "#4cd964",
+      "weight": 20,
+      "bonuses": 1,
+      "valueMul": 1.6
+    },
+    "raro": {
+      "name": "Raro",
+      "color": "#4aa3ff",
+      "weight": 5,
+      "bonuses": 2,
+      "valueMul": 2.6
+    }
   },
   "bonusPool": [
-    { "stat": "strength", "min": 1, "max": 2 },
-    { "stat": "intelligence", "min": 1, "max": 2 },
-    { "stat": "stamina", "min": 1, "max": 2 },
-    { "stat": "agility", "min": 1, "max": 2 },
-    { "stat": "willpower", "min": 1, "max": 2 },
-    { "stat": "critChance", "min": 0.01, "max": 0.02 },
-    { "stat": "hit", "min": 3, "max": 6 },
-    { "stat": "maxHp", "min": 8, "max": 15 },
-    { "stat": "maxMana", "min": 6, "max": 12 },
-    { "stat": "physDef", "min": 2, "max": 4 },
-    { "stat": "spiritDef", "min": 2, "max": 4 },
-    { "stat": "elemAtk", "min": 2, "max": 4 }
+    {
+      "stat": "strength",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "stat": "intelligence",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "stat": "stamina",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "stat": "agility",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "stat": "willpower",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "stat": "critChance",
+      "min": 0.01,
+      "max": 0.02
+    },
+    {
+      "stat": "hit",
+      "min": 3,
+      "max": 6
+    },
+    {
+      "stat": "maxHp",
+      "min": 8,
+      "max": 15
+    },
+    {
+      "stat": "maxMana",
+      "min": 6,
+      "max": 12
+    },
+    {
+      "stat": "physDef",
+      "min": 2,
+      "max": 4
+    },
+    {
+      "stat": "spiritDef",
+      "min": 2,
+      "max": 4
+    },
+    {
+      "stat": "elemAtk",
+      "min": 2,
+      "max": 4
+    }
   ],
   "bases": {
-    "colar_jade": { "name": "Colar de Jade Simples", "slot": "colar", "reqLevel": 1, "durability": 100, "value": 24, "stats": { "willpower": 1, "maxMana": 10 } },
-    "colar_dragao": { "name": "Colar do Dragão Sereno", "slot": "colar", "reqLevel": 5, "durability": 100, "value": 120, "stats": { "willpower": 2, "maxMana": 25, "spiritDef": 3 } },
-    "tunica_algodao": { "name": "Túnica de Algodão", "slot": "tronco", "reqLevel": 1, "durability": 100, "value": 32, "stats": { "physDef": 3, "maxHp": 10 } },
-    "manto_seda": { "name": "Manto de Seda Azul", "slot": "tronco", "reqLevel": 5, "durability": 100, "value": 160, "stats": { "physDef": 8, "spiritDef": 4, "maxHp": 30 } },
-    "espadas_ferro": { "name": "Espadas Duplas de Ferro", "slot": "arma", "sect": "lamina", "reqLevel": 1, "durability": 100, "value": 40, "stats": { "physAtk": 5 } },
-    "espadas_vento": { "name": "Espadas Duplas do Vento Cortante", "slot": "arma", "sect": "lamina", "reqLevel": 5, "durability": 100, "value": 200, "stats": { "physAtk": 14, "hit": 5 } },
-    "leque_bambu": { "name": "Leque de Qi de Bambu", "slot": "arma", "sect": "pavilhao", "reqLevel": 1, "durability": 100, "value": 40, "stats": { "spiritAtk": 5 } },
-    "leque_nuvens": { "name": "Leque de Qi das Nuvens Brancas", "slot": "arma", "sect": "pavilhao", "reqLevel": 5, "durability": 100, "value": 200, "stats": { "spiritAtk": 14, "hit": 5 } },
-    "bastao_ferro": { "name": "Bastão de Ferro", "slot": "arma", "sect": "tita", "reqLevel": 1, "durability": 100, "value": 40, "stats": { "physAtk": 5 } },
-    "bastao_brasa": { "name": "Bastão da Brasa Eterna", "slot": "arma", "sect": "tita", "reqLevel": 5, "durability": 100, "value": 200, "stats": { "physAtk": 14, "hit": 5 } },
-    "agulhas_bronze": { "name": "Agulhas de Bronze", "slot": "arma", "sect": "vibora", "reqLevel": 1, "durability": 100, "value": 40, "stats": { "physAtk": 5 } },
-    "agulhas_jade": { "name": "Agulhas de Jade Esmeralda", "slot": "arma", "sect": "vibora", "reqLevel": 5, "durability": 100, "value": 200, "stats": { "physAtk": 14, "hit": 5 } },
-    "faixa_linho": { "name": "Faixa de Linho", "slot": "cabeca", "reqLevel": 1, "durability": 100, "value": 20, "stats": { "physDef": 1, "spiritDef": 1, "maxHp": 6 } },
-    "coroa_monge": { "name": "Coroa de Bronze do Monge", "slot": "cabeca", "reqLevel": 5, "durability": 100, "value": 100, "stats": { "physDef": 4, "spiritDef": 4, "stamina": 1 } },
-    "calca_algodao": { "name": "Calça de Algodão", "slot": "calca", "reqLevel": 1, "durability": 100, "value": 24, "stats": { "physDef": 2, "maxHp": 8 } },
-    "calca_couro": { "name": "Calça de Couro Reforçado", "slot": "calca", "reqLevel": 5, "durability": 100, "value": 120, "stats": { "physDef": 6, "maxHp": 20, "stamina": 1 } },
-    "sandalia_palha": { "name": "Sandálias de Palha", "slot": "bota", "reqLevel": 1, "durability": 100, "value": 20, "stats": { "evasion": 2, "physDef": 1 } },
-    "botas_andarilho": { "name": "Botas de Seda do Andarilho", "slot": "bota", "reqLevel": 5, "durability": 100, "value": 100, "stats": { "agility": 2, "evasion": 4 } }
+    "colar_jade": {
+      "name": "Colar de Jade Simples",
+      "slot": "colar",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 24,
+      "stats": {
+        "willpower": 1,
+        "maxMana": 10
+      }
+    },
+    "colar_dragao": {
+      "name": "Colar do Dragão Sereno",
+      "slot": "colar",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 120,
+      "stats": {
+        "willpower": 2,
+        "maxMana": 25,
+        "spiritDef": 3
+      }
+    },
+    "tunica_algodao": {
+      "name": "Túnica de Algodão",
+      "slot": "tronco",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 32,
+      "stats": {
+        "physDef": 3,
+        "maxHp": 10
+      }
+    },
+    "manto_seda": {
+      "name": "Manto de Seda Azul",
+      "slot": "tronco",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 160,
+      "stats": {
+        "physDef": 8,
+        "spiritDef": 4,
+        "maxHp": 30
+      }
+    },
+    "espadas_ferro": {
+      "name": "Espadas Duplas de Ferro",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 40,
+      "stats": {
+        "physAtk": 5
+      }
+    },
+    "espadas_vento": {
+      "name": "Espadas Duplas do Vento Cortante",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 200,
+      "stats": {
+        "physAtk": 14,
+        "hit": 5
+      }
+    },
+    "leque_bambu": {
+      "name": "Leque de Qi de Bambu",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 40,
+      "stats": {
+        "spiritAtk": 5
+      }
+    },
+    "leque_nuvens": {
+      "name": "Leque de Qi das Nuvens Brancas",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 200,
+      "stats": {
+        "spiritAtk": 14,
+        "hit": 5
+      }
+    },
+    "bastao_ferro": {
+      "name": "Bastão de Ferro",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 40,
+      "stats": {
+        "physAtk": 5
+      }
+    },
+    "bastao_brasa": {
+      "name": "Bastão da Brasa Eterna",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 200,
+      "stats": {
+        "physAtk": 14,
+        "hit": 5
+      }
+    },
+    "agulhas_bronze": {
+      "name": "Agulhas de Bronze",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 40,
+      "stats": {
+        "physAtk": 5
+      }
+    },
+    "agulhas_jade": {
+      "name": "Agulhas de Jade Esmeralda",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 200,
+      "stats": {
+        "physAtk": 14,
+        "hit": 5
+      }
+    },
+    "faixa_linho": {
+      "name": "Faixa de Linho",
+      "slot": "cabeca",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 20,
+      "stats": {
+        "physDef": 1,
+        "spiritDef": 1,
+        "maxHp": 6
+      }
+    },
+    "coroa_monge": {
+      "name": "Coroa de Bronze do Monge",
+      "slot": "cabeca",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 100,
+      "stats": {
+        "physDef": 4,
+        "spiritDef": 4,
+        "stamina": 1
+      }
+    },
+    "calca_algodao": {
+      "name": "Calça de Algodão",
+      "slot": "calca",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 24,
+      "stats": {
+        "physDef": 2,
+        "maxHp": 8
+      }
+    },
+    "calca_couro": {
+      "name": "Calça de Couro Reforçado",
+      "slot": "calca",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 120,
+      "stats": {
+        "physDef": 6,
+        "maxHp": 20,
+        "stamina": 1
+      }
+    },
+    "sandalia_palha": {
+      "name": "Sandálias de Palha",
+      "slot": "bota",
+      "reqLevel": 1,
+      "durability": 100,
+      "value": 20,
+      "stats": {
+        "evasion": 2,
+        "physDef": 1
+      }
+    },
+    "botas_andarilho": {
+      "name": "Botas de Seda do Andarilho",
+      "slot": "bota",
+      "reqLevel": 5,
+      "durability": 100,
+      "value": 100,
+      "stats": {
+        "agility": 2,
+        "evasion": 4
+      }
+    },
+    "colar_cristal": {
+      "name": "Colar de Cristal de Neve",
+      "slot": "colar",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 260,
+      "stats": {
+        "willpower": 3,
+        "maxMana": 45,
+        "spiritDef": 6
+      }
+    },
+    "manto_yeti": {
+      "name": "Manto de Pele de Yeti",
+      "slot": "tronco",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 350,
+      "stats": {
+        "physDef": 14,
+        "spiritDef": 8,
+        "maxHp": 60
+      }
+    },
+    "espadas_trovao_nevado": {
+      "name": "Espadas Duplas do Trovão Nevado",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 440,
+      "stats": {
+        "physAtk": 26,
+        "hit": 8
+      }
+    },
+    "leque_lua_fria": {
+      "name": "Leque de Qi da Lua Fria",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 440,
+      "stats": {
+        "spiritAtk": 26,
+        "hit": 8
+      }
+    },
+    "bastao_granito": {
+      "name": "Bastão do Pico de Granito",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 440,
+      "stats": {
+        "physAtk": 26,
+        "hit": 8
+      }
+    },
+    "agulhas_prata": {
+      "name": "Agulhas de Prata Sombria",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 440,
+      "stats": {
+        "physAtk": 26,
+        "hit": 8
+      }
+    },
+    "capuz_la": {
+      "name": "Capuz de Lã da Montanha",
+      "slot": "cabeca",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 220,
+      "stats": {
+        "physDef": 7,
+        "spiritDef": 7,
+        "stamina": 2
+      }
+    },
+    "calca_la": {
+      "name": "Calça Forrada de Lã",
+      "slot": "calca",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 260,
+      "stats": {
+        "physDef": 10,
+        "maxHp": 40,
+        "stamina": 2
+      }
+    },
+    "botas_pico": {
+      "name": "Botas de Pele do Pico",
+      "slot": "bota",
+      "reqLevel": 10,
+      "durability": 100,
+      "value": 220,
+      "stats": {
+        "agility": 3,
+        "evasion": 7
+      }
+    },
+    "colar_lotus": {
+      "name": "Colar do Lótus Celeste",
+      "slot": "colar",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 480,
+      "stats": {
+        "willpower": 5,
+        "maxMana": 70,
+        "spiritDef": 10
+      }
+    },
+    "armadura_templo": {
+      "name": "Armadura do Templo Caído",
+      "slot": "tronco",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 640,
+      "stats": {
+        "physDef": 22,
+        "spiritDef": 13,
+        "maxHp": 100
+      }
+    },
+    "espadas_ceu_partido": {
+      "name": "Espadas Duplas do Céu Partido",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 800,
+      "stats": {
+        "physAtk": 40,
+        "hit": 12,
+        "critChance": 0.02
+      }
+    },
+    "leque_fenix": {
+      "name": "Leque de Qi da Fênix de Jade",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 800,
+      "stats": {
+        "spiritAtk": 40,
+        "hit": 12,
+        "critChance": 0.02
+      }
+    },
+    "bastao_vulcao": {
+      "name": "Bastão do Vulcão Adormecido",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 800,
+      "stats": {
+        "physAtk": 40,
+        "hit": 12,
+        "critChance": 0.02
+      }
+    },
+    "agulhas_escorpiao": {
+      "name": "Agulhas do Escorpião Celeste",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 800,
+      "stats": {
+        "physAtk": 40,
+        "hit": 12,
+        "critChance": 0.02
+      }
+    },
+    "elmo_guardiao": {
+      "name": "Elmo do Guardião do Templo",
+      "slot": "cabeca",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 400,
+      "stats": {
+        "physDef": 11,
+        "spiritDef": 11,
+        "stamina": 3
+      }
+    },
+    "calca_escamas": {
+      "name": "Calça de Escamas de Bronze",
+      "slot": "calca",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 480,
+      "stats": {
+        "physDef": 16,
+        "maxHp": 65,
+        "stamina": 3
+      }
+    },
+    "botas_passo_celeste": {
+      "name": "Botas do Passo Celeste",
+      "slot": "bota",
+      "reqLevel": 15,
+      "durability": 100,
+      "value": 400,
+      "stats": {
+        "agility": 5,
+        "evasion": 11
+      }
+    }
   },
   "potions": {
-    "pocao_hp_p": { "name": "Poção de Vida Pequena", "kind": "hp", "percent": 0.3, "duration": 8, "cooldown": 1, "price": 12, "color": "#e04848" },
-    "pocao_hp_g": { "name": "Poção de Vida Grande", "kind": "hp", "percent": 0.6, "duration": 8, "cooldown": 1, "price": 36, "color": "#ff2a2a" },
-    "pocao_mp_p": { "name": "Poção de Mana Pequena", "kind": "mp", "percent": 0.3, "duration": 8, "cooldown": 1, "price": 14, "color": "#4a8fe0" },
-    "pocao_mp_g": { "name": "Poção de Mana Grande", "kind": "mp", "percent": 0.6, "duration": 8, "cooldown": 1, "price": 40, "color": "#2a6aff" }
+    "pocao_hp_p": {
+      "name": "Poção de Vida Pequena",
+      "kind": "hp",
+      "percent": 0.3,
+      "duration": 8,
+      "cooldown": 1,
+      "price": 12,
+      "color": "#e04848"
+    },
+    "pocao_hp_g": {
+      "name": "Poção de Vida Grande",
+      "kind": "hp",
+      "percent": 0.6,
+      "duration": 8,
+      "cooldown": 1,
+      "price": 36,
+      "color": "#ff2a2a"
+    },
+    "pocao_mp_p": {
+      "name": "Poção de Mana Pequena",
+      "kind": "mp",
+      "percent": 0.3,
+      "duration": 8,
+      "cooldown": 1,
+      "price": 14,
+      "color": "#4a8fe0"
+    },
+    "pocao_mp_g": {
+      "name": "Poção de Mana Grande",
+      "kind": "mp",
+      "percent": 0.6,
+      "duration": 8,
+      "cooldown": 1,
+      "price": 40,
+      "color": "#2a6aff"
+    }
+  },
+  "upgradeStep": 0.06,
+  "materials": {
+    "minerio_ferro": {
+      "name": "Minério de Ferro",
+      "tier": "comum",
+      "value": 10,
+      "color": "#c9b8a0",
+      "desc": "Material comum de forja. Cai dos monstros da floresta e das ruínas e vem de itens desmontados."
+    },
+    "cristal_gelo": {
+      "name": "Cristal de Gelo Eterno",
+      "tier": "raro",
+      "value": 120,
+      "color": "#7fd4ff",
+      "desc": "Material raro de forja. Cai dos monstros da Montanha Nevada e de itens raros desmontados."
+    },
+    "essencia_qi": {
+      "name": "Essência de Qi Ancestral",
+      "tier": "especial",
+      "value": 600,
+      "color": "#d58cff",
+      "desc": "Material especial de forja. Só os chefes deixam cair."
+    }
+  },
+  "consumables": {
+    "pergaminho_retorno": {
+      "name": "Pergaminho de Retorno",
+      "price": 80,
+      "color": "#f0d27a",
+      "desc": "Leva você de volta à Vila das Nuvens na hora."
+    }
+  },
+  "merchant": {
+    "stockMin": 4,
+    "stockMax": 6,
+    "refreshMinutes": 60,
+    "rareChance": 0.85,
+    "priceMul": 2,
+    "materials": {
+      "cristal_gelo": 450
+    }
   }
 }

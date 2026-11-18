@@ -3,7 +3,7 @@ import type { ActionError } from '../core/types';
 import { CLASSES } from '../core/data';
 import { PORTRAITS } from '../render/sprites';
 import { L } from '../core/i18n';
-import { BASES, POTIONS, SLOT_NAMES } from '../core/items';
+import { BASES, CONSUMABLES, MATERIALS, POTIONS, SLOT_NAMES } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
 import { closeX } from './labels';
@@ -14,8 +14,10 @@ import { byId } from './dom';
 
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
 const selKey = (s: Sel | null) => (s ? (s.kind === 'bag' ? `b${s.i}` : `e${s.slot}`) : '');
-type Tab = 'equip' | 'pot'; // Craft e Gemas entram quando esses sistemas existirem
-const tabOf = (it: ItemInstance): Tab => (POTIONS[it.baseId] ? 'pot' : 'equip');
+type Tab = 'equip' | 'pot' | 'mat';
+const tabOf = (it: ItemInstance): Tab =>
+  POTIONS[it.baseId] || CONSUMABLES[it.baseId] ? 'pot' : MATERIALS[it.baseId] ? 'mat' : 'equip';
+const usable = (it: ItemInstance) => !!POTIONS[it.baseId] || !!CONSUMABLES[it.baseId];
 // slots em volta do corpo: esquerda de cima para baixo (cabeça, colar, tronco), direita (arma, calça, bota)
 const BODY_LEFT: Slot[] = ['cabeca', 'colar', 'tronco'],
   BODY_RIGHT: Slot[] = ['arma', 'calca', 'bota'];
@@ -137,8 +139,7 @@ export class InventoryPanel {
     this.sel = sel;
     this.sig = '';
     byId('item-tip').classList.add('hidden');
-    if (dbl && this.selItem())
-      this.act(sel.kind === 'eq' ? 'unequip' : POTIONS[this.selItem()!.baseId] ? 'use' : 'equip');
+    if (dbl && this.selItem()) this.act(sel.kind === 'eq' ? 'unequip' : usable(this.selItem()!) ? 'use' : 'equip');
   }
 
   private act(a: string) {
@@ -154,8 +155,8 @@ export class InventoryPanel {
       this.sel = null;
       return;
     }
-    if (a === 'tab-equip' || a === 'tab-pot') {
-      this.tab = a === 'tab-pot' ? 'pot' : 'equip';
+    if (a === 'tab-equip' || a === 'tab-pot' || a === 'tab-mat') {
+      this.tab = a.slice(4) as Tab;
       if (this.sel?.kind === 'bag') this.sel = null;
       return;
     }
@@ -174,6 +175,10 @@ export class InventoryPanel {
       const it = w.bag[s.i],
         d = it && POTIONS[it.baseId];
       if (it && d) w.usePotion(d.kind, it.baseId);
+      else if (it?.baseId === 'pergaminho_retorno') {
+        if (w.useReturnScroll(s.i)) this.onClose();
+        else this.toast(L('Você já está na vila', 'You are already in the village'), '#ff8a80');
+      }
     }
     if (err) this.toast(actionErrorText(err), '#ff8a80');
   }
@@ -202,15 +207,15 @@ export class InventoryPanel {
     const count = (t: Tab) => w.bag.filter((x) => x && tabOf(x) === t).length;
     const tabBtn = (t: Tab, label: string) =>
       `<button class="inv-tab ${this.tab === t ? 'on' : ''}" data-act="tab-${t}" role="tab" aria-selected="${this.tab === t}">${label} <small>${count(t)}</small></button>`;
-    const tabs = `<div class="inv-tabs" role="tablist">${tabBtn('equip', L('Equipamento', 'Equipment'))}${tabBtn('pot', L('Poções', 'Potions'))}</div>`;
+    const tabs = `<div class="inv-tabs" role="tablist">${tabBtn('equip', L('Equipamento', 'Equipment'))}${tabBtn('pot', L('Consumíveis', 'Consumables'))}${tabBtn('mat', L('Materiais', 'Materials'))}</div>`;
     const it = this.selItem(),
       s = this.sel;
     let detail = `<div class="muted">${L('Toque em um item para ver os detalhes. Duplo toque equipa ou usa.', 'Tap an item to see details. Double tap equips or uses.')}</div>`;
     if (it && s) {
-      const pot = POTIONS[it.baseId];
       let btn = '';
       if (s.kind === 'eq') btn = `<button class="primary" data-act="unequip">${L('Desequipar', 'Unequip')}</button>`;
-      else if (pot) btn = `<button class="primary" data-act="use">${L('Usar', 'Use')}</button>`;
+      else if (usable(it)) btn = `<button class="primary" data-act="use">${L('Usar', 'Use')}</button>`;
+      else if (MATERIALS[it.baseId]) btn = '';
       else {
         const err = w.canEquip(it);
         btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>${L('Equipar', 'Equip')}</button>${err ? `<small class="muted">${actionErrorText(err)}</small>` : ''}`;

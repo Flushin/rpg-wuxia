@@ -46,7 +46,10 @@ export interface MonsterDef {
   scale?: number; // tamanho do sprite
   defMul?: { phys: number; spirit: number }; // multiplicadores sobre a defesa derivada
   keepDistance?: number; // arqueiro: recua se o jogador chegar mais perto que isso
-  projectile?: 'arrow';
+  projectile?: 'arrow' | 'ice';
+  onHit?: { slow: number; duration: number }; // golpe normal deixa o alvo lento (Espectro de gelo)
+  /** golpe em área marcado no chão em volta do próprio monstro (Yeti), além do ataque normal */
+  slam?: { radius: number; delay: number; mult: number; interval: number };
   groupAggro?: boolean; // monstros do mesmo grupo (propriedade "group" do mapa) entram juntos
   boss?: {
     arenaRadius: number; // área do chefe (leash e auto-combate evita)
@@ -56,6 +59,7 @@ export interface MonsterDef {
   loot?: {
     gold?: { min: number; max: number; perLevel?: number }; // perLevel: soma (nível-1)*perLevel aos dois limites
     potions?: { id: string; chance: number; minMonsterLevel?: number }[];
+    materials?: { id: string; chance: number; min?: number; max?: number }[]; // forja (marco 9)
     equipment?: EquipDrop | EquipDrop[];
     guaranteed?: { rarity: 'comum' | 'incomum' | 'raro'; reqLevel: number }; // 1 item garantido (slot aleatório)
   };

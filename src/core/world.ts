@@ -27,6 +27,8 @@ import * as npcs from './world/npcs';
 import * as boss from './world/boss';
 import * as quests from './world/quests';
 import * as shop from './world/shop';
+import * as forge from './world/forge';
+import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
@@ -123,11 +125,17 @@ export class World {
   arenas: Avoid[] = []; // áreas de chefe do mapa atual
   /** segundos seguidos com o jogador fora da arena (com folga) durante a luta com o chefe */
   private bossAwayT = 0;
-  bossRespawnAtMs = 0; // relógio real (ms) em que o chefe renasce; 0 = vivo
+  /** chefes mortos: id do monstro → ms (relógio real) do renascimento (marco 9: um por chefe) */
+  bossRespawn: Record<string, number> = {};
+  /** O renascimento mais distante entre os chefes mortos (0 = todos vivos). */
+  get bossRespawnAtMs(): number {
+    return Math.max(0, ...Object.values(this.bossRespawn));
+  }
   // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
   respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
+  merchant: merchant.MerchantState | null = null; // estoque do Mercador Ambulante (marco 9); sorteado ao abrir
   autoAttack = false;
 
   // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
@@ -762,6 +770,7 @@ export class World {
     const pd = p.dead ? Infinity : dist(m, p);
     const boss = def.boss;
     if (boss) this.tickBossExtras(m, def, dt);
+    else if (def.slam) this.tickSlam(m, def, dt);
     const fromHome = p.dead ? Infinity : dist(p, m.home);
     const wake = !boss || fromHome <= boss.arenaRadius; // chefe só acorda com o jogador na arena
     // chefe em combate só desiste com o jogador bem fora da arena (folga + alguns segundos): desviar de um golpe
@@ -849,7 +858,9 @@ export class World {
   }
 
   private aggro(m: Entity) {
-    if (m.ai !== 'chase' && MONSTERS[m.monsterId]?.boss) m.aiTimer = 3;
+    const md = MONSTERS[m.monsterId];
+    if (m.ai !== 'chase' && md?.boss) m.aiTimer = 3;
+    else if (m.ai !== 'chase' && md?.slam) m.aiTimer = 1.5;
     m.ai = 'chase';
     m.repathCd = 0;
     m.path = [];
@@ -866,6 +877,9 @@ export class World {
   // ---------- boss: src/core/world/boss.ts ----------
   tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
     return boss.tickBossExtras(this, m, def, dt);
+  }
+  tickSlam(m: Entity, def: MonsterDef, dt: number) {
+    return boss.tickSlam(this, m, def, dt);
   }
   resetBoss(m: Entity) {
     return boss.resetBoss(this, m);
@@ -948,8 +962,8 @@ export class World {
       if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
     }
     if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
-    if (a.kind === 'monster' && MONSTERS[a.monsterId]?.projectile)
-      this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: 'arrow' });
+    const proj = a.kind === 'monster' ? MONSTERS[a.monsterId]?.projectile : undefined;
+    if (proj) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: proj });
     if (r.hit && t.kind === 'player' && a.kind === 'monster') this.wearGear();
     if (r.hit) {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
@@ -959,6 +973,9 @@ export class World {
       // roubo de vida da seita (Tormenta): parte do dano causado volta como vida
       const ls = a.kind === 'player' ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
       if (ls > 0 && dealt > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + dealt * ls);
+      // golpe que deixa lento (Espectro de gelo, marco 9)
+      const oh = a.kind === 'monster' && !skill ? MONSTERS[a.monsterId]?.onHit : undefined;
+      if (oh && t.hp > 0) this.addBuff(t, a.monsterId, 'slow', oh.slow, oh.duration);
     } else {
       this.emit({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
     }
@@ -1014,10 +1031,11 @@ export class World {
     m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
     if (!m.summoned && !def.boss && m.spawnKey) this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
     if (def.boss) {
-      this.bossRespawnAtMs = this.clock() + def.respawnSeconds * 1000;
+      const at = this.clock() + def.respawnSeconds * 1000;
+      this.bossRespawn[def.id] = at;
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
-      this.emit({ type: 'bossDefeated', respawnAt: this.bossRespawnAtMs });
+      this.emit({ type: 'bossDefeated', respawnAt: at });
     }
     if (this.targetId === m.id) {
       this.targetId = null;
@@ -1163,6 +1181,34 @@ export class World {
     return shop.repairAll(this);
   }
 
+  // ---------- forja (marco 9): src/core/world/forge.ts ----------
+  forgeUpgrade(it: ItemInstance, force = false): ActionError | null {
+    return forge.upgrade(this, it, force);
+  }
+  forgeRarity(it: ItemInstance, force = false): ActionError | null {
+    return forge.raiseRarity(this, it, force);
+  }
+  forgeReroll(it: ItemInstance, force = false): ActionError | null {
+    return forge.reroll(this, it, force);
+  }
+  forgeSalvage(bagIndex: number, force = false): ActionError | null {
+    return forge.salvage(this, bagIndex, force);
+  }
+
+  // ---------- Mercador Ambulante (marco 9): src/core/world/merchant.ts ----------
+  merchantStock(): merchant.MerchantState {
+    return merchant.merchantStock(this);
+  }
+  merchantBuy(idx: number, force = false): ActionError | null {
+    return merchant.buyOffer(this, idx, force);
+  }
+  merchantBuyGoods(id: string, qty: number, force = false): ActionError | null {
+    return merchant.buyGoods(this, id, qty, force);
+  }
+  useReturnScroll(bagIndex: number): boolean {
+    return merchant.useReturnScroll(this, bagIndex);
+  }
+
   // ---------- offlineApply: src/core/world/offlineApply.ts ----------
   applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
     return offlineApply.applyOffline(this, now, lastSeen, saved);
@@ -1202,14 +1248,16 @@ export class World {
     this.arenas = [];
     this.bossSummoned = false;
     this.arenaSeen = false;
-    if (this.bossRespawnAtMs && this.bossRespawnAtMs <= this.clock()) this.bossRespawnAtMs = 0;
     const now = this.clock();
+    for (const [k, t] of Object.entries(this.bossRespawn)) if (t <= now) delete this.bossRespawn[k];
     for (const [k, t] of Object.entries(this.respawnAtMs)) if (t <= now) delete this.respawnAtMs[k];
     this.map.objects.forEach((o, idx) => {
       if (o.type === 'monsterSpawn') {
         const def = MONSTERS[String(o.props.monster)];
         if (!def) return;
-        const m = this.makeMonster(def, { x: o.x, y: o.y });
+        const lv = Number(o.props.minLevel) || 0,
+          lv2 = Number(o.props.maxLevel) || 0;
+        const m = this.makeMonster(def, { x: o.x, y: o.y }, lv ? [lv, Math.max(lv, lv2 || lv)] : undefined);
         m.group = Number(o.props.group) || 0;
         m.spawnKey = `${mapId}#${idx}`;
         this.monsters.push(m);
@@ -1221,10 +1269,11 @@ export class World {
         }
         if (def.boss) {
           this.arenas.push({ x: o.x, y: o.y, r: def.boss.arenaRadius });
-          if (this.bossRespawnAtMs > this.clock()) {
+          const bt = this.bossRespawn[def.id] ?? 0;
+          if (bt > now) {
             m.dead = true;
             m.hp = 0;
-            m.respawnAt = this.time + (this.bossRespawnAtMs - this.clock()) / 1000;
+            m.respawnAt = this.time + (bt - now) / 1000;
           }
         }
       } else if (o.type === 'npc') {
@@ -1318,7 +1367,7 @@ export class World {
   }
 
   /** Interno: usado pelos módulos de src/core/world/. */
-  makeMonster(def: MonsterDef, home: Point): Entity {
+  makeMonster(def: MonsterDef, home: Point, levels?: [number, number]): Entity {
     const e = this.blank('monster', def.name, 1);
     e.monsterId = def.id;
     e.home = { ...home };
@@ -1329,14 +1378,21 @@ export class World {
     e.attackInterval = def.attackInterval;
     e.moveSpeed = def.moveSpeed;
     e.aiTimer = this.rng.range(0.5, 4);
-    this.applyMonsterLevel(e, def, this.rng.int(def.minLevel, def.maxLevel));
+    if (levels) e.levels = levels;
+    this.applyMonsterLevel(e, def, this.rollLevel(e, def));
     return e;
   }
 
+  /** Nível sorteado: a faixa do ponto do mapa (propriedades minLevel/maxLevel, marco 9) ou a do monstro. */
+  private rollLevel(e: Entity, def: MonsterDef): number {
+    const [a, b] = e.levels ?? [def.minLevel, def.maxLevel];
+    return this.rng.int(a, b);
+  }
+
   private respawn(m: Entity, def: MonsterDef) {
-    this.applyMonsterLevel(m, def, this.rng.int(def.minLevel, def.maxLevel));
+    this.applyMonsterLevel(m, def, this.rollLevel(m, def));
     if (def.boss) {
-      this.bossRespawnAtMs = 0;
+      delete this.bossRespawn[def.id];
       this.resetBoss(m);
     }
     if (m.spawnKey) delete this.respawnAtMs[m.spawnKey];

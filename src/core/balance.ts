@@ -59,6 +59,11 @@ export const KNOBS = {
   'drop.pocoes': { grupo: 'Drops', desc: 'chance de os monstros soltarem poções', scope: 'monstro' },
   'drop.equipamento': { grupo: 'Drops', desc: 'chance de os monstros soltarem equipamento', scope: 'monstro' },
   'drop.raros': { grupo: 'Drops', desc: 'peso de Incomum e Raro no sorteio de raridade (Comum fica igual)' },
+  'drop.materiais': { grupo: 'Drops', desc: 'chance de os monstros soltarem materiais de forja', scope: 'monstro' },
+  // Forja e Mercador (marco 9)
+  'forja.ouro': { grupo: 'Forja', desc: 'ouro cobrado pela forja do ferreiro (melhorar, raridade, trocar bônus)' },
+  'forja.chance': { grupo: 'Forja', desc: 'chance de sucesso de melhorar um item (máximo 100%)' },
+  'mercador.precos': { grupo: 'Forja', desc: 'preços do Mercador Ambulante' },
   // Mundo
   'respawn.monstros': { grupo: 'Mundo', desc: 'tempo para o monstro renascer (+ = demora mais)', scope: 'monstro' },
   'offline.eficiencia': { grupo: 'Mundo', desc: 'eficiência do ganho offline (máximo 100%)' },
@@ -132,6 +137,7 @@ interface MonsterLike {
     gold?: { min: number; max: number; perLevel?: number };
     potions?: { chance: number }[];
     equipment?: { chance: number } | { chance: number }[];
+    materials?: { chance: number }[];
   };
 }
 export function balanceMonsters(monsters: Record<string, MonsterLike>) {
@@ -153,6 +159,8 @@ export function balanceMonsters(monsters: Record<string, MonsterLike>) {
     const de = bal('drop.equipamento', id);
     for (const e of L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [])
       e.chance = Math.min(1, e.chance * de);
+    const dm = bal('drop.materiais', id);
+    for (const md of L.materials ?? []) md.chance = Math.min(1, md.chance * dm);
   }
 }
 
@@ -187,7 +195,14 @@ export function balanceItems(j: {
   wearPerHit: number;
   rarities: Record<string, { weight: number }>;
   potions: Record<string, { percent: number; price: number }>;
+  consumables: Record<string, { price: number }>;
+  merchant: { priceMul: number; materials: Record<string, number> };
 }) {
+  const mp = bal('mercador.precos');
+  j.merchant.priceMul *= mp;
+  for (const id of Object.keys(j.merchant.materials))
+    j.merchant.materials[id] = Math.max(1, Math.round(j.merchant.materials[id] * mp));
+  for (const c of Object.values(j.consumables)) c.price = Math.max(1, Math.round(c.price * mp));
   j.sellRatio *= bal('venda.itens');
   j.repairCostPerPoint *= bal('conserto.custo');
   j.wearPerHit *= bal('desgaste.equipamento');

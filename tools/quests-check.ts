@@ -15,7 +15,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 type Priv = { killMonster: (m: Entity) => void; questTalk: (id: string) => void; openNpcWindow: (n: Entity) => void };
 const priv = (w: World) => w as unknown as Priv;
@@ -37,7 +37,11 @@ const talkTo = (w: World, role: string) => {
 };
 
 console.log('== dados ==');
-ok(QUESTS.length === 8, '8 etapas na cadeia');
+ok(QUESTS.length === 14, '14 etapas na cadeia (8 até o nível 10 + 6 do marco 9)');
+ok(
+  QUESTS.slice(8).every((q) => q.minLevel >= 10) && QUESTS[QUESTS.length - 1].objective.type === 'kill',
+  'etapas do marco 9 a partir do nível 10, terminando num abate (o Abade)',
+);
 ok(
   QUESTS.every((q, i) => i === 0 || q.minLevel >= QUESTS[i - 1].minLevel),
   'níveis mínimos em ordem',
@@ -49,8 +53,8 @@ ok(
 ok(
   QUESTS.filter((q) => q.reward.item)
     .map((q) => q.id)
-    .join() === 'acampamentos,barro_bronze',
-  'itens nas etapas 4 e 7',
+    .join() === 'acampamentos,barro_bronze,fera_branca,guardioes_templo',
+  'itens nas etapas 4, 7, 11 e 13',
 );
 
 for (const classId of ['lamina', 'pavilhao']) {
@@ -113,8 +117,8 @@ for (const classId of ['lamina', 'pavilhao']) {
           BASES[it.baseId].slot === 'arma' &&
           it.rarity === 'incomum' &&
           BASES[it.baseId].sect === classId &&
-          BASES[it.baseId].reqLevel === 5,
-        'arma Incomum nv 5 da própria seita',
+          BASES[it.baseId].reqLevel === (q.reward.itemLevel ?? 5),
+        `arma Incomum nv ${q.reward.itemLevel ?? 5} da própria seita`,
       );
     }
     if (q.reward.item === 'tronco')
@@ -122,8 +126,8 @@ for (const classId of ['lamina', 'pavilhao']) {
         gained.length === 1 &&
           BASES[gained[0].baseId].slot === 'tronco' &&
           gained[0].rarity === 'incomum' &&
-          BASES[gained[0].baseId].reqLevel === 5,
-        'manto Incomum nv 5',
+          BASES[gained[0].baseId].reqLevel === (q.reward.itemLevel ?? 5),
+        `tronco Incomum nv ${q.reward.itemLevel ?? 5}`,
       );
     w.changeMap('cidade');
   }
@@ -133,7 +137,10 @@ for (const classId of ['lamina', 'pavilhao']) {
     'cadeia completa: sem marcas',
   );
   const evs = drain(w).filter((e) => e.type === 'quest');
-  ok(evs.filter((e) => e.type === 'quest' && e.kind === 'completed').length === 8, '8 avisos de missão concluída');
+  ok(
+    evs.filter((e) => e.type === 'quest' && e.kind === 'completed').length === QUESTS.length,
+    `${QUESTS.length} avisos de missão concluída`,
+  );
 }
 
 console.log('== save ==');

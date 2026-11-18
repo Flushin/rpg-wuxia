@@ -12,6 +12,8 @@ import {
   equipmentBaseIds,
   isBroken,
   isPotionId,
+  isStackId,
+  MATERIALS,
   itemColor,
   itemName,
   itemStats,
@@ -58,7 +60,7 @@ export function freeSlots(w: World): number {
 }
 
 export function canFit(w: World, baseId: string, qty = 1): boolean {
-  if (!isPotionId(baseId)) return freeSlots(w) >= 1;
+  if (!isStackId(baseId)) return freeSlots(w) >= 1;
   let room = freeSlots(w) * STACK_MAX;
   for (const b of w.bag) if (b && b.baseId === baseId) room += STACK_MAX - (b.qty ?? 1);
   return room >= qty;
@@ -68,7 +70,7 @@ export function canFit(w: World, baseId: string, qty = 1): boolean {
 export function addItem(w: World, item: ItemInstance): boolean {
   const qty = item.qty ?? 1;
   if (!canFit(w, item.baseId, qty)) return false;
-  if (isPotionId(item.baseId)) {
+  if (isStackId(item.baseId)) {
     let rem = qty;
     for (const b of w.bag) {
       if (rem <= 0) break;
@@ -127,13 +129,19 @@ export function collect(w: World, item: ItemInstance, x: number, y: number) {
       color: itemColor(item),
       qty: item.qty ?? 1,
       potion: isPotionId(item.baseId),
-      rarity: item.rarity,
+      rarity: pickupRarity(item),
     });
   } else {
     w.ground.push({ id: w.nextGround++, x, y, item, expires: w.time + GROUND_SECONDS });
     w.emit({ type: 'bagFull' });
   }
 }
+
+/** Raridade mostrada ao pegar: material raro/especial aparece no aviso de itens como os equipamentos raros. */
+const pickupRarity = (it: ItemInstance): Rarity => {
+  const m = MATERIALS[it.baseId];
+  return m ? (m.tier === 'comum' ? 'comum' : 'raro') : it.rarity;
+};
 
 export function tickGround(w: World) {
   if (!w.ground.length) return;
@@ -155,7 +163,7 @@ export function tickGround(w: World) {
         color: itemColor(it),
         qty: it.qty ?? 1,
         potion: isPotionId(it.baseId),
-        rarity: it.rarity,
+        rarity: pickupRarity(it),
       });
     }
   }
@@ -181,6 +189,12 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
     const s = spot();
     w.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
     collect(w, makePotion(pd.id, 1), s.x, s.y);
+  }
+  for (const md of L.materials ?? []) {
+    if (w.rng.next() >= md.chance) continue;
+    const s = spot();
+    w.emit({ type: 'drop', x: s.x, y: s.y, color: MATERIALS[md.id]?.color ?? '#fff' });
+    collect(w, makePotion(md.id, w.rng.int(md.min ?? 1, md.max ?? md.min ?? 1)), s.x, s.y);
   }
   const sectOk = (id: string) => !BASES[id].sect || BASES[id].sect === w.classId;
   const give = (id: string, rarity: Rarity, ilvl = m.level) => {

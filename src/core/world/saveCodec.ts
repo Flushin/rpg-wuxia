@@ -7,6 +7,7 @@ import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
+import { restoreMerchant, serializeMerchant } from './merchant';
 
 export function serialize(w: World): SaveData {
   return {
@@ -30,9 +31,11 @@ export function serialize(w: World): SaveData {
       JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => w.equipment[sl]).map((sl) => [sl, w.equipment[sl]]))),
     ),
     auto: w.auto.serialize(),
-    bossRespawnAt: w.bossRespawnAtMs > w.clock() ? w.bossRespawnAtMs : undefined,
+    bossRespawnAt: (w.bossRespawn.general_terracota ?? 0) > w.clock() ? w.bossRespawn.general_terracota : undefined,
+    bossRespawns: Object.fromEntries(Object.entries(w.bossRespawn).filter(([, t]) => t > w.clock())),
     respawns: Object.fromEntries(Object.entries(w.respawnAtMs).filter(([, t]) => t > w.clock())),
     quest: { ...w.quest },
+    merchant: serializeMerchant(w),
   };
 }
 
@@ -62,11 +65,15 @@ export function restore(w: World, s: SaveData, now: number) {
   w.recalc(w.player, false);
   w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
   w.clock = () => now;
-  w.bossRespawnAtMs = Number.isFinite(Number(s.bossRespawnAt)) ? Math.max(0, Number(s.bossRespawnAt)) : 0;
+  w.bossRespawn = {};
+  if (Number(s.bossRespawnAt) > 0) w.bossRespawn.general_terracota = Number(s.bossRespawnAt); // save antigo
+  for (const [k, v] of Object.entries(s.bossRespawns ?? {}))
+    if (typeof k === 'string' && Number(v) > 0) w.bossRespawn[k] = Number(v);
   for (const [k, v] of Object.entries(s.respawns ?? {}))
     if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
   w.changeMap(w.maps[s.mapId] ? s.mapId : HOME_MAP);
   w.clock = () => Date.now();
   w.auto.load(s.auto);
   w.quest = sanitizeQuest(s.quest);
+  w.merchant = restoreMerchant(s.merchant);
 }

@@ -2,7 +2,7 @@ import questsJson from '../data/quests.json';
 import { localize } from './i18n';
 import { balanceQuests } from './balance';
 
-// Missões (marco 7): uma cadeia principal linear do nível 1 ao 10. Só abater, falar e ir até um mapa.
+// Missões (marco 7; 11–20 no marco 9): uma cadeia principal linear do nível 1 ao 20. Só abater, falar e ir até um mapa.
 // Os textos ficam em src/data/quests.json (PT) e na seção "quests" de en.json.
 
 export type QuestObjective =
@@ -17,7 +17,8 @@ export interface QuestDef {
   turnIn: string;
   minLevel: number;
   objective: QuestObjective;
-  reward: { xp: number; gold: number; item?: 'arma' | 'tronco' };
+  /** item: equipamento Incomum do slot, do nível itemLevel (padrão 5) e da seita do personagem */
+  reward: { xp: number; gold: number; item?: 'arma' | 'tronco'; itemLevel?: number };
   name: string;
   offer: string;
   goal: string;

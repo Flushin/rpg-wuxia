@@ -26,6 +26,8 @@ export interface ItemInstance {
   ilvl: number;
   durability: number;
   qty?: number;
+  /** melhoria do ferreiro (+1 a +10, marco 9); sem = +0 */
+  plus?: number;
 }
 export interface GroundItem {
   id: number;
@@ -99,6 +101,7 @@ export interface Entity {
   group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
   summoned: boolean;
   spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
+  levels?: [number, number]; // faixa de nível do ponto do mapa (marco 9); sem = a do monstro
   // NPCs
   npcId: string; // id em npcs.json / papel (ferreiro, vendedor, mestre_lamina, morador1...)
   wander: number; // raio em tiles para andar pela cidade (0 = parado)
@@ -156,10 +159,11 @@ export type GameEvent =
   | { type: 'npcClose' }
   | { type: 'trade'; kind: 'buy' | 'sell'; gold: number }
   | { type: 'repair'; gold: number }
+  | { type: 'forge'; kind: 'upgrade' | 'rarity' | 'reroll' | 'salvage'; success: boolean; plus: number; rarity: Rarity }
   | { type: 'durabilityLost' }
   | { type: 'autoState'; state: AutoState }
   | { type: 'autoStopped'; reason: 'broken' }
-  | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: 'arrow' }
+  | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: 'arrow' | 'ice' }
   | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number }
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }
@@ -244,9 +248,12 @@ export interface SaveData {
   bag?: (ItemInstance | null)[];
   equipment?: Partial<Record<Slot, ItemInstance>>;
   auto?: AutoSave;
-  bossRespawnAt?: number; // ms (relógio real) em que o chefe renasce
+  bossRespawnAt?: number; // ms (relógio real) em que o General renasce (saves antigos; desde o marco 9 = bossRespawns.general_terracota)
+  bossRespawns?: Record<string, number>; // id do chefe → ms (relógio real) em que renasce (marco 9)
   respawns?: Record<string, number>; // "mapa#índice" → ms (relógio real) em que o monstro comum renasce
   quest?: { stage: number; status: string; progress: number }; // cadeia principal de missões (marco 7)
+  /** estoque do Mercador Ambulante (marco 9): janela de renovação e ofertas (item, preço, vendido) */
+  merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
 /** Por que uma ação de inventário/loja/ferreiro não aconteceu. A interface traduz (src/ui/actionError.ts). */
@@ -257,4 +264,8 @@ export type ActionError =
   | { code: 'bagFull' }
   | { code: 'noGold' }
   | { code: 'talkToSeller' }
-  | { code: 'talkToBlacksmith' };
+  | { code: 'talkToBlacksmith' }
+  | { code: 'cannotForge' }
+  | { code: 'noMaterials' }
+  | { code: 'talkToMerchant' }
+  | { code: 'soldOut' };

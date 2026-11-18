@@ -27,14 +27,22 @@
       "title": "Mestre do Titã",
       "greeting": "Hm. A montanha também sabe esperar.",
       "intro": "No Titã, ficamos firmes na linha de frente, de cajado ou punhos, aguentando os golpes por todos. Somos a muralha que protege os companheiros. Nosso caminho é de resistência e força bruta.",
-      "tips": ["Pele de Ferro antes de puxar um grupo de bandidos: o escudo aguenta o primeiro ataque de todos.", "Punho Vulcânico atordoa o alvo; use no arqueiro ou no chefe na hora em que ele for atacar.", "Tremor deixa os inimigos lentos. Quem escolhe este caminho deve favorecer Força e Vigor."]
+      "tips": [
+        "Pele de Ferro antes de puxar um grupo de bandidos: o escudo aguenta o primeiro ataque de todos.",
+        "Punho Vulcânico atordoa o alvo; use no arqueiro ou no chefe na hora em que ele for atacar.",
+        "Tremor deixa os inimigos lentos. Quem escolhe este caminho deve favorecer Força e Vigor."
+      ]
     },
     "vibora": {
       "name": "Mestra Du",
       "title": "Mestra da Víbora",
       "greeting": "Quieta como a sombra, paciente como o veneno.",
       "intro": "Na Víbora, atacamos de longe com agulhas envenenadas. O veneno corrói o inimigo aos poucos, e nossas artes também curam aos poucos. Aqui vence quem tem paciência.",
-      "tips": ["Envenene primeiro: Sangue de Serpente faz suas agulhas baterem mais forte em quem já está envenenado.", "Névoa Tóxica envenena um grupo inteiro de uma vez e deixa todos lentos para você recuar.", "Seiva de Jade cura aos poucos; use antes de a vida ficar baixa. Favoreça Força e Agilidade."]
+      "tips": [
+        "Envenene primeiro: Sangue de Serpente faz suas agulhas baterem mais forte em quem já está envenenado.",
+        "Névoa Tóxica envenena um grupo inteiro de uma vez e deixa todos lentos para você recuar.",
+        "Seiva de Jade cura aos poucos; use antes de a vida ficar baixa. Favoreça Força e Agilidade."
+      ]
     }
   },
   "npcs": {
@@ -61,10 +69,10 @@
     "mercador": {
       "name": "Mercador Ambulante",
       "lines": [
-        "Ah, viajante! Percorri mil estradas, mas minhas carroças ainda estão vazias por enquanto.",
-        "Não tenho nada à venda hoje. Espero mercadorias raras de terras distantes, e dizem que a espera vale a pena.",
-        "Seda do sul, especiarias do deserto, relíquias de mosteiros esquecidos... tudo isso pode chegar um dia.",
-        "Volte mais tarde, amigo. Quem sabe eu tenha algo digno de um guerreiro como você."
+        "Ah, viajante! Minhas carroças finalmente chegaram: relíquias de mosteiros esquecidos e armas de terras distantes. Dê uma olhada!",
+        "Meu estoque muda a cada hora: o que não for vendido segue viagem com a próxima caravana.",
+        "Cristais de gelo eterno vêm das montanhas do norte. Caros, eu sei, mas o ferreiro sabe o que fazer com eles.",
+        "Um pergaminho de retorno leva você de volta à vila num piscar de olhos. Nunca saia sem um."
       ]
     },
     "morador1": {

@@ -151,6 +151,123 @@
    "offer": "O General de Terracota comanda tudo do fundo das ruínas. Enquanto ele estiver de pé, a vila não terá paz. Derrote-o. Saia do círculo vermelho quando ele erguer a lâmina.",
    "goal": "Derrote o General de Terracota",
    "done": "O General caiu! A Vila das Nuvens vai lembrar do seu nome por gerações. Este ouro é pouco perto do que você fez."
+  },
+  {
+   "id": "trilha_norte",
+   "giver": "anciao",
+   "turnIn": "anciao",
+   "minLevel": 10,
+   "objective": {
+    "type": "reach",
+    "map": "montanha"
+   },
+   "reward": {
+    "xp": 6000,
+    "gold": 400
+   },
+   "name": "A trilha do norte",
+   "offer": "Agora que o General caiu, o portão norte da vila se abriu para você. Lá em cima fica a Montanha Nevada e, no topo, um templo que ninguém visita há décadas. Suba até lá e veja com os próprios olhos.",
+   "goal": "Chegue à Montanha Nevada",
+   "done": "Neve que nunca derrete e um silêncio pesado... Os monges daquele templo eram nossos amigos. Algo muito errado aconteceu lá em cima."
+  },
+  {
+   "id": "espectros",
+   "giver": "guarda",
+   "turnIn": "guarda",
+   "minLevel": 11,
+   "objective": {
+    "type": "kill",
+    "monster": "espectro_gelo",
+    "count": 10
+   },
+   "reward": {
+    "xp": 10000,
+    "gold": 500
+   },
+   "name": "Vultos na neve",
+   "offer": "Os viajantes que descem da montanha falam de vultos gelados que atiram estilhaços e congelam as pernas de quem foge. Derrote 10 Espectros de Gelo. Ataque de perto ou eles vão deixá-lo lento.",
+   "goal": "Derrote espectros de gelo",
+   "done": "Dez a menos. Os mercadores já falam em voltar a usar a trilha do norte. Obrigado, guerreiro."
+  },
+  {
+   "id": "fera_branca",
+   "giver": "mestre",
+   "turnIn": "mestre",
+   "minLevel": 13,
+   "objective": {
+    "type": "kill",
+    "monster": "yeti",
+    "count": 6
+   },
+   "reward": {
+    "xp": 16000,
+    "gold": 700,
+    "item": "arma",
+    "itemLevel": 10
+   },
+   "name": "A fera branca",
+   "offer": "Os yetis são lentos, mas um golpe deles derruba uma árvore. Quando a fera erguer os braços, um círculo vai marcar o chão: saia dele antes do impacto. Derrote 6 yetis e volte.",
+   "goal": "Derrote yetis",
+   "done": "Você aprendeu a ler a fera. Leve esta arma: foi forjada para quem caminha na neve."
+  },
+  {
+   "id": "cristais_perdidos",
+   "giver": "mercador",
+   "turnIn": "mercador",
+   "minLevel": 14,
+   "objective": {
+    "type": "kill",
+    "monster": "espectro_gelo",
+    "count": 12
+   },
+   "reward": {
+    "xp": 22000,
+    "gold": 900
+   },
+   "name": "Cristais perdidos",
+   "offer": "Minha caravana de cristais de gelo foi atacada na encosta alta. Os espectros guardam os cristais como se fossem deles! Derrote 12 espectros e talvez eu consiga recuperar parte da carga.",
+   "goal": "Derrote espectros de gelo",
+   "done": "Recuperei metade dos cristais! Não é tudo, mas o ferreiro vai ficar feliz. Aceite este ouro."
+  },
+  {
+   "id": "guardioes_templo",
+   "giver": "mestre",
+   "turnIn": "mestre",
+   "minLevel": 16,
+   "objective": {
+    "type": "kill",
+    "monster": "yeti",
+    "count": 10
+   },
+   "reward": {
+    "xp": 32000,
+    "gold": 1200,
+    "item": "tronco",
+    "itemLevel": 15
+   },
+   "name": "Guardiões do templo",
+   "offer": "Os yetis da encosta alta não estão caçando: estão guardando o caminho do templo. Alguém os mandou lá. Derrote 10 deles e abra a passagem.",
+   "goal": "Derrote yetis",
+   "done": "O caminho está aberto. Vista esta armadura: o que espera no templo é pior do que qualquer fera."
+  },
+  {
+   "id": "abade_caido",
+   "giver": "anciao",
+   "turnIn": "anciao",
+   "minLevel": 18,
+   "objective": {
+    "type": "kill",
+    "monster": "abade_caido",
+    "count": 1
+   },
+   "reward": {
+    "xp": 50000,
+    "gold": 3000
+   },
+   "name": "O Abade Caído",
+   "offer": "Agora eu sei a verdade. O abade do templo buscou um poder proibido e se perdeu nele. Seus discípulos o seguiram na queda. Suba até o pátio do templo e liberte-o. Cuidado: com metade da vida ele vai chamar os discípulos.",
+   "goal": "Derrote o Abade Caído",
+   "done": "O sino do templo tocou de novo depois de tantos anos... A montanha está em paz, e a vila também. Você se tornou uma lenda, guerreiro."
   }
  ]
 }
