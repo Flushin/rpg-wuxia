@@ -18,13 +18,9 @@ import {
 import {
   BAG_SIZE,
   BASES,
-  POTIONS,
   SLOTS,
   STARTING_KIT,
   STARTING_WEAPON,
-  isPotionId,
-  itemColor,
-  itemName,
   makeEquipment,
   makePotion,
   maxDurability,
@@ -32,8 +28,8 @@ import {
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
-import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import * as offlineApply from './world/offlineApply';
 import * as npcs from './world/npcs';
 import * as boss from './world/boss';
 import * as quests from './world/quests';
@@ -150,7 +146,7 @@ export class World {
   npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   private constructor(
-    private maps: Record<string, GameMap>,
+    readonly maps: Record<string, GameMap>,
     name: string,
     classId: string,
     level: number,
@@ -1116,77 +1112,9 @@ export class World {
     return shop.repairAll(this);
   }
 
-  // ---------- ganho offline ----------
-  private applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
-    if (!saved?.active || !saved.mapId || TOWN_MAPS.has(saved.mapId) || !this.maps[saved.mapId]) return null;
-    const rate = this.auto.rate();
-    if (!rate) return null;
-    const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0
-    const res: OfflineResult = computeOffline({
-      elapsedMs,
-      rate,
-      level: this.player.level,
-      xp: this.xp,
-      potions: { hp: this.kindCount('hp'), mp: this.kindCount('mp') },
-      seed: (now ^ Math.floor(this.xp * 7919)) >>> 0,
-    });
-    if (res.kills < 1) return null;
-    const lvl0 = this.player.level;
-    this.gold += res.gold;
-    this.gainXp(res.xp);
-    const items: OfflineReport['items'] = [];
-    let soldCount = 0,
-      soldGold = 0;
-    const sell = (it: ItemInstance) => {
-      soldCount += it.qty ?? 1;
-      soldGold += this.sellValueNow(it);
-    };
-    for (const d of res.drops) {
-      const isPot = isPotionId(d.baseId);
-      for (let i = 0; i < (isPot ? 1 : d.qty); i++) {
-        const it = isPot
-          ? makePotion(d.baseId, d.qty)
-          : makeEquipment(d.baseId, d.rarity, CLASSES[this.classId].element, this.rng, rate.monLevel);
-        let placed = this.addItem(it);
-        if (!placed) {
-          this.auto.makeRoom();
-          placed = this.addItem(it);
-        }
-        if (!placed) {
-          sell(it);
-          continue;
-        }
-        const e = items.find((x) => x.name === itemName(it) && x.rarity === it.rarity);
-        if (e) e.qty += it.qty ?? 1;
-        else items.push({ name: itemName(it), color: itemColor(it), rarity: it.rarity, qty: it.qty ?? 1 });
-      }
-    }
-    const used: Record<PotionKind, number> = { hp: 0, mp: 0 };
-    for (const k of ['hp', 'mp'] as PotionKind[]) {
-      for (let n = res.potionsUsed[k]; n > 0; n--) {
-        const i = this.bag.findIndex((b) => b && POTIONS[b.baseId]?.kind === k);
-        if (i < 0) break;
-        this.removeFromBag(i);
-        used[k]++;
-      }
-    }
-    this.player.hp = this.player.derived.maxHp;
-    this.player.mana = this.player.derived.maxMana;
-    this.events.length = 0; // sem toasts de nível/skill atrás do resumo
-    return {
-      elapsedMs,
-      effMin: res.effMin,
-      efficiency: res.efficiency,
-      kills: res.kills,
-      xp: res.xp,
-      levelsGained: this.player.level - lvl0,
-      newLevel: this.player.level,
-      gold: res.gold,
-      items,
-      potionsUsed: used,
-      soldCount,
-      soldGold,
-    };
+  // ---------- offlineApply: src/core/world/offlineApply.ts ----------
+  applyOffline(now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
+    return offlineApply.applyOffline(this, now, lastSeen, saved);
   }
 
   // ---------- mapa / entidades ----------
