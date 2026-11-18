@@ -329,6 +329,10 @@ for (const classId of Object.keys(CLASSES)) {
     'skill sobe de nível com 20 usos (xp 20)',
   );
   ok(skillXpToNext(2) === 30 && skillXpToNext(9) === Math.round(20 * 1.5 ** 8), 'curva de xp');
+  ok(
+    skillXpToNext(10) === Math.round(20 * 1.5 ** 8 * 1.4) && skillXpToNext(14) === Math.round(20 * 1.5 ** 8 * 1.4 ** 5),
+    'curva de xp 10–15 (×1,4 por nível)',
+  );
   ok(Math.abs(skillScale(10) - 1.72) < 1e-9, 'nv 10 = +72% de efeito');
   // persistência
   const save = w.serialize();

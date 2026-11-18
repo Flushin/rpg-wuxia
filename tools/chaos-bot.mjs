@@ -37,7 +37,7 @@ function parseArgs(argv) {
   const o = {
     url: 'http://localhost:5173/',
     minutos: 60, // 0 = sem fim (até Ctrl+C)
-    semente: (Date.now() % 1_000_000_000) >>> 0,
+    semente: Date.now() % 1_000_000_000 >>> 0,
     janela: false, // true = mostra o navegador
     saida: join(ROOT, 'chaos-reports'),
     sessaoMin: 15, // a cada N minutos, fecha tudo e começa do zero com outro aparelho
@@ -490,7 +490,7 @@ function checarRegras(cfg) {
 
   // habilidades, poções, missão
   for (const [id, s] of Object.entries(w.skills)) {
-    if (!Number.isInteger(s.level) || s.level < 1 || s.level > 10)
+    if (!Number.isInteger(s.level) || s.level < 1 || s.level > 15)
       bad(`sk.lv`, `habilidade ${id} com nível ${s.level}`, true);
     if (!fin(s.cd) || s.cd < -0.001) bad('sk.cd', `habilidade ${id} com recarga ${s.cd}`, true);
     if (!fin(s.xp) || s.xp < 0) bad('sk.xp', `habilidade ${id} com xp ${s.xp}`, true);
