@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { parseTiledMap, type GameMap } from '../core/map';
 import { makeTextures } from '../render/textures';
-import { createSpriteAnims, preloadSprites } from '../render/sprites';
+import { preloadSprites } from '../render/sprites';
 import { sfxFiles } from '../render/audio';
 import { loadAll } from '../save';
 import { showLoadError } from '../ui/create';
@@ -23,7 +23,6 @@ export class BootScene extends Phaser.Scene {
   }
   create() {
     makeTextures(this);
-    createSpriteAnims(this);
     const maps: Record<string, GameMap> = {};
     for (const id of MAP_IDS) maps[id] = parseTiledMap(id, this.cache.json.get('map-' + id));
     this.registry.set('maps', maps);

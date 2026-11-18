@@ -173,6 +173,12 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **D5 (18/11/2026):** **ganho offline ao voltar do segundo plano** (P3): se o jogo ficou fora da tela 5 min ou mais
   (`RESUME_OFFLINE_MIN_MS` em `core/offline.ts`) com o auto ligado, aplica o mesmo cálculo de quando o jogo abre
   (`World.applyResumeOffline`) e mostra o resumo; o auto espera o resumo ser fechado. Vale no app e na web (aba escondida).
+- **D6 (18/11/2026):** memória. As folhas de personagens e monstros (as imagens mais pesadas) são carregadas **por
+  mapa** (`src/render/sheetLoader.ts`): ficam só a seita do jogador e quem aparece no mapa (monstros, invocação do
+  chefe, NPCs); as do mapa anterior são liberadas. Na troca de mapa o jogo espera as folhas chegarem (fração de
+  segundo; nada anda nesse meio-tempo). Medido no navegador: folhas na memória de ~81 MB (todas) para 27–33 MB por
+  mapa. Cenários, pisos e ícones continuam carregados no início. No APK vão só os sons `.ogg` (−1,8 MB;
+  `tools/android-trim-audio.mjs`).
 - **D7 (18/11/2026):** ícone e tela de abertura do app gerados de `assets/` (`tools/icons/make_app_icons.py` →
   `@capacitor/assets`). Versão do app lida do `package.json`: `versionCode = MAJOR*10000 + MINOR*100 + PATCH`
   (`tools/android-version.mjs`). **Regra:** subir a `version` do `package.json` antes de cada envio à loja.

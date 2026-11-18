@@ -18,6 +18,8 @@ import { itemColor } from '../core/items';
 import { DPR, TEXT_RES, cssSize } from '../render/display';
 import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
+import { sheetsForMap, syncSheets } from '../render/sheetLoader';
+import { queueSheet, sheetTexture } from '../render/sprites';
 import { PREF, getPref, setPref } from '../platform/prefs';
 import { exitApp, onBackButton } from '../platform/backButton';
 import { askExit, closeTopWindow } from '../ui/backAction';
@@ -58,12 +60,18 @@ export class GameScene extends Phaser.Scene {
   private teleViews = new Map<number, Phaser.GameObjects.Graphics>();
   private userZoom = loadZoom();
   private pinch: { d: number; z: number } | null = null;
+  private mapLoading = false;
 
   constructor() {
     super('Game');
   }
   init(data: { world: World }) {
     this.world = data.world;
+  }
+
+  // folhas de personagens do primeiro mapa (as dos outros mapas são carregadas na troca: ver onMapChange)
+  preload() {
+    for (const k of sheetsForMap(this.world)) if (!this.textures.exists(sheetTexture(k))) queueSheet(this, k);
   }
 
   create() {
@@ -109,7 +117,7 @@ export class GameScene extends Phaser.Scene {
     if (rep) this.hud.showOffline(rep, () => this.world.auto.resume());
     else this.world.auto.resume();
     this.cameras.main.setBackgroundColor('#10141c');
-    this.rebuildMap();
+    syncSheets(this, this.world, () => this.rebuildMap());
     this.applyZoom();
     const onResize = () => this.applyZoom();
     this.scale.on('resize', onResize);
@@ -190,6 +198,15 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.setUserZoom(this.pinch.z * (d / this.pinch.d));
+  }
+
+  /** Troca de mapa: o jogo espera as folhas do novo mapa carregarem (fração de segundo) e redesenha. */
+  private onMapChange() {
+    this.mapLoading = true;
+    syncSheets(this, this.world, () => {
+      this.mapLoading = false;
+      this.rebuildMap();
+    });
   }
 
   private rebuildMap() {
@@ -307,11 +324,13 @@ export class GameScene extends Phaser.Scene {
 
   update(_t: number, delta: number) {
     perf.tick(delta, this.children.length);
+    if (this.mapLoading) return; // nada anda nem é desenhado até as folhas do novo mapa chegarem
     const w = this.world;
     this.updatePinch();
     w.advance(delta / 1000);
     const evs = w.events.splice(0);
     for (const ev of evs) this.handle(ev);
+    if (this.mapLoading) return; // trocou de mapa neste quadro e as folhas ainda estão chegando
 
     const live = new Set<number>([w.player.id]);
     const tgt = w.monsters.find((m) => m.id === w.targetId && !m.dead);
@@ -441,7 +460,7 @@ export class GameScene extends Phaser.Scene {
   private handle(ev: GameEvent) {
     this.tips.onEvent(ev);
     audio.onEvent(ev, this.world.player.id);
-    if (ev.type === 'mapChange') this.rebuildMap();
+    if (ev.type === 'mapChange') this.onMapChange();
     else this.feedback.handle(ev);
   }
 }
