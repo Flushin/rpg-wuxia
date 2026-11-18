@@ -3,6 +3,7 @@ import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
 import npcsJson from '../data/npcs.json';
 import { localize } from './i18n';
+import { balanceClasses, balanceMonsters, balanceProgression } from './balance';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
 
 export interface ClassDef {
@@ -74,6 +75,10 @@ export interface Progression {
 export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;
 export const MONSTERS = localize('monsters', monstersJson) as unknown as Record<string, MonsterDef>;
 export const PROGRESSION = progressionJson as Progression;
+// multiplicadores de src/data/balance.json (ver src/core/balance.ts)
+balanceClasses(CLASSES);
+balanceMonsters(MONSTERS);
+balanceProgression(PROGRESSION);
 
 // Falas dos NPCs da cidade e dos mestres das seitas (também usadas na criação de personagem)
 export interface MasterText {

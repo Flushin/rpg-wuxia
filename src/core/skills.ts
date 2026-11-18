@@ -1,5 +1,6 @@
 import skillsJson from '../data/skills.json';
 import { localize } from './i18n';
+import { bal, balanceSkills } from './balance';
 import type { BuffKind } from './types';
 
 export interface SkillDef {
@@ -46,6 +47,7 @@ export interface SkillState {
 }
 
 export const SKILLS = localize('skills', skillsJson) as unknown as Record<string, SkillDef[]>;
+balanceSkills(SKILLS); // multiplicadores de src/data/balance.json
 const BY_ID = new Map(
   Object.values(SKILLS)
     .flat()
@@ -57,8 +59,10 @@ export const SKILL_MAX_LEVEL = 10;
 export const GLOBAL_COOLDOWN = 0.5;
 export const LEVEL_BONUS = 0.08;
 
-export const skillScale = (level: number) => 1 + LEVEL_BONUS * (Math.max(1, level) - 1);
-export const skillXpToNext = (level: number) => Math.round(20 * Math.pow(1.5, level - 1));
+export const skillScale = (level: number) => 1 + LEVEL_BONUS * bal('skills.bonus_por_nivel') * (Math.max(1, level) - 1);
+/** XP de uso para a skill subir; "xp.skills" +10% = cada uso vale 10% a mais (o requisito cai na mesma proporção). */
+export const skillXpToNext = (level: number) =>
+  Math.max(1, Math.round((20 * Math.pow(1.5, level - 1)) / bal('xp.skills')));
 export const classActives = (classId: string) => (SKILLS[classId] ?? []).filter((s) => s.type === 'active');
 export const initials = (name: string) =>
   name

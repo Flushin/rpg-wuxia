@@ -48,7 +48,7 @@
 - **Marco 9: pós-nível-10.** Nível máximo 20, mapa novo com 2–3 monstros e 1 chefe, novas bases de equipamento. **Sistemas escolhidos: craft** (fabricar/melhorar itens com materiais de monstros) e **mercador ambulante vendendo itens raros**. Gemas e baú/ouro compartilhado ficaram de fora por enquanto. Fase 0 (decisões) feita em 18/11/2026 — ver "Pós-nível-10 (marco 9)" abaixo.
 - **Marco 10: online.** Save na nuvem com conta e, depois, multiplayer.
 - **Publicação na Play Store: depois de todos os marcos** (decidido pelo Lucas em 18/11/2026: primeiro a jogabilidade). O que falta está em "Pendências das auditorias (18/11/2026)".
-- **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os 7 `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
+- **Contínuo (feito em 17/11/2026, auditoria A1):** `npm test` (os `check:*`) e `typecheck` rodam no GitHub Actions em todo PR e antes de cada publicação; se falhar, o site não é atualizado. O `check:layout` e o `sim:balance` continuam manuais.
 
 
 ## Decididas
@@ -121,7 +121,7 @@ Decidido pelo Lucas em 17/11/2026, a partir do `AUDITORIA.md` (relatório e plan
 - **Report de bug no app:** continua pelo Web3Forms, declarado na política de privacidade e no Data Safety. Confirmado pelo Lucas em 18/11/2026 (a auditoria de direitos dizia que seria substituído; vale esta decisão).
 
 **Fase A feita (17/11/2026, sem mudar regras do jogo):**
-- **A1:** testes no GitHub Actions (ver "Contínuo" no roteiro); `esbuild` declarado no `package.json`; `npm test` roda os 7 checks.
+- **A1:** testes no GitHub Actions (ver "Contínuo" no roteiro); `esbuild` declarado no `package.json`; `npm test` roda os checks (8 desde o módulo de balanceamento).
 - **A2:** simulador determinístico — o relógio dos renascimentos acompanha o tempo simulado e a luta do chefe usa a semente
   desde o começo. A medição mudou (Tormenta ~61 min, Geada ~43 min; Tormenta vence o chefe com Incomum 10/10): antes os
   monstros pareciam renascer mais devagar do que no jogo ao trocar de mapa. Detalhes em `docs/balanceamento.md`.
@@ -559,6 +559,7 @@ Decidido pelo Lucas em 16/11/2026.
 ### Balanceamento
 - **Ritmo:** ~1 hora de jogo ativo para chegar ao nível 10.
 - **Resultado da simulação:** Tormenta ~69 min (~3 mortes), Geada ~50 min (~7 mortes). Chefe: Tormenta vence 40% (Incomum) / 75% (Raro); Geada vence sempre recuando. Aceito por enquanto; ajustar depois de jogar. Detalhes em `docs/balanceamento.md`. Lobos ficaram mais fracos e com mais ouro.
+- **Módulo de balanceamento (18/11/2026):** ajustes de número passam por `npm run balance -- <chave> +10%`, que grava multiplicadores em `src/data/balance.json` (com histórico) sem mexer nos outros JSON. `src/core/balance.ts` aplica ao carregar; tudo em 0% = jogo igual (simulador idêntico). Lista de chaves e uso em `docs/balanceamento.md`.
 
 ### Escopo da primeira versão jogável
 - 1 cidade com NPCs — funcionais: **ferreiro** (conserto) e **vendedor de poções**; os demais sem função (mestres das 4 seitas, guarda do portão, ancião, moradores e mercador ambulante — só falas). No Marco 7, parte deles passa a dar as missões da cadeia principal.

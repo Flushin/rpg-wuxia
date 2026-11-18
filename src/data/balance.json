@@ -1,0 +1,9 @@
+{
+  "_doc": [
+    "Multiplicadores de balanceamento. 1 = valor original dos outros JSON; 1.1 = +10%; 0.8 = -20%.",
+    "Não edite à mão: use npm run balance (lista tudo) e npm run balance -- <chave> +10% (veja docs/balanceamento.md).",
+    "Chave com id vale só para aquele monstro/skill/seita/poção/missão/nível (ex.: xp.monstros.lobo) e multiplica a global."
+  ],
+  "multiplicadores": {},
+  "historico": []
+}

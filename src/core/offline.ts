@@ -1,6 +1,7 @@
 import { PROGRESSION } from './data';
 import { POTIONS } from './items';
 import { Rng } from './rng';
+import { balanceOffline } from './balance';
 import type { AutoRate, PotionKind, Rarity } from './types';
 
 // Eficiência por faixa de tempo fora: 60% até 12 h, 40% de 12 a 18 h, 20% de 18 a 24 h, 0 depois.
@@ -9,6 +10,7 @@ export const OFFLINE_TIERS: { untilH: number; eff: number }[] = [
   { untilH: 18, eff: 0.4 },
   { untilH: 24, eff: 0.2 },
 ];
+balanceOffline(OFFLINE_TIERS); // multiplicadores de src/data/balance.json
 export const MAX_OFFLINE_DROPS = 2000;
 /** Ao voltar do segundo plano (app minimizado, aba escondida): ganho offline só se ficou fora pelo menos isto (P3). */
 export const RESUME_OFFLINE_MIN_MS = 5 * 60_000;

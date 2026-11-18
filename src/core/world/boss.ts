@@ -1,6 +1,7 @@
 // Chefe (General de Terracota): golpes marcados no chão, invocação e arena.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { MONSTERS, type MonsterDef } from '../data';
+import { bal } from '../balance';
 import { isWalkable } from '../pathfinding';
 import { type Entity, type Point, type Telegraph } from '../types';
 import type { World } from '../world';
@@ -77,7 +78,7 @@ export function directDamage(w: World, a: Entity, t: Entity, mult: number) {
   const physical = a.damageType === 'physical';
   const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
     df = physical ? t.derived.physDef : t.derived.spiritDef;
-  const amount = Math.max(1, Math.round(atk * mult * (1 - df / (df + 100))));
+  const amount = Math.max(1, Math.round(atk * mult * bal('dano.monstros', a.monsterId) * (1 - df / (df + 100))));
   const dealt = w.absorb(t, amount);
   t.hp -= dealt;
   if (dealt > 0)

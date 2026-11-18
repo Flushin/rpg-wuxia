@@ -1,5 +1,6 @@
 import itemsJson from '../data/items.json';
 import { L, localize } from './i18n';
+import { balanceItems } from './balance';
 import type { Rng } from './rng';
 import type { Bonus, ItemInstance, PotionKind, Rarity, Slot } from './types';
 
@@ -50,6 +51,7 @@ const J = localize('items', itemsJson) as unknown as {
   bases: Record<string, ItemBase>;
   potions: Record<string, PotionDef>;
 };
+balanceItems(J); // multiplicadores de src/data/balance.json
 export const SLOTS = J.slots,
   SLOT_NAMES = J.slotNames,
   BAG_SIZE = J.bagSize,
