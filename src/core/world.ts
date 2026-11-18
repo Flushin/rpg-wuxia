@@ -34,6 +34,7 @@ import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS } from './mapsConfig';
 import { computeOffline, type OfflineResult } from './offline';
 import { Rng } from './rng';
+import * as boss from './world/boss';
 import * as quests from './world/quests';
 import * as shop from './world/shop';
 import { dist } from './world/geometry';
@@ -130,9 +131,9 @@ export class World {
   respawnAtMs: Record<string, number> = {};
   clock: () => number = () => Date.now();
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
-  private bossSummoned = false;
+  bossSummoned = false;
   private arenaSeen = false;
-  private nextTelegraph = 1;
+  nextTelegraph = 1;
   private npcGoal: number | null = null;
   nextGround = 1;
   private pendingSkill: number | null = null;
@@ -141,7 +142,7 @@ export class World {
   private moveInput: Point = { x: 0, y: 0 };
   private respawnTimer = 0;
   private portalCd = 0;
-  private lastDamaged = -99;
+  lastDamaged = -99;
   private acc = 0;
   private nextId = 2;
   rng = new Rng((Date.now() & 0xffffffff) >>> 0);
@@ -421,7 +422,7 @@ export class World {
     const k = Math.max(0, 1 - red);
     return { ...t, derived: { ...t.derived, physDef: t.derived.physDef * k, spiritDef: t.derived.spiritDef * k } };
   }
-  private absorb(e: Entity, amount: number): number {
+  absorb(e: Entity, amount: number): number {
     let rem = amount;
     for (const b of e.buffs) {
       if (b.kind !== 'shield' || rem <= 0) continue;
@@ -829,90 +830,20 @@ export class World {
     }
   }
 
-  // ---------- chefe ----------
-  private tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
-    const b = def.boss!,
-      p = this.player;
-    if (m.ai === 'chase') {
-      m.aiTimer -= dt;
-      if (m.aiTimer <= 0 && !p.dead) {
-        m.aiTimer = m.hp <= m.derived.maxHp * b.summon.atHpPct ? b.aoe.intervalPhase2 : b.aoe.interval;
-        const t: Telegraph = {
-          id: this.nextTelegraph++,
-          x: p.x,
-          y: p.y,
-          radius: b.aoe.radius,
-          delay: b.aoe.delay,
-          remaining: b.aoe.delay,
-          ownerId: m.id,
-          mult: b.aoe.mult,
-        };
-        this.telegraphs.push(t);
-        this.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
-      }
-      if (!this.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) this.summonAdds(m, b.summon);
-    }
+  // ---------- boss: src/core/world/boss.ts ----------
+  tickBossExtras(m: Entity, def: MonsterDef, dt: number) {
+    return boss.tickBossExtras(this, m, def, dt);
   }
-  private summonAdds(boss: Entity, sm: { monsterId: string; count: number; level: number }) {
-    this.bossSummoned = true;
-    const sdef = MONSTERS[sm.monsterId],
-      ids: number[] = [];
-    for (let i = 0; i < sm.count; i++) {
-      const a = (i / sm.count) * Math.PI * 2 + 0.7;
-      let pos: Point = { x: boss.x + Math.cos(a) * 2.2, y: boss.y + Math.sin(a) * 2.2 };
-      if (!isWalkable(this.map, pos.x, pos.y)) pos = { x: boss.x, y: boss.y };
-      const e = this.makeMonster(sdef, pos);
-      this.applyMonsterLevel(e, sdef, sm.level);
-      e.home = { ...boss.home };
-      e.summoned = true;
-      e.ai = 'chase';
-      e.respawnAt = Infinity;
-      this.monsters.push(e);
-      ids.push(e.id);
-    }
-    this.emit({ type: 'bossSummon', ids });
+  resetBoss(m: Entity) {
+    return boss.resetBoss(this, m);
   }
-  private resetBoss(m: Entity) {
-    this.bossSummoned = false;
-    this.telegraphs = this.telegraphs.filter((t) => t.ownerId !== m.id);
-    this.monsters = this.monsters.filter((x) => !x.summoned);
-    m.aiTimer = 0;
+  tickTelegraphs(dt: number) {
+    return boss.tickTelegraphs(this, dt);
   }
-  private tickTelegraphs(dt: number) {
-    if (!this.telegraphs.length) return;
-    const p = this.player;
-    for (const t of [...this.telegraphs]) {
-      t.remaining -= dt;
-      if (t.remaining > 0) continue;
-      this.telegraphs = this.telegraphs.filter((x) => x !== t);
-      const owner = this.monsters.find((e) => e.id === t.ownerId);
-      const hit = !!owner && !owner.dead && !p.dead && dist(p, t) <= t.radius;
-      this.emit({ type: 'telegraphResolved', id: t.id, x: t.x, y: t.y, radius: t.radius, hit });
-      if (hit && owner) this.directDamage(owner, p, t.mult);
-    }
-  }
-  // dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa
-  private directDamage(a: Entity, t: Entity, mult: number) {
-    const physical = a.damageType === 'physical';
-    const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
-      df = physical ? t.derived.physDef : t.derived.spiritDef;
-    const amount = Math.max(1, Math.round(atk * mult * (1 - df / (df + 100))));
-    const dealt = this.absorb(t, amount);
-    t.hp -= dealt;
-    if (dealt > 0)
-      this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
-    this.lastDamaged = this.time;
-    this.wearGear();
-    if (t.hp <= 0) this.killPlayer();
-  }
-  // chefe engajado (para a barra grande no topo)
   engagedBoss(): Entity | null {
-    return (
-      this.monsters.find(
-        (m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && (m.ai === 'chase' || m.hp < m.derived.maxHp),
-      ) ?? null
-    );
+    return boss.engagedBoss(this);
   }
+
   // ---------- inventário: src/core/world/inventory.ts ----------
   wearGear() {
     return inventory.wearGear(this);
@@ -1056,7 +987,7 @@ export class World {
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
 
-  private killPlayer() {
+  killPlayer() {
     const p = this.player;
     p.dead = true;
     p.hp = 0;
@@ -1394,7 +1325,7 @@ export class World {
     return e;
   }
 
-  private applyMonsterLevel(e: Entity, def: MonsterDef, level: number) {
+  applyMonsterLevel(e: Entity, def: MonsterDef, level: number) {
     e.level = level;
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
@@ -1405,7 +1336,7 @@ export class World {
     e.hp = e.derived.maxHp;
   }
 
-  private makeMonster(def: MonsterDef, home: Point): Entity {
+  makeMonster(def: MonsterDef, home: Point): Entity {
     const e = this.blank('monster', def.name, 1);
     e.monsterId = def.id;
     e.home = { ...home };
