@@ -128,7 +128,9 @@
 #inv-panel,
 #npc-panel,
 #settings-panel,
-#auto-panel {
+#auto-panel,
+#dungeon-panel,
+#trial-panel {
   z-index: 5;
 }
 #offline-panel {
