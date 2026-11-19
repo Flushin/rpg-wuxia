@@ -94,7 +94,7 @@ export class AutoPanel {
     byId('auto-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
-      <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de ${pct(SHIELD_HP)} em combate (o auto guarda mana para ele).`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below ${pct(SHIELD_HP)} in combat (the auto saves mana for it).`)}</small>
+      <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai ao levar dano em combate (vida abaixo de ${pct(SHIELD_HP)}) ou com 2+ monstros atacando, e o auto guarda mana para ele.`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when you take damage in combat (health below ${pct(SHIELD_HP)}) or when 2+ monsters attack, and the auto saves mana for it.`)}</small>
       <h3>${L('Alvos', 'Targets')}</h3>
       ${sld(L('Nível máximo acima do seu', 'Max level above yours'), 'maxLevelAbove', 0, AUTO_MAX_LEVEL_LIMIT, c.maxLevelAbove, false, '+')}
       ${seg(L('Monstros fracos (2+ níveis abaixo)', 'Weak monsters (2+ levels below)'), 'grayMode', [

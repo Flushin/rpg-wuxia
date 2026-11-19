@@ -585,11 +585,29 @@ console.log('\n== skills de área e escudo ==');
   p.auto.toggle();
   run(p, 2);
   ok(!drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'), 'HP cheio: sem Véu de Névoa');
-  p.player.hp = p.player.derived.maxHp * 0.5;
+  p.player.hp = p.player.derived.maxHp * 0.85;
   run(p, 1);
   ok(
     drain(p).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'),
-    'HP < 70% com monstro em combate: Véu de Névoa',
+    'levou dano (HP < 90%) com monstro em combate: Véu de Névoa',
+  );
+  // 2+ monstros atacando: sai mesmo com a vida cheia
+  const q = mk('pavilhao', 20);
+  q.player.derived.maxMana = 9999;
+  q.player.mana = 9999;
+  for (const m of q.monsters.slice(0, 2)) {
+    m.ai = 'chase';
+    m.attackCd = 999;
+    m.moveSpeed = 0;
+    m.x = q.player.x + 4;
+    m.y = q.player.y;
+    m.hp = m.derived.maxHp = 99999;
+  }
+  q.auto.toggle();
+  run(q, 1);
+  ok(
+    drain(q).some((e) => e.type === 'skillCast' && e.skillId === 'escudo_nuvem'),
+    '2 monstros atacando, vida cheia: Véu de Névoa',
   );
 }
 

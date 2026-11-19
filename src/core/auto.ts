@@ -39,7 +39,8 @@ export const RATE_MIN_SEC = 120; // mínimo de dados para o ritmo valer
 export const BUCKET_SEC = 60,
   MAX_BUCKETS = 30;
 const SHOP_COOLDOWN = 120; // s entre viagens à vila (evita laço se a compra falhar)
-export const SHIELD_HP = 0.7; // Véu de Névoa / Pele de Ferro: usado com a vida abaixo de 70% em combate
+export const SHIELD_HP = 0.9; // Véu de Névoa / Pele de Ferro: usado ao levar dano em combate (vida abaixo de 90%)
+export const SHIELD_CROWD = 2; // ... ou já de cara com 2+ monstros atacando
 export const HEAL_HP = 0.6; // Seiva de Jade: usada com a vida abaixo de 60% em combate
 const REST_HP = 0.35,
   REST_DONE = 0.9,
@@ -710,7 +711,8 @@ export class AutoCombat {
     } else if (!w.autoAttack) w.setTarget(t.id);
     if (w.gcd > 0) return;
     const defs = w.activeSkills();
-    const aggroed = w.monsters.some((m) => !m.dead && m.ai === 'chase');
+    const chasers = w.monsters.filter((m) => !m.dead && m.ai === 'chase').length,
+      aggroed = chasers > 0;
     // reserva mana para o escudo/cura pronto: senão as skills de ataque gastam tudo e ele nunca sai na hora certa
     const reserve = defs
       .filter(
@@ -735,7 +737,8 @@ export class AutoCombat {
       )
         continue;
       if (def.shield) {
-        if (!(aggroed && p.hp < p.derived.maxHp * SHIELD_HP) || w.hasBuff(p, 'shield')) continue;
+        if (!(aggroed && (p.hp < p.derived.maxHp * SHIELD_HP || chasers >= SHIELD_CROWD)) || w.hasBuff(p, 'shield'))
+          continue;
       } else if (def.heal) {
         if (!(aggroed && p.hp < p.derived.maxHp * HEAL_HP) || w.hasBuff(p, 'regen')) continue;
       } else if (p.mana - (def.mana ?? 0) < reserve) continue;
