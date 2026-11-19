@@ -21,6 +21,11 @@ export const SHEETS: Record<string, string> = {
   yeti: 'yeti',
   'fallen-disciple': 'discipulo_caido',
   'fallen-abbot': 'abade_caido',
+  'shadow-assassin': 'assassino_sombras',
+  'jade-serpent': 'serpente_jade',
+  'spirit-crane': 'grou_espiritual',
+  'jade-guardian': 'guardiao_jade',
+  'mist-lord': 'senhor_nevoa',
 };
 /** Quadro parado virado em 3/4 (direção 1), que mostra melhor o monstro que o de frente. */
 export const monsterSprite = (m: Monster, cls = '') => spriteHtml(SHEETS[m.sprite] ?? m.id, cls, 'idle_1_0');
@@ -97,6 +102,10 @@ function behavior(m: Monster): string[] {
   out.push(`Percebe você a ${s1(m.aggroRange)} de distância.`);
   if (m.keepDistance) out.push('Recua para manter distância quando você se aproxima.');
   if (m.groupAggro) out.push('Anda em grupo: atacar um faz o grupo todo vir atrás de você.');
+  if (m.poisonRes)
+    out.push(
+      `<b>Resiste a veneno:</b> o veneno das skills e o dano de veneno rendem ${Math.round(m.poisonRes * 100)}% menos nele.`,
+    );
   if (m.onHit?.slow)
     out.push(
       `Cada acerto deixa você <b>${Math.round(m.onHit.slow * 100)}% mais lento</b> por ${s1(m.onHit.duration)} s.`,

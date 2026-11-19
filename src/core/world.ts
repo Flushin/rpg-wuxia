@@ -1,4 +1,4 @@
-import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
+import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, freePointsAt, type MonsterDef } from './data';
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
@@ -596,8 +596,13 @@ export class World {
     if (v.dead) return;
     if (def.debuff) this.addBuff(v, def.id, def.debuff.kind, def.debuff.value, def.debuff.duration);
     if (def.poison) {
+      const res = v.kind === 'monster' ? Math.min(0.9, MONSTERS[v.monsterId]?.poisonRes ?? 0) : 0;
       const total =
-        expectedDamage(this.player, this.defender(v)) * def.poison.percent * scale * bal('dano.jogador', this.classId);
+        expectedDamage(this.player, this.defender(v)) *
+        def.poison.percent *
+        scale *
+        bal('dano.jogador', this.classId) *
+        (1 - res);
       this.addBuff(v, def.id, 'poison', total / def.poison.duration, def.poison.duration);
     }
     if (def.stun) this.addBuff(v, def.id, 'stun', 0, def.stun);
@@ -1189,7 +1194,7 @@ export class World {
       p.level++;
       const up = CLASSES[this.classId].levelUpAttributes;
       for (const k of ATTR_KEYS) p.attrs[k] += up[k];
-      this.freePoints += PROGRESSION.freePointsPerLevel;
+      this.freePoints += freePointsAt(p.level);
       this.recalc(p, false);
       p.hp = p.derived.maxHp;
       p.mana = p.derived.maxMana;
@@ -1473,6 +1478,7 @@ export class World {
       e.derived.physDef *= def.defMul.phys;
       e.derived.spiritDef *= def.defMul.spirit;
     }
+    if (def.poisonRes) e.elemRes.poison = Math.round(100 * Math.min(0.9, def.poisonRes)); // dano elemental de veneno
     if (e.trial) {
       // chefe do Trial: vida, ataque e defesas do nível escolhido (src/core/trial.ts)
       const t = trialStats(def, level);

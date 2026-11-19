@@ -1,0 +1,132 @@
+{
+ "frames": {
+  "bambu_c": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 168,
+    "h": 318
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 168,
+    "h": 318
+   },
+   "sourceSize": {
+    "w": 168,
+    "h": 318
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9371
+   }
+  },
+  "bambu_a": {
+   "frame": {
+    "x": 170,
+    "y": 0,
+    "w": 148,
+    "h": 306
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 148,
+    "h": 306
+   },
+   "sourceSize": {
+    "w": 148,
+    "h": 306
+   },
+   "pivot": {
+    "x": 0.4662,
+    "y": 0.9608
+   }
+  },
+  "bambu_b": {
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 170,
+    "h": 248
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 170,
+    "h": 248
+   },
+   "sourceSize": {
+    "w": 170,
+    "h": 248
+   },
+   "pivot": {
+    "x": 0.4706,
+    "y": 0.9153
+   }
+  },
+  "brotos": {
+   "frame": {
+    "x": 492,
+    "y": 0,
+    "w": 35,
+    "h": 39
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 35,
+    "h": 39
+   },
+   "sourceSize": {
+    "w": 35,
+    "h": 39
+   },
+   "pivot": {
+    "x": 0.5143,
+    "y": 0.7949
+   }
+  },
+  "folhas": {
+   "frame": {
+    "x": 529,
+    "y": 0,
+    "w": 47,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 47,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 47,
+    "h": 24
+   },
+   "pivot": {
+    "x": 0.5745,
+    "y": 0.625
+   }
+  }
+ },
+ "meta": {
+  "image": "bambu.png",
+  "size": {
+   "w": 1024,
+   "h": 318
+  },
+  "scale": "0.5"
+ }
+}

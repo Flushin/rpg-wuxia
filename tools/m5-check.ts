@@ -1,7 +1,7 @@
 // Verificação headless do marco 5: monstros novos, chefe, vários personagens (não vai para o build do jogo).
 // Uso: npm run check:m5
 import { readFileSync } from 'node:fs';
-import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
+import { CLASSES, MONSTERS, PROGRESSION, freePointsAt, totalFreePoints } from '../src/core/data';
 import { rollAttack } from '../src/core/combat';
 import { BASES } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
@@ -616,6 +616,7 @@ console.log('\n== vários personagens: save ==');
   );
 }
 
+const NOW_MIG = 1_800_000_000_000;
 console.log('\n== versão do save e migrações (C8) ==');
 {
   const base = { name: 'V', classId: 'pavilhao', level: 2 };
@@ -638,6 +639,37 @@ console.log('\n== versão do save e migrações (C8) ==');
   ok(
     Object.keys(CHARACTER_MIGRATIONS).every((k) => Number(k) < CHARACTER_SAVE_VERSION),
     'toda migração leva a uma versão que existe',
+  );
+  // 1 → 2 (nível máximo 30): save no antigo nível máximo fica no 20 com a barra do 21 em 0%
+  const v1 = (level: number, xp: number): SaveData => ({
+    version: 1,
+    name: 'Teto',
+    classId: 'lamina',
+    level,
+    xp,
+    freePoints: 0,
+    attributes: { ...CLASSES.lamina.baseAttributes },
+    mapId: 'cidade',
+    lastSeen: NOW_MIG,
+    gold: 0,
+  });
+  const at20 = migrateCharacter(v1(20, 80000));
+  ok(at20.level === 20 && at20.xp === 0 && at20.version === 2, 'save v1 no nível 20: continua no 20 com XP 0');
+  ok(migrateCharacter(v1(15, 1234)).xp === 1234, 'save v1 abaixo do 20: XP mantida');
+  ok(migrateCharacter({ ...v1(20, 500), version: 2 }).xp === 500, 'save v2 no 20 não é mexido de novo');
+  const w20 = World.fromSave(maps, migrateCharacter(v1(20, 0)), NOW_MIG, false);
+  ok(
+    w20.player.level === 20 && w20.xp === 0 && w20.xpToNext() === PROGRESSION.xpToNext[19],
+    'nível 20 abre em 0% do 21',
+  );
+  w20.gainXp(PROGRESSION.xpToNext[19] - 1);
+  ok(w20.player.level === 20, 'XP abaixo do necessário não sobe');
+  w20.gainXp(1);
+  ok(w20.player.level === 21 && w20.freePoints === 4, 'nível 21: +4 pontos livres');
+  w20.gainXp(1e9);
+  ok(
+    w20.player.level === 30 && w20.xp === 0 && w20.xpToNext() === null && w20.freePoints === 40,
+    `sobe até o 30 e para (pontos ${w20.freePoints})`,
   );
 }
 
@@ -734,11 +766,16 @@ console.log('\n== dicas e dados ==');
   ok(!!tips.bandidos && !!tips.terracota && !!tips.chefe, 'dicas bandidos, terracota e chefe existem');
   ok(/Quebra-Guarda/.test(JSON.stringify(tips.terracota)), 'dica da terracota recomenda o Quebra-Guarda (Tormenta)');
   ok(
-    PROGRESSION.levelCap === 20 &&
-      PROGRESSION.xpToNext.length === 19 &&
+    PROGRESSION.levelCap === 30 &&
+      PROGRESSION.xpToNext.length === 29 &&
       PROGRESSION.xpToNext.every((v, i, a) => i === 0 || v > a[i - 1]),
-    'curva de XP crescente até o nível 20',
+    'curva de XP crescente até o nível 30',
   );
+  ok(
+    freePointsAt(2) === 3 && freePointsAt(20) === 3 && freePointsAt(21) === 4 && freePointsAt(30) === 4,
+    'pontos livres: 3 por nível até o 20, 4 do 21 ao 30',
+  );
+  ok(totalFreePoints(20) === 57 && totalFreePoints(30) === 97, 'total de pontos livres no 20 (57) e no 30 (97)');
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

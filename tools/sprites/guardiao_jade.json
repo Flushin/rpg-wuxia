@@ -1,0 +1,127 @@
+{
+ "name": "guardiao_jade",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword",
+  "1H_Sword_Offhand",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield",
+  "Knight_Cape"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "0,0": [
+    130,
+    214,
+    170
+   ],
+   "1,0": [
+    76,
+    160,
+    118
+   ],
+   "2,0": [
+    24,
+    60,
+    44
+   ],
+   "3,0": [
+    112,
+    200,
+    154
+   ],
+   "7,0": [
+    86,
+    172,
+    128
+   ],
+   "4,0": [
+    96,
+    184,
+    138
+   ],
+   "6,0": [
+    104,
+    192,
+    146
+   ],
+   "7,1": [
+    70,
+    150,
+    110
+   ],
+   "2,1": [
+    102,
+    190,
+    144
+   ],
+   "0,1": [
+    92,
+    180,
+    134
+   ],
+   "1,1": [
+    78,
+    162,
+    120
+   ],
+   "3,1": [
+    200,
+    190,
+    120
+   ],
+   "5,1": [
+    40,
+    90,
+    66
+   ],
+   "2,2": [
+    200,
+    190,
+    120
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "2H_Melee_Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Walking_A",
+   "frames": 8,
+   "fps": 10
+  },
+  "attack": {
+   "action": "2H_Melee_Attack_Chop",
+   "frames": 8,
+   "fps": 13,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_B",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle"
+}

@@ -64,6 +64,7 @@ const TILE_COLORS: Record<string, string> = {
   pillar: '#4a4038',
   snow: '#dfe6ee',
   pine: '#2c4a3c',
+  bamboo: '#2f5a34',
 };
 
 /** Faixa de nível dos monstros comuns do mapa. */

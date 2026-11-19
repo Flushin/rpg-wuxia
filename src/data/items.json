@@ -9,7 +9,8 @@
     "Pocoes: curam percent do maximo ao longo de duration s; um efeito por tipo (hp/mp), usar outra do mesmo tipo reinicia; cooldown por tipo.",
     "Materiais (marco 9): empilham como poções; tier comum (mapas antigos), raro (montanha) e especial (chefes). value = referência; venda = value * sellRatio.",
     "Melhorar (+1 a +10): cada nível soma upgradeStep (fração) aos stats da base, não aos bônus.",
-    "Consumíveis (marco 9): empilham; price = preço no Mercador Ambulante. Mercador: merchant (estoque, preços e renovação)."
+    "Consumíveis (marco 9): empilham; price = preço no Mercador Ambulante. Mercador: merchant (estoque, preços e renovação).",
+    "Nível 30 (etapa 3): bases nv 20 (Bambu Sombrio) e nv 25 (Névoa); Jade da Névoa substitui o Cristal de Gelo na forja de itens nv 20+."
   ],
   "slots": [
     "colar",
@@ -552,6 +553,228 @@
         "agility": 5,
         "evasion": 11
       }
+    },
+    "colar_bambu": {
+      "name": "Colar de Contas de Bambu",
+      "slot": "colar",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 650,
+      "stats": {
+        "willpower": 7,
+        "maxMana": 95,
+        "spiritDef": 14
+      }
+    },
+    "veste_bambu": {
+      "name": "Veste do Bambu Sombrio",
+      "slot": "tronco",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 870,
+      "stats": {
+        "physDef": 30,
+        "spiritDef": 18,
+        "maxHp": 135
+      }
+    },
+    "espadas_folha_bambu": {
+      "name": "Espadas Duplas Folha de Bambu",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 1080,
+      "stats": {
+        "physAtk": 54,
+        "hit": 16,
+        "critChance": 0.03
+      }
+    },
+    "leque_bambu_negro": {
+      "name": "Leque de Qi do Bambu Negro",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 1080,
+      "stats": {
+        "spiritAtk": 54,
+        "hit": 16,
+        "critChance": 0.03
+      }
+    },
+    "bastao_raiz_bambu": {
+      "name": "Bastão Raiz de Bambu",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 1080,
+      "stats": {
+        "physAtk": 54,
+        "hit": 16,
+        "critChance": 0.03
+      }
+    },
+    "agulhas_espinho": {
+      "name": "Agulhas Espinho Sombrio",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 1080,
+      "stats": {
+        "physAtk": 54,
+        "hit": 16,
+        "critChance": 0.03
+      }
+    },
+    "chapeu_bambu": {
+      "name": "Chapéu de Bambu Trançado",
+      "slot": "cabeca",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 540,
+      "stats": {
+        "physDef": 15,
+        "spiritDef": 15,
+        "stamina": 4
+      }
+    },
+    "calca_cacador": {
+      "name": "Calça do Caçador Sombrio",
+      "slot": "calca",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 650,
+      "stats": {
+        "physDef": 22,
+        "maxHp": 88,
+        "stamina": 4
+      }
+    },
+    "botas_sombra": {
+      "name": "Botas da Sombra Silenciosa",
+      "slot": "bota",
+      "reqLevel": 20,
+      "durability": 100,
+      "value": 540,
+      "stats": {
+        "agility": 7,
+        "evasion": 15
+      }
+    },
+    "colar_nevoa": {
+      "name": "Colar do Coração da Névoa",
+      "slot": "colar",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 820,
+      "stats": {
+        "willpower": 9,
+        "maxMana": 120,
+        "spiritDef": 17
+      }
+    },
+    "manto_nevoa": {
+      "name": "Manto da Névoa Celeste",
+      "slot": "tronco",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 1090,
+      "stats": {
+        "physDef": 37,
+        "spiritDef": 22,
+        "maxHp": 170
+      }
+    },
+    "espadas_rasga_nevoa": {
+      "name": "Espadas Duplas Rasga-Névoa",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 1360,
+      "stats": {
+        "physAtk": 68,
+        "hit": 20,
+        "critChance": 0.04
+      }
+    },
+    "leque_grou": {
+      "name": "Leque de Qi do Grou Celeste",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 1360,
+      "stats": {
+        "spiritAtk": 68,
+        "hit": 20,
+        "critChance": 0.04
+      }
+    },
+    "bastao_pico": {
+      "name": "Bastão do Pico Eterno",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 1360,
+      "stats": {
+        "physAtk": 68,
+        "hit": 20,
+        "critChance": 0.04
+      }
+    },
+    "agulhas_jade_celeste": {
+      "name": "Agulhas de Jade Celeste",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 1360,
+      "stats": {
+        "physAtk": 68,
+        "hit": 20,
+        "critChance": 0.04
+      }
+    },
+    "coroa_jade": {
+      "name": "Coroa de Jade da Névoa",
+      "slot": "cabeca",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 680,
+      "stats": {
+        "physDef": 19,
+        "spiritDef": 19,
+        "stamina": 5
+      }
+    },
+    "calca_nuvens": {
+      "name": "Calça das Nuvens Altas",
+      "slot": "calca",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 820,
+      "stats": {
+        "physDef": 27,
+        "maxHp": 110,
+        "stamina": 5
+      }
+    },
+    "botas_nebulosas": {
+      "name": "Botas do Passo Nebuloso",
+      "slot": "bota",
+      "reqLevel": 25,
+      "durability": 100,
+      "value": 680,
+      "stats": {
+        "agility": 9,
+        "evasion": 19
+      }
     }
   },
   "potions": {
@@ -614,6 +837,13 @@
       "value": 600,
       "color": "#d58cff",
       "desc": "Material especial de forja. Só os chefes deixam cair."
+    },
+    "jade_nevoa": {
+      "name": "Jade da Névoa",
+      "tier": "raro",
+      "value": 200,
+      "color": "#5fe0a8",
+      "desc": "Material raro de forja para itens nível 20 ou mais. Cai dos monstros do Bosque de Bambu Sombrio e do Pico da Névoa e de itens nv 20+ desmontados."
     }
   },
   "consumables": {
@@ -631,7 +861,8 @@
     "rareChance": 0.85,
     "priceMul": 2,
     "materials": {
-      "cristal_gelo": 450
+      "cristal_gelo": 450,
+      "jade_nevoa": 750
     }
   }
 }

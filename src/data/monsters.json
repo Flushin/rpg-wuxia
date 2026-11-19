@@ -1394,5 +1394,466 @@
         }
       ]
     }
+  },
+  "assassino_sombras": {
+    "id": "assassino_sombras",
+    "name": "Assassino das Sombras",
+    "sprite": "shadow-assassin",
+    "minLevel": 20,
+    "maxLevel": 25,
+    "baseAttributes": {
+      "strength": 5,
+      "intelligence": 0,
+      "stamina": 12.6,
+      "agility": 10,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 0.85,
+      "intelligence": 0,
+      "stamina": 7.2,
+      "agility": 0.7,
+      "willpower": 0.6
+    },
+    "damageType": "physical",
+    "aggroRange": 5,
+    "leashRange": 13,
+    "attackRange": 1.5,
+    "attackInterval": 1.9,
+    "moveSpeed": 3.6,
+    "defMul": {
+      "phys": 0.9,
+      "spirit": 2.2
+    },
+    "poisonRes": 0.4,
+    "xpBase": 108,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 18,
+        "max": 26,
+        "perLevel": 1.8
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.3
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.75
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.05,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        },
+        {
+          "chance": 0.07,
+          "minReqLevel": 20,
+          "maxReqLevel": 20
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.08
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.03
+        }
+      ]
+    }
+  },
+  "serpente_jade": {
+    "id": "serpente_jade",
+    "name": "Serpente de Jade",
+    "sprite": "jade-serpent",
+    "minLevel": 21,
+    "maxLevel": 25,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 4,
+      "stamina": 12.6,
+      "agility": 7,
+      "willpower": 9
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.55,
+      "stamina": 8.64,
+      "agility": 0.65,
+      "willpower": 1.1
+    },
+    "damageType": "spiritual",
+    "aggroRange": 5,
+    "leashRange": 14,
+    "attackRange": 5.5,
+    "attackInterval": 2.3,
+    "moveSpeed": 3.1,
+    "projectile": "poison",
+    "onHit": {
+      "slow": 0.25,
+      "duration": 2
+    },
+    "defMul": {
+      "phys": 1.0,
+      "spirit": 2.4
+    },
+    "poisonRes": 0.6,
+    "xpBase": 101,
+    "xpPerLevel": 20,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 16,
+        "max": 24,
+        "perLevel": 1.8
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.3
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.75
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.05,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        },
+        {
+          "chance": 0.07,
+          "minReqLevel": 20,
+          "maxReqLevel": 20
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.1
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.03
+        }
+      ]
+    }
+  },
+  "grou_espiritual": {
+    "id": "grou_espiritual",
+    "name": "Grou Espiritual",
+    "sprite": "spirit-crane",
+    "minLevel": 25,
+    "maxLevel": 30,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 4.5,
+      "stamina": 14.4,
+      "agility": 8,
+      "willpower": 10
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.65,
+      "stamina": 9.36,
+      "agility": 0.7,
+      "willpower": 1.2
+    },
+    "damageType": "spiritual",
+    "aggroRange": 5,
+    "leashRange": 14,
+    "attackRange": 5.5,
+    "attackInterval": 2.0,
+    "moveSpeed": 3.4,
+    "projectile": "qi",
+    "defMul": {
+      "phys": 1.0,
+      "spirit": 2.4
+    },
+    "poisonRes": 0.3,
+    "xpBase": 122,
+    "xpPerLevel": 23,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 20,
+        "max": 28,
+        "perLevel": 2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.3
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.75
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.06,
+          "minReqLevel": 20,
+          "maxReqLevel": 20
+        },
+        {
+          "chance": 0.06,
+          "minReqLevel": 25,
+          "maxReqLevel": 25,
+          "minMonsterLevel": 25
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.12
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "guardiao_jade": {
+    "id": "guardiao_jade",
+    "name": "Guardião de Jade",
+    "sprite": "jade-guardian",
+    "minLevel": 26,
+    "maxLevel": 30,
+    "scale": 1.45,
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 0,
+      "stamina": 21.6,
+      "agility": 3,
+      "willpower": 5
+    },
+    "perLevel": {
+      "strength": 1.0,
+      "intelligence": 0,
+      "stamina": 11.52,
+      "agility": 0.45,
+      "willpower": 0.7
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 12,
+    "attackRange": 1.8,
+    "attackInterval": 2.6,
+    "moveSpeed": 2.0,
+    "slam": {
+      "radius": 2.3,
+      "delay": 1.3,
+      "mult": 1.8,
+      "interval": 9
+    },
+    "defMul": {
+      "phys": 0.6,
+      "spirit": 2.0
+    },
+    "poisonRes": 0.5,
+    "xpBase": 137,
+    "xpPerLevel": 26,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 22,
+        "max": 32,
+        "perLevel": 2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.3
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.75
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.06,
+          "minReqLevel": 20,
+          "maxReqLevel": 20
+        },
+        {
+          "chance": 0.07,
+          "minReqLevel": 25,
+          "maxReqLevel": 25,
+          "minMonsterLevel": 25
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.35,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.15
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "senhor_nevoa": {
+    "id": "senhor_nevoa",
+    "name": "Senhor da Névoa",
+    "sprite": "mist-lord",
+    "minLevel": 30,
+    "maxLevel": 30,
+    "scale": 1.5,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 32,
+      "stamina": 1900,
+      "agility": 22,
+      "willpower": 200
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "spiritual",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.4,
+    "moveSpeed": 2.2,
+    "defMul": {
+      "phys": 0.22,
+      "spirit": 0.45
+    },
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.6,
+        "delay": 1.4,
+        "mult": 2,
+        "interval": 6,
+        "intervalPhase2": 4.2
+      },
+      "summon": {
+        "monsterId": "grou_espiritual",
+        "count": 2,
+        "level": 27,
+        "atHpPct": 0.5
+      },
+      "enrage": {
+        "atHpPct": 0.3,
+        "attackIntervalMul": 0.75,
+        "damageMul": 1.25,
+        "moveSpeedMul": 1.2
+      }
+    },
+    "xpBase": 40000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 900,
+    "loot": {
+      "gold": {
+        "min": 2500,
+        "max": 3200
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 25
+      },
+      "equipment": [
+        {
+          "chance": 1,
+          "minReqLevel": 25,
+          "maxReqLevel": 25
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 1,
+          "min": 6,
+          "max": 8
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 1,
+          "min": 4,
+          "max": 6
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1,
+          "min": 3,
+          "max": 3
+        }
+      ]
+    }
   }
 }

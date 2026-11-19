@@ -291,6 +291,60 @@
       },
       "botas_passo_celeste": {
         "name": "Celestial Step Boots"
+      },
+      "colar_bambu": {
+        "name": "Bamboo Bead Necklace"
+      },
+      "veste_bambu": {
+        "name": "Shadow Bamboo Vest"
+      },
+      "espadas_folha_bambu": {
+        "name": "Bamboo Leaf Twin Swords"
+      },
+      "leque_bambu_negro": {
+        "name": "Black Bamboo Qi Fan"
+      },
+      "bastao_raiz_bambu": {
+        "name": "Bamboo Root Staff"
+      },
+      "agulhas_espinho": {
+        "name": "Shadow Thorn Needles"
+      },
+      "chapeu_bambu": {
+        "name": "Woven Bamboo Hat"
+      },
+      "calca_cacador": {
+        "name": "Shadow Hunter Trousers"
+      },
+      "botas_sombra": {
+        "name": "Silent Shadow Boots"
+      },
+      "colar_nevoa": {
+        "name": "Heart of the Mist Necklace"
+      },
+      "manto_nevoa": {
+        "name": "Celestial Mist Mantle"
+      },
+      "espadas_rasga_nevoa": {
+        "name": "Mist-Rending Twin Swords"
+      },
+      "leque_grou": {
+        "name": "Celestial Crane Qi Fan"
+      },
+      "bastao_pico": {
+        "name": "Eternal Peak Staff"
+      },
+      "agulhas_jade_celeste": {
+        "name": "Celestial Jade Needles"
+      },
+      "coroa_jade": {
+        "name": "Misty Jade Crown"
+      },
+      "calca_nuvens": {
+        "name": "High Cloud Trousers"
+      },
+      "botas_nebulosas": {
+        "name": "Misty Step Boots"
       }
     },
     "potions": {
@@ -319,6 +373,10 @@
       "essencia_qi": {
         "name": "Ancestral Qi Essence",
         "desc": "Special forging material. Only bosses drop it."
+      },
+      "jade_nevoa": {
+        "name": "Mist Jade",
+        "desc": "Rare forging material for level 20+ items. Dropped by Shadow Bamboo Grove and Misty Peak monsters and by salvaging level 20+ items."
       }
     },
     "consumables": {
@@ -382,6 +440,21 @@
     },
     "rei_bandidos": {
       "name": "Bandit King"
+    },
+    "assassino_sombras": {
+      "name": "Shadow Assassin"
+    },
+    "serpente_jade": {
+      "name": "Jade Serpent"
+    },
+    "grou_espiritual": {
+      "name": "Spirit Crane"
+    },
+    "guardiao_jade": {
+      "name": "Jade Guardian"
+    },
+    "senhor_nevoa": {
+      "name": "Lord of the Mist"
     }
   },
   "tips": {
@@ -617,7 +690,14 @@
     "Besteiro": "Crossbowman",
     "Brutamontes": "Brute",
     "Rei dos Bandidos": "Bandit King",
-    "Covil dos Bandidos": "Bandit Lair"
+    "Covil dos Bandidos": "Bandit Lair",
+    "Bosque de Bambu Sombrio": "Shadow Bamboo Grove",
+    "Pico da Névoa": "Misty Peak",
+    "Assassino das Sombras": "Shadow Assassin",
+    "Serpente de Jade": "Jade Serpent",
+    "Grou Espiritual": "Spirit Crane",
+    "Guardião de Jade": "Jade Guardian",
+    "Senhor da Névoa": "Lord of the Mist"
   },
   "quests": {
     "chain": [
@@ -704,11 +784,41 @@
         "offer": "Now I know the truth. The temple's abbot sought a forbidden power and lost himself in it. His disciples followed him in his fall. Climb to the temple courtyard and free him. Beware: at half health he will call his disciples.",
         "goal": "Defeat the Fallen Abbot",
         "done": "The temple bell has rung again after so many years... The mountain is at peace, and so is the village. You have become a legend, warrior."
+      },
+      {
+        "name": "The Eastern Pass",
+        "offer": "The temple bell rings again, but the eastern winds carry a strange silence. On the mountain's high slope there is a pass leading to a bamboo grove where not even the birds sing. Go there and see it with your own eyes.",
+        "goal": "Reach the Shadow Bamboo Grove",
+        "done": "So it is true: the grove has darkened. Someone hides among the bamboo. Rest, warrior; the worst is yet to come."
+      },
+      {
+        "name": "Shadows Among the Bamboo",
+        "offer": "Travelers who take the eastern pass don't come back. The few who escaped speak of figures in black leaping from the bamboo with two knives. Defeat 12 of these assassins and the trail will be safe again.",
+        "goal": "Defeat shadow assassins",
+        "done": "The caravans are using the pass again. The assassins had a serpent mark on their knives... I don't like the smell of this."
+      },
+      {
+        "name": "The Jade Venom",
+        "offer": "The mark on the knives belongs to the Jade Serpent sect, sorceresses who traded honor for poisons. They protect the assassins from afar. Defeat 12 of them, but don't stand still before the venom: it binds your feet.",
+        "goal": "Defeat jade serpents",
+        "done": "You fought like a true disciple. Take this weapon forged with bamboo from the grove: up on the mountain you will need it."
+      },
+      {
+        "name": "Crane Feathers",
+        "offer": "Above the grove lies the Misty Peak, where the Crane-style monks became restless spirits. They say their qi feathers are worth a fortune and that they guard mist jade. Defeat 12 spirit cranes and I will pay well for the news.",
+        "goal": "Defeat spirit cranes",
+        "done": "Real mist jade! With this the blacksmith's forge will work day and night. Take your gold, you earned every coin."
+      },
+      {
+        "name": "The Lord of the Mist",
+        "offer": "Now it all makes sense. The one sending the assassins and the serpents is the Lord of the Mist, an ancient master who merged with the mist of the peak to live forever. Climb to the Jade Shrine and put an end to it. At half health he calls the cranes; near the end, he flies into a rage.",
+        "goal": "Defeat the Lord of the Mist",
+        "done": "The mist has parted over the peak for the first time in a thousand years. From the village you can see the shrine shining in the sun. Wear this mantle: it is yours by right, master."
       }
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [{"texto": "Max level is now 30: from 21 to 30 each level gives 4 free points (was 3) on top of the sect attributes. Characters at level 20 stay at 20 and start earning XP again."}, {"texto": "New equipment: level 20 (Shadow Bamboo) and level 25 (Mist) sets, with all 6 pieces and a weapon for each sect. The rare material Mist Jade replaces the Eternal Ice Crystal when forging level 20+ items, and the Traveling Merchant now sells it. The Trial now gives level 20 items (levels 1–5) and level 25 items (levels 6–10)."}, {"texto": "Two new maps for levels 20 to 30: the Shadow Bamboo Grove (level 20+, through the eastern pass of the Snowy Mountain), with Shadow Assassins and Jade Serpents, and the Misty Peak (level 25+), with Spirit Cranes, Jade Guardians and the boss Lord of the Mist in the Jade Shrine. Five new quests from 20 to 28. The new monsters resist poison, and on the new maps offline gains yield 5/6 of the usual."}],
     "versoes": [
       {"itens": [{"texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."}]},
       {"itens": [{"texto": "Battery saver on Auto: hunting without touching the screen for a while, the game enters rest mode (black screen with a summary of gains and much less processing), losing nothing from the hunt, material drops included. While Auto is on, the phone no longer turns the screen off by itself. One tap brings it back. Set it in ⚙ Settings (30 s, 1 min, 2 min or off)."}]},

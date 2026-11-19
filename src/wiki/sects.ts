@@ -4,7 +4,7 @@ import {
   BASES,
   CLASSES,
   ELEMENT_NAMES,
-  PROGRESSION,
+  freePointsText,
   SECT_ORDER,
   SKILLS,
   SKILL_MAX_LEVEL,
@@ -36,7 +36,7 @@ const sects = () => SECT_ORDER.filter((s) => CLASSES[s]);
 // ---------- Seitas ----------
 export function sectIndexPage(): string {
   return `<h1>Seitas</h1><p class="intro">A seita é a classe do personagem: define o estilo de luta, o elemento, a arma e as skills.
-    É escolhida ao criar o personagem. A cada nível você ganha atributos automáticos da seita e mais ${PROGRESSION.freePointsPerLevel} pontos para distribuir.</p>
+    É escolhida ao criar o personagem. A cada nível você ganha atributos automáticos da seita e mais ${freePointsText()} para distribuir.</p>
     <div class="grid sect-grid">${sects()
       .map((id) => {
         const c = CLASSES[id];
@@ -75,7 +75,7 @@ export function sectPage(id: string): string | null {
       <table class="tbl kv">${info.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table></section>
     <section class="panel"><h2>Atributos</h2>
       <table class="tbl"><thead><tr><th></th><th>No nível 1</th><th>Por nível</th></tr></thead><tbody>${attrRows}</tbody></table>
-      <p class="muted">Além disso, ${PROGRESSION.freePointsPerLevel} pontos livres por nível. Com os atributos iniciais: ${lv1.maxHp} de vida,
+      <p class="muted">Além disso, ${freePointsText()}. Com os atributos iniciais: ${lv1.maxHp} de vida,
       ${lv1.maxMana} de mana, ${c.damageType === 'physical' ? `${lv1.physAtk} de ataque físico` : `${lv1.spiritAtk} de ataque espiritual`}.</p>
       <h3>Onde pôr os pontos</h3><ul>
       ${c.recommended.map((r) => `<li><b>${STAT_LABELS[r.attr]}</b> — ${esc(r.reason)}</li>`).join('')}

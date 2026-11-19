@@ -41,6 +41,8 @@ export interface OfflineInput {
   xp: number;
   potions: Record<PotionKind, number>;
   seed: number;
+  /** multiplica a eficiência (mapa de caça com offlineMul em mapsConfig; nível 30: 5/6 nos mapas 20–30) */
+  effMul?: number;
 }
 export interface OfflineResult {
   elapsedMin: number;
@@ -74,7 +76,7 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
   const { rate } = inp,
     rng = new Rng(inp.seed >>> 0);
   const elapsedMin = Number.isFinite(inp.elapsedMs) && inp.elapsedMs > 0 ? inp.elapsedMs / 60000 : 0;
-  const effMin = effectiveMinutes(inp.elapsedMs);
+  const effMin = effectiveMinutes(inp.elapsedMs) * Math.max(0, inp.effMul ?? 1);
   const kills = Math.max(0, Math.floor(rate.killsPerMin * effMin + 1e-6));
   const goldCap = offlineGoldCap(rate);
   const gold = Math.min(goldCap, Math.floor(kills * rate.goldPerKill));

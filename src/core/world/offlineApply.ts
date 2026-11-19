@@ -5,7 +5,7 @@ import { POTIONS, isStackId, itemColor, itemName, makeEquipment, makePotion } fr
 import { computeOffline, type OfflineResult } from '../offline';
 import { type ItemInstance, type PotionKind, type SaveData } from '../types';
 import type { OfflineReport, World } from '../world';
-import { TOWN_MAPS } from '../mapsConfig';
+import { MAPS_CONFIG, TOWN_MAPS } from '../mapsConfig';
 import { isDungeonMap } from '../dungeons';
 
 // ---------- ganho offline ----------
@@ -22,6 +22,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     xp: w.xp,
     potions: { hp: w.kindCount('hp'), mp: w.kindCount('mp') },
     seed: (now ^ Math.floor(w.xp * 7919)) >>> 0,
+    effMul: MAPS_CONFIG[saved.mapId]?.offlineMul ?? 1,
   });
   if (res.kills < 1) return null;
   const lvl0 = w.player.level;

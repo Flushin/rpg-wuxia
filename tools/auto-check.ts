@@ -17,7 +17,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const HOUR = 3.6e6;
 
@@ -924,7 +924,7 @@ console.log('\n== offline: faixas de eficiência ==');
     elapsedMs: 20 * HOUR,
     rate,
     level: CAP - 1,
-    xp: 100,
+    xp: PROGRESSION.xpToNext[CAP - 2] - 100,
     potions: { hp: 0, mp: 0 },
     seed: 1,
   });

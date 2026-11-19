@@ -1,7 +1,7 @@
 // Inventário: mochila, equipar, poções, itens no chão, coleta e desgaste.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { DUNGEON_EQUIP_DROP_MUL, isDungeonMap } from '../dungeons';
-import { TRIAL_EQUIP_REQ_LEVEL, trialDropMul, trialGold } from '../trial';
+import { trialDropMul, trialEquipReqLevel, trialGold } from '../trial';
 import { CLASSES, type MonsterDef } from '../data';
 import { L } from '../i18n';
 import {
@@ -225,7 +225,7 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
   }
 }
 
-/** Chefe do Trial (src/core/trial.ts): ouro do nível, 1 Raro nv 15 garantido, 1 equipamento nv 15 e os materiais do
+/** Chefe do Trial (src/core/trial.ts): ouro do nível, 1 Raro garantido, 1 equipamento (nv 20 ou 25) e os materiais do
  *  chefe. A chance de equipamento e de material é multiplicada pelo bônus do nível (×1,12 a ×1,186); o que passa de
  *  100% vira chance de cair mais um. Os itens saem com o nível do chefe (bônus maiores). */
 function trialLoot(w: World, m: Entity, def: MonsterDef) {
@@ -246,7 +246,7 @@ function trialLoot(w: World, m: Entity, def: MonsterDef) {
       collect(w, makePotion(md.id, w.rng.int(md.min ?? 1, md.max ?? md.min ?? 1)), s.x, s.y);
     }
   const ids = equipmentBaseIds().filter(
-    (id) => BASES[id].reqLevel === TRIAL_EQUIP_REQ_LEVEL && (!BASES[id].sect || BASES[id].sect === w.classId),
+    (id) => BASES[id].reqLevel === trialEquipReqLevel(tier) && (!BASES[id].sect || BASES[id].sect === w.classId),
   );
   if (!ids.length) return;
   const give = (rarity: Rarity) => {

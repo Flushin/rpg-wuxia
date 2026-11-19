@@ -1,273 +1,371 @@
 {
- "chain": [
-  {
-   "id": "boas_vindas",
-   "giver": "anciao",
-   "turnIn": "mestre",
-   "minLevel": 1,
-   "objective": {
-    "type": "talk",
-    "npc": "mestre"
-   },
-   "reward": {
-    "xp": 100,
-    "gold": 20
-   },
-   "name": "Boas-vindas",
-   "offer": "Você chegou em boa hora, jovem. Antes de pegar em armas, apresente-se ao mestre da sua seita na praça. Ele vai guiar seus primeiros passos.",
-   "goal": "Fale com o mestre da sua seita",
-   "done": "Então você é o novo discípulo. O ancião fez bem em mandá-lo até mim."
-  },
-  {
-   "id": "primeiro_treino",
-   "giver": "mestre",
-   "turnIn": "mestre",
-   "minLevel": 1,
-   "objective": {
-    "type": "kill",
-    "monster": "lobo",
-    "count": 5
-   },
-   "reward": {
-    "xp": 150,
-    "gold": 30
-   },
-   "name": "Primeiro treino",
-   "offer": "Golpes no ar não ensinam nada. Siga para a Floresta Sombria pelo portão leste e derrote 5 lobos. Volte quando terminar.",
-   "goal": "Derrote lobos",
-   "done": "Nada mal. Seu corpo já começa a entender o caminho da seita."
-  },
-  {
-   "id": "lobos_estrada",
-   "giver": "guarda",
-   "turnIn": "guarda",
-   "minLevel": 2,
-   "objective": {
-    "type": "kill",
-    "monster": "lobo",
-    "count": 8
-   },
-   "reward": {
-    "xp": 300,
-    "gold": 50
-   },
-   "name": "Lobos na estrada",
-   "offer": "As alcateias estão rondando a estrada da floresta e os mercadores não conseguem passar. Derrote 8 lobos e a estrada volta a ser segura.",
-   "goal": "Derrote lobos",
-   "done": "A estrada está mais calma. Os mercadores agradecem, e eu também."
-  },
-  {
-   "id": "acampamentos",
-   "giver": "guarda",
-   "turnIn": "guarda",
-   "minLevel": 4,
-   "objective": {
-    "type": "kill",
-    "monster": "bandido_espadachim",
-    "count": 6
-   },
-   "reward": {
-    "xp": 900,
-    "gold": 120,
-    "item": "arma"
-   },
-   "name": "Acampamentos",
-   "offer": "Bandidos montaram acampamentos no fundo da floresta. Os espadachins andam em grupo, então tome cuidado. Derrote 6 deles.",
-   "goal": "Derrote bandidos espadachins",
-   "done": "Você enfrentou os grupos sozinho? Fique com esta arma do arsenal da vila. Use-a quando estiver pronto."
-  },
-  {
-   "id": "carga_roubada",
-   "giver": "mercador",
-   "turnIn": "mercador",
-   "minLevel": 5,
-   "objective": {
-    "type": "kill",
-    "monster": "bandido_arqueiro",
-    "count": 4
-   },
-   "reward": {
-    "xp": 1600,
-    "gold": 150
-   },
-   "name": "Carga roubada",
-   "offer": "Os arqueiros dos bandidos atacaram minha carroça e levaram metade da carga! Derrote 4 deles. Eles atiram de longe, então chegue perto rápido.",
-   "goal": "Derrote bandidos arqueiros",
-   "done": "Minha carga não volta, mas pelo menos eles não vão roubar mais ninguém. Tome, pela ajuda."
-  },
-  {
-   "id": "portao_antigo",
-   "giver": "anciao",
-   "turnIn": "anciao",
-   "minLevel": 6,
-   "objective": {
-    "type": "reach",
-    "map": "ruinas"
-   },
-   "reward": {
-    "xp": 1500,
-    "gold": 150
-   },
-   "name": "O portão antigo",
-   "offer": "No fim da estrada da floresta há um portal de pedra que leva às ruínas do imperador. Vá até lá e me conte o que viu.",
-   "goal": "Chegue às Ruínas de Terracota",
-   "done": "Guerreiros de barro andando entre as colunas... Então as histórias eram verdade. Fale com seu mestre: ele vai saber o que fazer."
-  },
-  {
-   "id": "barro_bronze",
-   "giver": "mestre",
-   "turnIn": "mestre",
-   "minLevel": 7,
-   "objective": {
-    "type": "kill",
-    "monster": "guerreiro_terracota",
-    "count": 8
-   },
-   "reward": {
-    "xp": 4000,
-    "gold": 300,
-    "item": "tronco"
-   },
-   "name": "Barro e bronze",
-   "offer": "Os guerreiros de terracota resistem bem a lâminas, mas o barro tem pontos fracos. Derrote 8 deles e aprenda a quebrá-los.",
-   "goal": "Derrote guerreiros de terracota",
-   "done": "Agora você conhece o inimigo. Vista isto: um discípulo que vai enfrentar o General precisa de proteção melhor."
-  },
-  {
-   "id": "general_desperta",
-   "giver": "anciao",
-   "turnIn": "anciao",
-   "minLevel": 9,
-   "objective": {
-    "type": "kill",
-    "monster": "general_terracota",
-    "count": 1
-   },
-   "reward": {
-    "xp": 6000,
-    "gold": 800
-   },
-   "name": "O General desperta",
-   "offer": "O General de Terracota comanda tudo do fundo das ruínas. Enquanto ele estiver de pé, a vila não terá paz. Derrote-o. Saia do círculo vermelho quando ele erguer a lâmina.",
-   "goal": "Derrote o General de Terracota",
-   "done": "O General caiu! A Vila das Nuvens vai lembrar do seu nome por gerações. Este ouro é pouco perto do que você fez."
-  },
-  {
-   "id": "trilha_norte",
-   "giver": "anciao",
-   "turnIn": "anciao",
-   "minLevel": 10,
-   "objective": {
-    "type": "reach",
-    "map": "montanha"
-   },
-   "reward": {
-    "xp": 6000,
-    "gold": 400
-   },
-   "name": "A trilha do norte",
-   "offer": "Agora que o General caiu, o portão norte da vila se abriu para você. Lá em cima fica a Montanha Nevada e, no topo, um templo que ninguém visita há décadas. Suba até lá e veja com os próprios olhos.",
-   "goal": "Chegue à Montanha Nevada",
-   "done": "Neve que nunca derrete e um silêncio pesado... Os monges daquele templo eram nossos amigos. Algo muito errado aconteceu lá em cima."
-  },
-  {
-   "id": "espectros",
-   "giver": "guarda",
-   "turnIn": "guarda",
-   "minLevel": 11,
-   "objective": {
-    "type": "kill",
-    "monster": "espectro_gelo",
-    "count": 10
-   },
-   "reward": {
-    "xp": 10000,
-    "gold": 500
-   },
-   "name": "Vultos na neve",
-   "offer": "Os viajantes que descem da montanha falam de vultos gelados que atiram estilhaços e congelam as pernas de quem foge. Derrote 10 Espectros de Gelo. Ataque de perto ou eles vão deixá-lo lento.",
-   "goal": "Derrote espectros de gelo",
-   "done": "Dez a menos. Os mercadores já falam em voltar a usar a trilha do norte. Obrigado, guerreiro."
-  },
-  {
-   "id": "fera_branca",
-   "giver": "mestre",
-   "turnIn": "mestre",
-   "minLevel": 13,
-   "objective": {
-    "type": "kill",
-    "monster": "yeti",
-    "count": 6
-   },
-   "reward": {
-    "xp": 16000,
-    "gold": 700,
-    "item": "arma",
-    "itemLevel": 10
-   },
-   "name": "A fera branca",
-   "offer": "Os yetis são lentos, mas um golpe deles derruba uma árvore. Quando a fera erguer os braços, um círculo vai marcar o chão: saia dele antes do impacto. Derrote 6 yetis e volte.",
-   "goal": "Derrote yetis",
-   "done": "Você aprendeu a ler a fera. Leve esta arma: foi forjada para quem caminha na neve."
-  },
-  {
-   "id": "cristais_perdidos",
-   "giver": "mercador",
-   "turnIn": "mercador",
-   "minLevel": 14,
-   "objective": {
-    "type": "kill",
-    "monster": "espectro_gelo",
-    "count": 12
-   },
-   "reward": {
-    "xp": 22000,
-    "gold": 900
-   },
-   "name": "Cristais perdidos",
-   "offer": "Minha caravana de cristais de gelo foi atacada na encosta alta. Os espectros guardam os cristais como se fossem deles! Derrote 12 espectros e talvez eu consiga recuperar parte da carga.",
-   "goal": "Derrote espectros de gelo",
-   "done": "Recuperei metade dos cristais! Não é tudo, mas o ferreiro vai ficar feliz. Aceite este ouro."
-  },
-  {
-   "id": "guardioes_templo",
-   "giver": "mestre",
-   "turnIn": "mestre",
-   "minLevel": 16,
-   "objective": {
-    "type": "kill",
-    "monster": "yeti",
-    "count": 10
-   },
-   "reward": {
-    "xp": 32000,
-    "gold": 1200,
-    "item": "tronco",
-    "itemLevel": 15
-   },
-   "name": "Guardiões do templo",
-   "offer": "Os yetis da encosta alta não estão caçando: estão guardando o caminho do templo. Alguém os mandou lá. Derrote 10 deles e abra a passagem.",
-   "goal": "Derrote yetis",
-   "done": "O caminho está aberto. Vista esta armadura: o que espera no templo é pior do que qualquer fera."
-  },
-  {
-   "id": "abade_caido",
-   "giver": "anciao",
-   "turnIn": "anciao",
-   "minLevel": 18,
-   "objective": {
-    "type": "kill",
-    "monster": "abade_caido",
-    "count": 1
-   },
-   "reward": {
-    "xp": 50000,
-    "gold": 3000
-   },
-   "name": "O Abade Caído",
-   "offer": "Agora eu sei a verdade. O abade do templo buscou um poder proibido e se perdeu nele. Seus discípulos o seguiram na queda. Suba até o pátio do templo e liberte-o. Cuidado: com metade da vida ele vai chamar os discípulos.",
-   "goal": "Derrote o Abade Caído",
-   "done": "O sino do templo tocou de novo depois de tantos anos... A montanha está em paz, e a vila também. Você se tornou uma lenda, guerreiro."
-  }
- ]
+  "chain": [
+    {
+      "id": "boas_vindas",
+      "giver": "anciao",
+      "turnIn": "mestre",
+      "minLevel": 1,
+      "objective": {
+        "type": "talk",
+        "npc": "mestre"
+      },
+      "reward": {
+        "xp": 100,
+        "gold": 20
+      },
+      "name": "Boas-vindas",
+      "offer": "Você chegou em boa hora, jovem. Antes de pegar em armas, apresente-se ao mestre da sua seita na praça. Ele vai guiar seus primeiros passos.",
+      "goal": "Fale com o mestre da sua seita",
+      "done": "Então você é o novo discípulo. O ancião fez bem em mandá-lo até mim."
+    },
+    {
+      "id": "primeiro_treino",
+      "giver": "mestre",
+      "turnIn": "mestre",
+      "minLevel": 1,
+      "objective": {
+        "type": "kill",
+        "monster": "lobo",
+        "count": 5
+      },
+      "reward": {
+        "xp": 150,
+        "gold": 30
+      },
+      "name": "Primeiro treino",
+      "offer": "Golpes no ar não ensinam nada. Siga para a Floresta Sombria pelo portão leste e derrote 5 lobos. Volte quando terminar.",
+      "goal": "Derrote lobos",
+      "done": "Nada mal. Seu corpo já começa a entender o caminho da seita."
+    },
+    {
+      "id": "lobos_estrada",
+      "giver": "guarda",
+      "turnIn": "guarda",
+      "minLevel": 2,
+      "objective": {
+        "type": "kill",
+        "monster": "lobo",
+        "count": 8
+      },
+      "reward": {
+        "xp": 300,
+        "gold": 50
+      },
+      "name": "Lobos na estrada",
+      "offer": "As alcateias estão rondando a estrada da floresta e os mercadores não conseguem passar. Derrote 8 lobos e a estrada volta a ser segura.",
+      "goal": "Derrote lobos",
+      "done": "A estrada está mais calma. Os mercadores agradecem, e eu também."
+    },
+    {
+      "id": "acampamentos",
+      "giver": "guarda",
+      "turnIn": "guarda",
+      "minLevel": 4,
+      "objective": {
+        "type": "kill",
+        "monster": "bandido_espadachim",
+        "count": 6
+      },
+      "reward": {
+        "xp": 900,
+        "gold": 120,
+        "item": "arma"
+      },
+      "name": "Acampamentos",
+      "offer": "Bandidos montaram acampamentos no fundo da floresta. Os espadachins andam em grupo, então tome cuidado. Derrote 6 deles.",
+      "goal": "Derrote bandidos espadachins",
+      "done": "Você enfrentou os grupos sozinho? Fique com esta arma do arsenal da vila. Use-a quando estiver pronto."
+    },
+    {
+      "id": "carga_roubada",
+      "giver": "mercador",
+      "turnIn": "mercador",
+      "minLevel": 5,
+      "objective": {
+        "type": "kill",
+        "monster": "bandido_arqueiro",
+        "count": 4
+      },
+      "reward": {
+        "xp": 1600,
+        "gold": 150
+      },
+      "name": "Carga roubada",
+      "offer": "Os arqueiros dos bandidos atacaram minha carroça e levaram metade da carga! Derrote 4 deles. Eles atiram de longe, então chegue perto rápido.",
+      "goal": "Derrote bandidos arqueiros",
+      "done": "Minha carga não volta, mas pelo menos eles não vão roubar mais ninguém. Tome, pela ajuda."
+    },
+    {
+      "id": "portao_antigo",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 6,
+      "objective": {
+        "type": "reach",
+        "map": "ruinas"
+      },
+      "reward": {
+        "xp": 1500,
+        "gold": 150
+      },
+      "name": "O portão antigo",
+      "offer": "No fim da estrada da floresta há um portal de pedra que leva às ruínas do imperador. Vá até lá e me conte o que viu.",
+      "goal": "Chegue às Ruínas de Terracota",
+      "done": "Guerreiros de barro andando entre as colunas... Então as histórias eram verdade. Fale com seu mestre: ele vai saber o que fazer."
+    },
+    {
+      "id": "barro_bronze",
+      "giver": "mestre",
+      "turnIn": "mestre",
+      "minLevel": 7,
+      "objective": {
+        "type": "kill",
+        "monster": "guerreiro_terracota",
+        "count": 8
+      },
+      "reward": {
+        "xp": 4000,
+        "gold": 300,
+        "item": "tronco"
+      },
+      "name": "Barro e bronze",
+      "offer": "Os guerreiros de terracota resistem bem a lâminas, mas o barro tem pontos fracos. Derrote 8 deles e aprenda a quebrá-los.",
+      "goal": "Derrote guerreiros de terracota",
+      "done": "Agora você conhece o inimigo. Vista isto: um discípulo que vai enfrentar o General precisa de proteção melhor."
+    },
+    {
+      "id": "general_desperta",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 9,
+      "objective": {
+        "type": "kill",
+        "monster": "general_terracota",
+        "count": 1
+      },
+      "reward": {
+        "xp": 6000,
+        "gold": 800
+      },
+      "name": "O General desperta",
+      "offer": "O General de Terracota comanda tudo do fundo das ruínas. Enquanto ele estiver de pé, a vila não terá paz. Derrote-o. Saia do círculo vermelho quando ele erguer a lâmina.",
+      "goal": "Derrote o General de Terracota",
+      "done": "O General caiu! A Vila das Nuvens vai lembrar do seu nome por gerações. Este ouro é pouco perto do que você fez."
+    },
+    {
+      "id": "trilha_norte",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 10,
+      "objective": {
+        "type": "reach",
+        "map": "montanha"
+      },
+      "reward": {
+        "xp": 6000,
+        "gold": 400
+      },
+      "name": "A trilha do norte",
+      "offer": "Agora que o General caiu, o portão norte da vila se abriu para você. Lá em cima fica a Montanha Nevada e, no topo, um templo que ninguém visita há décadas. Suba até lá e veja com os próprios olhos.",
+      "goal": "Chegue à Montanha Nevada",
+      "done": "Neve que nunca derrete e um silêncio pesado... Os monges daquele templo eram nossos amigos. Algo muito errado aconteceu lá em cima."
+    },
+    {
+      "id": "espectros",
+      "giver": "guarda",
+      "turnIn": "guarda",
+      "minLevel": 11,
+      "objective": {
+        "type": "kill",
+        "monster": "espectro_gelo",
+        "count": 10
+      },
+      "reward": {
+        "xp": 10000,
+        "gold": 500
+      },
+      "name": "Vultos na neve",
+      "offer": "Os viajantes que descem da montanha falam de vultos gelados que atiram estilhaços e congelam as pernas de quem foge. Derrote 10 Espectros de Gelo. Ataque de perto ou eles vão deixá-lo lento.",
+      "goal": "Derrote espectros de gelo",
+      "done": "Dez a menos. Os mercadores já falam em voltar a usar a trilha do norte. Obrigado, guerreiro."
+    },
+    {
+      "id": "fera_branca",
+      "giver": "mestre",
+      "turnIn": "mestre",
+      "minLevel": 13,
+      "objective": {
+        "type": "kill",
+        "monster": "yeti",
+        "count": 6
+      },
+      "reward": {
+        "xp": 16000,
+        "gold": 700,
+        "item": "arma",
+        "itemLevel": 10
+      },
+      "name": "A fera branca",
+      "offer": "Os yetis são lentos, mas um golpe deles derruba uma árvore. Quando a fera erguer os braços, um círculo vai marcar o chão: saia dele antes do impacto. Derrote 6 yetis e volte.",
+      "goal": "Derrote yetis",
+      "done": "Você aprendeu a ler a fera. Leve esta arma: foi forjada para quem caminha na neve."
+    },
+    {
+      "id": "cristais_perdidos",
+      "giver": "mercador",
+      "turnIn": "mercador",
+      "minLevel": 14,
+      "objective": {
+        "type": "kill",
+        "monster": "espectro_gelo",
+        "count": 12
+      },
+      "reward": {
+        "xp": 22000,
+        "gold": 900
+      },
+      "name": "Cristais perdidos",
+      "offer": "Minha caravana de cristais de gelo foi atacada na encosta alta. Os espectros guardam os cristais como se fossem deles! Derrote 12 espectros e talvez eu consiga recuperar parte da carga.",
+      "goal": "Derrote espectros de gelo",
+      "done": "Recuperei metade dos cristais! Não é tudo, mas o ferreiro vai ficar feliz. Aceite este ouro."
+    },
+    {
+      "id": "guardioes_templo",
+      "giver": "mestre",
+      "turnIn": "mestre",
+      "minLevel": 16,
+      "objective": {
+        "type": "kill",
+        "monster": "yeti",
+        "count": 10
+      },
+      "reward": {
+        "xp": 32000,
+        "gold": 1200,
+        "item": "tronco",
+        "itemLevel": 15
+      },
+      "name": "Guardiões do templo",
+      "offer": "Os yetis da encosta alta não estão caçando: estão guardando o caminho do templo. Alguém os mandou lá. Derrote 10 deles e abra a passagem.",
+      "goal": "Derrote yetis",
+      "done": "O caminho está aberto. Vista esta armadura: o que espera no templo é pior do que qualquer fera."
+    },
+    {
+      "id": "abade_caido",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 18,
+      "objective": {
+        "type": "kill",
+        "monster": "abade_caido",
+        "count": 1
+      },
+      "reward": {
+        "xp": 50000,
+        "gold": 3000
+      },
+      "name": "O Abade Caído",
+      "offer": "Agora eu sei a verdade. O abade do templo buscou um poder proibido e se perdeu nele. Seus discípulos o seguiram na queda. Suba até o pátio do templo e liberte-o. Cuidado: com metade da vida ele vai chamar os discípulos.",
+      "goal": "Derrote o Abade Caído",
+      "done": "O sino do templo tocou de novo depois de tantos anos... A montanha está em paz, e a vila também. Você se tornou uma lenda, guerreiro."
+    },
+    {
+      "id": "passo_leste",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 20,
+      "objective": {
+        "type": "reach",
+        "map": "bambu"
+      },
+      "reward": {
+        "xp": 20000,
+        "gold": 1500
+      },
+      "name": "O passo do leste",
+      "offer": "O sino do templo voltou a tocar, mas os ventos do leste trazem um silêncio estranho. Na encosta alta da montanha há um passo que leva a um bosque de bambu onde nem os pássaros cantam. Vá até lá e veja com seus olhos.",
+      "goal": "Chegue ao Bosque de Bambu Sombrio",
+      "done": "Então é verdade: o bosque escureceu. Alguém se esconde entre o bambu. Descanse, guerreiro; o pior ainda está por vir."
+    },
+    {
+      "id": "sombras_bambu",
+      "giver": "guarda",
+      "turnIn": "guarda",
+      "minLevel": 21,
+      "objective": {
+        "type": "kill",
+        "monster": "assassino_sombras",
+        "count": 12
+      },
+      "reward": {
+        "xp": 40000,
+        "gold": 1800
+      },
+      "name": "Sombras entre o bambu",
+      "offer": "Viajantes que pegam o passo do leste não voltam. Os poucos que escaparam falam de vultos de preto que saltam do bambu com duas facas. Derrote 12 desses assassinos e a trilha volta a ser segura.",
+      "goal": "Derrote assassinos das sombras",
+      "done": "As caravanas voltaram a passar pelo passo. Os assassinos tinham uma marca de serpente nas facas... Isso não me cheira bem."
+    },
+    {
+      "id": "veneno_jade",
+      "giver": "mestre",
+      "turnIn": "mestre",
+      "minLevel": 23,
+      "objective": {
+        "type": "kill",
+        "monster": "serpente_jade",
+        "count": 12
+      },
+      "reward": {
+        "xp": 60000,
+        "gold": 2200,
+        "item": "arma",
+        "itemLevel": 20
+      },
+      "name": "O veneno de jade",
+      "offer": "A marca nas facas é da seita da Serpente de Jade, feiticeiras que trocaram a honra por venenos. Elas protegem os assassinos de longe. Derrote 12 delas, mas não fique parado diante do veneno: ele prende os pés.",
+      "goal": "Derrote serpentes de jade",
+      "done": "Você lutou como um verdadeiro discípulo. Leve esta arma forjada com o bambu do bosque: no alto da montanha ela vai fazer falta."
+    },
+    {
+      "id": "penas_grou",
+      "giver": "mercador",
+      "turnIn": "mercador",
+      "minLevel": 26,
+      "objective": {
+        "type": "kill",
+        "monster": "grou_espiritual",
+        "count": 12
+      },
+      "reward": {
+        "xp": 80000,
+        "gold": 2600
+      },
+      "name": "Penas de grou",
+      "offer": "Acima do bosque fica o Pico da Névoa, onde os monges do estilo Grou viraram espíritos sem descanso. Dizem que suas penas de qi valem uma fortuna, e que guardam jade da névoa. Derrote 12 grous espirituais e eu pago bem pela notícia.",
+      "goal": "Derrote grous espirituais",
+      "done": "Jade da névoa de verdade! Com isso a forja do ferreiro vai trabalhar dia e noite. Tome seu ouro, você mereceu cada moeda."
+    },
+    {
+      "id": "senhor_nevoa",
+      "giver": "anciao",
+      "turnIn": "anciao",
+      "minLevel": 28,
+      "objective": {
+        "type": "kill",
+        "monster": "senhor_nevoa",
+        "count": 1
+      },
+      "reward": {
+        "xp": 100000,
+        "gold": 5000,
+        "item": "tronco",
+        "itemLevel": 25
+      },
+      "name": "O Senhor da Névoa",
+      "offer": "Agora tudo faz sentido. Quem envia os assassinos e as serpentes é o Senhor da Névoa, um antigo mestre que se fundiu à névoa do pico para viver para sempre. Suba ao Santuário de Jade e acabe com isso. Com metade da vida ele chama os grous; perto do fim, fica furioso.",
+      "goal": "Derrote o Senhor da Névoa",
+      "done": "A névoa se abriu sobre o pico pela primeira vez em mil anos. Daqui da vila dá para ver o santuário brilhando ao sol. Vista este manto: ele é seu por direito, mestre."
+    }
+  ]
 }
