@@ -12,7 +12,15 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save; `world/`)
 - `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en
 - `src/scenes/`, `src/ui/`, `src/render/`, `src/platform/`, `src/styles/` telas, interface, desenho, Android, CSS
+- `wiki/index.html` + `src/wiki/`: wiki para jogadores (PT), gerada dos JSON de `src/data/`; publicada em `<site>/wiki/`; `npm run check:wiki` confere contra o jogo
 - `tools/` scripts de checagem e geração; `docs/` documentação (`docs/decisoes/` decisões por tema, `docs/roadmap/`, `docs/arquivo/` histórico)
+
+## Wiki (regra)
+Toda mudança no jogo que afete algo mostrado na wiki atualiza a wiki **no mesmo commit/PR**.
+- Números e listas dos JSON (`src/data/`, `public/maps/`) já saem atualizados; confira a página afetada.
+- Regras copiadas em `src/wiki/` (fórmulas de combate, forja, offline, skills, preços, constantes) e textos à mão
+  (`src/wiki/mechanics.ts`, papéis dos NPCs em `src/wiki/npcs.ts`, comportamento de monstros) precisam ser editados junto.
+- Conteúdo novo (item, monstro, NPC, mapa, skill, seita, mecânica) ganha página/entrada na wiki; `npm run check:wiki` deve passar.
 
 ## Economia de contexto
 - Não leia docs grandes inteiros: use grep e leia só a seção relevante.

@@ -66,12 +66,12 @@ import {
 export const STEP = 1 / 60;
 const TARGET_RANGE = 14;
 
-const TOWN_REGEN = 0.03; // 3% por segundo
+export const TOWN_REGEN = 0.03; // 3% por segundo (a wiki mostra; tools/wiki-check.ts confere)
 const POISON_TICK = 1; // segundos entre os tiques de veneno
 const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
-const DEATH_DURABILITY_LOSS = 0.1;
+export const DEATH_DURABILITY_LOSS = 0.1;
 const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
 const BOSS_LEASH_SLACK = 3; // chefe só larga o jogador além do raio da arena + isto (tiles)
 const BOSS_LEASH_GRACE = 3; // ...e depois de tantos segundos seguidos lá fora
