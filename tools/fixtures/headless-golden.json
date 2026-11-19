@@ -1,0 +1,1315 @@
+{
+ "browser": "Chromium 157.0.8103.78",
+ "generatedAt": "2026-11-19",
+ "results": {
+  "floresta-3h": {
+   "offline": {
+    "elapsedMs": 10800000,
+    "effMin": 107.99999999999999,
+    "efficiency": 0.5999999999999999,
+    "kills": 612,
+    "xp": 26136,
+    "levelsGained": 2,
+    "newLevel": 8,
+    "gold": 5724,
+    "items": [
+     {
+      "name": "Poção de Vida Pequena",
+      "color": "#e04848",
+      "rarity": "comum",
+      "qty": 22
+     },
+     {
+      "name": "Colar de Jade Simples",
+      "color": "#4cd964",
+      "rarity": "incomum",
+      "qty": 15
+     },
+     {
+      "name": "Minério de Ferro",
+      "color": "#c9b8a0",
+      "rarity": "comum",
+      "qty": 29
+     },
+     {
+      "name": "Túnica de Algodão",
+      "color": "#ffffff",
+      "rarity": "comum",
+      "qty": 7
+     }
+    ],
+    "potionsUsed": {
+     "hp": 42,
+     "mp": 10
+    },
+    "soldCount": 0,
+    "soldGold": 0
+   },
+   "save": {
+    "version": 1,
+    "name": "Ana",
+    "classId": "lamina",
+    "level": 8,
+    "xp": 7936,
+    "freePoints": 6,
+    "attributes": {
+     "strength": 20,
+     "intelligence": 8,
+     "stamina": 20,
+     "agility": 10,
+     "willpower": 8
+    },
+    "mapId": "floresta",
+    "lastSeen": 1800000000000,
+    "skills": {
+     "corte_duplo": {
+      "level": 1,
+      "xp": 0
+     },
+     "passo_fantasma": {
+      "level": 1,
+      "xp": 0
+     },
+     "tempestade_laminas": {
+      "level": 1,
+      "xp": 0
+     },
+     "golpe_rompe_guarda": {
+      "level": 1,
+      "xp": 0
+     },
+     "fluxo_lamina": {
+      "level": 1,
+      "xp": 0
+     }
+    },
+    "ratioCursor": 0,
+    "seenTips": [],
+    "tipsEnabled": true,
+    "audio": {
+     "sfx": 80,
+     "music": 50,
+     "muted": false
+    },
+    "gold": 6224,
+    "bag": [
+     null,
+     null,
+     {
+      "uid": "srv-mywpiww0-1-9dhx",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "physDef",
+        "value": 6
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-2-s9ig",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "intelligence",
+        "value": 4
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-3-q186",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "willpower",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-4-t8js",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "maxHp",
+        "value": 29
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-5-l16q",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "critChance",
+        "value": 0.022
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-6-c8uo",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "intelligence",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-7-v3q1",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "intelligence",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-8-cci9",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "intelligence",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-9-sboe",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "stamina",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-a-pxl4",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "physDef",
+        "value": 7
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-b-8pgu",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "maxMana",
+        "value": 18
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-c-6j11",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "maxHp",
+        "value": 28
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-d-v8so",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "elem_thunder",
+        "value": 5
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-e-tgia",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "hit",
+        "value": 9
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-f-gpoe",
+      "baseId": "colar_jade",
+      "rarity": "incomum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": [
+       {
+        "stat": "spiritDef",
+        "value": 6
+       }
+      ]
+     },
+     {
+      "uid": "srv-mywpiww0-h-ch8r",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 29
+     },
+     {
+      "uid": "srv-mywpiww0-i-tvp3",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-j-b1n5",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-k-zux8",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-l-v8s2",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-m-wg54",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-n-s7g2",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     {
+      "uid": "srv-mywpiww0-o-j0qz",
+      "baseId": "tunica_algodao",
+      "rarity": "comum",
+      "ilvl": 6,
+      "durability": 100,
+      "bonuses": []
+     },
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "equipment": {},
+    "auto": {
+     "active": true,
+     "mapId": "floresta",
+     "config": {
+      "skillsOff": [],
+      "hpThreshold": 40,
+      "mpThreshold": 30,
+      "buyHp": 10,
+      "buyMp": 5,
+      "sellIncomum": false,
+      "maxLevelAbove": 2,
+      "grayMode": "last",
+      "retaliate": "always",
+      "onStrongAggro": "keep",
+      "crowdAvoid": "low"
+     },
+     "buckets": [
+      {
+       "sec": 600,
+       "kills": 55,
+       "xp": 2310,
+       "gold": 495,
+       "potHp": 6,
+       "potMp": 2,
+       "levelSum": 330,
+       "drops": {
+        "pocao_hp_p|comum": 3,
+        "colar_jade|incomum": 2,
+        "minerio_ferro|comum": 4
+       }
+      },
+      {
+       "sec": 300,
+       "kills": 30,
+       "xp": 1320,
+       "gold": 300,
+       "potHp": 3,
+       "potMp": 1,
+       "levelSum": 180,
+       "drops": {
+        "tunica_algodao|comum": 1
+       }
+      }
+     ]
+    },
+    "bossRespawns": {},
+    "respawns": {},
+    "quest": {
+     "stage": 0,
+     "status": "pending",
+     "progress": 0
+    }
+   },
+   "merchant": {
+    "period": 500000,
+    "offers": [
+     {
+      "item": {
+       "uid": "srv-mywpiww0-p-fi3q",
+       "baseId": "coroa_monge",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "spiritDef",
+         "value": 7
+        },
+        {
+         "stat": "intelligence",
+         "value": 2
+        }
+       ]
+      },
+      "price": 520,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywpiww0-q-h2nj",
+       "baseId": "espadas_vento",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "elem_thunder",
+         "value": 6
+        },
+        {
+         "stat": "stamina",
+         "value": 2
+        }
+       ]
+      },
+      "price": 1040,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywpiww0-r-69yb",
+       "baseId": "calca_couro",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "maxHp",
+         "value": 23
+        },
+        {
+         "stat": "maxMana",
+         "value": 18
+        }
+       ]
+      },
+      "price": 624,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywpiww0-s-tvh2",
+       "baseId": "botas_andarilho",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "maxMana",
+         "value": 12
+        },
+        {
+         "stat": "agility",
+         "value": 2
+        }
+       ]
+      },
+      "price": 520,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywpiww0-t-hiv3",
+       "baseId": "manto_seda",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "willpower",
+         "value": 3
+        },
+        {
+         "stat": "physDef",
+         "value": 4
+        }
+       ]
+      },
+      "price": 832,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywpiww0-u-wgge",
+       "baseId": "colar_dragao",
+       "rarity": "raro",
+       "ilvl": 5,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "maxMana",
+         "value": 17
+        },
+        {
+         "stat": "stamina",
+         "value": 2
+        }
+       ]
+      },
+      "price": 624,
+      "sold": false
+     }
+    ]
+   }
+  },
+  "ruinas-14h-mochila-cheia": {
+   "offline": {
+    "elapsedMs": 75600123,
+    "effMin": 612.00041,
+    "efficiency": 0.48571382086243425,
+    "kills": 2448,
+    "xp": 293760,
+    "levelsGained": 6,
+    "newLevel": 17,
+    "gold": 61200,
+    "items": [],
+    "potionsUsed": {
+     "hp": 0,
+     "mp": 0
+    },
+    "soldCount": 183,
+    "soldGold": 10366
+   },
+   "save": {
+    "version": 1,
+    "name": "Bia",
+    "classId": "pavilhao",
+    "level": 17,
+    "xp": 13260,
+    "freePoints": 18,
+    "attributes": {
+     "strength": 28,
+     "intelligence": 19,
+     "stamina": 28,
+     "agility": 15,
+     "willpower": 19
+    },
+    "mapId": "ruinas",
+    "lastSeen": 1800025200123,
+    "skills": {
+     "esfera_qi": {
+      "level": 1,
+      "xp": 0
+     },
+     "lotus_congelante": {
+      "level": 1,
+      "xp": 0
+     },
+     "chuva_qi": {
+      "level": 1,
+      "xp": 0
+     },
+     "escudo_nuvem": {
+      "level": 1,
+      "xp": 0
+     },
+     "meditacao_celeste": {
+      "level": 1,
+      "xp": 0
+     }
+    },
+    "ratioCursor": 0,
+    "seenTips": [],
+    "tipsEnabled": true,
+    "audio": {
+     "sfx": 80,
+     "music": 50,
+     "muted": false
+    },
+    "gold": 72066,
+    "bag": [
+     {
+      "uid": "b0",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b1",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b2",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b3",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b4",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b5",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b6",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b7",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b8",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b9",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b10",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b11",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b12",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b13",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b14",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b15",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b16",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b17",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b18",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b19",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b20",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b21",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b22",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b23",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b24",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b25",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b26",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b27",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b28",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     },
+     {
+      "uid": "b29",
+      "baseId": "minerio_ferro",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 1
+     }
+    ],
+    "equipment": {},
+    "auto": {
+     "active": true,
+     "mapId": "ruinas",
+     "config": {
+      "skillsOff": [],
+      "hpThreshold": 40,
+      "mpThreshold": 30,
+      "buyHp": 10,
+      "buyMp": 10,
+      "sellIncomum": false,
+      "maxLevelAbove": 2,
+      "grayMode": "last",
+      "retaliate": "always",
+      "onStrongAggro": "keep",
+      "crowdAvoid": "low"
+     },
+     "buckets": [
+      {
+       "sec": 1200,
+       "kills": 80,
+       "xp": 9600,
+       "gold": 2000,
+       "potHp": 8,
+       "potMp": 3,
+       "levelSum": 880,
+       "drops": {
+        "colar_dragao|raro": 1,
+        "manto_seda|incomum": 3,
+        "essencia_qi|comum": 2
+       }
+      }
+     ]
+    },
+    "bossRespawns": {},
+    "respawns": {},
+    "quest": {
+     "stage": 0,
+     "status": "pending",
+     "progress": 0
+    }
+   },
+   "merchant": {
+    "period": 500007,
+    "offers": [
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3f-stst",
+       "baseId": "elmo_guardiao",
+       "rarity": "raro",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "physDef",
+         "value": 9
+        },
+        {
+         "stat": "spiritDef",
+         "value": 9
+        }
+       ]
+      },
+      "price": 2080,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3g-r1w3",
+       "baseId": "botas_passo_celeste",
+       "rarity": "raro",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "spiritDef",
+         "value": 12
+        },
+        {
+         "stat": "willpower",
+         "value": 6
+        }
+       ]
+      },
+      "price": 2080,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3h-uy09",
+       "baseId": "leque_fenix",
+       "rarity": "incomum",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "critChance",
+         "value": 0.055
+        }
+       ]
+      },
+      "price": 2560,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3i-idd8",
+       "baseId": "colar_lotus",
+       "rarity": "raro",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "willpower",
+         "value": 6
+        },
+        {
+         "stat": "spiritDef",
+         "value": 13
+        }
+       ]
+      },
+      "price": 2496,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3j-kjcm",
+       "baseId": "calca_escamas",
+       "rarity": "raro",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "strength",
+         "value": 5
+        },
+        {
+         "stat": "hit",
+         "value": 19
+        }
+       ]
+      },
+      "price": 2496,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-myx4j1ff-3k-ax5n",
+       "baseId": "armadura_templo",
+       "rarity": "raro",
+       "ilvl": 15,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "strength",
+         "value": 7
+        },
+        {
+         "stat": "elem_ice",
+         "value": 9
+        }
+       ]
+      },
+      "price": 3328,
+      "sold": false
+     }
+    ]
+   }
+  },
+  "relogio-voltou": {
+   "offline": null,
+   "save": {
+    "version": 1,
+    "name": "Caio",
+    "classId": "tita",
+    "level": 4,
+    "xp": 0,
+    "freePoints": 0,
+    "attributes": {
+     "strength": 14,
+     "intelligence": 6,
+     "stamina": 14,
+     "agility": 8,
+     "willpower": 6
+    },
+    "mapId": "floresta",
+    "lastSeen": 1799992800000,
+    "skills": {
+     "punho_montanha": {
+      "level": 1,
+      "xp": 0
+     },
+     "tremor": {
+      "level": 1,
+      "xp": 0
+     },
+     "pele_ferro": {
+      "level": 1,
+      "xp": 0
+     },
+     "punho_vulcanico": {
+      "level": 1,
+      "xp": 0
+     },
+     "corpo_bronze": {
+      "level": 1,
+      "xp": 0
+     }
+    },
+    "ratioCursor": 0,
+    "seenTips": [],
+    "tipsEnabled": true,
+    "audio": {
+     "sfx": 80,
+     "music": 50,
+     "muted": false
+    },
+    "gold": 500,
+    "bag": [
+     {
+      "uid": "c1",
+      "baseId": "pocao_hp_p",
+      "rarity": "comum",
+      "bonuses": [],
+      "ilvl": 1,
+      "durability": 0,
+      "qty": 5
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "equipment": {},
+    "auto": {
+     "active": true,
+     "mapId": "floresta",
+     "config": {
+      "skillsOff": [],
+      "hpThreshold": 40,
+      "mpThreshold": 30,
+      "buyHp": 10,
+      "buyMp": 10,
+      "sellIncomum": false,
+      "maxLevelAbove": 2,
+      "grayMode": "last",
+      "retaliate": "always",
+      "onStrongAggro": "keep",
+      "crowdAvoid": "low"
+     },
+     "buckets": [
+      {
+       "sec": 400,
+       "kills": 25,
+       "xp": 750,
+       "gold": 150,
+       "potHp": 3,
+       "potMp": 1,
+       "levelSum": 100,
+       "drops": {
+        "pocao_hp_p|comum": 1
+       }
+      }
+     ]
+    },
+    "bossRespawns": {},
+    "respawns": {},
+    "quest": {
+     "stage": 0,
+     "status": "pending",
+     "progress": 0
+    }
+   },
+   "merchant": {
+    "period": 499998,
+    "offers": [
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-0-4i7c",
+       "baseId": "bastao_ferro",
+       "rarity": "raro",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "intelligence",
+         "value": 2
+        },
+        {
+         "stat": "stamina",
+         "value": 1
+        }
+       ]
+      },
+      "price": 208,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-1-qq21",
+       "baseId": "faixa_linho",
+       "rarity": "raro",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "maxHp",
+         "value": 15
+        },
+        {
+         "stat": "maxMana",
+         "value": 11
+        }
+       ]
+      },
+      "price": 104,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-2-rs09",
+       "baseId": "calca_algodao",
+       "rarity": "raro",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "hit",
+         "value": 5
+        },
+        {
+         "stat": "willpower",
+         "value": 1
+        }
+       ]
+      },
+      "price": 125,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-3-h6fk",
+       "baseId": "tunica_algodao",
+       "rarity": "incomum",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "maxHp",
+         "value": 10
+        }
+       ]
+      },
+      "price": 102,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-4-uc52",
+       "baseId": "sandalia_palha",
+       "rarity": "raro",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "willpower",
+         "value": 2
+        },
+        {
+         "stat": "agility",
+         "value": 2
+        }
+       ]
+      },
+      "price": 104,
+      "sold": false
+     },
+     {
+      "item": {
+       "uid": "srv-mywl8lc0-5-nyqk",
+       "baseId": "colar_jade",
+       "rarity": "raro",
+       "ilvl": 1,
+       "durability": 100,
+       "bonuses": [
+        {
+         "stat": "elem_fire",
+         "value": 3
+        },
+        {
+         "stat": "maxMana",
+         "value": 8
+        }
+       ]
+      },
+      "price": 125,
+      "sold": false
+     }
+    ]
+   }
+  }
+ }
+}

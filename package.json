@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9",
+    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9 && npm run check:headless",
     "maps": "node tools/gen-maps.mjs",
     "check:items": "esbuild tools/items-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/items-check.mjs && node /tmp/items-check.mjs",
     "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
@@ -26,7 +26,10 @@
     "format:check": "prettier --check .",
     "android:prepare": "npm run build && (test -d android || npx cap add android) && node tools/android-version.mjs && npx capacitor-assets generate --android && npx cap sync android && node tools/android-trim-audio.mjs",
     "android:apk": "npm run android:prepare && cd android && ./gradlew assembleDebug",
-    "check:m9": "esbuild tools/m9-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m9-check.mjs && node /tmp/m9-check.mjs"
+    "check:m9": "esbuild tools/m9-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m9-check.mjs && node /tmp/m9-check.mjs",
+    "build:headless": "node tools/headless-build.mjs",
+    "check:headless": "node tools/headless-check.mjs",
+    "golden:headless": "node tools/headless-golden.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

@@ -198,6 +198,7 @@ export class World {
   ): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
     now ??= clock.now();
+    w.rng = new Rng((now & 0xffffffff) >>> 0); // sorteio a partir do instante da carga: o servidor reproduz igual
     saveCodec.restore(w, s, now, clock);
     w.offlineReport = offline ? w.applyOffline(now, s.lastSeen, s.auto) : null;
     return w;
