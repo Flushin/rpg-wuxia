@@ -33,6 +33,7 @@
     "check:m9": "esbuild tools/m9-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m9-check.mjs && node /tmp/m9-check.mjs"
   },
   "dependencies": {
+    "@capacitor-community/keep-awake": "^8.0.1",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.2",
     "@capacitor/filesystem": "^8.1.5",

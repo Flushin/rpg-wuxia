@@ -22,6 +22,8 @@ export const PREF = {
   HUD_LAYOUT: 'rpg-hud-layout',
   /** última versão do jogo cujas novidades o jogador abriu (ex.: '0.1.0') */
   NEWS_SEEN: 'rpg-news-seen',
+  /** modo descanso (economia de bateria no Auto): segundos sem tocar até entrar; '0' desligado */
+  REST: 'rpg-rest',
 } as const;
 export type PrefKey = (typeof PREF)[keyof typeof PREF];
 
