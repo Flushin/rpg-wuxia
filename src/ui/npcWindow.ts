@@ -51,7 +51,7 @@ const icon = (it: ItemInstance) => `<span class="cell mini" style="${cellStyle(i
 export class NpcWindow {
   private sig = '';
   private tab: 'buy' | 'sell' = 'buy';
-  private smithTab: 'repair' | 'forge' = 'repair';
+  private smithTab: 'repair' | 'forge' | 'salvage' = 'repair';
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
   private salvageAsk = false; // desmontar aguardando confirmação
   private qty = 1;
@@ -139,7 +139,10 @@ export class NpcWindow {
     }
     if (a === 'stab') {
       audio.ui('ui_click');
-      this.smithTab = v as 'repair' | 'forge';
+      this.smithTab = v as 'repair' | 'forge' | 'salvage';
+      this.forgeSel = '';
+      this.salvageAsk = false;
+      this.showSide = false;
       return;
     }
     if (a === 'fsel') {
@@ -242,7 +245,8 @@ export class NpcWindow {
     let view: View,
       sub = '';
     if (role === 'ferreiro') {
-      const v = this.smithTab === 'forge' ? this.forge() : this.smith();
+      const v =
+        this.smithTab === 'forge' ? this.forge() : this.smithTab === 'salvage' ? this.salvageView() : this.smith();
       view = { ...v, top: this.smithTabs() + (v.top ?? '') };
     } else if (role === 'vendedor') view = this.shop();
     else if (role === 'mercador') view = this.merchant(role);
@@ -339,7 +343,7 @@ export class NpcWindow {
   private smithTabs(): string {
     const b = (t: string, label: string) =>
       `<button class="${this.smithTab === t ? 'on' : ''}" data-a="stab" data-v="${t}">${label}</button>`;
-    return `<div class="tabs">${b('repair', L('Consertar', 'Repair'))}${b('forge', L('Forjar', 'Forge'))}</div>`;
+    return `<div class="tabs">${b('repair', L('Consertar', 'Repair'))}${b('forge', L('Forjar', 'Forge'))}${b('salvage', L('Desmontar', 'Salvage'))}</div>`;
   }
 
   private forgeItem(): ItemInstance | null {
@@ -406,8 +410,6 @@ export class NpcWindow {
         ra = rarityCost(it),
         re = rerollCost(it),
         plus = it.plus ?? 0;
-      const inBag = this.forgeSel.startsWith('bag:');
-      const salv = salvageYield(it);
       // ações primeiro (é o que se usa várias vezes seguidas); a ficha completa do item vem logo abaixo
       detail = `${this.costRow(
         L(`Melhorar para +${plus + 1}`, `Upgrade to +${plus + 1}`),
@@ -440,9 +442,37 @@ export class NpcWindow {
           L('Sorteia de novo todos os bônus.', 'Rerolls all bonuses.'),
           L('Só itens Incomuns ou Raros têm bônus.', 'Only Uncommon or Rare items have bonuses.'),
         )}
-        <div class="srow"><div class="si"><b>${L('Desmontar', 'Salvage')}</b><small>${L('Recebe', 'Get')}: ${this.matsHtml(salv).replace(/ <i>\([^)]*\)<\/i>/g, '')}</small>
-          ${inBag ? '' : `<small class="muted">${L('Desequipe antes de desmontar.', 'Unequip it before salvaging.')}</small>`}</div>
-          <button class="${this.salvageAsk ? 'danger' : ''}" data-a="forge" data-v="salvage" ${inBag ? '' : 'disabled'}>${this.salvageAsk ? L('Confirmar?', 'Confirm?') : L('Desmontar', 'Salvage')}</button></div>
+<div class="tipbody ftip">${itemTipHtml(w, it, false)}</div>`;
+    }
+    return { top, list: `<div class="fpick">${pick.join('')}</div>`, side: detail, wide: true };
+  }
+
+  /** Aba Desmontar: só itens da mochila; escolhe um, vê os materiais que recebe e confirma. */
+  private salvageView(): View {
+    const w = this.world;
+    const pick: string[] = [];
+    w.bag.forEach((it, i) => {
+      if (!it || !BASES[it.baseId]) return;
+      const ref = `bag:${i}`;
+      pick.push(
+        `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b></span></button>`,
+      );
+    });
+    const top = `<div class="npc-mats"><small class="muted">${L(
+      'Transforma equipamentos da mochila em materiais de forja. Itens equipados não aparecem aqui.',
+      'Turns equipment in your bag into forging materials. Equipped items are not listed here.',
+    )}</small></div>`;
+    if (!pick.length)
+      return {
+        top,
+        list: `<p class="muted">${L('Nenhum equipamento na mochila para desmontar.', 'No equipment in your bag to salvage.')}</p>`,
+      };
+    const it = this.forgeItem();
+    let detail = `<p class="muted">${L('Escolha um item para desmontar.', 'Choose an item to salvage.')}</p>`;
+    if (it && this.forgeSel.startsWith('bag:')) {
+      detail = `<div class="srow"><div class="si"><b>${L('Você recebe', 'You get')}</b><small>${this.matsHtml(salvageYield(it)).replace(/ <i>\([^)]*\)<\/i>/g, '')}</small>
+          <small class="muted">${L('O item é destruído.', 'The item is destroyed.')}</small></div>
+          <button class="${this.salvageAsk ? 'danger' : ''}" data-a="forge" data-v="salvage">${this.salvageAsk ? L('Confirmar?', 'Confirm?') : L('Desmontar', 'Salvage')}</button></div>
         <div class="tipbody ftip">${itemTipHtml(w, it, false)}</div>`;
     }
     return { top, list: `<div class="fpick">${pick.join('')}</div>`, side: detail, wide: true };

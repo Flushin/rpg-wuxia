@@ -66,8 +66,8 @@ function npcList(): NpcInfo[] {
          <p>Na aba <b>Forjar</b>, usando ouro e materiais (${itemLink('minerio_ferro')}, ${itemLink('cristal_gelo')}, ${itemLink('essencia_qi')}):</p>
          <ul><li><b>Melhorar</b> o item de +1 até +10, somando força aos atributos base.</li>
          <li><b>Subir a raridade</b> (Comum → Incomum → Raro), ganhando bônus aleatórios.</li>
-         <li><b>Trocar um bônus</b> aleatório por outro.</li>
-         <li><b>Desmontar</b> itens que você não quer, recebendo materiais de volta.</li></ul>`,
+         <li><b>Trocar um bônus</b> aleatório por outro.</li></ul>
+         <p>Na aba <b>Desmontar</b> transforma equipamentos da mochila que você não quer em materiais de volta.</p>`,
     },
     {
       id: 'vendedor',
