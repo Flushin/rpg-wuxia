@@ -197,7 +197,7 @@ export function directDamage(w: World, a: Entity, t: Entity, mult: number) {
   if (dealt > 0)
     w.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
   w.lastDamaged = w.time;
-  w.wearGear();
+  if (dealt > 0) w.wearGear(); // golpe todo absorvido pelo escudo não desgasta
   if (t.hp <= 0) w.killPlayer();
 }
 

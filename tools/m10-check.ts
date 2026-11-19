@@ -4,7 +4,7 @@
 // Uso: npm run check:m10
 import { readFileSync } from 'node:fs';
 import { CLASSES, MONSTERS } from '../src/core/data';
-import { BASES } from '../src/core/items';
+import { BASES, makeEquipment } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { MAPS_CONFIG, portalMinLevel } from '../src/core/mapsConfig';
 import { computeOffline } from '../src/core/offline';
@@ -144,6 +144,26 @@ console.log('== resistência a veneno ==');
     noRes > 0 && Math.abs(withRes / noRes - (1 - keep!)) < 0.01,
     `veneno das skills rende ${Math.round(keep! * 100)}% menos (${withRes.toFixed(1)} contra ${noRes.toFixed(1)} por s)`,
   );
+}
+
+console.log('== desgaste: escudo protege o equipamento ==');
+{
+  const w = mk(22, 'bambu', 'tita');
+  w.equipment.tronco = makeEquipment('veste_bambu', 'comum', null, new Rng(1), 22);
+  for (const sl of Object.keys(w.equipment)) if (sl !== 'tronco') delete (w.equipment as Record<string, unknown>)[sl];
+  const m = w.monsters.find((x) => x.monsterId === 'assassino_sombras')!;
+  (w as unknown as { rng: { next: () => number; range: (a: number, b: number) => number } }).rng = {
+    next: () => 0.01,
+    range: (a: number, b: number) => (a + b) / 2,
+  } as never;
+  const hit = () => (w as unknown as { attack: (a: Entity, t: Entity) => unknown }).attack(m, w.player);
+  const d0 = w.equipment.tronco!.durability;
+  w.addBuff(w.player, 'teste', 'shield', 1e6, 30);
+  hit();
+  ok(w.equipment.tronco!.durability === d0, 'golpe todo absorvido pelo escudo não gasta durabilidade');
+  w.player.buffs = [];
+  hit();
+  ok(w.equipment.tronco!.durability < d0, 'golpe que passa do escudo gasta durabilidade');
 }
 
 console.log('== Senhor da Névoa ==');

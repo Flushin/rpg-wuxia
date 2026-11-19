@@ -1067,9 +1067,10 @@ export class World {
     if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
     const proj = a.kind === 'monster' ? MONSTERS[a.monsterId]?.projectile : undefined;
     if (proj) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: proj });
-    if (r.hit && t.kind === 'player' && a.kind === 'monster') this.wearGear();
     if (r.hit) {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
+      // desgaste: só golpe que passa do escudo (o escudo protege o equipamento; decidido pelo Lucas em 19/11/2026)
+      if (t.kind === 'player' && a.kind === 'monster' && dealt > 0) this.wearGear();
       t.hp -= dealt;
       if (dealt > 0)
         this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });

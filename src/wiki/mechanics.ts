@@ -206,7 +206,7 @@ function morte(): string {
       <li>Cada item equipado perde <b>${pc(loss)} da durabilidade máxima</b>.</li>
       <li>Você <b>não</b> perde XP, ouro nem itens. Efeitos de poção ativos acabam.</li></ul></section>
     <section class="panel"><h2>Durabilidade</h2><ul>
-      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado.</li>
+      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado. Golpe <b>todo absorvido por um escudo</b> (Pele de Ferro, Véu de Névoa…) não desgasta.</li>
       <li>Com durabilidade <b>0</b>, o item para de dar bônus (mas não some). Um aviso ⚠ aparece no topo da tela quando algo está gasto.</li>
       <li>O <a href="#/npc/ferreiro">Ferreiro</a> conserta:</li></ul>
       ${formula('Conserto = durabilidade que falta × nível do item × ' + n1(REPAIR_COST_PER_POINT * bal('conserto.custo')) + ' (arredondado para cima)')}
