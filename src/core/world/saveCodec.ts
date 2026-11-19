@@ -1,5 +1,6 @@
 // Save: transforma o World em SaveData (serialize) e preenche um World novo a partir do save (restore).
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
+import { isDungeonMap } from '../dungeons';
 import { SKILL_MAX_LEVEL } from '../skills';
 import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
@@ -71,7 +72,8 @@ export function restore(w: World, s: SaveData, now: number) {
     if (typeof k === 'string' && Number(v) > 0) w.bossRespawn[k] = Number(v);
   for (const [k, v] of Object.entries(s.respawns ?? {}))
     if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
-  w.changeMap(w.maps[s.mapId] ? s.mapId : HOME_MAP);
+  // masmorra não fica salva: quem fechou o jogo lá dentro volta para a vila (a corrida acaba)
+  w.changeMap(w.maps[s.mapId] && !isDungeonMap(s.mapId) ? s.mapId : HOME_MAP);
   w.clock = () => Date.now();
   w.auto.load(s.auto);
   w.quest = sanitizeQuest(s.quest);

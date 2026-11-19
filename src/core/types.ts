@@ -129,6 +129,14 @@ export type GameEvent =
   | { type: 'playerDeath' }
   | { type: 'mapChange'; mapId: string }
   | { type: 'portalLocked'; name: string; minLevel: number }
+  /** pisou no Portal das Masmorras: a interface abre o menu de escolha (World.dungeonMenu) */
+  | { type: 'dungeonMenu' }
+  /** entrou numa masmorra (já pagou a entrada) */
+  | { type: 'dungeonEnter'; dungeonId: string; cost: number }
+  /** chefe da masmorra derrotado */
+  | { type: 'dungeonCleared'; dungeonId: string }
+  /** tentou ligar o Auto dentro de uma masmorra */
+  | { type: 'autoBlocked' }
   | {
       type: 'skillCast';
       skillId: string;
@@ -167,8 +175,8 @@ export type GameEvent =
   | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number }
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }
-  | { type: 'bossSummon'; ids: number[] }
-  | { type: 'bossDefeated'; respawnAt: number };
+  | { type: 'bossSummon'; ids: number[]; name: string }
+  | { type: 'bossDefeated'; name: string; respawnAt: number };
 
 // Círculo de aviso no chão (golpe em área do chefe)
 export interface Telegraph {

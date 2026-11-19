@@ -1,5 +1,10 @@
 {
-  "proxima": [],
+  "proxima": [
+    {
+      "texto": "Masmorras: o novo Portal das Masmorras, na saída oeste da vila, leva ao Desfiladeiro do Gelo Eterno (nível 10+). Entrada paga, monstros que não renascem, mais chance de equipamento e o Yeti Ancestral no fim. Sem Auto lá dentro.",
+      "wiki": "mapa/gruta"
+    }
+  ],
   "versoes": [
     {
       "versao": "0.1.0",

@@ -1,5 +1,6 @@
 // Inventário: mochila, equipar, poções, itens no chão, coleta e desgaste.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
+import { DUNGEON_EQUIP_DROP_MUL, isDungeonMap } from '../dungeons';
 import { CLASSES, type MonsterDef } from '../data';
 import { L } from '../i18n';
 import {
@@ -209,9 +210,10 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
     collect(w, it, s.x, s.y);
   };
   const eqs = L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [];
+  const eqMul = isDungeonMap(w.mapId) ? DUNGEON_EQUIP_DROP_MUL : 1; // masmorra: +25% de chance de equipamento
   for (const eq of eqs) {
     if (eq.minMonsterLevel && m.level < eq.minMonsterLevel) continue;
-    if (w.rng.next() >= eq.chance) continue;
+    if (w.rng.next() >= eq.chance * eqMul) continue;
     const ids = equipmentBaseIds().filter(
       (id) => BASES[id].reqLevel <= eq.maxReqLevel && BASES[id].reqLevel >= (eq.minReqLevel ?? 0) && sectOk(id),
     );

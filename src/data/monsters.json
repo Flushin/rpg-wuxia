@@ -669,5 +669,85 @@
         }
       ]
     }
+  },
+  "yeti_ancestral": {
+    "id": "yeti_ancestral",
+    "name": "Yeti Ancestral",
+    "sprite": "yeti",
+    "minLevel": 15,
+    "maxLevel": 15,
+    "scale": 2,
+    "baseAttributes": {
+      "strength": 14,
+      "intelligence": 0,
+      "stamina": 560,
+      "agility": 12,
+      "willpower": 110
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.4,
+    "attackInterval": 2.6,
+    "moveSpeed": 1.8,
+    "defMul": {
+      "phys": 0.25,
+      "spirit": 1.6
+    },
+    "xpBase": 3000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 600,
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.6,
+        "delay": 1.4,
+        "mult": 1.8,
+        "interval": 7,
+        "intervalPhase2": 5
+      },
+      "summon": {
+        "monsterId": "yeti",
+        "count": 2,
+        "level": 13,
+        "atHpPct": 0.5
+      }
+    },
+    "loot": {
+      "gold": {
+        "min": 300,
+        "max": 400
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 10
+      },
+      "equipment": [
+        {
+          "chance": 0.4,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "cristal_gelo",
+          "chance": 1,
+          "min": 2,
+          "max": 3
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1
+        }
+      ]
+    }
   }
 }

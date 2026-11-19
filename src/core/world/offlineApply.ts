@@ -6,10 +6,12 @@ import { computeOffline, type OfflineResult } from '../offline';
 import { type ItemInstance, type PotionKind, type SaveData } from '../types';
 import type { OfflineReport, World } from '../world';
 import { TOWN_MAPS } from '../mapsConfig';
+import { isDungeonMap } from '../dungeons';
 
 // ---------- ganho offline ----------
 export function applyOffline(w: World, now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
   if (!saved?.active || !saved.mapId || TOWN_MAPS.has(saved.mapId) || !w.maps[saved.mapId]) return null;
+  if (isDungeonMap(saved.mapId)) return null; // masmorra não rende nada offline
   const rate = w.auto.rate();
   if (!rate) return null;
   const elapsedMs = Math.max(0, now - (Number(lastSeen) || now)); // relógio adulterado: negativo vira 0

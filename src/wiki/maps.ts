@@ -9,6 +9,8 @@ export interface Spawn {
 export interface Portal {
   target: string;
   minLevel: number;
+  /** portal de menu (o Portal das Masmorras da vila): sem destino fixo */
+  menu?: string;
 }
 export interface WikiMap {
   id: string;
@@ -40,7 +42,12 @@ async function loadOne(id: string): Promise<WikiMap> {
           minLevel: Number(p.minLevel) || undefined,
           maxLevel: Number(p.maxLevel) || undefined,
         });
-      else if (o.type === 'portal') m.portals.push({ target: String(p.target), minLevel: Number(p.minLevel) || 0 });
+      else if (o.type === 'portal')
+        m.portals.push(
+          p.menu
+            ? { target: '', minLevel: 0, menu: String(p.menu) }
+            : { target: String(p.target), minLevel: Number(p.minLevel) || 0 },
+        );
       else if (o.type === 'npc') m.npcs.push(String(p.npc));
     }
   return m;

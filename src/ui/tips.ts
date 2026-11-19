@@ -134,7 +134,7 @@ export class TipManager {
     }
     if (w.seenTips.includes('portal')) return;
     for (const o of w.map.objects) {
-      if (o.type !== 'portal') continue;
+      if (o.type !== 'portal' || o.props.menu) continue; // a dica fala do portal da floresta
       if (Math.hypot(w.player.x - (o.x + o.w / 2), w.player.y - (o.y + o.h / 2)) < 6) {
         this.trigger('portal');
         return;

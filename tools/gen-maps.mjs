@@ -349,6 +349,8 @@ function cidade() {
     area('Floresta', 'portal', 29, 14, 2, 4, { target: 'floresta', targetX: 5.5, targetY: 16.5 }),
     // saída norte (marco 9): só abre no nível 10 (minLevel)
     area('Montanha Nevada', 'portal', 15, 1, 2, 2, { target: 'montanha', targetX: 16, targetY: 27.5, minLevel: 10 }),
+    // saída oeste: portal das masmorras (abre o menu de escolha; src/core/dungeons.ts)
+    area('Portal das Masmorras', 'portal', 1, 14, 2, 4, { menu: 'masmorras' }),
   );
   return tiled('Vila das Nuvens', gr, objs);
 }
@@ -596,10 +598,90 @@ function montanha() {
   return tiled('Montanha Nevada', gr, objs);
 }
 
+// ---- masmorra: Desfiladeiro do Gelo Eterno (nível 10–15) ----
+// Instância (src/core/dungeons.ts): monstros não renascem; entrada no sul, três salões e a arena do chefe no norte.
+// Paredes de pinheiros e rochas nevadas; arena de lajes com braseiros, como a do templo da montanha.
+const GRUTA_ARENA = { x: 16, y: 6, r: 5.5 };
+function gruta() {
+  const rnd = rngFn(1510);
+  const gr = makeGrid(PN, PN);
+  for (let j = 1; j < H - 1; j++) for (let i = 1; i < W - 1; i++) if (rnd() < 0.3) gr.set(i, j, PI);
+  // entrada (sul) e primeiro salão
+  gr.rect(15, 24, 2, 7, SN);
+  gr.disc(16, 21, 3.6, SN);
+  // passagens para os salões oeste e leste
+  gr.rect(7, 21, 9, 2, SN);
+  gr.rect(17, 21, 8, 2, SN);
+  gr.disc(7, 16, 3.4, SN); // salão oeste
+  gr.rect(6, 18, 2, 4, SN);
+  gr.disc(25, 16, 3.4, SN); // salão leste
+  gr.rect(24, 18, 2, 4, SN);
+  // os dois salões sobem até a antecâmara, na frente da arena
+  gr.rect(6, 11, 2, 3, SN);
+  gr.rect(24, 11, 2, 3, SN);
+  gr.rect(6, 11, 20, 2, SN);
+  gr.disc(16, 13.5, 2, SN);
+  // arena do chefe: lajes com 6 braseiros em volta. Sem portal perto: fugindo dos golpes o jogador saía sem querer;
+  // a única saída é a da entrada (sul)
+  gr.rect(9, 1, 14, 10, RU); // salão largo como o pátio do templo da montanha: espaço para desviar e recuar
+  gr.disc(GRUTA_ARENA.x, GRUTA_ARENA.y, 4.6, RU);
+  gr.rect(15, 10, 2, 2, RU);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(GRUTA_ARENA.x + Math.cos(a) * 4), Math.floor(GRUTA_ARENA.y + Math.sin(a) * 4), PI);
+  }
+  const seen = sealUnreachable(gr, 16, 27, PN);
+  for (const [i, j, what] of [
+    [16, 6, 'arena'],
+    [7, 16, 'salão oeste'],
+    [25, 16, 'salão leste'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`gruta: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+  ];
+  const used = [];
+  const place = (monster, name, cx, cy, r, minLevel, maxLevel) => {
+    const c = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (
+          Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
+          Math.hypot(i + 0.5 - 16, j + 0.5 - 27.5) >= 7 && // ninguém atira em quem acabou de chegar
+          seen.has(j * W + i) &&
+          walkable(gr.get(i, j))
+        )
+          c.push([i, j]);
+    for (let tries = 0; tries < 200 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2)) continue;
+      used.push([i, j]);
+      objs.push(point(name, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel }));
+      return;
+    }
+    throw new Error(`gruta: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  const spectre = (cx, cy, r, a, b) => place('espectro_gelo', 'Espectro de Gelo', cx, cy, r, a, b);
+  const yeti = (cx, cy, r, a, b) => place('yeti', 'Yeti', cx, cy, r, a, b);
+  for (let n = 0; n < 3; n++) spectre(16, 19.5, 3.4, 11, 12); // primeiro salão
+  for (let n = 0; n < 2; n++) spectre(7, 16, 2.8, 12, 13); // salão oeste
+  yeti(7, 16, 2.8, 12, 13);
+  for (let n = 0; n < 2; n++) spectre(25, 16, 2.8, 13, 14); // salão leste
+  yeti(25, 16, 2.8, 13, 14);
+  yeti(16, 13.5, 1.6, 14, 14); // antecâmara
+  spectre(10, 11.5, 1.2, 14, 14);
+  spectre(22, 11.5, 1.2, 14, 14);
+  objs.push(point('Yeti Ancestral', 'monsterSpawn', GRUTA_ARENA.x, GRUTA_ARENA.y, { monster: 'yeti_ancestral' }));
+  console.log(`gruta: ${seen.size} tiles andáveis, ${used.length} monstros + Yeti Ancestral`);
+  return tiled('Desfiladeiro do Gelo Eterno', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
 writeFileSync('public/maps/ruinas.json', JSON.stringify(ruinas()));
 writeFileSync('public/maps/montanha.json', JSON.stringify(montanha()));
+writeFileSync('public/maps/gruta.json', JSON.stringify(gruta()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

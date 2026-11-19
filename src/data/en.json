@@ -355,6 +355,9 @@
     },
     "abade_caido": {
       "name": "Fallen Abbot"
+    },
+    "yeti_ancestral": {
+      "name": "Ancestral Yeti"
     }
   },
   "tips": {
@@ -576,7 +579,10 @@
     "General de Terracota": "Terracotta General",
     "Espectro de Gelo": "Ice Specter",
     "Yeti": "Yeti",
-    "Abade Caído": "Fallen Abbot"
+    "Abade Caído": "Fallen Abbot",
+    "Yeti Ancestral": "Ancestral Yeti",
+    "Desfiladeiro do Gelo Eterno": "Eternal Ice Gorge",
+    "Portal das Masmorras": "Dungeon Portal"
   },
   "quests": {
     "chain": [
@@ -667,7 +673,11 @@
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [
+      {
+        "texto": "Dungeons: the new Dungeon Portal, at the west exit of the village, leads to the Eternal Ice Gorge (level 10+). Paid entry, monsters that don't respawn, higher equipment drop chance and the Ancestral Yeti at the end. No Auto inside."
+      }
+    ],
     "versoes": [
       {
         "itens": [

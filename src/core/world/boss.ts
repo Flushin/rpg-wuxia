@@ -73,7 +73,7 @@ export function summonAdds(w: World, boss: Entity, sm: { monsterId: string; coun
     w.monsters.push(e);
     ids.push(e.id);
   }
-  w.emit({ type: 'bossSummon', ids });
+  w.emit({ type: 'bossSummon', ids, name: boss.name });
 }
 
 export function resetBoss(w: World, m: Entity) {

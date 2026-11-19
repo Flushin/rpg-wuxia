@@ -4,6 +4,8 @@ import { computeDerived } from '../core/stats';
 import type { Attributes } from '../core/types';
 import { EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from './data';
 import { loadMaps, type WikiMap } from './maps';
+import { MAPS_CONFIG } from '../core/mapsConfig';
+import { DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
 import { spriteHtml } from './npcs';
 import { chance, itemLink, questList, spoiler } from './ui';
 
@@ -114,7 +116,7 @@ function behavior(m: Monster): string[] {
   return out;
 }
 
-function bossMechanics(m: Monster): string {
+function bossMechanics(m: Monster, inDungeon: boolean): string {
   const b = m.boss!;
   const li: string[] = [`Luta dentro de uma arena (raio ${b.arenaRadius}).`];
   if (b.aoe)
@@ -127,7 +129,11 @@ function bossMechanics(m: Monster): string {
       `Com ${Math.round(b.summon.atHpPct * 100)}% da vida, chama ${b.summon.count} <a href="#/monstro/${s?.id}">${esc(s?.name ?? b.summon.monsterId)}</a> (nível ${b.summon.level})${b.aoe?.intervalPhase2 ? ` e passa a marcar círculos a cada ${s1(b.aoe.intervalPhase2)} s` : ''}.`,
     );
   }
-  li.push(`Renasce ${Math.round(m.respawnSeconds / 60)} minutos depois de derrotado.`);
+  li.push(
+    inDungeon
+      ? 'Chefe de masmorra: não renasce; está de volta a cada nova entrada.'
+      : `Renasce ${Math.round(m.respawnSeconds / 60)} minutos depois de derrotado.`,
+  );
   return `<ul>${li.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 }
 
@@ -188,6 +194,9 @@ export async function monsterPage(id: string): Promise<string | null> {
           `<li><b>${esc(mp.name)}</b> — ${mp.spawns.filter((s) => s.monster === id).length} ponto(s) no mapa</li>`,
       )
       .join('') +
+    (where.some((mp) => MAPS_CONFIG[mp.id]?.dungeon) && !m.boss
+      ? `<li class="muted">Na masmorra não renasce (instância) e tem +${Math.round((DUNGEON_EQUIP_DROP_MUL - 1) * 100)}% de chance de equipamento.</li>`
+      : '') +
     (called && where.length
       ? `</ul>${spoiler(`<ul>${called}</ul>`, 'Também aparece numa luta de chefe')}<ul>`
       : called);
@@ -199,7 +208,14 @@ export async function monsterPage(id: string): Promise<string | null> {
     <section class="panel"><h2>Como luta</h2><ul>${behavior(m)
       .map((x) => `<li>${x}</li>`)
       .join('')}</ul>
-      ${m.boss ? `<h3>Mecânicas de chefe</h3>${bossMechanics(m)}` : ''}</section>
+      ${
+        m.boss
+          ? `<h3>Mecânicas de chefe</h3>${bossMechanics(
+              m,
+              where.some((mp) => MAPS_CONFIG[mp.id]?.dungeon),
+            )}`
+          : ''
+      }</section>
     <section class="panel"><h2>Drops</h2>${drops(m)}</section>
     ${qs.length ? `<section class="panel"><h2>Missões</h2>${questList(qs)}</section>` : ''}`;
   const head = `<a class="back" href="#/monstros">‹ Monstros</a>

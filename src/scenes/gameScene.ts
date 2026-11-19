@@ -26,6 +26,7 @@ import { exitApp, onBackButton } from '../platform/backButton';
 import { askExit, closeTopWindow } from '../ui/backAction';
 import { onPause, onResume } from '../platform/lifecycle';
 import { isNative, restartApp } from '../platform';
+import { DUNGEONS } from '../core/dungeons';
 
 /** Distância (tiles) do portal em que as folhas do mapa de destino começam a carregar. */
 const PREFETCH_DIST = 8;
@@ -231,11 +232,16 @@ export class GameScene extends Phaser.Scene {
         dy = Math.max(o.y - p.y, 0, p.y - (o.y + o.h));
       const d = Math.hypot(dx, dy);
       nearest = Math.min(nearest, d);
-      const id = String(o.props.target),
-        target = w.maps[id];
-      if (!target || this.prefetchedMaps.has(id) || d > PREFETCH_DIST) continue;
-      this.prefetchedMaps.add(id);
-      prefetchSheets(this, target, w.classId);
+      // portal de menu (masmorras): adianta as masmorras que o personagem já pode escolher
+      const ids = o.props.menu
+        ? DUNGEONS.filter((dg) => dg.minLevel <= p.level).map((dg) => dg.map)
+        : [String(o.props.target)];
+      for (const id of ids) {
+        const target = w.maps[id];
+        if (!target || this.prefetchedMaps.has(id) || d > PREFETCH_DIST) continue;
+        this.prefetchedMaps.add(id);
+        prefetchSheets(this, target, w.classId);
+      }
     }
     if (nearest > RELEASE_DIST && this.prefetchedMaps.size) {
       this.prefetchedMaps.clear();

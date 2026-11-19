@@ -1,5 +1,6 @@
 // Simulação de balanceamento: cada seita caça sozinha (core + auto reais) do nível 1 ao 10 e depois enfrenta o General.
 // Uso: npm run sim:balance [-- --seeds=3 --max=120]
+import { isWalkable } from '../src/core/pathfinding';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { CLASSES, MONSTERS } from '../src/core/data';
 import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, isBroken } from '../src/core/items';
@@ -9,7 +10,7 @@ import { World } from '../src/core/world';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -235,6 +236,11 @@ function fightBoss(w: World, classId: string, rarity: Rarity, trace: boolean): B
   const hpMax = boss.derived.maxHp;
   w.player.x = boss.x - 6;
   w.player.y = boss.y;
+  if (!isWalkable(w.map, w.player.x, w.player.y)) {
+    // masmorra: arena fechada; entra pela porta sul
+    w.player.x = boss.x + 0.5;
+    w.player.y = boss.y + 6;
+  }
   w.player.path = [];
   // poções contadas pelo uso (contar a mochila dava número negativo quando o jogador pegava poção caída)
   let potionsUsed = 0;
@@ -434,6 +440,33 @@ function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
   const w = highWorld(classId, 20, seed, 15, rarity);
   w.changeMap('montanha');
   return fightBoss(w, classId, rarity, false);
+}
+
+// ---------- masmorra: chefe do Desfiladeiro do Gelo Eterno (Yeti Ancestral) ----------
+// Personagem nos níveis 11–15 com equipamento nv 10; os monstros comuns da masmorra já foram derrotados.
+if (process.argv.includes('--masmorra')) {
+  console.log('| Seita | Nível | Equipamento nv 10 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
+  console.log('|---|---|---|---|---|---|---|');
+  for (const classId of Object.keys(CLASSES))
+    for (const level of [11, 13, 15])
+      for (const tier of ['incomum', 'raro'] as Rarity[]) {
+        const bs = Array.from({ length: Math.max(5, SEEDS * 2) }, (_, i) => {
+          const w = highWorld(classId, level, i + 1, 10, tier);
+          w.changeMap('gruta');
+          for (const m of w.monsters)
+            if (!MONSTERS[m.monsterId].boss) {
+              m.dead = true;
+              m.respawnAt = Infinity;
+            }
+          return fightBoss(w, classId, tier, process.argv.includes('--trace-masmorra') && i === 0);
+        });
+        const wins = bs.filter((b) => b.win),
+          lost = bs.filter((b) => !b.win);
+        console.log(
+          `| ${CLASSES[classId].name} | ${level} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
+        );
+      }
+  process.exit(0);
 }
 
 if (process.argv.includes('--m9')) {
