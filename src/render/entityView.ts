@@ -262,17 +262,17 @@ export class EntityView {
   }
 
   /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose. */
-  levelUp(glowMs: number, color: number) {
+  levelUp(glowMs: number, color: number, intensity = 1) {
     if (this.sheet?.meta.anims.levelup && this.anim !== 'death') {
       this.attacking = false;
       this.posing = true;
       this.play('levelup', true);
     }
-    this.glow(glowMs, color);
+    this.glow(glowMs, color, intensity);
   }
 
   /** Cópia do sprite pintada de uma cor, somando luz por cima do corpo: acende, pulsa e se apaga. */
-  private glow(ms: number, color: number) {
+  private glow(ms: number, color: number, intensity = 1) {
     this.glowSp?.destroy();
     const sp = this.sprite;
     const g = this.scene.add
@@ -288,9 +288,9 @@ export class EntityView {
     this.scene.tweens.chain({
       targets: g,
       tweens: [
-        { alpha: 0.6, duration: ms * 0.12, ease: 'Quad.easeOut' },
-        { alpha: 0.2, duration: ms * 0.25, ease: 'Sine.easeInOut' },
-        { alpha: 0.45, duration: ms * 0.2, ease: 'Sine.easeInOut' },
+        { alpha: 0.6 * intensity, duration: ms * 0.12, ease: 'Quad.easeOut' },
+        { alpha: 0.2 * intensity, duration: ms * 0.25, ease: 'Sine.easeInOut' },
+        { alpha: 0.45 * intensity, duration: ms * 0.2, ease: 'Sine.easeInOut' },
         { alpha: 0, duration: ms * 0.43, ease: 'Quad.easeIn' },
       ],
       onComplete: () => {

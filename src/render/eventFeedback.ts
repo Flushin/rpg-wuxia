@@ -271,7 +271,7 @@ export class EventFeedback {
         return true;
       case 'levelup': {
         const v = this.views.get(this.world.player.id);
-        if (v) this.levelUpFx.play(v);
+        if (v) this.levelUpFx.play(v, ev.level);
         toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`));
         return true;
       }
