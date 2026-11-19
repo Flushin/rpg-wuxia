@@ -20,6 +20,7 @@ import type {
 import type { World } from './world';
 import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { isDungeonMap } from './dungeons';
+import { inTelegraph, safeSpot } from './world/boss';
 
 export const AUTO_MAX_LEVEL_GAP = 2; // padrão da opção maxLevelAbove: alvos até 2 níveis acima do personagem
 export const AUTO_MAX_LEVEL_LIMIT = 5; // máximo da opção no menu
@@ -683,12 +684,22 @@ export class AutoCombat {
     return !!MONSTERS[m.monsterId]?.boss || this.w.inArena(m);
   }
 
-  /** Círculo de golpe em área (Yeti) em cima do personagem: sai dele pelo lado oposto ao centro. */
+  /** Golpe em área marcado em cima do personagem: sai do círculo (Yeti) pelo lado oposto ao centro; da linha, para o
+   * lugar livre mais perto. */
   private dodge(): boolean {
     const w = this.w,
       p = w.player;
-    const tg = w.telegraphs.find((t) => dist(p, t) <= t.radius + 0.3);
+    const tg = w.telegraphs.find((t) => inTelegraph(t, p, 0.3));
     if (!tg) return false;
+    if (tg.shape === 'line') {
+      const q = safeSpot(w, p);
+      if (!q) return false;
+      w.autoAttack = false;
+      w.pendingSkill = null;
+      w.autoMove(q.x, q.y);
+      this.status = L('Desviando', 'Dodging');
+      return true;
+    }
     for (const turn of [0, 0.6, -0.6, 1.2, -1.2, Math.PI / 2, -Math.PI / 2]) {
       const a = (Math.atan2(p.y - tg.y, p.x - tg.x) || 0) + turn,
         r = tg.radius + 1.1;

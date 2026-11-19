@@ -6,6 +6,7 @@ import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL, dungeonById } from '../src/core/dunge
 import { MAPS_CONFIG, MAP_IDS } from '../src/core/mapsConfig';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { World } from '../src/core/world';
+import { inTelegraph, safeSpot } from '../src/core/world/boss';
 import type { Entity, GameEvent, SaveData } from '../src/core/types';
 
 let fails = 0;
@@ -208,6 +209,63 @@ console.log('\n== Mosteiro Profanado ==');
       Math.abs(boss.derived.physAtk - atk0) < 1e-6,
     'luta resetada: fúria acaba',
   );
+}
+
+console.log('\n== Covil dos Bandidos ==');
+{
+  const C = dungeonById('covil')!;
+  ok(!!C && C.minLevel === 20 && C.cost === 1000, 'terceira masmorra: nível 20, 1000 de ouro');
+  ok(DUNGEONS.map((d) => d.id).join() === 'gruta,mosteiro,covil', 'menu em ordem de nível');
+  ok(fresh(19, 5000).enterDungeon('covil')?.code === 'needLevel', 'nível 19: recusado');
+  const w = fresh(20, 1500);
+  ok(w.enterDungeon('covil') === null && w.mapId === 'covil' && w.gold === 500, 'nível 20: entra e paga 1000');
+  const lv = w.monsters.filter((m) => !MONSTERS[m.monsterId].boss).map((m) => m.level);
+  ok(lv.length >= 12 && Math.min(...lv) >= 20 && Math.max(...lv) <= 22, `monstros nv 20–22 (${lv.length})`);
+  const boss = w.monsters.find((m) => MONSTERS[m.monsterId].boss)!;
+  ok(boss.monsterId === 'rei_bandidos' && boss.level === 22, 'chefe Rei dos Bandidos nv 22');
+
+  console.log('\n== golpe em linha ==');
+  const l = MONSTERS.rei_bandidos.boss!.line!;
+  w.player.x = boss.x;
+  w.player.y = boss.y + 3;
+  w.player.hp = w.player.derived.maxHp = 1e6;
+  w.tick(1 / 60);
+  ok(boss.ai === 'chase', '(luta começou)');
+  const strike = () => {
+    boss.aiTimer = 0;
+    w.telegraphs = [];
+    drain(w);
+    w.tick(1 / 60);
+    return w.telegraphs.filter((t) => t.ownerId === boss.id);
+  };
+  const s1 = strike();
+  ok(s1.length === 1 && s1[0].shape !== 'line', '1º golpe: círculo');
+  const s2 = strike();
+  ok(
+    s2.length === 1 && s2[0].shape === 'line' && Math.abs((s2[0].angle ?? 0) - Math.PI / 2) < 0.2,
+    '2º golpe: linha do chefe na direção do jogador',
+  );
+  const t = s2[0];
+  ok(inTelegraph(t, { x: boss.x, y: boss.y + l.length - 0.5 }), 'acerta na ponta da linha');
+  ok(!inTelegraph(t, { x: boss.x + l.width, y: boss.y + 3 }), 'não acerta ao lado');
+  ok(!inTelegraph(t, { x: boss.x, y: boss.y - 1 }), 'não acerta atrás do chefe');
+  // quem fica na linha leva o golpe; quem sai para o lado, não
+  const hp0 = w.player.hp;
+  for (let i = 0; i < (l.delay + 0.1) * 60; i++) {
+    w.player.x = boss.x;
+    w.player.y = boss.y + 3;
+    w.tick(1 / 60);
+  }
+  ok(w.player.hp < hp0, 'na linha: leva o golpe');
+  const s3 = strike(); // círculo de novo
+  ok(s3.length === 1 && s3[0].shape !== 'line', 'alterna: círculo');
+  boss.hp = Math.floor(boss.derived.maxHp * (l.fanAtHpPct - 0.01));
+  const s4 = strike();
+  ok(s4.length === l.fanCount && s4.every((x) => x.shape === 'line'), `com pouca vida: leque de ${l.fanCount} linhas`);
+  const q = safeSpot(w, w.player);
+  ok(!!q && !w.telegraphs.some((x) => inTelegraph(x, q!)), 'há lugar livre para desviar');
+  w.resetBoss(boss);
+  ok(!boss.strikes && !w.telegraphs.length, 'luta resetada: zera a contagem e apaga as linhas');
 }
 
 if (fails) {

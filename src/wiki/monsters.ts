@@ -119,7 +119,13 @@ function behavior(m: Monster): string[] {
 function bossMechanics(m: Monster, inDungeon: boolean): string {
   const b = m.boss!;
   const li: string[] = [`Luta dentro de uma arena (raio ${b.arenaRadius}).`];
-  if (b.aoe)
+  if (b.aoe && b.line) {
+    const l = b.line;
+    li.push(
+      `A cada ${s1(b.aoe.interval)} s marca um golpe no chão, alternando: um círculo vermelho (raio ${s1(b.aoe.radius)}, ${b.aoe.mult}× o dano) em cima de você e uma <b>linha</b> que sai dele na sua direção (${s1(l.length)} de comprimento, ${s1(l.width)} de largura, ${l.mult}× o dano). Os dois acertam após ${s1(b.aoe.delay)} e ${s1(l.delay)} s. Da linha, desvie para o lado.`,
+      `Com ${Math.round(l.fanAtHpPct * 100)}% da vida a linha vira um <b>leque</b> de ${l.fanCount} linhas${b.aoe.intervalPhase2 ? ` e os golpes vêm a cada ${s1(b.aoe.intervalPhase2)} s` : ''}: fique entre elas, longe do chefe, ou atrás dele.`,
+    );
+  } else if (b.aoe)
     li.push(
       `A cada ${s1(b.aoe.interval)} s marca um círculo vermelho (raio ${s1(b.aoe.radius)}) que explode após ${s1(b.aoe.delay)} s com ${b.aoe.mult}× o dano. Saia de dentro dele!`,
     );

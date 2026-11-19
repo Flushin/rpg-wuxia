@@ -2,7 +2,7 @@
 
 Decidido com o Lucas em 19/11/2026.
 
-- **Entrada:** Portal das Masmorras na saída oeste da vila. Pisar nele abre um menu com as masmorras (por enquanto uma);
+- **Entrada:** Portal das Masmorras na saída oeste da vila. Pisar nele abre um menu com as masmorras ;
   afastar-se fecha o menu. Lista em `src/core/dungeons.ts`.
 - **Formato:** instância. Cada entrada é uma corrida nova; os monstros não renascem; chefe no fim com item garantido.
   Morrer, sair pelo portal ou fechar o jogo encerra a corrida (o save nunca fica dentro da masmorra).
@@ -17,6 +17,11 @@ Decidido com o Lucas em 19/11/2026.
   Almas Penadas e Guardiões de Pedra nv 16–19 (14 monstros); chefe Patriarca Profanado nv 20 com **fúria** a 30% da vida
   (golpes ~54% mais rápidos, +30% de dano, +25% de passo; acaba se a luta recomeçar), sem invocação.
   Raro nv 15 garantido + 40% de item nv 15. Sprites reaproveitados (Discípulo, Espectro, Terracota, Abade), sem arte nova.
+- **Terceira masmorra (19/11/2026):** Covil dos Bandidos (`covil`), nível 20+ (fim de jogo), 1000 de ouro. Salteadores,
+  Besteiros e Brutamontes nv 20–22 (14 monstros; os de cada acampamento entram em combate juntos); chefe Rei dos Bandidos
+  nv 22 com **golpe em linha**: os golpes marcados alternam círculo e uma faixa que sai dele na direção do jogador
+  (9 × 1,8, 2,2× o dano); com 50% da vida a linha vira leque de 3. Raro nv 15 garantido + 1 item nv 15 garantido.
+  Sprites de bandido reaproveitados (Brutamontes e Rei maiores), sem arte nova.
 - **Sem portal na arena:** a saída fica só na entrada; um portal atrás da arena fazia quem desviava dos golpes sair sem querer.
 - Balanceamento do chefe: `docs/balanceamento.md` (seção "Masmorra").
 

@@ -32,6 +32,8 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
   // masmorra: Mosteiro Profanado; salão do Patriarca Profanado no norte
   mosteiro: { trees: 'city', grassDecor: 0.08, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  // masmorra: Covil dos Bandidos; terreiro do Rei dos Bandidos no norte
+  covil: { trees: 'forest', grassDecor: 0.09, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
 };
 
 /** Mapas carregados no boot (public/maps/<id>.json). */

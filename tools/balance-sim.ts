@@ -7,10 +7,11 @@ import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, i
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
 import { World } from '../src/core/world';
+import { inTelegraph, safeSpot } from '../src/core/world/boss';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro', 'covil'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -276,7 +277,13 @@ function fightBoss(w: World, classId: string, rarity: Rarity, trace: boolean): B
         dodging = dodging || false;
         continue;
       }
-      if (Math.hypot(p.x - t.x, p.y - t.y) <= t.radius + 0.2) {
+      if (t.shape === 'line' && inTelegraph(t, p, 0.2)) {
+        // linha: o lugar livre mais perto (para o lado)
+        const q = safeSpot(w, p);
+        if (q) w.moveTo(q.x, q.y);
+        dodging = true;
+        seenTele.set(t.id, 1);
+      } else if (t.shape !== 'line' && Math.hypot(p.x - t.x, p.y - t.y) <= t.radius + 0.2) {
         const a = Math.atan2(p.y - t.y, p.x - t.x) || 0;
         w.moveTo(t.x + Math.cos(a) * (t.radius + 1.3), t.y + Math.sin(a) * (t.radius + 1.3));
         dodging = true;
@@ -445,11 +452,13 @@ function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
 // ---------- masmorra: chefe da masmorra ----------
 // --masmorra (Desfiladeiro, Yeti Ancestral): níveis 11/13/15 com equipamento nv 10.
 // --masmorra=mosteiro (Patriarca Profanado): níveis 16/18/20 com equipamento nv 15.
+// --masmorra=covil (Rei dos Bandidos): nível 20 com equipamento nv 15.
 // Os monstros comuns da masmorra já foram derrotados.
 const masmorraArg = process.argv.find((a) => a.startsWith('--masmorra'));
 if (masmorraArg) {
   const dungeonMap = masmorraArg.split('=')[1] || 'gruta';
-  const [levels, gearLevel] = dungeonMap === 'mosteiro' ? [[16, 18, 20], 15] : [[11, 13, 15], 10];
+  const [levels, gearLevel] =
+    dungeonMap === 'covil' ? [[20], 15] : dungeonMap === 'mosteiro' ? [[16, 18, 20], 15] : [[11, 13, 15], 10];
   console.log(`masmorra ${dungeonMap}: equipamento nv ${gearLevel}`);
   console.log('| Seita | Nível | Equipamento | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
   console.log('|---|---|---|---|---|---|---|');

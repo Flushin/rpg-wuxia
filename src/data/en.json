@@ -370,6 +370,18 @@
     },
     "patriarca_profanado": {
       "name": "Defiled Patriarch"
+    },
+    "salteador": {
+      "name": "Raider"
+    },
+    "besteiro": {
+      "name": "Crossbowman"
+    },
+    "brutamontes": {
+      "name": "Brute"
+    },
+    "rei_bandidos": {
+      "name": "Bandit King"
     }
   },
   "tips": {
@@ -599,7 +611,12 @@
     "Alma Penada": "Restless Soul",
     "Guardião de Pedra": "Stone Guardian",
     "Patriarca Profanado": "Defiled Patriarch",
-    "Mosteiro Profanado": "Defiled Monastery"
+    "Mosteiro Profanado": "Defiled Monastery",
+    "Salteador": "Raider",
+    "Besteiro": "Crossbowman",
+    "Brutamontes": "Brute",
+    "Rei dos Bandidos": "Bandit King",
+    "Covil dos Bandidos": "Bandit Lair"
   },
   "quests": {
     "chain": [
@@ -693,6 +710,9 @@
     "proxima": [
       {
         "texto": "Second dungeon: the Defiled Monastery (level 16+, 500 gold), with Defiled Monks, Restless Souls and Stone Guardians. At the end, the Defiled Patriarch becomes enraged at 30% health."
+      },
+      {
+        "texto": "Third dungeon: the Bandit Lair (level 20, 1000 gold), with Raiders, Crossbowmen and Brutes that attack in packs. At the end, the Bandit King marks line strikes on the ground and, when wounded, fan strikes."
       }
     ],
     "versoes": [

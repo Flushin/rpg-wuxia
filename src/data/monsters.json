@@ -1064,5 +1064,335 @@
         }
       ]
     }
+  },
+  "salteador": {
+    "id": "salteador",
+    "name": "Salteador",
+    "sprite": "bandit-sword",
+    "minLevel": 20,
+    "maxLevel": 22,
+    "baseAttributes": {
+      "strength": 4,
+      "intelligence": 0,
+      "stamina": 6,
+      "agility": 9,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1.05,
+      "intelligence": 0,
+      "stamina": 3.6,
+      "agility": 0.65,
+      "willpower": 0.55
+    },
+    "damageType": "physical",
+    "aggroRange": 5,
+    "leashRange": 13,
+    "attackRange": 1.5,
+    "attackInterval": 1.6,
+    "moveSpeed": 3.5,
+    "groupAggro": true,
+    "defMul": {
+      "phys": 0.9,
+      "spirit": 1.1
+    },
+    "xpBase": 110,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 14,
+        "max": 20,
+        "perLevel": 1.6
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.18
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.12
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.08,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "besteiro": {
+    "id": "besteiro",
+    "name": "Besteiro",
+    "sprite": "bandit-archer",
+    "minLevel": 20,
+    "maxLevel": 22,
+    "baseAttributes": {
+      "strength": 3,
+      "intelligence": 0,
+      "stamina": 6,
+      "agility": 8,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 0.9,
+      "intelligence": 0,
+      "stamina": 3.8,
+      "agility": 0.7,
+      "willpower": 0.8
+    },
+    "damageType": "physical",
+    "aggroRange": 6,
+    "leashRange": 15,
+    "attackRange": 6,
+    "attackInterval": 2.3,
+    "moveSpeed": 3.3,
+    "keepDistance": 3.5,
+    "projectile": "arrow",
+    "groupAggro": true,
+    "defMul": {
+      "phys": 0.7,
+      "spirit": 1.2
+    },
+    "xpBase": 95,
+    "xpPerLevel": 20,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 12,
+        "max": 18,
+        "perLevel": 1.6
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.18
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.12
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.08,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "brutamontes": {
+    "id": "brutamontes",
+    "name": "Brutamontes",
+    "sprite": "bandit-sword",
+    "minLevel": 20,
+    "maxLevel": 22,
+    "scale": 1.4,
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 0,
+      "stamina": 10,
+      "agility": 3,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1.15,
+      "intelligence": 0,
+      "stamina": 5.6,
+      "agility": 0.4,
+      "willpower": 0.6
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 12,
+    "attackRange": 1.8,
+    "attackInterval": 2.6,
+    "moveSpeed": 2.2,
+    "slam": {
+      "radius": 2.2,
+      "delay": 1.3,
+      "mult": 1.7,
+      "interval": 10
+    },
+    "defMul": {
+      "phys": 1.1,
+      "spirit": 1.1
+    },
+    "xpBase": 130,
+    "xpPerLevel": 26,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 16,
+        "max": 24,
+        "perLevel": 1.6
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.18
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.12
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.08,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "rei_bandidos": {
+    "id": "rei_bandidos",
+    "name": "Rei dos Bandidos",
+    "sprite": "bandit-sword",
+    "minLevel": 22,
+    "maxLevel": 22,
+    "scale": 2,
+    "baseAttributes": {
+      "strength": 30,
+      "intelligence": 0,
+      "stamina": 1000,
+      "agility": 18,
+      "willpower": 120
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.2,
+    "moveSpeed": 2.2,
+    "defMul": {
+      "phys": 0.35,
+      "spirit": 1.0
+    },
+    "xpBase": 9000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 600,
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.4,
+        "delay": 1.4,
+        "mult": 1.8,
+        "interval": 5.5,
+        "intervalPhase2": 4
+      },
+      "line": {
+        "length": 9,
+        "width": 1.8,
+        "delay": 1.2,
+        "mult": 2.2,
+        "fanAtHpPct": 0.5,
+        "fanCount": 3,
+        "fanSpread": 0.55
+      }
+    },
+    "loot": {
+      "gold": {
+        "min": 1000,
+        "max": 1300
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 15
+      },
+      "equipment": [
+        {
+          "chance": 1,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 1,
+          "min": 4,
+          "max": 6
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1,
+          "min": 3,
+          "max": 3
+        }
+      ]
+    }
   }
 }

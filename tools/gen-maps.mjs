@@ -771,6 +771,105 @@ function mosteiro() {
   return tiled('Mosteiro Profanado', gr, objs);
 }
 
+// ---- masmorra: Covil dos Bandidos (nível 20, fim de jogo) ----
+// Instância (src/core/dungeons.ts): monstros não renascem. Entrada no sul por uma trilha na mata; acampamento da
+// entrada, acampamento oeste (barracos) e acampamento leste (beira do riacho); os dois sobem à paliçada, que leva ao
+// terreiro do Rei dos Bandidos no norte. Os bandidos de cada acampamento entram em combate juntos (group).
+// Sem portal perto da arena (como na gruta).
+const COVIL_ARENA = { x: 16, y: 6, r: 5.5 };
+function covil() {
+  const rnd = rngFn(2022);
+  const gr = makeGrid(T, T);
+  // trilha de entrada (sul) e acampamento da entrada, com dois barracos
+  gr.rect(15, 25, 2, 6, P);
+  gr.disc(16, 21, 3.7, G);
+  gr.rect(13, 20, 6, 2, P);
+  gr.set(12, 18, HS);
+  gr.set(20, 18, HS);
+  // trilhas para os acampamentos oeste e leste
+  gr.rect(6, 21, 8, 2, P);
+  gr.rect(19, 21, 8, 2, P);
+  gr.disc(7, 16, 3.6, G); // acampamento oeste: barracos
+  gr.rect(6, 18, 2, 4, P);
+  gr.set(4, 14, HS);
+  gr.set(9, 13, HS);
+  gr.set(5, 18, HS);
+  gr.disc(25, 16, 3.6, G); // acampamento leste: riacho
+  gr.rect(24, 18, 2, 4, P);
+  for (let j = 12; j <= 20; j++) gr.set(28, j, WA);
+  gr.disc(27.5, 15, 1.1, WA);
+  // paliçada: corredor de cima ligando os dois acampamentos, com o portão do terreiro no meio
+  gr.rect(6, 12, 2, 4, P);
+  gr.rect(24, 12, 2, 4, P);
+  gr.rect(6, 12, 20, 2, P);
+  gr.disc(16, 13, 2, PL);
+  // terreiro do Rei: chão batido largo (espaço para desviar das linhas) cercado de barracos
+  gr.rect(9, 1, 14, 10, P);
+  gr.disc(COVIL_ARENA.x, COVIL_ARENA.y, 4.8, P);
+  gr.rect(15, 10, 2, 3, P); // porteira: único acesso ao terreiro
+  for (const [i, j] of [
+    [9, 1],
+    [22, 1],
+    [9, 9],
+    [22, 9],
+  ])
+    gr.set(i, j, HS);
+  const seen = sealUnreachable(gr, 16, 27, T);
+  for (const [i, j, what] of [
+    [16, 6, 'arena'],
+    [7, 16, 'acampamento oeste'],
+    [25, 16, 'acampamento leste'],
+    [16, 13, 'portão'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`covil: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+  ];
+  const used = [];
+  const place = (monster, name, cx, cy, r, minLevel, maxLevel, group) => {
+    const c = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (
+          Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
+          Math.hypot(i + 0.5 - 16, j + 0.5 - 27.5) >= 6.5 && // ninguém ataca quem acabou de chegar
+          seen.has(j * W + i) &&
+          walkable(gr.get(i, j))
+        )
+          c.push([i, j]);
+    for (let tries = 0; tries < 200 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2)) continue;
+      used.push([i, j]);
+      objs.push(point(name, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel, group }));
+      return;
+    }
+    throw new Error(`covil: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  const raider = (cx, cy, r, a, b, g) => place('salteador', 'Salteador', cx, cy, r, a, b, g);
+  const xbow = (cx, cy, r, a, b, g) => place('besteiro', 'Besteiro', cx, cy, r, a, b, g);
+  const brute = (cx, cy, r, a, b, g) => place('brutamontes', 'Brutamontes', cx, cy, r, a, b, g);
+  for (let n = 0; n < 2; n++) raider(16, 20, 3.2, 20, 20, 1); // acampamento da entrada
+  xbow(16, 20, 3.2, 20, 20, 1);
+  for (let n = 0; n < 2; n++) raider(7, 16, 3, 20, 21, 2); // acampamento oeste
+  xbow(7, 16, 3, 20, 21, 2);
+  brute(7, 16, 3, 21, 21, 0);
+  for (let n = 0; n < 2; n++) xbow(24.5, 16, 3, 20, 21, 3); // acampamento leste
+  raider(24.5, 16, 3, 20, 21, 3);
+  brute(24.5, 16, 3, 21, 21, 0);
+  raider(11, 12.5, 1.5, 21, 22, 4); // paliçada
+  xbow(21, 12.5, 1.5, 21, 22, 5);
+  brute(16, 13, 1.6, 22, 22, 0); // portão do terreiro
+  objs.push(
+    point('Rei dos Bandidos', 'monsterSpawn', COVIL_ARENA.x, COVIL_ARENA.y, {
+      monster: 'rei_bandidos',
+    }),
+  );
+  console.log(`covil: ${seen.size} tiles andáveis, ${used.length} monstros + Rei dos Bandidos`);
+  return tiled('Covil dos Bandidos', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
@@ -778,5 +877,6 @@ writeFileSync('public/maps/ruinas.json', JSON.stringify(ruinas()));
 writeFileSync('public/maps/montanha.json', JSON.stringify(montanha()));
 writeFileSync('public/maps/gruta.json', JSON.stringify(gruta()));
 writeFileSync('public/maps/mosteiro.json', JSON.stringify(mosteiro()));
+writeFileSync('public/maps/covil.json', JSON.stringify(covil()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');
