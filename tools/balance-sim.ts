@@ -10,7 +10,7 @@ import { World } from '../src/core/world';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -442,17 +442,23 @@ function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
   return fightBoss(w, classId, rarity, false);
 }
 
-// ---------- masmorra: chefe do Desfiladeiro do Gelo Eterno (Yeti Ancestral) ----------
-// Personagem nos níveis 11–15 com equipamento nv 10; os monstros comuns da masmorra já foram derrotados.
-if (process.argv.includes('--masmorra')) {
-  console.log('| Seita | Nível | Equipamento nv 10 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
+// ---------- masmorra: chefe da masmorra ----------
+// --masmorra (Desfiladeiro, Yeti Ancestral): níveis 11/13/15 com equipamento nv 10.
+// --masmorra=mosteiro (Patriarca Profanado): níveis 16/18/20 com equipamento nv 15.
+// Os monstros comuns da masmorra já foram derrotados.
+const masmorraArg = process.argv.find((a) => a.startsWith('--masmorra'));
+if (masmorraArg) {
+  const dungeonMap = masmorraArg.split('=')[1] || 'gruta';
+  const [levels, gearLevel] = dungeonMap === 'mosteiro' ? [[16, 18, 20], 15] : [[11, 13, 15], 10];
+  console.log(`masmorra ${dungeonMap}: equipamento nv ${gearLevel}`);
+  console.log('| Seita | Nível | Equipamento | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
   console.log('|---|---|---|---|---|---|---|');
   for (const classId of Object.keys(CLASSES))
-    for (const level of [11, 13, 15])
+    for (const level of levels)
       for (const tier of ['incomum', 'raro'] as Rarity[]) {
         const bs = Array.from({ length: Math.max(5, SEEDS * 2) }, (_, i) => {
-          const w = highWorld(classId, level, i + 1, 10, tier);
-          w.changeMap('gruta');
+          const w = highWorld(classId, level, i + 1, gearLevel, tier);
+          w.changeMap(dungeonMap);
           for (const m of w.monsters)
             if (!MONSTERS[m.monsterId].boss) {
               m.dead = true;

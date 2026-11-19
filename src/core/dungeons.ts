@@ -1,5 +1,5 @@
 // Masmorras: instâncias escolhidas no menu do Portal das Masmorras (saída oeste da vila).
-// Regras (aprovadas pelo Lucas em 19/11/2026): entrada paga em ouro; monstros não renascem; chefe no fim com item
+// Regras (aprovadas pelo Lucas em 19/11/2026; segunda masmorra também em 19/11/2026): entrada paga em ouro; monstros não renascem; chefe no fim com item
 // garantido; o Auto não funciona lá dentro; morrer, sair ou fechar o jogo encerra a corrida (volta à vila).
 // O desenho de cada masmorra é um mapa comum (public/maps/<map>.json) marcado com dungeon: true em mapsConfig.ts.
 import { MAPS_CONFIG } from './mapsConfig';
@@ -27,6 +27,17 @@ export const DUNGEONS: DungeonDef[] = [
     desc: {
       pt: 'Um desfiladeiro congelado sob a montanha, cheio de espectros e yetis. No fundo dorme o Yeti Ancestral.',
       en: 'A frozen gorge beneath the mountain, full of spectres and yetis. The Ancestral Yeti sleeps at its end.',
+    },
+  },
+  {
+    id: 'mosteiro',
+    map: 'mosteiro',
+    minLevel: 16,
+    cost: 500,
+    levels: [16, 20],
+    desc: {
+      pt: 'Um mosteiro tomado pela corrupção do Abade: monges profanados, almas penadas e guardiões de pedra. No salão principal, o Patriarca Profanado entra em fúria quando ferido.',
+      en: "A monastery overtaken by the Abbot's corruption: defiled monks, restless souls and stone guardians. In the main hall, the Defiled Patriarch becomes enraged when wounded.",
     },
   },
 ];

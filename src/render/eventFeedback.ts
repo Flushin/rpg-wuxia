@@ -186,6 +186,9 @@ export class EventFeedback {
       case 'bossSummon':
         toast(L(`${ev.name} invoca reforços!`, `${ev.name} summons reinforcements!`), '#ff8a60');
         return true;
+      case 'bossEnrage':
+        toast(L(`${ev.name} entra em fúria!`, `${ev.name} becomes enraged!`), '#ff5a4a');
+        return true;
       case 'portalLocked':
         toast(
           L(`${ev.name}: só a partir do nível ${ev.minLevel}`, `${ev.name}: requires level ${ev.minLevel}`),

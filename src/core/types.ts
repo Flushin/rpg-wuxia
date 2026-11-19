@@ -100,6 +100,8 @@ export interface Entity {
   buffs: Buff[];
   group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
   summoned: boolean;
+  /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */
+  enraged?: boolean;
   spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
   levels?: [number, number]; // faixa de nível do ponto do mapa (marco 9); sem = a do monstro
   // NPCs
@@ -176,6 +178,8 @@ export type GameEvent =
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }
   | { type: 'bossSummon'; ids: number[]; name: string }
+  /** chefe entrou em fúria (boss.enrage) */
+  | { type: 'bossEnrage'; id: number; name: string }
   | { type: 'bossDefeated'; name: string; respawnAt: number };
 
 // Círculo de aviso no chão (golpe em área do chefe)

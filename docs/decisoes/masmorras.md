@@ -13,7 +13,11 @@ Decidido com o Lucas em 19/11/2026.
 - **Primeira masmorra:** Desfiladeiro do Gelo Eterno (`gruta`), nível 10+, Espectros de Gelo e Yetis nv 11–14,
   chefe Yeti Ancestral nv 15 (invoca 2 Yetis a 50% da vida; Raro nv 10 garantido + 40% de item nv 15).
   Monstros reaproveitam sprites existentes (sem arte nova).
+- **Segunda masmorra (19/11/2026):** Mosteiro Profanado (`mosteiro`), nível 16+, 500 de ouro. Monges Profanados,
+  Almas Penadas e Guardiões de Pedra nv 16–19 (14 monstros); chefe Patriarca Profanado nv 20 com **fúria** a 30% da vida
+  (golpes ~54% mais rápidos, +30% de dano, +25% de passo; acaba se a luta recomeçar), sem invocação.
+  Raro nv 15 garantido + 40% de item nv 15. Sprites reaproveitados (Discípulo, Espectro, Terracota, Abade), sem arte nova.
 - **Sem portal na arena:** a saída fica só na entrada; um portal atrás da arena fazia quem desviava dos golpes sair sem querer.
 - Balanceamento do chefe: `docs/balanceamento.md` (seção "Masmorra").
 
-Ideias para depois: mais masmorras no menu (outras faixas de nível), recorde de tempo por masmorra, baú no fim em vez do drop do chefe.
+Ideias para depois: mais masmorras no menu (outras faixas de nível, ex.: uma de nível 5+), recorde de tempo por masmorra, baú no fim em vez do drop do chefe.

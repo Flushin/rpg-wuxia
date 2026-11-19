@@ -54,7 +54,9 @@ export interface MonsterDef {
   boss?: {
     arenaRadius: number; // área do chefe (leash e auto-combate evita)
     aoe: { radius: number; delay: number; mult: number; interval: number; intervalPhase2: number };
-    summon: { monsterId: string; count: number; level: number; atHpPct: number };
+    summon?: { monsterId: string; count: number; level: number; atHpPct: number };
+    /** fúria (Patriarca Profanado): abaixo de atHpPct da vida ataca mais rápido, bate mais forte e anda mais rápido */
+    enrage?: { atHpPct: number; attackIntervalMul: number; damageMul: number; moveSpeedMul: number };
   };
   loot?: {
     gold?: { min: number; max: number; perLevel?: number }; // perLevel: soma (nível-1)*perLevel aos dois limites

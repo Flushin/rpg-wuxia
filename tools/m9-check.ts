@@ -123,7 +123,7 @@ console.log('== Abade Caído ==');
   const b = w.monsters.find((m) => m.monsterId === 'abade_caido')!;
   ok(!!b && b.level === 20 && (MONSTERS.abade_caido.scale ?? 1) >= 1.5, 'Abade nível 20 e grande');
   ok(w.arenas.length === 1, 'arena do templo');
-  ok(MONSTERS.abade_caido.boss!.summon.monsterId === 'discipulo_caido', 'invoca Discípulos Caídos');
+  ok(MONSTERS.abade_caido.boss!.summon!.monsterId === 'discipulo_caido', 'invoca Discípulos Caídos');
   w.player.x = b.x + 1;
   w.player.y = b.y;
   w.player.hp = w.player.derived.maxHp = 1e6;

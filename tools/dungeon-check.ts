@@ -1,5 +1,5 @@
 // Verificação headless das masmorras: menu do portal, entrada paga, instância sem renascimento, Auto bloqueado,
-// save fora da masmorra e +25% de chance de equipamento. Uso: npm run check:dungeon
+// save fora da masmorra, +25% de chance de equipamento e a fúria do chefe do Mosteiro Profanado. Uso: npm run check:dungeon
 import { readFileSync } from 'node:fs';
 import { MONSTERS } from '../src/core/data';
 import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL, dungeonById } from '../src/core/dungeons';
@@ -157,6 +157,57 @@ console.log('\n== chance de equipamento ==');
   };
   ok(roll('montanha') === 0, 'montanha: 8% não passa nos 7% do Yeti');
   ok(roll('gruta') === 1, 'masmorra: 8% passa nos 7% × 1,25');
+}
+
+console.log('\n== Mosteiro Profanado ==');
+{
+  const M = dungeonById('mosteiro')!;
+  ok(!!M && M.minLevel === 16 && M.cost === 500, 'segunda masmorra: nível 16+, 500 de ouro');
+  ok(DUNGEONS[0].id === 'gruta' && DUNGEONS[1].id === 'mosteiro', 'menu em ordem de nível');
+  ok(fresh(15, 5000).enterDungeon('mosteiro')?.code === 'needLevel', 'nível 15: recusado');
+  const w = fresh(16, 1000);
+  ok(w.enterDungeon('mosteiro') === null && w.mapId === 'mosteiro' && w.gold === 500, 'nível 16: entra e paga 500');
+  const lv = w.monsters.filter((m) => !MONSTERS[m.monsterId].boss).map((m) => m.level);
+  ok(lv.length >= 12 && Math.min(...lv) >= 16 && Math.max(...lv) <= 19, `monstros nv 16–19 (${lv.length})`);
+  const boss = w.monsters.find((m) => MONSTERS[m.monsterId].boss)!;
+  ok(boss.monsterId === 'patriarca_profanado' && boss.level === 20, 'chefe Patriarca Profanado nv 20');
+
+  console.log('\n== fúria do chefe ==');
+  const def = MONSTERS.patriarca_profanado,
+    e = def.boss!.enrage!;
+  const atk0 = boss.derived.physAtk;
+  w.player.x = boss.x;
+  w.player.y = boss.y + 3;
+  w.tick(1 / 60);
+  ok(boss.ai === 'chase', '(luta começou)');
+  boss.hp = Math.floor(boss.derived.maxHp * (e.atHpPct + 0.05));
+  drain(w);
+  w.tick(1 / 60);
+  ok(!boss.enraged, `acima de ${e.atHpPct * 100}%: sem fúria`);
+  boss.hp = Math.floor(boss.derived.maxHp * (e.atHpPct - 0.01));
+  w.tick(1 / 60);
+  const evs = drain(w);
+  ok(
+    !!boss.enraged && evs.some((x) => x.type === 'bossEnrage' && x.name === boss.name),
+    'abaixo: entra em fúria (com aviso)',
+  );
+  ok(Math.abs(boss.attackInterval - def.attackInterval * e.attackIntervalMul) < 1e-9, 'ataca mais rápido');
+  ok(Math.abs(boss.derived.physAtk - atk0 * e.damageMul) < 1e-6, 'bate mais forte');
+  ok(Math.abs(boss.moveSpeed - def.moveSpeed * e.moveSpeedMul) < 1e-9, 'anda mais rápido');
+  w.tick(1 / 60);
+  ok(
+    evs.filter((x) => x.type === 'bossEnrage').length === 1 && !drain(w).some((x) => x.type === 'bossEnrage'),
+    'aviso só uma vez',
+  );
+  ok(!w.monsters.some((m) => m.summoned), 'não invoca lacaios');
+  w.resetBoss(boss);
+  ok(
+    !boss.enraged &&
+      boss.attackInterval === def.attackInterval &&
+      boss.moveSpeed === def.moveSpeed &&
+      Math.abs(boss.derived.physAtk - atk0) < 1e-6,
+    'luta resetada: fúria acaba',
+  );
 }
 
 if (fails) {

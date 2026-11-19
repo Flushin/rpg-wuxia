@@ -7,6 +7,10 @@
     {
       "texto": "Auto: com a mochila de equipamentos cheia, volta à vila para vender no vendedor e retorna à caça. O Véu de Névoa e a Pele de Ferro agora saem assim que você leva dano ou é cercado.",
       "wiki": "mecanicas/auto"
+    },
+    {
+      "texto": "Segunda masmorra: o Mosteiro Profanado (nível 16+, 500 de ouro), com Monges Profanados, Almas Penadas e Guardiões de Pedra. No fim, o Patriarca Profanado entra em fúria com 30% da vida.",
+      "wiki": "mapa/mosteiro"
     }
   ],
   "versoes": [
