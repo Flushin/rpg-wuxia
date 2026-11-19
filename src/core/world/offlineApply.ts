@@ -6,6 +6,7 @@ import { computeOffline, type OfflineResult } from '../offline';
 import { type ItemInstance, type PotionKind, type SaveData } from '../types';
 import type { OfflineReport, World } from '../world';
 import { TOWN_MAPS } from '../mapsConfig';
+import { econItem, type EconItem } from './ledger';
 
 // ---------- ganho offline ----------
 export function applyOffline(w: World, now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
@@ -23,6 +24,8 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
   });
   if (res.kills < 1) return null;
   const lvl0 = w.player.level;
+  const created: EconItem[] = [];
+  w.econ({ src: 'offline', ref: saved.mapId, xp: res.xp, gold: res.gold, itemsIn: created }); // itens: preenchidos abaixo
   w.gold += res.gold;
   w.gainXp(res.xp);
   const items: OfflineReport['items'] = [];
@@ -38,6 +41,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
       const it = isPot
         ? makePotion(d.baseId, d.qty)
         : makeEquipment(d.baseId, d.rarity, CLASSES[w.classId].element, w.rng, rate.monLevel);
+      created.push(econItem(it));
       let placed = w.addItem(it);
       if (!placed) {
         w.auto.makeRoom();

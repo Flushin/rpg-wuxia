@@ -4,6 +4,7 @@ import { BASES, POTIONS, SLOTS, buyPrice, makePotion, maxDurability, repairCost,
 import { type ItemInstance } from '../types';
 import type { ActionError } from '../types';
 import type { World } from '../world';
+import { econItem } from './ledger';
 
 export function buy(w: World, potionId: string, qty: number): ActionError | null {
   if (w.npcRole() !== 'vendedor') return { code: 'talkToSeller' };
@@ -17,7 +18,9 @@ export function purchase(w: World, potionId: string, qty: number): ActionError |
   if (w.gold < cost) return { code: 'noGold' };
   if (!w.canFit(potionId, qty)) return { code: 'bagFull' };
   w.gold -= cost;
-  w.addItem(makePotion(potionId, qty));
+  const it = makePotion(potionId, qty);
+  w.addItem(it);
+  w.econ({ src: 'shop', ref: potionId, gold: -cost, itemsIn: [econItem(it)] });
   w.emit({ type: 'trade', kind: 'buy', gold: cost });
   return null;
 }
@@ -36,6 +39,7 @@ export function sellRaw(w: World, bagIndex: number, qty = 1): number {
     gold = sellValue(it) * n;
   w.removeFromBag(bagIndex, n);
   w.gold += gold;
+  w.econ({ src: 'sell', gold, itemsOut: [econItem({ ...it, qty: n })] });
   w.bumpInv();
   w.emit({ type: 'trade', kind: 'sell', gold });
   return gold;
@@ -45,6 +49,7 @@ export function sellRaw(w: World, bagIndex: number, qty = 1): number {
 export function sellValueNow(w: World, it: ItemInstance): number {
   const gold = sellValue(it) * (it.qty ?? 1);
   w.gold += gold;
+  w.econ({ src: 'sell', gold, itemsOut: [econItem(it)] }); // a entrada foi anotada por quem criou o item
   w.bumpInv();
   w.emit({ type: 'trade', kind: 'sell', gold });
   return gold;
@@ -60,6 +65,7 @@ export function repair(w: World, it: ItemInstance): ActionError | null {
   if (cost <= 0) return null;
   if (w.gold < cost) return { code: 'noGold' };
   w.gold -= cost;
+  w.econ({ src: 'repair', ref: it.baseId, gold: -cost });
   it.durability = maxDurability(it);
   w.recalc(w.player, false);
   w.bumpInv();
@@ -77,6 +83,7 @@ export function repairAll(w: World): ActionError | null {
   if (cost <= 0) return null;
   if (w.gold < cost) return { code: 'noGold' };
   w.gold -= cost;
+  w.econ({ src: 'repair', ref: 'all', gold: -cost });
   for (const i of repairTargets(w)) i.durability = maxDurability(i);
   w.recalc(w.player, false);
   w.bumpInv();

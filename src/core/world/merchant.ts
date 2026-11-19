@@ -15,6 +15,7 @@ import {
 import { HOME_MAP, TOWN_MAPS } from '../mapsConfig';
 import type { ActionError, ItemInstance } from '../types';
 import type { World } from '../world';
+import { econItem } from './ledger';
 
 export interface MerchantOffer {
   item: ItemInstance;
@@ -86,6 +87,7 @@ export function buyOffer(w: World, idx: number, force = false): ActionError | nu
   if (!w.canFit(o.item.baseId)) return { code: 'bagFull' };
   w.gold -= o.price;
   o.sold = true;
+  w.econ({ src: 'merchant', gold: -o.price, itemsIn: [econItem(o.item)] });
   w.addItem({ ...o.item });
   w.emit({ type: 'trade', kind: 'buy', gold: o.price });
   return null;
@@ -100,6 +102,7 @@ export function buyGoods(w: World, id: string, qty: number, force = false): Acti
   if (!w.canFit(id, qty)) return { code: 'bagFull' };
   w.gold -= cost;
   w.addItem(makeStack(id, qty));
+  w.econ({ src: 'merchant', ref: id, gold: -cost, itemsIn: [{ baseId: id, qty }] });
   w.emit({ type: 'trade', kind: 'buy', gold: cost });
   return null;
 }

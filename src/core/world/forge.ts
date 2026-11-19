@@ -6,6 +6,7 @@ import { bal } from '../balance';
 import { BASES, MATERIALS, MAX_PLUS, RARITIES, RARITY_ORDER, makeStack, rollBonuses } from '../items';
 import type { ActionError, ItemInstance, Rarity } from '../types';
 import type { World } from '../world';
+import { econItem } from './ledger';
 
 export type Mats = Record<string, number>;
 export interface ForgeCost {
@@ -103,6 +104,16 @@ function check(w: World, it: ItemInstance, cost: ForgeCost | null, force: boolea
   return null;
 }
 
+function forgeEcon(w: World, kind: string, it: ItemInstance, cost: ForgeCost, ok: boolean) {
+  w.econ({
+    src: 'forge',
+    ref: `${kind}:${it.uid}`,
+    gold: -cost.gold,
+    itemsOut: Object.entries(cost.mats).map(([baseId, qty]) => ({ baseId, qty })),
+    ok,
+  });
+}
+
 function done(w: World, it: ItemInstance, kind: ForgeKind, success: boolean) {
   if (Object.values(w.equipment).includes(it)) w.recalc(w.player, false);
   w.bumpInv();
@@ -118,6 +129,7 @@ export function upgrade(w: World, it: ItemInstance, force = false): ActionError 
   w.gold -= cost.gold;
   const ok = w.rng.next() < cost.chance;
   if (ok) it.plus = (it.plus ?? 0) + 1;
+  forgeEcon(w, 'upgrade', it, cost, ok);
   done(w, it, 'upgrade', ok);
   return null;
 }
@@ -141,6 +153,7 @@ export function raiseRarity(w: World, it: ItemInstance, force = false): ActionEr
     ),
   ];
   it.rarity = next;
+  forgeEcon(w, 'rarity', it, cost, true);
   done(w, it, 'rarity', true);
   return null;
 }
@@ -152,6 +165,7 @@ export function reroll(w: World, it: ItemInstance, force = false): ActionError |
   takeMats(w, cost.mats);
   w.gold -= cost.gold;
   it.bonuses = rollBonuses(RARITIES[it.rarity].bonuses, it.ilvl, CLASSES[w.classId].element, w.rng);
+  forgeEcon(w, 'reroll', it, cost, true);
   done(w, it, 'reroll', true);
   return null;
 }
@@ -172,6 +186,12 @@ export function salvage(w: World, bagIndex: number, force = false): ActionError 
     w.bumpInv();
     return { code: 'bagFull' };
   }
+  w.econ({
+    src: 'forge',
+    ref: 'salvage',
+    itemsOut: [econItem(it)],
+    itemsIn: Object.entries(got).map(([baseId, qty]) => ({ baseId, qty })),
+  });
   done(w, it, 'salvage', true);
   return null;
 }

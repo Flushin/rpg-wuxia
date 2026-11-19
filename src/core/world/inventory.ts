@@ -1,6 +1,7 @@
 // Inventário: mochila, equipar, poções, itens no chão, coleta e desgaste.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { CLASSES, type MonsterDef } from '../data';
+import { econItem, type EconSource } from './ledger';
 import { L } from '../i18n';
 import {
   BASES,
@@ -109,7 +110,8 @@ export function removeFromBag(w: World, i: number, qty = 1) {
   w.bumpInv();
 }
 
-export function collect(w: World, item: ItemInstance, x: number, y: number) {
+export function collect(w: World, item: ItemInstance, x: number, y: number, src: EconSource = 'loot', ref?: string) {
+  w.econ({ src, ref, itemsIn: [econItem(item)] });
   w.auto.recordDrop(item);
   let placed = addItem(w, item);
   if (!placed && w.auto.sellingActive) {
@@ -149,6 +151,7 @@ export function tickGround(w: World) {
   for (const g of [...w.ground]) {
     if (w.time >= g.expires) {
       w.ground = w.ground.filter((x) => x !== g);
+      if (g.item) w.econ({ src: 'loot', ref: 'expired', itemsOut: [econItem(g.item)] }); // sumiu do chão
       w.emit({ type: 'groundGone', id: g.id });
       continue;
     }
@@ -178,6 +181,7 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
     const g = w.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add));
     if (g > 0) {
       w.gold += g;
+      w.econ({ src: 'loot', ref: def.id, gold: g });
       w.bumpInv();
       w.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
       w.emit({ type: 'goldPickup', amount: g });
@@ -188,20 +192,20 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
     if (w.rng.next() >= pd.chance) continue;
     const s = spot();
     w.emit({ type: 'drop', x: s.x, y: s.y, color: POTIONS[pd.id]?.color ?? '#fff' });
-    collect(w, makePotion(pd.id, 1), s.x, s.y);
+    collect(w, makePotion(pd.id, 1), s.x, s.y, 'loot', def.id);
   }
   for (const md of L.materials ?? []) {
     if (w.rng.next() >= md.chance) continue;
     const s = spot();
     w.emit({ type: 'drop', x: s.x, y: s.y, color: MATERIALS[md.id]?.color ?? '#fff' });
-    collect(w, makePotion(md.id, w.rng.int(md.min ?? 1, md.max ?? md.min ?? 1)), s.x, s.y);
+    collect(w, makePotion(md.id, w.rng.int(md.min ?? 1, md.max ?? md.min ?? 1)), s.x, s.y, 'loot', def.id);
   }
   const sectOk = (id: string) => !BASES[id].sect || BASES[id].sect === w.classId;
   const give = (id: string, rarity: Rarity, ilvl = m.level) => {
     const it = makeEquipment(id, rarity, CLASSES[w.classId].element, w.rng, ilvl);
     const s = spot();
     w.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
-    collect(w, it, s.x, s.y);
+    collect(w, it, s.x, s.y, 'loot', def.id);
   };
   const eqs = L.equipment ? (Array.isArray(L.equipment) ? L.equipment : [L.equipment]) : [];
   for (const eq of eqs) {

@@ -32,6 +32,7 @@ import * as forge from './world/forge';
 import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
+import { LEDGER_MAX, type EconEntry, type EconSource } from './world/ledger';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { computeDerived, emptyElements } from './stats';
 import { bal } from './balance';
@@ -212,6 +213,27 @@ export class World {
   emit(ev: GameEvent) {
     this.events.push(ev);
     this.auto.observe(ev);
+  }
+
+  // ---------- registro econômico (roadmap M0, E1d): src/core/world/ledger.ts ----------
+  ledger: EconEntry[] = [];
+  /** entradas descartadas por passar do limite desde o último drainLedger */
+  ledgerDropped = 0;
+  /** Anota um ganho ou gasto. O instante vem do relógio do World. */
+  econ(e: Omit<EconEntry, 't'>) {
+    this.ledger.push({ t: this.clock.now(), ...e });
+    if (this.ledger.length > LEDGER_MAX) {
+      const n = this.ledger.length - LEDGER_MAX;
+      this.ledger.splice(0, n);
+      this.ledgerDropped += n;
+    }
+  }
+  /** Devolve e limpa o registro (quem envia à nuvem chama isto). */
+  drainLedger(): { entries: EconEntry[]; dropped: number } {
+    const out = { entries: this.ledger, dropped: this.ledgerDropped };
+    this.ledger = [];
+    this.ledgerDropped = 0;
+    return out;
   }
 
   // ---------- comandos ----------
@@ -930,8 +952,8 @@ export class World {
   removeFromBag(i: number, qty = 1) {
     return inventory.removeFromBag(this, i, qty);
   }
-  collect(item: ItemInstance, x: number, y: number) {
-    return inventory.collect(this, item, x, y);
+  collect(item: ItemInstance, x: number, y: number, src: EconSource = 'loot', ref?: string) {
+    return inventory.collect(this, item, x, y, src, ref);
   }
   tickGround() {
     return inventory.tickGround(this);
@@ -1056,7 +1078,9 @@ export class World {
     this.emit({ type: 'death', id: m.id });
     this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.questKill(m.monsterId);
-    this.gainXp(Math.round(def.xpBase + def.xpPerLevel * (m.level - 1)));
+    const xp = Math.round(def.xpBase + def.xpPerLevel * (m.level - 1));
+    this.econ({ src: 'kill', ref: def.id, xp });
+    this.gainXp(xp);
     this.dropLoot(m, def);
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }

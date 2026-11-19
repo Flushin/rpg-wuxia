@@ -61,6 +61,7 @@ export function questTurnIn(w: World, force = false): boolean {
   const r = v.def.reward;
   w.quest = { stage: w.quest.stage + 1, status: 'pending', progress: 0 };
   w.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });
+  if (r.gold || r.xp) w.econ({ src: 'quest', ref: v.def.id, gold: r.gold || undefined, xp: r.xp || undefined });
   if (r.gold) {
     w.gold += r.gold;
     w.bumpInv();
@@ -71,7 +72,7 @@ export function questTurnIn(w: World, force = false): boolean {
     const base = Object.entries(BASES).find(
       ([, b]) => b.slot === r.item && b.reqLevel === lv && (!b.sect || b.sect === w.classId),
     );
-    if (base) w.collect(makeEquipment(base[0], 'incomum', null, w.rng, lv), w.player.x, w.player.y);
+    if (base) w.collect(makeEquipment(base[0], 'incomum', null, w.rng, lv), w.player.x, w.player.y, 'quest', v.def.id);
   }
   if (r.xp) w.gainXp(r.xp);
   return true;

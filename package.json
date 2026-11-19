@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9 && npm run check:headless",
+    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9 && npm run check:m0 && npm run check:headless",
     "maps": "node tools/gen-maps.mjs",
     "check:items": "esbuild tools/items-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/items-check.mjs && node /tmp/items-check.mjs",
     "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
@@ -29,7 +29,8 @@
     "check:m9": "esbuild tools/m9-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m9-check.mjs && node /tmp/m9-check.mjs",
     "build:headless": "node tools/headless-build.mjs",
     "check:headless": "node tools/headless-check.mjs",
-    "golden:headless": "node tools/headless-golden.mjs"
+    "golden:headless": "node tools/headless-golden.mjs",
+    "check:m0": "esbuild tools/m0-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m0-check.mjs && node /tmp/m0-check.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
