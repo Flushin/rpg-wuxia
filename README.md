@@ -5,6 +5,7 @@ TypeScript + Vite + Phaser 3. Versão atual: ver `package.json` (aparece no cant
 
 - Jogar: https://flushin.github.io/rpg-wuxia/ (publicado a cada push na `main`).
 - Decisões do projeto: [`docs/decisoes-do-projeto.md`](docs/decisoes-do-projeto.md) — **leia antes de mudar regras**.
+- Regras para sessões de IA: [`CLAUDE.md`](CLAUDE.md). Roadmap: [`docs/roadmap/`](docs/roadmap/README.md).
 - Auditoria e plano de refatoração: [`AUDITORIA.md`](AUDITORIA.md).
 
 ## Como rodar
@@ -13,7 +14,7 @@ TypeScript + Vite + Phaser 3. Versão atual: ver `package.json` (aparece no cant
 npm install
 npm run dev         # servidor de desenvolvimento
 npm run build       # tsc --noEmit (strict) + build de produção em dist/
-npm test            # os 9 testes de regra (check:*) — também rodam no GitHub Actions
+npm test            # os testes de regra (check:*), o M0 e o core headless — também rodam no GitHub Actions
 npm run sim:balance # simulador de balanceamento (determinístico: mesma semente = mesmo resultado; -- --m9 = do 10 ao 20 e o Abade)
 npm run balance     # módulo de balanceamento: lista ou muda em % (ex.: npm run balance -- xp.monstros +10%)
 npm run maps        # regenera os mapas em public/maps/ a partir de tools/gen-maps.mjs
@@ -36,7 +37,7 @@ Trailer (vídeo promocional gravado do próprio jogo): veja [`tools/trailer/READ
 ## Estrutura
 
 ```
-src/core/     regras do jogo, sem Phaser: World (estado + tick de 1/60 s), combate, auto-combate, itens, missões, offline, A*
+src/core/     regras do jogo, sem Phaser nem navegador (roda em Node): World, combate, auto, itens, missões, offline, A*, Clock
 src/data/     JSON de dados (PT) + en.json (traduções); src/data/sprites/ = animações e âncoras das folhas
 src/render/   desenho no Phaser: mapa, entidades, efeitos de skill, áudio
 src/scenes/   Boot (carrega), Create (tela inicial, 4 personagens), Game (loop: core → tela)
