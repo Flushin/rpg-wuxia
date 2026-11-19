@@ -62,4 +62,10 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
   Média 3,03× (margem ±20% por seita: ok). Mortes 0–0,3 no trecho. Ouro ganho ~250 mil (10→20: ~49 mil); conserto
   20–125 mil (a Titã gasta metade do que ganha). Offline acima de 3× por causa da taxa 5/6 nos mapas novos (decidido).
   Senhor da Névoa (`--senhor`): no nível 30, 4–5 vitórias em 5 para todas as seitas com equipamento nv 25.
+- **Economia (revisão, 19/11/2026):** no 20→30 todas as seitas ganham ~250 mil de ouro; o conserto levava 8–18% (Víbora,
+  Geada, Tormenta) e **50%** da Titã (21% no 10→20), porque todo golpe recebido gastava durabilidade, mesmo absorvido.
+  Decidido pelo Lucas (opção A): **golpe todo absorvido por escudo não desgasta** (vale em todos os níveis e no chefe).
+  Simulador (2 execuções): Titã 125 mil → ~70 mil (28%); Tormenta igual (~44 mil); tempos de 20→30 iguais.
+  Testadas e não adotadas: desgaste proporcional ao dano (Titã ~8%, mas muda a economia do 1 ao 30) e teto do custo de
+  conserto no nível 20 do item.
 - Fora do escopo: skills ou níveis de skill novos, masmorras/fases do Trial novas, mudar a progressão 1–20.
