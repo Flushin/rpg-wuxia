@@ -86,6 +86,10 @@ Implementadas a pedido do Lucas e publicadas no site.
   dedo) para redesenhar. Ações do próprio jogador (tocar num item, equipar, trocar de aba) continuam na hora.
   - **Reforço (PR #23):** a moldura que rola (`.inv-card`) passou a ser criada uma vez só; a cada mudança só o conteúdo de dentro
     é trocado, então a rolagem nunca é perdida (antes a moldura inteira era recriada e a posição era restaurada depois).
+  - **Centralizado (19/11/2026):** as outras janelas (Skills, Atributos, NPC, Masmorras) ainda voltavam ao topo com o auto
+    atacando. Agora toda janela que se redesenha aberta usa `renderPanel()` (`src/ui/panelRender.ts`): compara o HTML novo com
+    o da tela e só troca o que mudou, mantendo elementos, rolagem, foco e hover. Ajustes de redesenho valem para todas as janelas
+    ali. Regra: eventos das janelas ficam no elemento raiz (delegação), nunca em elementos internos.
 
 - **Tela "Créditos e licenças"** *(17/11/2026, pedida pelo Lucas a partir do `AUDITORIA_DIREITOS.md`)*: abre por um link
   discreto no rodapé da tela inicial (ao lado da versão) e pelo botão "Créditos e licenças" em ⚙. Mostra quem fez o jogo, os

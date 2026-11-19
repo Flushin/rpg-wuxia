@@ -8,6 +8,7 @@ import type { World } from '../core/world';
 import { attrBreakdown } from '../core/stats';
 import { audio } from '../render/audio';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
+import { renderPanel } from './panelRender';
 import { byId, escapeHtml } from './dom';
 
 export class AttrsPanel {
@@ -98,7 +99,9 @@ export class AttrsPanel {
       (e) =>
         `<div class="at-el el-${e}"><span>${ELEMENT_LABELS[e]}</span><b class="${p.elemAtk[e] ? '' : 'zero'}">${p.elemAtk[e]}</b><b class="${p.elemRes[e] ? '' : 'zero'}">${p.elemRes[e]}</b></div>`,
     ).join('');
-    byId('attrs-panel').innerHTML = `<div class="card at-card" style="--c:${cls.color}">${closeX('data-close="1"')}
+    renderPanel(
+      byId('attrs-panel'),
+      `<div class="card at-card" style="--c:${cls.color}">${closeX('data-close="1"')}
       <h2>${escapeHtml(p.name)}</h2>
       <div class="at-sub">${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
       <div class="at-pts ${free > 0 ? 'has' : ''}"><span>${L('Pontos livres', 'Free points')}</span><b>${free}</b>
@@ -107,6 +110,7 @@ export class AttrsPanel {
       <h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
       <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
       <h3 class="at-h">${L('Elementos', 'Elements')}</h3>
-      <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div>`;
+      <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div>`,
+    );
   }
 }

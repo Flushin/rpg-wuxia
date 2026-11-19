@@ -3,6 +3,7 @@ import { initials, skillScale, SKILL_MAX_LEVEL } from '../core/skills';
 import { skillIconHtml } from './icons';
 import type { World } from '../core/world';
 import { closeX } from './labels';
+import { renderPanel } from './panelRender';
 import { byId } from './dom';
 import { isTouch } from '../platform/input';
 
@@ -62,8 +63,11 @@ export class SkillsPanel {
         <div><b>${d.name}</b>${key}<div class="d">${d.description}</div>${stats}${prog}</div></div>`;
       })
       .join('');
-    byId('skills-panel').innerHTML = `<div class="card">${closeX('data-close="1"')}<h2>Skills</h2>
+    renderPanel(
+      byId('skills-panel'),
+      `<div class="card">${closeX('data-close="1"')}<h2>Skills</h2>
       <small class="muted">${L('Skills ativas sobem de nível quando usadas. Passivas sobem com o nível do personagem. Cada nível dá +8% de efeito.', 'Active skills level up when used. Passives grow with your character level. Each level gives +8% effect.')}</small>${rows}
-      <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`;
+      <button class="primary" data-close="1">${L('Fechar', 'Close')}</button></div>`,
+    );
   }
 }

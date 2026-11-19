@@ -5,6 +5,7 @@ import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { actionErrorText } from './actionError';
+import { renderPanel } from './panelRender';
 import { byId, escapeHtml } from './dom';
 
 export class DungeonWindow {
@@ -60,11 +61,14 @@ export class DungeonWindow {
         ${why ? `<small class="muted">${why}</small>` : ''}
       </div>`;
     }).join('');
-    el.innerHTML = `<div class="card npc-card"><div class="npc-top"><div class="npc-head"><h2>${escapeHtml(tn('Portal das Masmorras'))}</h2><span class="gold">${w.gold} ${L('ouro', 'gold')}</span><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div></div>
+    renderPanel(
+      el,
+      `<div class="card npc-card"><div class="npc-top"><div class="npc-head"><h2>${escapeHtml(tn('Portal das Masmorras'))}</h2><span class="gold">${w.gold} ${L('ouro', 'gold')}</span><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div></div>
       <div class="npc-cols"><div class="npc-list">${rows}</div></div>
       <div class="npc-foot"><small class="muted">${L(
         `Nas masmorras os monstros não renascem e têm +${bonus}% de chance de equipamento. O Auto não funciona lá dentro. Morrer ou sair encerra a corrida.`,
         `In dungeons monsters don't respawn and have +${bonus}% equipment drop chance. Auto doesn't work inside. Dying or leaving ends the run.`,
-      )}</small></div></div>`;
+      )}</small></div></div>`,
+    );
   }
 }
