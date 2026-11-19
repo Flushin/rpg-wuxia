@@ -1,7 +1,8 @@
 // Painel de Configurações (botão ⚙): idioma, tamanho da interface, dicas, avisos de itens, FPS, som,
 // report de bug, créditos e trocar personagem.
 // Não guarda estado próprio: cada opção grava no dono dela (audio, perf, uiScale, rewards, World via TipManager).
-import { L, bindLangButtons, langButtons } from '../core/i18n';
+import { L } from '../core/i18n';
+import { bindLangButtons, langButtons } from './lang';
 import type { World } from '../core/world';
 import { closeX } from './labels';
 import { audio } from '../render/audio';

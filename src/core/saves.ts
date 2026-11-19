@@ -1,6 +1,7 @@
 import { L } from './i18n';
 import type { SaveData } from './types';
 import { SAVE_FILE_VERSION, migrateCharacter } from './saveFormat';
+import { systemClock } from './clock';
 
 export const SLOT_COUNT = 4;
 export interface SaveFile {
@@ -62,7 +63,7 @@ export function deleteSlot(f: SaveFile, i: number): SaveFile {
 }
 
 // "há 2 h", "há 5 min", "agora"
-export function relativeTime(ms: number, now = Date.now()): string {
+export function relativeTime(ms: number, now = systemClock.now()): string {
   const d = Math.max(0, now - (Number(ms) || now)) / 1000;
   if (d < 60) return L('agora há pouco', 'just now');
   if (d < 3600) return L(`há ${Math.floor(d / 60)} min`, `${Math.floor(d / 60)} min ago`);

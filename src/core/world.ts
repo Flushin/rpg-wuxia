@@ -20,6 +20,7 @@ import { BAG_SIZE, SLOTS, STARTING_KIT, STARTING_WEAPON, makeEquipment, makePoti
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { Rng } from './rng';
+import { systemClock, type Clock } from './clock';
 import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
 import { RESUME_OFFLINE_MIN_MS } from './offline';
@@ -133,7 +134,8 @@ export class World {
   }
   // monstros comuns mortos: "mapa#índice" → ms (relógio real) do renascimento; conta mesmo fora do mapa
   respawnAtMs: Record<string, number> = {};
-  clock: () => number = () => Date.now();
+  /** relógio real (ms): no navegador o do aparelho; no servidor e nos testes, o injetado (src/core/clock.ts) */
+  clock: Clock = systemClock;
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
   merchant: merchant.MerchantState | null = null; // estoque do Mercador Ambulante (marco 9); sorteado ao abrir
   autoAttack = false;
@@ -147,7 +149,7 @@ export class World {
   chasing = false;
   moveInput: Point = { x: 0, y: 0 };
   lastDamaged = -99;
-  rng = new Rng((Date.now() & 0xffffffff) >>> 0);
+  rng = new Rng((systemClock.now() & 0xffffffff) >>> 0);
   npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
 
   // ---- privados do World
@@ -185,10 +187,18 @@ export class World {
     return w;
   }
 
-  // offline=false: não aplica ganho offline (só o último personagem jogado recebe)
-  static fromSave(maps: Record<string, GameMap>, s: SaveData, now = Date.now(), offline = true): World {
+  // offline=false: não aplica ganho offline (só o último personagem jogado recebe).
+  // clock: relógio que o World passa a usar (o do servidor, no servidor); now é o instante da carga (padrão: clock.now()).
+  static fromSave(
+    maps: Record<string, GameMap>,
+    s: SaveData,
+    now?: number,
+    offline = true,
+    clock: Clock = systemClock,
+  ): World {
     const w = new World(maps, s.name, s.classId, s.level, { ...s.attributes });
-    saveCodec.restore(w, s, now);
+    now ??= clock.now();
+    saveCodec.restore(w, s, now, clock);
     w.offlineReport = offline ? w.applyOffline(now, s.lastSeen, s.auto) : null;
     return w;
   }
@@ -1029,9 +1039,10 @@ export class World {
     m.path = [];
     m.buffs = [];
     m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
-    if (!m.summoned && !def.boss && m.spawnKey) this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
+    if (!m.summoned && !def.boss && m.spawnKey)
+      this.respawnAtMs[m.spawnKey] = this.clock.now() + def.respawnSeconds * 1000;
     if (def.boss) {
-      const at = this.clock() + def.respawnSeconds * 1000;
+      const at = this.clock.now() + def.respawnSeconds * 1000;
       this.bossRespawn[def.id] = at;
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
@@ -1248,7 +1259,7 @@ export class World {
     this.arenas = [];
     this.bossSummoned = false;
     this.arenaSeen = false;
-    const now = this.clock();
+    const now = this.clock.now();
     for (const [k, t] of Object.entries(this.bossRespawn)) if (t <= now) delete this.bossRespawn[k];
     for (const [k, t] of Object.entries(this.respawnAtMs)) if (t <= now) delete this.respawnAtMs[k];
     this.map.objects.forEach((o, idx) => {

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { MONSTERS } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { World } from '../src/core/world';
+import { derivedClock } from '../src/core/clock';
 import type { Entity, SaveData } from '../src/core/types';
 
 let fails = 0;
@@ -31,7 +32,7 @@ const save: SaveData = {
   lastSeen: NOW,
 };
 const w = World.fromSave(maps, save, NOW, false);
-w.clock = () => clock;
+w.clock = derivedClock(() => clock);
 
 console.log('\n== tempos ==');
 ok(

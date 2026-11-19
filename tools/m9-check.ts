@@ -19,6 +19,7 @@ import { World } from '../src/core/world';
 import { upgradeCost, rarityCost, rerollCost, salvageYield, FORGE } from '../src/core/world/forge';
 import { merchantPeriod, stockLevel } from '../src/core/world/merchant';
 import type { Entity, GameEvent, SaveData } from '../src/core/types';
+import { fixedClock } from '../src/core/clock';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -48,7 +49,7 @@ const mk = (level: number, mapId = 'cidade', classId = 'lamina'): World => {
   };
   const w = World.fromSave(maps, s, NOW, false);
   priv(w).rng = new Rng(42);
-  w.clock = () => NOW;
+  w.clock = fixedClock(NOW);
   return w;
 };
 const openNpc = (w: World, role: string) => {
@@ -335,12 +336,12 @@ console.log('== Mercador Ambulante ==');
   ok(w.merchantBuy(0)?.code === 'soldOut', 'não vende o mesmo item duas vezes');
   ok(w.merchantStock() === st, 'na mesma hora o estoque não muda');
   const w2 = World.fromSave(maps, { ...w.serialize(), lastSeen: NOW }, NOW, false);
-  w2.clock = () => NOW;
+  w2.clock = fixedClock(NOW);
   ok(
     w2.merchantStock().offers[0].sold && w2.merchantStock().offers.length === st.offers.length,
     'save guarda o estoque',
   );
-  w2.clock = () => NOW + 60 * 60_000;
+  w2.clock = fixedClock(NOW + 60 * 60_000);
   const st2 = w2.merchantStock();
   ok(st2.period === merchantPeriod(NOW) + 1 && !st2.offers.some((x) => x.sold), 'uma hora depois: estoque novo');
   ok(w.merchantBuyGoods('cristal_gelo', 2) === null && w.potionCount('cristal_gelo') === 2, 'vende cristais de gelo');

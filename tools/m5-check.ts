@@ -12,6 +12,7 @@ import { CHARACTER_MIGRATIONS, CHARACTER_SAVE_VERSION, migrateCharacter } from '
 import { computeDerived } from '../src/core/stats';
 import { World } from '../src/core/world';
 import type { AutoBucket, Entity, GameEvent, SaveData } from '../src/core/types';
+import { fixedClock } from '../src/core/clock';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -402,7 +403,7 @@ console.log('\n== chefe: leash na arena ==');
 console.log('\n== chefe: respawn persiste no save ==');
 {
   const { w, b } = bossSetup();
-  w.clock = () => NOW;
+  w.clock = fixedClock(NOW);
   priv(w).killMonster(b);
   ok(b.dead && Math.abs(w.bossRespawnAtMs - (NOW + 600_000)) < 1, 'morte marca respawn em 10 min (relógio real)');
   const s = w.serialize();

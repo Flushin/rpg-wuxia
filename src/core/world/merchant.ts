@@ -62,7 +62,7 @@ function roll(w: World): MerchantOffer[] {
 
 /** Estoque atual; sorteia de novo se a janela de renovação mudou desde o último sorteio. */
 export function merchantStock(w: World): MerchantState {
-  const p = merchantPeriod(w.clock());
+  const p = merchantPeriod(w.clock.now());
   if (!w.merchant || w.merchant.period !== p) w.merchant = { period: p, offers: roll(w) };
   return w.merchant;
 }

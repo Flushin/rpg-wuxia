@@ -74,3 +74,21 @@ const fileStorage: SaveStorage = {
 };
 
 export const saveStorage: SaveStorage = isNative ? fileStorage : indexedDbStorage;
+
+/**
+ * Web: pede ao navegador para não apagar o IndexedDB quando faltar espaço (roadmap M0). Protege o save local até
+ * existir save na nuvem. O navegador decide sozinho: o Chrome costuma aceitar em PWA instalado ou site muito usado;
+ * o Safari ignora em parte. Não mostra pergunta ao jogador. No app nativo não precisa (o save é arquivo do app).
+ * Devolve true se o armazenamento ficou (ou já era) persistente.
+ */
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (isNative) return true;
+  try {
+    const sm = globalThis.navigator?.storage;
+    if (!sm?.persist) return false;
+    if (await sm.persisted?.()) return true;
+    return await sm.persist();
+  } catch {
+    return false;
+  }
+}

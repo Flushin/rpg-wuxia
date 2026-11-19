@@ -232,7 +232,7 @@ export class NpcWindow {
       this.sellFilter = 'all';
       this.sellJunkAsk = false;
     }
-    const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
+    const refreshMin = Math.ceil(merchantRefreshIn(w.clock.now()) / 60_000);
     const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
@@ -453,7 +453,7 @@ export class NpcWindow {
     const w = this.world,
       st = w.merchantStock();
     const line = NPC_TEXT.npcs[role]?.lines[0];
-    const mins = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
+    const mins = Math.ceil(merchantRefreshIn(w.clock.now()) / 60_000);
     const offers = st.offers
       .map((o, i) => {
         const it = o.item;

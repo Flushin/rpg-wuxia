@@ -8,6 +8,7 @@ import type { SaveData } from '../types';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
+import { fixedClock, type Clock } from '../clock';
 
 export function serialize(w: World): SaveData {
   return {
@@ -19,7 +20,7 @@ export function serialize(w: World): SaveData {
     freePoints: w.freePoints,
     attributes: { ...w.player.attrs },
     mapId: w.mapId,
-    lastSeen: Date.now(),
+    lastSeen: w.clock.now(),
     skills: Object.fromEntries(Object.entries(w.skills).map(([id, st]) => [id, { level: st.level, xp: st.xp }])),
     ratioCursor: w.ratioCursor,
     seenTips: [...w.seenTips],
@@ -31,9 +32,9 @@ export function serialize(w: World): SaveData {
       JSON.stringify(Object.fromEntries(SLOTS.filter((sl) => w.equipment[sl]).map((sl) => [sl, w.equipment[sl]]))),
     ),
     auto: w.auto.serialize(),
-    bossRespawnAt: (w.bossRespawn.general_terracota ?? 0) > w.clock() ? w.bossRespawn.general_terracota : undefined,
-    bossRespawns: Object.fromEntries(Object.entries(w.bossRespawn).filter(([, t]) => t > w.clock())),
-    respawns: Object.fromEntries(Object.entries(w.respawnAtMs).filter(([, t]) => t > w.clock())),
+    bossRespawnAt: (w.bossRespawn.general_terracota ?? 0) > w.clock.now() ? w.bossRespawn.general_terracota : undefined,
+    bossRespawns: Object.fromEntries(Object.entries(w.bossRespawn).filter(([, t]) => t > w.clock.now())),
+    respawns: Object.fromEntries(Object.entries(w.respawnAtMs).filter(([, t]) => t > w.clock.now())),
     quest: { ...w.quest },
     merchant: serializeMerchant(w),
   };
@@ -41,7 +42,7 @@ export function serialize(w: World): SaveData {
 
 // Preenche um World recém-criado (nome, seita, nível e atributos já vêm do construtor) com o resto do save.
 // Valores estranhos são corrigidos aqui (save antigo, editado ou corrompido). Não aplica o ganho offline.
-export function restore(w: World, s: SaveData, now: number) {
+export function restore(w: World, s: SaveData, now: number, clock: Clock) {
   w.xp = s.xp;
   w.freePoints = s.freePoints;
   w.ratioCursor = s.ratioCursor ?? 0;
@@ -64,7 +65,7 @@ export function restore(w: World, s: SaveData, now: number) {
   }
   w.recalc(w.player, false);
   w.player.hp = Math.min(w.player.hp, w.player.derived.maxHp);
-  w.clock = () => now;
+  w.clock = fixedClock(now); // a troca de mapa abaixo usa o instante da carga
   w.bossRespawn = {};
   if (Number(s.bossRespawnAt) > 0) w.bossRespawn.general_terracota = Number(s.bossRespawnAt); // save antigo
   for (const [k, v] of Object.entries(s.bossRespawns ?? {}))
@@ -72,7 +73,7 @@ export function restore(w: World, s: SaveData, now: number) {
   for (const [k, v] of Object.entries(s.respawns ?? {}))
     if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
   w.changeMap(w.maps[s.mapId] ? s.mapId : HOME_MAP);
-  w.clock = () => Date.now();
+  w.clock = clock;
   w.auto.load(s.auto);
   w.quest = sanitizeQuest(s.quest);
   w.merchant = restoreMerchant(s.merchant);

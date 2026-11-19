@@ -1,3 +1,4 @@
+import './boot'; // primeiro: idioma, uid e armazenamento antes de carregar os dados do jogo
 import Phaser from 'phaser';
 import { L, LANG } from './core/i18n';
 import { BootScene } from './scenes/bootScene';

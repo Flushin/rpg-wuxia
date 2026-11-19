@@ -1,40 +1,22 @@
-// Idioma do jogo (PT/EN). Decidido uma vez ao carregar a página; trocar salva a escolha e recarrega.
+// Idioma do jogo (PT/EN). O core não lê o navegador: o idioma entra por initLang (roadmap M0, E1b), para o core rodar
+// em Node (servidor e testes). No jogo, src/boot.ts detecta o idioma (preferência salva ou idioma do aparelho) e chama
+// initLang antes de qualquer dado ser carregado. Sem initLang, vale o português (servidor e scripts de teste).
+// Trocar de idioma no jogo (salvar a escolha e recarregar) fica em src/ui/lang.ts.
 import en from '../data/en.json';
-import { PREF, getPref, setPref } from '../platform/prefs';
-import { restartApp } from '../platform';
 
 export type Lang = 'pt' | 'en';
 
-function detect(): Lang {
-  if (typeof window === 'undefined') return 'pt'; // scripts de teste (Node) rodam em PT
-  const s = getPref(PREF.LANG);
-  if (s === 'pt' || s === 'en') return s;
-  return (navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en';
-}
+export let LANG: Lang = 'pt';
+let dataLocalized = false;
 
-export const LANG: Lang = detect();
+/** Define o idioma. Tem de vir antes de carregar os dados traduzidos (CLASSES, ITEMS...), que são traduzidos uma vez só. */
+export function initLang(lang: Lang) {
+  if (dataLocalized && lang !== LANG) throw new Error('initLang chamado depois de os dados já estarem traduzidos');
+  LANG = lang;
+}
 
 /** Texto fixo da interface: L('Jogar', 'Play'). */
 export const L = (pt: string, en: string) => (LANG === 'en' ? en : pt);
-
-/** Salva o idioma e recomeça o jogo (o jogo já salva ao sair da tela). */
-export function setLang(lang: Lang) {
-  if (lang === LANG) return;
-  setPref(PREF.LANG, lang);
-  restartApp();
-}
-
-/** Botões PT | EN para telas e painéis. Use com bindLangButtons. */
-export const langButtons = () =>
-  `<div class="lang-sw">${(['pt', 'en'] as Lang[]).map((l) => `<button data-lang="${l}" class="${l === LANG ? 'primary' : ''}">${l.toUpperCase()}</button>`).join('')}</div>`;
-export function bindLangButtons(root: HTMLElement) {
-  root.querySelectorAll<HTMLElement>('[data-lang]').forEach((b) => {
-    b.onclick = (e) => {
-      e.stopPropagation();
-      setLang(b.dataset.lang as Lang);
-    };
-  });
-}
 
 type Overlay = { [k: string]: unknown };
 function merge(target: Overlay, over: Overlay) {
@@ -50,6 +32,7 @@ function merge(target: Overlay, over: Overlay) {
  * Os JSON de dados continuam em português; en.json espelha a mesma estrutura só com os textos.
  */
 export function localize<T>(section: keyof typeof en, data: T): T {
+  dataLocalized = true;
   if (LANG === 'en') merge(data as Overlay, (en as Record<string, Overlay>)[section]);
   return data;
 }

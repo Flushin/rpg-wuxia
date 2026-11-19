@@ -6,6 +6,7 @@ import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, i
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
 import { World } from '../src/core/world';
+import { derivedClock } from '../src/core/clock';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
@@ -29,7 +30,7 @@ const priv = (w: World) => w as unknown as { rng: Rng; recalc: (e: unknown, k: b
 // Isso também deixa a simulação determinística (mesma semente = mesmo resultado, em qualquer computador).
 const SIM_EPOCH_MS = Date.UTC(2026, 0, 1);
 const useSimClock = (w: World) => {
-  w.clock = () => SIM_EPOCH_MS + w.time * 1000;
+  w.clock = derivedClock(() => SIM_EPOCH_MS + w.time * 1000);
 };
 
 // pontuação simples de equipamento para o "jogador médio" decidir o que vestir

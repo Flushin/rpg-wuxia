@@ -1,4 +1,5 @@
-import { L, bindLangButtons, langButtons } from '../core/i18n';
+import { L } from '../core/i18n';
+import { bindLangButtons, langButtons } from './lang';
 import { CLASSES, NPC_TEXT, SECT_ORDER } from '../core/data';
 import { MASTER_PORTRAITS } from '../render/sprites';
 import { SLOT_COUNT, relativeTime, type SaveFile } from '../core/saves';

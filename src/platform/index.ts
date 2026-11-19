@@ -1,6 +1,6 @@
 // Camada de plataforma: tudo o que muda entre o jogo no navegador (web/PWA) e o app das lojas (Capacitor).
 // O resto do código usa só estas funções. Cada arquivo tem a implementação web e a do app, escolhida por `isNative`.
-// Este arquivo não importa plugins do Capacitor: ele é usado também pelos scripts de teste (Node), via core/i18n.
+// Este arquivo não importa plugins do Capacitor (fica leve e seguro de importar em qualquer lugar).
 //
 // Mapa:
 //   index.ts      isNative, restartApp, registerServiceWorker

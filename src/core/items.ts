@@ -1,4 +1,5 @@
 import itemsJson from '../data/items.json';
+import { newUid } from './uid';
 import { L, localize } from './i18n';
 import { balanceItems } from './balance';
 import type { Rng } from './rng';
@@ -144,10 +145,7 @@ export const itemColor = (it: ItemInstance) =>
 export const maxDurability = (it: ItemInstance) => BASES[it.baseId]?.durability ?? 0;
 export const isBroken = (it: ItemInstance) => !!BASES[it.baseId] && it.durability <= 0;
 
-// nível do item = maior entre o nível exigido da base e o do drop
-let uidCounter = 0;
-export const newUid = () =>
-  `${Date.now().toString(36)}-${(uidCounter++).toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+export { newUid } from './uid';
 
 export function makePotion(baseId: string, qty = 1): ItemInstance {
   return { uid: newUid(), baseId, rarity: 'comum', bonuses: [], ilvl: 1, durability: 0, qty };
@@ -187,6 +185,7 @@ export function rollBonuses(
   return out;
 }
 
+// nível do item = maior entre o nível exigido da base e o do drop
 export function makeEquipment(
   baseId: string,
   rarity: Rarity,
