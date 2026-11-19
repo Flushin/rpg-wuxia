@@ -121,12 +121,14 @@ export class EntityView {
     this.label.setText(labelOf(e));
     this.ring.clear();
     this.bar.clear();
-    // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha
+    // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha;
+    // chefe em fúria = tom vermelho
     const slow = e.buffs.some((b) => b.kind === 'slow'),
       broken = e.buffs.some((b) => b.kind === 'defReduction'),
       shield = e.buffs.some((b) => b.kind === 'shield' && b.value > 0);
     if (!this.flashing) {
       if (slow) this.sprite.setTint(0x8fc8ff);
+      else if (e.enraged) this.sprite.setTint(0xff7a6a);
       else this.sprite.clearTint();
     }
     let ix = -18;

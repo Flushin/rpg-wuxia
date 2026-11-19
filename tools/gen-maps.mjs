@@ -677,11 +677,106 @@ function gruta() {
   return tiled('Desfiladeiro do Gelo Eterno', gr, objs);
 }
 
+// ---- masmorra: Mosteiro Profanado (nível 16–20) ----
+// Instância (src/core/dungeons.ts): monstros não renascem. Entrada no sul pelo pátio do portão; dali, ala oeste
+// (salão de meditação, lajes e colunas) ou ala leste (jardim com lago); as duas sobem ao claustro, que leva à
+// antecâmara e ao salão do Patriarca no norte. Paredes de pilares; sem portal perto da arena (como na gruta).
+const MOSTEIRO_ARENA = { x: 16, y: 6, r: 5.5 };
+function mosteiro() {
+  const rnd = rngFn(1620);
+  const gr = makeGrid(T, T);
+  // bosque em volta; os prédios (salão do Patriarca, claustro, ala oeste, pátio) têm paredes de pilares
+  gr.rect(8, 0, 16, 12, PI);
+  gr.rect(2, 11, 28, 4, PI);
+  gr.rect(2, 13, 9, 11, PI);
+  gr.rect(10, 18, 12, 8, PI);
+  // entrada (sul) e pátio do portão, com duas cerejeiras nos cantos de cima
+  gr.rect(15, 25, 2, 6, P);
+  gr.rect(11, 19, 10, 6, PL);
+  gr.set(11, 19, T);
+  gr.set(20, 19, T);
+  // ala oeste: salão de meditação (lajes) com duas fileiras de colunas
+  gr.rect(9, 21, 2, 2, PL);
+  gr.rect(3, 14, 7, 9, RU);
+  for (const j of [16, 19]) for (const i of [4, 8]) gr.set(i, j, PI);
+  // ala leste: jardim com lago e árvores
+  gr.rect(21, 21, 2, 2, PL);
+  gr.rect(22, 14, 7, 9, G);
+  gr.disc(25.5, 18, 1.5, WA);
+  gr.set(28, 14, T);
+  gr.set(22, 22, T);
+  // claustro: corredor de cima ligando as duas alas, com a antecâmara no meio
+  gr.rect(3, 12, 26, 2, P);
+  gr.disc(16, 12.5, 2.2, PL);
+  // salão do Patriarca: lajes com 6 braseiros em volta; a porta é o único acesso
+  gr.rect(9, 1, 14, 10, RU);
+  gr.disc(MOSTEIRO_ARENA.x, MOSTEIRO_ARENA.y, 4.6, RU);
+  gr.rect(15, 10, 2, 2, RU);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(MOSTEIRO_ARENA.x + Math.cos(a) * 4), Math.floor(MOSTEIRO_ARENA.y + Math.sin(a) * 4), PI);
+  }
+  const seen = sealUnreachable(gr, 16, 27, T);
+  for (const [i, j, what] of [
+    [16, 6, 'arena'],
+    [6, 18, 'ala oeste'],
+    [24, 16, 'ala leste'],
+    [16, 12, 'antecâmara'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`mosteiro: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+  ];
+  const used = [];
+  const place = (monster, name, cx, cy, r, minLevel, maxLevel) => {
+    const c = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (
+          Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
+          Math.hypot(i + 0.5 - 16, j + 0.5 - 27.5) >= 6 && // ninguém ataca quem acabou de chegar
+          seen.has(j * W + i) &&
+          walkable(gr.get(i, j))
+        )
+          c.push([i, j]);
+    for (let tries = 0; tries < 200 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2)) continue;
+      used.push([i, j]);
+      objs.push(point(name, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel }));
+      return;
+    }
+    throw new Error(`mosteiro: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  const monk = (cx, cy, r, a, b) => place('monge_profanado', 'Monge Profanado', cx, cy, r, a, b);
+  const soul = (cx, cy, r, a, b) => place('alma_penada', 'Alma Penada', cx, cy, r, a, b);
+  const guard = (cx, cy, r, a, b) => place('guardiao_pedra', 'Guardião de Pedra', cx, cy, r, a, b);
+  for (let n = 0; n < 3; n++) monk(16, 20.5, 3.5, 16, 17); // pátio do portão
+  for (let n = 0; n < 2; n++) monk(6, 18, 3.5, 17, 18); // ala oeste
+  guard(6, 18, 3.5, 17, 18);
+  soul(6, 18, 3.5, 17, 18);
+  for (let n = 0; n < 2; n++) soul(25, 18, 3.6, 17, 18); // ala leste
+  guard(25, 18, 3.6, 17, 18);
+  monk(6, 12.5, 1.5, 18, 19); // claustro
+  soul(26, 12.5, 1.5, 18, 19);
+  guard(16, 12.5, 1.6, 19, 19); // antecâmara
+  monk(13, 12.5, 1, 19, 19);
+  objs.push(
+    point('Patriarca Profanado', 'monsterSpawn', MOSTEIRO_ARENA.x, MOSTEIRO_ARENA.y, {
+      monster: 'patriarca_profanado',
+    }),
+  );
+  console.log(`mosteiro: ${seen.size} tiles andáveis, ${used.length} monstros + Patriarca`);
+  return tiled('Mosteiro Profanado', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
 writeFileSync('public/maps/ruinas.json', JSON.stringify(ruinas()));
 writeFileSync('public/maps/montanha.json', JSON.stringify(montanha()));
 writeFileSync('public/maps/gruta.json', JSON.stringify(gruta()));
+writeFileSync('public/maps/mosteiro.json', JSON.stringify(mosteiro()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

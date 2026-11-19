@@ -59,6 +59,8 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Discípulo Caído (só na luta do Abade) | 18 | 300 | 15–25 | — |
 | Abade Caído | 20 | 20000 | 900–1200 | 900 s |
 | Yeti Ancestral (chefe da masmorra) | 15 | 3000 | 300–400 | — (instância) |
+| Monge Profanado / Alma Penada / Guardião de Pedra (masmorra) | 16–19 | 100+20 / 80+18 / 120+24 | 12–18 / 8–12 / 12–18 (+por nível) | — (instância) |
+| Patriarca Profanado (chefe da masmorra) | 20 | 6000 | 600–800 | — (instância) |
 
 Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
 Desde o marco 9 o nível máximo é 20, com 27000 / 31500 / 37000 / 42500 / 49500 / 56000 / 64000 / 73000 / 83000 /
@@ -111,6 +113,23 @@ ataca de longe e deixa lento quem recua. Com 2 Yetis nv 13 invocados, velocidade
 Corrida inteira (12 monstros nv 11–14 + chefe): ~3800 XP dos monstros + 3000 do chefe e ~300 + 350 de ouro, contra
 250 de entrada. O ganho de XP fica perto do de caçar na montanha; o atrativo é o equipamento (+25% de chance e o Raro garantido).
 
+## Masmorra: Patriarca Profanado (19/11/2026)
+
+`npm run sim:balance -- --masmorra=mosteiro` (6 lutas por linha; equipamento nv 15 em todos os slots). Fúria a 30%:
+intervalo de ataque ×0,65, dano ×1,3, passo ×1,25. Força 25 (22 deixava Tormenta e Titã com folga demais).
+
+| Seita | Nv 16 incomum / raro | Nv 18 incomum / raro | Nv 20 incomum / raro | Poções (nv 16 incomum) |
+|---|---|---|---|---|
+| Tormenta | 6/6 · 6/6 | 6/6 · 6/6 | 6/6 · 6/6 | ~16 |
+| Geada | 6/6 · 6/6 | 6/6 · 6/6 | 6/6 · 6/6 | ~1 |
+| Titã | 6/6 · 6/6 | 6/6 · 6/6 | 6/6 · 6/6 | ~16 (luta de ~140 s) |
+| Víbora | 6/6 · 6/6 | 6/6 · 6/6 | 6/6 · 6/6 | ~4 |
+
+Gasto de poções parecido com o do Yeti Ancestral; quem luta de perto sente a fúria, as seitas de longe recuam.
+Comuns (nv 17): Monge 670 de vida e golpe rápido (1,6 s), Alma = Espectro sem lentidão e recuando, Guardião = vida do
+Yeti com defesa física ×1,4 (fraco contra espírito). Corrida inteira: ~6000 XP dos monstros + 6000 do chefe e
+~500 + 700 de ouro, contra 500 de entrada.
+
 ---
 
 # Registro do marco 5
@@ -126,7 +145,7 @@ Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do 
 - Cada seita cria o personagem, liga o Auto e caça sozinha. O "jogador médio" simulado só decide o que o auto não decide: gasta pontos com **Distribuir recomendado**, veste upgrades (pontuação simples por atributo útil), conserta e vende sobras na vila, e vai às Ruínas ao chegar no nível 7.
 - Mede minutos por nível, mortes, ouro ganho por hora, gasto em poções e conserto.
 - Depois simula o chefe no nível 10 com equipamento nível 5 Incomum ou Raro em todos os slots, 18 poções e um jogador ativo: esquiva dos círculos (reação de 0,45 s), bebe poção com vida baixa; a Lâmina luta de perto, o Pavilhão recua dando a volta na arena.
-- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--trace-masmorra` mostra a luta).
+- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--masmorra=mosteiro`: Patriarca nos níveis 16/18/20 com equipamento nv 15; `--trace-masmorra` mostra a luta).
 
 ## Curva de XP (`progression.json`)
 

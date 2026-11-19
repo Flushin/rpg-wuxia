@@ -358,6 +358,18 @@
     },
     "yeti_ancestral": {
       "name": "Ancestral Yeti"
+    },
+    "monge_profanado": {
+      "name": "Defiled Monk"
+    },
+    "alma_penada": {
+      "name": "Restless Soul"
+    },
+    "guardiao_pedra": {
+      "name": "Stone Guardian"
+    },
+    "patriarca_profanado": {
+      "name": "Defiled Patriarch"
     }
   },
   "tips": {
@@ -582,7 +594,12 @@
     "Abade Caído": "Fallen Abbot",
     "Yeti Ancestral": "Ancestral Yeti",
     "Desfiladeiro do Gelo Eterno": "Eternal Ice Gorge",
-    "Portal das Masmorras": "Dungeon Portal"
+    "Portal das Masmorras": "Dungeon Portal",
+    "Monge Profanado": "Defiled Monk",
+    "Alma Penada": "Restless Soul",
+    "Guardião de Pedra": "Stone Guardian",
+    "Patriarca Profanado": "Defiled Patriarch",
+    "Mosteiro Profanado": "Defiled Monastery"
   },
   "quests": {
     "chain": [
@@ -673,7 +690,11 @@
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [
+      {
+        "texto": "Second dungeon: the Defiled Monastery (level 16+, 500 gold), with Defiled Monks, Restless Souls and Stone Guardians. At the end, the Defiled Patriarch becomes enraged at 30% health."
+      }
+    ],
     "versoes": [
       {
         "itens": [

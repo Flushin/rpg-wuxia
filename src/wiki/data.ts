@@ -66,6 +66,7 @@ export interface BossDef {
   arenaRadius: number;
   aoe?: { radius: number; delay: number; mult: number; interval: number; intervalPhase2?: number };
   summon?: { monsterId: string; count: number; level: number; atHpPct: number };
+  enrage?: { atHpPct: number; attackIntervalMul: number; damageMul: number; moveSpeedMul: number };
 }
 export interface Monster {
   id: string;

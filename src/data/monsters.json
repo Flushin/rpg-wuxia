@@ -749,5 +749,320 @@
         }
       ]
     }
+  },
+  "monge_profanado": {
+    "id": "monge_profanado",
+    "name": "Monge Profanado",
+    "sprite": "fallen-disciple",
+    "minLevel": 16,
+    "maxLevel": 19,
+    "baseAttributes": {
+      "strength": 4,
+      "intelligence": 0,
+      "stamina": 6,
+      "agility": 8,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1,
+      "intelligence": 0,
+      "stamina": 3.5,
+      "agility": 0.6,
+      "willpower": 0.5
+    },
+    "damageType": "physical",
+    "aggroRange": 5,
+    "leashRange": 13,
+    "attackRange": 1.5,
+    "attackInterval": 1.6,
+    "moveSpeed": 3.4,
+    "defMul": {
+      "phys": 0.8,
+      "spirit": 1.3
+    },
+    "xpBase": 100,
+    "xpPerLevel": 20,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 12,
+        "max": 18,
+        "perLevel": 1.4
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.05
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.15
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.1
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.03
+        }
+      ]
+    }
+  },
+  "alma_penada": {
+    "id": "alma_penada",
+    "name": "Alma Penada",
+    "sprite": "ice-spectre",
+    "minLevel": 16,
+    "maxLevel": 19,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 3.5,
+      "stamina": 6,
+      "agility": 6,
+      "willpower": 8
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.55,
+      "stamina": 4.5,
+      "agility": 0.6,
+      "willpower": 1
+    },
+    "damageType": "spiritual",
+    "aggroRange": 5,
+    "leashRange": 14,
+    "attackRange": 5.5,
+    "attackInterval": 2.4,
+    "moveSpeed": 3,
+    "keepDistance": 3,
+    "projectile": "ice",
+    "defMul": {
+      "phys": 0.55,
+      "spirit": 2.6
+    },
+    "xpBase": 80,
+    "xpPerLevel": 18,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 8,
+        "max": 12,
+        "perLevel": 1.2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.05
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.15
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.1
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "essencia_qi",
+          "chance": 0.05
+        }
+      ]
+    }
+  },
+  "guardiao_pedra": {
+    "id": "guardiao_pedra",
+    "name": "Guardião de Pedra",
+    "sprite": "terracotta",
+    "minLevel": 17,
+    "maxLevel": 19,
+    "scale": 1.35,
+    "baseAttributes": {
+      "strength": 6,
+      "intelligence": 0,
+      "stamina": 10,
+      "agility": 3,
+      "willpower": 4
+    },
+    "perLevel": {
+      "strength": 1.1,
+      "intelligence": 0,
+      "stamina": 5.5,
+      "agility": 0.4,
+      "willpower": 0.6
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 12,
+    "attackRange": 1.8,
+    "attackInterval": 2.6,
+    "moveSpeed": 2,
+    "slam": {
+      "radius": 2.2,
+      "delay": 1.3,
+      "mult": 1.7,
+      "interval": 10
+    },
+    "defMul": {
+      "phys": 1.4,
+      "spirit": 0.8
+    },
+    "xpBase": 120,
+    "xpPerLevel": 24,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 12,
+        "max": 18,
+        "perLevel": 1.6
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.05
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.04
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.15
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.1
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.08,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.4,
+          "min": 1,
+          "max": 3
+        }
+      ]
+    }
+  },
+  "patriarca_profanado": {
+    "id": "patriarca_profanado",
+    "name": "Patriarca Profanado",
+    "sprite": "fallen-abbot",
+    "minLevel": 20,
+    "maxLevel": 20,
+    "scale": 2,
+    "baseAttributes": {
+      "strength": 25,
+      "intelligence": 0,
+      "stamina": 800,
+      "agility": 16,
+      "willpower": 110
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.4,
+    "moveSpeed": 2.0,
+    "defMul": {
+      "phys": 0.3,
+      "spirit": 1.2
+    },
+    "xpBase": 6000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 600,
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.6,
+        "delay": 1.4,
+        "mult": 1.9,
+        "interval": 6.5,
+        "intervalPhase2": 4.5
+      },
+      "enrage": {
+        "atHpPct": 0.3,
+        "attackIntervalMul": 0.65,
+        "damageMul": 1.3,
+        "moveSpeedMul": 1.25
+      }
+    },
+    "loot": {
+      "gold": {
+        "min": 600,
+        "max": 800
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 15
+      },
+      "equipment": [
+        {
+          "chance": 0.4,
+          "minReqLevel": 15,
+          "maxReqLevel": 15
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 1,
+          "min": 3,
+          "max": 4
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1,
+          "min": 2,
+          "max": 2
+        }
+      ]
+    }
   }
 }

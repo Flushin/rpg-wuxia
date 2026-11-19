@@ -30,6 +30,8 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10 },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
   gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  // masmorra: Mosteiro Profanado; salão do Patriarca Profanado no norte
+  mosteiro: { trees: 'city', grassDecor: 0.08, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
 };
 
 /** Mapas carregados no boot (public/maps/<id>.json). */

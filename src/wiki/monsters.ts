@@ -129,6 +129,13 @@ function bossMechanics(m: Monster, inDungeon: boolean): string {
       `Com ${Math.round(b.summon.atHpPct * 100)}% da vida, chama ${b.summon.count} <a href="#/monstro/${s?.id}">${esc(s?.name ?? b.summon.monsterId)}</a> (nível ${b.summon.level})${b.aoe?.intervalPhase2 ? ` e passa a marcar círculos a cada ${s1(b.aoe.intervalPhase2)} s` : ''}.`,
     );
   }
+  if (b.enrage) {
+    const e = b.enrage,
+      pc = (x: number) => Math.round(x * 100);
+    li.push(
+      `Com ${pc(e.atHpPct)}% da vida entra em <b>fúria</b> (fica avermelhado): golpes ${pc(1 / e.attackIntervalMul - 1)}% mais rápidos, ${pc(e.damageMul - 1)}% mais fortes e passo ${pc(e.moveSpeedMul - 1)}% mais rápido${b.aoe?.intervalPhase2 ? `; passa a marcar círculos a cada ${s1(b.aoe.intervalPhase2)} s` : ''}. A fúria só acaba se a luta recomeçar.`,
+    );
+  }
   li.push(
     inDungeon
       ? 'Chefe de masmorra: não renasce; está de volta a cada nova entrada.'

@@ -1,4 +1,4 @@
-// Chefe (General de Terracota): golpes marcados no chão, invocação e arena.
+// Chefes: golpes marcados no chão, invocação, fúria e arena.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { MONSTERS, type MonsterDef } from '../data';
 import { bal } from '../balance';
@@ -14,7 +14,7 @@ export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number)
   if (m.ai === 'chase') {
     m.aiTimer -= dt;
     if (m.aiTimer <= 0 && !p.dead) {
-      m.aiTimer = m.hp <= m.derived.maxHp * b.summon.atHpPct ? b.aoe.intervalPhase2 : b.aoe.interval;
+      m.aiTimer = m.hp <= m.derived.maxHp * phase2Pct(def) ? b.aoe.intervalPhase2 : b.aoe.interval;
       const t: Telegraph = {
         id: w.nextTelegraph++,
         x: p.x,
@@ -28,8 +28,23 @@ export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number)
       w.telegraphs.push(t);
       w.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
     }
-    if (!w.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) summonAdds(w, m, b.summon);
+    if (b.summon && !w.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) summonAdds(w, m, b.summon);
+    if (b.enrage && !m.enraged && m.hp <= m.derived.maxHp * b.enrage.atHpPct) enrage(w, m, def);
   }
+}
+
+/** Vida (fração) em que o chefe passa para a fase 2 (círculos mais frequentes): a da invocação ou a da fúria. */
+export const phase2Pct = (def: MonsterDef) => def.boss?.summon?.atHpPct ?? def.boss?.enrage?.atHpPct ?? 0.5;
+
+/** Fúria: golpes mais rápidos e mais fortes e passo mais rápido até a luta resetar (resetBoss). */
+export function enrage(w: World, m: Entity, def: MonsterDef) {
+  const e = def.boss!.enrage!;
+  m.enraged = true;
+  m.attackInterval = def.attackInterval * e.attackIntervalMul;
+  m.moveSpeed = def.moveSpeed * e.moveSpeedMul;
+  m.derived.physAtk *= e.damageMul;
+  m.derived.spiritAtk *= e.damageMul;
+  w.emit({ type: 'bossEnrage', id: m.id, name: m.name });
 }
 
 // Golpe em área de monstro comum (Yeti, marco 9): com o jogador perto, marca um círculo em volta de si e bate
@@ -78,6 +93,15 @@ export function summonAdds(w: World, boss: Entity, sm: { monsterId: string; coun
 
 export function resetBoss(w: World, m: Entity) {
   w.bossSummoned = false;
+  if (m.enraged) {
+    const def = MONSTERS[m.monsterId],
+      hp = m.hp;
+    m.enraged = false;
+    m.attackInterval = def.attackInterval;
+    m.moveSpeed = def.moveSpeed;
+    w.applyMonsterLevel(m, def, m.level); // refaz ataque/defesa sem o bônus da fúria
+    m.hp = hp;
+  }
   w.telegraphs = w.telegraphs.filter((t) => t.ownerId !== m.id);
   w.monsters = w.monsters.filter((x) => !x.summoned);
   m.aiTimer = 0;
