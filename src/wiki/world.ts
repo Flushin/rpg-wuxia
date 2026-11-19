@@ -88,7 +88,8 @@ const minimap = (id: string, big = false) => `<canvas class="minimap${big ? ' bi
 
 export async function mapIndexPage(): Promise<string> {
   const maps = await loadMaps();
-  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. A vila é segura: lá a vida e a mana voltam sozinhas fora de combate.</p>
+  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. A vila é segura: lá a vida e a mana voltam sozinhas fora de combate.
+    No jogo, a aba <b>Mundo</b> do mapa (tecla M ou toque no minimapa) mostra todos os mapas; toque num deles para ver, passo a passo, por quais portais ir saindo de onde você está (o próximo portal pisca no minimapa).</p>
     <div class="grid map-grid">${maps
       .map((m) => {
         const lv = mapLevels(m),
