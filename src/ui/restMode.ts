@@ -12,6 +12,8 @@ import { PREF, getPref, setPref } from '../platform/prefs';
 export const REST_DELAYS = [0, 30, 60, 120] as const;
 const DEFAULT_DELAY = 60;
 const REST_FPS = 10;
+/** a tela preta só redesenha o resumo a cada 30 s (menos trabalho no descanso) */
+const PAINT_MS = 30000;
 
 /** Campos internos do TimeStep do Phaser (3.60+) usados para trocar o FPS em tempo de execução. */
 type Loop = Phaser.Core.TimeStep & { _target: number; forceSetTimeOut: boolean };
@@ -142,7 +144,7 @@ class RestMode {
 
   private paint() {
     const now = performance.now();
-    if (!this.el || !this.world || now - this.lastPaint < 1000) return;
+    if (!this.el || !this.world || now - this.lastPaint < PAINT_MS) return;
     this.lastPaint = now;
     const p = this.world.player,
       g = this.gain,
