@@ -1,15 +1,20 @@
 {
-  "proxima": [
-    {
-      "texto": "Masmorras: o novo Portal das Masmorras, na saída oeste da vila, leva ao Desfiladeiro do Gelo Eterno (nível 10+). Entrada paga, monstros que não renascem, mais chance de equipamento e o Yeti Ancestral no fim. Sem Auto lá dentro.",
-      "wiki": "mapa/gruta"
-    },
-    {
-      "texto": "Auto: com a mochila de equipamentos cheia, volta à vila para vender no vendedor e retorna à caça. O Véu de Névoa e a Pele de Ferro agora saem assim que você leva dano ou é cercado.",
-      "wiki": "mecanicas/auto"
-    }
-  ],
+  "proxima": [],
   "versoes": [
+    {
+      "versao": "0.2.0",
+      "data": "2026-11-19",
+      "itens": [
+        {
+          "texto": "Masmorras: o novo Portal das Masmorras, na saída oeste da vila, leva ao Desfiladeiro do Gelo Eterno (nível 10+). Entrada paga, monstros que não renascem, mais chance de equipamento e o Yeti Ancestral no fim. Sem Auto lá dentro.",
+          "wiki": "mapa/gruta"
+        },
+        {
+          "texto": "Auto: com a mochila de equipamentos cheia, volta à vila para vender no vendedor e retorna à caça. O Véu de Névoa e a Pele de Ferro agora saem assim que você leva dano ou é cercado.",
+          "wiki": "mecanicas/auto"
+        }
+      ]
+    },
     {
       "versao": "0.1.0",
       "data": "2026-11-19",
@@ -22,7 +27,10 @@
           "texto": "Quatro regiões para explorar: Vila das Nuvens, Floresta Sombria, Montanha Nevada e Ruínas de Terracota.",
           "wiki": "mapas"
         },
-        { "texto": "Suba até o nível 20 seguindo as 14 missões da história.", "wiki": "missoes" },
+        {
+          "texto": "Suba até o nível 20 seguindo as 14 missões da história.",
+          "wiki": "missoes"
+        },
         {
           "texto": "Forja: aprimore, suba a raridade, troque os bônus e desmonte equipamentos.",
           "wiki": "mecanicas/forja"
@@ -31,7 +39,10 @@
           "texto": "Auto-combate e ganho offline: seu personagem continua caçando enquanto você está fora.",
           "wiki": "mecanicas/auto"
         },
-        { "texto": "Wiki do jogo com todos os itens, monstros, NPCs e mapas.", "wiki": "" }
+        {
+          "texto": "Wiki do jogo com todos os itens, monstros, NPCs e mapas.",
+          "wiki": ""
+        }
       ]
     }
   ]
