@@ -1,5 +1,6 @@
 // Páginas de missões (a cadeia principal, em ordem) e de mapas (minimapa desenhado dos tiles, monstros, NPCs e saídas).
 import { MAPS_CONFIG } from '../core/mapsConfig';
+import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
 import { MONSTERS, QUESTS, SLOT_NAMES, esc, type Quest } from './data';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterSprite } from './monsters';
@@ -74,9 +75,11 @@ function mapLevels(m: WikiMap): [number, number] | null {
   }
   return lv.length ? [Math.min(...lv), Math.max(...lv)] : null;
 }
-/** Nível mínimo para entrar: o maior minLevel dos portais que levam a este mapa (0 = livre). */
+/** Nível mínimo para entrar: o maior minLevel dos portais que levam a este mapa (0 = livre); masmorra: o do menu. */
 const entryLevel = (id: string, maps: WikiMap[]) =>
+  DUNGEONS.find((d) => d.map === id)?.minLevel ??
   Math.min(...maps.flatMap((m) => m.portals.filter((p) => p.target === id).map((p) => p.minLevel)).concat(Infinity));
+const dungeonOf = (id: string) => DUNGEONS.find((d) => d.map === id);
 
 const minimap = (id: string, big = false) => `<canvas class="minimap${big ? ' big' : ''}" data-map="${id}"></canvas>`;
 
@@ -87,7 +90,9 @@ export async function mapIndexPage(): Promise<string> {
       .map((m) => {
         const lv = mapLevels(m),
           entry = entryLevel(m.id, maps);
-        const sub = MAPS_CONFIG[m.id]?.town ? 'Cidade' : lv ? `monstros nível ${lv[0]}–${lv[1]}` : '';
+        const sub = MAPS_CONFIG[m.id]?.town
+          ? 'Cidade'
+          : `${dungeonOf(m.id) ? 'Masmorra · ' : ''}${lv ? `monstros nível ${lv[0]}–${lv[1]}` : ''}`;
         return `<a class="card-link" href="#/mapa/${m.id}">${minimap(m.id)}<b>${esc(m.name)}</b><small>${sub}${entry > 0 && entry < Infinity ? ` · entrada nível ${entry}+` : ''}</small></a>`;
       })
       .join('')}</div>`;
@@ -107,8 +112,21 @@ export async function mapPage(id: string): Promise<string | null> {
     secret = mons.filter((k) => isSpoiler(MONSTERS[k], maps));
   const monRow = (k: string) =>
     `<li><a href="#/monstro/${k}">${monsterSprite(MONSTERS[k], 'mini')}</a> ${monsterLabel(k)} — ${count.get(k)} ponto(s)</li>`;
+  const dungeon = dungeonOf(id);
+  const seenExit = new Set<string>();
   const exits = m.portals
+    .filter((p) => {
+      const k = p.menu ?? p.target; // a masmorra tem duas saídas para a vila: lista uma vez
+      if (seenExit.has(k)) return false;
+      seenExit.add(k);
+      return true;
+    })
     .map((p) => {
+      if (p.menu)
+        return `<li>Portal das Masmorras (escolha no menu): ${DUNGEONS.map((d) => {
+          const t = maps.find((x) => x.id === d.map);
+          return `<a href="#/mapa/${d.map}">${esc(t?.name ?? d.map)}</a> <small class="tag">nível ${d.minLevel}+ · ${d.cost} ouro</small>`;
+        }).join(', ')}</li>`;
       const t = maps.find((x) => x.id === p.target);
       return `<li><a href="#/mapa/${p.target}">${esc(t?.name ?? p.target)}</a>${p.minLevel ? ` <small class="tag">nível ${p.minLevel}+</small>` : ''}</li>`;
     })
@@ -119,11 +137,12 @@ export async function mapPage(id: string): Promise<string | null> {
   const qOpen = qs.filter((q) => !isBossQuest(q)),
     qBoss = qs.filter(isBossQuest);
   return `<a class="back" href="#/mapas">‹ Mapas</a><h1>${esc(m.name)}</h1>
-    <div class="sub">${town ? 'Cidade (segura)' : 'Área de caça'}${lv ? ` · monstros nível ${lv[0]}–${lv[1]}` : ''}${entry > 0 && entry < Infinity ? ` · entrada a partir do nível ${entry}` : ''}</div>
+    <div class="sub">${town ? 'Cidade (segura)' : dungeon ? 'Masmorra (instância)' : 'Área de caça'}${lv ? ` · monstros nível ${lv[0]}–${lv[1]}` : ''}${entry > 0 && entry < Infinity ? ` · entrada a partir do nível ${entry}` : ''}</div>
     <section class="panel">${minimap(id, true)}
       <div class="legend"><span><i style="background:#f0d27a"></i>Saída</span><span><i style="background:#7fd4ff"></i>NPC</span><span><i style="background:#e04848"></i>Monstro</span></div></section>
     ${m.npcs.length ? `<section class="panel"><h2>NPCs</h2><ul>${m.npcs.map((n) => `<li><a href="#/npc/${n}">${esc(npcName(n))}</a></li>`).join('')}</ul></section>` : ''}
     ${mons.length ? `<section class="panel"><h2>Monstros</h2><ul class="mon-rows">${open.map(monRow).join('')}</ul>${secret.length ? spoiler(`<ul class="mon-rows">${secret.map(monRow).join('')}</ul>`, 'Chefe desta região') : ''}</section>` : ''}
+    ${dungeon ? dungeonPanel(dungeon) : ''}
     <section class="panel"><h2>Saídas</h2><ul>${exits}</ul></section>
     ${qs.length ? `<section class="panel"><h2>Missões aqui</h2><ul>${qOpen.map(qRow).join('')}</ul>${qBoss.length ? spoiler(`<ul>${qBoss.map(qRow).join('')}</ul>`, 'Missão de chefe') : ''}</section>` : ''}`;
 }
@@ -204,4 +223,16 @@ export async function fillMinimaps(root: ParentNode) {
         else if (o.type === 'monsterSpawn' && !MONSTERS[String(p.monster)]?.boss) dot(tx, ty, '#e04848', R);
       }
   }
+}
+
+/** Regras da masmorra (src/core/dungeons.ts, World.enterDungeon/killMonster, AutoCombat). */
+function dungeonPanel(d: (typeof DUNGEONS)[number]): string {
+  const bonus = Math.round((DUNGEON_EQUIP_DROP_MUL - 1) * 100);
+  return `<section class="panel"><h2>Masmorra</h2><p class="lore">${esc(d.desc.pt)}</p><ul>
+      <li>Entrada pelo <b>Portal das Masmorras</b>, na saída oeste da <a href="#/mapa/cidade">vila</a>: a partir do nível <b>${d.minLevel}</b>, custa <b>${d.cost}</b> ouro por entrada.</li>
+      <li>Cada entrada é uma corrida nova: todos os monstros vivos, e eles <b>não renascem</b>. O chefe fica no fim e dá um item garantido.</li>
+      <li>Os monstros daqui têm <b>+${bonus}%</b> de chance de deixar equipamento (sobre a chance normal deles).</li>
+      <li>O <a href="#/mecanicas/auto">Auto</a> não funciona aqui, e a masmorra não rende ganho offline.</li>
+      <li>Morrer, sair por um portal ou fechar o jogo encerra a corrida: você volta para a vila e precisa pagar de novo para entrar.</li>
+    </ul></section>`;
 }

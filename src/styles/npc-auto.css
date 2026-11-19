@@ -16,7 +16,8 @@
 #item-tip small {
   color: #99a;
 }
-#npc-panel {
+#npc-panel,
+#dungeon-panel {
   position: fixed;
   inset: 0 0 var(--fix-b, 0px) 0;
   display: flex;
@@ -26,7 +27,8 @@
   pointer-events: none !important;
 }
 /* Janela de NPC: topo fixo (nome, ouro, abas), corpo que rola e rodapé fixo. O cartão em si não rola. */
-#npc-panel .card {
+#npc-panel .card,
+#dungeon-panel .card {
   pointer-events: auto;
   width: min(380px, 100%);
   max-height: calc(100% - 24px);
@@ -584,4 +586,26 @@
 .ftip {
   margin-top: 8px;
   font-size: 13px;
+}
+
+/* Menu do Portal das Masmorras (src/ui/dungeonWindow.ts) */
+.dg-row {
+  border: 1px solid #445;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+}
+.dg-row.locked {
+  opacity: 0.7;
+}
+.dg-row .lore {
+  margin: 4px 0;
+}
+.dg-info {
+  font-size: 12px;
+  color: #ccd;
+  margin-bottom: 6px;
+}
+.dg-row button {
+  width: 100%;
 }

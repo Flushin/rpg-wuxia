@@ -58,6 +58,7 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Yeti | 12–14 / 16–18 (por ponto) | 110 + 22 | 10–16 (+1,5 por nível) | 30 s |
 | Discípulo Caído (só na luta do Abade) | 18 | 300 | 15–25 | — |
 | Abade Caído | 20 | 20000 | 900–1200 | 900 s |
+| Yeti Ancestral (chefe da masmorra) | 15 | 3000 | 300–400 | — (instância) |
 
 Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
 Desde o marco 9 o nível máximo é 20, com 27000 / 31500 / 37000 / 42500 / 49500 / 56000 / 64000 / 73000 / 83000 /
@@ -94,6 +95,24 @@ nasciam com sorteio não controlado. O ritmo continua dentro da meta de ~1 hora.
 
 ---
 
+## Masmorra: Yeti Ancestral (19/11/2026)
+
+`npm run sim:balance -- --masmorra` (6 lutas por linha; monstros comuns já derrotados; equipamento nv 10 em todos os slots).
+Primeira versão invocava 2 Espectros de Gelo: as seitas de longe (Geada, Víbora) perdiam quase sempre, porque o espectro
+ataca de longe e deixa lento quem recua. Com 2 Yetis nv 13 invocados, velocidade 1,8 e arena larga como a do templo:
+
+| Seita | Nv 11 incomum / raro | Nv 13 incomum / raro | Nv 15 incomum / raro | Luta |
+|---|---|---|---|---|
+| Tormenta | 5/6 · 5/6 | 6/6 · 6/6 | 6/6 · 6/6 | 50–90 s |
+| Geada | 5/6 · 6/6 | 6/6 · 6/6 | 5/6 · 6/6 | 55–80 s |
+| Titã | 6/6 · 6/6 | 5/6 · 5/6 | 6/6 · 6/6 | 80–110 s |
+| Víbora | 6/6 · 6/6 | 6/6 · 6/6 | 6/6 · 6/6 | 30–50 s |
+
+Corrida inteira (12 monstros nv 11–14 + chefe): ~3800 XP dos monstros + 3000 do chefe e ~300 + 350 de ouro, contra
+250 de entrada. O ganho de XP fica perto do de caçar na montanha; o atrativo é o equipamento (+25% de chance e o Raro garantido).
+
+---
+
 # Registro do marco 5
 
 > Nomes antigos usados neste documento: Lâmina Errante = **Tormenta**, Pavilhão das Nuvens = **Geada**, Corte Duplo = Presas Gêmeas, Golpe Rompe-Guarda = Quebra-Guarda.
@@ -107,7 +126,7 @@ Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do 
 - Cada seita cria o personagem, liga o Auto e caça sozinha. O "jogador médio" simulado só decide o que o auto não decide: gasta pontos com **Distribuir recomendado**, veste upgrades (pontuação simples por atributo útil), conserta e vende sobras na vila, e vai às Ruínas ao chegar no nível 7.
 - Mede minutos por nível, mortes, ouro ganho por hora, gasto em poções e conserto.
 - Depois simula o chefe no nível 10 com equipamento nível 5 Incomum ou Raro em todos os slots, 18 poções e um jogador ativo: esquiva dos círculos (reação de 0,45 s), bebe poção com vida baixa; a Lâmina luta de perto, o Pavilhão recua dando a volta na arena.
-- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe).
+- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--trace-masmorra` mostra a luta).
 
 ## Curva de XP (`progression.json`)
 

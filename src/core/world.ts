@@ -28,6 +28,7 @@ import {
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { dungeonById, isDungeonMap } from './dungeons';
 import { Rng } from './rng';
 import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
@@ -149,6 +150,8 @@ export class World {
   quest: QuestState = { stage: 0, status: 'pending', progress: 0 }; // missão atual da cadeia (marco 7)
   merchant: merchant.MerchantState | null = null; // estoque do Mercador Ambulante (marco 9); sorteado ao abrir
   autoAttack = false;
+  /** menu das masmorras aberto (o jogador pisou no Portal das Masmorras); fecha ao sair de cima do portal */
+  dungeonMenu = false;
 
   // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
   bossSummoned = false;
@@ -166,6 +169,8 @@ export class World {
   private arenaSeen = false;
   private respawnTimer = 0;
   private portalCd = 0;
+  /** está em cima de um portal de menu: o menu só abre de novo depois de sair e pisar outra vez */
+  private onMenuPortal = false;
   private acc = 0;
   private nextId = 2;
 
@@ -754,10 +759,27 @@ export class World {
   }
 
   private checkPortals() {
-    if (this.portalCd > 0) return;
     const p = this.player;
+    // portal de menu (masmorras): abre o menu ao pisar; fecha ao se afastar (folga de 1,5 tile)
+    let onMenu = false;
     for (const o of this.map.objects) {
-      if (o.type !== 'portal' || p.x < o.x || p.x >= o.x + o.w || p.y < o.y || p.y >= o.y + o.h) continue;
+      if (o.type !== 'portal' || !o.props.menu) continue;
+      const dx = Math.max(o.x - p.x, 0, p.x - (o.x + o.w)),
+        dy = Math.max(o.y - p.y, 0, p.y - (o.y + o.h));
+      if (dx === 0 && dy === 0) onMenu = true;
+      else if (this.dungeonMenu && Math.hypot(dx, dy) > 1.5) this.dungeonMenu = false;
+    }
+    if (!onMenu) this.onMenuPortal = false;
+    else if (!this.onMenuPortal && this.portalCd <= 0) {
+      this.onMenuPortal = true;
+      p.path = [];
+      this.dungeonMenu = true;
+      this.emit({ type: 'dungeonMenu' });
+    }
+    if (this.portalCd > 0) return;
+    for (const o of this.map.objects) {
+      if (o.type !== 'portal' || o.props.menu || p.x < o.x || p.x >= o.x + o.w || p.y < o.y || p.y >= o.y + o.h)
+        continue;
       const minLevel = portalMinLevel(o);
       if (p.level < minLevel) {
         // portal trancado: avisa e espera um pouco antes de avisar de novo (o jogador pode continuar em cima dele)
@@ -768,6 +790,26 @@ export class World {
       this.changeMap(String(o.props.target), Number(o.props.targetX), Number(o.props.targetY));
       return;
     }
+  }
+
+  /** Menu das masmorras: paga a entrada e entra numa instância nova (monstros todos vivos). */
+  enterDungeon(id: string): ActionError | null {
+    const d = dungeonById(id);
+    if (!d || !this.maps[d.map] || this.player.dead) return null;
+    if (this.player.level < d.minLevel) return { code: 'needLevel', level: d.minLevel };
+    if (this.gold < d.cost) return { code: 'noGold' };
+    this.gold -= d.cost;
+    this.bumpInv();
+    this.dungeonMenu = false;
+    this.auto.disable(); // o Auto não funciona na masmorra
+    this.changeMap(d.map);
+    this.emit({ type: 'dungeonEnter', dungeonId: d.id, cost: d.cost });
+    return null;
+  }
+
+  /** Masmorra do mapa atual (null fora de uma). */
+  get dungeonId(): string | null {
+    return isDungeonMap(this.mapId) ? this.mapId : null;
   }
 
   private tickMonster(m: Entity, dt: number) {
@@ -1040,14 +1082,17 @@ export class World {
     m.hp = 0;
     m.path = [];
     m.buffs = [];
-    m.respawnAt = m.summoned ? Infinity : this.time + def.respawnSeconds;
-    if (!m.summoned && !def.boss && m.spawnKey) this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
+    const dungeon = this.dungeonId; // masmorra: instância, nada renasce (nem conta nos relógios de renascimento)
+    m.respawnAt = m.summoned || dungeon ? Infinity : this.time + def.respawnSeconds;
+    if (!dungeon && !m.summoned && !def.boss && m.spawnKey)
+      this.respawnAtMs[m.spawnKey] = this.clock() + def.respawnSeconds * 1000;
     if (def.boss) {
-      const at = this.clock() + def.respawnSeconds * 1000;
-      this.bossRespawn[def.id] = at;
+      const at = dungeon ? 0 : this.clock() + def.respawnSeconds * 1000;
+      if (!dungeon) this.bossRespawn[def.id] = at;
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
-      this.emit({ type: 'bossDefeated', respawnAt: at });
+      this.emit({ type: 'bossDefeated', name: m.name, respawnAt: at });
+      if (dungeon) this.emit({ type: 'dungeonCleared', dungeonId: dungeon });
     }
     if (this.targetId === m.id) {
       this.targetId = null;
@@ -1256,6 +1301,8 @@ export class World {
     this.ground = [];
     this.openNpc = null;
     this.npcGoal = null;
+    this.dungeonMenu = false;
+    this.onMenuPortal = false;
     this.telegraphs = [];
     this.arenas = [];
     this.bossSummoned = false;

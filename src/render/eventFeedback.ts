@@ -184,7 +184,7 @@ export class EventFeedback {
     const toast = (msg: string, color?: string) => this.hud.toast(msg, color);
     switch (ev.type) {
       case 'bossSummon':
-        toast(L('O General invoca guerreiros!', 'The General summons warriors!'), '#ff8a60');
+        toast(L(`${ev.name} invoca reforços!`, `${ev.name} summons reinforcements!`), '#ff8a60');
         return true;
       case 'portalLocked':
         toast(
@@ -193,7 +193,28 @@ export class EventFeedback {
         );
         return true;
       case 'bossDefeated':
-        toast(L('General de Terracota derrotado!', 'Terracotta General defeated!'), '#ffd23f');
+        toast(L(`${ev.name} derrotado!`, `${ev.name} defeated!`), '#ffd23f');
+        return true;
+      case 'dungeonEnter':
+        toast(
+          L(
+            `Masmorra: −${ev.cost} ouro. O Auto não funciona aqui.`,
+            `Dungeon: −${ev.cost} gold. Auto doesn't work here.`,
+          ),
+          '#c08cff',
+        );
+        return true;
+      case 'dungeonCleared':
+        toast(
+          L(
+            'Masmorra concluída! A saída é o portal da entrada.',
+            'Dungeon cleared! The exit is the portal at the entrance.',
+          ),
+          '#ffd23f',
+        );
+        return true;
+      case 'autoBlocked':
+        toast(L('O Auto não funciona nas masmorras.', "Auto doesn't work in dungeons."), '#ff8a80');
         return true;
       case 'autoStopped':
         toast(

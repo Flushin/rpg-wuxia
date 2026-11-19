@@ -18,6 +18,8 @@ export interface MapConfig {
   autoExitVia?: string;
   /** Auto ligado na cidade: vai caçar no mapa com o maior autoFromLevel <= nível do personagem (que tenha monstros). */
   autoFromLevel?: number;
+  /** Masmorra (instância, src/core/dungeons.ts): só se entra pelo menu do portal; monstros não renascem; sem Auto. */
+  dungeon?: boolean;
 }
 
 export const MAPS_CONFIG: Record<string, MapConfig> = {
@@ -26,6 +28,8 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   ruinas: { trees: 'forest', arena: { x: 24.5, y: 16.5, r: 6.2 }, autoExitVia: 'floresta' },
   // marco 9: entrada pela saída norte da vila (portal com minLevel 10); arena = pátio do templo (tools/gen-maps.mjs)
   montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10 },
+  // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
+  gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
 };
 
 /** Mapas carregados no boot (public/maps/<id>.json). */

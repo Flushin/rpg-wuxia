@@ -19,6 +19,7 @@ import type {
 } from './types';
 import type { World } from './world';
 import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { isDungeonMap } from './dungeons';
 
 export const AUTO_MAX_LEVEL_GAP = 2; // padrão da opção maxLevelAbove: alvos até 2 níveis acima do personagem
 export const AUTO_MAX_LEVEL_LIMIT = 5; // máximo da opção no menu
@@ -110,6 +111,12 @@ export class AutoCombat {
   // ---------- comandos ----------
   toggle() {
     this.pendingResume = false;
+    if (isDungeonMap(this.w.mapId)) {
+      // masmorra: o Auto não funciona de jeito nenhum
+      this.setState('off');
+      this.w.emit({ type: 'autoBlocked' });
+      return;
+    }
     if (this.state === 'on') this.setState('off');
     else {
       this.visit = { shop: null, shopped: false };
@@ -129,6 +136,11 @@ export class AutoCombat {
     if (this.state !== 'on') return;
     this.setState('off');
     this.pendingResume = true;
+  }
+  /** Desliga (ligado ou pausado) sem religar depois: usado ao entrar numa masmorra. */
+  disable() {
+    this.pendingResume = false;
+    this.setState('off');
   }
   manualMove() {
     if (this.state === 'on') this.setState('pausado');
@@ -282,8 +294,12 @@ export class AutoCombat {
 
   // ---------- tick ----------
   tick(dt: number) {
-    if (this.state !== 'on') return;
     const w = this.w;
+    if (isDungeonMap(w.mapId)) {
+      if (this.state !== 'off') this.disable(); // garantia: nada liga o Auto dentro da masmorra
+      return;
+    }
+    if (this.state !== 'on') return;
     this.walkCd -= dt;
     if (TOWN_MAPS.has(w.mapId)) {
       this.tickTown(dt);
@@ -423,7 +439,7 @@ export class AutoCombat {
     while (queue.length) {
       const cur = queue.shift()!;
       for (const o of maps[cur]?.objects ?? []) {
-        if (o.type !== 'portal' || portalMinLevel(o) > this.w.player.level) continue;
+        if (o.type !== 'portal' || o.props.menu || portalMinLevel(o) > this.w.player.level) continue;
         const t = String(o.props.target);
         if (t === from || first[t] || !maps[t]) continue;
         first[t] = cur === from ? t : first[cur];
@@ -451,7 +467,7 @@ export class AutoCombat {
 
   private portalTo(target: string | null) {
     for (const o of this.w.map.objects) {
-      if (o.type !== 'portal' || portalMinLevel(o) > this.w.player.level) continue;
+      if (o.type !== 'portal' || o.props.menu || portalMinLevel(o) > this.w.player.level) continue;
       const t = String(o.props.target);
       if (target === null ? !TOWN_MAPS.has(t) : target === TOWN_TARGET ? TOWN_MAPS.has(t) : t === target)
         return { o, target: t };
