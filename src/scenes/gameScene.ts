@@ -19,13 +19,18 @@ import { itemColor } from '../core/items';
 import { DPR, TEXT_RES, cssSize } from '../render/display';
 import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
-import { sheetsForMap, syncSheets } from '../render/sheetLoader';
+import { prefetchSheets, releasePrefetched, sheetsForMap, syncSheets } from '../render/sheetLoader';
 import { queueSheet, sheetTexture } from '../render/sprites';
 import { PREF, getPref, setPref } from '../platform/prefs';
 import { exitApp, onBackButton } from '../platform/backButton';
 import { askExit, closeTopWindow } from '../ui/backAction';
 import { onPause, onResume } from '../platform/lifecycle';
 import { isNative, restartApp } from '../platform';
+
+/** Distância (tiles) do portal em que as folhas do mapa de destino começam a carregar. */
+const PREFETCH_DIST = 8;
+/** Distância (tiles) de todos os portais em que as folhas adiantadas são liberadas (folga para não ficar indo e vindo). */
+const RELEASE_DIST = 12;
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const ZOOM_MIN = 1,
@@ -62,6 +67,8 @@ export class GameScene extends Phaser.Scene {
   private userZoom = loadZoom();
   private pinch: { d: number; z: number } | null = null;
   private mapLoading = false;
+  /** Mapas de destino cujas folhas já foram adiantadas neste mapa (prefetchNearPortal). */
+  private prefetchedMaps = new Set<string>();
 
   constructor() {
     super('Game');
@@ -205,10 +212,35 @@ export class GameScene extends Phaser.Scene {
   /** Troca de mapa: o jogo espera as folhas do novo mapa carregarem (fração de segundo) e redesenha. */
   private onMapChange() {
     this.mapLoading = true;
+    this.prefetchedMaps.clear();
     syncSheets(this, this.world, () => {
       this.mapLoading = false;
       this.rebuildMap();
     });
+  }
+
+  /** Perto de um portal (até PREFETCH_DIST tiles): adianta as folhas do mapa de destino (sheetLoader).
+   *  Longe de todos (mais de RELEASE_DIST): libera de novo, para não segurar memória de dois mapas (D6). */
+  private prefetchNearPortal() {
+    const w = this.world,
+      p = w.player;
+    let nearest = Infinity;
+    for (const o of w.map.objects) {
+      if (o.type !== 'portal') continue;
+      const dx = Math.max(o.x - p.x, 0, p.x - (o.x + o.w)),
+        dy = Math.max(o.y - p.y, 0, p.y - (o.y + o.h));
+      const d = Math.hypot(dx, dy);
+      nearest = Math.min(nearest, d);
+      const id = String(o.props.target),
+        target = w.maps[id];
+      if (!target || this.prefetchedMaps.has(id) || d > PREFETCH_DIST) continue;
+      this.prefetchedMaps.add(id);
+      prefetchSheets(this, target, w.classId);
+    }
+    if (nearest > RELEASE_DIST && this.prefetchedMaps.size) {
+      this.prefetchedMaps.clear();
+      releasePrefetched(this);
+    }
   }
 
   private rebuildMap() {
@@ -333,6 +365,7 @@ export class GameScene extends Phaser.Scene {
     const evs = w.events.splice(0);
     for (const ev of evs) this.handle(ev);
     if (this.mapLoading) return; // trocou de mapa neste quadro e as folhas ainda estão chegando
+    this.prefetchNearPortal();
 
     const live = new Set<number>([w.player.id]);
     const tgt = w.monsters.find((m) => m.id === w.targetId && !m.dead);
