@@ -2,7 +2,7 @@
 
 > **Este documento é o registro do marco 5** (método e resultados daquela época). Vários números mudaram depois
 > (XP dos monstros −22%, ouro pela metade, respawn de 30 s, Tormenta com roubo de vida, Geada com Stamina 10…).
-> Os valores atuais estão nos JSON de `src/data/` e as decisões em `docs/decisoes-do-projeto.md`.
+> Os valores atuais estão nos JSON de `src/data/` e as decisões em `docs/decisoes/README.md`.
 > A seção "Situação atual" logo abaixo traz a última medição.
 
 ## Módulo de balanceamento (`npm run balance`)
