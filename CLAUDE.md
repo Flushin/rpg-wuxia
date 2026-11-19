@@ -6,6 +6,8 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 ## Como rodar/testar
 - `npm run dev` (servidor), `npm run build` (tsc + vite), `npm run typecheck`
 - `npm test` (todos os `check:*`), `npm run check:layout`, `npm run maps`
+- **Antes de todo commit:** `npm run format` (Prettier) e `npm run format:check`; o CI roda `format:check` antes dos testes
+  e falha por qualquer arquivo fora do estilo, até um que você não mexeu.
 - `npm run balance` / `sim:balance` (simulações de balanceamento)
 - `npm run novidades:loja` (texto "O que há de novo" da Play Store)
 
