@@ -692,16 +692,20 @@
   "novidades": {
     "proxima": [
       {
-        "texto": "Dungeons: the new Dungeon Portal, at the west exit of the village, leads to the Eternal Ice Gorge (level 10+). Paid entry, monsters that don't respawn, higher equipment drop chance and the Ancestral Yeti at the end. No Auto inside."
-      },
-      {
-        "texto": "Auto: when the equipment bag is full, it returns to the village to sell to the vendor and goes back to hunting. Mist Veil and Iron Skin now fire as soon as you take damage or get surrounded."
-      },
-      {
         "texto": "Second dungeon: the Defiled Monastery (level 16+, 500 gold), with Defiled Monks, Restless Souls and Stone Guardians. At the end, the Defiled Patriarch becomes enraged at 30% health."
       }
     ],
     "versoes": [
+      {
+        "itens": [
+          {
+            "texto": "Dungeons: the new Dungeon Portal, at the west exit of the village, leads to the Eternal Ice Gorge (level 10+). Paid entry, monsters that don't respawn, higher equipment drop chance and the Ancestral Yeti at the end. No Auto inside."
+          },
+          {
+            "texto": "Auto: when the equipment bag is full, it returns to the village to sell to the vendor and goes back to hunting. Mist Veil and Iron Skin now fire as soon as you take damage or get surrounded."
+          }
+        ]
+      },
       {
         "itens": [
           {
