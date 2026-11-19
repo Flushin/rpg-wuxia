@@ -4,6 +4,7 @@ import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, item
 import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
 import { CLASSES, MONSTERS, SECT_ORDER, SKILLS } from './data';
+import { fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from './sects';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterIndexPage, monsterPage, monsterSprite } from './monsters';
@@ -22,8 +23,8 @@ const CATS: Cat[] = [
   { id: 'itens', label: 'Itens', icon: 'espadas_ferro', ready: true },
   { id: 'monstros', label: 'Monstros', icon: '🐺', ready: true },
   { id: 'npcs', label: 'NPCs', icon: '🧙', ready: true },
-  { id: 'missoes', label: 'Missões', icon: '❗', ready: false },
-  { id: 'mapas', label: 'Mapas', icon: '🗺', ready: false },
+  { id: 'missoes', label: 'Missões', icon: '❗', ready: true },
+  { id: 'mapas', label: 'Mapas', icon: '🗺', ready: true },
 ];
 const catIcon = (c: Cat) => (/^[a-z_]+$/.test(c.icon) ? iconHtml(c.icon, 'sm') : `<span class="emo">${c.icon}</span>`);
 
@@ -90,6 +91,12 @@ function searchIndex(): Hit[] {
     ...Object.values(SKILLS)
       .flat()
       .map((k) => ({ name: k.name, href: `#/skill/${k.id}`, icon: iconHtml('skill_' + k.id, 'sm'), kind: 'Skill' })),
+    ...(maps ?? []).map((m) => ({
+      name: m.name,
+      href: `#/mapa/${m.id}`,
+      icon: '<span class="emo">🗺</span>',
+      kind: 'Mapa',
+    })),
     // chefes ficam fora da busca (spoiler)
     ...Object.values(MONSTERS)
       .filter((m) => maps && !isSpoiler(m, maps))
@@ -142,6 +149,11 @@ async function route() {
   else if (parts[0] === 'skill') {
     html = skillPage(parts[1] ?? '');
     active = 'skills';
+  } else if (parts[0] === 'missoes') html = questIndexPage();
+  else if (parts[0] === 'mapas') html = mapIndexPage();
+  else if (parts[0] === 'mapa') {
+    html = mapPage(parts[1] ?? '');
+    active = 'mapas';
   } else if (parts[0] === 'monstros') html = monsterIndexPage();
   else if (parts[0] === 'monstro') {
     html = monsterPage(parts[1] ?? '');
@@ -160,6 +172,7 @@ async function route() {
   html ??= `<h1>Página não encontrada</h1><p><a href="#/">Voltar ao início</a></p>`;
   main.innerHTML = html;
   void fillSprites(main);
+  void fillMinimaps(main);
   const title = main.querySelector('h1')?.textContent;
   document.title = title && parts.length ? `${title} · Wiki do Mistpeak` : 'Wiki do Mistpeak';
   $('#results').classList.add('hidden');

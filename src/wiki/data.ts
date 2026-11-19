@@ -105,6 +105,8 @@ export interface Quest {
   minLevel: number;
   name: string;
   goal: string;
+  offer: string;
+  done: string;
   objective: { type: string; monster?: string; npc?: string; map?: string; count?: number };
   reward: { xp: number; gold: number; item?: string; itemLevel?: number };
 }

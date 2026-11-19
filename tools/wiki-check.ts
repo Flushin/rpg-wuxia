@@ -31,6 +31,7 @@ import { itemIndexPage, itemPage } from '../src/wiki/items';
 import { SHEETS, monsterIndexPage, monsterPage, statsAt } from '../src/wiki/monsters';
 import { NPCS, npcIndexPage, npcPage } from '../src/wiki/npcs';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from '../src/wiki/sects';
+import { mapIndexPage, mapPage, questIndexPage } from '../src/wiki/world';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -185,6 +186,9 @@ console.log('== páginas ==');
   for (const s of Object.values(W.SKILLS).flat()) look('skill/' + s.id, skillPage(s.id));
   look('monstros', await monsterIndexPage());
   for (const id of Object.keys(W.MONSTERS)) look('monstro/' + id, await monsterPage(id));
+  look('missoes', await questIndexPage());
+  look('mapas', await mapIndexPage());
+  for (const id of MAP_IDS) look('mapa/' + id, await mapPage(id));
   ok(!bad.length, `todas as páginas renderizam sem "undefined"/"NaN" ${bad.join(', ')}`);
 }
 

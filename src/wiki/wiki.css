@@ -358,6 +358,72 @@ h3 {
   border-bottom: none;
 }
 
+/* ---------- Missões e mapas ---------- */
+ol.plain {
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+.quest-chain > li {
+  margin-bottom: 12px;
+}
+.quest-card .q-top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.q-n {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1a1408;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.minimap {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
+.minimap.big {
+  max-width: 640px;
+}
+.map-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.mon-rows {
+  list-style: none;
+  padding: 0 !important;
+}
+.mon-rows .sprite.mini {
+  zoom: 0.4;
+}
+.mon-rows li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ---------- Abas e filtros ---------- */
 .tabs,
 .chips {
