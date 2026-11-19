@@ -25,6 +25,7 @@ import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { MASTER_PORTRAITS } from '../render/sprites';
 import { npcName, rewardText } from './questTracker';
+import { renderPanel, resetScroll } from './panelRender';
 import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import {
@@ -257,28 +258,19 @@ export class NpcWindow {
     } else view = { list: this.talk(role) };
     const quest = this.questBox(role);
     const gold = shop ? `<span class="gold">${w.gold} ${L('ouro', 'gold')}</span>` : '';
-    // A moldura (.npc-card) é a mesma enquanto a janela do mesmo NPC está aberta: só o conteúdo é trocado e a
-    // rolagem de cada coluna é devolvida. Antes a janela inteira era refeita e voltava ao topo a cada venda.
+    // renderPanel mantém os elementos (e a rolagem de cada coluna) entre atualizações; trocar de NPC, aba ou filtro
+    // volta ao topo.
     const key = `${n.id}|${role}|${this.tab}|${this.smithTab}|${this.sellFilter}`;
-    let card = el.querySelector('.npc-card') as HTMLElement | null;
-    const same = !!card && key === this.viewKey;
-    const scrollers = ['.npc-cols', '.npc-list', '.npc-side'];
-    const keep = same && card ? scrollers.map((q) => card!.querySelector(q)?.scrollTop ?? 0) : null;
+    const same = key === this.viewKey;
     this.viewKey = key;
-    if (!card) {
-      el.innerHTML = '<div class="card npc-card"></div>';
-      card = el.querySelector('.npc-card') as HTMLElement;
-    }
-    card.classList.toggle('npc-wide', !!view.wide);
-    card.classList.toggle('npc-split', !!view.side);
-    card.innerHTML = `<div class="npc-top"><div class="npc-head"><h2>${escapeHtml(tn(n.name))}${sub}</h2>${gold}<button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>${view.top ?? ''}</div>
+    renderPanel(
+      el,
+      `<div class="card npc-card${view.wide ? ' npc-wide' : ''}${view.side ? ' npc-split' : ''}"><div class="npc-top"><div class="npc-head"><h2>${escapeHtml(tn(n.name))}${sub}</h2>${gold}<button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div>${view.top ?? ''}</div>
       <div class="npc-cols"><div class="npc-list">${quest}${view.list}</div>${view.side ? `<div class="npc-side">${view.side}</div>` : ''}</div>
-      ${view.foot ? `<div class="npc-foot">${view.foot}</div>` : ''}`;
-    if (keep)
-      scrollers.forEach((q, i) => {
-        const e = card!.querySelector(q);
-        if (e) e.scrollTop = keep[i];
-      });
+      ${view.foot ? `<div class="npc-foot">${view.foot}</div>` : ''}</div>`,
+    );
+    const card = el.querySelector('.npc-card') as HTMLElement;
+    if (!same) resetScroll(el);
     if (this.showSide) {
       this.showSide = false;
       const cols = card.querySelector('.npc-cols') as HTMLElement,
