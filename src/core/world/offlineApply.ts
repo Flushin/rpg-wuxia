@@ -39,8 +39,9 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
         ? makePotion(d.baseId, d.qty)
         : makeEquipment(d.baseId, d.rarity, CLASSES[w.classId].element, w.rng, rate.monLevel);
       let placed = w.addItem(it);
+      if (!placed && isPot) continue; // aba de consumíveis/materiais cheia: o auto não olha, fica para trás
       if (!placed) {
-        // mochila cheia: vende de uma vez todo equipamento que o auto vende e segue caçando
+        // aba de equipamentos cheia: vende de uma vez todo equipamento que o auto vende e segue caçando
         const g0 = w.gold;
         soldCount += w.auto.makeRoom();
         soldGold += w.gold - g0;

@@ -1,7 +1,8 @@
 // Verificação headless das missões (marco 7). Uso: npm run check:quests
 import { readFileSync } from 'node:fs';
 import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
-import { BASES, BAG_SIZE, makePotion } from '../src/core/items';
+import { Rng } from '../src/core/rng';
+import { BASES, BAG_TAB_SIZE, makeEquipment, makePotion } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { QUESTS, sanitizeQuest } from '../src/core/quests';
 import { World } from '../src/core/world';
@@ -161,7 +162,7 @@ console.log('== save ==');
 console.log('== mochila cheia ==');
 {
   const w = World.create(maps, 'Teste', 'lamina');
-  for (let i = 0; i < BAG_SIZE; i++) w.bag[i] = makePotion(i % 2 ? 'pocao_hp_p' : 'pocao_mp_p', 99);
+  for (let i = 0; i < BAG_TAB_SIZE; i++) w.bag[i] = makeEquipment('colar_jade', 'comum', null, new Rng(i), 1);
   w.quest = { stage: 3, status: 'ready', progress: 6 };
   ok(
     w.questTurnIn(true) && w.ground.some((g) => g.item && BASES[g.item.baseId]?.slot === 'arma'),

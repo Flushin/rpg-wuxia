@@ -3,12 +3,15 @@
 import { CLASSES, type MonsterDef } from '../data';
 import { L } from '../i18n';
 import {
+  BAG_TAB_SIZE,
   BASES,
+  type BagTab,
   GROUND_SECONDS,
   POTIONS,
   SLOTS,
   STACK_MAX,
   baseOf,
+  bagTabOf,
   equipmentBaseIds,
   isBroken,
   isPotionId,
@@ -55,13 +58,15 @@ export function sortBag(w: World) {
   w.bumpInv();
 }
 
-export function freeSlots(w: World): number {
-  return w.bag.filter((b) => !b).length;
+/** Espaços livres numa aba da mochila (cada aba tem BAG_TAB_SIZE). */
+export function freeSlots(w: World, tab: BagTab = 'equip'): number {
+  return Math.max(0, BAG_TAB_SIZE - w.bag.filter((b) => b && bagTabOf(b.baseId) === tab).length);
 }
 
 export function canFit(w: World, baseId: string, qty = 1): boolean {
-  if (!isStackId(baseId)) return freeSlots(w) >= 1;
-  let room = freeSlots(w) * STACK_MAX;
+  const free = freeSlots(w, bagTabOf(baseId));
+  if (!isStackId(baseId)) return free >= 1;
+  let room = free * STACK_MAX;
   for (const b of w.bag) if (b && b.baseId === baseId) room += STACK_MAX - (b.qty ?? 1);
   return room >= qty;
 }
@@ -112,8 +117,8 @@ export function removeFromBag(w: World, i: number, qty = 1) {
 export function collect(w: World, item: ItemInstance, x: number, y: number) {
   w.auto.recordDrop(item);
   let placed = addItem(w, item);
-  if (!placed && w.auto.sellingActive) {
-    // auto-combate: mochila cheia vende o que a regra permite
+  if (!placed && w.auto.sellingActive && bagTabOf(item.baseId) === 'equip') {
+    // auto-combate: aba de equipamentos cheia vende o que a regra permite (as outras abas o auto não olha)
     w.auto.makeRoom();
     placed = addItem(w, item);
     if (!placed && w.auto.sellable(item)) {
@@ -249,7 +254,7 @@ export function unequip(w: World, slot: Slot): ActionError | null {
   const it = w.equipment[slot];
   if (!it) return null;
   const i = w.bag.findIndex((b) => !b);
-  if (i < 0) return { code: 'bagFull' };
+  if (i < 0 || freeSlots(w, 'equip') < 1) return { code: 'bagFull' };
   w.bag[i] = it;
   w.equipment[slot] = null;
   afterEquip(w);

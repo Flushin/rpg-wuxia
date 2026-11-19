@@ -81,7 +81,7 @@ console.log('\n== criação ==');
     World.create(maps, 'T', 'lamina').player.derived.physAtk === 2 + CLASSES.lamina.baseAttributes.strength * 2 + 5,
     'arma inicial soma +5 de ataque físico',
   );
-  ok(w.gold === 0 && w.bag.length === 30, 'ouro 0, mochila de 30');
+  ok(w.gold === 0 && w.bag.length === 90, 'ouro 0, mochila de 3 abas × 30');
 }
 
 console.log('\n== dados ==');
@@ -291,7 +291,11 @@ console.log('\n== mochila cheia / chão ==');
   const w = mk('lamina', 1, 'floresta', 2);
   const p = w.player;
   for (let i = 0; i < 30; i++) w.addItem(equipOf(w, 'colar_jade'));
-  ok(w.freeSlots() === 0 && !w.addItem(equipOf(w, 'colar_jade')), 'mochila de 30 enche e recusa');
+  ok(w.freeSlots() === 0 && !w.addItem(equipOf(w, 'colar_jade')), 'aba de equipamentos (30) enche e recusa');
+  ok(
+    w.canFit('pocao_hp_p', 99) && w.canFit('minerio_ferro', 99) && w.freeSlots('pot') > 0 && w.freeSlots('mat') === 30,
+    'abas de consumíveis e materiais têm espaço próprio',
+  );
   (w as unknown as { collect: (i: unknown, x: number, y: number) => void }).collect(
     equipOf(w, 'faixa_linho'),
     p.x + 3,
@@ -533,7 +537,14 @@ console.log('\n== vendedor: comprar e vender ==');
   near(w2, 'vendedor');
   w2.gold = 999;
   for (let k = 0; k < 30; k++) w2.addItem(equipOf(w2, 'colar_jade'));
-  ok(w2.buy('pocao_hp_p', 1)?.code === 'bagFull' && w2.gold === 999, 'compra com mochila cheia falha sem cobrar');
+  ok(w2.buy('pocao_hp_p', 1) === null, 'aba de equipamentos cheia não impede comprar poção');
+  w2.gold = 999;
+  w2.bag = w2.bag.map((b) => (b && b.qty ? null : b)); // tira as poções do kit (a de vida empilharia)
+  for (let k = 0; k < 30; k++) w2.addItem(makePotion('pocao_mp_p', 99));
+  ok(
+    w2.buy('pocao_hp_p', 1)?.code === 'bagFull' && w2.gold === 999,
+    'compra com aba de consumíveis cheia falha sem cobrar',
+  );
   w2.closeNpc();
   ok(w2.buy('pocao_hp_p', 1)?.code === 'talkToSeller', 'só compra com vendedor aberto');
   ok(

@@ -545,13 +545,13 @@ Decidido pelo Lucas em 16/11/2026.
   - Ganho offline: não precisa de ajuste, porque usa o ritmo medido com as opções em uso. O simulador de balanceamento usa os padrões.
 - **Ligar:** botão "Auto" no HUD + tecla Z; botão ☰ ao lado (▾ no HUD Novo do celular) abre o menu (skills usadas, limites de poção, quantidade de poções a comprar, vender Incomuns). Qualquer movimento manual pausa o auto.
 - **Sem poções (online):** volta à cidade, compra a quantidade definida no menu (se tiver ouro) e retorna a caçar; sem ouro, continua sem poção.
-- **Mochila cheia (online):** vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
+- **Mochila cheia (online):** o auto só olha a **aba de equipamentos**: quando ela lota, vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
 - **Ganho offline:** ao voltar, o jogador recebe XP, ouro e itens pelo tempo fora (o navegador não roda o jogo com a aba fechada), e gasta poções.
   - **Itens offline (19/11/2026):** só caem **poções e equipamentos Comuns**. Materiais, consumíveis e equipamentos Incomuns/Raros ficam de fora (`offlineDropAllowed` em `core/offline.ts`), para o offline não bancar refino e equipamento bom sem jogar.
   - Só conta se o jogador saiu com o auto-combate ligado num mapa de caça.
   - **Cálculo pelo ritmo real:** mede monstros por minuto, XP/ouro/drops por abate e poções gastas por abate durante o auto-combate antes de sair.
   - **Eficiência por faixa de tempo:** 60% até 12 h · 40% de 12 h a 18 h · 20% de 18 h a 24 h · 0 depois de 24 h.
-  - Sem morte e sem perda de durabilidade offline. Mochila cheia: vende de uma vez todo equipamento que o auto vende (Comuns; Incomuns se a opção estiver ligada) e segue caçando; o que ainda não couber também é vendido. Tudo entra em "Vendido automaticamente" no resumo. Se as poções acabarem offline, os ganhos continuam.
+  - Sem morte e sem perda de durabilidade offline. Aba de equipamentos cheia: vende de uma vez todo equipamento que o auto vende (Comuns; Incomuns se a opção estiver ligada) e segue caçando; o que ainda não couber também é vendido. Poções que não cabem na aba de consumíveis ficam para trás (o auto não olha as outras abas). Tudo entra em "Vendido automaticamente" no resumo. Se as poções acabarem offline, os ganhos continuam.
   - Tela de resumo "Enquanto você esteve fora" ao voltar.
 - **Skills no idle:** ganham experiência de uso no auto-combate, mas **não** no ganho offline.
 
@@ -633,7 +633,7 @@ Decidido pelo Lucas em 16/11/2026.
 - **Lista de teste:** 2 bases por slot (nível 1 e nível 5). Arma separada por seita (espadas duplas / leque de qi).
 - **Perda por morte:** −10% da durabilidade máxima em cada item equipado.
 - **Desgaste por golpe:** cada golpe recebido tira 0,3 de durabilidade dos itens equipados (aprovado no marco 5).
-- **Mochila:** 30 espaços; poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
+- **Mochila:** 3 abas (Equipamento, Consumíveis, Materiais) com **30 espaços cada** (19/11/2026; antes eram 30 no total); poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
 - **Ouro:** cai dos monstros. O **vendedor de poções também compra qualquer item**.
 - **Poções:** recuperam **ao longo de 8 s** (estilo Dragon Oath); não acumulam (usar outra do mesmo tipo reinicia o efeito). **Pequena:** 30%. **Grande:** 60%, mais cara, cai de monstros nível 5+ (até os bandidos existirem, só na loja). Atalhos no PC (Q = HP, E = mana) e botões no celular.
 
@@ -702,7 +702,7 @@ Implementadas a pedido do Lucas e publicadas no site.
 - **Organizar mochila** *(PR #1)*: botão "Organizar" / "Sort". Ordem: equipamentos na ordem dos slots, depois poções; dentro disso, raridade (Raro > Incomum > Comum) e nível decrescente. Junta pilhas de poções iguais até 99.
 - **Ícones nos slots de equipamento** *(PR #1)*: emoji no lugar das siglas — ⛑️ cabeça, 📿 colar, 👘 tronco, ⚔️ arma, 👖 calça, 👢 bota; esmaecidos nos slots vazios; o nome do slot continua no title/aria-label. Equipamentos na mochila também mostram o emoji (poções seguem HP/MP). Conferir como ficam no celular.
 - **Atributos detalhados** *(PR #2)*: no painel C, cada atributo mostra o total e, embaixo, uma linha pequena "5 base + 14 níveis + 6 equip." (EN: base / levels / equip.). Níveis = pontos automáticos + livres; equipamento ignora itens com durabilidade 0. Função `attrBreakdown` em `src/core/stats.ts`. Conferir a largura em telas estreitas.
-- **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O contador (x/30) e o "Organizar" continuam valendo para a mochila toda. Craft e Gemas entram quando esses sistemas existirem.
+- **Abas na mochila** *(PR #3)*: abas **Equipamento** e **Poções** (com a quantidade de cada) acima da bolsa; cada aba mostra os itens dela e depois os espaços livres. O "Organizar" vale para a mochila toda; o contador (x/30) é da aba aberta, porque cada aba tem 30 espaços próprios. Craft e Gemas entram quando esses sistemas existirem.
 - **Corpo do personagem na mochila** *(PR #3)*: silhueta no centro (na cor da seita) com os slots em volta — à esquerda cabeça, colar e tronco; à direita arma, calça e bota. **Marco 6:** Tormenta e Geada já mostram o retrato (sprite).
 
 - **Minimapa** *(PR #8)*: no canto superior direito, acima do nome do mapa (os botões descem um pouco). Mapa em losango com as cores dos tiles; personagem (branco), monstros (pontinhos vermelhos minúsculos), chefe (laranja, maior), NPCs (amarelo) e portais (losango roxo). **Mapa grande:** tecla **M** ou toque/clique no minimapa; mostra também os nomes dos portais e NPCs e uma legenda; fecha com M, Esc, X ou tocando fora. Atualiza a cada 0,15 s. Código em `src/ui/minimap.ts`. Testado no PC e no celular (em pé e deitado).

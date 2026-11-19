@@ -16,7 +16,16 @@ import {
   type SkillDef,
   type SkillState,
 } from './skills';
-import { BAG_SIZE, SLOTS, STARTING_KIT, STARTING_WEAPON, makeEquipment, makePotion, maxDurability } from './items';
+import {
+  BAG_SIZE,
+  type BagTab,
+  SLOTS,
+  STARTING_KIT,
+  STARTING_WEAPON,
+  makeEquipment,
+  makePotion,
+  maxDurability,
+} from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { Rng } from './rng';
@@ -901,8 +910,8 @@ export class World {
   sortBag() {
     return inventory.sortBag(this);
   }
-  freeSlots(): number {
-    return inventory.freeSlots(this);
+  freeSlots(tab: BagTab = 'equip'): number {
+    return inventory.freeSlots(this, tab);
   }
   canFit(baseId: string, qty = 1): boolean {
     return inventory.canFit(this, baseId, qty);

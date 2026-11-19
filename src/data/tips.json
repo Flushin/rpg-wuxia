@@ -57,7 +57,7 @@
   },
   "mochila_cheia": {
     "title": "Mochila cheia",
-    "text": "A mochila tem 30 espaços. O item fica no chão por 60 segundos: abra espaço (venda itens ao Vendedor de Poções) e ande por cima dele para pegar."
+    "text": "Cada aba da mochila (Equipamento, Consumíveis e Materiais) tem 30 espaços. O item fica no chão por 60 segundos: abra espaço (venda itens ao Vendedor de Poções) e ande por cima dele para pegar."
   },
   "primeiro_ouro": {
     "title": "Ouro",

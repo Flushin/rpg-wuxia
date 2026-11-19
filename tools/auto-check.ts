@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { effectiveMinutes, computeOffline } from '../src/core/offline';
-import { BAG_SIZE, makeEquipment, makePotion } from '../src/core/items';
+import { BAG_SIZE, BAG_TAB_SIZE, makeEquipment, makePotion } from '../src/core/items';
 import { World } from '../src/core/world';
 import { Rng } from '../src/core/rng';
 import type { AutoBucket, GameEvent, Point, Rarity, SaveData } from '../src/core/types';
@@ -730,7 +730,7 @@ console.log('\n== mochila cheia: auto-vende ==');
   addPotions(w, 3, 3);
   const fill = (r: Rarity) => {
     w.bag = Array(BAG_SIZE).fill(null);
-    for (let i = 0; i < BAG_SIZE; i++) w.bag[i] = makeEquipment('espadas_ferro', r, null, new Rng(i), 1);
+    for (let i = 0; i < BAG_TAB_SIZE; i++) w.bag[i] = makeEquipment('espadas_ferro', r, null, new Rng(i), 1);
   };
   const drop = (r: Rarity) =>
     (w as any).collect(makeEquipment('colar_jade', r, null, new Rng(9), 1), w.player.x, w.player.y); // eslint-disable-line
@@ -742,6 +742,19 @@ console.log('\n== mochila cheia: auto-vende ==');
     w.freeSlots() >= 28 && w.gold > g0 && w.ground.length === 0 && w.bag.some((b) => b?.baseId === 'colar_jade'),
     'Comuns vendidos, item novo entra na mochila',
   );
+  {
+    // aba de consumíveis cheia: o auto não olha e não vende equipamento por causa dela
+    const wp = mk('lamina', 5);
+    for (let i = 0; i < BAG_TAB_SIZE; i++) wp.bag[i] = makePotion('pocao_mp_p', 99);
+    for (let i = 0; i < 5; i++) wp.bag[BAG_TAB_SIZE + i] = makeEquipment('espadas_ferro', 'comum', null, new Rng(i), 1);
+    wp.auto.toggle();
+    const g1 = wp.gold;
+    (wp as any).collect(makePotion('pocao_hp_p', 1), wp.player.x, wp.player.y); // eslint-disable-line
+    ok(
+      wp.gold === g1 && wp.bag.filter((b) => b?.baseId === 'espadas_ferro').length === 5 && wp.ground.length === 1,
+      'aba de consumíveis cheia: poção fica no chão e nenhum equipamento é vendido',
+    );
+  }
   fill('incomum');
   drop('incomum');
   ok(w.ground.length === 1 && w.freeSlots() === 0, 'Incomum não é vendido por padrão: fica no chão');
@@ -922,7 +935,9 @@ console.log('\n== offline: aplicando no jogo ==');
     ...over,
   });
   // mochila cheia de Incomuns (o auto não vende): drops offline que não cabem são vendidos
-  const fullBag = Array.from({ length: BAG_SIZE }, () => makeEquipment('colar_jade', 'incomum', null, new Rng(1), 2));
+  const fullBag = Array.from({ length: BAG_TAB_SIZE }, () =>
+    makeEquipment('colar_jade', 'incomum', null, new Rng(1), 2),
+  );
   const w = mk('lamina', 1, 'floresta', base({ bag: fullBag }), NOW);
   const rep = w.offlineReport;
   ok(!!rep, 'gera relatório');
@@ -941,9 +956,9 @@ console.log('\n== offline: aplicando no jogo ==');
       // mochila só com espaço livre: lota de espadas Comuns, vende todas e continua
       const ws = mk('lamina', 1, 'floresta', base(), NOW);
       const r = ws.offlineReport!;
-      const swords = r.items.find((i) => i.rarity === 'comum' && i.qty > BAG_SIZE)?.qty ?? 0;
+      const swords = r.items.find((i) => i.rarity === 'comum' && i.qty > BAG_TAB_SIZE)?.qty ?? 0;
       ok(
-        swords > BAG_SIZE && r.soldCount > 0 && r.soldGold > 0 && ws.freeSlots() >= 0,
+        swords > BAG_TAB_SIZE && r.soldCount > 0 && r.soldGold > 0 && ws.freeSlots() >= 0,
         `mochila lotou: vendeu ${r.soldCount} equipamentos (+${r.soldGold} ouro) e continuou (${swords} espadas no total)`,
       );
     }
