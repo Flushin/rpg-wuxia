@@ -547,6 +547,7 @@ Decidido pelo Lucas em 16/11/2026.
 - **Sem poções (online):** volta à cidade, compra a quantidade definida no menu (se tiver ouro) e retorna a caçar; sem ouro, continua sem poção.
 - **Mochila cheia (online):** vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
 - **Ganho offline:** ao voltar, o jogador recebe XP, ouro e itens pelo tempo fora (o navegador não roda o jogo com a aba fechada), e gasta poções.
+  - **Itens offline (19/11/2026):** só caem **poções e equipamentos Comuns**. Materiais, consumíveis e equipamentos Incomuns/Raros ficam de fora (`offlineDropAllowed` em `core/offline.ts`), para o offline não bancar refino e equipamento bom sem jogar.
   - Só conta se o jogador saiu com o auto-combate ligado num mapa de caça.
   - **Cálculo pelo ritmo real:** mede monstros por minuto, XP/ouro/drops por abate e poções gastas por abate durante o auto-combate antes de sair.
   - **Eficiência por faixa de tempo:** 60% até 12 h · 40% de 12 h a 18 h · 20% de 18 h a 24 h · 0 depois de 24 h.

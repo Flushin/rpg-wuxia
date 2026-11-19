@@ -1,5 +1,5 @@
 import { PROGRESSION } from './data';
-import { POTIONS } from './items';
+import { BASES, POTIONS } from './items';
 import { Rng } from './rng';
 import { balanceOffline } from './balance';
 import type { AutoRate, PotionKind, Rarity } from './types';
@@ -14,6 +14,15 @@ balanceOffline(OFFLINE_TIERS); // multiplicadores de src/data/balance.json
 export const MAX_OFFLINE_DROPS = 2000;
 /** Ao voltar do segundo plano (app minimizado, aba escondida): ganho offline só se ficou fora pelo menos isto (P3). */
 export const RESUME_OFFLINE_MIN_MS = 5 * 60_000;
+
+/**
+ * O que pode cair offline: só poções e equipamento Comum. Material, consumível e equipamento
+ * Incomum/Raro ficam para quem joga (ou deixa o auto ligado com o jogo aberto).
+ */
+export function offlineDropAllowed(baseId: string, rarity: Rarity): boolean {
+  if (POTIONS[baseId]) return true;
+  return baseId in BASES && rarity === 'comum';
+}
 
 export interface OfflineInput {
   elapsedMs: number;
@@ -76,6 +85,7 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
   const drops: OfflineResult['drops'] = [];
   const potionDrops: Record<PotionKind, number> = { hp: 0, mp: 0 };
   for (const d of rate.drops) {
+    if (!offlineDropAllowed(d.baseId, d.rarity)) continue;
     const exp = kills * d.perKill;
     const qty = Math.min(MAX_OFFLINE_DROPS, Math.floor(exp) + (rng.next() < exp - Math.floor(exp) ? 1 : 0));
     if (qty <= 0) continue;

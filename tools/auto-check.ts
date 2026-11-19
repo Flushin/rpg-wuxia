@@ -861,10 +861,20 @@ console.log('\n== offline: faixas de eficiência ==');
     drops: [
       { baseId: 'espadas_ferro', rarity: 'comum' as Rarity, perKill: 0.1 },
       { baseId: 'pocao_hp_p', rarity: 'comum' as Rarity, perKill: 0.1 },
+      { baseId: 'colar_jade', rarity: 'incomum' as Rarity, perKill: 0.1 },
+      { baseId: 'espadas_ferro', rarity: 'raro' as Rarity, perKill: 0.1 },
+      { baseId: 'minerio_ferro', rarity: 'comum' as Rarity, perKill: 0.5 },
+      { baseId: 'pergaminho_retorno', rarity: 'comum' as Rarity, perKill: 0.1 },
     ],
   };
   const r6 = computeOffline({ elapsedMs: 6 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 3 }, seed: 1 });
   ok(r6.kills === 432 && r6.gold === 1728, `6 h: ${r6.kills} abates (2/min × 216 min) e ouro ${r6.gold}`);
+  ok(
+    r6.drops.length === 2 &&
+      r6.drops.some((d) => d.baseId === 'espadas_ferro' && d.rarity === 'comum') &&
+      r6.drops.some((d) => d.baseId === 'pocao_hp_p'),
+    `offline só dropa poção e equipamento Comum (${r6.drops.map((d) => `${d.baseId}|${d.rarity}`).join(', ')})`,
+  );
   ok(
     r6.potionsUsed.mp === 3 && r6.potionsUsed.hp > 0,
     'poções gastas limitadas ao que existe (+ drops); ganhos continuam',
@@ -904,14 +914,16 @@ console.log('\n== offline: aplicando no jogo ==');
     potHp: 15,
     potMp: 6,
     levelSum: 60,
-    drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4 },
+    drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4, 'minerio_ferro|comum': 5 },
   });
   const base = (over: Partial<SaveData> = {}): Partial<SaveData> => ({
     auto: { active: true, mapId: 'floresta', buckets: [bucket()] },
     lastSeen: NOW - 6 * HOUR,
     ...over,
   });
-  const w = mk('lamina', 1, 'floresta', base(), NOW);
+  // mochila cheia de Incomuns (o auto não vende): drops offline que não cabem são vendidos
+  const fullBag = Array.from({ length: BAG_SIZE }, () => makeEquipment('colar_jade', 'incomum', null, new Rng(1), 2));
+  const w = mk('lamina', 1, 'floresta', base({ bag: fullBag }), NOW);
   const rep = w.offlineReport;
   ok(!!rep, 'gera relatório');
   if (rep) {
@@ -925,6 +937,11 @@ console.log('\n== offline: aplicando no jogo ==');
       'pontos automáticos aplicados',
     );
     ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);
+    ok(
+      rep.items.every((i) => i.rarity === 'comum') &&
+        w.bag.every((b) => !b || (b.baseId !== 'minerio_ferro' && (b.rarity === 'comum' || b.baseId === 'colar_jade'))),
+      'offline não traz material nem Incomum/Raro',
+    );
     ok(
       rep.soldCount > 0 && w.freeSlots() === 0,
       `overflow vendido (${rep.soldCount} itens, +${rep.soldGold} ouro) e mochila no limite`,
