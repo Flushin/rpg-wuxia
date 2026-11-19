@@ -1,5 +1,5 @@
 // Painel de Configurações (botão ⚙): idioma, tamanho da interface, dicas, avisos de itens, FPS, som,
-// report de bug, créditos e trocar personagem.
+// novidades, report de bug, créditos e trocar personagem.
 // Não guarda estado próprio: cada opção grava no dono dela (audio, perf, uiScale, rewards, World via TipManager).
 import { L, bindLangButtons, langButtons } from '../core/i18n';
 import type { World } from '../core/world';
@@ -10,6 +10,7 @@ import { perf } from './perf';
 import { touchDebug } from './touchDebug';
 import { BugReport } from './bugReport';
 import { credits } from './credits';
+import { novidades, pontoNovidades, atualizarPontoNovidades } from './novidades';
 import { openPrivacyPolicy, openWiki } from './privacy';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import type { TipManager } from './tips';
@@ -66,6 +67,10 @@ export class SettingsPanel {
       case 'credits':
         this.toggle(false);
         credits().open();
+        break;
+      case 'news':
+        this.toggle(false);
+        novidades().open();
         break;
       case 'privacy':
         openPrivacyPolicy();
@@ -160,6 +165,7 @@ export class SettingsPanel {
       <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
       <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
       <small class="muted">${seen ? L(`${seen} dica(s) já vista(s)`, `${seen} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
+      <button data-act="news">📜 ${L('Novidades', "What's new")}${pontoNovidades()}</button>
       <button data-act="wiki">📖 ${L('Wiki do jogo', 'Game wiki')} <small class="muted">(${L('em português', 'in Portuguese')})</small></button>
       <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
       <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
@@ -167,5 +173,6 @@ export class SettingsPanel {
       <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
     bindLangButtons(byId('settings-panel'));
+    atualizarPontoNovidades();
   }
 }

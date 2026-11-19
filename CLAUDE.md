@@ -7,6 +7,7 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 - `npm run dev` (servidor), `npm run build` (tsc + vite), `npm run typecheck`
 - `npm test` (todos os `check:*`), `npm run check:layout`, `npm run maps`
 - `npm run balance` / `sim:balance` (simulações de balanceamento)
+- `npm run novidades:loja` (texto "O que há de novo" da Play Store)
 
 ## Mapa rápido
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save; `world/`)
@@ -21,6 +22,11 @@ Toda mudança no jogo que afete algo mostrado na wiki atualiza a wiki **no mesmo
 - Regras copiadas em `src/wiki/` (fórmulas de combate, forja, offline, skills, preços, constantes) e textos à mão
   (`src/wiki/mechanics.ts`, papéis dos NPCs em `src/wiki/npcs.ts`, comportamento de monstros) precisam ser editados junto.
 - Conteúdo novo (item, monstro, NPC, mapa, skill, seita, mecânica) ganha página/entrada na wiki; `npm run check:wiki` deve passar.
+
+## Novidades (regra)
+PR com **conteúdo novo** para o jogador (não correção nem ajuste) acrescenta um item em `"proxima"` de `src/data/novidades.json`
+(+ tradução em `en.json` "novidades"). Ao subir a `version` do `package.json`, mova os itens para uma entrada nova no topo de
+`"versoes"` (com data); `npm run check:novidades` exige essa entrada. Texto da Play Store: `npm run novidades:loja`.
 
 ## Economia de contexto
 - Não leia docs grandes inteiros: use grep e leia só a seção relevante.

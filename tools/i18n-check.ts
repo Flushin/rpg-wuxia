@@ -7,6 +7,7 @@ import monsters from '../src/data/monsters.json';
 import tips from '../src/data/tips.json';
 import npcs from '../src/data/npcs.json';
 import quests from '../src/data/quests.json';
+import novidades from '../src/data/novidades.json';
 import { readFileSync, readdirSync } from 'node:fs';
 
 type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -61,6 +62,7 @@ const sections: [string, unknown][] = [
   ['tips', tips],
   ['npcs', npcs],
   ['quests', quests],
+  ['novidades', novidades],
 ];
 for (const [name, data] of sections) orphans(E[name], data, name);
 
@@ -96,6 +98,15 @@ need(npcs, E.npcs, 'npcs');
 (quests as J).chain.forEach((q: J, i: number) => {
   for (const f of ['name', 'offer', 'goal', 'done']) need(q[f], E.quests?.chain?.[i]?.[f], `quests.chain[${i}].${f}`);
 });
+// novidades: todo texto de item (versões e "proxima")
+(novidades.proxima as J[]).forEach((n, i) =>
+  need(n.texto, E.novidades?.proxima?.[i]?.texto, `novidades.proxima[${i}].texto`),
+);
+novidades.versoes.forEach((v, i) =>
+  v.itens.forEach((n, j) =>
+    need(n.texto, E.novidades?.versoes?.[i]?.itens?.[j]?.texto, `novidades.versoes[${i}].itens[${j}].texto`),
+  ),
+);
 // no mais, itens: o EN do item não pode conter o PT idêntico por engano? (só avisa nomes iguais ao PT em campos longos)
 
 // names: todo displayName / portal / NPC / spawn dos mapas tem tradução, e nenhuma chave é órfã
@@ -115,7 +126,7 @@ for (const f of readdirSync('public/maps').filter((x) => x.endsWith('.json'))) {
 for (const n of used) if (!E.names?.[n]) bad(`names: "${n}" (mapas) sem tradução EN`);
 for (const k of Object.keys(E.names ?? {})) if (!used.has(k)) bad(`names: chave órfã "${k}" (não aparece nos mapas)`);
 for (const k of Object.keys(E))
-  if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'names'].includes(k))
+  if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'novidades', 'names'].includes(k))
     bad(`seção desconhecida "${k}"`);
 
 console.log(fails ? `${fails} problema(s)` : 'i18n-check: tudo ok');

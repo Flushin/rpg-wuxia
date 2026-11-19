@@ -93,6 +93,18 @@ Implementadas a pedido do Lucas e publicadas no site.
   Apache-2.0 exigem esse aviso no app. Os textos vêm dos arquivos de `docs/licencas/`, sem cópia. Fecha com X, Fechar,
   toque fora ou Esc. Código: `src/ui/credits.ts`. Registro de assets: `ASSETS_LICENCAS.md`.
 
+- **Novidades / "Édito da Seita"** *(19/11/2026, decidido pelo Lucas)*: anúncio do que há de novo para os jogadores.
+  **Só conteúdo novo** (seita, mapa, monstro, item, sistema); correções de bug e ajustes de mecânica não entram.
+  Anuncia **só quando a `version` do `package.json` sobe** (junta vários PRs). Fonte única: `src/data/novidades.json`
+  (+ `en.json` "novidades"); cada PR com conteúdo novo põe um item em `"proxima"`, e ao subir a versão os itens viram
+  uma entrada nova no topo de `"versoes"` com a data. No jogo: a janela abre sozinha **uma vez** na tela inicial após a
+  atualização, para quem já tem personagem; quem não tem só vê o ponto dourado no botão "Novidades" (rodapé da tela
+  inicial e ⚙). Título temático ("Édito da Seita · vX.Y.Z"), itens diretos, com "ver na wiki". Na wiki: página
+  `#/novidades` com o histórico. Play Store: `npm run novidades:loja` gera o "O que há de novo" (pt-BR/en-US, até 500
+  caracteres). `npm run check:novidades` exige entrada para a versão do `package.json`, links da wiki válidos e o limite
+  da loja. Primeira entrada: v0.1.0 (o jogo atual). Código: `src/core/novidades.ts`, `src/ui/novidades.ts`,
+  `src/wiki/novidades.ts`. Preferência no aparelho: `rpg-news-seen`.
+
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
 

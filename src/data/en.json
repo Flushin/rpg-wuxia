@@ -665,5 +665,32 @@
         "done": "The temple bell has rung again after so many years... The mountain is at peace, and so is the village. You have become a legend, warrior."
       }
     ]
+  },
+  "novidades": {
+    "proxima": [],
+    "versoes": [
+      {
+        "itens": [
+          {
+            "texto": "Four sects to choose from: Tempest, Frost, Titan and Viper, each with its own master and skills."
+          },
+          {
+            "texto": "Four regions to explore: Cloud Village, Dark Forest, Snowy Mountain and Terracotta Ruins."
+          },
+          {
+            "texto": "Reach level 20 by following the 14 story quests."
+          },
+          {
+            "texto": "Forge: upgrade, raise the rarity, reroll the bonuses and salvage equipment."
+          },
+          {
+            "texto": "Auto-battle and offline gains: your character keeps hunting while you are away."
+          },
+          {
+            "texto": "Game wiki with every item, monster, NPC and map (in Portuguese)."
+          }
+        ]
+      }
+    ]
   }
 }
