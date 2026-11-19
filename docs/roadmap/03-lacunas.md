@@ -4,7 +4,7 @@
 > **online assíncrono**, **casual PvE mobile**, **v1 grátis e F2P depois**, **solo dev sem experiência de lançamento, com a IA
 > fazendo quase tudo**.
 >
-> ⚠️ Pela regra do `docs/decisoes-do-projeto.md`, **nada aqui está decidido**. Toda funcionalidade que mexe na jogabilidade
+> ⚠️ Pela regra do `docs/decisoes/README.md`, **nada aqui está decidido**. Toda funcionalidade que mexe na jogabilidade
 > precisa da aprovação do Lucas antes de entrar.
 
 ## O que a premissa "solo dev sem experiência + IA faz quase tudo" muda
@@ -102,7 +102,7 @@ operar. A IA escreve e versiona as migrações do banco e as funções no reposi
 | I17 | **Acessibilidade** (modo daltônico nas raridades/áreas, reduzir efeitos e tremor) | Parcial | Barato, e as lojas valorizam. | CSS e paletas do `skillFx` | P | — |
 | I18 | **Vibração nos golpes** (o `haptics.ts` já existe e não é usado) | Esboço | Sensação de impacto no celular, quase de graça. | `src/platform/haptics.ts` | P | Bateria. Mitigação: opção para desligar. |
 | I19 | **Ferramenta de admin mínima** (buscar conta, ver logs, banir, restaurar save) | Não existe | Sem ela, cada ticket de suporte vira acesso direto ao banco. | E2, E3, E7 | M | — |
-| I20 | **Documentação operacional para a IA** (`CLAUDE.md` com as regras do projeto, manual de incidentes, como fazer deploy e migração, onde ficam os segredos) | Parcial: o `docs/decisoes-do-projeto.md` é ótimo, mas não há `CLAUDE.md` nem manual de operação | Com a IA fazendo quase tudo, cada sessão nova precisa achar o contexto sem o Lucas explicar de novo. Num incidente às 23h, o Lucas abre uma sessão e diz "siga o manual". | Nenhuma | P (contínuo) | Documento desatualizado. Mitigação: atualizar no mesmo PR da mudança (regra já usada no projeto). |
+| I20 | **Documentação operacional para a IA** (`CLAUDE.md` com as regras do projeto, manual de incidentes, como fazer deploy e migração, onde ficam os segredos) | Parcial: o `docs/decisoes/README.md` é ótimo, mas não há `CLAUDE.md` nem manual de operação | Com a IA fazendo quase tudo, cada sessão nova precisa achar o contexto sem o Lucas explicar de novo. Num incidente às 23h, o Lucas abre uma sessão e diz "siga o manual". | Nenhuma | P (contínuo) | Documento desatualizado. Mitigação: atualizar no mesmo PR da mudança (regra já usada no projeto). |
 
 ## Diferenciais (oportunidades de destaque)
 

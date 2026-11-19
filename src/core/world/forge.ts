@@ -1,6 +1,6 @@
 // Forja do ferreiro (marco 9, craft): melhorar (+1 a +10), subir raridade, trocar bônus e desmontar.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
-// Regras em docs/decisoes-do-projeto.md ("Craft (marco 9)"). Os números ficam em FORGE, abaixo.
+// Regras em docs/decisoes/roadmap-titas-pos-nivel-10.md ("Craft (marco 9)"). Os números ficam em FORGE, abaixo.
 import { CLASSES } from '../data';
 import { bal } from '../balance';
 import { BASES, MATERIALS, MAX_PLUS, RARITIES, RARITY_ORDER, makeStack, rollBonuses } from '../items';

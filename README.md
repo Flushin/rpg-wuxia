@@ -4,8 +4,8 @@ RPG de ação wuxia no navegador (PC e celular), isométrico, com combate tab-ta
 TypeScript + Vite + Phaser 3. Versão atual: ver `package.json` (aparece no canto da tela inicial).
 
 - Jogar: https://flushin.github.io/rpg-wuxia/ (publicado a cada push na `main`).
-- Decisões do projeto: [`docs/decisoes-do-projeto.md`](docs/decisoes-do-projeto.md) — **leia antes de mudar regras**.
-- Auditoria e plano de refatoração: [`AUDITORIA.md`](AUDITORIA.md).
+- Decisões do projeto: [`docs/decisoes/README.md`](docs/decisoes/README.md) (índice por tema) — **leia antes de mudar regras**, mas só o arquivo do tema relevante.
+- Auditoria e plano de refatoração: [`docs/arquivo/AUDITORIA.md`](docs/arquivo/AUDITORIA.md) (histórico).
 
 ## Como rodar
 

@@ -2,7 +2,7 @@
 
 Origem e licença de **tudo o que vai para o jogo** e não é código escrito no projeto: imagens, sons, músicas, fontes,
 modelos 3D e bibliotecas. As provas (licenças baixadas, prints das páginas) ficam em [`docs/licencas/`](docs/licencas/README.md).
-A análise completa está em [`AUDITORIA_DIREITOS.md`](AUDITORIA_DIREITOS.md).
+A análise completa está em [`docs/arquivo/AUDITORIA_DIREITOS.md`](docs/arquivo/AUDITORIA_DIREITOS.md).
 
 ## Regras
 

@@ -150,7 +150,7 @@ Legenda de status: **Completa** (funciona e tem teste ou uso confirmado) · **Pa
 | R7 | **Cota e chave pública do Web3Forms** no report de bug. | `src/ui/bugReport.ts` | Alguém pode lotar a cota e os reports reais deixam de chegar. | 🟢 Baixa |
 | R8 | **Ferramentas fora do `tsc`.** | `tsconfig.json` | Teste quebrado só aparece ao rodar. | 🟢 Baixa |
 | R9 | **Dependência de modelos CC0 para arte nova.** | `tools/sprites/` | Monstros temáticos (yeti, dragão) podem ficar genéricos. | 🟡 Média |
-| R10 | **Pendências antes da loja:** e-mail de contato e busca de marca no INPI/USPTO/EUIPO (nome e appId já decididos). | `docs/decisoes-do-projeto.md` | O appId não pode mudar depois do primeiro envio à Play Store. | 🟠 Média |
+| R10 | **Pendências antes da loja:** e-mail de contato e busca de marca no INPI/USPTO/EUIPO (nome e appId já decididos). | `docs/decisoes/README.md` | O appId não pode mudar depois do primeiro envio à Play Store. | 🟠 Média |
 
 ### A confirmar
 - Desempenho real em celulares de 2–3 GB de RAM com a Montanha (o D6 mediu 27–33 MB de folhas por mapa no navegador do PC).
