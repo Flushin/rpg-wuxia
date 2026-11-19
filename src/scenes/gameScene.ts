@@ -10,6 +10,7 @@ import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
 import { restMode } from '../ui/restMode';
+import { keepScreenOn } from '../platform/keepAwake';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
@@ -172,6 +173,7 @@ export class GameScene extends Phaser.Scene {
       },
     });
     this.events.once('shutdown', () => {
+      keepScreenOn(false);
       disarmBack();
       clearInterval(timer);
       offPause();
@@ -367,6 +369,7 @@ export class GameScene extends Phaser.Scene {
   update(_t: number, delta: number) {
     perf.tick(delta, this.children.length);
     restMode.update();
+    keepScreenOn(this.world.auto.state === 'on'); // o celular não apaga a tela com o Auto caçando
     if (this.mapLoading) return; // nada anda nem é desenhado até as folhas do novo mapa chegarem
     const w = this.world;
     this.updatePinch();
