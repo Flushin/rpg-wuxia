@@ -247,9 +247,10 @@ function auto(): string {
       <li><b>Alvos:</b> ataca o monstro mais perto, até <b>${AUTO_MAX_LEVEL_GAP} níveis acima</b> do seu (ajustável de +0 a +${AUTO_MAX_LEVEL_LIMIT}).
         Monstros 2+ níveis abaixo ("cinzas") ficam por último. Evita caminhos que atraem grupos. Nunca ataca chefes.</li>
       <li><b>Revide:</b> por padrão, revida quem o atacar; dá para limitar ao nível máximo ou desligar e, nesse caso, escolher entre continuar, se afastar ou voltar à vila.</li>
-      <li><b>Skills e poções:</b> você escolhe quais skills ele usa e com quanto de vida/mana toma poção (padrão: vida abaixo de 40%, mana abaixo de 30%).</li>
+      <li><b>Skills e poções:</b> você escolhe quais skills ele usa e com quanto de vida/mana toma poção (padrão: vida abaixo de 40%, mana abaixo de 30%).
+        Escudos saem ao levar dano em combate (vida abaixo de 90%) ou com 2+ monstros atacando; curas, com a vida abaixo de 60%. O auto guarda mana para eles enquanto estão prontos.</li>
       <li><b>Sem poções:</b> volta à vila, compra a quantidade definida no menu (se tiver ouro) e retorna.</li>
-      <li><b>Mochila cheia:</b> vende sozinho os equipamentos Comuns (opção para vender Incomuns também). O que não couber fica no chão.</li>
+      <li><b>Mochila cheia:</b> quando a aba de equipamentos lota, volta à vila, vende no vendedor os equipamentos Comuns (opção para vender Incomuns também) e retorna. Raros nunca são vendidos: se só sobrarem eles, continua caçando e os drops que não couberem ficam no chão.</li>
       <li><b>Morte:</b> volta da vila e continua, desde que nenhum item equipado esteja com durabilidade 0. Se estiver, para e espera você.</li>
       <li>Ligado na vila, vai sozinho para o melhor mapa de caça para o seu nível.</li>
       <li>As skills ganham experiência normalmente no auto-combate.</li></ul></section>

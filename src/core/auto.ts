@@ -39,7 +39,8 @@ export const RATE_MIN_SEC = 120; // mínimo de dados para o ritmo valer
 export const BUCKET_SEC = 60,
   MAX_BUCKETS = 30;
 const SHOP_COOLDOWN = 120; // s entre viagens à vila (evita laço se a compra falhar)
-export const SHIELD_HP = 0.7; // Véu de Névoa / Pele de Ferro: usado com a vida abaixo de 70% em combate
+export const SHIELD_HP = 0.9; // Véu de Névoa / Pele de Ferro: usado ao levar dano em combate (vida abaixo de 90%)
+export const SHIELD_CROWD = 2; // ... ou já de cara com 2+ monstros atacando
 export const HEAL_HP = 0.6; // Seiva de Jade: usada com a vida abaixo de 60% em combate
 const REST_HP = 0.35,
   REST_DONE = 0.9,
@@ -91,8 +92,8 @@ export class AutoCombat {
   private buckets: AutoBucket[] = [];
   private cur: AutoBucket = emptyBucket();
   private deathPending = false;
-  private leaving: false | 'shop' | 'flee' = false; // no mapa de caça, indo à vila (comprar poções / fugir de monstro forte)
-  private visit: { shop: boolean | null; shopped: boolean } = { shop: null, shopped: false };
+  private leaving: false | 'shop' | 'sell' | 'flee' = false; // no mapa de caça, indo à vila (poções / vender / fugir de monstro forte)
+  private visit: { shop: boolean | null; sell: boolean; shopped: boolean } = { shop: null, sell: false, shopped: false };
   private lastShop = -Infinity;
   private blocked: Record<string, number> = {};
   private walkCd = 0;
@@ -119,7 +120,7 @@ export class AutoCombat {
     }
     if (this.state === 'on') this.setState('off');
     else {
-      this.visit = { shop: null, shopped: false };
+      this.visit = { shop: null, sell: false, shopped: false };
       this.leaving = false;
       this.blocked = {};
       this.setState('on');
@@ -171,7 +172,7 @@ export class AutoCombat {
   observe(ev: GameEvent) {
     if (ev.type === 'playerDeath' && this.state === 'on') this.deathPending = true;
     else if (ev.type === 'mapChange') {
-      this.visit = { shop: null, shopped: false };
+      this.visit = { shop: null, sell: false, shopped: false };
       // indo à vila por um mapa intermediário (ruínas -> floresta -> vila): continua indo
       if (TOWN_MAPS.has(ev.mapId)) this.leaving = false;
     }
@@ -272,11 +273,13 @@ export class AutoCombat {
   }
 
   // ---------- venda automática (mochila cheia) ----------
-  get sellingActive() {
-    return this.state === 'on';
-  }
   sellable(it: ItemInstance): boolean {
     return !!BASES[it.baseId] && (it.rarity === 'comum' || (it.rarity === 'incomum' && this.cfg.sellIncomum));
+  }
+  /** Aba de equipamentos cheia e com algo que a regra vende: hora de ir ao vendedor da vila. */
+  private needsSell() {
+    const w = this.w;
+    return w.freeSlots('equip') === 0 && w.bag.some((it) => !!it && this.sellable(it));
   }
   // vende da mochila tudo que a regra permite; retorna quantos itens foram vendidos
   makeRoom(): number {
@@ -315,10 +318,10 @@ export class AutoCombat {
     this.drinkPotions();
     if (
       !this.leaving &&
-      ((this.shouldShop() && w.time - this.lastShop > SHOP_COOLDOWN) || this.needsRest()) &&
+      ((this.shouldShop() && w.time - this.lastShop > SHOP_COOLDOWN) || this.needsRest() || this.needsSell()) &&
       this.exitPortal()
     ) {
-      this.leaving = 'shop';
+      this.leaving = this.needsSell() ? 'sell' : 'shop';
       w.targetId = null;
       w.autoAttack = false;
     }
@@ -344,7 +347,9 @@ export class AutoCombat {
       this.status =
         this.leaving === 'flee'
           ? L('Fugindo para a vila', 'Fleeing to the village')
-          : L('Indo comprar poções', 'Buying potions');
+          : this.leaving === 'sell'
+            ? L('Mochila cheia: indo vender', 'Bag full: going to sell')
+            : L('Indo comprar poções', 'Buying potions');
       const p = this.exitPortal();
       if (p) this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
       return;
@@ -498,18 +503,22 @@ export class AutoCombat {
       }
     }
     if (this.visit.shop === null) {
+      this.visit.sell = this.needsSell();
       this.visit.shop = this.shouldShop();
       this.restSec = 0;
     }
-    if (this.visit.shop && !this.visit.shopped) {
+    if ((this.visit.shop || this.visit.sell) && !this.visit.shopped) {
       const v = w.npcs.find((n) => w.npcRole(n) === 'vendedor');
       if (v) {
-        this.status = L('Indo comprar poções', 'Buying potions');
+        this.status = this.visit.sell
+          ? L('Indo vender equipamentos', 'Selling equipment')
+          : L('Indo comprar poções', 'Buying potions');
         if (dist(w.player, v) > 1.5) {
           this.walkTo(v);
           return;
         }
-        this.shop();
+        if (this.visit.sell) this.makeRoom();
+        if (this.visit.shop || this.shouldShop()) this.shop();
       }
       this.visit.shopped = true;
     }
@@ -710,7 +719,19 @@ export class AutoCombat {
     } else if (!w.autoAttack) w.setTarget(t.id);
     if (w.gcd > 0) return;
     const defs = w.activeSkills();
-    const aggroed = w.monsters.some((m) => !m.dead && m.ai === 'chase');
+    const chasers = w.monsters.filter((m) => !m.dead && m.ai === 'chase').length,
+      aggroed = chasers > 0;
+    // reserva mana para o escudo/cura pronto: senão as skills de ataque gastam tudo e ele nunca sai na hora certa
+    const reserve = defs
+      .filter(
+        (d) =>
+          (d.shield || d.heal) &&
+          !this.cfg.skillsOff.includes(d.id) &&
+          w.isUnlocked(d) &&
+          w.skills[d.id].cd <= 0 &&
+          !w.hasBuff(p, d.shield ? 'shield' : 'regen'),
+      )
+      .reduce((a, d) => Math.max(a, d.mana ?? 0), 0);
     // da mais forte (desbloqueada por último) para a mais básica
     for (let slot = defs.length - 1; slot >= 0; slot--) {
       const def = defs[slot],
@@ -724,10 +745,12 @@ export class AutoCombat {
       )
         continue;
       if (def.shield) {
-        if (!(aggroed && p.hp < p.derived.maxHp * SHIELD_HP) || w.hasBuff(p, 'shield')) continue;
+        if (!(aggroed && (p.hp < p.derived.maxHp * SHIELD_HP || chasers >= SHIELD_CROWD)) || w.hasBuff(p, 'shield'))
+          continue;
       } else if (def.heal) {
         if (!(aggroed && p.hp < p.derived.maxHp * HEAL_HP) || w.hasBuff(p, 'regen')) continue;
-      } else if (def.area === 'self') {
+      } else if (p.mana - (def.mana ?? 0) < reserve) continue;
+      else if (def.area === 'self') {
         if (!w.monsters.some((m) => !m.dead && dist(m, p) <= (def.radius ?? 0))) continue;
       } else if (def.area === 'target') {
         if (

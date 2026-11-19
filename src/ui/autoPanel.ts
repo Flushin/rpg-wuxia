@@ -94,7 +94,7 @@ export class AutoPanel {
     byId('auto-panel').innerHTML =
       `<div class="card">${closeX('data-act="close"')}<h2>${L('Auto-combate', 'Auto-battle')}</h2>
       <h3>${L('Habilidades usadas', 'Skills used')}</h3>${skills}
-      <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai quando a vida está abaixo de ${pct(SHIELD_HP)} em combate.`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when health is below ${pct(SHIELD_HP)} in combat.`)}</small>
+      <small class="muted">${L(`O ataque básico é sempre usado. Skills de área só saem com monstro no alcance; o Véu de Névoa sai ao levar dano em combate (vida abaixo de ${pct(SHIELD_HP)}) ou com 2+ monstros atacando, e o auto guarda mana para ele.`, `The basic attack is always used. Area skills only fire with a monster in range; Mist Veil fires when you take damage in combat (health below ${pct(SHIELD_HP)}) or when 2+ monsters attack, and the auto saves mana for it.`)}</small>
       <h3>${L('Alvos', 'Targets')}</h3>
       ${sld(L('Nível máximo acima do seu', 'Max level above yours'), 'maxLevelAbove', 0, AUTO_MAX_LEVEL_LIMIT, c.maxLevelAbove, false, '+')}
       ${seg(L('Monstros fracos (2+ níveis abaixo)', 'Weak monsters (2+ levels below)'), 'grayMode', [
@@ -133,7 +133,7 @@ export class AutoPanel {
       <small class="muted">${L('Se faltar ouro, compra o que der. Sem ouro, continua caçando sem poção.', 'If gold runs short, buys what it can. With no gold, keeps hunting without potions.')}</small>
       <h3>${L('Mochila cheia', 'Bag full')}</h3>
       <label class="opt"><input type="checkbox" id="auto-sell-inc" ${c.sellIncomum ? 'checked' : ''}/> ${L('Vender também itens Incomuns', 'Also sell Uncommon items')}</label>
-      <small class="muted">${L(`Itens Comuns são vendidos sozinhos quando a mochila enche. Raros (e Incomuns, se a opção estiver desligada) ficam no chão por ${GROUND_SECONDS} s.`, `Common items are sold automatically when the bag fills up. Rare items (and Uncommon, if the option is off) stay on the ground for ${GROUND_SECONDS} s.`)}</small>
+      <small class="muted">${L(`Quando a mochila de equipamentos enche, o auto volta à vila, vende os Comuns no vendedor e retorna. Raros (e Incomuns, se a opção estiver desligada) não são vendidos; o que não couber fica no chão por ${GROUND_SECONDS} s.`, `When the equipment bag fills up, the auto returns to the village, sells Common items to the vendor and comes back. Rare items (and Uncommon, if the option is off) are not sold; what doesn't fit stays on the ground for ${GROUND_SECONDS} s.`)}</small>
       <div class="how">${L(
         `<b>Ganho offline.</b> Se você fechar o jogo com o Auto ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora, no ritmo medido nos últimos ~${RATE_WINDOW_MIN} min de auto-combate (precisa de pelo menos ${RATE_MIN_SEC / 60} min de dados).<br>
       Rendimento: ${tiersPt}.<br>
