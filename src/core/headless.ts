@@ -26,6 +26,9 @@ export { computeOffline } from './offline';
 export { migrateSaves } from './saves';
 export { CHARACTER_SAVE_VERSION } from './saveFormat';
 export { parseTiledMap, type GameMap } from './map';
+export { sumLedger, type EconEntry, type EconSource } from './world/ledger';
+/** Limites de XP/h, ouro/h e nível de item por nível e mapa (gerado por npm run sim:plausibility). */
+export { default as plausibility } from '../data/plausibility.json';
 export type { SaveData, ItemInstance, GameEvent } from './types';
 
 const RAW_MAPS: Record<string, unknown> = { cidade, floresta, ruinas, montanha };

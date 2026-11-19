@@ -1,0 +1,463 @@
+{
+ "_doc": "Limites de plausibilidade (roadmap M0 E4a; usados pelo servidor no M1 E4c). Gerado por `npm run sim:plausibility` a partir do sim:balance: maior ritmo médio de caça entre as 4 seitas e as sementes, vezes a folga. XP e ouro contam só abates, saque e venda (missões e ganho offline ficam de fora). maxItemLevel = maior entre o observado e o monstro mais forte do mapa, mais a folga. Não editar à mão.",
+ "margin": {
+  "rate": 2.5,
+  "ilvl": 2,
+  "minSampleMin": 3
+ },
+ "perLevelAndMap": {
+  "1": {
+   "floresta": {
+    "xpPerHour": 31884,
+    "goldPerHour": 7382,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 12753,
+     "goldPerHour": 2953,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 32
+   }
+  },
+  "2": {
+   "floresta": {
+    "xpPerHour": 31884,
+    "goldPerHour": 7382,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 12753,
+     "goldPerHour": 2953,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 32
+   }
+  },
+  "3": {
+   "floresta": {
+    "xpPerHour": 31884,
+    "goldPerHour": 7382,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 12753,
+     "goldPerHour": 2953,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 32
+   }
+  },
+  "4": {
+   "floresta": {
+    "xpPerHour": 31884,
+    "goldPerHour": 7382,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 12753,
+     "goldPerHour": 2953,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 32
+   }
+  },
+  "5": {
+   "floresta": {
+    "xpPerHour": 99420,
+    "goldPerHour": 16847,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 39768,
+     "goldPerHour": 6739,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 50
+   }
+  },
+  "6": {
+   "floresta": {
+    "xpPerHour": 111430,
+    "goldPerHour": 19359,
+    "maxItemLevel": 8,
+    "observed": {
+     "xpPerHour": 44572,
+     "goldPerHour": 7744,
+     "maxItemLevel": 6
+    },
+    "sampleMin": 122
+   }
+  },
+  "7": {
+   "ruinas": {
+    "xpPerHour": 292979,
+    "goldPerHour": 33420,
+    "maxItemLevel": 12,
+    "observed": {
+     "xpPerHour": 117191,
+     "goldPerHour": 13368,
+     "maxItemLevel": 9
+    },
+    "sampleMin": 60
+   }
+  },
+  "8": {
+   "ruinas": {
+    "xpPerHour": 296464,
+    "goldPerHour": 33992,
+    "maxItemLevel": 12,
+    "observed": {
+     "xpPerHour": 118585,
+     "goldPerHour": 13597,
+     "maxItemLevel": 9
+    },
+    "sampleMin": 130
+   }
+  },
+  "9": {
+   "ruinas": {
+    "xpPerHour": 295679,
+    "goldPerHour": 38259,
+    "maxItemLevel": 12,
+    "observed": {
+     "xpPerHour": 118271,
+     "goldPerHour": 15303,
+     "maxItemLevel": 9
+    },
+    "sampleMin": 155
+   }
+  },
+  "10": {
+   "ruinas": {
+    "xpPerHour": 297416,
+    "goldPerHour": 46012,
+    "maxItemLevel": 12,
+    "observed": {
+     "xpPerHour": 118966,
+     "goldPerHour": 18405,
+     "maxItemLevel": 9
+    },
+    "sampleMin": 54
+   },
+   "montanha": {
+    "xpPerHour": 424949,
+    "goldPerHour": 34810,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 169979,
+     "goldPerHour": 13924,
+     "maxItemLevel": 17
+    },
+    "sampleMin": 119
+   }
+  },
+  "11": {
+   "montanha": {
+    "xpPerHour": 546433,
+    "goldPerHour": 44802,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 218573,
+     "goldPerHour": 17921,
+     "maxItemLevel": 17
+    },
+    "sampleMin": 92
+   }
+  },
+  "12": {
+   "montanha": {
+    "xpPerHour": 558627,
+    "goldPerHour": 45579,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 223451,
+     "goldPerHour": 18231,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 143
+   }
+  },
+  "13": {
+   "montanha": {
+    "xpPerHour": 646236,
+    "goldPerHour": 66249,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 258494,
+     "goldPerHour": 26499,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 92
+   }
+  },
+  "14": {
+   "montanha": {
+    "xpPerHour": 662979,
+    "goldPerHour": 77487,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 265191,
+     "goldPerHour": 30994,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 88
+   }
+  },
+  "15": {
+   "montanha": {
+    "xpPerHour": 801691,
+    "goldPerHour": 66030,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 320676,
+     "goldPerHour": 26412,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 167
+   }
+  },
+  "16": {
+   "montanha": {
+    "xpPerHour": 899472,
+    "goldPerHour": 73802,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 359789,
+     "goldPerHour": 29520,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 85
+   }
+  },
+  "17": {
+   "montanha": {
+    "xpPerHour": 980412,
+    "goldPerHour": 79956,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 392165,
+     "goldPerHour": 31982,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 177
+   }
+  },
+  "18": {
+   "montanha": {
+    "xpPerHour": 1092430,
+    "goldPerHour": 89522,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 436972,
+     "goldPerHour": 35809,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 159
+   }
+  },
+  "19": {
+   "montanha": {
+    "xpPerHour": 1149401,
+    "goldPerHour": 93785,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 459760,
+     "goldPerHour": 37514,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 133
+   }
+  },
+  "20": {
+   "montanha": {
+    "xpPerHour": 1149401,
+    "goldPerHour": 93785,
+    "maxItemLevel": 22,
+    "observed": {
+     "xpPerHour": 459760,
+     "goldPerHour": 37514,
+     "maxItemLevel": 18
+    },
+    "sampleMin": 133
+   }
+  }
+ },
+ "perLevel": {
+  "1": {
+   "xpPerHour": 36726,
+   "goldPerHour": 7138,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 14690,
+    "goldPerHour": 2855
+   }
+  },
+  "2": {
+   "xpPerHour": 36726,
+   "goldPerHour": 7138,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 14690,
+    "goldPerHour": 2855
+   }
+  },
+  "3": {
+   "xpPerHour": 36726,
+   "goldPerHour": 7138,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 14690,
+    "goldPerHour": 2855
+   }
+  },
+  "4": {
+   "xpPerHour": 40462,
+   "goldPerHour": 6819,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 16185,
+    "goldPerHour": 2727
+   }
+  },
+  "5": {
+   "xpPerHour": 93176,
+   "goldPerHour": 15789,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 37270,
+    "goldPerHour": 6315
+   }
+  },
+  "6": {
+   "xpPerHour": 105216,
+   "goldPerHour": 20179,
+   "maxItemLevel": 8,
+   "observed": {
+    "xpPerHour": 42086,
+    "goldPerHour": 8071
+   }
+  },
+  "7": {
+   "xpPerHour": 259005,
+   "goldPerHour": 38503,
+   "maxItemLevel": 12,
+   "observed": {
+    "xpPerHour": 103602,
+    "goldPerHour": 15401
+   }
+  },
+  "8": {
+   "xpPerHour": 271521,
+   "goldPerHour": 39318,
+   "maxItemLevel": 12,
+   "observed": {
+    "xpPerHour": 108608,
+    "goldPerHour": 15727
+   }
+  },
+  "9": {
+   "xpPerHour": 295679,
+   "goldPerHour": 38259,
+   "maxItemLevel": 12,
+   "observed": {
+    "xpPerHour": 118271,
+    "goldPerHour": 15303
+   }
+  },
+  "10": {
+   "xpPerHour": 383906,
+   "goldPerHour": 46012,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 153562,
+    "goldPerHour": 18405
+   }
+  },
+  "11": {
+   "xpPerHour": 513334,
+   "goldPerHour": 43142,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 205333,
+    "goldPerHour": 17257
+   }
+  },
+  "12": {
+   "xpPerHour": 545379,
+   "goldPerHour": 54110,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 218151,
+    "goldPerHour": 21644
+   }
+  },
+  "13": {
+   "xpPerHour": 617802,
+   "goldPerHour": 70418,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 247121,
+    "goldPerHour": 28167
+   }
+  },
+  "14": {
+   "xpPerHour": 660125,
+   "goldPerHour": 77487,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 264050,
+    "goldPerHour": 30994
+   }
+  },
+  "15": {
+   "xpPerHour": 703587,
+   "goldPerHour": 74509,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 281434,
+    "goldPerHour": 29803
+   }
+  },
+  "16": {
+   "xpPerHour": 822670,
+   "goldPerHour": 89232,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 329068,
+    "goldPerHour": 35693
+   }
+  },
+  "17": {
+   "xpPerHour": 903825,
+   "goldPerHour": 91439,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 361530,
+    "goldPerHour": 36575
+   }
+  },
+  "18": {
+   "xpPerHour": 1025047,
+   "goldPerHour": 111267,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 410018,
+    "goldPerHour": 44507
+   }
+  },
+  "19": {
+   "xpPerHour": 1085890,
+   "goldPerHour": 110439,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 434356,
+    "goldPerHour": 44176
+   }
+  },
+  "20": {
+   "xpPerHour": 1085890,
+   "goldPerHour": 110439,
+   "maxItemLevel": 22,
+   "observed": {
+    "xpPerHour": 434356,
+    "goldPerHour": 44176
+   }
+  }
+ }
+}

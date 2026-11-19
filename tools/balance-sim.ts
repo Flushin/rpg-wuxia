@@ -8,6 +8,7 @@ import { Rng } from '../src/core/rng';
 import { World } from '../src/core/world';
 import { derivedClock } from '../src/core/clock';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
+import { PlausRun, buildPlausibility } from './plausibility';
 
 const maps: Record<string, GameMap> = {};
 for (const id of ['cidade', 'floresta', 'ruinas', 'montanha'])
@@ -24,6 +25,9 @@ const fmt = (n: number, d = 1) => (Number.isFinite(n) ? n.toFixed(d) : '-');
 const mean = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
 const DEBUG_DEATHS = process.argv.includes('--deaths');
 const QUESTS_ON = !process.argv.includes('--sem-missoes'); // marco 7: cadeia de missões (aceita/entrega na hora)
+// --plausibility: mede XP/h, ouro/h e nível de item por nível e mapa (tools/plausibility.ts) e grava o JSON
+const PLAUS = process.argv.includes('--plausibility');
+let plaus: PlausRun | null = null;
 const priv = (w: World) => w as unknown as { rng: Rng; recalc: (e: unknown, k: boolean) => void };
 // Relógio simulado: o World usa o relógio "real" (ms) para o renascimento de monstros fora do mapa e do chefe.
 // No simulador o tempo de jogo corre muito mais rápido que o real, então o relógio acompanha w.time.
@@ -123,6 +127,7 @@ function huntRun(classId: string, seed: number): Run {
   const steps = Math.floor((MAX_MIN * 60) / DT);
   for (let i = 0; i < steps; i++) {
     w.tick(DT);
+    plaus?.tick(w, DT);
     for (const ev of w.events.splice(0)) onEv(ev);
     if (w.time < nextPolicy) continue;
     nextPolicy = w.time + 1;
@@ -393,6 +398,7 @@ function highRun(classId: string, seed: number): Run {
   let nextPolicy = 0;
   for (let i = 0; i < (MAX_MIN * 60) / DT; i++) {
     w.tick(DT);
+    plaus?.tick(w, DT);
     for (const ev of w.events.splice(0)) {
       if (ev.type === 'levelup') run.levelAt[ev.level - 1] = w.time / 60;
       else if (ev.type === 'playerDeath') {
@@ -470,6 +476,22 @@ if (process.argv.includes('--m9')) {
         `| ${CLASSES[classId].name} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
       );
     }
+  process.exit(0);
+}
+
+if (PLAUS) {
+  const runs: PlausRun[] = [];
+  for (const classId of Object.keys(CLASSES))
+    for (let i = 1; i <= SEEDS; i++) {
+      runs.push((plaus = new PlausRun()));
+      huntRun(classId, i);
+      runs.push((plaus = new PlausRun()));
+      highRun(classId, i);
+    }
+  plaus = null;
+  const file = 'src/data/plausibility.json';
+  writeFileSync(file, JSON.stringify(buildPlausibility(runs, maps), null, 1) + '\n');
+  console.log(`${file} gravado (${runs.length} execuções)`);
   process.exit(0);
 }
 

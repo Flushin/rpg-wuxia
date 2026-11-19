@@ -30,7 +30,8 @@
     "build:headless": "node tools/headless-build.mjs",
     "check:headless": "node tools/headless-check.mjs",
     "golden:headless": "node tools/headless-golden.mjs",
-    "check:m0": "esbuild tools/m0-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m0-check.mjs && node /tmp/m0-check.mjs"
+    "check:m0": "esbuild tools/m0-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m0-check.mjs && node /tmp/m0-check.mjs",
+    "sim:plausibility": "esbuild tools/balance-sim.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/balance-sim.mjs && node /tmp/balance-sim.mjs --plausibility"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

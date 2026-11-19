@@ -12,6 +12,7 @@ import { makeEquipment, makeStack, POTIONS } from '../src/core/items';
 import { merchantPeriod } from '../src/core/world/merchant';
 import { LEDGER_MAX, sumLedger } from '../src/core/world/ledger';
 import type { ItemInstance, SaveData } from '../src/core/types';
+import plausibility from '../src/data/plausibility.json';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -233,6 +234,27 @@ const sameItems = (a: Record<string, number>, b: Record<string, number>) => {
   const off = w.ledger.filter((e) => e.src === 'offline');
   ok(off.length === 1 && off[0].xp === w.offlineReport?.xp, 'ganho offline anotado numa entrada com o XP do resumo');
   ok(off[0]?.gold === w.offlineReport?.gold, 'ganho offline: ouro do resumo');
+}
+
+console.log('\n== limites de plausibilidade (E4a) ==');
+{
+  type Lim = { xpPerHour: number; goldPerHour: number; maxItemLevel: number; observed: { xpPerHour: number } };
+  const per = plausibility.perLevel as unknown as Record<string, Lim>;
+  const byMap = plausibility.perLevelAndMap as unknown as Record<string, Record<string, Lim>>;
+  const lv = Array.from({ length: 20 }, (_, i) => String(i + 1));
+  ok(
+    lv.every((L) => per[L] && per[L].xpPerHour > 0 && per[L].goldPerHour > 0 && per[L].maxItemLevel > 0),
+    'há limite de XP/h, ouro/h e nível de item para os níveis 1 a 20',
+  );
+  ok(
+    lv.every((L) => Object.keys(byMap[L] ?? {}).length > 0),
+    'há limite por mapa em todos os níveis',
+  );
+  ok(
+    lv.every((L) => per[L].xpPerHour >= per[L].observed.xpPerHour * plausibility.margin.rate - 1),
+    `limite = observado × folga (${plausibility.margin.rate})`,
+  );
+  ok(per['20'].maxItemLevel >= 20, 'nível de item no fim do jogo cobre os monstros do nível 20');
 }
 
 console.log(fails ? `\n${fails} falha(s)` : '\nTudo certo.');
