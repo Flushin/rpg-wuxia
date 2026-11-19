@@ -25,14 +25,22 @@ export interface MapConfig {
   trial?: boolean;
   /** Ganho offline caçando aqui: multiplica a eficiência das faixas de tempo (nível 30: 5/6 nos mapas 20–30). */
   offlineMul?: number;
+  /** Posição no mapa-múndi (janela do mapa, aba Mundo): coluna e linha de uma grade; mapa sem ela não aparece. */
+  world?: { col: number; row: number };
 }
 
 export const MAPS_CONFIG: Record<string, MapConfig> = {
-  cidade: { town: true, music: 'music_cidade', trees: 'city', grassDecor: 0.035 },
-  floresta: { music: 'music_floresta', trees: 'forest', grassDecor: 0.09, autoFromLevel: 1 },
-  ruinas: { trees: 'forest', arena: { x: 24.5, y: 16.5, r: 6.2 }, autoExitVia: 'floresta' },
+  cidade: { town: true, world: { col: 1, row: 2 }, music: 'music_cidade', trees: 'city', grassDecor: 0.035 },
+  floresta: {
+    music: 'music_floresta',
+    trees: 'forest',
+    grassDecor: 0.09,
+    autoFromLevel: 1,
+    world: { col: 2, row: 2 },
+  },
+  ruinas: { trees: 'forest', arena: { x: 24.5, y: 16.5, r: 6.2 }, autoExitVia: 'floresta', world: { col: 3, row: 2 } },
   // marco 9: entrada pela saída norte da vila (portal com minLevel 10); arena = pátio do templo (tools/gen-maps.mjs)
-  montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10 },
+  montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10, world: { col: 1, row: 1 } },
   // nível 30: Bosque de Bambu Sombrio (nv 20–25), pelo passo leste da montanha (portal minLevel 20); offline a 5/6
   bambu: {
     music: 'music_floresta',
@@ -41,6 +49,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     autoFromLevel: 20,
     autoExitVia: 'montanha',
     offlineMul: 5 / 6,
+    world: { col: 2, row: 1 },
   },
   // nível 30: Pico da Névoa (nv 25–30), saída norte do Bosque (minLevel 25); santuário = arena do Senhor da Névoa
   pico: {
@@ -49,15 +58,35 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     autoFromLevel: 25,
     autoExitVia: 'bambu',
     offlineMul: 5 / 6,
+    world: { col: 2, row: 0 },
   },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
-  gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true, world: { col: 0, row: 1 } },
   // masmorra: Mosteiro Profanado; salão do Patriarca Profanado no norte
-  mosteiro: { trees: 'city', grassDecor: 0.08, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  mosteiro: {
+    trees: 'city',
+    grassDecor: 0.08,
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 0, row: 2 },
+  },
   // masmorra: Covil dos Bandidos; terreiro do Rei dos Bandidos no norte
-  covil: { trees: 'forest', grassDecor: 0.09, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  covil: {
+    trees: 'forest',
+    grassDecor: 0.09,
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 0, row: 3 },
+  },
   // Trial: arena única; o chefe escolhido no menu nasce no centro da arena (World.enterTrial)
-  trial: { trees: 'city', grassDecor: 0.04, arena: { x: 16, y: 9, r: 5.5 }, dungeon: true, trial: true },
+  trial: {
+    trees: 'city',
+    grassDecor: 0.04,
+    arena: { x: 16, y: 9, r: 5.5 },
+    dungeon: true,
+    trial: true,
+    world: { col: 1, row: 3 },
+  },
 };
 
 /** Mapas carregados no boot (public/maps/<id>.json). */

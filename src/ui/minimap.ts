@@ -5,10 +5,14 @@ import type { World } from '../core/world';
 import { closeX } from './labels';
 import { uiScale } from './uiScale';
 import { byId } from './dom';
+import { renderPanel } from './panelRender';
+import { MAPS_CONFIG } from '../core/mapsConfig';
+import { mapLevels, portalSide, worldLinks, worldRoute, type WorldLink } from '../core/worldRoutes';
 
 // Minimapa (melhoria aprovada em 15/11/2026): canto superior direito, mapa isométrico em losango.
 // Monstros = pontinhos minúsculos; chefe destacado; NPCs, portais e o personagem.
-// Mapa grande: tecla M ou toque/clique no minimapa.
+// Mapa grande: tecla M ou toque/clique no minimapa. Aba Mundo (mapa-múndi): todos os mapas ligados pelos portais;
+// tocar num mapa traça a rota (src/core/worldRoutes.ts), lista os portais na ordem e destaca o próximo no minimapa.
 
 const TILE_COLOR: Record<string, string> = {
   grass: '#4b7f3b',
@@ -22,7 +26,14 @@ const TILE_COLOR: Record<string, string> = {
   snow: '#dfe6ee',
   pine: '#2e5446',
 };
-const COLOR = { player: '#ffffff', monster: '#ff5a4a', boss: '#ff9a1f', npc: '#ffd23f', portal: '#c08cff' };
+const COLOR = {
+  player: '#ffffff',
+  monster: '#ff5a4a',
+  boss: '#ff9a1f',
+  npc: '#ffd23f',
+  portal: '#c08cff',
+  route: '#ffe066',
+};
 const REDRAW_MS = 150;
 
 /** Desenha o mapa (fundo, guardado) e os pontos num canvas, em projeção isométrica. */
@@ -59,7 +70,8 @@ class MapPainter {
     return { dpr, s, at: (x: number, y: number) => ({ x: ox + (x - y) * s, y: oy + ((x + y) * s) / 2 }) };
   }
 
-  draw(w: World, big: boolean) {
+  /** `next` = portal da rota escolhida no mapa-múndi (anel dourado piscando). */
+  draw(w: World, big: boolean, next?: WorldLink | null) {
     const map = w.map,
       lay = this.layout(map),
       ctx = this.canvas.getContext('2d')!;
@@ -100,6 +112,16 @@ class MapPainter {
       ctx.strokeStyle = '#fff';
       ctx.stroke();
       if (big) this.label(ctx, c.x, c.y - r - 3 * d, tn(o.name), COLOR.portal, d);
+    }
+    if (next && next.from === map.id) {
+      const o = next.portal,
+        c = lay.at(o.x + o.w / 2, o.y + o.h / 2),
+        pulse = 0.5 + 0.5 * Math.sin(performance.now() / 180);
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, (6 + 3 * pulse) * d, 0, Math.PI * 2);
+      ctx.lineWidth = Math.max(1.5, d * 1.4);
+      ctx.strokeStyle = COLOR.route;
+      ctx.stroke();
     }
     for (const n of w.npcs) {
       dot(n.x, n.y, 2, COLOR.npc, '#000');
@@ -155,32 +177,73 @@ class MapPainter {
   }
 }
 
+const SIDE = (): string[] => [
+  L('↑ no alto', '↑ top'),
+  L('↗ no alto, à direita', '↗ top right'),
+  L('→ à direita', '→ right'),
+  L('↘ embaixo, à direita', '↘ bottom right'),
+  L('↓ embaixo', '↓ bottom'),
+  L('↙ embaixo, à esquerda', '↙ bottom left'),
+  L('← à esquerda', '← left'),
+  L('↖ no alto, à esquerda', '↖ top left'),
+];
+// grade do mapa-múndi (SVG): tamanho de cada célula e do cartão de cada mapa
+const CELL_W = 200,
+  CELL_H = 92,
+  NODE_W = 176,
+  NODE_H = 58;
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 export class Minimap {
   private small: MapPainter;
   private big: MapPainter;
   private last = 0;
+  private tab: 'here' | 'world' = 'here';
+  /** destino escolhido no mapa-múndi (some ao chegar) */
+  private dest: string | null = null;
+  private links: WorldLink[];
+  private shownMap = '';
 
   constructor(private world: World) {
+    this.links = worldLinks(world.maps);
     const box = byId('minimap');
     box.setAttribute('aria-label', L('Minimapa — toque para abrir o mapa (M)', 'Minimap — tap to open the map (M)'));
     box.title = L('Mapa (M)', 'Map (M)');
     this.small = new MapPainter(byId('minimap-canvas') as HTMLCanvasElement);
     const panel = byId('bigmap');
-    panel.innerHTML = `<div class="card bigmap-card"><div class="bigmap-head"><h2 id="bigmap-title"></h2>${closeX('data-close')}</div>
+    panel.innerHTML = `<div class="card bigmap-card"><div class="bigmap-head"><h2 id="bigmap-title"></h2>
+        <div class="tabs bigmap-tabs"><button data-tab="here">${L('Este mapa', 'This map')}</button><button data-tab="world">${L('Mundo', 'World')}</button></div>
+        ${closeX('data-close')}</div>
       <canvas id="bigmap-canvas"></canvas>
-      <div class="bigmap-legend">
+      <div id="bigmap-world"></div>
+      <div class="bigmap-legend" id="bigmap-legend">
         <span><i style="background:${COLOR.player}"></i>${L('Você', 'You')}</span>
         <span><i style="background:${COLOR.monster}"></i>${L('Monstros', 'Monsters')}</span>
         <span><i style="background:${COLOR.boss}"></i>${L('Chefe', 'Boss')}</span>
         <span><i style="background:${COLOR.npc}"></i>NPC</span>
         <span><i class="dia" style="background:${COLOR.portal}"></i>${L('Portal', 'Portal')}</span>
-      </div></div>`;
+      </div>
+      <div id="bigmap-route"></div></div>`;
     this.big = new MapPainter(byId('bigmap-canvas') as HTMLCanvasElement);
     box.addEventListener('focus', () => box.blur()); // senão Espaço "clicaria" no minimapa em vez de atacar
     box.addEventListener('click', () => this.toggle(true));
     panel.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
-      if (t === panel || t.closest('[data-close]')) this.toggle(false); // fora do cartão ou no X
+      if (t === panel || t.closest('[data-close]')) return this.toggle(false); // fora do cartão ou no X
+      const tab = t.closest<HTMLElement>('[data-tab]')?.dataset.tab;
+      if (tab === 'here' || tab === 'world') {
+        this.tab = tab;
+        return this.refresh();
+      }
+      if (t.closest('[data-clear]')) {
+        this.dest = null;
+        return this.refresh();
+      }
+      const to = t.closest<Element>('[data-map]')?.getAttribute('data-map');
+      if (to) {
+        this.dest = to === this.world.mapId || to === this.dest ? null : to;
+        this.refresh();
+      }
     });
   }
 
@@ -191,20 +254,163 @@ export class Minimap {
   toggle(open?: boolean) {
     const show = open ?? !this.open;
     byId('bigmap').classList.toggle('hidden', !show);
-    if (show) {
-      byId('bigmap-title').textContent = this.world.map.name;
-      this.big.draw(this.world, true);
+    if (show) this.refresh();
+  }
+
+  /** Rota até o destino escolhido, a partir do mapa atual (null = sem destino ou sem caminho). */
+  private route(): WorldLink[] | null {
+    if (!this.dest) return null;
+    return worldRoute(this.links, this.world.mapId, this.dest);
+  }
+
+  private refresh() {
+    this.shownMap = this.world.mapId;
+    const world = this.tab === 'world';
+    byId('bigmap-title').textContent = world ? L('Mapa-múndi', 'World map') : this.world.map.name;
+    byId('bigmap')
+      .querySelectorAll<HTMLElement>('[data-tab]')
+      .forEach((b) => {
+        b.classList.toggle('on', b.dataset.tab === this.tab);
+      });
+    byId('bigmap-canvas').classList.toggle('hidden', world);
+    byId('bigmap-legend').classList.toggle('hidden', world);
+    byId('bigmap-world').classList.toggle('hidden', !world);
+    const route = this.route();
+    if (world) renderPanel(byId('bigmap-world'), this.worldSvg(route));
+    else this.big.draw(this.world, true, route?.[0]);
+    renderPanel(byId('bigmap-route'), this.routeHtml(route));
+  }
+
+  /** Mapa-múndi: um cartão por mapa (posição em MAPS_CONFIG.world) e as ligações entre eles. */
+  private worldSvg(route: WorldLink[] | null): string {
+    const maps = this.world.maps,
+      lvl = this.world.player.level;
+    const ids = Object.keys(maps).filter((id) => MAPS_CONFIG[id]?.world);
+    const pos = (id: string) => {
+      const g = MAPS_CONFIG[id].world!;
+      return { x: g.col * CELL_W + CELL_W / 2, y: g.row * CELL_H + CELL_H / 2 };
+    };
+    const cols = Math.max(...ids.map((id) => MAPS_CONFIG[id].world!.col)) + 1,
+      rows = Math.max(...ids.map((id) => MAPS_CONFIG[id].world!.row)) + 1;
+    const onRoute = new Set((route ?? []).map((l) => `${l.from}>${l.to}`));
+    // uma linha por par de mapas (ida e volta)
+    const pairs = new Map<string, { a: string; b: string; menu?: string; hot: boolean }>();
+    for (const l of this.links) {
+      if (!MAPS_CONFIG[l.from]?.world || !MAPS_CONFIG[l.to]?.world) continue;
+      const k = [l.from, l.to].sort().join('|');
+      const p = pairs.get(k) ?? { a: l.from, b: l.to, menu: l.menu, hot: false };
+      p.menu = p.menu ?? l.menu;
+      p.hot ||= onRoute.has(`${l.from}>${l.to}`);
+      pairs.set(k, p);
     }
+    let edges = '';
+    for (const p of pairs.values()) {
+      const a = pos(p.a),
+        b = pos(p.b);
+      edges += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="wm-edge${p.menu ? ' menu' : ''}${p.hot ? ' hot' : ''}"/>`;
+    }
+    let nodes = '';
+    for (const id of ids) {
+      const m = maps[id],
+        c = pos(id),
+        here = id === this.world.mapId,
+        dest = id === this.dest;
+      // nível para chegar: o maior minLevel do caminho a partir da vila
+      const path = worldRoute(this.links, 'cidade', id) ?? [];
+      const need = Math.max(0, ...path.map((l) => l.minLevel));
+      const lv = mapLevels(m);
+      const sub = [
+        lv ? `${L('Nv', 'Lv')} ${lv[0]}–${lv[1]}` : MAPS_CONFIG[id].town ? L('cidade segura', 'safe town') : '',
+        need > lvl ? `🔒 ${need}` : '',
+      ]
+        .filter(Boolean)
+        .join(' · ');
+      const name = m.name;
+      // nomes longos em duas linhas
+      let l1 = name,
+        l2 = '';
+      if (name.length > 20) {
+        const mid = name.length / 2;
+        let cut = -1;
+        for (let i = 0; i < name.length; i++)
+          if (name[i] === ' ' && (cut < 0 || Math.abs(i - mid) < Math.abs(cut - mid))) cut = i;
+        if (cut > 0) {
+          l1 = name.slice(0, cut);
+          l2 = name.slice(cut + 1);
+        }
+      }
+      const cls = [
+        'wm-node',
+        here ? 'here' : '',
+        dest ? 'dest' : '',
+        need > lvl ? 'locked' : '',
+        MAPS_CONFIG[id].dungeon ? 'inst' : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      const ty = l2 ? -14 : -6;
+      nodes += `<g class="${cls}" data-map="${id}" transform="translate(${c.x},${c.y})" role="button">
+        <rect x="${-NODE_W / 2}" y="${-NODE_H / 2}" width="${NODE_W}" height="${NODE_H}" rx="9"/>
+        <text y="${ty}" class="wm-name">${esc(l1)}</text>${l2 ? `<text y="${ty + 14}" class="wm-name">${esc(l2)}</text>` : ''}
+        <text y="${l2 ? 20 : 14}" class="wm-sub">${esc(sub)}</text>
+        ${here ? `<text y="${-NODE_H / 2 - 5}" class="wm-here">● ${L('você está aqui', 'you are here')}</text>` : ''}
+      </g>`;
+    }
+    return `<svg viewBox="0 -12 ${cols * CELL_W} ${rows * CELL_H + 12}" class="wm-svg">${edges}${nodes}</svg>`;
+  }
+
+  /** Lista de passos da rota (ou a instrução de tocar num mapa). */
+  private routeHtml(route: WorldLink[] | null): string {
+    if (!this.dest)
+      return `<p class="wm-hint">${L('Toque num mapa da aba Mundo para ver o caminho até ele.', 'Tap a map on the World tab to see the way there.')}</p>`;
+    const maps = this.world.maps,
+      lvl = this.world.player.level,
+      to = maps[this.dest]?.name ?? this.dest;
+    const head = `<div class="wm-route-head"><b>${L('Rota até', 'Route to')} ${esc(to)}</b><button data-clear>${L('Limpar', 'Clear')}</button></div>`;
+    if (!route) return `${head}<p class="wm-hint">${L('Não há caminho daqui.', 'No way from here.')}</p>`;
+    const sides = SIDE();
+    const steps = route
+      .map((l, i) => {
+        const m = maps[l.from],
+          side = sides[portalSide(m, l.portal)],
+          pn = esc(tn(l.portal.name)),
+          dn = esc(maps[l.to].name);
+        const how =
+          l.menu === 'masmorras'
+            ? L(
+                `entre no <b>${pn}</b> (${side}) e escolha <b>${dn}</b>`,
+                `enter the <b>${pn}</b> (${side}) and pick <b>${dn}</b>`,
+              ) + (l.cost ? ` · ${l.cost} ${L('ouro', 'gold')}` : '')
+            : l.menu === 'trial'
+              ? L(
+                  `entre no portal <b>${pn}</b> (${side}) e escolha o chefe`,
+                  `enter the <b>${pn}</b> portal (${side}) and pick the boss`,
+                )
+              : L(`saia pelo portal <b>${pn}</b> (${side}) → ${dn}`, `take the <b>${pn}</b> portal (${side}) → ${dn}`);
+        const lock = l.minLevel > lvl ? ` <span class="wm-lock">🔒 ${L('nível', 'level')} ${l.minLevel}</span>` : '';
+        return `<li class="${i === 0 ? 'now' : ''}"><span class="wm-from">${esc(m.name)}:</span> ${how}${lock}</li>`;
+      })
+      .join('');
+    return `${head}<ol class="wm-steps">${steps}</ol>${
+      route.length
+        ? `<p class="wm-hint">${L('O próximo portal pisca em dourado no minimapa.', 'The next portal blinks gold on the minimap.')}</p>`
+        : ''
+    }`;
   }
 
   update() {
+    if (this.dest === this.world.mapId) this.dest = null; // chegou
+    if (this.open && this.shownMap !== this.world.mapId) this.refresh(); // atravessou um portal com o mapa aberto
     const now = performance.now();
     if (now - this.last < REDRAW_MS) return;
     this.last = now;
-    this.small.draw(this.world, false);
+    const next = this.route()?.[0];
+    this.small.draw(this.world, false, next);
     if (this.open) {
-      byId('bigmap-title').textContent = this.world.map.name;
-      this.big.draw(this.world, true);
+      if (this.tab === 'here') {
+        byId('bigmap-title').textContent = this.world.map.name;
+        this.big.draw(this.world, true, next);
+      }
     }
   }
 }
