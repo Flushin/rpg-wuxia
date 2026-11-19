@@ -133,7 +133,7 @@ export class AutoPanel {
       <small class="muted">${L('Se faltar ouro, compra o que der. Sem ouro, continua caçando sem poção.', 'If gold runs short, buys what it can. With no gold, keeps hunting without potions.')}</small>
       <h3>${L('Mochila cheia', 'Bag full')}</h3>
       <label class="opt"><input type="checkbox" id="auto-sell-inc" ${c.sellIncomum ? 'checked' : ''}/> ${L('Vender também itens Incomuns', 'Also sell Uncommon items')}</label>
-      <small class="muted">${L(`Itens Comuns são vendidos sozinhos quando a mochila enche. Raros (e Incomuns, se a opção estiver desligada) ficam no chão por ${GROUND_SECONDS} s.`, `Common items are sold automatically when the bag fills up. Rare items (and Uncommon, if the option is off) stay on the ground for ${GROUND_SECONDS} s.`)}</small>
+      <small class="muted">${L(`Quando a mochila de equipamentos enche, o auto volta à vila, vende os Comuns no vendedor e retorna. Raros (e Incomuns, se a opção estiver desligada) não são vendidos; o que não couber fica no chão por ${GROUND_SECONDS} s.`, `When the equipment bag fills up, the auto returns to the village, sells Common items to the vendor and comes back. Rare items (and Uncommon, if the option is off) are not sold; what doesn't fit stays on the ground for ${GROUND_SECONDS} s.`)}</small>
       <div class="how">${L(
         `<b>Ganho offline.</b> Se você fechar o jogo com o Auto ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora, no ritmo medido nos últimos ~${RATE_WINDOW_MIN} min de auto-combate (precisa de pelo menos ${RATE_MIN_SEC / 60} min de dados).<br>
       Rendimento: ${tiersPt}.<br>

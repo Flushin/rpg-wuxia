@@ -117,16 +117,8 @@ export function removeFromBag(w: World, i: number, qty = 1) {
 
 export function collect(w: World, item: ItemInstance, x: number, y: number) {
   w.auto.recordDrop(item);
-  let placed = addItem(w, item);
-  if (!placed && w.auto.sellingActive && bagTabOf(item.baseId) === 'equip') {
-    // auto-combate: aba de equipamentos cheia vende o que a regra permite (as outras abas o auto não olha)
-    w.auto.makeRoom();
-    placed = addItem(w, item);
-    if (!placed && w.auto.sellable(item)) {
-      w.sellValueNow(item);
-      return;
-    }
-  }
+  // auto-combate com a aba de equipamentos cheia: o drop fica no chão e o auto vai vender na vila (core/auto.ts)
+  const placed = addItem(w, item);
   if (placed) {
     w.emit({
       type: 'itemPickup',

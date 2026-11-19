@@ -3,6 +3,10 @@
     {
       "texto": "Masmorras: o novo Portal das Masmorras, na saída oeste da vila, leva ao Desfiladeiro do Gelo Eterno (nível 10+). Entrada paga, monstros que não renascem, mais chance de equipamento e o Yeti Ancestral no fim. Sem Auto lá dentro.",
       "wiki": "mapa/gruta"
+    },
+    {
+      "texto": "Auto: com a mochila de equipamentos cheia, volta à vila para vender no vendedor e retorna à caça. O Véu de Névoa e a Pele de Ferro agora saem assim que você leva dano ou é cercado.",
+      "wiki": "mecanicas/auto"
     }
   ],
   "versoes": [

@@ -742,24 +742,39 @@ console.log('\n== monstro perto do portal ==');
   ok(run(w, 40, () => n.dead) && w.mapId === 'floresta', 'auto mata o monstro colado no portal sem atravessar');
 }
 
-console.log('\n== mochila cheia: auto-vende ==');
+console.log('\n== mochila cheia: volta à vila para vender ==');
 {
-  const w = mk('lamina', 5);
-  addPotions(w, 3, 3);
-  const fill = (r: Rarity) => {
+  const fill = (w: World, r: Rarity) => {
     w.bag = Array(BAG_SIZE).fill(null);
     for (let i = 0; i < BAG_TAB_SIZE; i++) w.bag[i] = makeEquipment('espadas_ferro', r, null, new Rng(i), 1);
+    addPotions(w, 99, 99); // não volta à vila por falta de poção
   };
-  const drop = (r: Rarity) =>
+  const drop = (w: World, r: Rarity) =>
     (w as any).collect(makeEquipment('colar_jade', r, null, new Rng(9), 1), w.player.x, w.player.y); // eslint-disable-line
-  fill('comum');
-  w.auto.toggle();
-  const g0 = w.gold;
-  drop('comum');
-  ok(
-    w.freeSlots() >= 28 && w.gold > g0 && w.ground.length === 0 && w.bag.some((b) => b?.baseId === 'colar_jade'),
-    'Comuns vendidos, item novo entra na mochila',
-  );
+  const trip = (r: Rarity, sellInc: boolean) => {
+    const w = mk('lamina', 5);
+    spawnAll(w);
+    fill(w, r);
+    w.auto.cfg.sellIncomum = sellInc;
+    w.auto.toggle();
+    const g0 = w.gold;
+    drop(w, r);
+    const ground = w.ground.length;
+    const town = run(w, 60, () => w.mapId === 'cidade');
+    const back = town && run(w, 120, () => w.mapId === 'floresta');
+    return { w, g0, ground, town, back };
+  };
+  const a = trip('comum', false);
+  ok(a.ground === 1, 'aba cheia: drop fica no chão (sem venda instantânea)');
+  ok(a.town && a.back, 'Comuns: foi à vila e voltou a caçar');
+  ok(a.w.freeSlots() === BAG_TAB_SIZE && a.w.gold > a.g0, `Comuns vendidos no vendedor (+${a.w.gold - a.g0} ouro)`);
+  ok(a.w.auto.state === 'on', 'auto continua ligado');
+  const b = trip('incomum', false);
+  ok(!b.town && b.w.freeSlots() === 0, 'Incomuns com a opção desligada: não vai à vila, continua caçando');
+  const c = trip('incomum', true);
+  ok(c.town && c.back && c.w.freeSlots() === BAG_TAB_SIZE, 'com a opção ligada: vai à vila vender os Incomuns');
+  const d = trip('raro', true);
+  ok(!d.town && d.w.freeSlots() === 0 && d.w.auto.state === 'on', 'Raros nunca são vendidos: continua caçando');
   {
     // aba de consumíveis cheia: o auto não olha e não vende equipamento por causa dela
     const wp = mk('lamina', 5);
@@ -773,22 +788,6 @@ console.log('\n== mochila cheia: auto-vende ==');
       'aba de consumíveis cheia: poção fica no chão e nenhum equipamento é vendido',
     );
   }
-  fill('incomum');
-  drop('incomum');
-  ok(w.ground.length === 1 && w.freeSlots() === 0, 'Incomum não é vendido por padrão: fica no chão');
-  w.ground = [];
-  w.auto.cfg.sellIncomum = true;
-  drop('incomum');
-  ok(w.ground.length === 0 && w.freeSlots() >= 28, 'com a opção ligada vende Incomuns');
-  fill('raro');
-  w.auto.cfg.sellIncomum = true;
-  drop('raro');
-  ok(w.ground.length === 1, 'Raro nunca é vendido: fica no chão');
-  w.auto.toggle();
-  w.ground = [];
-  fill('comum');
-  drop('comum');
-  ok(w.ground.length === 1, 'auto desligado: comportamento antigo (chão)');
 }
 
 console.log('\n== morte ==');
