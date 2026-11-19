@@ -15,6 +15,7 @@
 | [`03-lacunas.md`](03-lacunas.md) | O que falta: essencial, importante, diferencial ou adiar, com complexidade e riscos |
 | [`04-marcos.md`](04-marcos.md) | M0 → M5+, com o critério de "pronto", métricas e checklist marcado com quem faz cada tarefa |
 | [`05-guia-lancamento.md`](05-guia-lancamento.md) | Guia do primeiro lançamento: glossário, a jornada na Play Store em ordem, custos e armadilhas |
+| [`06-backend-prototipo.md`](06-backend-prototipo.md) | Relatório do protótipo do backend (M0): Supabase × Firebase, testes e recomendação |
 
 ## Onde o jogo está
 

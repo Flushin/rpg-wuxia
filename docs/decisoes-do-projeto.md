@@ -53,6 +53,26 @@
 
 ## Decididas
 
+### M0 · Fundação técnica (19/11/2026, feito pela IA; nada muda no jogo)
+Itens 🤖 do M0 de `docs/roadmap/04-marcos.md`. O `sim:balance` deu **saída idêntica** antes e depois.
+- **Relógio injetável (E1a):** `src/core/clock.ts`; o core só usa horário real por `world.clock.now()`. `World.fromSave`
+  recebe o relógio (o do servidor, no servidor) e sorteia a partir do instante da carga.
+- **Idioma por parâmetro (E1b):** o core não lê o navegador (`initLang`); detectar e trocar o idioma ficou em `src/ui/lang.ts`.
+- **Core headless (E1c):** `npm run build:headless` → `dist-headless/mistpeak-core.mjs`; o `check:headless` (na CI) confere
+  que o resultado em Node é igual ao do Chromium (gabarito em `tools/fixtures/headless-golden.json`).
+- **Registro econômico (E1d):** XP, ouro e itens ganhos/gastos anotados por fonte no `World` (`src/core/world/ledger.ts`),
+  só na memória (vai junto com o envio à nuvem no M1). Beber poção e o kit inicial não entram.
+- **Limites de plausibilidade (E4a):** `src/data/plausibility.json`, gerado por `npm run sim:plausibility`. Folga
+  **proposta** de 2,5× no XP/h e no ouro/h e +2 no nível de item; ⚠ confirmar com o Lucas antes do M1 (E4c), quando a
+  folga passa a marcar contas.
+- **uid de itens:** `<aparelho>-<ms>-<contador>-<aleatório>`, com o relógio injetável e um Rng próprio (não mexe nos drops).
+  O id do aparelho (8 letras/números) é sorteado na primeira abertura e guardado nas preferências.
+- **Save local protegido:** o jogo pede `navigator.storage.persist()` na web ao abrir (sem pergunta ao jogador).
+- **Testes:** `tools/*.ts` passam pelo `tsc`; novos `check:m0`, `check:headless` e `check:backend` no `npm test`.
+- **Regras para IA:** `CLAUDE.md` na raiz.
+- **Protótipo do backend:** código em `backend/` (Supabase e Firebase), relatório em `docs/roadmap/06-backend-prototipo.md`
+  com a recomendação (Supabase). ⏳ Falta o Lucas criar a conta e escolher.
+
 ### Roadmap online (18/11/2026)
 Respondido pelo Lucas em 18/11/2026, ao pedir o roadmap em `docs/roadmap/` (o roadmap é uma proposta; cada item de
 jogabilidade continua passando por pergunta antes de ser feito).

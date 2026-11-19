@@ -71,18 +71,19 @@ o M3 (decidido pelo Lucas em 18/11/2026: primeiro criar mais e jogar mais offlin
 **Esforço:** 2 a 3 semanas. **Tempo do Lucas:** ~5 h/semana (testar e decidir), mais ~1 h para criar a conta no Supabase.
 
 **Código e arquitetura:**
-- [ ] 🤖 **I20** `CLAUDE.md` com as regras do projeto (decisões, múltipla escolha, testes, como rodar), para qualquer sessão de IA começar sabendo o contexto
-- [ ] 🤖 **E1a** Relógio injetável (`Clock`) no core: trocar os 12 `Date.now()` (offline, mercador, renascimentos, saves, `newUid`) por `world.clock.now()`
-- [ ] 🤖 **E1b** `i18n` sem `window` no core (o idioma entra por parâmetro) para o core rodar em Node
-- [ ] 🤖 **E1c** Bundle "headless" do core (esbuild, plataforma Node) e teste `check:headless` na CI
-- [ ] 🤖 **E1d** Registro de eventos econômicos no `World` (XP, ouro, drops, forja, compras), para auditoria no servidor
-- [ ] 🤖 **E4a** Gerar `plausibility.json` a partir do `sim:balance` (XP/h, ouro/h e nível de item máximos por nível e mapa, com folga)
-- [ ] 🤖 `uid` de itens à prova de servidor. Hoje o `newUid()` (`src/core/items.ts:149`) usa `Date.now()`, um contador e
+- [x] 🤖 **I20** `CLAUDE.md` com as regras do projeto (decisões, múltipla escolha, testes, como rodar), para qualquer sessão de IA começar sabendo o contexto
+- [x] 🤖 **E1a** Relógio injetável (`Clock`) no core: trocar os 12 `Date.now()` (offline, mercador, renascimentos, saves, `newUid`) por `world.clock.now()`
+- [x] 🤖 **E1b** `i18n` sem `window` no core (o idioma entra por parâmetro) para o core rodar em Node
+- [x] 🤖 **E1c** Bundle "headless" do core (esbuild, plataforma Node) e teste `check:headless` na CI
+- [x] 🤖 **E1d** Registro de eventos econômicos no `World` (XP, ouro, drops, forja, compras), para auditoria no servidor
+- [x] 🤖 **E4a** Gerar `plausibility.json` a partir do `sim:balance` (XP/h, ouro/h e nível de item máximos por nível e mapa, com folga)
+- [x] 🤖 `uid` de itens à prova de servidor. Hoje o `newUid()` (`src/core/items.ts:149`) usa `Date.now()`, um contador e
       `Math.random()` fora do RNG com semente; passar para o `Clock` e o RNG, com prefixo por aparelho ou conta.
-- [ ] 🤖 `navigator.storage.persist()` na web (protege o save local até a nuvem existir)
-- [ ] 🤖 Incluir `tools/*.ts` num `tsconfig` próprio para os testes passarem pelo `tsc`
+- [x] 🤖 `navigator.storage.persist()` na web (protege o save local até a nuvem existir)
+- [x] 🤖 Incluir `tools/*.ts` num `tsconfig` próprio para os testes passarem pelo `tsc`
 - [ ] 🤝 Criar a conta no Supabase (grátis), com a IA guiando, e guardar as chaves no lugar certo (nunca no repositório)
 - [ ] 🤖 Protótipo do backend: login convidado, salvar/ler o save e uma função TS importando o core, em Supabase e, para comparar, Firebase
+      (código e testes locais feitos em 19/11/2026, relatório em `06-backend-prototipo.md`; falta o teste ponta a ponta com a conta)
 - [ ] 👤 Escolher o backend com base no relatório do protótipo (múltipla escolha); a IA registra a decisão e o modelo de dados
 
 **Métricas de validação:**

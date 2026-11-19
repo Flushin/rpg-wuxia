@@ -8,3 +8,9 @@ trailer-rec.log
 android
 ios
 chaos-reports
+# protótipo do backend: gerados por npm run build:backend e dependências locais
+backend/supabase/functions/_shared/mistpeak-server.*
+backend/firebase/functions/lib
+backend/firebase/functions/node_modules
+.env
+.env.local

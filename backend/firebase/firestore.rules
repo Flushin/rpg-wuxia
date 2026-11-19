@@ -1,0 +1,15 @@
+rules_version = '2';
+// Protótipo do save na nuvem (roadmap M0). Mesma regra do Supabase: o aparelho só LÊ os próprios personagens;
+// quem grava é a função saveSync (Admin SDK, ignora estas regras), com o relógio do servidor.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/characters/{slot} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+      match /history/{version} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow write: if false;
+      }
+    }
+  }
+}
