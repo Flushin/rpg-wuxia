@@ -26,7 +26,7 @@ import {
 import { statsAt } from './monsters';
 import {
   TRIAL_BOSSES,
-  TRIAL_EQUIP_REQ_LEVEL,
+  trialEquipReqLevel,
   TRIAL_MIN_LEVEL,
   TRIAL_STATS,
   TRIAL_TIERS,
@@ -66,11 +66,14 @@ const levelFactor = (reqLevel: number) => 1 + reqLevel / 5;
 const fGold = (v: number, reqLevel: number) => Math.round(v * levelFactor(reqLevel) * bal('forja.ouro'));
 type Mats = Record<string, number>;
 const clean = (m: Mats): Mats => Object.fromEntries(Object.entries(m).filter(([, v]) => v > 0));
+/** Material raro: Cristal de Gelo nos itens nv 1–15, Jade da Névoa nos nv 20+ (JADE_FROM_LEVEL em forge.ts). */
+const JADE_FROM_LEVEL = 20;
+const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? 'jade_nevoa' : 'cristal_gelo');
 export function upgradeCost(reqLevel: number, plus: number) {
   return {
     mats: clean({
       minerio_ferro: 2 + 2 * plus,
-      cristal_gelo: plus >= 4 ? plus - 3 : 0,
+      [rareMat(reqLevel)]: plus >= 4 ? plus - 3 : 0,
       essencia_qi: plus >= 7 ? 1 : 0,
     }),
     gold: fGold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * plus, reqLevel),
@@ -79,20 +82,20 @@ export function upgradeCost(reqLevel: number, plus: number) {
 }
 export const rarityCost = (reqLevel: number, from: string) =>
   from === 'comum'
-    ? { mats: { minerio_ferro: 12, cristal_gelo: 1 } as Mats, gold: fGold(FORGE.rarityGold.incomum, reqLevel) }
+    ? { mats: { minerio_ferro: 12, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rarityGold.incomum, reqLevel) }
     : {
-        mats: { minerio_ferro: 20, cristal_gelo: 4, essencia_qi: 1 } as Mats,
+        mats: { minerio_ferro: 20, [rareMat(reqLevel)]: 4, essencia_qi: 1 } as Mats,
         gold: fGold(FORGE.rarityGold.raro, reqLevel),
       };
 export const rerollCost = (reqLevel: number, rarity: string) =>
   rarity === 'incomum'
-    ? { mats: { minerio_ferro: 6, cristal_gelo: 1 } as Mats, gold: fGold(FORGE.rerollGold.incomum, reqLevel) }
-    : { mats: { minerio_ferro: 10, cristal_gelo: 2 } as Mats, gold: fGold(FORGE.rerollGold.raro, reqLevel) };
+    ? { mats: { minerio_ferro: 6, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rerollGold.incomum, reqLevel) }
+    : { mats: { minerio_ferro: 10, [rareMat(reqLevel)]: 2 } as Mats, gold: fGold(FORGE.rerollGold.raro, reqLevel) };
 export const salvageYield = (reqLevel: number, rarity: string, plus: number): Mats =>
   clean({
     minerio_ferro:
       1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : rarity === 'raro' ? 3 : 0) + Math.floor(plus / 2),
-    cristal_gelo: (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0),
+    [rareMat(reqLevel)]: (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0),
   });
 /** OFFLINE_TIERS e OFFLINE_GOLD_CAP_HOURS em src/core/offline.ts */
 export const OFFLINE_TIERS = [
@@ -237,7 +240,8 @@ function forja(): string {
     .join('');
   return `<section class="panel"><h2>Melhorar (+1 a +10)</h2>
       <p>Cada + soma <b>${pc(UPGRADE_STEP)}</b> aos atributos base do item (não aos bônus aleatórios). Materiais e ouro são cobrados antes;
-      se <b>falhar</b>, o item fica como estava (não quebra nem perde +).</p>
+      se <b>falhar</b>, o item fica como estava (não quebra nem perde +). Os materiais da tabela são os de itens até o nível 15; em itens de
+      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade), aqui e em subir raridade, trocar bônus e desmontar.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Melhoria</th><th>Chance</th><th>Materiais</th>${goldHead}</tr></thead><tbody>${up}</tbody></table></div></section>
     <section class="panel"><h2>Subir raridade e trocar bônus</h2>
       <p><b>Subir raridade</b> (Comum → Incomum → Raro) dá um bônus aleatório novo e mantém os que o item já tem. <b>Trocar bônus</b> sorteia de novo
@@ -245,7 +249,7 @@ function forja(): string {
       <div class="scroll"><table class="tbl"><thead><tr><th></th><th>Materiais</th>${goldHead}</tr></thead><tbody>
       ${rr('Comum → Incomum', (lv) => rarityCost(lv, 'comum'))}${rr('Incomum → Raro', (lv) => rarityCost(lv, 'incomum'))}
       ${rr('Trocar bônus (Incomum)', (lv) => rerollCost(lv, 'incomum'))}${rr('Trocar bônus (Raro)', (lv) => rerollCost(lv, 'raro'))}</tbody></table></div></section>
-    <section class="panel"><h2>Desmontar</h2><p>Transforma um equipamento em materiais. Itens com + devolvem um pouco mais (+1 minério a cada 2 +, +1 cristal a partir do +6).</p>
+    <section class="panel"><h2>Desmontar</h2><p>Transforma um equipamento em materiais. Itens com + devolvem um pouco mais (+1 minério a cada 2 +, +1 cristal ou jade a partir do +6).</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Raridade</th>${lvs.map((lv) => `<th>Item nv ${lv}</th>`).join('')}</tr></thead><tbody>${sal}</tbody></table></div></section>
     <section class="panel"><h2>Comprar e vender</h2><ul>
       <li>O <a href="#/npc/vendedor">Vendedor de Poções</a> compra qualquer item por <b>${pc(SELL_RATIO)}</b> do valor de referência (vezes o multiplicador da raridade).</li>
@@ -319,7 +323,7 @@ function trial(): string {
       <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th></tr></thead><tbody>${tiers}</tbody></table></section>
     <section class="panel"><h2>Recompensa</h2><ul>
       <li>Ouro da tabela acima e ${trialXp(1)} de XP no nível 1 (+${trialXp(2) - trialXp(1)} por nível).</li>
-      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${TRIAL_EQUIP_REQ_LEVEL} (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (21–30): mais fortes que os nível ${TRIAL_EQUIP_REQ_LEVEL} comuns.</li>
+      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 6–10 (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (21–30): mais fortes que os mesmos itens caídos no mundo.</li>
       <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
       <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1; a cada nível o bônus cresce 5%: 12,60%, 13,23% … ${pct2(trialDropPct(TRIAL_TIERS))}%). O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
 }

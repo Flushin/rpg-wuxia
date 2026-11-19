@@ -23,4 +23,11 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
   Névoa** (substitui o Cristal de Gelo na forja de itens nv 20+; o Mercador vende).
 - **Offline nos mapas novos:** **50% / 33% / 17%** (5/6 da regra atual); o offline 20→30 fica ~3,6×, fora do critério.
 - **Trial:** níveis 1–5 soltam bases nv 20 e 6–10 nv 25; XP do Trial fica como está. **Masmorras:** sem mudança.
+- **Feito na etapa 3:** bases nv 20 (`colar_bambu`, `veste_bambu`, `espadas_folha_bambu`, `leque_bambu_negro`,
+  `bastao_raiz_bambu`, `agulhas_espinho`, `chapeu_bambu`, `calca_cacador`, `botas_sombra`; ~1,35× o nv 15) e nv 25
+  (`colar_nevoa`, `manto_nevoa`, `espadas_rasga_nevoa`, `leque_grou`, `bastao_pico`, `agulhas_jade_celeste`, `coroa_jade`,
+  `calca_nuvens`, `botas_nebulosas`; ~1,7×). `jade_nevoa` (raro, valor 200, Mercador 750) substitui o cristal em todas
+  as receitas de itens nv 20+ (`JADE_FROM_LEVEL` em `forge.ts`), inclusive desmontar. Ouro da forja: ×5 (nv 20), ×6 (nv 25).
+  Trial: `trialEquipReqLevel` (nv 20 nos níveis 1–5, nv 25 nos 6–10). Mercador: estoque nv 20 a partir do nível 20 e nv 25
+  a partir do 25. Drops de jade e do tier novo pelos monstros entram na etapa 4.
 - Fora do escopo: skills ou níveis de skill novos, masmorras/fases do Trial novas, mudar a progressão 1–20.

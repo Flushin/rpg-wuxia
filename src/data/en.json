@@ -291,6 +291,60 @@
       },
       "botas_passo_celeste": {
         "name": "Celestial Step Boots"
+      },
+      "colar_bambu": {
+        "name": "Bamboo Bead Necklace"
+      },
+      "veste_bambu": {
+        "name": "Shadow Bamboo Vest"
+      },
+      "espadas_folha_bambu": {
+        "name": "Bamboo Leaf Twin Swords"
+      },
+      "leque_bambu_negro": {
+        "name": "Black Bamboo Qi Fan"
+      },
+      "bastao_raiz_bambu": {
+        "name": "Bamboo Root Staff"
+      },
+      "agulhas_espinho": {
+        "name": "Shadow Thorn Needles"
+      },
+      "chapeu_bambu": {
+        "name": "Woven Bamboo Hat"
+      },
+      "calca_cacador": {
+        "name": "Shadow Hunter Trousers"
+      },
+      "botas_sombra": {
+        "name": "Silent Shadow Boots"
+      },
+      "colar_nevoa": {
+        "name": "Heart of the Mist Necklace"
+      },
+      "manto_nevoa": {
+        "name": "Celestial Mist Mantle"
+      },
+      "espadas_rasga_nevoa": {
+        "name": "Mist-Rending Twin Swords"
+      },
+      "leque_grou": {
+        "name": "Celestial Crane Qi Fan"
+      },
+      "bastao_pico": {
+        "name": "Eternal Peak Staff"
+      },
+      "agulhas_jade_celeste": {
+        "name": "Celestial Jade Needles"
+      },
+      "coroa_jade": {
+        "name": "Misty Jade Crown"
+      },
+      "calca_nuvens": {
+        "name": "High Cloud Trousers"
+      },
+      "botas_nebulosas": {
+        "name": "Misty Step Boots"
       }
     },
     "potions": {
@@ -319,6 +373,10 @@
       "essencia_qi": {
         "name": "Ancestral Qi Essence",
         "desc": "Special forging material. Only bosses drop it."
+      },
+      "jade_nevoa": {
+        "name": "Mist Jade",
+        "desc": "Rare forging material for level 20+ items. Dropped by Shadow Bamboo Grove and Misty Peak monsters and by salvaging level 20+ items."
       }
     },
     "consumables": {
@@ -708,7 +766,7 @@
     ]
   },
   "novidades": {
-    "proxima": [{"texto": "Max level is now 30: from 21 to 30 each level gives 4 free points (was 3) on top of the sect attributes. Characters at level 20 stay at 20 and start earning XP again. Maps, monsters and equipment for levels 20–30 arrive in the next versions."}],
+    "proxima": [{"texto": "Max level is now 30: from 21 to 30 each level gives 4 free points (was 3) on top of the sect attributes. Characters at level 20 stay at 20 and start earning XP again. Maps and monsters for levels 20–30 arrive in the next versions."}, {"texto": "New equipment: level 20 (Shadow Bamboo) and level 25 (Mist) sets, with all 6 pieces and a weapon for each sect. The rare material Mist Jade replaces the Eternal Ice Crystal when forging level 20+ items, and the Traveling Merchant now sells it. The Trial now gives level 20 items (levels 1–5) and level 25 items (levels 6–10)."}],
     "versoes": [
       {"itens": [{"texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."}]},
       {"itens": [{"texto": "Battery saver on Auto: hunting without touching the screen for a while, the game enters rest mode (black screen with a summary of gains and much less processing), losing nothing from the hunt, material drops included. While Auto is on, the phone no longer turns the screen off by itself. One tap brings it back. Set it in ⚙ Settings (30 s, 1 min, 2 min or off)."}]},

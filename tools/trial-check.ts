@@ -14,7 +14,9 @@ import {
   trialDropPct,
   trialStats,
   trialUnlocked,
+  trialEquipReqLevel,
 } from '../src/core/trial';
+import { BASES } from '../src/core/items';
 import { World } from '../src/core/world';
 import type { Entity, GameEvent, SaveData } from '../src/core/types';
 
@@ -117,6 +119,14 @@ console.log('\n== entrada ==');
   ok(w.gold > gold0, 'ouro da vitória');
   const items = [...w.bag, ...w.ground.map((g) => g.item)].filter((it) => it && it.ilvl === 21);
   ok(items.length - bag0 >= 2 && items.some((it) => it!.rarity === 'raro'), 'Raro garantido + equipamento, nível 21');
+  ok(
+    items.every((it) => BASES[it!.baseId]?.reqLevel === 20),
+    'nível 1 do Trial: bases nv 20',
+  );
+  ok(
+    trialEquipReqLevel(5) === 20 && trialEquipReqLevel(6) === 25 && trialEquipReqLevel(10) === 25,
+    'níveis 6–10: bases nv 25',
+  );
 
   console.log('\n== save e saída ==');
   const s = w.serialize();

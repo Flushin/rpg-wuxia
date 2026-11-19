@@ -768,6 +768,102 @@ def i_pergaminho(im):
     fill(im, mask_ellipse((300, 300, 360, 360)), (200, 40, 40), outline=5)
 
 
+# ---------- nível 30 (etapa 3): conjuntos nv 20 (Bambu Sombrio) e nv 25 (Névoa) e Jade da Névoa ----------
+def colar_contas(im, cord, bead_in, bead_out):
+    fill(im, mask_line([(110, 100), (170, 260), (256, 300), (342, 260), (402, 100)], 10), cord, outline=5)
+    for x, y in ((150, 190), (196, 262), (256, 300), (316, 262), (362, 190)):
+        fill(im, mask_ellipse((x - 26, y - 26, x + 26, y + 26)), bead_in, bead_out, outline=5)
+    fill(im, mask_poly([(232, 320), (280, 320), (296, 450), (216, 450)]), (90, 140, 70), (40, 70, 30))
+
+
+def i_colar_bambu(im):
+    colar_contas(im, (90, 70, 50), (150, 190, 110), (60, 100, 50))
+
+
+def i_veste_bambu(im):
+    robe(im, (40, 70, 52), (120, 170, 100), (24, 34, 28))
+
+
+def i_espadas_folha_bambu(im):
+    for a in (-0.55, 0.55):
+        jian(im, a, blade=(200, 236, 200), guard=(70, 110, 60), hilt=(40, 50, 36), glow_c=(140, 230, 150), tassel=(40, 90, 50))
+
+
+def i_leque_bambu_negro(im):
+    fan(im, (210, 228, 200), (36, 40, 34), accent=(100, 160, 90), cloud=(170, 210, 160))
+
+
+def i_bastao_raiz_bambu(im):
+    staff(im, (90, 130, 70), (170, 210, 120), glow_c=(150, 230, 130), band=(40, 60, 30))
+
+
+def i_agulhas_espinho(im):
+    needles(im, (170, 200, 160), (40, 60, 40), glow_c=(120, 220, 120))
+
+
+def i_chapeu_bambu(im):
+    fill(im, mask_poly([(256, 110), (440, 330), (72, 330)]), (210, 190, 120), (140, 116, 60))
+    d = ImageDraw.Draw(im)
+    for k in range(1, 6):
+        x = 72 + k * (368 / 6)
+        d.line([(256, 120), (x, 326)], fill=(120, 96, 50, 255), width=5)
+    fill(im, mask_poly([(150, 330), (362, 330), (340, 360), (172, 360)]), (40, 70, 52), outline=5)
+
+
+def i_calca_cacador(im):
+    pants(im, (50, 64, 54), strap=(110, 150, 90), belt=(30, 36, 30))
+
+
+def i_botas_sombra(im):
+    boot(im, (44, 50, 48), (20, 22, 22), trim=(110, 160, 100))
+
+
+def i_colar_nevoa(im):
+    colar_gema(im, (220, 226, 236), (230, 255, 245), (60, 190, 150), (150, 255, 210))
+
+
+def i_manto_nevoa(im):
+    robe(im, (220, 232, 240), (90, 200, 170), (120, 140, 170))
+
+
+def i_espadas_rasga_nevoa(im):
+    for a in (-0.55, 0.55):
+        jian(im, a, blade=(236, 250, 255), guard=(80, 200, 160), glow_c=(170, 255, 230), tassel=(230, 240, 255))
+
+
+def i_leque_grou(im):
+    fan(im, (246, 248, 252), (40, 44, 60), accent=(220, 50, 50), cloud=(170, 230, 210))
+
+
+def i_bastao_pico(im):
+    staff(im, (200, 210, 224), (110, 230, 190), glow_c=(170, 255, 225), band=(80, 96, 120))
+
+
+def i_agulhas_jade_celeste(im):
+    needles(im, (150, 240, 200), (230, 240, 255), glow_c=(160, 255, 220))
+
+
+def i_coroa_jade(im):
+    fill(im, mask_poly([(130, 380), (130, 220), (190, 290), (256, 150), (322, 290), (382, 220), (382, 380)]), (120, 220, 180), (30, 110, 80))
+    for x, y in ((256, 250), (180, 330), (332, 330)):
+        fill(im, mask_ellipse((x - 18, y - 18, x + 18, y + 18)), (240, 255, 250), (140, 220, 200), outline=4)
+
+
+def i_calca_nuvens(im):
+    pants(im, (210, 220, 236), strap=(90, 190, 160), belt=(100, 120, 150))
+
+
+def i_botas_nebulosas(im):
+    boot(im, (200, 214, 230), (90, 100, 120), trim=(100, 220, 180))
+
+
+def i_jade(im):
+    m = mask_poly([(256, 90), (380, 200), (350, 380), (256, 440), (162, 380), (132, 200)])
+    part = new(); fill(part, m, (210, 255, 230), (40, 150, 100))
+    im.alpha_composite(glow(part, m, (120, 240, 180), 30, 1.3))
+    fill(im, mask_ellipse((214, 190, 298, 274)), (240, 255, 248), (150, 230, 200), outline=4)
+
+
 ITEMS = {
     'colar_jade': i_colar_jade, 'colar_dragao': i_colar_dragao,
     'tunica_algodao': i_tunica, 'manto_seda': i_manto,
@@ -791,6 +887,15 @@ ITEMS = {
     'botas_pico': i_botas_pico, 'botas_passo_celeste': i_botas_passo_celeste,
     'minerio_ferro': i_minerio, 'cristal_gelo': i_cristal, 'essencia_qi': i_essencia,
     'pergaminho_retorno': i_pergaminho,
+    'colar_bambu': i_colar_bambu, 'veste_bambu': i_veste_bambu,
+    'espadas_folha_bambu': i_espadas_folha_bambu, 'leque_bambu_negro': i_leque_bambu_negro,
+    'bastao_raiz_bambu': i_bastao_raiz_bambu, 'agulhas_espinho': i_agulhas_espinho,
+    'chapeu_bambu': i_chapeu_bambu, 'calca_cacador': i_calca_cacador, 'botas_sombra': i_botas_sombra,
+    'colar_nevoa': i_colar_nevoa, 'manto_nevoa': i_manto_nevoa,
+    'espadas_rasga_nevoa': i_espadas_rasga_nevoa, 'leque_grou': i_leque_grou,
+    'bastao_pico': i_bastao_pico, 'agulhas_jade_celeste': i_agulhas_jade_celeste,
+    'coroa_jade': i_coroa_jade, 'calca_nuvens': i_calca_nuvens, 'botas_nebulosas': i_botas_nebulosas,
+    'jade_nevoa': i_jade,
 }
 SKILLS = {
     'corte_duplo': (s_corte_duplo, THUNDER_BG), 'passo_fantasma': (s_passo, THUNDER_BG),

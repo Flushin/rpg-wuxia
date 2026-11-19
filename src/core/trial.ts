@@ -91,9 +91,10 @@ export const trialGold = (tier: number): [number, number] => [
   Math.round(trialCost(tier) * 1.0),
   Math.round(trialCost(tier) * 1.3),
 ];
-/** Drop normal do chefe no Trial (antes do bônus): 1 Raro nv 15 garantido, 1 equipamento nv 15 e os materiais do chefe.
- *  Os itens saem com o nível do chefe (bônus mais altos). */
-export const TRIAL_EQUIP_REQ_LEVEL = 15;
+/** Drop normal do chefe no Trial (antes do bônus): 1 Raro garantido, 1 equipamento de raridade sorteada e os materiais
+ *  do chefe. Bases nv 20 nos níveis 1–5 do Trial e nv 25 nos 6–10 (nível 30, etapa 3); os itens saem com o nível do
+ *  chefe (bônus mais altos). */
+export const trialEquipReqLevel = (tier: number) => (tier <= 5 ? 20 : 25);
 
 /** Progresso salvo: maior nível vencido de cada chefe (0 = nenhum). Libera até o seguinte. */
 export type TrialProgress = Record<string, number>;

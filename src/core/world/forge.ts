@@ -26,9 +26,15 @@ export const FORGE = {
 };
 const ORE = 'minerio_ferro',
   CRYSTAL = 'cristal_gelo',
+  JADE = 'jade_nevoa',
   ESSENCE = 'essencia_qi';
+/** Itens deste nível em diante usam Jade da Névoa no lugar do Cristal de Gelo (nível 30, etapa 3). */
+export const JADE_FROM_LEVEL = 20;
+/** Material raro da forja do item: Cristal de Gelo (nv 1–15) ou Jade da Névoa (nv 20+). */
+export const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? JADE : CRYSTAL);
+const rare = (it: ItemInstance) => rareMat(BASES[it.baseId]?.reqLevel ?? 1);
 
-/** Itens de nível mais alto custam mais ouro na forja: ×1 no nível 1, ×2 no 5, ×3 no 10, ×4 no 15. */
+/** Itens de nível mais alto custam mais ouro na forja: ×1 no nível 1, ×2 no 5, ×3 no 10, ×4 no 15, ×5 no 20, ×6 no 25. */
 const levelFactor = (it: ItemInstance) => 1 + (BASES[it.baseId]?.reqLevel ?? 1) / 5;
 const gold = (n: number, it: ItemInstance) => Math.round(n * levelFactor(it) * bal('forja.ouro'));
 const clean = (m: Mats): Mats => Object.fromEntries(Object.entries(m).filter(([, n]) => n > 0));
@@ -37,7 +43,7 @@ export function upgradeCost(it: ItemInstance): ForgeCost | null {
   const n = it.plus ?? 0;
   if (!BASES[it.baseId] || n >= MAX_PLUS) return null;
   return {
-    mats: clean({ [ORE]: 2 + 2 * n, [CRYSTAL]: n >= 4 ? n - 3 : 0, [ESSENCE]: n >= 7 ? 1 : 0 }),
+    mats: clean({ [ORE]: 2 + 2 * n, [rare(it)]: n >= 4 ? n - 3 : 0, [ESSENCE]: n >= 7 ? 1 : 0 }),
     gold: gold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * n, it),
     chance: Math.min(1, FORGE.upgradeChance[n] * bal('forja.chance')),
   };
@@ -47,16 +53,16 @@ export function upgradeCost(it: ItemInstance): ForgeCost | null {
 export function rarityCost(it: ItemInstance): ForgeCost | null {
   if (!BASES[it.baseId] || it.rarity === 'raro') return null;
   return it.rarity === 'comum'
-    ? { mats: { [ORE]: 12, [CRYSTAL]: 1 }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
-    : { mats: { [ORE]: 20, [CRYSTAL]: 4, [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
+    ? { mats: { [ORE]: 12, [rare(it)]: 1 }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
+    : { mats: { [ORE]: 20, [rare(it)]: 4, [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
 }
 
 /** Sorteia de novo todos os bônus de um item Incomum ou Raro (a quantidade continua a mesma). */
 export function rerollCost(it: ItemInstance): ForgeCost | null {
   if (!BASES[it.baseId] || it.rarity === 'comum') return null;
   return it.rarity === 'incomum'
-    ? { mats: { [ORE]: 6, [CRYSTAL]: 1 }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
-    : { mats: { [ORE]: 10, [CRYSTAL]: 2 }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
+    ? { mats: { [ORE]: 6, [rare(it)]: 1 }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
+    : { mats: { [ORE]: 10, [rare(it)]: 2 }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
 }
 
 /** Materiais que desmontar o item devolve. */
@@ -67,7 +73,7 @@ export function salvageYield(it: ItemInstance): Mats {
   return clean({
     [ORE]:
       1 + Math.floor(b.reqLevel / 5) + (r === 'incomum' ? 2 : r === 'raro' ? 3 : 0) + Math.floor((it.plus ?? 0) / 2),
-    [CRYSTAL]: (b.reqLevel >= 10 ? 1 : 0) + (r === 'raro' ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0),
+    [rare(it)]: (b.reqLevel >= 10 ? 1 : 0) + (r === 'raro' ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0),
   });
 }
 

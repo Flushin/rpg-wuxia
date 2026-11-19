@@ -308,10 +308,55 @@ console.log('== drops de materiais ==');
   ok(g.potionCount('essencia_qi') >= 1, 'General solta essência de qi');
 }
 
+console.log('== nível 30: conjuntos nv 20 e 25 e Jade da Névoa ==');
+{
+  for (const lv of [20, 25]) {
+    const ids = Object.keys(BASES).filter((id) => BASES[id].reqLevel === lv);
+    const slots = new Set(ids.map((id) => BASES[id].slot)),
+      sects = new Set(ids.map((id) => BASES[id].sect).filter(Boolean));
+    ok(
+      ids.length === 9 && slots.size === 6 && sects.size === 4,
+      `conjunto nv ${lv}: 9 peças, 6 espaços, arma das 4 seitas`,
+    );
+  }
+  const atk = (lv: number) =>
+    BASES[Object.keys(BASES).find((id) => BASES[id].reqLevel === lv && BASES[id].sect === 'lamina')!].stats.physAtk;
+  ok(atk(15) === 40 && atk(20) === 54 && atk(25) === 68, 'arma: 40 → 54 → 68 de ataque');
+  ok(MATERIALS.jade_nevoa?.tier === 'raro', 'Jade da Névoa é material raro');
+  const rng = new Rng(5);
+  const i15 = makeEquipment('elmo_guardiao', 'incomum', null, rng),
+    i20 = makeEquipment('chapeu_bambu', 'incomum', null, rng),
+    i25 = makeEquipment('coroa_jade', 'raro', null, rng);
+  i15.plus = i20.plus = 5;
+  ok(upgradeCost(i15)!.mats.cristal_gelo === 2 && !upgradeCost(i15)!.mats.jade_nevoa, 'item nv 15: forja com cristal');
+  ok(
+    upgradeCost(i20)!.mats.jade_nevoa === 2 && !upgradeCost(i20)!.mats.cristal_gelo,
+    'item nv 20: jade no lugar do cristal',
+  );
+  ok(
+    rarityCost(i20)!.mats.jade_nevoa === 4 && rerollCost(i25)!.mats.jade_nevoa === 2,
+    'raridade e troca de bônus com jade',
+  );
+  ok(salvageYield(i25).jade_nevoa === 2 && !salvageYield(i25).cristal_gelo, 'desmontar nv 25 Raro dá jade');
+  ok(upgradeCost(i20)!.gold > upgradeCost(i15)!.gold, 'ouro da forja sobe com o nível do item');
+  const items = JSON.parse(readFileSync('src/data/items.json', 'utf8'));
+  ok(
+    items.merchant.materials.jade_nevoa > items.merchant.materials.cristal_gelo,
+    'Mercador vende jade (mais caro que cristal)',
+  );
+}
+
 console.log('== Mercador Ambulante ==');
 {
   const w = mk(12);
-  ok(stockLevel(12) === 10 && stockLevel(9) === 5 && stockLevel(20) === 15, 'nível do estoque acompanha o personagem');
+  ok(
+    stockLevel(12) === 10 &&
+      stockLevel(9) === 5 &&
+      stockLevel(19) === 15 &&
+      stockLevel(20) === 20 &&
+      stockLevel(30) === 25,
+    'nível do estoque acompanha o personagem',
+  );
   const st = w.merchantStock();
   ok(st.offers.length >= 4 && st.offers.length <= 6, '4 a 6 itens');
   ok(
