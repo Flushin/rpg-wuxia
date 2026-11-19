@@ -1,9 +1,18 @@
-# Gera o APK de teste (debug) do app Android em todo PR e sob demanda (aba Actions → "APK Android" → Run workflow).
+# Gera o APK de teste (debug) do app Android sob demanda (aba Actions → "APK Android" → Run workflow) e nos PRs
+# que mexem em arquivos do lado Android (lista em `paths`); PR só de conteúdo/wiki não gera APK.
 # O APK fica no fim da página da execução, em "Artifacts" (mistpeak-debug-apk). Instalar no celular: ver docs/android.md.
 # A pasta android/ não está no repositório: é gerada aqui a partir do capacitor.config.ts.
 name: APK Android
 on:
   pull_request:
+    paths:
+      - capacitor.config.ts
+      - package.json
+      - package-lock.json
+      - assets/**
+      - src/platform/**
+      - tools/android-*.mjs
+      - .github/workflows/android.yml
   workflow_dispatch:
 permissions:
   contents: read

@@ -5,8 +5,9 @@ Tudo o que muda entre web e app fica em `src/platform/` (ver `src/platform/index
 
 ## Baixar e instalar o APK de teste
 
-1. Em todo PR o GitHub Actions roda **"APK Android"** e gera um APK de teste (debug).
-   Para gerar sem PR: aba **Actions → APK Android → Run workflow**.
+1. O GitHub Actions roda **"APK Android"** e gera um APK de teste (debug) nos PRs que mexem no lado Android
+   (`capacitor.config.ts`, `package.json`/lock, `assets/`, `src/platform/`, `tools/android-*`).
+   Para os demais (ou sem PR): aba **Actions → APK Android → Run workflow**, escolhendo a branch.
 2. Abra a execução e baixe **`mistpeak-debug-apk`** em "Artifacts", no fim da página (vem num `.zip`).
 3. No celular: copie o `app-debug.apk` para o aparelho e abra. O Android pede para permitir
    "instalar apps desconhecidos" para o app que abriu o arquivo (Arquivos, Chrome, Drive…).
