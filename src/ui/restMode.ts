@@ -16,6 +16,10 @@ const REST_FPS = 10;
 /** Campos internos do TimeStep do Phaser (3.60+) usados para trocar o FPS em tempo de execução. */
 type Loop = Phaser.Core.TimeStep & { _target: number; forceSetTimeOut: boolean };
 
+/** Battery Status API (Chromium/WebView Android); ausente em alguns navegadores (Firefox, Safari). */
+type Battery = { level: number; charging: boolean };
+type NavBattery = Navigator & { getBattery?: () => Promise<Battery> };
+
 class RestMode {
   delay: number = (() => {
     const raw = getPref(PREF.REST);
@@ -29,8 +33,15 @@ class RestMode {
   private since = 0;
   private gain = { kills: 0, xp: 0, gold: 0, items: 0 };
   private lastPaint = 0;
+  private battery: Battery | null = null;
+  /** nível (0–1) ao entrar no descanso; null se ainda não lido ou sem API */
+  private batStart: number | null = null;
 
   constructor() {
+    (navigator as NavBattery)
+      .getBattery?.()
+      .then((b) => (this.battery = b))
+      .catch(() => {});
     // qualquer toque/tecla conta como atividade; na fase de captura, antes de qualquer painel tratar
     const poke = () => this.poke();
     window.addEventListener('pointerdown', (e) => this.poke(e), true);
@@ -91,6 +102,7 @@ class RestMode {
     this.active = true;
     this.since = performance.now();
     this.gain = { kills: 0, xp: 0, gold: 0, items: 0 };
+    this.batStart = this.battery ? this.battery.level : null;
     s.sys.setVisible(false); // o canvas só é limpo; nada do mapa é desenhado
     setLoopFps(s.game, REST_FPS);
     if (!this.el) {
@@ -139,10 +151,27 @@ class RestMode {
       <b>🌙 ${L('Modo descanso', 'Rest mode')}</b>
       <span>${L('Auto caçando', 'Auto hunting')} · ${L('HP', 'HP')} ${Math.round((100 * p.hp) / p.derived.maxHp)}%</span>
       <span>${min} min · ${g.kills} ${L('abates', 'kills')} · ${g.xp} XP · ${g.gold} ${L('ouro', 'gold')} · ${g.items} ${L('itens', 'items')}</span>
+      ${this.batteryLine(now)}
       <small>${L('Toque para voltar', 'Tap to return')}</small></div>`;
     // a caixa muda um pouco de lugar a cada minuto (evita marcar a tela)
     const box = this.el.firstElementChild as HTMLElement;
     box.style.transform = `translate(${((min * 37) % 41) - 20}vw, ${((min * 23) % 51) - 25}vh)`;
+  }
+
+  /** Bateria atual e quanto caiu desde que o descanso começou (com média por hora após 10 min). */
+  private batteryLine(now: number): string {
+    const b = this.battery;
+    if (!b) return '';
+    const cur = Math.round(b.level * 100);
+    let txt = `🔋 ${cur}%`;
+    if (b.charging) txt += ` · ${L('carregando', 'charging')}`;
+    if (this.batStart === null) this.batStart = b.level;
+    const used = Math.round((this.batStart - b.level) * 100);
+    if (b.charging && used <= 0) return `<span>${txt}</span>`;
+    txt += ` · ${L('gasto no descanso', 'used while resting')}: ${Math.max(0, used)}%`;
+    const h = (now - this.since) / 3600000;
+    if (used > 0 && h >= 1 / 6) txt += ` (~${(used / h).toFixed(1)}%/h)`;
+    return `<span>${txt}</span>`;
   }
 }
 
