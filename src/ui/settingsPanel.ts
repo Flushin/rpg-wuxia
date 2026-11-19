@@ -10,7 +10,7 @@ import { perf } from './perf';
 import { touchDebug } from './touchDebug';
 import { BugReport } from './bugReport';
 import { credits } from './credits';
-import { openPrivacyPolicy } from './privacy';
+import { openPrivacyPolicy, openWiki } from './privacy';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import type { TipManager } from './tips';
 import { byId } from './dom';
@@ -69,6 +69,9 @@ export class SettingsPanel {
         break;
       case 'privacy':
         openPrivacyPolicy();
+        break;
+      case 'wiki':
+        openWiki();
         break;
       case 'switch':
         this.toggle(false);
@@ -157,6 +160,7 @@ export class SettingsPanel {
       <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
       <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
       <small class="muted">${seen ? L(`${seen} dica(s) já vista(s)`, `${seen} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
+      <button data-act="wiki">📖 ${L('Wiki do jogo', 'Game wiki')} <small class="muted">(${L('em português', 'in Portuguese')})</small></button>
       <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
       <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
       <button data-act="privacy">${L('Política de privacidade', 'Privacy policy')}</button>

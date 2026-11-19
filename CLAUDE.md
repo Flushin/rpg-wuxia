@@ -12,6 +12,7 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save; `world/`)
 - `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en
 - `src/scenes/`, `src/ui/`, `src/render/`, `src/platform/`, `src/styles/` telas, interface, desenho, Android, CSS
+- `wiki/index.html` + `src/wiki/`: wiki para jogadores (PT), gerada dos JSON de `src/data/`; publicada em `<site>/wiki/`
 - `tools/` scripts de checagem e geração; `docs/` documentação (`docs/decisoes/` decisões por tema, `docs/roadmap/`, `docs/arquivo/` histórico)
 
 ## Economia de contexto

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Wiki do Mistpeak</title>
+    <meta name="description" content="Wiki do Mistpeak: mecânicas, seitas, itens, monstros, NPCs e missões." />
+    <meta name="theme-color" content="#10141c" />
+    <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+  </head>
+  <body>
+    <header class="top">
+      <button id="menu-btn" aria-label="Menu">☰</button>
+      <a class="brand" href="#/">MISTPEAK <small>wiki</small></a>
+      <div class="search">
+        <input id="q" type="search" placeholder="Buscar item, NPC…" autocomplete="off" aria-label="Buscar" />
+        <div id="results" class="hidden"></div>
+      </div>
+      <a class="play" href="../">Jogar</a>
+    </header>
+    <div class="layout">
+      <nav id="nav" aria-label="Categorias"></nav>
+      <main id="main"></main>
+    </div>
+    <script type="module" src="/src/wiki/main.ts"></script>
+  </body>
+</html>
