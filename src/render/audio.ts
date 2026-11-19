@@ -99,6 +99,23 @@ class AudioManager {
     if (!snd.play()) done();
   }
 
+  /** Subida de nível. Marco: o mesmo som mais grave, com um eco mais baixo logo depois. */
+  levelUp(milestone: boolean) {
+    if (!milestone) return this.sfx('level_up');
+    const s = this.scene,
+      d = SFX.level_up;
+    if (!s || !d || this.resting || !s.cache.audio.exists('level_up')) return;
+    const vol = d.volume * this.sfxGain();
+    if (vol <= 0) return;
+    const play = (v: number) => {
+      const snd = s.sound.add('level_up', { volume: v, detune: -300 });
+      snd.once('complete', () => snd.destroy());
+      if (!snd.play()) snd.destroy();
+    };
+    play(Math.min(1, vol * 1.15));
+    s.time.delayedCall(170, () => play(vol * 0.4));
+  }
+
   ui(key: string) {
     this.sfx(key);
   }
@@ -134,9 +151,7 @@ class AudioManager {
       case 'playerDeath':
         this.sfx('player_death');
         break;
-      case 'levelup':
-        this.sfx('level_up');
-        break;
+      // levelup: tocado por LevelUpFx junto com cada animação da fila (levelUp)
       case 'skillLevelUp':
         this.sfx('level_up');
         break;

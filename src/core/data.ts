@@ -102,6 +102,9 @@ balanceClasses(CLASSES);
 balanceMonsters(MONSTERS);
 balanceProgression(PROGRESSION);
 
+/** subida de nível: o jogador fica parado fazendo a pose (só visual; o auto espera). Igual à animação "levelup" (8 quadros a 12 fps). */
+export const LEVELUP_POSE_S = 0.65;
+
 /** Pontos livres ganhos ao chegar ao nível `level` (3 até o 20; 4 do 21 ao 30). */
 export function freePointsAt(level: number): number {
   const h = PROGRESSION.freePointsHigh;

@@ -49,7 +49,7 @@ export class EventFeedback {
     private views: Map<number, EntityView>,
     private fx: SkillFx,
   ) {
-    this.levelUpFx = new LevelUpFx(scene);
+    this.levelUpFx = new LevelUpFx(scene, () => this.views.get(this.world.player.id));
   }
 
   /** Devolve true se o evento foi tratado aqui. */
@@ -269,12 +269,17 @@ export class EventFeedback {
         } else if (ev.kind === 'completed')
           toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
         return true;
-      case 'levelup': {
-        const v = this.views.get(this.world.player.id);
-        if (v) this.levelUpFx.play(v, ev.level);
-        toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`));
+      case 'levelup':
+        this.levelUpFx.request(ev.level, ev.pose);
+        // ganho offline: o resumo já mostrou os níveis e os pontos
+        if (!ev.replay)
+          toast(
+            L(
+              `Nível ${ev.level}! +${ev.points} pontos de atributo`,
+              `Level ${ev.level}! +${ev.points} attribute points`,
+            ),
+          );
         return true;
-      }
       case 'playerDeath':
         toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'));
         return true;

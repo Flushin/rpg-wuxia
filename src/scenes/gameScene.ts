@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import { L } from '../core/i18n';
 import { TILE_H, TILE_W, screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
-import type { World } from '../core/world';
+import type { OfflineReport, World } from '../core/world';
 import { EntityView } from '../render/entityView';
 import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
@@ -128,7 +128,7 @@ export class GameScene extends Phaser.Scene {
       .setVisible(false);
     const rep = this.world.offlineReport;
     this.world.offlineReport = null;
-    if (rep) this.hud.showOffline(rep, () => this.world.auto.resume());
+    if (rep) this.hud.showOffline(rep, () => this.afterOffline(rep));
     else this.world.auto.resume();
     this.cameras.main.setBackgroundColor('#10141c');
     syncSheets(this, this.world, () => this.rebuildMap());
@@ -161,7 +161,7 @@ export class GameScene extends Phaser.Scene {
       const rep = this.world.applyResumeOffline(Date.now(), at, autoAtPause);
       if (!rep) return;
       save();
-      this.hud.showOffline(rep, () => this.world.auto.resume());
+      this.hud.showOffline(rep, () => this.afterOffline(rep));
     });
     // voltar: fecha a janela de cima; sem janela, no app pergunta se quer sair e na web avisa
     // (salva já, caso o jogador saia de verdade)
@@ -539,6 +539,12 @@ export class GameScene extends Phaser.Scene {
         v.destroy();
         this.groundViews.delete(id);
       }
+  }
+
+  /** Resumo offline fechado: o auto volta e toca a animação dos níveis ganhos fora do jogo. */
+  private afterOffline(rep: OfflineReport) {
+    this.world.auto.resume();
+    this.world.celebrateOfflineLevels(rep);
   }
 
   private handle(ev: GameEvent) {

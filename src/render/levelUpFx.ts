@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
+import { L } from '../core/i18n';
 import { TILE_H, TILE_W } from '../core/iso';
+import { audio } from './audio';
 import { DEPTH } from './depth';
+import { TEXT_RES } from './display';
 import type { EntityView } from './entityView';
 
 // Subida de nível: só visual. O personagem faz a pose (EntityView.levelUp) e é envolvido por luz dourada:
 // clarão no corpo, coluna de luz subindo, anel abrindo no chão e faíscas subindo. Tudo segue o personagem.
 // Níveis marco (múltiplos de 10): a mesma animação, maior, mais intensa, mais longa e com um tremor leve de câmera.
+// Vários níveis de uma vez: uma animação por nível, em fila; só a primeira tem a pose.
 export const LEVELUP_MS = 1200;
 export const LEVELUP_MILESTONE_MS = 1800;
 export const isMilestoneLevel = (level: number) => level % 10 === 0;
@@ -23,6 +27,7 @@ const LOOK = {
     sparkScale: 0.5,
     sparkFreq: 35,
     sparkSpeed: 120,
+    font: 15,
   },
   milestone: {
     ms: LEVELUP_MILESTONE_MS,
@@ -35,6 +40,7 @@ const LOOK = {
     sparkScale: 0.7,
     sparkFreq: 22,
     sparkSpeed: 160,
+    font: 19,
   },
 };
 const GOLD = 0xffe07a;
@@ -42,12 +48,45 @@ const GOLD_LIGHT = 0xfff4c8;
 const SPARKS = [0xfff8e0, 0xffe07a, 0xffc040];
 
 export class LevelUpFx {
-  constructor(private scene: Phaser.Scene) {}
+  private queue: number[] = [];
+  private next?: Phaser.Time.TimerEvent; // fim da animação que está tocando
 
-  play(view: EntityView, level: number) {
-    const k = isMilestoneLevel(level) ? LOOK.milestone : LOOK.normal;
+  constructor(
+    private scene: Phaser.Scene,
+    private playerView: () => EntityView | undefined,
+  ) {
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.queue = [];
+      this.next = undefined;
+    });
+  }
+
+  /** Um nível subiu. pose = primeira do lote: começa já, com a pose. As outras esperam a vez e tocam só a luz. */
+  request(level: number, pose: boolean) {
+    if (pose) {
+      this.next?.remove();
+      this.start(level, true);
+    } else if (this.next) this.queue.push(level);
+    else this.start(level, false);
+  }
+
+  private start(level: number, pose: boolean) {
+    const view = this.playerView();
+    const ms = view ? this.play(view, level, pose) : 0;
+    this.next = this.scene.time.delayedCall(ms, () => {
+      this.next = undefined;
+      const l = this.queue.shift();
+      if (l !== undefined) this.start(l, false);
+    });
+  }
+
+  /** Toca uma animação; devolve a duração (ms) até a próxima da fila poder começar. */
+  private play(view: EntityView, level: number, pose: boolean): number {
+    const milestone = isMilestoneLevel(level);
+    const k = milestone ? LOOK.milestone : LOOK.normal;
     const ms = k.ms;
-    view.levelUp(ms, GOLD_LIGHT, k.glow);
+    view.levelUp(ms, GOLD_LIGHT, k.glow, pose);
+    audio.levelUp(milestone);
     const h = Math.max(48, view.height);
 
     // coluna de luz atrás do corpo (a pose fica à vista): cresce do chão para o alto, segura e se apaga afinando
@@ -100,14 +139,34 @@ export class LevelUpFx {
     // marco: tremor curto e fraco quando a coluna chega ao alto
     if (k === LOOK.milestone) this.scene.time.delayedCall(ms * 0.2, () => this.scene.cameras.main.shake(260, 0.004));
 
+    // "Nível 20!" subindo dourado acima da cabeça (maior no marco)
+    const label = this.scene.add
+      .text(0, 0, L(`Nível ${level}!`, `Level ${level}!`), {
+        fontSize: `${k.font}px`,
+        color: '#ffe07a',
+        fontStyle: 'bold',
+        stroke: '#3a2400',
+        strokeThickness: 5,
+        resolution: TEXT_RES,
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(DEPTH.FLOAT_TEXT)
+      .setScale(0.6)
+      .setAlpha(0);
+    const lift = { y: 0 };
+    this.scene.tweens.add({ targets: label, alpha: 1, scale: 1, duration: ms * 0.15, ease: 'Back.easeOut' });
+    this.scene.tweens.add({ targets: lift, y: 26, duration: ms, ease: 'Sine.easeOut' });
+    this.scene.tweens.add({ targets: label, alpha: 0, delay: ms * 0.7, duration: ms * 0.3, ease: 'Quad.easeIn' });
+
     // acompanha o personagem até o fim (troca de mapa destrói o personagem: o efeito some junto)
-    const parts: Phaser.GameObjects.GameObject[] = [beam, ring, sparks];
+    const parts: Phaser.GameObjects.GameObject[] = [beam, ring, sparks, label];
     const follow = () => {
       if (!view.container.active) return done();
       const { x, y } = view.container;
       beam.setPosition(x, y + 6).setDepth(view.container.depth - 0.001);
       ring.setPosition(x, y);
       sparks.setPosition(x, y);
+      label.setPosition(x, y - h - 18 - lift.y);
     };
     const done = () => {
       this.scene.events.off(Phaser.Scenes.Events.POST_UPDATE, follow);
@@ -118,5 +177,6 @@ export class LevelUpFx {
     this.scene.events.on(Phaser.Scenes.Events.POST_UPDATE, follow);
     this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, done);
     this.scene.time.delayedCall(ms + 900, done); // + vida das últimas faíscas
+    return ms;
   }
 }

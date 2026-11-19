@@ -261,9 +261,10 @@ export class EntityView {
     this.play('attack', true);
   }
 
-  /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose. */
-  levelUp(glowMs: number, color: number, intensity = 1) {
-    if (this.sheet?.meta.anims.levelup && this.anim !== 'death') {
+  /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose;
+   *  pose = false (níveis seguintes da fila): só o brilho. */
+  levelUp(glowMs: number, color: number, intensity = 1, pose = true) {
+    if (pose && this.sheet?.meta.anims.levelup && this.anim !== 'death') {
       this.attacking = false;
       this.posing = true;
       this.play('levelup', true);
