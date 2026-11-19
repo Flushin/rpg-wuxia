@@ -35,7 +35,7 @@ PR com **conteúdo novo** para o jogador (não correção nem ajuste) acrescenta
 - Não crie relatórios .md grandes sem pedido.
 - Mantenha este CLAUDE.md curto e atualize-o no mesmo commit das mudanças que o afetem.
 - Leitura: grep antes, depois só o intervalo de linhas relevante; não releia arquivo que acabou de editar.
-  Nunca leia `node_modules/`, `dist/`, `android/app/build/`, `*.min.js`, `*.map`.
+  Nunca leia `node_modules/`, `dist/`, pastas `build/`, `*.min.js`, `*.map`.
 - Buscas amplas (muitos arquivos): subagente Explore/haiku, trazendo só a conclusão.
 - Testes: rode só o `check:*` afetado (ex.: `npm run check:items`), não `npm test` inteiro; `npm test` só antes de subir.
 - Saídas longas sempre limitadas (`| tail -40`); em build/typecheck mostre só os erros. Não repita comando só para confirmar.
