@@ -128,3 +128,6 @@ problem, the Report a bug button (in ⚙) sends your report to the developer; se
 
 > Antes de publicar: conferir se os nomes das seitas e mapas na descrição batem com o jogo da versão enviada, e se o
 > jogo continua gratuito e sem compras (a descrição afirma isso).
+
+**O que há de novo (a cada envio):** `npm run novidades:loja` imprime o texto em pt-BR e en-US, gerado de
+`src/data/novidades.json` para a versão do `package.json`, no formato de colar no Play Console (até 500 caracteres).

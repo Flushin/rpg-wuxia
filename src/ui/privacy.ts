@@ -14,8 +14,12 @@ export function openPrivacyPolicy() {
   else window.open('./privacidade.html' + hash, '_blank');
 }
 
-/** Abre a wiki (wiki/index.html, publicada junto com o jogo). Mesma regra do app: no Android vai para o navegador. */
-export function openWiki() {
-  if (isNative) window.location.href = SITE + 'wiki/';
-  else window.open('./wiki/', '_blank');
+/**
+ * Abre a wiki (wiki/index.html, publicada junto com o jogo). Mesma regra do app: no Android vai para o navegador.
+ * `page` = página sem o "#/" (ex.: "mecanicas/forja"); vazio = início.
+ */
+export function openWiki(page = '') {
+  const path = 'wiki/' + (page ? '#/' + page : '');
+  if (isNative) window.location.href = SITE + path;
+  else window.open('./' + path, '_blank');
 }

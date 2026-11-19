@@ -5,6 +5,7 @@ import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
 import { CLASSES, MONSTERS, SECT_ORDER, SKILLS } from './data';
 import { mechanicsPage } from './mechanics';
+import { novidadesPage } from './novidades';
 import { fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from './sects';
 import { loadMaps, type WikiMap } from './maps';
@@ -18,6 +19,7 @@ interface Cat {
 }
 // Ícones: emojis por enquanto nas categorias sem item que as represente.
 const CATS: Cat[] = [
+  { id: 'novidades', label: 'Novidades', icon: '✨', ready: true },
   { id: 'mecanicas', label: 'Mecânicas', icon: '📜', ready: true },
   { id: 'seitas', label: 'Seitas', icon: '☯', ready: true },
   { id: 'skills', label: 'Skills', icon: 'skill_corte_duplo', ready: true },
@@ -42,7 +44,7 @@ function nav(active: string) {
 
 function home(): string {
   return `<h1>Wiki do Mistpeak</h1>
-    <p class="intro">Tudo sobre o jogo: mecânicas, seitas, itens, monstros, NPCs e missões. Os números aqui saem direto dos dados do jogo,
+    <p class="intro">Tudo sobre o jogo: novidades, mecânicas, seitas, itens, monstros, NPCs e missões. Os números aqui saem direto dos dados do jogo,
     então estão sempre atualizados. Conteúdo sobre chefes fica escondido atrás de um aviso de <b>spoiler</b>.</p>
     <div class="grid cats">${CATS.map(
       (c) =>
@@ -150,7 +152,8 @@ async function route() {
   else if (parts[0] === 'skill') {
     html = skillPage(parts[1] ?? '');
     active = 'skills';
-  } else if (parts[0] === 'mecanicas') html = mechanicsPage(parts[1]);
+  } else if (parts[0] === 'novidades') html = novidadesPage();
+  else if (parts[0] === 'mecanicas') html = mechanicsPage(parts[1]);
   else if (parts[0] === 'missoes') html = questIndexPage();
   else if (parts[0] === 'mapas') html = mapIndexPage();
   else if (parts[0] === 'mapa') {

@@ -70,8 +70,9 @@ button.link {
   color: #99a;
   text-decoration: underline;
 }
-/* Créditos e licenças (tela inicial e ⚙) */
-#credits-panel {
+/* Créditos e licenças e Novidades (tela inicial e ⚙) */
+#credits-panel,
+#news-panel {
   position: fixed;
   inset: 0 0 var(--fix-b, 0px) 0;
   z-index: 35; /* acima da tela inicial (10) e das dicas de item (30); abaixo do carregamento (50) */
@@ -81,7 +82,8 @@ button.link {
   overflow: auto;
   touch-action: pan-y;
 }
-#credits-panel .card {
+#credits-panel .card,
+#news-panel .card {
   width: min(460px, 100%);
   max-height: none;
   margin: auto;
@@ -92,7 +94,8 @@ button.link {
   user-select: text;
   -webkit-user-select: text;
 }
-#credits-panel p {
+#credits-panel p,
+#news-panel p {
   margin: 0;
   font-size: 13px;
 }
@@ -128,4 +131,42 @@ button.link {
   font-size: 10px;
   color: #667;
   pointer-events: none;
+}
+/* Novidades (Édito da Seita) */
+.news-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+.news-list li {
+  margin: 0 0 6px;
+}
+.news-list button.link {
+  padding: 0;
+  margin-left: 2px;
+}
+.news-old {
+  font-size: 13px;
+  border: 1px solid #445;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+.news-old summary {
+  cursor: pointer;
+}
+.news-old .news-list {
+  margin-top: 6px;
+}
+/* ponto dourado de "não lido" no botão Novidades */
+.news-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #d4a017;
+  vertical-align: middle;
+}
+.news-dot.hidden {
+  display: none;
 }

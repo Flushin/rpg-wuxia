@@ -20,6 +20,8 @@ export const PREF = {
   AUDIO: 'rpg-audio',
   /** layout do HUD no toque: 'novo' (padrão) | 'classico' (o de antes de 18/11/2026) */
   HUD_LAYOUT: 'rpg-hud-layout',
+  /** última versão do jogo cujas novidades o jogador abriu (ex.: '0.1.0') */
+  NEWS_SEEN: 'rpg-news-seen',
 } as const;
 export type PrefKey = (typeof PREF)[keyof typeof PREF];
 

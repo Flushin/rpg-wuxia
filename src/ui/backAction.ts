@@ -1,5 +1,5 @@
 // O que o botão/gesto de voltar faz dentro do jogo (ligado em gameScene com platform/backButton).
-// 1) Fecha a janela de cima, da mais alta para a mais baixa: Sair do jogo? → créditos → report de bug →
+// 1) Fecha a janela de cima, da mais alta para a mais baixa: Sair do jogo? → créditos → novidades → report de bug →
 //    ⚙ → resumo offline → dica → janelas do HUD (mapa, atributos, skills, mochila, auto, NPC).
 // 2) Sem janela aberta: no app, pergunta "Sair do jogo?"; na web, só avisa (ver platform/backButton).
 import { L } from '../core/i18n';
@@ -9,6 +9,7 @@ import type { Hud } from './hud';
 const OVERLAYS: { id: string; close: string | null }[] = [
   { id: 'exit-panel', close: null },
   { id: 'credits-panel', close: null },
+  { id: 'news-panel', close: null },
   { id: 'bug-panel', close: null },
   { id: 'settings-panel', close: null },
   { id: 'offline-panel', close: '.primary' },

@@ -1,0 +1,29 @@
+{
+  "proxima": [],
+  "versoes": [
+    {
+      "versao": "0.1.0",
+      "data": "2026-11-19",
+      "itens": [
+        {
+          "texto": "Quatro seitas para escolher: Tormenta, Geada, Titã e Víbora, cada uma com seu mestre e suas skills.",
+          "wiki": "seitas"
+        },
+        {
+          "texto": "Quatro regiões para explorar: Vila das Nuvens, Floresta Sombria, Montanha Nevada e Ruínas de Terracota.",
+          "wiki": "mapas"
+        },
+        { "texto": "Suba até o nível 20 seguindo as 14 missões da história.", "wiki": "missoes" },
+        {
+          "texto": "Forja: aprimore, suba a raridade, troque os bônus e desmonte equipamentos.",
+          "wiki": "mecanicas/forja"
+        },
+        {
+          "texto": "Auto-combate e ganho offline: seu personagem continua caçando enquanto você está fora.",
+          "wiki": "mecanicas/auto"
+        },
+        { "texto": "Wiki do jogo com todos os itens, monstros, NPCs e mapas.", "wiki": "" }
+      ]
+    }
+  ]
+}

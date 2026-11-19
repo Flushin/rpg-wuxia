@@ -5,6 +5,7 @@ import { SLOT_COUNT, relativeTime, type SaveFile } from '../core/saves';
 import { ATTR_KEYS } from '../core/types';
 import { ATTR_LABELS, DAMAGE_LABELS, ELEMENT_LABELS } from './labels';
 import { byId, escapeHtml } from './dom';
+import { novidades, novidadesPendentes } from './novidades';
 
 export interface TitleHandlers {
   onPlay: (slot: number, isLast: boolean) => void;
@@ -53,6 +54,8 @@ export function showTitleScreen(initial: SaveFile, h: TitleHandlers, mapName: (i
   bindLangButtons(byId('lang-slot'));
   renderSlots();
   st.show('slots');
+  // atualização com novidades: abre o Édito uma vez para quem já tem personagem (quem é novo só vê o ponto aceso)
+  if (novidadesPendentes() && initial.slots.some(Boolean)) novidades().open();
 }
 
 /** Lista dos 4 espaços (Jogar, Criar, Apagar). Devolve a função que redesenha a lista. */
