@@ -93,7 +93,11 @@ export class AutoCombat {
   private cur: AutoBucket = emptyBucket();
   private deathPending = false;
   private leaving: false | 'shop' | 'sell' | 'flee' = false; // no mapa de caça, indo à vila (poções / vender / fugir de monstro forte)
-  private visit: { shop: boolean | null; sell: boolean; shopped: boolean } = { shop: null, sell: false, shopped: false };
+  private visit: { shop: boolean | null; sell: boolean; shopped: boolean } = {
+    shop: null,
+    sell: false,
+    shopped: false,
+  };
   private lastShop = -Infinity;
   private blocked: Record<string, number> = {};
   private walkCd = 0;
