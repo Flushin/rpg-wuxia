@@ -598,11 +598,12 @@ function montanha() {
   for (let n = 0; n < 2; n++) spectre(27, 13.5, 2.8, 15, 17);
   yeti(27, 13.5, 2.8, 16, 18);
   objs.push(point('Abade Caído', 'monsterSpawn', MONTANHA_ARENA.x, MONTANHA_ARENA.y, { monster: 'abade_caido' }));
-  // nível 30: passo leste da encosta alta (clareira nordeste) até o Bosque de Bambu Sombrio, liberado no nível 20.
-  // Aberto depois dos monstros, para não mudar o sorteio do mapa.
-  gr.rect(28, 13, 3, 2, SN);
+  // nível 30: passo leste, ao pé da montanha (sudeste, junto da entrada), até o Bosque de Bambu Sombrio, liberado no
+  // nível 20. Longe das clareiras: quem só atravessa a montanha não é puxado para lutas no caminho. Aberto depois dos
+  // monstros, para não mudar o sorteio do mapa.
+  gr.rect(17, 29, 14, 2, SN);
   objs.push(
-    area('Bosque de Bambu Sombrio', 'portal', 29, 13, 2, 2, { target: 'bambu', targetX: 3, targetY: 16, minLevel: 20 }),
+    area('Bosque de Bambu Sombrio', 'portal', 30, 29, 1, 2, { target: 'bambu', targetX: 3, targetY: 16, minLevel: 20 }),
   );
   console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável, ${used.length} monstros + Abade`);
   return tiled('Montanha Nevada', gr, objs);
@@ -889,7 +890,7 @@ function placer(name, gr, seen, rnd, objs, avoid) {
       for (let i = 1; i < W - 1; i++)
         if (
           Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
-          Math.hypot(i + 0.5 - avoid.x, j + 0.5 - avoid.y) >= 6 && // ninguém ataca quem acabou de chegar
+          [avoid].flat().every((a) => Math.hypot(i + 0.5 - a.x, j + 0.5 - a.y) >= 6) && // nem quem chega nem quem passa
           seen.has(j * W + i) &&
           walkable(gr.get(i, j))
         )
@@ -909,13 +910,15 @@ function placer(name, gr, seen, rnd, objs, avoid) {
 // ---- Bosque de Bambu Sombrio (nível 30, nv 20–25) ----
 // Entrada a oeste (vinda do passo leste da Montanha Nevada); trilha de terra serpenteia entre moitas fechadas de bambu
 // (tile 'bamboo', bloqueia) e um riacho. Clareiras do oeste e do centro com monstros nv 20–22; clareiras do leste e do
-// norte com nv 23–25. Saída norte para o Pico da Névoa (portal com minLevel 25).
+// norte com nv 23–25. A trilha do Pico da Névoa (portal com minLevel 25) sai junto da entrada, pela beira oeste, longe
+// das clareiras: quem só atravessa o bosque não fica preso lutando no caminho.
 function bambu() {
   const rnd = rngFn(2030);
   const gr = makeGrid(G, BB);
   for (let j = 1; j < H - 1; j++) for (let i = 1; i < W - 1; i++) if (rnd() < 0.42) gr.set(i, j, BB);
   // trilha: entrada oeste (2,16) -> centro -> sobe para o norte (16,2)
   gr.rect(1, 15, 9, 2, P);
+  gr.rect(1, 10, 2, 6, P); // trilha do Pico, pela beira oeste
   gr.rect(8, 11, 2, 6, P);
   gr.rect(8, 11, 9, 2, P);
   gr.rect(15, 2, 2, 11, P);
@@ -944,7 +947,8 @@ function bambu() {
   gr.disc(16, 15, 1.6, PL);
   const seen = sealUnreachable(gr, 2, 16, BB);
   for (const [i, j, what] of [
-    [16, 2, 'saída norte'],
+    [1, 10, 'trilha do Pico'],
+    [16, 2, 'clareira norte'],
     [26, 12, 'clareira leste'],
     [5, 22, 'clareira sudoeste'],
     [24, 5, 'clareira nordeste'],
@@ -952,10 +956,13 @@ function bambu() {
     if (!seen.has(j * W + i)) throw new Error(`bambu: ${what} inalcançável`);
   const objs = [
     point('player', 'spawn', 3, 16),
-    area('Montanha Nevada', 'portal', 1, 15, 1, 2, { target: 'montanha', targetX: 27.5, targetY: 13.5 }),
-    area('Pico da Névoa', 'portal', 15, 1, 2, 1, { target: 'pico', targetX: 16, targetY: 27.5, minLevel: 25 }),
+    area('Montanha Nevada', 'portal', 1, 15, 1, 2, { target: 'montanha', targetX: 29, targetY: 29.5 }),
+    area('Pico da Névoa', 'portal', 1, 10, 1, 2, { target: 'pico', targetX: 16, targetY: 27.5, minLevel: 25 }),
   ];
-  const { place, used } = placer('bambu', gr, seen, rnd, objs, { x: 3, y: 16 });
+  const { place, used } = placer('bambu', gr, seen, rnd, objs, [
+    { x: 3, y: 16 },
+    { x: 1.5, y: 11 },
+  ]);
   const ass = (cx, cy, r, a, b) => place('Assassino das Sombras', 'assassino_sombras', cx, cy, r, a, b);
   const ser = (cx, cy, r, a, b) => place('Serpente de Jade', 'serpente_jade', cx, cy, r, a, b);
   // oeste e centro (nv 20–22)
@@ -1029,7 +1036,7 @@ function pico() {
     if (!seen.has(j * W + i)) throw new Error(`pico: ${what} inalcançável`);
   const objs = [
     point('player', 'spawn', 16, 27.5),
-    area('Bosque de Bambu Sombrio', 'portal', 15, 29, 2, 2, { target: 'bambu', targetX: 16, targetY: 3 }),
+    area('Bosque de Bambu Sombrio', 'portal', 15, 29, 2, 2, { target: 'bambu', targetX: 2.5, targetY: 11 }),
   ];
   const { place, used } = placer('pico', gr, seen, rnd, objs, { x: 16, y: 27.5 });
   const grou = (cx, cy, r, a, b) => place('Grou Espiritual', 'grou_espiritual', cx, cy, r, a, b);

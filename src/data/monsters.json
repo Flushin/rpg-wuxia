@@ -1425,8 +1425,9 @@
       "phys": 0.9,
       "spirit": 2.2
     },
-    "xpBase": 120,
-    "xpPerLevel": 24,
+    "poisonRes": 0.4,
+    "xpBase": 108,
+    "xpPerLevel": 22,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -1449,7 +1450,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.4
+          "chance": 0.75
         }
       ],
       "equipment": [
@@ -1508,7 +1509,6 @@
     "attackRange": 5.5,
     "attackInterval": 2.3,
     "moveSpeed": 3.1,
-    "keepDistance": 3,
     "projectile": "poison",
     "onHit": {
       "slow": 0.25,
@@ -1518,8 +1518,9 @@
       "phys": 1.0,
       "spirit": 2.4
     },
-    "xpBase": 112,
-    "xpPerLevel": 22,
+    "poisonRes": 0.6,
+    "xpBase": 101,
+    "xpPerLevel": 20,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -1542,7 +1543,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.4
+          "chance": 0.75
         }
       ],
       "equipment": [
@@ -1601,14 +1602,14 @@
     "attackRange": 5.5,
     "attackInterval": 2.0,
     "moveSpeed": 3.4,
-    "keepDistance": 3.5,
     "projectile": "qi",
     "defMul": {
       "phys": 1.0,
       "spirit": 2.4
     },
-    "xpBase": 136,
-    "xpPerLevel": 26,
+    "poisonRes": 0.3,
+    "xpBase": 122,
+    "xpPerLevel": 23,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -1631,7 +1632,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.4
+          "chance": 0.75
         }
       ],
       "equipment": [
@@ -1699,11 +1700,12 @@
       "interval": 9
     },
     "defMul": {
-      "phys": 1.0,
+      "phys": 0.6,
       "spirit": 2.0
     },
-    "xpBase": 152,
-    "xpPerLevel": 29,
+    "poisonRes": 0.5,
+    "xpBase": 137,
+    "xpPerLevel": 26,
     "respawnSeconds": 30,
     "loot": {
       "gold": {
@@ -1726,7 +1728,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.4
+          "chance": 0.75
         }
       ],
       "equipment": [

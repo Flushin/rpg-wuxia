@@ -2,7 +2,9 @@
 // Uso: npm run sim:balance [-- --seeds=3 --max=120]
 import { isWalkable } from '../src/core/pathfinding';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { CLASSES, MONSTERS, totalFreePoints } from '../src/core/data';
+import { CLASSES, MONSTERS, PROGRESSION, totalFreePoints } from '../src/core/data';
+import { MAPS_CONFIG } from '../src/core/mapsConfig';
+import { OFFLINE_TIERS } from '../src/core/offline';
 import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, isBroken } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
@@ -77,6 +79,8 @@ interface Run {
   /** idas à vila e minutos fora dos mapas de caça (vila e caminho), só no highRun */
   townTrips?: number;
   awayMin?: number;
+  /** minutos que a faixa levaria só no ganho offline (ritmo medido do Auto em cada nível × eficiência do mapa) */
+  offlineMin?: number;
 }
 
 function huntRun(classId: string, seed: number): Run {
@@ -416,6 +420,7 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     quests: 0,
     townTrips: 0,
     awayMin: 0,
+    offlineMin: 0,
   };
   run.levelAt[start - 1] = 0;
   w.auto.toggle();
@@ -425,8 +430,13 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
   for (let i = 0; i < (MAX_MIN * 60) / DT; i++) {
     w.tick(DT);
     for (const ev of w.events.splice(0)) {
-      if (ev.type === 'levelup') run.levelAt[ev.level - 1] = w.time / 60;
-      else if (ev.type === 'playerDeath') {
+      if (ev.type === 'levelup') {
+        run.levelAt[ev.level - 1] = w.time / 60;
+        // offline: o mesmo nível só com o ganho offline, no ritmo que o Auto tinha (primeira faixa, 0–12 h)
+        const r = w.auto.rate(),
+          eff = OFFLINE_TIERS[0].eff * (MAPS_CONFIG[w.auto.huntMap]?.offlineMul ?? 1);
+        if (r) run.offlineMin! += PROGRESSION.xpToNext[ev.level - 2] / (r.killsPerMin * r.xpPerKill * eff);
+      } else if (ev.type === 'playerDeath') {
         run.deaths++;
         run.levelDeaths[w.player.level]++;
         if (DEBUG_DEATHS)
@@ -598,9 +608,10 @@ if (process.argv.includes('--m10')) {
   console.log('|---|' + lvls.map(() => '---|').join('') + '---|---|---|' + (ref ? '---|---|' : ''));
   const only = process.argv.find((a) => a.startsWith('--only='))?.split('=')[1];
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
-    const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1, 20, 30, 15));
+    const de = Number(process.argv.find((a) => a.startsWith('--de='))?.split('=')[1] ?? 20); // diagnóstico: começa mais alto
+    const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1, de, 30, de >= 25 ? 20 : 15));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     const t30 = mean(rs.map((r) => r.levelAt[29]));
@@ -635,7 +646,7 @@ if (process.argv.includes('--m9')) {
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     console.log(

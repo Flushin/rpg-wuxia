@@ -118,6 +118,34 @@ console.log('== monstros ==');
   ok(eq('assassino_sombras').includes(20) && eq('guardiao_jade').includes(25), 'bosque solta nv 20; pico solta nv 25');
 }
 
+console.log('== resistência a veneno ==');
+{
+  ok(
+    ['assassino_sombras', 'serpente_jade', 'grou_espiritual', 'guardiao_jade'].every(
+      (id) => (MONSTERS[id].poisonRes ?? 0) > 0 && (MONSTERS[id].poisonRes ?? 0) <= 0.9,
+    ) && !MONSTERS.yeti.poisonRes,
+    'monstros do nível 30 resistem a veneno (os antigos não)',
+  );
+  const w = mk(22, 'bambu', 'vibora');
+  const s = w.monsters.find((m) => m.monsterId === 'serpente_jade')!;
+  ok(s.elemRes.poison === Math.round(100 * MONSTERS.serpente_jade.poisonRes!), 'resistência elemental de veneno');
+  const poisonOn = (target: Entity) => {
+    target.buffs = [];
+    const def = w.classSkills().find((k) => k.poison)!;
+    (w as unknown as { applyOnHit: (d: unknown, v: Entity, sc: number) => void }).applyOnHit(def, target, 1);
+    return target.buffs.find((b) => b.kind === 'poison')?.value ?? 0;
+  };
+  const withRes = poisonOn(s),
+    keep = MONSTERS.serpente_jade.poisonRes;
+  MONSTERS.serpente_jade.poisonRes = 0;
+  const noRes = poisonOn(s);
+  MONSTERS.serpente_jade.poisonRes = keep;
+  ok(
+    noRes > 0 && Math.abs(withRes / noRes - (1 - keep!)) < 0.01,
+    `veneno das skills rende ${Math.round(keep! * 100)}% menos (${withRes.toFixed(1)} contra ${noRes.toFixed(1)} por s)`,
+  );
+}
+
 console.log('== Senhor da Névoa ==');
 {
   const def = MONSTERS.senhor_nevoa;

@@ -95,6 +95,7 @@ export interface Monster {
   respawnSeconds: number;
   defMul?: { phys: number; spirit: number };
   projectile?: string;
+  poisonRes?: number;
   keepDistance?: number;
   groupAggro?: boolean;
   onHit?: { slow: number; duration: number };

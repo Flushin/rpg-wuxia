@@ -51,6 +51,9 @@ export interface MonsterDef {
   /** golpe em área marcado no chão em volta do próprio monstro (Yeti), além do ataque normal */
   slam?: { radius: number; delay: number; mult: number; interval: number };
   groupAggro?: boolean; // monstros do mesmo grupo (propriedade "group" do mapa) entram juntos
+  /** resistência a veneno (0–0,9): reduz o veneno das skills e o dano elemental de veneno (nível 30: inimigos da
+   *  seita da Serpente de Jade, espíritos e estátuas) */
+  poisonRes?: number;
   boss?: {
     arenaRadius: number; // área do chefe (leash e auto-combate evita)
     aoe: { radius: number; delay: number; mult: number; interval: number; intervalPhase2: number };

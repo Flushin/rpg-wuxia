@@ -11,8 +11,8 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
 - **Ritmo:** 20→30 custa **~3× o tempo** do 10→20 **de cada seita**, margem **±20%** (2,4×–3,6×; média das quatro
   2,7×–3,3×), medido **só no jogo ativo**. Monstros escalam com o tier novo de itens: o abate leva ~o mesmo tempo da
   montanha; o "mais forte" é dano recebido e quantidade de monstros, não abates 3× mais longos.
-- **Curva (provisória, etapa 2):** 106k / 120k / 136k / 154k / 174k / 197k / 223k / 252k / 285k / 322k (~1,97 milhão;
-  ajuste final na etapa 5).
+- **Curva (final, etapa 5):** 114,5k / 129,5k / 147k / 166,5k / 188k / 213k / 241k / 272k / 308k / 348k (~2,13 milhões;
+  a provisória da etapa 2 era 8% menor). Missões 21–30: 300 mil (~14%).
 - **Atributos:** do 21 ao 30, **4 pontos livres** por nível (`freePointsHigh` em `progression.json`) + os automáticos da seita.
 - **Saves:** versão 2 do personagem. Save v1 no nível 20 (o antigo máximo) fica no **20 com XP 0** (0% da barra do 21).
 - **Mapas (etapa 4), acesso por um passo no alto da Montanha Nevada:** Bosque de Bambu Sombrio (nv 20–25, liberado no
@@ -44,4 +44,22 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
   de mana, e a vila fica a 2–3 mapas). 20→30 / 10→20: Tormenta ~3,5×, Geada ~2,9×, Titã ~3,7×, Víbora ~2,25× (média
   ~3,1×). Senhor da Névoa no nível 30, equipamento nv 25 Incomum/Raro: 4–5 vitórias em 5 para todas as seitas.
   Titã e Víbora ficam para o ajuste fino da etapa 5.
+- **Etapa 5 (ajuste fino, 19/11/2026):** inimigos da faixa resistem a veneno (`poisonRes`: assassino 40%, serpente 60%,
+  grou 30%, guardião 50%; reduz o veneno das skills e o dano elemental de veneno; decidido pelo Lucas para a Víbora).
+  Serpente e Grou sem recuo (`keepDistance`): quem luta de perto passava a luta correndo atrás deles. Guardião com defesa
+  física ×0,6 (a Titã travava no Pico). Poção de mana grande 75% nos monstros novos (as idas à vila eram por mana). Passo
+  da montanha para o Bosque mudado para o sudeste (junto da entrada) e trilha do Pico junto da entrada do Bosque: quem
+  atravessava era puxado para lutas no caminho. XP por abate dos monstros novos −10%.
+- **Resultado final** (`npm run sim:balance -- --m10 --seeds=3`, referência `--m9 --seeds=3` no mesmo código):
+
+  | Seita | 10→20 | 20→30 | Razão | Só offline 10→20 / 20→30 (estimativa) |
+  |---|---|---|---|---|
+  | Tormenta | 117 min | 331 min | 2,83× | 3,2 h / 11,0 h (3,4×) |
+  | Geada | 105 min | 327 min | 3,12× | 3,1 h / 10,9 h (3,5×) |
+  | Titã | 168 min | 577 min | 3,43× | 4,3 h / 19,6 h (4,6×) |
+  | Víbora | 116 min | 317 min | 2,73× | 3,1 h / 10,7 h (3,5×) |
+
+  Média 3,03× (margem ±20% por seita: ok). Mortes 0–0,3 no trecho. Ouro ganho ~250 mil (10→20: ~49 mil); conserto
+  20–125 mil (a Titã gasta metade do que ganha). Offline acima de 3× por causa da taxa 5/6 nos mapas novos (decidido).
+  Senhor da Névoa (`--senhor`): no nível 30, 4–5 vitórias em 5 para todas as seitas com equipamento nv 25.
 - Fora do escopo: skills ou níveis de skill novos, masmorras/fases do Trial novas, mudar a progressão 1–20.

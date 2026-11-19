@@ -63,10 +63,16 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Patriarca Profanado (chefe da masmorra) | 20 | 6000 | 600–800 | — (instância) |
 | Salteador / Besteiro / Brutamontes (masmorra) | 20–22 | 110+22 / 95+20 / 130+26 | 14–20 / 12–18 / 16–24 (+por nível) | — (instância) |
 | Rei dos Bandidos (chefe da masmorra) | 22 | 9000 | 1000–1300 | — (instância) |
+| Assassino das Sombras / Serpente de Jade (Bosque de Bambu Sombrio) | 20–25 | 108+22 / 101+20 | 18–26 / 16–24 (+por nível) | 30 s |
+| Grou Espiritual / Guardião de Jade (Pico da Névoa) | 25–30 | 122+23 / 137+26 | 20–28 / 22–32 (+por nível) | 30 s |
+| Senhor da Névoa | 30 | 40000 | 2500–3200 | 900 s |
 
 Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
 Desde o marco 9 o nível máximo é 20, com 27000 / 31500 / 37000 / 42500 / 49500 / 56000 / 64000 / 73000 / 83000 /
-94000 do 10→11 ao 19→20 (calibrado na fase 9: ~2 h jogando ativo; `npm run sim:balance -- --m9`). Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
+94000 do 10→11 ao 19→20 (calibrado na fase 9: ~2 h jogando ativo; `npm run sim:balance -- --m9`). Nível 30 (19/11/2026):
+114500 / 129500 / 147000 / 166500 / 188000 / 213000 / 241000 / 272000 / 308000 / 348000 do 20→21 ao 29→30 (~3× o tempo do
+10→20 de cada seita; `npm run sim:balance -- --m10`; números em `docs/decisoes/nivel-30.md`). Do 21 ao 30, 4 pontos livres
+por nível. Venda de itens: 15% do valor. O respawn conta mesmo fora do mapa.
 
 ## Situação atual (17/11/2026)
 
@@ -189,7 +195,9 @@ No nível 10 as seitas corpo a corpo precisam dos itens do Trial e de escolher o
 - Cada seita cria o personagem, liga o Auto e caça sozinha. O "jogador médio" simulado só decide o que o auto não decide: gasta pontos com **Distribuir recomendado**, veste upgrades (pontuação simples por atributo útil), conserta e vende sobras na vila, e vai às Ruínas ao chegar no nível 7.
 - Mede minutos por nível, mortes, ouro ganho por hora, gasto em poções e conserto.
 - Depois simula o chefe no nível 10 com equipamento nível 5 Incomum ou Raro em todos os slots, 18 poções e um jogador ativo: esquiva dos círculos (reação de 0,45 s), bebe poção com vida baixa; a Lâmina luta de perto, o Pavilhão recua dando a volta na arena.
-- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--masmorra=mosteiro`: Patriarca nos níveis 16/18/20 com equipamento nv 15; `--masmorra=covil`: Rei dos Bandidos no nível 20; `--trace-masmorra` mostra a luta).
+- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--masmorra=mosteiro`: Patriarca nos níveis 16/18/20 com equipamento nv 15; `--masmorra=covil`: Rei dos Bandidos no nível 20; `--trace-masmorra` mostra a luta), `--m9` / `--m10` (do 10 ao 20 / do
+20 ao 30 com Auto e missões; `--only=<seita>`, idas à vila e motivo, estimativa só offline; `--m10 --de=27` começa mais
+alto para diagnóstico), `--senhor` (Senhor da Névoa nos níveis 28 e 30, equipamento nv 25).
 
 ## Curva de XP (`progression.json`)
 
