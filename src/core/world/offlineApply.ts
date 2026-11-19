@@ -39,8 +39,12 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
         ? makePotion(d.baseId, d.qty)
         : makeEquipment(d.baseId, d.rarity, CLASSES[w.classId].element, w.rng, rate.monLevel);
       let placed = w.addItem(it);
+      if (!placed && isPot) continue; // aba de consumíveis/materiais cheia: o auto não olha, fica para trás
       if (!placed) {
-        w.auto.makeRoom();
+        // aba de equipamentos cheia: vende de uma vez todo equipamento que o auto vende e segue caçando
+        const g0 = w.gold;
+        soldCount += w.auto.makeRoom();
+        soldGold += w.gold - g0;
         placed = w.addItem(it);
       }
       if (!placed) {
@@ -61,6 +65,15 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
       used[k]++;
     }
   }
+  // teto de ouro vale para abates + vendas: o que passar do teto se perde
+  let goldCapped = res.gold >= res.goldCap && res.goldCap > 0;
+  const over = res.gold + soldGold - res.goldCap;
+  if (over > 0) {
+    const cut = Math.min(over, soldGold);
+    w.gold -= cut;
+    soldGold -= cut;
+    goldCapped = true;
+  }
   w.player.hp = w.player.derived.maxHp;
   w.player.mana = w.player.derived.maxMana;
   w.events.length = 0; // sem toasts de nível/skill atrás do resumo
@@ -77,5 +90,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     potionsUsed: used,
     soldCount,
     soldGold,
+    goldCap: res.goldCap,
+    goldCapped,
   };
 }

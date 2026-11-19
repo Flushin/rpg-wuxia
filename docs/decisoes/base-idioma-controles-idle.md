@@ -59,12 +59,14 @@
   - Ganho offline: não precisa de ajuste, porque usa o ritmo medido com as opções em uso. O simulador de balanceamento usa os padrões.
 - **Ligar:** botão "Auto" no HUD + tecla Z; botão ☰ ao lado (▾ no HUD Novo do celular) abre o menu (skills usadas, limites de poção, quantidade de poções a comprar, vender Incomuns). Qualquer movimento manual pausa o auto.
 - **Sem poções (online):** volta à cidade, compra a quantidade definida no menu (se tiver ouro) e retorna a caçar; sem ouro, continua sem poção.
-- **Mochila cheia (online):** vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
+- **Mochila cheia (online):** o auto só olha a **aba de equipamentos**: quando ela lota, vende automaticamente itens Comuns (opção no menu para vender também Incomuns); Incomuns/Raros que não couberem ficam no chão (60 s).
 - **Ganho offline:** ao voltar, o jogador recebe XP, ouro e itens pelo tempo fora (o navegador não roda o jogo com a aba fechada), e gasta poções.
+  - **Teto de ouro (19/11/2026):** cada volta do offline dá no máximo **3 h de ouro de caça** no ritmo medido pelo auto (`offlineGoldCap` em `core/offline.ts`), somando ouro dos abates e das vendas automáticas; o que passa disso se perde e o resumo mostra "Teto de ouro atingido". Ajuste: `npm run balance -- offline.teto_ouro +x%`.
+  - **Itens offline (19/11/2026):** só caem **poções e equipamentos Comuns**. Materiais, consumíveis e equipamentos Incomuns/Raros ficam de fora (`offlineDropAllowed` em `core/offline.ts`), para o offline não bancar refino e equipamento bom sem jogar.
   - Só conta se o jogador saiu com o auto-combate ligado num mapa de caça.
   - **Cálculo pelo ritmo real:** mede monstros por minuto, XP/ouro/drops por abate e poções gastas por abate durante o auto-combate antes de sair.
   - **Eficiência por faixa de tempo:** 60% até 12 h · 40% de 12 h a 18 h · 20% de 18 h a 24 h · 0 depois de 24 h.
-  - Sem morte e sem perda de durabilidade offline. Itens que não cabem na mochila são vendidos automaticamente. Se as poções acabarem offline, os ganhos continuam.
+  - Sem morte e sem perda de durabilidade offline. Aba de equipamentos cheia: vende de uma vez todo equipamento que o auto vende (Comuns; Incomuns se a opção estiver ligada) e segue caçando; o que ainda não couber também é vendido. Tudo entra em "Vendido automaticamente" no resumo. Poções que não cabem na aba de consumíveis ficam para trás (o auto não olha as outras abas). Se as poções acabarem offline, os ganhos continuam.
   - Tela de resumo "Enquanto você esteve fora" ao voltar.
 - **Skills no idle:** ganham experiência de uso no auto-combate, mas **não** no ganho offline.
 

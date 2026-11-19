@@ -416,7 +416,7 @@
     },
     "mochila_cheia": {
       "title": "Bag full",
-      "text": "The bag has 30 slots. The item stays on the ground for 60 seconds: free up space (sell items to the Potion Seller) and walk over it to pick it up."
+      "text": "Each bag tab (Equipment, Consumables and Materials) has 30 slots. The item stays on the ground for 60 seconds: free up space (sell items to the Potion Seller) and walk over it to pick it up."
     },
     "primeiro_ouro": {
       "title": "Gold",
@@ -430,7 +430,7 @@
     },
     "ganho_offline": {
       "title": "Earnings while you are away",
-      "text": "Leave Auto on in a hunting map when you close the game and you get XP, gold and items for the time away, at the pace auto measured before you left. It pays 60% up to 12 h, 40% from 12 h to 18 h, 20% from 18 h to 24 h and nothing after that. No deaths, and potions are used at the measured pace."
+      "text": "Leave Auto on in a hunting map when you close the game and you get XP, gold, potions and Common gear for the time away (materials and Uncommon or Rare items only drop while you play), at the pace auto measured before you left. It pays 60% up to 12 h, 40% from 12 h to 18 h, 20% from 18 h to 24 h and nothing after that. No deaths, and potions are used at the measured pace. Gold per return is capped at what you would earn in 3 h of hunting."
     },
     "bandidos": {
       "title": "Bandits",

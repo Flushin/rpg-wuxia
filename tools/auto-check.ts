@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { effectiveMinutes, computeOffline } from '../src/core/offline';
-import { BAG_SIZE, makeEquipment, makePotion } from '../src/core/items';
+import { BAG_SIZE, BAG_TAB_SIZE, makeEquipment, makePotion } from '../src/core/items';
 import { World } from '../src/core/world';
 import { Rng } from '../src/core/rng';
 import type { AutoBucket, GameEvent, Point, Rarity, SaveData } from '../src/core/types';
@@ -730,7 +730,7 @@ console.log('\n== mochila cheia: auto-vende ==');
   addPotions(w, 3, 3);
   const fill = (r: Rarity) => {
     w.bag = Array(BAG_SIZE).fill(null);
-    for (let i = 0; i < BAG_SIZE; i++) w.bag[i] = makeEquipment('espadas_ferro', r, null, new Rng(i), 1);
+    for (let i = 0; i < BAG_TAB_SIZE; i++) w.bag[i] = makeEquipment('espadas_ferro', r, null, new Rng(i), 1);
   };
   const drop = (r: Rarity) =>
     (w as any).collect(makeEquipment('colar_jade', r, null, new Rng(9), 1), w.player.x, w.player.y); // eslint-disable-line
@@ -742,6 +742,19 @@ console.log('\n== mochila cheia: auto-vende ==');
     w.freeSlots() >= 28 && w.gold > g0 && w.ground.length === 0 && w.bag.some((b) => b?.baseId === 'colar_jade'),
     'Comuns vendidos, item novo entra na mochila',
   );
+  {
+    // aba de consumíveis cheia: o auto não olha e não vende equipamento por causa dela
+    const wp = mk('lamina', 5);
+    for (let i = 0; i < BAG_TAB_SIZE; i++) wp.bag[i] = makePotion('pocao_mp_p', 99);
+    for (let i = 0; i < 5; i++) wp.bag[BAG_TAB_SIZE + i] = makeEquipment('espadas_ferro', 'comum', null, new Rng(i), 1);
+    wp.auto.toggle();
+    const g1 = wp.gold;
+    (wp as any).collect(makePotion('pocao_hp_p', 1), wp.player.x, wp.player.y); // eslint-disable-line
+    ok(
+      wp.gold === g1 && wp.bag.filter((b) => b?.baseId === 'espadas_ferro').length === 5 && wp.ground.length === 1,
+      'aba de consumíveis cheia: poção fica no chão e nenhum equipamento é vendido',
+    );
+  }
   fill('incomum');
   drop('incomum');
   ok(w.ground.length === 1 && w.freeSlots() === 0, 'Incomum não é vendido por padrão: fica no chão');
@@ -861,10 +874,24 @@ console.log('\n== offline: faixas de eficiência ==');
     drops: [
       { baseId: 'espadas_ferro', rarity: 'comum' as Rarity, perKill: 0.1 },
       { baseId: 'pocao_hp_p', rarity: 'comum' as Rarity, perKill: 0.1 },
+      { baseId: 'colar_jade', rarity: 'incomum' as Rarity, perKill: 0.1 },
+      { baseId: 'espadas_ferro', rarity: 'raro' as Rarity, perKill: 0.1 },
+      { baseId: 'minerio_ferro', rarity: 'comum' as Rarity, perKill: 0.5 },
+      { baseId: 'pergaminho_retorno', rarity: 'comum' as Rarity, perKill: 0.1 },
     ],
   };
   const r6 = computeOffline({ elapsedMs: 6 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 3 }, seed: 1 });
-  ok(r6.kills === 432 && r6.gold === 1728, `6 h: ${r6.kills} abates (2/min × 216 min) e ouro ${r6.gold}`);
+  ok(r6.kills === 432, `6 h: ${r6.kills} abates (2/min × 216 min)`);
+  // teto de ouro: 3 h no ritmo medido = 2/min × 60 × 4 ouro × 3 = 1440
+  ok(r6.goldCap === 1440 && r6.gold === 1440, `6 h: ouro limitado ao teto (${r6.gold} de ${432 * 4})`);
+  const r1 = computeOffline({ elapsedMs: 1 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
+  ok(r1.gold === r1.kills * 4 && r1.gold < r1.goldCap, `1 h: abaixo do teto, ouro cheio (${r1.gold})`);
+  ok(
+    r6.drops.length === 2 &&
+      r6.drops.some((d) => d.baseId === 'espadas_ferro' && d.rarity === 'comum') &&
+      r6.drops.some((d) => d.baseId === 'pocao_hp_p'),
+    `offline só dropa poção e equipamento Comum (${r6.drops.map((d) => `${d.baseId}|${d.rarity}`).join(', ')})`,
+  );
   ok(
     r6.potionsUsed.mp === 3 && r6.potionsUsed.hp > 0,
     'poções gastas limitadas ao que existe (+ drops); ganhos continuam',
@@ -904,14 +931,18 @@ console.log('\n== offline: aplicando no jogo ==');
     potHp: 15,
     potMp: 6,
     levelSum: 60,
-    drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4 },
+    drops: { 'espadas_ferro|comum': 3, 'colar_jade|incomum': 2, 'pocao_hp_p|comum': 4, 'minerio_ferro|comum': 5 },
   });
   const base = (over: Partial<SaveData> = {}): Partial<SaveData> => ({
     auto: { active: true, mapId: 'floresta', buckets: [bucket()] },
     lastSeen: NOW - 6 * HOUR,
     ...over,
   });
-  const w = mk('lamina', 1, 'floresta', base(), NOW);
+  // mochila cheia de Incomuns (o auto não vende): drops offline que não cabem são vendidos
+  const fullBag = Array.from({ length: BAG_TAB_SIZE }, () =>
+    makeEquipment('colar_jade', 'incomum', null, new Rng(1), 2),
+  );
+  const w = mk('lamina', 1, 'floresta', base({ bag: fullBag }), NOW);
   const rep = w.offlineReport;
   ok(!!rep, 'gera relatório');
   if (rep) {
@@ -924,7 +955,26 @@ console.log('\n== offline: aplicando no jogo ==');
         CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * gained,
       'pontos automáticos aplicados',
     );
-    ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);
+    // ritmo do teste: 3 abates/min × 4 ouro → teto de 3 h = 2160 (abates + vendas)
+    ok(
+      rep.goldCap === 2160 && rep.goldCapped && rep.gold + rep.soldGold === 2160 && w.gold >= rep.gold,
+      `teto de ouro: ${rep.gold} dos abates + ${rep.soldGold} de vendas = ${rep.goldCap}`,
+    );
+    {
+      // mochila só com espaço livre: lota de espadas Comuns, vende todas e continua
+      const ws = mk('lamina', 1, 'floresta', base(), NOW);
+      const r = ws.offlineReport!;
+      const swords = r.items.find((i) => i.rarity === 'comum' && i.qty > BAG_TAB_SIZE)?.qty ?? 0;
+      ok(
+        swords > BAG_TAB_SIZE && r.soldCount > 0 && r.gold + r.soldGold <= r.goldCap,
+        `mochila lotou: vendeu ${r.soldCount} equipamentos e continuou (${swords} espadas no total; ouro dentro do teto)`,
+      );
+    }
+    ok(
+      rep.items.every((i) => i.rarity === 'comum') &&
+        w.bag.every((b) => !b || (b.baseId !== 'minerio_ferro' && (b.rarity === 'comum' || b.baseId === 'colar_jade'))),
+      'offline não traz material nem Incomum/Raro',
+    );
     ok(
       rep.soldCount > 0 && w.freeSlots() === 0,
       `overflow vendido (${rep.soldCount} itens, +${rep.soldGold} ouro) e mochila no limite`,

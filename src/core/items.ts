@@ -80,7 +80,8 @@ const J = localize('items', itemsJson) as unknown as {
 balanceItems(J); // multiplicadores de src/data/balance.json
 export const SLOTS = J.slots,
   SLOT_NAMES = J.slotNames,
-  BAG_SIZE = J.bagSize,
+  /** Espaços de cada aba da mochila (equipamento, consumíveis, materiais). */
+  BAG_TAB_SIZE = J.bagSize,
   STACK_MAX = J.stackMax;
 export const WEAR_PER_HIT = J.wearPerHit;
 export const GROUND_SECONDS = J.groundSeconds,
@@ -101,6 +102,14 @@ export const isMaterialId = (id: string) => id in MATERIALS;
 /** Empilha na mochila (até STACK_MAX): poções e materiais de forja. */
 export const isConsumableId = (id: string) => id in CONSUMABLES;
 export const isStackId = (id: string) => id in POTIONS || id in MATERIALS || id in CONSUMABLES;
+
+/** Abas da mochila: cada uma tem BAG_TAB_SIZE espaços próprios. */
+export type BagTab = 'equip' | 'pot' | 'mat';
+export const BAG_TABS: BagTab[] = ['equip', 'pot', 'mat'];
+/** Total de espaços (todas as abas juntas, num array só). */
+export const BAG_SIZE = BAG_TAB_SIZE * BAG_TABS.length;
+export const bagTabOf = (baseId: string): BagTab =>
+  baseId in POTIONS || baseId in CONSUMABLES ? 'pot' : baseId in MATERIALS ? 'mat' : 'equip';
 
 export const STAT_LABELS: Record<string, string> = {
   strength: L('Força', 'Strength'),

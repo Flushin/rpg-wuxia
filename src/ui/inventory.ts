@@ -3,7 +3,7 @@ import type { ActionError } from '../core/types';
 import { CLASSES } from '../core/data';
 import { PORTRAIT_ANIMS, PORTRAITS } from '../render/sprites';
 import { L } from '../core/i18n';
-import { BASES, CONSUMABLES, MATERIALS, POTIONS, SLOT_NAMES } from '../core/items';
+import { BAG_TAB_SIZE, BASES, type BagTab, CONSUMABLES, MATERIALS, POTIONS, SLOT_NAMES, bagTabOf } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
 import { closeX } from './labels';
@@ -15,9 +15,8 @@ import { isTouch } from '../platform/input';
 
 type Sel = { kind: 'bag'; i: number } | { kind: 'eq'; slot: Slot };
 const selKey = (s: Sel | null) => (s ? (s.kind === 'bag' ? `b${s.i}` : `e${s.slot}`) : '');
-type Tab = 'equip' | 'pot' | 'mat';
-const tabOf = (it: ItemInstance): Tab =>
-  POTIONS[it.baseId] || CONSUMABLES[it.baseId] ? 'pot' : MATERIALS[it.baseId] ? 'mat' : 'equip';
+type Tab = BagTab;
+const tabOf = (it: ItemInstance): Tab => bagTabOf(it.baseId);
 const usable = (it: ItemInstance) => !!POTIONS[it.baseId] || !!CONSUMABLES[it.baseId];
 // slots em volta do corpo: esquerda de cima para baixo (cabeça, colar, tronco), direita (arma, calça, bota)
 const BODY_LEFT: Slot[] = ['cabeca', 'colar', 'tronco'],
@@ -211,7 +210,7 @@ export class InventoryPanel {
       `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i])}</button>`;
     const idx = w.bag.map((_, i) => i);
     const inTab = idx.filter((i) => w.bag[i] && tabOf(w.bag[i]!) === this.tab),
-      free = idx.filter((i) => !w.bag[i]);
+      free = idx.filter((i) => !w.bag[i]).slice(0, w.freeSlots(this.tab));
     const bag = [...inTab, ...free].map(bagCell).join('');
     const count = (t: Tab) => w.bag.filter((x) => x && tabOf(x) === t).length;
     const tabBtn = (t: Tab, label: string) =>
@@ -246,7 +245,7 @@ export class InventoryPanel {
     main.innerHTML = `${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
       <h3>${L('Equipamento', 'Equipment')}</h3><div class="eq-body">${eq}</div>
-      <h3>${L('Bolsa', 'Inventory')} (${w.bag.filter(Boolean).length}/${w.bag.length}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
+      <h3>${L('Bolsa', 'Inventory')} (${count(this.tab)}/${BAG_TAB_SIZE}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button>`;
     det.innerHTML = detail;
     [panel.scrollTop, card.scrollTop, main.scrollTop, det.scrollTop] = keep;

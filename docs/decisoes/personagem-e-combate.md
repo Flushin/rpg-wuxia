@@ -76,7 +76,7 @@
 - **Lista de teste:** 2 bases por slot (nível 1 e nível 5). Arma separada por seita (espadas duplas / leque de qi).
 - **Perda por morte:** −10% da durabilidade máxima em cada item equipado.
 - **Desgaste por golpe:** cada golpe recebido tira 0,3 de durabilidade dos itens equipados (aprovado no marco 5).
-- **Mochila:** 30 espaços; poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
+- **Mochila:** 3 abas (Equipamento, Consumíveis, Materiais) com **30 espaços cada** (19/11/2026; antes eram 30 no total); poções iguais empilham até 99. **Coleta automática** dos drops, com aviso do que foi pego.
 - **Ouro:** cai dos monstros. O **vendedor de poções também compra qualquer item**.
 - **Poções:** recuperam **ao longo de 8 s** (estilo Dragon Oath); não acumulam (usar outra do mesmo tipo reinicia o efeito). **Pequena:** 30%. **Grande:** 60%, mais cara, cai de monstros nível 5+ (até os bandidos existirem, só na loja). Atalhos no PC (Q = HP, E = mana) e botões no celular.
 
