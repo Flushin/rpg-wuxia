@@ -14,7 +14,7 @@ import { PotionBar } from './potions';
 import { Rewards } from './rewards';
 import { QuestTracker } from './questTracker';
 import { AttrsPanel } from './attrsPanel';
-import { byId } from './dom';
+import { byId, setStyle, setText } from './dom';
 import { applyHudLayout, updateHudMenu } from './hudLayout';
 
 const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
@@ -131,19 +131,21 @@ export class Hud {
     const w = this.world,
       p = w.player,
       d = p.derived;
-    byId('p-name').textContent = p.name;
-    byId('p-level').textContent = L(`Nv ${p.level}`, `Lv ${p.level}`);
-    byId('p-hp').style.width = pct(p.hp, d.maxHp);
-    byId('p-hp-t').textContent = `${Math.ceil(p.hp)} / ${d.maxHp}`;
-    byId('p-mp').style.width = pct(p.mana, d.maxMana);
-    byId('p-mp-t').textContent = `${Math.floor(p.mana)} / ${d.maxMana}`;
+    setText(byId('p-name'), p.name);
+    setText(byId('p-level'), L(`Nv ${p.level}`, `Lv ${p.level}`));
+    setStyle(byId('p-hp'), 'width', pct(p.hp, d.maxHp));
+    setText(byId('p-hp-t'), `${Math.ceil(p.hp)} / ${d.maxHp}`);
+    setStyle(byId('p-mp'), 'width', pct(p.mana, d.maxMana));
+    setText(byId('p-mp-t'), `${Math.floor(p.mana)} / ${d.maxMana}`);
     const need = w.xpToNext();
-    byId('p-xp').style.width = need === null ? '100%' : pct(w.xp, need);
-    byId('p-xp-t').textContent =
+    setStyle(byId('p-xp'), 'width', need === null ? '100%' : pct(w.xp, need));
+    setText(
+      byId('p-xp-t'),
       need === null
         ? L(`Nível máximo (${PROGRESSION.levelCap})`, `Max level (${PROGRESSION.levelCap})`)
-        : `XP ${Math.floor(w.xp)} / ${need}`;
-    byId('map-name').textContent = w.map.name;
+        : `XP ${Math.floor(w.xp)} / ${need}`,
+    );
+    setText(byId('map-name'), w.map.name);
     if (w.gold !== this.goldSig) {
       this.goldSig = w.gold;
       byId('p-gold').textContent = String(w.gold);
@@ -151,7 +153,7 @@ export class Hud {
     this.rewards.update();
     this.questTracker.update(this.world);
     const badge = byId('pts-badge');
-    badge.textContent = w.freePoints > 0 ? String(w.freePoints) : '';
+    setText(badge, w.freePoints > 0 ? String(w.freePoints) : '');
     badge.classList.toggle('hidden', w.freePoints <= 0);
     updateHudMenu(w.freePoints > 0);
 
@@ -159,18 +161,18 @@ export class Hud {
       bb = byId('boss-bar');
     bb.classList.toggle('hidden', !boss);
     if (boss) {
-      byId('boss-name').textContent = L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`);
-      byId('boss-hp').style.width = pct(boss.hp, boss.derived.maxHp);
-      byId('boss-hp-t').textContent = `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`;
+      setText(byId('boss-name'), L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`));
+      setStyle(byId('boss-hp'), 'width', pct(boss.hp, boss.derived.maxHp));
+      setText(byId('boss-hp-t'), `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`);
     }
     const t = w.getTarget(),
       tf = byId('target-frame');
     tf.classList.toggle('hidden', !t || t === boss);
     if (t) {
-      byId('t-name').textContent = t.name;
-      byId('t-level').textContent = L(`Nv ${t.level}`, `Lv ${t.level}`);
-      byId('t-hp').style.width = pct(t.hp, t.derived.maxHp);
-      byId('t-hp-t').textContent = `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`;
+      setText(byId('t-name'), t.name);
+      setText(byId('t-level'), L(`Nv ${t.level}`, `Lv ${t.level}`));
+      setStyle(byId('t-hp'), 'width', pct(t.hp, t.derived.maxHp));
+      setText(byId('t-hp-t'), `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`);
     }
     this.attrs.update();
     this.hotbar.update();

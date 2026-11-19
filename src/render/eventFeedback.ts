@@ -33,7 +33,12 @@ const FLOAT_COLOR = {
 
 type Ev<T extends GameEvent['type']> = Extract<GameEvent, { type: T }>;
 
+// Textos que sobem (dano, avisos): reaproveitados em vez de criados e destruídos a cada golpe. Cada Text novo
+// cria um canvas e uma textura na placa de vídeo — com muitos números por segundo (área, veneno) o iPhone engasga.
+const FLOAT_POOL_MAX = 24;
+
 export class EventFeedback {
+  private floatPool = new Map<number, Phaser.GameObjects.Text[]>(); // por tamanho da fonte (trocar a fonte remede)
   constructor(
     private scene: Phaser.Scene,
     private world: World,
@@ -330,18 +335,39 @@ export class EventFeedback {
 
   private floatText(x: number, y: number, text: string, color: string, size: number) {
     x += Phaser.Math.Between(-8, 8);
-    const t = this.scene.add
-      .text(x, y, text, { fontSize: `${size}px`, color, fontStyle: 'bold', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.FLOAT_TEXT)
-      .setResolution(TEXT_RES);
+    const pool = this.floatPool.get(size) ?? [];
+    this.floatPool.set(size, pool);
+    let t = pool.pop();
+    while (t && !t.scene) t = pool.pop(); // destruído junto com a cena
+    if (t) {
+      t.style.color = color; // sem redesenhar duas vezes: a cor entra junto com o texto
+      if (t.text !== text) t.setText(text);
+      else t.updateText();
+      t.setPosition(x, y).setAlpha(1).setVisible(true).setActive(true);
+    } else
+      t = this.scene.add
+        .text(x, y, text, {
+          fontSize: `${size}px`,
+          color,
+          fontStyle: 'bold',
+          stroke: '#000',
+          strokeThickness: 4,
+          resolution: TEXT_RES, // no estilo (e não setResolution depois): desenha uma vez só
+        })
+        .setOrigin(0.5)
+        .setDepth(DEPTH.FLOAT_TEXT);
+    const txt = t;
     this.scene.tweens.add({
-      targets: t,
+      targets: txt,
       y: y - 36,
       alpha: 0,
       duration: 900,
       ease: 'Cubic.easeOut',
-      onComplete: () => t.destroy(),
+      onComplete: () => {
+        if (pool.length >= FLOAT_POOL_MAX) return txt.destroy();
+        txt.setVisible(false).setActive(false);
+        pool.push(txt);
+      },
     });
   }
 }

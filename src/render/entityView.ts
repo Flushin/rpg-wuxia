@@ -85,9 +85,8 @@ export class EntityView {
     const text = labelOf(e);
     const labelY = this.sheet ? -this.top - 4 : e.kind === 'monster' ? -36 * this.sc : -52;
     const label = scene.add
-      .text(0, labelY, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3 })
-      .setOrigin(0.5, 1)
-      .setResolution(DPR * 2);
+      .text(0, labelY, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3, resolution: DPR * 2 })
+      .setOrigin(0.5, 1);
     label.setName('label');
     this.label = label;
     // nome fora do container, sempre por cima (árvores, casas e o portão não cortam o nome) — NPCs, monstros e jogador
@@ -103,7 +102,9 @@ export class EntityView {
     if (this.sheet) this.animate(e);
     else if (Math.abs(s.x - this.lastSx) > 0.2) this.sprite.setFlipX(s.x < this.lastSx);
     this.lastSx = s.x;
-    this.container.setPosition(s.x, s.y).setDepth(e.x + e.y);
+    this.container.setPosition(s.x, s.y);
+    // setDepth sempre manda o Phaser reordenar a cena inteira (~1.500 objetos), mesmo com o mesmo valor
+    if (this.container.depth !== e.x + e.y) this.container.setDepth(e.x + e.y);
     if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
     if (this.mark)
       this.mark.setPosition(s.x, s.y + (this.labelY ?? -50) - 16 + Math.sin(this.scene.time.now / 260) * 3);
@@ -266,9 +267,15 @@ export class EntityView {
     }
     if (!this.mark) {
       this.mark = this.scene.add
-        .text(0, 0, m, { fontSize: '26px', fontStyle: 'bold', color: '#ffd23f', stroke: '#3a2400', strokeThickness: 5 })
+        .text(0, 0, m, {
+          fontSize: '26px',
+          fontStyle: 'bold',
+          color: '#ffd23f',
+          stroke: '#3a2400',
+          strokeThickness: 5,
+          resolution: DPR * 2,
+        })
         .setOrigin(0.5, 1)
-        .setResolution(DPR * 2)
         .setDepth(DEPTH.QUEST_MARK);
     }
     this.mark.setText(m).setColor(m === '!' ? '#ffd23f' : '#9fe8a0');

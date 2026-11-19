@@ -2,7 +2,7 @@ import { L } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import type { World } from '../core/world';
 import { uiRect, uiScale, uiW } from './uiScale';
-import { byId, escapeHtml } from './dom';
+import { byId, escapeHtml, viewportKey } from './dom';
 
 /** Nome de exibição de um NPC pelo id ('anciao', 'mestre_lamina'...). */
 export function npcName(id: string): string {
@@ -19,12 +19,18 @@ export function rewardText(r: { xp: number; gold: number; item?: 'arma' | 'tronc
 }
 
 // Rastreador da missão (marco 7): linha pequena no canto direito, logo abaixo dos botões do topo.
+// A posição depende do tamanho de outros blocos (ler isso força o navegador a refazer o layout): só é refeita
+// quando a missão/tela muda e, por garantia, a cada PLACE_MS — não a cada quadro.
+const PLACE_MS = 1000;
+
 export class QuestTracker {
   private sig = '';
+  private placeSig = '';
+  private placedAt = 0;
   update(w: World) {
     const el = byId('quest-tracker'),
       v = w.questView();
-    const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${innerWidth}x${innerHeight}|${uiScale()}`;
+    const sig = `${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${v.phase}|${viewportKey()}|${uiScale()}`;
     if (sig !== this.sig) {
       this.sig = sig;
       if (!v.def) {
@@ -51,6 +57,11 @@ export class QuestTracker {
       el.innerHTML = `<div class="qt-name">${escapeHtml(v.def.name)}</div><div class="qt-line">${line}</div>`;
       el.classList.remove('hidden');
     }
+    const now = performance.now(),
+      placeSig = `${sig}|${w.player.level}`;
+    if (placeSig === this.placeSig && now - this.placedAt < PLACE_MS) return;
+    this.placeSig = placeSig;
+    this.placedAt = now;
     // logo abaixo do bloco do topo direito (que muda de altura conforme a tela)
     const r = uiRect(byId('top-right'));
     el.style.top = `${Math.round(r.bottom + 6)}px`;

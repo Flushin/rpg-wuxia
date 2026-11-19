@@ -109,10 +109,10 @@ export class GameScene extends Phaser.Scene {
         align: 'center',
         stroke: '#000',
         strokeThickness: 3,
+        resolution: TEXT_RES,
       })
       .setOrigin(0.5, 1)
       .setDepth(DEPTH.AUTO_TEXT)
-      .setResolution(TEXT_RES)
       .setVisible(false);
     const rep = this.world.offlineReport;
     this.world.offlineReport = null;
@@ -410,10 +410,16 @@ export class GameScene extends Phaser.Scene {
     this.autoText.setVisible(show);
     if (!show) return;
     const s = tileToScreen(p.x, p.y);
-    this.autoText
-      .setText(a.state === 'pausado' ? L('Auto pausado', 'Auto paused') : a.status ? `Auto\n${a.status}` : 'Auto')
-      .setColor(a.state === 'pausado' ? '#f0c060' : '#9fe8a0')
-      .setPosition(s.x, s.y - 70);
+    const text = a.state === 'pausado' ? L('Auto pausado', 'Auto paused') : a.status ? `Auto\n${a.status}` : 'Auto',
+      color = a.state === 'pausado' ? '#f0c060' : '#9fe8a0';
+    // setColor do Phaser redesenha o texto e reenvia a textura para a placa de vídeo mesmo com a mesma cor:
+    // a cada quadro isso derrubava o FPS no iPhone com o Auto ligado. Só mexe quando muda.
+    if (this.autoText.style.color !== color) {
+      this.autoText.style.color = color;
+      if (this.autoText.text === text) this.autoText.updateText();
+    }
+    if (this.autoText.text !== text) this.autoText.setText(text);
+    this.autoText.setPosition(s.x, s.y - 70);
   }
 
   private syncGround() {
@@ -449,7 +455,8 @@ export class GameScene extends Phaser.Scene {
         this.groundViews.set(g.id, v);
       }
       const s = tileToScreen(g.x, g.y);
-      v.setPosition(s.x, s.y + Math.sin(this.time.now / 250 + g.id) * 2).setDepth(g.x + g.y);
+      v.setPosition(s.x, s.y + Math.sin(this.time.now / 250 + g.id) * 2);
+      if (v.depth !== g.x + g.y) v.setDepth(g.x + g.y); // setDepth reordena a cena toda: só quando muda
       v.setAlpha(g.expires - this.world.time < 10 ? 0.4 + 0.6 * Math.abs(Math.sin(this.time.now / 150)) : 1);
     }
     for (const [id, v] of this.groundViews)
