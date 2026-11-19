@@ -2,7 +2,7 @@
 // Uso: npm run sim:balance [-- --seeds=3 --max=120]
 import { isWalkable } from '../src/core/pathfinding';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { CLASSES, MONSTERS } from '../src/core/data';
+import { CLASSES, MONSTERS, totalFreePoints } from '../src/core/data';
 import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, isBroken } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
@@ -365,7 +365,7 @@ function highWorld(
     classId,
     level,
     xp: 0,
-    freePoints: 3 * (level - 1),
+    freePoints: totalFreePoints(level),
     attributes: attrs,
     mapId: 'cidade',
     lastSeen: 0,

@@ -1,4 +1,4 @@
-import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, type MonsterDef } from './data';
+import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, freePointsAt, type MonsterDef } from './data';
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
@@ -1189,7 +1189,7 @@ export class World {
       p.level++;
       const up = CLASSES[this.classId].levelUpAttributes;
       for (const k of ATTR_KEYS) p.attrs[k] += up[k];
-      this.freePoints += PROGRESSION.freePointsPerLevel;
+      this.freePoints += freePointsAt(p.level);
       this.recalc(p, false);
       p.hp = p.derived.maxHp;
       p.mana = p.derived.maxMana;

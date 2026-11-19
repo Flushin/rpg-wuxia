@@ -10,7 +10,7 @@
 // falta ou vem estranho. Migração é para quando um campo muda de sentido, de nome ou de formato.
 
 export const SAVE_FILE_VERSION = 2;
-export const CHARACTER_SAVE_VERSION = 1;
+export const CHARACTER_SAVE_VERSION = 2;
 
 type RawSave = Record<string, unknown>;
 
@@ -18,7 +18,11 @@ type RawSave = Record<string, unknown>;
  * Migrações do personagem: a função na chave N leva um save da versão N para a N+1.
  * Ex.: { 1: (s) => ({ ...s, novoCampo: converter(s.campoVelho) }) } quando CHARACTER_SAVE_VERSION virar 2.
  */
-export const CHARACTER_MIGRATIONS: Record<number, (s: RawSave) => RawSave> = {};
+export const CHARACTER_MIGRATIONS: Record<number, (s: RawSave) => RawSave> = {
+  // 1 → 2 (nível máximo 20 → 30, decidido pelo Lucas em 19/11/2026): quem estava no antigo nível máximo (20)
+  // continua no 20 com a barra do 21 em 0%. A XP guardada não vira níveis.
+  1: (s) => (Number(s.level) >= 20 ? { ...s, level: 20, xp: 0 } : s),
+};
 
 /**
  * Leva um personagem salvo (de qualquer versão) até a atual, aplicando as migrações em ordem.

@@ -924,7 +924,7 @@ console.log('\n== offline: faixas de eficiência ==');
     elapsedMs: 20 * HOUR,
     rate,
     level: CAP - 1,
-    xp: 100,
+    xp: PROGRESSION.xpToNext[CAP - 2] - 100,
     potions: { hp: 0, mp: 0 },
     seed: 1,
   });

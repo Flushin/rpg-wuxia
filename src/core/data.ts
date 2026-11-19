@@ -87,6 +87,8 @@ export interface Progression {
   levelCap: number;
   xpToNext: number[];
   freePointsPerLevel: number;
+  /** A partir deste nível, cada nível dá estes pontos livres em vez de freePointsPerLevel (nível 30: 4 do 21 ao 30). */
+  freePointsHigh?: { fromLevel: number; points: number };
 }
 
 export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;
@@ -96,6 +98,18 @@ export const PROGRESSION = progressionJson as Progression;
 balanceClasses(CLASSES);
 balanceMonsters(MONSTERS);
 balanceProgression(PROGRESSION);
+
+/** Pontos livres ganhos ao chegar ao nível `level` (3 até o 20; 4 do 21 ao 30). */
+export function freePointsAt(level: number): number {
+  const h = PROGRESSION.freePointsHigh;
+  return h && level >= h.fromLevel ? h.points : PROGRESSION.freePointsPerLevel;
+}
+/** Total de pontos livres de um personagem no nível `level` (sem gastar nenhum). */
+export function totalFreePoints(level: number): number {
+  let n = 0;
+  for (let l = 2; l <= level; l++) n += freePointsAt(l);
+  return n;
+}
 
 // Falas dos NPCs da cidade e dos mestres das seitas (também usadas na criação de personagem)
 export interface MasterText {

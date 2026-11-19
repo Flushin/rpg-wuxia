@@ -12,6 +12,7 @@ import {
   MONSTERS,
   POTIONS,
   PROGRESSION,
+  freePointsText,
   RARITIES,
   REPAIR_COST_PER_POINT,
   SELL_RATIO,
@@ -178,7 +179,7 @@ function combate(): string {
       <li><b>Escudos</b> absorvem o dano antes da vida. <b>Redução de defesa</b> diminui as duas defesas do alvo. <b>Lentidão</b> e <b>atordoamento</b> não mudam o dano.</li>
       ${cls.lifeSteal ? `<li><b>Roubo de vida</b> (Tormenta): ${pc(cls.lifeSteal)} do dano causado volta como vida.</li>` : ''}</ul>${ex}</section>
     <section class="panel"><h2>Níveis</h2><p>Nível máximo <b>${PROGRESSION.levelCap}</b>. A cada nível você ganha os atributos automáticos da sua <a href="#/seitas">seita</a>
-      e <b>${PROGRESSION.freePointsPerLevel} pontos</b> para distribuir. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
+      e <b>${freePointsText()}</b> para distribuir. Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
       <details class="more"><summary>XP para cada nível</summary><table class="tbl"><thead><tr><th>Nível</th><th>XP</th></tr></thead><tbody>${xpRows}</tbody></table></details></section>`;
 }
 
