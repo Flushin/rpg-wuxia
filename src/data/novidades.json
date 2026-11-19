@@ -3,6 +3,10 @@
     {
       "texto": "Segunda masmorra: o Mosteiro Profanado (nível 16+, 500 de ouro), com Monges Profanados, Almas Penadas e Guardiões de Pedra. No fim, o Patriarca Profanado entra em fúria com 30% da vida.",
       "wiki": "mapa/mosteiro"
+    },
+    {
+      "texto": "Terceira masmorra: o Covil dos Bandidos (nível 20, 1000 de ouro), com Salteadores, Besteiros e Brutamontes que atacam em bando. No fim, o Rei dos Bandidos marca golpes em linha no chão e, ferido, em leque.",
+      "wiki": "mapa/covil"
     }
   ],
   "versoes": [

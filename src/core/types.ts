@@ -102,6 +102,8 @@ export interface Entity {
   summoned: boolean;
   /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */
   enraged?: boolean;
+  /** chefe com golpe em linha (boss.line): quantos golpes marcados já deu, para alternar círculo e linha */
+  strikes?: number;
   spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
   levels?: [number, number]; // faixa de nível do ponto do mapa (marco 9); sem = a do monstro
   // NPCs
@@ -174,7 +176,7 @@ export type GameEvent =
   | { type: 'autoState'; state: AutoState }
   | { type: 'autoStopped'; reason: 'broken' }
   | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: 'arrow' | 'ice' }
-  | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number }
+  | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number; shape?: 'line' }
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }
   | { type: 'bossSummon'; ids: number[]; name: string }
@@ -192,6 +194,11 @@ export interface Telegraph {
   remaining: number;
   ownerId: number;
   mult: number;
+  /** golpe em linha (Rei dos Bandidos): retângulo que sai de (x, y) na direção angle, com length de comprimento e
+   * meia-largura radius. Sem shape = círculo de raio radius centrado em (x, y). */
+  shape?: 'line';
+  angle?: number;
+  length?: number;
 }
 
 export type AutoState = 'off' | 'on' | 'pausado';

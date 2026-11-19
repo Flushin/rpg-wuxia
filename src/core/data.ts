@@ -57,6 +57,17 @@ export interface MonsterDef {
     summon?: { monsterId: string; count: number; level: number; atHpPct: number };
     /** fúria (Patriarca Profanado): abaixo de atHpPct da vida ataca mais rápido, bate mais forte e anda mais rápido */
     enrage?: { atHpPct: number; attackIntervalMul: number; damageMul: number; moveSpeedMul: number };
+    /** golpe em linha (Rei dos Bandidos): os golpes marcados alternam círculo e linha saindo do chefe na direção do
+     * jogador; abaixo de fanAtHpPct da vida a linha vira leque de fanCount linhas separadas por fanSpread rad */
+    line?: {
+      length: number;
+      width: number;
+      delay: number;
+      mult: number;
+      fanAtHpPct: number;
+      fanCount: number;
+      fanSpread: number;
+    };
   };
   loot?: {
     gold?: { min: number; max: number; perLevel?: number }; // perLevel: soma (nível-1)*perLevel aos dois limites

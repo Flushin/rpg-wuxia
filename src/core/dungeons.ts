@@ -1,5 +1,5 @@
 // Masmorras: instâncias escolhidas no menu do Portal das Masmorras (saída oeste da vila).
-// Regras (aprovadas pelo Lucas em 19/11/2026; segunda masmorra também em 19/11/2026): entrada paga em ouro; monstros não renascem; chefe no fim com item
+// Regras (aprovadas pelo Lucas em 19/11/2026; segunda e terceira masmorras também em 19/11/2026): entrada paga em ouro; monstros não renascem; chefe no fim com item
 // garantido; o Auto não funciona lá dentro; morrer, sair ou fechar o jogo encerra a corrida (volta à vila).
 // O desenho de cada masmorra é um mapa comum (public/maps/<map>.json) marcado com dungeon: true em mapsConfig.ts.
 import { MAPS_CONFIG } from './mapsConfig';
@@ -38,6 +38,17 @@ export const DUNGEONS: DungeonDef[] = [
     desc: {
       pt: 'Um mosteiro tomado pela corrupção do Abade: monges profanados, almas penadas e guardiões de pedra. No salão principal, o Patriarca Profanado entra em fúria quando ferido.',
       en: "A monastery overtaken by the Abbot's corruption: defiled monks, restless souls and stone guardians. In the main hall, the Defiled Patriarch becomes enraged when wounded.",
+    },
+  },
+  {
+    id: 'covil',
+    map: 'covil',
+    minLevel: 20,
+    cost: 1000,
+    levels: [20, 22],
+    desc: {
+      pt: 'O esconderijo dos bandidos mais perigosos da região: salteadores, besteiros e brutamontes que atacam em bando. No terreiro, o Rei dos Bandidos corta em linha reta e, ferido, em leque.',
+      en: 'The hideout of the most dangerous bandits in the region: raiders, crossbowmen and brutes that attack in packs. In the yard, the Bandit King slashes in straight lines and, when wounded, in a fan.',
     },
   },
 ];

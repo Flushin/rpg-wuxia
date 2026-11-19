@@ -61,6 +61,8 @@ Resumo para não ler os valores antigos do registro do marco 5 por engano. A fon
 | Yeti Ancestral (chefe da masmorra) | 15 | 3000 | 300–400 | — (instância) |
 | Monge Profanado / Alma Penada / Guardião de Pedra (masmorra) | 16–19 | 100+20 / 80+18 / 120+24 | 12–18 / 8–12 / 12–18 (+por nível) | — (instância) |
 | Patriarca Profanado (chefe da masmorra) | 20 | 6000 | 600–800 | — (instância) |
+| Salteador / Besteiro / Brutamontes (masmorra) | 20–22 | 110+22 / 95+20 / 130+26 | 14–20 / 12–18 / 16–24 (+por nível) | — (instância) |
+| Rei dos Bandidos (chefe da masmorra) | 22 | 9000 | 1000–1300 | — (instância) |
 
 Curva de XP (`progression.json`): 250 / 455 / 850 / 1800 / 4000 / 6200 / 12000 / 15500 / 20000 (nível 1→2 até 9→10).
 Desde o marco 9 o nível máximo é 20, com 27000 / 31500 / 37000 / 42500 / 49500 / 56000 / 64000 / 73000 / 83000 /
@@ -138,6 +140,24 @@ Yeti com defesa física ×1,4 (fraco contra espírito). Corrida inteira: ~6000 X
 
 Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do nível certo (auto-combate), com poucas mortes, ouro suficiente para poções e conserto custando ~10-15% do ouro ganho. Tudo é guiado por dados (`src/data/*.json`) e conferido por `npm run sim:balance`.
 
+## Masmorra: Rei dos Bandidos (19/11/2026)
+
+`npm run sim:balance -- --masmorra=covil` (6 lutas por linha; nível 20, equipamento nv 15 em todos os slots). Golpes
+marcados a cada 5,5 s (4 s abaixo de 50%), alternando círculo (raio 2,4, 1,8×) e linha (9 × 1,8, 2,2×); abaixo de 50%
+a linha vira leque de 3 (0,55 rad entre elas). Vida 10050, força 30 (28–34 mudam pouco: o dano vem dos golpes marcados).
+
+| Seita | Nv 20 incomum | Nv 20 raro | Poções (incomum / raro) | Comparação: Patriarca nv 20 incomum |
+|---|---|---|---|---|
+| Tormenta | 6/6 (91 s) | 6/6 (69 s) | ~11 / ~7 | ~6 poções, 51 s |
+| Geada | 6/6 (56 s) | 6/6 (45 s) | ~1 / ~0,5 | ~0,2, 46 s |
+| Titã | 6/6 (145 s) | 6/6 (117 s) | ~15 / ~11 | ~10, 94 s |
+| Víbora | 6/6 (56 s) | 6/6 (44 s) | ~5 / ~3 | ~3, 37 s |
+
+Cerca de 1,5–2× o gasto de poções do Patriarca no mesmo nível. A simulação desvia com 0,45 s de reação; o jogador real
+leva mais linhas. Comuns (nv 21): Salteador 830 de vida e golpe de 1,6 s, Besteiro 870 atirando de 6 tiles e recuando,
+Brutamontes 1270 com golpe em área; Salteadores e Besteiros do mesmo acampamento entram juntos. Corrida inteira:
+~700 + ~1150 de ouro contra 1000 de entrada, mais 2 itens nv 15 garantidos do chefe (um Raro) e ~1 item dos monstros.
+
 ## Como medir
 
 `tools/balance-sim.ts` roda o `World` real (core + `auto.ts`, sem Phaser) em passos de 1/30 s:
@@ -145,7 +165,7 @@ Meta: **cerca de 1 hora de jogo ativo** do nível 1 ao 10, caçando monstros do 
 - Cada seita cria o personagem, liga o Auto e caça sozinha. O "jogador médio" simulado só decide o que o auto não decide: gasta pontos com **Distribuir recomendado**, veste upgrades (pontuação simples por atributo útil), conserta e vende sobras na vila, e vai às Ruínas ao chegar no nível 7.
 - Mede minutos por nível, mortes, ouro ganho por hora, gasto em poções e conserto.
 - Depois simula o chefe no nível 10 com equipamento nível 5 Incomum ou Raro em todos os slots, 18 poções e um jogador ativo: esquiva dos círculos (reação de 0,45 s), bebe poção com vida baixa; a Lâmina luta de perto, o Pavilhão recua dando a volta na arena.
-- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--masmorra=mosteiro`: Patriarca nos níveis 16/18/20 com equipamento nv 15; `--trace-masmorra` mostra a luta).
+- Flags: `--seeds=N`, `--max=min`, `--detail` (tabela por nível), `--deaths` (contexto de cada morte), `--trace --class=lamina` (linha do tempo do chefe), `--masmorra` (chefe da masmorra nos níveis 11/13/15 com equipamento nv 10; `--masmorra=mosteiro`: Patriarca nos níveis 16/18/20 com equipamento nv 15; `--masmorra=covil`: Rei dos Bandidos no nível 20; `--trace-masmorra` mostra a luta).
 
 ## Curva de XP (`progression.json`)
 

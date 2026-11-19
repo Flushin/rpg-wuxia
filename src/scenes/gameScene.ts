@@ -413,7 +413,7 @@ export class GameScene extends Phaser.Scene {
     this.hud.update();
   }
 
-  // círculo vermelho no chão: preenche até o impacto
+  // círculo (ou faixa, no golpe em linha) vermelho no chão: preenche até o impacto
   private syncTelegraphs() {
     const live = new Set<number>();
     for (const t of this.world.telegraphs) {
@@ -428,6 +428,32 @@ export class GameScene extends Phaser.Scene {
         ry = t.radius * TELEGRAPH_RY,
         k = Math.max(0, Math.min(1, 1 - t.remaining / t.delay));
       g.clear().setPosition(c.x, c.y);
+      if (t.shape === 'line') {
+        // faixa no chão saindo do chefe; o preenchimento avança do chefe até a ponta
+        const a = t.angle ?? 0,
+          ux = Math.cos(a),
+          uy = Math.sin(a),
+          len = t.length ?? 0,
+          hw = t.radius;
+        const quad = (l: number) =>
+          [
+            [-uy * hw, ux * hw],
+            [-uy * hw + ux * l, ux * hw + uy * l],
+            [uy * hw + ux * l, -ux * hw + uy * l],
+            [uy * hw, -ux * hw],
+          ].map(([dx, dy]) => {
+            const s = tileToScreen(t.x + dx, t.y + dy);
+            return new Phaser.Math.Vector2(s.x - c.x, s.y - c.y);
+          });
+        const full = quad(len);
+        g.fillStyle(0xff2020, 0.14);
+        g.fillPoints(full, true);
+        g.fillStyle(0xff3030, 0.28 + 0.25 * k);
+        g.fillPoints(quad(len * k), true);
+        g.lineStyle(3, 0xff5050, 0.95);
+        g.strokePoints(full, true);
+        continue;
+      }
       g.fillStyle(0xff2020, 0.14);
       g.fillEllipse(0, 0, rx * 2, ry * 2);
       g.fillStyle(0xff3030, 0.28 + 0.25 * k);

@@ -1,4 +1,4 @@
-// Chefes: golpes marcados no chão, invocação, fúria e arena.
+// Chefes: golpes marcados no chão (círculo e linha), invocação, fúria e arena.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { MONSTERS, type MonsterDef } from '../data';
 import { bal } from '../balance';
@@ -14,27 +14,89 @@ export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number)
   if (m.ai === 'chase') {
     m.aiTimer -= dt;
     if (m.aiTimer <= 0 && !p.dead) {
-      m.aiTimer = m.hp <= m.derived.maxHp * phase2Pct(def) ? b.aoe.intervalPhase2 : b.aoe.interval;
-      const t: Telegraph = {
-        id: w.nextTelegraph++,
-        x: p.x,
-        y: p.y,
-        radius: b.aoe.radius,
-        delay: b.aoe.delay,
-        remaining: b.aoe.delay,
-        ownerId: m.id,
-        mult: b.aoe.mult,
-      };
-      w.telegraphs.push(t);
-      w.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
+      const phase2 = m.hp <= m.derived.maxHp * phase2Pct(def);
+      m.aiTimer = phase2 ? b.aoe.intervalPhase2 : b.aoe.interval;
+      m.strikes = (m.strikes ?? 0) + 1;
+      if (b.line && m.strikes % 2 === 0) lineStrike(w, m, b.line);
+      else {
+        const t: Telegraph = {
+          id: w.nextTelegraph++,
+          x: p.x,
+          y: p.y,
+          radius: b.aoe.radius,
+          delay: b.aoe.delay,
+          remaining: b.aoe.delay,
+          ownerId: m.id,
+          mult: b.aoe.mult,
+        };
+        w.telegraphs.push(t);
+        w.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay });
+      }
     }
     if (b.summon && !w.bossSummoned && m.hp <= m.derived.maxHp * b.summon.atHpPct) summonAdds(w, m, b.summon);
     if (b.enrage && !m.enraged && m.hp <= m.derived.maxHp * b.enrage.atHpPct) enrage(w, m, def);
   }
 }
 
-/** Vida (fração) em que o chefe passa para a fase 2 (círculos mais frequentes): a da invocação ou a da fúria. */
-export const phase2Pct = (def: MonsterDef) => def.boss?.summon?.atHpPct ?? def.boss?.enrage?.atHpPct ?? 0.5;
+/** Vida (fração) em que o chefe passa para a fase 2 (golpes mais frequentes): a da invocação, da fúria ou do leque. */
+export const phase2Pct = (def: MonsterDef) =>
+  def.boss?.summon?.atHpPct ?? def.boss?.enrage?.atHpPct ?? def.boss?.line?.fanAtHpPct ?? 0.5;
+
+type LineDef = NonNullable<NonNullable<MonsterDef['boss']>['line']>;
+
+/** Golpe em linha: do chefe na direção do jogador; com pouca vida, leque de várias linhas. Desvia-se para o lado. */
+export function lineStrike(w: World, m: Entity, l: LineDef) {
+  const p = w.player,
+    base = Math.atan2(p.y - m.y, p.x - m.x) || 0,
+    n = m.hp <= m.derived.maxHp * l.fanAtHpPct ? l.fanCount : 1;
+  for (let i = 0; i < n; i++) {
+    const t: Telegraph = {
+      id: w.nextTelegraph++,
+      x: m.x,
+      y: m.y,
+      radius: l.width / 2,
+      delay: l.delay,
+      remaining: l.delay,
+      ownerId: m.id,
+      mult: l.mult,
+      shape: 'line',
+      angle: base + (i - (n - 1) / 2) * l.fanSpread,
+      length: l.length,
+    };
+    w.telegraphs.push(t);
+    w.emit({ type: 'telegraph', id: t.id, x: t.x, y: t.y, radius: t.radius, delay: t.delay, shape: 'line' });
+  }
+}
+
+/** O ponto está dentro da área marcada (margin: folga em tiles, para quem desvia com antecedência)? */
+export function inTelegraph(t: Telegraph, q: Point, margin = 0): boolean {
+  if (t.shape !== 'line') return dist(q, t) <= t.radius + margin;
+  const a = t.angle ?? 0,
+    dx = q.x - t.x,
+    dy = q.y - t.y,
+    along = dx * Math.cos(a) + dy * Math.sin(a),
+    across = -dx * Math.sin(a) + dy * Math.cos(a);
+  return along >= -margin && along <= (t.length ?? 0) + margin && Math.abs(across) <= t.radius + margin;
+}
+
+/** Centro da área marcada (para mostrar o texto do impacto): o meio da linha ou o centro do círculo. */
+export function telegraphCenter(t: Telegraph): Point {
+  if (t.shape !== 'line') return { x: t.x, y: t.y };
+  const a = t.angle ?? 0,
+    h = (t.length ?? 0) / 2;
+  return { x: t.x + Math.cos(a) * h, y: t.y + Math.sin(a) * h };
+}
+
+/** Lugar andável mais perto de `from` fora de todas as áreas marcadas (desvio do Auto e da simulação). */
+export function safeSpot(w: World, from: Point, margin = 0.4): Point | null {
+  for (const r of [1, 1.6, 2.3, 3.1, 4])
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2,
+        q = { x: from.x + Math.cos(a) * r, y: from.y + Math.sin(a) * r };
+      if (isWalkable(w.map, q.x, q.y) && !w.telegraphs.some((t) => inTelegraph(t, q, margin))) return q;
+    }
+  return null;
+}
 
 /** Fúria: golpes mais rápidos e mais fortes e passo mais rápido até a luta resetar (resetBoss). */
 export function enrage(w: World, m: Entity, def: MonsterDef) {
@@ -93,6 +155,7 @@ export function summonAdds(w: World, boss: Entity, sm: { monsterId: string; coun
 
 export function resetBoss(w: World, m: Entity) {
   w.bossSummoned = false;
+  m.strikes = 0;
   if (m.enraged) {
     const def = MONSTERS[m.monsterId],
       hp = m.hp;
@@ -115,8 +178,9 @@ export function tickTelegraphs(w: World, dt: number) {
     if (t.remaining > 0) continue;
     w.telegraphs = w.telegraphs.filter((x) => x !== t);
     const owner = w.monsters.find((e) => e.id === t.ownerId);
-    const hit = !!owner && !owner.dead && !p.dead && dist(p, t) <= t.radius;
-    w.emit({ type: 'telegraphResolved', id: t.id, x: t.x, y: t.y, radius: t.radius, hit });
+    const hit = !!owner && !owner.dead && !p.dead && inTelegraph(t, p),
+      c = telegraphCenter(t);
+    w.emit({ type: 'telegraphResolved', id: t.id, x: c.x, y: c.y, radius: t.radius, hit });
     if (hit && owner) directDamage(w, owner, p, t.mult);
   }
 }

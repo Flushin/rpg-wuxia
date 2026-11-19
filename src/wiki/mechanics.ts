@@ -243,7 +243,7 @@ function auto(): string {
     (t, i) => `<tr><td>${i ? OFFLINE_TIERS[i - 1].untilH : 0} a ${t.untilH} h</td><td>${pc(t.eff)}</td></tr>`,
   ).join('');
   return `<section class="panel"><h2>Auto-combate</h2><p>Liga no botão <b>Auto</b> (ou tecla Z). Com o jogo aberto, o personagem caça sozinho no mapa todo.
-      O botão ☰ ao lado abre o menu de opções. Qualquer movimento manual pausa o auto. Nas masmorras (<a href="#/mapa/gruta">Desfiladeiro</a>, <a href="#/mapa/mosteiro">Mosteiro</a>) o auto não funciona.</p><ul>
+      O botão ☰ ao lado abre o menu de opções. Qualquer movimento manual pausa o auto. Nas masmorras (<a href="#/mapa/gruta">Desfiladeiro</a>, <a href="#/mapa/mosteiro">Mosteiro</a>, <a href="#/mapa/covil">Covil</a>) o auto não funciona.</p><ul>
       <li><b>Alvos:</b> ataca o monstro mais perto, até <b>${AUTO_MAX_LEVEL_GAP} níveis acima</b> do seu (ajustável de +0 a +${AUTO_MAX_LEVEL_LIMIT}).
         Monstros 2+ níveis abaixo ("cinzas") ficam por último. Evita caminhos que atraem grupos. Nunca ataca chefes.</li>
       <li><b>Revide:</b> por padrão, revida quem o atacar; dá para limitar ao nível máximo ou desligar e, nesse caso, escolher entre continuar, se afastar ou voltar à vila.</li>
