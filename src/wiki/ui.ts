@@ -5,12 +5,12 @@ import { npcName } from './npcs';
 export const itemLink = (id: string) =>
   itemKind(id) ? `<a class="ilink" href="#/item/${id}">${iconHtml(id, 'sm')}${esc(itemName(id))}</a>` : esc(id);
 
-/** Monstros ainda não têm página: nome + nível. */
+/** Link para a página do monstro, com a faixa de nível dele. */
 export function monsterLabel(id: string): string {
   const m = MONSTERS[id];
   if (!m) return esc(id);
   const lv = m.minLevel === m.maxLevel ? `nv ${m.minLevel}` : `nv ${m.minLevel}–${m.maxLevel}`;
-  return `<b>${esc(m.name)}</b> <small class="muted">(${lv}${m.boss ? ', chefe' : ''})</small>`;
+  return `<a href="#/monstro/${id}"><b>${esc(m.name)}</b></a> <small class="muted">(${lv}${m.boss ? ', chefe' : ''})</small>`;
 }
 
 /** Conteúdo escondido atrás de um botão (chefes, segredos). */

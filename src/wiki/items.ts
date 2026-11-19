@@ -147,10 +147,11 @@ export function itemPage(id: string): string | null {
       Object.entries(b.stats)
         .map(([s, v]) => row(esc(STAT_LABELS[s] ?? s), `+${fmtStatValue(s, v)}`))
         .join('');
+    const total = Object.values(RARITIES).reduce((t, r) => t + r.weight, 0);
     const rar = Object.values(RARITIES)
       .map(
         (r) =>
-          `<tr><td><b style="color:${r.color}">${esc(r.name)}</b></td><td>${r.bonuses}</td><td>${r.weight}%</td><td>${sellPrice(b.value, r.valueMul)} ouro</td></tr>`,
+          `<tr><td><b style="color:${r.color}">${esc(r.name)}</b></td><td>${r.bonuses}</td><td>${+((r.weight / total) * 100).toFixed(1)}%</td><td>${sellPrice(b.value, r.valueMul)} ouro</td></tr>`,
       )
       .join('');
     extra = `<section class="panel"><h2>Raridades</h2>

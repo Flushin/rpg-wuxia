@@ -6,6 +6,7 @@ import npcsJson from '../data/npcs.json';
 import questsJson from '../data/quests.json';
 import classesJson from '../data/classes.json';
 import atlas from '../data/sprites/icones.json';
+import { balanceItems, balanceMonsters, balanceQuests } from '../core/balance';
 
 export interface Base {
   name: string;
@@ -35,20 +36,43 @@ export interface Consumable {
   price: number;
   desc: string;
 }
-interface EquipDrop {
+export interface EquipDrop {
   chance: number;
   maxReqLevel: number;
   minReqLevel?: number;
   minMonsterLevel?: number;
 }
+type Attrs = { strength: number; intelligence: number; stamina: number; agility: number; willpower: number };
+export interface BossDef {
+  arenaRadius: number;
+  aoe?: { radius: number; delay: number; mult: number; interval: number; intervalPhase2?: number };
+  summon?: { monsterId: string; count: number; level: number; atHpPct: number };
+}
 export interface Monster {
   id: string;
   name: string;
+  sprite: string;
   minLevel: number;
   maxLevel: number;
-  boss?: unknown;
+  baseAttributes: Attrs;
+  perLevel: Attrs;
+  damageType: 'physical' | 'spiritual';
+  aggroRange: number;
+  attackRange: number;
+  attackInterval: number;
+  moveSpeed: number;
+  xpBase: number;
+  xpPerLevel: number;
+  respawnSeconds: number;
+  defMul?: { phys: number; spirit: number };
+  projectile?: string;
+  keepDistance?: number;
+  groupAggro?: boolean;
+  onHit?: { slow: number; duration: number };
+  slam?: { radius: number; delay: number; mult: number; interval: number };
+  boss?: BossDef;
   loot: {
-    gold?: { min: number; max: number };
+    gold?: { min: number; max: number; perLevel?: number };
     potions?: { id: string; chance: number; minMonsterLevel?: number }[];
     materials?: { id: string; chance: number; min?: number; max?: number }[];
     equipment?: EquipDrop | EquipDrop[];
@@ -86,6 +110,12 @@ const I = itemsJson as unknown as {
   };
   upgradeStep: number;
 };
+
+// Mesmos multiplicadores de src/data/balance.json que o jogo aplica ao carregar (a wiki é outra página, então
+// aplica uma vez aqui). As regras aplicadas na hora do uso (ex.: vida dos monstros) usam bal() nas páginas.
+balanceItems(I as unknown as Parameters<typeof balanceItems>[0]);
+balanceMonsters(monstersJson as unknown as Parameters<typeof balanceMonsters>[0]);
+balanceQuests((questsJson as unknown as { chain: Parameters<typeof balanceQuests>[0] }).chain);
 
 export const SLOT_NAMES = I.slotNames;
 export const RARITIES = I.rarities;

@@ -299,6 +299,20 @@ h3 {
   color: var(--muted);
   font-size: 12px;
 }
+.mon-grid .card-link {
+  justify-content: flex-end;
+  min-height: 170px;
+}
+.mon-grid .sprite {
+  zoom: 0.9;
+}
+.drops li {
+  margin: 6px 0;
+}
+.tbl.stats th:first-child {
+  color: var(--muted);
+  font-weight: 500;
+}
 .npc-grid .card-link {
   justify-content: flex-end;
   min-height: 170px;

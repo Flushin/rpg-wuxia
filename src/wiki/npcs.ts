@@ -116,9 +116,9 @@ let cache: NpcInfo[] | null = null;
 export const NPCS = () => (cache ??= npcList());
 export const npcName = (id: string) => NPCS().find((n) => n.id === id)?.name ?? id;
 
-/** Sprite parado (1º quadro da animação idle) do NPC. Lê o atlas em public/sprites/<sheet>.json. */
-export function spriteHtml(sheet: string, cls = ''): string {
-  return `<span class="sprite ${cls}" data-sheet="${esc(sheet)}"></span>`;
+/** Sprite parado (1º quadro da animação idle; idle_<direção>_0) de NPC ou monstro. Lê o atlas em public/sprites/<sheet>.json. */
+export function spriteHtml(sheet: string, cls = '', frame = 'idle_0_0'): string {
+  return `<span class="sprite ${cls}" data-sheet="${esc(sheet)}" data-frame="${frame}"></span>`;
 }
 export async function fillSprites(root: ParentNode) {
   const els = root.querySelectorAll<HTMLElement>('.sprite[data-sheet]');
@@ -126,7 +126,7 @@ export async function fillSprites(root: ParentNode) {
     const sheet = el.dataset.sheet!;
     try {
       const j = await loadSheet(sheet);
-      const f = j.frames['idle_0_0']?.frame ?? Object.values(j.frames)[0]?.frame;
+      const f = j.frames[el.dataset.frame ?? 'idle_0_0']?.frame ?? Object.values(j.frames)[0]?.frame;
       if (!f) continue;
       el.style.width = f.w + 'px';
       el.style.height = f.h + 'px';

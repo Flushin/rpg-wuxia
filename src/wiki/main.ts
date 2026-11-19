@@ -3,6 +3,9 @@ import './wiki.css';
 import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, itemName } from './data';
 import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
+import { MONSTERS } from './data';
+import { loadMaps, type WikiMap } from './maps';
+import { isSpoiler, monsterIndexPage, monsterPage, monsterSprite } from './monsters';
 
 interface Cat {
   id: string;
@@ -16,7 +19,7 @@ const CATS: Cat[] = [
   { id: 'seitas', label: 'Seitas', icon: '☯', ready: false },
   { id: 'skills', label: 'Skills', icon: '✨', ready: false },
   { id: 'itens', label: 'Itens', icon: 'espadas_ferro', ready: true },
-  { id: 'monstros', label: 'Monstros', icon: '🐺', ready: false },
+  { id: 'monstros', label: 'Monstros', icon: '🐺', ready: true },
   { id: 'npcs', label: 'NPCs', icon: '🧙', ready: true },
   { id: 'missoes', label: 'Missões', icon: '❗', ready: false },
   { id: 'mapas', label: 'Mapas', icon: '🗺', ready: false },
@@ -54,6 +57,11 @@ interface Hit {
   kind: string;
 }
 let index: Hit[] | null = null;
+let maps: WikiMap[] | null = null;
+void loadMaps().then((m) => {
+  maps = m;
+  index = null; // refaz o índice com os monstros
+});
 function searchIndex(): Hit[] {
   return (index ??= [
     ...allItemIds().map((id) => ({
@@ -72,6 +80,10 @@ function searchIndex(): Hit[] {
                 : '',
     })),
     ...NPCS().map((n) => ({ name: n.name, href: `#/npc/${n.id}`, icon: spriteHtml(n.sheet, 'mini'), kind: 'NPC' })),
+    // chefes ficam fora da busca (spoiler)
+    ...Object.values(MONSTERS)
+      .filter((m) => maps && !isSpoiler(m, maps))
+      .map((m) => ({ name: m.name, href: `#/monstro/${m.id}`, icon: monsterSprite(m, 'mini'), kind: 'Monstro' })),
   ]);
 }
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -94,12 +106,14 @@ function renderSearch(q: string) {
 }
 
 // ---------- Rotas ----------
-function route() {
+let routeSeq = 0;
+async function route() {
+  const seq = ++routeSeq;
   const raw = location.hash.replace(/^#\/?/, '');
   const [path, qs = ''] = raw.split('?');
   const parts = path.split('/').filter(Boolean).map(decodeURIComponent);
   const params = new URLSearchParams(qs);
-  let html: string | null = null,
+  let html: string | null | Promise<string | null> = null,
     active = parts[0] ?? '';
   if (!parts.length) html = home();
   else if (parts[0] === 'itens') html = itemIndexPage(parts[1] ?? 'equip', params);
@@ -110,13 +124,22 @@ function route() {
   else if (parts[0] === 'npc') {
     html = npcPage(parts[1] ?? '');
     active = 'npcs';
+  } else if (parts[0] === 'monstros') html = monsterIndexPage();
+  else if (parts[0] === 'monstro') {
+    html = monsterPage(parts[1] ?? '');
+    active = 'monstros';
   } else {
     const c = CATS.find((x) => x.id === parts[0]);
     if (c) html = soon(c);
   }
-  html ??= `<h1>Página não encontrada</h1><p><a href="#/">Voltar ao início</a></p>`;
   nav(active);
   const main = $('#main');
+  if (html instanceof Promise) {
+    main.innerHTML = '<p class="muted">Carregando…</p>';
+    html = await html.catch(() => '<h1>Erro ao carregar</h1><p>Verifique a conexão e recarregue a página.</p>');
+    if (seq !== routeSeq) return; // o jogador já foi para outra página
+  }
+  html ??= `<h1>Página não encontrada</h1><p><a href="#/">Voltar ao início</a></p>`;
   main.innerHTML = html;
   void fillSprites(main);
   const title = main.querySelector('h1')?.textContent;
@@ -127,7 +150,7 @@ function route() {
   window.scrollTo(0, 0);
 }
 
-window.addEventListener('hashchange', route);
+window.addEventListener('hashchange', () => void route());
 const q = $('#q') as HTMLInputElement;
 q.addEventListener('input', () => renderSearch(q.value));
 q.addEventListener('keydown', (e) => {
@@ -138,4 +161,4 @@ document.addEventListener('click', (e) => {
   if (!(e.target as HTMLElement).closest('.search')) $('#results').classList.add('hidden');
 });
 $('#menu-btn').addEventListener('click', () => document.body.classList.toggle('menu-open'));
-route();
+void route();
