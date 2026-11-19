@@ -14,6 +14,7 @@ import { initViewport } from './ui/viewport';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
 import { initScrollbars } from './ui/scrollbars';
 import { registerServiceWorker } from './platform';
+import { watchForUpdates } from './platform/update';
 import { initNativeApp } from './platform/native';
 
 captureErrors();
@@ -89,3 +90,4 @@ window.addEventListener('orientationchange', () => setTimeout(fit, 200));
 if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
 
 registerServiceWorker();
+watchForUpdates();
