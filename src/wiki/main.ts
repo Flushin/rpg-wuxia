@@ -4,6 +4,7 @@ import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, item
 import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
 import { CLASSES, MONSTERS, SECT_ORDER, SKILLS } from './data';
+import { mechanicsPage } from './mechanics';
 import { fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from './sects';
 import { loadMaps, type WikiMap } from './maps';
@@ -17,7 +18,7 @@ interface Cat {
 }
 // Ícones: emojis por enquanto nas categorias sem item que as represente.
 const CATS: Cat[] = [
-  { id: 'mecanicas', label: 'Mecânicas', icon: '📜', ready: false },
+  { id: 'mecanicas', label: 'Mecânicas', icon: '📜', ready: true },
   { id: 'seitas', label: 'Seitas', icon: '☯', ready: true },
   { id: 'skills', label: 'Skills', icon: 'skill_corte_duplo', ready: true },
   { id: 'itens', label: 'Itens', icon: 'espadas_ferro', ready: true },
@@ -149,7 +150,8 @@ async function route() {
   else if (parts[0] === 'skill') {
     html = skillPage(parts[1] ?? '');
     active = 'skills';
-  } else if (parts[0] === 'missoes') html = questIndexPage();
+  } else if (parts[0] === 'mecanicas') html = mechanicsPage(parts[1]);
+  else if (parts[0] === 'missoes') html = questIndexPage();
   else if (parts[0] === 'mapas') html = mapIndexPage();
   else if (parts[0] === 'mapa') {
     html = mapPage(parts[1] ?? '');

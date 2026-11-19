@@ -358,6 +358,29 @@ h3 {
   border-bottom: none;
 }
 
+/* ---------- Mecânicas ---------- */
+.formula {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--gold);
+  background: var(--card2);
+  border-radius: 0 8px 8px 0;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13.5px;
+}
+.scroll {
+  overflow-x: auto;
+}
+.scroll .tbl td,
+.scroll .tbl th {
+  white-space: nowrap;
+}
+details.more summary {
+  cursor: pointer;
+  color: var(--link);
+  margin: 6px 0;
+}
+
 /* ---------- Missões e mapas ---------- */
 ol.plain {
   list-style: none;

@@ -32,6 +32,11 @@ import { SHEETS, monsterIndexPage, monsterPage, statsAt } from '../src/wiki/mons
 import { NPCS, npcIndexPage, npcPage } from '../src/wiki/npcs';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from '../src/wiki/sects';
 import { mapIndexPage, mapPage, questIndexPage } from '../src/wiki/world';
+import * as M from '../src/wiki/mechanics';
+import { hitChance as cHit } from '../src/core/combat';
+import { DEATH_DURABILITY_LOSS, TOWN_REGEN } from '../src/core/world';
+import { FORGE, rarityCost, rerollCost, salvageYield, upgradeCost } from '../src/core/world/forge';
+import { OFFLINE_GOLD_CAP_HOURS, OFFLINE_TIERS } from '../src/core/offline';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -167,6 +172,40 @@ console.log('== fórmulas copiadas ==');
   ok(!bad.length, `preços de venda e do Mercador ${bad.join(', ')}`);
 }
 
+console.log('== mecânicas (cópias) ==');
+{
+  ok(
+    M.TOWN_REGEN === TOWN_REGEN && M.DEATH_DURABILITY_LOSS === DEATH_DURABILITY_LOSS,
+    'regeneração na vila e perda ao morrer',
+  );
+  const hv = [-300, -50, 0, 37, 120, 400];
+  ok(
+    hv.every((a) => hv.every((b) => M.hitChance(80 + a, b) === cHit(80 + a, b))),
+    'chance de acerto',
+  );
+  ok(same(M.FORGE, FORGE), 'tabela da forja (FORGE)');
+  const rng = new Rng(3);
+  const bad: string[] = [];
+  for (const id of Object.keys(C_BASES))
+    for (const r of ['comum', 'incomum', 'raro'] as const) {
+      const it = makeEquipment(id, r, null, rng);
+      const lv = C_BASES[id].reqLevel;
+      for (let plus = 0; plus < 10; plus++) {
+        it.plus = plus;
+        if (!same(M.upgradeCost(lv, plus), upgradeCost(it))) bad.push(`melhorar ${id}+${plus}`);
+        if (!same(M.salvageYield(lv, r, plus), salvageYield(it))) bad.push(`desmontar ${id} ${r}+${plus}`);
+      }
+      it.plus = 0;
+      if (r !== 'raro' && !same({ ...M.rarityCost(lv, r), chance: 1 }, rarityCost(it))) bad.push(`raridade ${id} ${r}`);
+      if (r !== 'comum' && !same({ ...M.rerollCost(lv, r), chance: 1 }, rerollCost(it))) bad.push(`trocar ${id} ${r}`);
+    }
+  ok(!bad.length, `custos da forja e desmontar ${bad.slice(0, 5).join(', ')}`);
+  ok(
+    same(M.OFFLINE_TIERS, OFFLINE_TIERS) && M.OFFLINE_GOLD_CAP_HOURS === OFFLINE_GOLD_CAP_HOURS,
+    'ganho offline (faixas e teto)',
+  );
+}
+
 console.log('== páginas ==');
 {
   const bad: string[] = [];
@@ -186,6 +225,8 @@ console.log('== páginas ==');
   for (const s of Object.values(W.SKILLS).flat()) look('skill/' + s.id, skillPage(s.id));
   look('monstros', await monsterIndexPage());
   for (const id of Object.keys(W.MONSTERS)) look('monstro/' + id, await monsterPage(id));
+  look('mecanicas', M.mechanicsPage());
+  for (const t of ['combate', 'morte', 'forja', 'auto']) look('mecanicas/' + t, M.mechanicsPage(t));
   look('missoes', await questIndexPage());
   look('mapas', await mapIndexPage());
   for (const id of MAP_IDS) look('mapa/' + id, await mapPage(id));
