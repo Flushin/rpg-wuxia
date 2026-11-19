@@ -196,7 +196,9 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     if (o.type !== 'portal') continue;
     // portal na borda de cima/baixo fica de frente para o outro eixo: espelha o sprite
     const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
-    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns));
+    // `scale` no mapa força o tamanho do sprite (ex.: Trial, na borda de baixo, some se ficar pequeno)
+    const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
+    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc));
   }
   if (water.length) {
     // água: cada tile troca de quadro com sua própria fase (sem todos piscarem juntos)
@@ -250,6 +252,7 @@ function portal(
   h: number,
   name: string,
   flip = false,
+  scale = 1,
 ): Phaser.GameObjects.GameObject[] {
   const out: Phaser.GameObjects.GameObject[] = [];
   const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
@@ -264,7 +267,7 @@ function portal(
   const c = tileToScreen(x + w / 2, y + h / 2);
   const gate = scene.add
     .image(c.x, c.y, 'props-ruinas', 'portal')
-    .setScale(SPRITE_SCALE * Math.min(1, h / 3.2))
+    .setScale(SPRITE_SCALE * scale)
     .setFlipX(flip)
     .setDepth(Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1);
   gate.setName('tree');
@@ -285,7 +288,7 @@ function portal(
     .setDepth(gate.depth + 0.5);
   out.push(sparks);
   const label = scene.add
-    .text(c.x, c.y - 92 * Math.min(1, h / 3.2), name, {
+    .text(c.x, c.y - 92 * scale, name, {
       fontSize: '13px',
       color: '#e8d0ff',
       stroke: '#000',

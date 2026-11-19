@@ -352,7 +352,7 @@ function cidade() {
     // saída oeste: portal das masmorras (abre o menu de escolha; src/core/dungeons.ts)
     area('Portal das Masmorras', 'portal', 1, 14, 2, 4, { menu: 'masmorras' }),
     // saída sul: portal do Trial (menu de chefe e nível; src/core/trial.ts)
-    area('Trial', 'portal', 15, 29, 2, 2, { menu: 'trial' }),
+    area('Trial', 'portal', 15, 29, 2, 2, { menu: 'trial', scale: 1.1 }),
   );
   return tiled('Vila das Nuvens', gr, objs);
 }
