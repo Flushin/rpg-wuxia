@@ -711,6 +711,17 @@ export class AutoCombat {
     if (w.gcd > 0) return;
     const defs = w.activeSkills();
     const aggroed = w.monsters.some((m) => !m.dead && m.ai === 'chase');
+    // reserva mana para o escudo/cura pronto: senão as skills de ataque gastam tudo e ele nunca sai na hora certa
+    const reserve = defs
+      .filter(
+        (d) =>
+          (d.shield || d.heal) &&
+          !this.cfg.skillsOff.includes(d.id) &&
+          w.isUnlocked(d) &&
+          w.skills[d.id].cd <= 0 &&
+          !w.hasBuff(p, d.shield ? 'shield' : 'regen'),
+      )
+      .reduce((a, d) => Math.max(a, d.mana ?? 0), 0);
     // da mais forte (desbloqueada por último) para a mais básica
     for (let slot = defs.length - 1; slot >= 0; slot--) {
       const def = defs[slot],
@@ -727,7 +738,8 @@ export class AutoCombat {
         if (!(aggroed && p.hp < p.derived.maxHp * SHIELD_HP) || w.hasBuff(p, 'shield')) continue;
       } else if (def.heal) {
         if (!(aggroed && p.hp < p.derived.maxHp * HEAL_HP) || w.hasBuff(p, 'regen')) continue;
-      } else if (def.area === 'self') {
+      } else if (p.mana - (def.mana ?? 0) < reserve) continue;
+      else if (def.area === 'self') {
         if (!w.monsters.some((m) => !m.dead && dist(m, p) <= (def.radius ?? 0))) continue;
       } else if (def.area === 'target') {
         if (

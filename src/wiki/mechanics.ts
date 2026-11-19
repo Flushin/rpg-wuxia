@@ -247,7 +247,8 @@ function auto(): string {
       <li><b>Alvos:</b> ataca o monstro mais perto, até <b>${AUTO_MAX_LEVEL_GAP} níveis acima</b> do seu (ajustável de +0 a +${AUTO_MAX_LEVEL_LIMIT}).
         Monstros 2+ níveis abaixo ("cinzas") ficam por último. Evita caminhos que atraem grupos. Nunca ataca chefes.</li>
       <li><b>Revide:</b> por padrão, revida quem o atacar; dá para limitar ao nível máximo ou desligar e, nesse caso, escolher entre continuar, se afastar ou voltar à vila.</li>
-      <li><b>Skills e poções:</b> você escolhe quais skills ele usa e com quanto de vida/mana toma poção (padrão: vida abaixo de 40%, mana abaixo de 30%).</li>
+      <li><b>Skills e poções:</b> você escolhe quais skills ele usa e com quanto de vida/mana toma poção (padrão: vida abaixo de 40%, mana abaixo de 30%).
+        Escudos saem com a vida abaixo de 70% em combate (curas, abaixo de 60%), e o auto guarda mana para eles enquanto estão prontos.</li>
       <li><b>Sem poções:</b> volta à vila, compra a quantidade definida no menu (se tiver ouro) e retorna.</li>
       <li><b>Mochila cheia:</b> vende sozinho os equipamentos Comuns (opção para vender Incomuns também). O que não couber fica no chão.</li>
       <li><b>Morte:</b> volta da vila e continua, desde que nenhum item equipado esteja com durabilidade 0. Se estiver, para e espera você.</li>
