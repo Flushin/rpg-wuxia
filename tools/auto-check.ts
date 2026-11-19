@@ -937,6 +937,16 @@ console.log('\n== offline: aplicando no jogo ==');
       'pontos automáticos aplicados',
     );
     ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);
+    {
+      // mochila só com espaço livre: lota de espadas Comuns, vende todas e continua
+      const ws = mk('lamina', 1, 'floresta', base(), NOW);
+      const r = ws.offlineReport!;
+      const swords = r.items.find((i) => i.rarity === 'comum' && i.qty > BAG_SIZE)?.qty ?? 0;
+      ok(
+        swords > BAG_SIZE && r.soldCount > 0 && r.soldGold > 0 && ws.freeSlots() >= 0,
+        `mochila lotou: vendeu ${r.soldCount} equipamentos (+${r.soldGold} ouro) e continuou (${swords} espadas no total)`,
+      );
+    }
     ok(
       rep.items.every((i) => i.rarity === 'comum') &&
         w.bag.every((b) => !b || (b.baseId !== 'minerio_ferro' && (b.rarity === 'comum' || b.baseId === 'colar_jade'))),

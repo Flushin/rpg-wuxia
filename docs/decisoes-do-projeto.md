@@ -551,7 +551,7 @@ Decidido pelo Lucas em 16/11/2026.
   - Só conta se o jogador saiu com o auto-combate ligado num mapa de caça.
   - **Cálculo pelo ritmo real:** mede monstros por minuto, XP/ouro/drops por abate e poções gastas por abate durante o auto-combate antes de sair.
   - **Eficiência por faixa de tempo:** 60% até 12 h · 40% de 12 h a 18 h · 20% de 18 h a 24 h · 0 depois de 24 h.
-  - Sem morte e sem perda de durabilidade offline. Itens que não cabem na mochila são vendidos automaticamente. Se as poções acabarem offline, os ganhos continuam.
+  - Sem morte e sem perda de durabilidade offline. Mochila cheia: vende de uma vez todo equipamento que o auto vende (Comuns; Incomuns se a opção estiver ligada) e segue caçando; o que ainda não couber também é vendido. Tudo entra em "Vendido automaticamente" no resumo. Se as poções acabarem offline, os ganhos continuam.
   - Tela de resumo "Enquanto você esteve fora" ao voltar.
 - **Skills no idle:** ganham experiência de uso no auto-combate, mas **não** no ganho offline.
 

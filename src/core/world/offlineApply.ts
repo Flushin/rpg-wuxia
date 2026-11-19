@@ -40,7 +40,10 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
         : makeEquipment(d.baseId, d.rarity, CLASSES[w.classId].element, w.rng, rate.monLevel);
       let placed = w.addItem(it);
       if (!placed) {
-        w.auto.makeRoom();
+        // mochila cheia: vende de uma vez todo equipamento que o auto vende e segue caçando
+        const g0 = w.gold;
+        soldCount += w.auto.makeRoom();
+        soldGold += w.gold - g0;
         placed = w.addItem(it);
       }
       if (!placed) {
