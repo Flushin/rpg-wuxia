@@ -5,7 +5,7 @@ import { CLASSES, MONSTERS, PROGRESSION } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { effectiveMinutes, computeOffline } from '../src/core/offline';
 import { BAG_SIZE, BAG_TAB_SIZE, makeEquipment, makePotion } from '../src/core/items';
-import { World } from '../src/core/world';
+import { LEVELUP_POSE_S, World } from '../src/core/world';
 import { Rng } from '../src/core/rng';
 import type { AutoBucket, GameEvent, Point, Rarity, SaveData } from '../src/core/types';
 
@@ -966,6 +966,7 @@ console.log('\n== offline: aplicando no jogo ==');
     ok(rep.kills === Math.floor(3 * 216), `abates = taxa × minutos efetivos (${rep.kills})`);
     const gained = w.player.level - 1;
     ok(gained >= 5 && rep.levelsGained === gained, `XP sobe vários níveis (nv ${w.player.level})`);
+    ok(w.levelUpPose === 0, 'subida de nível offline não deixa o personagem parado na pose');
     ok(w.freePoints === gained * PROGRESSION.freePointsPerLevel, `pontos livres acumulam (${w.freePoints})`);
     ok(
       w.player.attrs.strength ===
@@ -1119,6 +1120,23 @@ console.log('\n== montanha nevada (marco 9, fase 2) ==');
   const b9 = mk('lamina', 9, 'cidade');
   b9.auto.toggle();
   ok(b9.auto.huntMap === 'floresta', 'auto nível 9: continua na floresta');
+}
+
+console.log('\n== subida de nível: pose de 0,65 s ==');
+{
+  const w = mk('lamina', 5, 'floresta');
+  w.auto.toggle();
+  w.gainXp(w.xpToNext()!);
+  ok(w.player.level === 6 && w.levelUpPose === LEVELUP_POSE_S, 'sobe de nível e começa a pose');
+  const x = w.player.x,
+    y = w.player.y;
+  w.setMoveInput(1, 0);
+  w.useSkill(0);
+  ok(!w.events.some((e) => e.type === 'skillCast'), 'durante a pose: skill não sai');
+  run(w, LEVELUP_POSE_S - 0.1);
+  ok(w.player.x === x && w.player.y === y, 'durante a pose: fica parado');
+  run(w, 0.3);
+  ok(w.levelUpPose === 0 && (w.player.x !== x || w.player.y !== y), 'depois da pose: volta a andar');
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

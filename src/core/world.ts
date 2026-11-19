@@ -85,6 +85,8 @@ const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 export const DEATH_DURABILITY_LOSS = 0.1;
+/** subida de nível: o jogador fica parado fazendo a pose (só visual; o auto espera). Igual à animação "levelup" (8 quadros a 12 fps). */
+export const LEVELUP_POSE_S = 0.65;
 const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
 const BOSS_LEASH_SLACK = 3; // chefe só larga o jogador além do raio da arena + isto (tiles)
 const BOSS_LEASH_GRACE = 3; // ...e depois de tantos segundos seguidos lá fora
@@ -118,6 +120,8 @@ export class World {
   classId: string;
   xp = 0;
   freePoints = 0;
+  /** segundos que ainda faltam da pose de subida de nível (não vai para o save) */
+  levelUpPose = 0;
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
@@ -465,7 +469,7 @@ export class World {
   useSkill(slot: number) {
     const p = this.player,
       def = this.activeSkills()[slot];
-    if (!def || p.dead) return;
+    if (!def || p.dead || this.levelUpPose > 0) return;
     if (!this.isUnlocked(def)) return this.fail(def, 'locked');
     const st = this.skills[def.id];
     if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
@@ -688,6 +692,8 @@ export class World {
     if (this.player.dead) {
       this.respawnTimer -= dt;
       if (this.respawnTimer <= 0) this.respawnPlayer();
+    } else if (this.levelUpPose > 0) {
+      this.levelUpPose = Math.max(0, this.levelUpPose - dt); // pose de subida de nível: nem o auto nem o jogador agem
     } else {
       this.auto.tick(dt);
       this.tickPlayer(dt);
@@ -1200,6 +1206,7 @@ export class World {
       p.hp = p.derived.maxHp;
       p.mana = p.derived.maxMana;
       this.emit({ type: 'levelup', level: p.level });
+      this.levelUpPose = LEVELUP_POSE_S;
       for (const s of this.classSkills()) if (s.unlock === p.level) this.emit({ type: 'skillUnlocked', skillId: s.id });
     }
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;

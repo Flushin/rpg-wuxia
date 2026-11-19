@@ -34,6 +34,8 @@ export class EntityView {
   private lastX = 0;
   private lastY = 0;
   private attacking = false;
+  private posing = false; // pose de subida de nível tocando
+  private glowSp?: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite; // brilho por cima do corpo
   private deadAt = 0;
   private movedAt = -1e9; // último instante em que se moveu (ms)
   private accX = 0; // deslocamento acumulado desde a última troca de direção
@@ -63,6 +65,9 @@ export class EntityView {
       sp.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
         if (this.anim === 'attack') {
           this.attacking = false;
+          this.anim = '';
+        } else if (this.anim === 'levelup') {
+          this.posing = false;
           this.anim = '';
         }
       });
@@ -101,6 +106,7 @@ export class EntityView {
     const s = tileToScreen(e.x, e.y);
     if (this.sheet) this.animate(e);
     else if (Math.abs(s.x - this.lastSx) > 0.2) this.sprite.setFlipX(s.x < this.lastSx);
+    if (this.glowSp) this.glowSp.setFrame(this.sprite.frame.name).setFlipX(this.sprite.flipX);
     this.lastSx = s.x;
     this.container.setPosition(s.x, s.y);
     // setDepth sempre manda o Phaser reordenar a cena inteira (~1.500 objetos), mesmo com o mesmo valor
@@ -192,6 +198,7 @@ export class EntityView {
       return;
     }
     if (this.anim === 'death') this.anim = ''; // renasceu
+    if (this.posing) return; // pose de subida de nível: o mundo deixa o jogador parado até ela acabar
     const step = Math.hypot(dx, dy);
     if (step > 1.5) {
       this.accX = this.accY = 0;
@@ -234,9 +241,14 @@ export class EntityView {
     this.anim = anim;
   }
 
+  /** Altura (px) do topo do personagem acima dos pés. */
+  get height() {
+    return this.top;
+  }
+
   /** Em combate, parado: olha para o alvo (x, y em tiles). */
   face(x: number, y: number, fromX: number, fromY: number) {
-    if (!this.sheet || this.attacking || this.anim === 'walk' || this.anim === 'death') return;
+    if (!this.sheet || this.attacking || this.posing || this.anim === 'walk' || this.anim === 'death') return;
     if (Math.hypot(x - fromX, y - fromY) > 0.05) this.dir = dirFromDelta(x - fromX, y - fromY);
   }
 
@@ -244,8 +256,48 @@ export class EntityView {
   attack(towardX: number, towardY: number, fromX: number, fromY: number) {
     if (!this.sheet || this.anim === 'death') return;
     if (Math.hypot(towardX - fromX, towardY - fromY) > 0.01) this.dir = dirFromDelta(towardX - fromX, towardY - fromY);
+    this.posing = false;
     this.attacking = true;
     this.play('attack', true);
+  }
+
+  /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose. */
+  levelUp(glowMs: number, color: number) {
+    if (this.sheet?.meta.anims.levelup && this.anim !== 'death') {
+      this.attacking = false;
+      this.posing = true;
+      this.play('levelup', true);
+    }
+    this.glow(glowMs, color);
+  }
+
+  /** Cópia do sprite pintada de uma cor, somando luz por cima do corpo: acende, pulsa e se apaga. */
+  private glow(ms: number, color: number) {
+    this.glowSp?.destroy();
+    const sp = this.sprite;
+    const g = this.scene.add
+      .image(sp.x, sp.y, sp.texture.key, sp.frame.name)
+      .setOrigin(sp.originX, sp.originY)
+      .setScale(sp.scaleX, sp.scaleY)
+      .setFlipX(sp.flipX)
+      .setTintFill(color)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0);
+    this.container.addAt(g, this.container.getIndex(sp) + 1);
+    this.glowSp = g;
+    this.scene.tweens.chain({
+      targets: g,
+      tweens: [
+        { alpha: 0.6, duration: ms * 0.12, ease: 'Quad.easeOut' },
+        { alpha: 0.2, duration: ms * 0.25, ease: 'Sine.easeInOut' },
+        { alpha: 0.45, duration: ms * 0.2, ease: 'Sine.easeInOut' },
+        { alpha: 0, duration: ms * 0.43, ease: 'Quad.easeIn' },
+      ],
+      onComplete: () => {
+        g.destroy();
+        if (this.glowSp === g) this.glowSp = undefined;
+      },
+    });
   }
 
   flash() {

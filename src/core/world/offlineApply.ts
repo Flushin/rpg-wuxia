@@ -28,6 +28,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
   const lvl0 = w.player.level;
   w.gold += res.gold;
   w.gainXp(res.xp);
+  w.levelUpPose = 0; // ganho offline não trava o personagem (a animação toca depois do resumo)
   const items: OfflineReport['items'] = [];
   let soldCount = 0,
     soldGold = 0;
