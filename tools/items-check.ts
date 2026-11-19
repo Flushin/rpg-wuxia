@@ -305,7 +305,7 @@ console.log('\n== mochila cheia / chão ==');
   p.y = w.ground[0].y;
   run(w, 0.1);
   ok(
-    w.ground.length === 0 && w.bag[0]?.baseId === 'faixa_linho' && drain(w).some((e) => e.type === 'itemPickup'),
+    w.ground.length === 0 && w.bag.at(0)?.baseId === 'faixa_linho' && drain(w).some((e) => e.type === 'itemPickup'),
     'coleta ao andar por cima quando há espaço',
   );
   w.bag[0] = null;

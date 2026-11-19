@@ -1,0 +1,10 @@
+{
+  // Os scripts de teste e de balanceamento (tools/*.ts) passam pelo mesmo tsc do jogo (roadmap M0).
+  // Rodam em Node (empacotados pelo esbuild), por isso os tipos do Node e não os do navegador/Vite.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"]
+  },
+  "include": ["tools/*.ts", "src/globals.d.ts"]
+}

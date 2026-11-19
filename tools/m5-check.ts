@@ -620,7 +620,10 @@ console.log('\n== vários personagens: save ==');
 console.log('\n== versão do save e migrações (C8) ==');
 {
   const base = { name: 'V', classId: 'pavilhao', level: 2 };
-  ok(migrateCharacter({ ...base }).version === CHARACTER_SAVE_VERSION, 'sem versão: vira a versão atual');
+  ok(
+    (migrateCharacter({ ...base }) as { version?: number }).version === CHARACTER_SAVE_VERSION,
+    'sem versão: vira a versão atual',
+  );
   ok(
     migrateSaves({ slots: [{ ...base }] }).slots[0]?.version === CHARACTER_SAVE_VERSION,
     'migrateSaves passa cada espaço pela migração',

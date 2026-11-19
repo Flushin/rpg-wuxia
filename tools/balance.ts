@@ -40,6 +40,8 @@ const itemsJson = raw('items') as {
   wearPerHit: number;
   rarities: Record<string, { name: string; weight: number }>;
   potions: Record<string, { name: string; percent: number; price: number }>;
+  consumables: Record<string, { price: number }>;
+  merchant: { priceMul: number; materials: Record<string, number> };
 };
 const questsJson = raw('quests') as { chain: { id: string; name: string; reward: { xp: number; gold: number } }[] };
 const progressionJson = raw('progression') as { xpToNext: number[] };

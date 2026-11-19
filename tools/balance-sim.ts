@@ -102,7 +102,7 @@ function huntRun(classId: string, seed: number): Run {
         console.log(
           `morte ${classId} nv${w.player.level} t=${(w.time / 60).toFixed(1)}m ${w.mapId} [${w.auto.status}] pots=${w.kindCount('hp')} perto: ${w.monsters
             .filter((m) => !m.dead && Math.hypot(m.x - w.player.x, m.y - w.player.y) < 8)
-            .map((m) => m.name.split(' ').pop() + m.level + m.ai[0])
+            .map((m) => (m.name.split(' ').pop() ?? '') + m.level + m.ai[0])
             .join(',')}`,
         );
     } else if (ev.type === 'goldPickup') {

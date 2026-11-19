@@ -25,7 +25,14 @@ const setLevel = (w: World, lvl: number) => {
 };
 /** Mata (de mentira) um monstro do tipo pedido, criando-o se o mapa não tiver. */
 function kill(w: World, monsterId: string) {
-  const m = { ...w.monsters[0], monsterId, dead: false, hp: 1, summoned: true, spawnKey: undefined } as Entity;
+  const m = {
+    ...w.monsters[0],
+    monsterId,
+    dead: false,
+    hp: 1,
+    summoned: true,
+    spawnKey: undefined,
+  } as unknown as Entity;
   w.monsters.push(m);
   priv(w).killMonster(m);
 }
