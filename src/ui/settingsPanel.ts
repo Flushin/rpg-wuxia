@@ -1,5 +1,5 @@
 // Painel de Configurações (botão ⚙): idioma, tamanho da interface, dicas, avisos de itens, FPS, som,
-// novidades, report de bug, créditos e trocar personagem.
+// economia de bateria (modo descanso), novidades, report de bug, créditos e trocar personagem.
 // Não guarda estado próprio: cada opção grava no dono dela (audio, perf, uiScale, rewards, World via TipManager).
 import { L, bindLangButtons, langButtons } from '../core/i18n';
 import type { World } from '../core/world';
@@ -7,6 +7,7 @@ import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
+import { restMode, REST_DELAYS } from './restMode';
 import { touchDebug } from './touchDebug';
 import { BugReport } from './bugReport';
 import { credits } from './credits';
@@ -39,6 +40,13 @@ export class SettingsPanel {
     const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
     const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
     const hl = (e.target as HTMLElement).closest('[data-hud]') as HTMLElement | null;
+    const rest = (e.target as HTMLElement).closest('[data-rest]') as HTMLElement | null;
+    if (rest) {
+      audio.ui('ui_click');
+      restMode.setDelay(+rest.dataset.rest!);
+      this.render();
+      return;
+    }
     if (hl) {
       audio.ui('ui_click');
       setHudLayout(hl.dataset.hud as HudLayout);
@@ -156,6 +164,10 @@ export class SettingsPanel {
               .join('')}</div></div>`
           : ''
       }
+      <div class="opt ui-size-row"><span>${L('Economia de bateria no Auto (tela de descanso após ficar sem tocar)', 'Battery saver while on Auto (rest screen after no touch)')}</span><div class="ui-size">${REST_DELAYS.map(
+        (s) =>
+          `<button data-rest="${s}" class="${restMode.delay === s ? 'primary' : ''}">${s === 0 ? L('Desligado', 'Off') : s < 60 ? `${s} s` : `${s / 60} min`}</button>`,
+      ).join('')}</div></div>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>

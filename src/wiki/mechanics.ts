@@ -253,7 +253,8 @@ function auto(): string {
       <li><b>Mochila cheia:</b> quando a aba de equipamentos lota, volta à vila, vende no vendedor os equipamentos Comuns (opção para vender Incomuns também) e retorna. Raros nunca são vendidos: se só sobrarem eles, continua caçando e os drops que não couberem ficam no chão.</li>
       <li><b>Morte:</b> volta da vila e continua, desde que nenhum item equipado esteja com durabilidade 0. Se estiver, para e espera você.</li>
       <li>Ligado na vila, vai sozinho para o melhor mapa de caça para o seu nível.</li>
-      <li>As skills ganham experiência normalmente no auto-combate.</li></ul></section>
+      <li>As skills ganham experiência normalmente no auto-combate.</li>
+      <li><b>Economia de bateria:</b> com o auto caçando e sem tocar na tela por um tempo (⚙ Configurações: 30 s, 1 min — padrão —, 2 min ou desligado), o jogo entra no <b>modo descanso</b>: tela preta com o resumo do que foi ganho, a 10 quadros por segundo. A caça rende o mesmo (drops de material incluídos, pois o jogo segue aberto). Um toque volta ao normal; se o auto parar ou o personagem cair, o jogo volta sozinho.</li></ul></section>
     <section class="panel"><h2>Ganho offline</h2><p>Se você fechar o jogo com o auto-combate ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora,
       calculados pelo ritmo que o auto estava tendo (monstros por minuto, XP, ouro, drops e poções por abate).</p>
       <table class="tbl"><thead><tr><th>Tempo fora</th><th>Eficiência</th></tr></thead><tbody>${tiers}<tr><td>mais de ${OFFLINE_TIERS[OFFLINE_TIERS.length - 1].untilH} h</td><td>0%</td></tr></tbody></table>

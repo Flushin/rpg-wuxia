@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{"texto": "Economia de bateria no Auto: caçando sem tocar na tela por um tempo, o jogo entra no modo descanso (tela preta com o resumo dos ganhos e bem menos processamento), sem perder nada da caça nem os drops de material. Um toque volta. Ajuste em ⚙ Configurações (30 s, 1 min, 2 min ou desligado).", "wiki": "mecanicas/auto"}],
   "versoes": [
     {
       "versao": "0.2.0",

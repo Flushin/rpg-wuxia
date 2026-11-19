@@ -419,3 +419,28 @@
   color: #ffd86b;
   text-shadow: 0 0 3px #000;
 }
+
+/* modo descanso (economia de bateria no Auto): tela preta por cima de tudo; um toque volta */
+#rest-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6a7380;
+  font-size: 13px;
+  text-align: center;
+}
+#rest-screen.hidden {
+  display: none;
+}
+#rest-screen .rest-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#rest-screen b {
+  color: #8a94a2;
+}

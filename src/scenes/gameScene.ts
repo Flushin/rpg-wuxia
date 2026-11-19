@@ -9,6 +9,7 @@ import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
+import { restMode } from '../ui/restMode';
 import { writeSave } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
@@ -93,6 +94,7 @@ export class GameScene extends Phaser.Scene {
     audio.playMusicForMap(this.world.mapId);
     this.hud = new Hud(this.world);
     touchDebug.attach(this.world);
+    restMode.attach(this, this.world);
     this.fx = new SkillFx(this);
     this.feedback = new EventFeedback(this, this.world, this.hud, this.views, this.fx);
     setupControls(this.world, this.hud, (x, y) => this.tapAt(x, y));
@@ -364,6 +366,7 @@ export class GameScene extends Phaser.Scene {
 
   update(_t: number, delta: number) {
     perf.tick(delta, this.children.length);
+    restMode.update();
     if (this.mapLoading) return; // nada anda nem é desenhado até as folhas do novo mapa chegarem
     const w = this.world;
     this.updatePinch();
@@ -533,6 +536,7 @@ export class GameScene extends Phaser.Scene {
 
   private handle(ev: GameEvent) {
     this.tips.onEvent(ev);
+    restMode.onEvent(ev);
     audio.onEvent(ev, this.world.player.id);
     if (ev.type === 'mapChange') this.onMapChange();
     else this.feedback.handle(ev);
