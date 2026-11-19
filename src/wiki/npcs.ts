@@ -47,7 +47,7 @@ function npcList(): NpcInfo[] {
       portrait: MASTER_SHEETS[sect] ? `${MASTER_SHEETS[sect]}_retrato.png` : undefined,
       sect,
       does: () =>
-        `<p>Mestre da seita <b>${esc(CLASSES[sect]?.name ?? sect)}</b>. Recebe quem escolheu essa seita, explica o estilo de luta e dá dicas de combate.
+        `<p>Mestre da seita <a href="#/seita/${sect}"><b>${esc(CLASSES[sect]?.name ?? sect)}</b></a>. Recebe quem escolheu essa seita, explica o estilo de luta e dá dicas de combate.
          Também é quem passa várias missões da história para os alunos da seita.</p>
          <p class="lore">“${esc(m.greeting)}”</p><p>${esc(m.intro)}</p>
          ${m.tips?.length ? `<h3>Dicas do mestre</h3><ul>${m.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}`,

@@ -1,12 +1,31 @@
-// Dados da wiki: lidos dos mesmos JSON do jogo (src/data/), em português. Nada aqui é escrito à mão,
-// exceto os rótulos e as descrições de papel dos NPCs (npcs.ts). Mudou um número no JSON, a wiki muda junto.
-import itemsJson from '../data/items.json';
-import monstersJson from '../data/monsters.json';
+// Dados da wiki: lidos dos mesmos JSON do jogo (src/data/), em português, com o mesmo balanceamento.
+// Mudou um número no JSON, a wiki muda junto. Escrito à mão: rótulos, textos de papel dos NPCs (npcs.ts) e
+// algumas fórmulas copiadas do jogo (marcadas), que tools/wiki-check.ts (npm run check:wiki) confere.
+import itemsRaw from '../data/items.json';
+import monstersRaw from '../data/monsters.json';
 import npcsJson from '../data/npcs.json';
-import questsJson from '../data/quests.json';
-import classesJson from '../data/classes.json';
+import questsRaw from '../data/quests.json';
+import classesRaw from '../data/classes.json';
+import skillsRaw from '../data/skills.json';
+import progressionRaw from '../data/progression.json';
 import atlas from '../data/sprites/icones.json';
-import { balanceItems, balanceMonsters, balanceQuests } from '../core/balance';
+import {
+  bal,
+  balanceClasses,
+  balanceItems,
+  balanceMonsters,
+  balanceProgression,
+  balanceQuests,
+  balanceSkills,
+} from '../core/balance';
+
+// Cópias: o balanceamento abaixo muda os objetos, e no teste (tools/wiki-check.ts) o jogo também aplica o seu.
+const itemsJson = structuredClone(itemsRaw),
+  monstersJson = structuredClone(monstersRaw),
+  questsJson = structuredClone(questsRaw),
+  classesJson = structuredClone(classesRaw),
+  skillsJson = structuredClone(skillsRaw),
+  progressionJson = structuredClone(progressionRaw);
 
 export interface Base {
   name: string;
@@ -92,6 +111,7 @@ export interface Quest {
 
 const I = itemsJson as unknown as {
   slotNames: Record<string, string>;
+  startingWeapon: Record<string, string>;
   sellRatio: number;
   repairCostPerPoint: number;
   rarities: Record<string, { name: string; color: string; weight: number; bonuses: number; valueMul: number }>;
@@ -115,9 +135,13 @@ const I = itemsJson as unknown as {
 // aplica uma vez aqui). As regras aplicadas na hora do uso (ex.: vida dos monstros) usam bal() nas páginas.
 balanceItems(I as unknown as Parameters<typeof balanceItems>[0]);
 balanceMonsters(monstersJson as unknown as Parameters<typeof balanceMonsters>[0]);
+balanceClasses(classesJson as unknown as Parameters<typeof balanceClasses>[0]);
+balanceSkills(skillsJson as unknown as Parameters<typeof balanceSkills>[0]);
+balanceProgression(progressionJson as unknown as Parameters<typeof balanceProgression>[0]);
 balanceQuests((questsJson as unknown as { chain: Parameters<typeof balanceQuests>[0] }).chain);
 
 export const SLOT_NAMES = I.slotNames;
+export const STARTING_WEAPON = I.startingWeapon;
 export const RARITIES = I.rarities;
 export const BONUS_POOL = I.bonusPool;
 export const SELL_RATIO = I.sellRatio;
@@ -128,7 +152,76 @@ export const MATERIALS = I.materials;
 export const CONSUMABLES = I.consumables;
 export const MONSTERS = monstersJson as unknown as Record<string, Monster>;
 export const QUESTS = (questsJson as unknown as { chain: Quest[] }).chain;
-export const CLASSES = classesJson as unknown as Record<string, { name: string; element: string; color: string }>;
+export type AttrKey = 'strength' | 'intelligence' | 'stamina' | 'agility' | 'willpower';
+export interface ClassDef {
+  id: string;
+  name: string;
+  description: string;
+  rangeLabel: string;
+  damageType: 'physical' | 'spiritual';
+  element: string;
+  attackRange: number;
+  attackInterval: number;
+  attackWhileMoving?: boolean;
+  moveSpeed: number;
+  lifeSteal?: number;
+  color: string;
+  baseAttributes: Record<AttrKey, number>;
+  levelUpAttributes: Record<AttrKey, number>;
+  elementAttack: Record<string, number>;
+  recommended: { attr: AttrKey; reason: string }[];
+  optional: { attr: AttrKey; reason: string }[];
+}
+export const CLASSES = classesJson as unknown as Record<string, ClassDef>;
+/** Ordem das seitas no jogo (SECT_ORDER em src/core/data.ts). */
+export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];
+export const ELEMENT_NAMES: Record<string, string> = { fire: 'Fogo', ice: 'Gelo', thunder: 'Trovão', poison: 'Veneno' };
+export const PROGRESSION = progressionJson as unknown as {
+  levelCap: number;
+  xpToNext: number[];
+  freePointsPerLevel: number;
+};
+
+export interface SkillDef {
+  id: string;
+  name: string;
+  type: 'active' | 'passive';
+  unlock: number;
+  description: string;
+  mana?: number;
+  cooldown?: number;
+  target?: string;
+  range?: number | 'melee';
+  area?: 'self' | 'target';
+  radius?: number;
+  dash?: boolean;
+  hits?: number[];
+  debuff?: { kind: string; value: number; duration: number };
+  poison?: { percent: number; duration: number };
+  shield?: { percent: number; duration: number };
+  heal?: { percent: number; duration: number };
+  stun?: number;
+  passive?: Record<string, number>;
+}
+export const SKILLS = skillsJson as unknown as Record<string, SkillDef[]>;
+export const skillSect = (id: string) => SECT_ORDER.find((s) => SKILLS[s]?.some((k) => k.id === id));
+export const skillById = (id: string) =>
+  Object.values(SKILLS)
+    .flat()
+    .find((k) => k.id === id);
+
+// Cópias das regras de src/core/skills.ts (lá o módulo depende do idioma do jogo); tools/wiki-check.ts confere que batem.
+export const SKILL_MAX_LEVEL = 15;
+export const LEVEL_BONUS = 0.08;
+export const skillScale = (level: number) => 1 + LEVEL_BONUS * bal('skills.bonus_por_nivel') * (Math.max(1, level) - 1);
+export const skillXpToNext = (level: number) =>
+  Math.max(
+    1,
+    Math.round(
+      (level < 10 ? 20 * Math.pow(1.5, level - 1) : 20 * Math.pow(1.5, 8) * Math.pow(1.4, level - 9)) /
+        bal('xp.skills'),
+    ),
+  );
 export const NPC_TEXT = npcsJson as unknown as {
   masters: Record<string, { name: string; title: string; greeting: string; intro: string; tips?: string[] }>;
   npcs: Record<string, { name: string; lines: string[] }>;

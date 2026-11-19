@@ -3,7 +3,8 @@ import './wiki.css';
 import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, itemName } from './data';
 import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
-import { MONSTERS } from './data';
+import { CLASSES, MONSTERS, SECT_ORDER, SKILLS } from './data';
+import { sectIndexPage, sectPage, skillIndexPage, skillPage } from './sects';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterIndexPage, monsterPage, monsterSprite } from './monsters';
 
@@ -16,8 +17,8 @@ interface Cat {
 // Ícones: emojis por enquanto nas categorias sem item que as represente.
 const CATS: Cat[] = [
   { id: 'mecanicas', label: 'Mecânicas', icon: '📜', ready: false },
-  { id: 'seitas', label: 'Seitas', icon: '☯', ready: false },
-  { id: 'skills', label: 'Skills', icon: '✨', ready: false },
+  { id: 'seitas', label: 'Seitas', icon: '☯', ready: true },
+  { id: 'skills', label: 'Skills', icon: 'skill_corte_duplo', ready: true },
   { id: 'itens', label: 'Itens', icon: 'espadas_ferro', ready: true },
   { id: 'monstros', label: 'Monstros', icon: '🐺', ready: true },
   { id: 'npcs', label: 'NPCs', icon: '🧙', ready: true },
@@ -80,6 +81,15 @@ function searchIndex(): Hit[] {
                 : '',
     })),
     ...NPCS().map((n) => ({ name: n.name, href: `#/npc/${n.id}`, icon: spriteHtml(n.sheet, 'mini'), kind: 'NPC' })),
+    ...SECT_ORDER.filter((id) => CLASSES[id]).map((id) => ({
+      name: CLASSES[id].name,
+      href: `#/seita/${id}`,
+      icon: '<span class="emo">☯</span>',
+      kind: 'Seita',
+    })),
+    ...Object.values(SKILLS)
+      .flat()
+      .map((k) => ({ name: k.name, href: `#/skill/${k.id}`, icon: iconHtml('skill_' + k.id, 'sm'), kind: 'Skill' })),
     // chefes ficam fora da busca (spoiler)
     ...Object.values(MONSTERS)
       .filter((m) => maps && !isSpoiler(m, maps))
@@ -124,6 +134,14 @@ async function route() {
   else if (parts[0] === 'npc') {
     html = npcPage(parts[1] ?? '');
     active = 'npcs';
+  } else if (parts[0] === 'seitas') html = sectIndexPage();
+  else if (parts[0] === 'seita') {
+    html = sectPage(parts[1] ?? '');
+    active = 'seitas';
+  } else if (parts[0] === 'skills') html = skillIndexPage();
+  else if (parts[0] === 'skill') {
+    html = skillPage(parts[1] ?? '');
+    active = 'skills';
   } else if (parts[0] === 'monstros') html = monsterIndexPage();
   else if (parts[0] === 'monstro') {
     html = monsterPage(parts[1] ?? '');

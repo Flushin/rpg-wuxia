@@ -8,7 +8,7 @@ import { spriteHtml } from './npcs';
 import { chance, itemLink, questList, spoiler } from './ui';
 
 // Nome do sprite em monsters.json -> folha em public/sprites/ (cópia de BY_TEXTURE em src/render/sprites.ts).
-const SHEETS: Record<string, string> = {
+export const SHEETS: Record<string, string> = {
   wolf: 'lobo',
   'bandit-sword': 'bandido_espadachim',
   'bandit-archer': 'bandido_arqueiro',
@@ -40,8 +40,8 @@ function levelRange(m: Monster, maps: WikiMap[]): [number, number] {
 }
 const lvText = ([a, b]: [number, number]) => (a === b ? `${a}` : `${a}–${b}`);
 
-/** Mesma conta de applyMonsterLevel (src/core/world.ts). */
-function statsAt(m: Monster, level: number) {
+/** Mesma conta de applyMonsterLevel (src/core/world.ts); conferida por tools/wiki-check.ts. */
+export function statsAt(m: Monster, level: number) {
   const a = {} as Attributes;
   for (const k of Object.keys(m.baseAttributes) as (keyof Attributes)[])
     a[k] = Math.round(m.baseAttributes[k] + m.perLevel[k] * (level - 1));
