@@ -4,7 +4,7 @@
 > cada tarefa diz quem faz, os marcos evitam sistemas que exigem operação humana diária, e a parte de loja começa cedo
 > (detalhada em `05-guia-lancamento.md`).
 >
-> **Nomes:** para não confundir com os Marcos 1–9 do `docs/decisoes-do-projeto.md` (já concluídos), este roadmap usa
+> **Nomes:** para não confundir com os Marcos 1–9 do `docs/decisoes/README.md` (já concluídos), este roadmap usa
 > **M0 a M5+**. O antigo "Marco 10: online" está distribuído entre o M0, o M1 e o M3.
 >
 > **Regra da casa:** cada item que muda a jogabilidade passa por pergunta de múltipla escolha ao Lucas antes de ser feito.
@@ -25,7 +25,7 @@
    simulador e o `check:layout` quando a interface muda.
 3. A IA escreve no PR **o que testar jogando** (roteiro de 5 minutos). O Lucas joga o APK da CI ou o site de teste e responde
    "ok" ou "achei isso".
-4. Merge, registro da decisão em `docs/decisoes-do-projeto.md` e a caixa marcada aqui.
+4. Merge, registro da decisão em `docs/decisoes/README.md` e a caixa marcada aqui.
 
 **Esforço:** as semanas são de calendário, com a IA implementando. O gargalo passa a ser o **tempo do Lucas** para testar
 e decidir, e as esperas que ninguém acelera: verificação de identidade, teste fechado da Play (14 dias), revisão da loja

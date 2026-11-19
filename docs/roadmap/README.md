@@ -1,7 +1,7 @@
 # Roadmap do Mistpeak: resumo executivo
 
 > Análise de 18/11/2026: inventário do código, benchmark com 12 RPGs online, lacunas e marcos.
-> É uma **proposta**. Pela regra do `docs/decisoes-do-projeto.md`, cada item que muda a jogabilidade precisa da
+> É uma **proposta**. Pela regra do `docs/decisoes/README.md`, cada item que muda a jogabilidade precisa da
 > aprovação do Lucas antes de ser feito.
 >
 > **Premissa:** solo dev **sem experiência de lançar jogos ou apps nas lojas**; a **IA faz quase tudo** (código, testes,
