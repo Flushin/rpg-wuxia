@@ -29,13 +29,21 @@ const REDRAW_MS = 150;
 class MapPainter {
   private bg: HTMLCanvasElement | null = null;
   private bgKey = '';
-  constructor(private canvas: HTMLCanvasElement) {}
+  // tamanho na tela guardado (ResizeObserver): ler clientWidth a cada redesenho força o navegador a refazer o layout
+  private size: { w: number; h: number } | null = null;
+  constructor(private canvas: HTMLCanvasElement) {
+    if (typeof ResizeObserver !== 'undefined')
+      new ResizeObserver(() => {
+        this.size = null;
+      }).observe(canvas);
+  }
 
   /** Losango que cabe em w×h: tile (i,j) -> pixel. */
   private layout(map: GameMap) {
     const dpr = Math.min(3, Math.min(2, window.devicePixelRatio || 1) * uiScale());
-    const w = this.canvas.clientWidth || 1,
-      h = this.canvas.clientHeight || 1;
+    if (!this.size || typeof ResizeObserver === 'undefined')
+      this.size = { w: this.canvas.clientWidth || 1, h: this.canvas.clientHeight || 1 };
+    const { w, h } = this.size;
     if (this.canvas.width !== Math.round(w * dpr) || this.canvas.height !== Math.round(h * dpr)) {
       this.canvas.width = Math.round(w * dpr);
       this.canvas.height = Math.round(h * dpr);

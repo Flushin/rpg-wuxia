@@ -1,7 +1,7 @@
 // Recompensas fora do meio da tela: XP e ouro no próprio HUD, itens num feed curto à esquerda.
 import type { Rarity } from '../core/types';
 import { uiRect } from './uiScale';
-import { byId, escapeHtml } from './dom';
+import { byId, escapeHtml, viewportKey } from './dom';
 import { PREF, getPref, setPref } from '../platform/prefs';
 
 const LINE_MS = 3000;
@@ -28,6 +28,7 @@ export class Rewards {
   private goldSum = 0;
   private goldUntil = 0;
   private xpTimer = 0;
+  private placeSig = '';
   filter: LootFilter = loadLootFilter();
 
   gold(amount: number) {
@@ -84,10 +85,16 @@ export class Rewards {
       for (const l of gone) l.el.remove();
       this.lines = this.lines.filter((l) => now < l.until);
     }
-    if (this.lines.length) this.place();
+    // reposiciona só quando algo que muda o lugar do feed mudou (ler posições força o navegador a refazer o layout)
+    if (this.lines.length && this.feedSig() !== this.placeSig) this.place();
+  }
+
+  private feedSig() {
+    return `${this.lines.length}|${byId('target-frame').classList.contains('hidden')}|${viewportKey()}`;
   }
 
   private place() {
+    this.placeSig = this.feedSig();
     placeFeed();
   }
 }

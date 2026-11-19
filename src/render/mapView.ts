@@ -337,6 +337,7 @@ function building(
 function fadeBuildings(strips: Phaser.GameObjects.Image[], who: { x: number; y: number; depth: number }[]) {
   const hit = new Set<string>();
   for (const t of strips) {
+    if (!t.visible) continue; // fora da tela (cullMap): não cobre ninguém
     for (const p of who) {
       if (!(t.depth > p.depth)) continue;
       const b = t.getBounds(),
@@ -389,11 +390,11 @@ export function cullMap(objs: Phaser.GameObjects.GameObject[], cam: Phaser.Camer
 }
 
 /** Árvores na frente do jogador (e do alvo) ficam transparentes para eles não sumirem atrás delas. */
+const buildingStrips = new WeakMap<Phaser.GameObjects.Image[], Phaser.GameObjects.Image[]>();
 export function fadeTreesNear(trees: Phaser.GameObjects.Image[], who: { x: number; y: number; depth: number }[]) {
-  fadeBuildings(
-    trees.filter((t) => t.name === 'building'),
-    who,
-  );
+  let strips = buildingStrips.get(trees); // a lista é a mesma até trocar de mapa: filtra uma vez só
+  if (!strips) buildingStrips.set(trees, (strips = trees.filter((t) => t.name === 'building')));
+  fadeBuildings(strips, who);
   for (const t of trees) {
     if (t.name === 'building' || !t.visible) continue; // casas: fadeBuildings (a casa inteira junto)
     let covers = false;
