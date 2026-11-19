@@ -43,5 +43,8 @@ O modelo da sessão é escolhido pelo Lucas. Sempre que uma subtarefa não preci
 
 Só delegue tarefas autocontidas (o subagente começa sem contexto; tarefa minúscula sai mais barata feita direto). Dê instruções completas ao subagente e confira o resultado antes de subir. Se a sessão inteira for de tarefas simples, sugira ao Lucas trocar com `/model`.
 
+## Perguntas ao Lucas
+Sempre mande perguntas e decisões como opções clicáveis (ferramenta AskUserQuestion), nunca só em texto para ele digitar.
+
 ## Git
 Desenvolva na branch indicada pela sessão; commits em português.
