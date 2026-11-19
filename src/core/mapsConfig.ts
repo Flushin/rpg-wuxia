@@ -20,6 +20,8 @@ export interface MapConfig {
   autoFromLevel?: number;
   /** Masmorra (instância, src/core/dungeons.ts): só se entra pelo menu do portal; monstros não renascem; sem Auto. */
   dungeon?: boolean;
+  /** Trial (src/core/trial.ts): instância como a masmorra, mas o chefe é escolhido no menu do portal sul da vila. */
+  trial?: boolean;
 }
 
 export const MAPS_CONFIG: Record<string, MapConfig> = {
@@ -34,6 +36,8 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   mosteiro: { trees: 'city', grassDecor: 0.08, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
   // masmorra: Covil dos Bandidos; terreiro do Rei dos Bandidos no norte
   covil: { trees: 'forest', grassDecor: 0.09, arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
+  // Trial: arena única; o chefe escolhido no menu nasce no centro da arena (World.enterTrial)
+  trial: { trees: 'city', grassDecor: 0.04, arena: { x: 16, y: 9, r: 5.5 }, dungeon: true, trial: true },
 };
 
 /** Mapas carregados no boot (public/maps/<id>.json). */

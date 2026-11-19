@@ -23,6 +23,21 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
+import {
+  TRIAL_BOSSES,
+  TRIAL_EQUIP_REQ_LEVEL,
+  TRIAL_MIN_LEVEL,
+  TRIAL_STATS,
+  TRIAL_TIERS,
+  trialBossLevel,
+  trialCost,
+  trialDropPct,
+  trialGold,
+  trialStats,
+  trialSummonLevel,
+  trialWeakness,
+  trialXp,
+} from '../core/trial';
 import { itemLink } from './ui';
 
 const n1 = (v: number) => String(+v.toFixed(1)).replace('.', ',');
@@ -100,6 +115,7 @@ const TOPICS = [
   { id: 'morte', label: 'Morte, vida e durabilidade', icon: 'pocao_hp_g' },
   { id: 'forja', label: 'Forja e economia', icon: 'minerio_ferro' },
   { id: 'auto', label: 'Auto-combate e ganho offline', icon: 'pergaminho_retorno' },
+  { id: 'trial', label: 'Trial (desafio de chefes)', icon: 'essencia_qi' },
 ];
 
 export function mechanicsPage(topic?: string): string {
@@ -108,7 +124,7 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -243,7 +259,7 @@ function auto(): string {
     (t, i) => `<tr><td>${i ? OFFLINE_TIERS[i - 1].untilH : 0} a ${t.untilH} h</td><td>${pc(t.eff)}</td></tr>`,
   ).join('');
   return `<section class="panel"><h2>Auto-combate</h2><p>Liga no botão <b>Auto</b> (ou tecla Z). Com o jogo aberto, o personagem caça sozinho no mapa todo.
-      O botão ☰ ao lado abre o menu de opções. Qualquer movimento manual pausa o auto. Nas masmorras (<a href="#/mapa/gruta">Desfiladeiro</a>, <a href="#/mapa/mosteiro">Mosteiro</a>, <a href="#/mapa/covil">Covil</a>) o auto não funciona.</p><ul>
+      O botão ☰ ao lado abre o menu de opções. Qualquer movimento manual pausa o auto. Nas masmorras (<a href="#/mapa/gruta">Desfiladeiro</a>, <a href="#/mapa/mosteiro">Mosteiro</a>, <a href="#/mapa/covil">Covil</a>) e no <a href="#/mecanicas/trial">Trial</a> o auto não funciona.</p><ul>
       <li><b>Alvos:</b> ataca o monstro mais perto, até <b>${AUTO_MAX_LEVEL_GAP} níveis acima</b> do seu (ajustável de +0 a +${AUTO_MAX_LEVEL_LIMIT}).
         Monstros 2+ níveis abaixo ("cinzas") ficam por último. Evita caminhos que atraem grupos. Nunca ataca chefes.</li>
       <li><b>Revide:</b> por padrão, revida quem o atacar; dá para limitar ao nível máximo ou desligar e, nesse caso, escolher entre continuar, se afastar ou voltar à vila.</li>
@@ -263,4 +279,46 @@ function auto(): string {
       <li>Offline não há morte nem desgaste. Gasta poções; se acabarem, os ganhos continuam.</li>
       <li>As skills <b>não</b> ganham experiência offline.</li>
       <li>Ao minimizar o app, o ganho conta se você ficar fora pelo menos 5 minutos.</li></ul></section>`;
+}
+
+/** Trial (src/core/trial.ts, World.enterTrial/spawnTrialBoss, inventory.trialLoot). */
+function trial(): string {
+  const S = TRIAL_STATS,
+    pct2 = (v: number) => v.toFixed(2).replace('.', ',');
+  const tiers = Array.from({ length: TRIAL_TIERS }, (_, i) => i + 1)
+    .map((t) => {
+      const st = trialStats(MONSTERS.rei_bandidos, trialBossLevel(t)),
+        [g0, g1] = trialGold(t);
+      return `<tr><td>${t}</td><td>${trialBossLevel(t)}</td><td>${trialCost(t)}</td><td>+${pct2(trialDropPct(t))}%</td><td>${st.hp}</td><td>${Math.max(st.physDef, st.spiritDef)} / ${Math.min(st.physDef, st.spiritDef)}</td><td>${g0}–${g1}</td></tr>`;
+    })
+    .join('');
+  const bosses = TRIAL_BOSSES.map((id) => {
+    const m = MONSTERS[id],
+      b = m.boss!,
+      mech = ['círculos'];
+    if (b.line) mech.push('linha / leque');
+    if (b.summon) mech.push(`invoca ${b.summon.count}`);
+    if (b.enrage) mech.push('fúria');
+    return `<tr><td><a href="#/monstro/${id}">${m.name}</a></td><td><b>${trialWeakness(m) === 'physical' ? 'Físico' : 'Espiritual'}</b></td><td>${n1(m.attackInterval)} s</td><td>${n1(m.moveSpeed)}</td><td>${mech.join(', ')}</td></tr>`;
+  }).join('');
+  return `<section class="panel"><h2>O que é</h2><p>Uma arena onde você escolhe <b>qual chefe</b> enfrentar e em <b>qual nível</b>.
+      O portal fica na saída sul da <a href="#/mapa/cidade">vila</a>; pisar nele abre o menu. Precisa ser nível <b>${TRIAL_MIN_LEVEL}</b>.</p><ul>
+      <li><b>${TRIAL_TIERS} níveis por chefe:</b> no nível 1 o chefe é nível ${trialBossLevel(1)}; cada nível do Trial sobe o chefe em 1 (nível ${TRIAL_TIERS} = chefe ${trialBossLevel(TRIAL_TIERS)}).</li>
+      <li><b>Liberação:</b> vencer o nível N de um chefe libera o N+1 <b>daquele chefe</b>. O progresso fica salvo.</li>
+      <li><b>Entrada:</b> ${trialCost(1)} de ouro no nível 1, +${trialCost(2) - trialCost(1)} por nível.</li>
+      <li>Como nas masmorras: o <a href="#/mecanicas/auto">Auto</a> não funciona, nada renasce e morrer, sair pelo portal ou fechar o jogo encerra a luta (paga de novo para tentar).</li>
+      <li>Depois da vitória, a saída é o portal da entrada (ao sul da arena).</li></ul></section>
+    <section class="panel"><h2>Ponto fraco</h2><p>No Trial todos os chefes têm a <b>mesma vida e o mesmo dano por segundo</b> no mesmo nível. O que muda é o jeito de lutar e o ponto fraco:
+      defesa alta contra um tipo de dano e baixa contra o outro. Tormenta, Titã e Víbora causam dano físico; Geada, espiritual.
+      Quem bate mais devagar bate mais forte (dano proporcional ao intervalo entre golpes).</p>
+      <table class="tbl"><thead><tr><th>Chefe</th><th>Fraco contra</th><th>Golpe a cada</th><th>Passo</th><th>Mecânicas</th></tr></thead><tbody>${bosses}</tbody></table>
+      <p class="muted">Ajudantes invocados vêm ${trialBossLevel(1) - trialSummonLevel(trialBossLevel(1))} níveis abaixo do chefe.</p></section>
+    <section class="panel"><h2>Níveis</h2>
+      ${formula(`vida = ${S.hp} × ${n1(S.hpGrowth)}<sup>(nível do chefe − 21)</sup> · ataque = ${S.atk} × ${String(S.atkGrowth).replace('.', ',')}<sup>(nível − 21)</sup> × intervalo / ${n1(S.refInterval)} · defesa forte ${S.defStrong}, fraca ${S.defWeak}, × ${String(S.defGrowth).replace('.', ',')}<sup>(nível − 21)</sup>`)}
+      <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th></tr></thead><tbody>${tiers}</tbody></table></section>
+    <section class="panel"><h2>Recompensa</h2><ul>
+      <li>Ouro da tabela acima e ${trialXp(1)} de XP no nível 1 (+${trialXp(2) - trialXp(1)} por nível).</li>
+      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${TRIAL_EQUIP_REQ_LEVEL} (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (21–30): mais fortes que os nível ${TRIAL_EQUIP_REQ_LEVEL} comuns.</li>
+      <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
+      <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1; a cada nível o bônus cresce 5%: 12,60%, 13,23% … ${pct2(trialDropPct(TRIAL_TIERS))}%). O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
 }

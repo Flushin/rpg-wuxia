@@ -6,12 +6,13 @@ import { CLASSES, MONSTERS } from '../src/core/data';
 import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, isBroken } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
+import { TRIAL_BOSSES, TRIAL_MAP, trialBossLevel } from '../src/core/trial';
 import { World } from '../src/core/world';
 import { inTelegraph, safeSpot } from '../src/core/world/boss';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro', 'covil'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro', 'covil', 'trial'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -347,7 +348,14 @@ function fightBoss(w: World, classId: string, rarity: Rarity, trace: boolean): B
 // ---------- marco 9: do nível 10 ao 20 na Montanha Nevada ----------
 // Personagem pronto no nível 10 (pontos pelo recomendado, skills no nível 5, equipamento nv 5 Incomum, missões
 // do marco 9 liberadas), Auto ligado na vila. O jogador médio do policy() veste o que cair, conserta e vende.
-function highWorld(classId: string, level: number, seed: number, gearLevel: number, rarity: Rarity): World {
+function highWorld(
+  classId: string,
+  level: number,
+  seed: number,
+  gearLevel: number,
+  rarity: Rarity,
+  ilvl = gearLevel,
+): World {
   const c = CLASSES[classId],
     attrs = { ...c.baseAttributes };
   for (const k of Object.keys(attrs) as (keyof typeof attrs)[]) attrs[k] += c.levelUpAttributes[k] * (level - 1);
@@ -373,7 +381,7 @@ function highWorld(classId: string, level: number, seed: number, gearLevel: numb
     const id = equipmentBaseIds(sl).find(
       (b) => BASES[b].reqLevel === gearLevel && (!BASES[b].sect || BASES[b].sect === classId),
     )!;
-    w.equipment[sl] = makeEquipment(id, rarity, c.element, priv(w).rng, gearLevel);
+    w.equipment[sl] = makeEquipment(id, rarity, c.element, priv(w).rng, ilvl);
   }
   priv(w).recalc(w.player, false);
   w.player.hp = w.player.derived.maxHp;
@@ -481,6 +489,41 @@ if (masmorraArg) {
           `| ${CLASSES[classId].name} | ${level} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
         );
       }
+  process.exit(0);
+}
+
+// ---------- Trial: chefes nível 21–30 (src/core/trial.ts) ----------
+// --trial: cada chefe nos níveis 1/4/7/10 do Trial, personagem nível 20. Equipamento "nv 15": incomum nv 15 (quem
+// acabou de chegar); "Trial": raro nv 15 com o nível de item do chefe anterior (o que o Trial dá ao subir).
+// --trial=<id do chefe> roda só esse chefe; --tiers=1,2,3 escolhe os níveis.
+const trialArg = process.argv.find((a) => a.startsWith('--trial'));
+if (trialArg) {
+  const only = trialArg.split('=')[1],
+    tiersArg = process.argv.find((a) => a.startsWith('--tiers='));
+  const tiers = tiersArg ? tiersArg.split('=')[1].split(',').map(Number) : [1, 4, 7, 10];
+  const N = Math.max(4, SEEDS);
+  console.log('| Chefe | Seita | ' + tiers.map((t) => `Nv ${t} (nv15 inc / Trial)`).join(' | ') + ' |');
+  console.log('|---|---|' + tiers.map(() => '---|').join(''));
+  for (const bossId of TRIAL_BOSSES.filter((b) => !only || b === only))
+    for (const classId of Object.keys(CLASSES)) {
+      const cells = tiers.map((tier) => {
+        const res = (['base', 'trial'] as const).map((gear) => {
+          const bs = Array.from({ length: N }, (_, i) => {
+            const w =
+              gear === 'base'
+                ? highWorld(classId, 20, i + 1, 15, 'incomum')
+                : highWorld(classId, 20, i + 1, 15, 'raro', trialBossLevel(tier) - 1);
+            w.trialRun = { bossId, tier };
+            w.changeMap(TRIAL_MAP);
+            return fightBoss(w, classId, gear === 'base' ? 'incomum' : 'raro', false);
+          });
+          const wins = bs.filter((b) => b.win);
+          return `${wins.length}/${N} ${wins.length ? fmt(mean(wins.map((b) => b.seconds)), 0) + 's ' + fmt(mean(wins.map((b) => b.potions)), 0) + 'p' : ''}`;
+        });
+        return res.join(' · ');
+      });
+      console.log(`| ${MONSTERS[bossId].name} | ${CLASSES[classId].name} | ${cells.join(' | ')} |`);
+    }
   process.exit(0);
 }
 

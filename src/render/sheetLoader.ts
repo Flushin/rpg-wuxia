@@ -27,9 +27,18 @@ function sheetsOf(map: GameMap, classId: string): Set<string> {
   return keys;
 }
 
-/** Folhas que o mapa atual do mundo usa. */
+/** Folhas que o mapa atual do mundo usa (mais os monstros vivos que não vêm do mapa: o chefe do Trial). */
 export function sheetsForMap(world: World): Set<string> {
-  return sheetsOf(world.map, world.classId);
+  const keys = sheetsOf(world.map, world.classId);
+  for (const m of world.monsters) {
+    const def = MONSTERS[m.monsterId],
+      summon = def?.boss?.summon && MONSTERS[def.boss.summon.monsterId];
+    for (const texture of [def?.sprite, summon && summon.sprite]) {
+      const sh = texture ? sheetFor(texture) : null;
+      if (sh) keys.add(sh.key);
+    }
+  }
+  return keys;
 }
 
 let loaded = new Set<string>();

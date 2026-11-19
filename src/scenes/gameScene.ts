@@ -29,6 +29,7 @@ import { askExit, closeTopWindow } from '../ui/backAction';
 import { onPause, onResume } from '../platform/lifecycle';
 import { isNative, restartApp } from '../platform';
 import { DUNGEONS } from '../core/dungeons';
+import { TRIAL_MAP } from '../core/trial';
 
 /** Distância (tiles) do portal em que as folhas do mapa de destino começam a carregar. */
 const PREFETCH_DIST = 8;
@@ -237,9 +238,12 @@ export class GameScene extends Phaser.Scene {
       const d = Math.hypot(dx, dy);
       nearest = Math.min(nearest, d);
       // portal de menu (masmorras): adianta as masmorras que o personagem já pode escolher
-      const ids = o.props.menu
-        ? DUNGEONS.filter((dg) => dg.minLevel <= p.level).map((dg) => dg.map)
-        : [String(o.props.target)];
+      const ids =
+        o.props.menu === 'trial'
+          ? [TRIAL_MAP]
+          : o.props.menu
+            ? DUNGEONS.filter((dg) => dg.minLevel <= p.level).map((dg) => dg.map)
+            : [String(o.props.target)];
       for (const id of ids) {
         const target = w.maps[id];
         if (!target || this.prefetchedMaps.has(id) || d > PREFETCH_DIST) continue;

@@ -17,7 +17,8 @@
   color: #99a;
 }
 #npc-panel,
-#dungeon-panel {
+#dungeon-panel,
+#trial-panel {
   position: fixed;
   inset: 0 0 var(--fix-b, 0px) 0;
   display: flex;
@@ -28,7 +29,8 @@
 }
 /* Janela de NPC: topo fixo (nome, ouro, abas), corpo que rola e rodapé fixo. O cartão em si não rola. */
 #npc-panel .card,
-#dungeon-panel .card {
+#dungeon-panel .card,
+#trial-panel .card {
   pointer-events: auto;
   width: min(380px, 100%);
   max-height: calc(100% - 24px);
@@ -608,4 +610,20 @@
 }
 .dg-row button {
   width: 100%;
+}
+/* Menu do Trial (src/ui/trialWindow.ts): escolha do nível com − e + */
+.tr-tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.tr-tier span {
+  flex: 1;
+  text-align: center;
+}
+.dg-row .tr-tier button {
+  width: 36px;
+  flex: none;
 }

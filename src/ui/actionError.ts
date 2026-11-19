@@ -29,5 +29,7 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Mercador Ambulante', 'Talk to the Traveling Merchant');
     case 'soldOut':
       return L('Já vendido', 'Already sold');
+    case 'trialLocked':
+      return L('Vença o nível anterior deste chefe', 'Beat the previous level of this boss');
   }
 }

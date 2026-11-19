@@ -6,6 +6,7 @@ import { isWalkable } from '../pathfinding';
 import { type Entity, type Point, type Telegraph } from '../types';
 import type { World } from '../world';
 import { dist } from './geometry';
+import { trialSummonLevel } from '../trial';
 
 // ---------- chefe ----------
 export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number) {
@@ -142,7 +143,7 @@ export function summonAdds(w: World, boss: Entity, sm: { monsterId: string; coun
     let pos: Point = { x: boss.x + Math.cos(a) * 2.2, y: boss.y + Math.sin(a) * 2.2 };
     if (!isWalkable(w.map, pos.x, pos.y)) pos = { x: boss.x, y: boss.y };
     const e = w.makeMonster(sdef, pos);
-    w.applyMonsterLevel(e, sdef, sm.level);
+    w.applyMonsterLevel(e, sdef, boss.trial ? trialSummonLevel(boss.level) : sm.level); // Trial: 3 níveis abaixo do chefe
     e.home = { ...boss.home };
     e.summoned = true;
     e.ai = 'chase';
