@@ -38,4 +38,10 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
   nem ave; decidido pelo Lucas). Sprites: `tools/sprites/<id>.json`; moitas de bambu: `tools/sprites/render_bambu.py`.
   Missões: O passo do leste (20), Sombras entre o bambu (21), O veneno de jade (23, arma nv 20), Penas de grou (26) e
   O Senhor da Névoa (28, tronco nv 25): 300 mil de XP. Teste: `npm run check:m10`. Simulador: `--m10` (`--only=<seita>`).
+- **Ajuste da etapa 4 (simulador `--m10`, 1 execução por seita):** vida dos monstros novos ×1,8 e XP ×0,8 sobre o
+  rascunho; assassino mais lento (golpe a cada 1,9 s) e guardião com menos força; defesa espiritual alta em todos
+  (a Geada não atravessa tudo); poção de vida grande 30% e de mana grande 40% (as idas à vila eram quase todas por falta
+  de mana, e a vila fica a 2–3 mapas). 20→30 / 10→20: Tormenta ~3,5×, Geada ~2,9×, Titã ~3,7×, Víbora ~2,25× (média
+  ~3,1×). Senhor da Névoa no nível 30, equipamento nv 25 Incomum/Raro: 4–5 vitórias em 5 para todas as seitas.
+  Titã e Víbora ficam para o ajuste fino da etapa 5.
 - Fora do escopo: skills ou níveis de skill novos, masmorras/fases do Trial novas, mudar a progressão 1–20.

@@ -397,6 +397,7 @@ function highWorld(
   return w;
 }
 
+const tripWhy: Record<string, number> = {};
 function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5): Run {
   const w = highWorld(classId, start, seed, gear, 'incomum');
   const run: Run = {
@@ -419,7 +420,8 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
   run.levelAt[start - 1] = 0;
   w.auto.toggle();
   let nextPolicy = 0,
-    lastMap = w.mapId;
+    lastMap = w.mapId,
+    lastLeaving: string | false = false;
   for (let i = 0; i < (MAX_MIN * 60) / DT; i++) {
     w.tick(DT);
     for (const ev of w.events.splice(0)) {
@@ -451,6 +453,21 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     nextPolicy = w.time + 1;
     if (w.mapId !== w.auto.huntMap) run.awayMin! += 1 / 60;
     if (w.mapId === 'cidade' && lastMap !== 'cidade') run.townTrips!++;
+    const lv = (w.auto as unknown as { leaving: string | false }).leaving;
+    if (lv && !lastLeaving) {
+      const why =
+        lv !== 'shop'
+          ? lv
+          : w.kindCount('hp') === 0
+            ? w.kindCount('mp') === 0
+              ? 'hp+mp'
+              : 'hp'
+            : w.kindCount('mp') === 0
+              ? 'mp'
+              : 'outro';
+      tripWhy[why] = (tripWhy[why] ?? 0) + 1;
+    }
+    lastLeaving = lv;
     lastMap = w.mapId;
     if (process.argv.includes('--status') && Math.round(w.time) % 30 === 0)
       console.log(
@@ -583,7 +600,7 @@ if (process.argv.includes('--m10')) {
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1, 20, 30, 15));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min`,
+      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     const t30 = mean(rs.map((r) => r.levelAt[29]));
@@ -618,7 +635,7 @@ if (process.argv.includes('--m9')) {
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min`,
+      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     console.log(

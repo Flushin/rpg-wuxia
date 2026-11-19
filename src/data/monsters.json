@@ -1449,7 +1449,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.15
+          "chance": 0.4
         }
       ],
       "equipment": [
@@ -1542,7 +1542,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.15
+          "chance": 0.4
         }
       ],
       "equipment": [
@@ -1631,7 +1631,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.15
+          "chance": 0.4
         }
       ],
       "equipment": [
@@ -1726,7 +1726,7 @@
         },
         {
           "id": "pocao_mp_g",
-          "chance": 0.15
+          "chance": 0.4
         }
       ],
       "equipment": [
@@ -1769,7 +1769,7 @@
     "scale": 1.5,
     "baseAttributes": {
       "strength": 0,
-      "intelligence": 40,
+      "intelligence": 32,
       "stamina": 1900,
       "agility": 22,
       "willpower": 200
