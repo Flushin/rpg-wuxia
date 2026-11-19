@@ -59,12 +59,20 @@ class AudioManager {
     this.onChange = onChange ?? (() => {});
     this.music = null;
     this.playing.clear();
+    scene.sound.mute = this.resting;
     scene.events.once('shutdown', () => {
       this.stopMusic();
       this.scene = null;
     });
   }
   private onChange: () => void = () => {};
+  /** modo descanso (tela preta): nenhum som, nem efeito nem música */
+  private resting = false;
+
+  setResting(on: boolean) {
+    this.resting = on;
+    if (this.scene) this.scene.sound.mute = on;
+  }
 
   private sfxGain() {
     return this.settings.muted ? 0 : this.settings.sfx / 100;
@@ -76,7 +84,7 @@ class AudioManager {
   sfx(key: string, detune = 0) {
     const s = this.scene,
       d = SFX[key];
-    if (!s || !d || !s.cache.audio.exists(key)) return;
+    if (!s || !d || this.resting || !s.cache.audio.exists(key)) return;
     const vol = d.volume * this.sfxGain();
     if (vol <= 0) return;
     const n = this.playing.get(key) ?? 0;

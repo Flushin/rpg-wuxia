@@ -3,11 +3,12 @@ import { L } from '../core/i18n';
 import type { GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { PREF, getPref, setPref } from '../platform/prefs';
+import { audio } from '../render/audio';
 
 // Modo descanso (economia de bateria): com o Auto caçando e sem tocar na tela por um tempo, o jogo para de
 // desenhar o mapa, cai para REST_FPS quadros por segundo e mostra uma tela preta (pixels apagados no OLED)
 // com o resumo do que foi ganho. A simulação anda em passo fixo (World.advance), então caçar a 10 FPS rende
-// o mesmo que a 60: os drops de material continuam (o jogo segue aberto). Um toque volta ao normal.
+// o mesmo que a 60: os drops de material continuam (o jogo segue aberto). Sem som (efeitos e música). Um toque volta ao normal.
 // Escolha em ⚙ (Desligado / 30 s / 1 min / 2 min); fica salva no aparelho.
 export const REST_DELAYS = [0, 30, 60, 120] as const;
 const DEFAULT_DELAY = 60;
@@ -102,6 +103,7 @@ class RestMode {
     const s = this.scene;
     if (!s || this.active) return;
     this.active = true;
+    audio.setResting(true);
     this.since = performance.now();
     this.gain = { kills: 0, xp: 0, gold: 0, items: 0 };
     this.batStart = this.battery ? this.battery.level : null;
@@ -120,6 +122,7 @@ class RestMode {
   private wake(afterRelease = false) {
     if (!this.active) return;
     this.active = false;
+    audio.setResting(false);
     this.lastInput = performance.now();
     const el = this.el;
     if (el && afterRelease) {
