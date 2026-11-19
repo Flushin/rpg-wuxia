@@ -158,7 +158,31 @@ leva mais linhas. Comuns (nv 21): Salteador 830 de vida e golpe de 1,6 s, Bestei
 Brutamontes 1270 com golpe em área; Salteadores e Besteiros do mesmo acampamento entram juntos. Corrida inteira:
 ~700 + ~1150 de ouro contra 1000 de entrada, mais 2 itens nv 15 garantidos do chefe (um Raro) e ~1 item dos monstros.
 
-## Como medir
+## Trial (19/11/2026)
+
+`npm run sim:balance -- --trial` (5 lutas por célula; personagem nível 20; `--trial=<chefe>`, `--tiers=1,5,10`).
+Todos os chefes com a mesma vida e o mesmo dano por segundo no nível: vida 9000 × 1,10^(nível − 21), ataque
+58 × 1,065^(nível − 21) × intervalo / 2,4, defesa forte 300 e fraca 110 × 1,04^(nível − 21). Cada chefe mantém as
+mecânicas e o lado fraco do jogo normal (General e Yeti: físico; Patriarca, Abade e Rei: espiritual).
+Células: vitórias com equipamento nv 15 incomum · com equipamento "do Trial" (raro nv 15 com nível de item do chefe anterior).
+
+| Chefe | Seita | Nv 5 (nv15 inc · Trial) | Nv 10 (nv15 inc · Trial) |
+|---|---|---|---|
+| General de Terracota | Tormenta | 4/5 · 5/5 | 1/5 · 4/5 (11 poções) |
+| General de Terracota | Geada | 5/5 · 5/5 | 4/5 · 5/5 |
+| Yeti Ancestral | Tormenta | 5/5 · 5/5 | 2/5 · 5/5 (11 poções) |
+| Patriarca Profanado | Tormenta | 3/5 · 3/5 | 0/5 · 1/5 |
+| Patriarca Profanado | Geada | 5/5 · 5/5 (0 poções) | 5/5 · 5/5 (1 poção) |
+| Abade Caído | Tormenta | 1/5 · 4/5 | 0/5 · 2/5 |
+| Rei dos Bandidos | Tormenta | 4/5 · 4/5 | 0/5 · 5/5 (18 poções) |
+| Rei dos Bandidos | Titã | 5/5 · 4/5 | 0/5 · 4/5 (23 poções) |
+| Víbora (todos) | — | 5/5 · 5/5 | 5/5 · 5/5 (5–10 poções) |
+
+Nível 1 (chefe 21): todas as seitas vencem todos os chefes com equipamento nv 15 incomum (Rei e Abade: Tormenta 4/5).
+O ponto fraco pesa: Tormenta leva ~2× o tempo contra os chefes fortes contra físico; Geada idem contra General/Yeti.
+No nível 10 as seitas corpo a corpo precisam dos itens do Trial e de escolher o chefe certo. Geada e Víbora vencem tudo
+(a mesma folga que já têm nas masmorras: assunto do balanceamento das seitas, não do Trial).
+
 
 `tools/balance-sim.ts` roda o `World` real (core + `auto.ts`, sem Phaser) em passos de 1/30 s:
 

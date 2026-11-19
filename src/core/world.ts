@@ -27,8 +27,20 @@ import {
   maxDurability,
 } from './items';
 import { AutoCombat } from './auto';
-import { HOME_MAP, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { dungeonById, isDungeonMap } from './dungeons';
+import {
+  TRIAL_MAP,
+  TRIAL_MIN_LEVEL,
+  isTrialBoss,
+  trialBossLevel,
+  trialCost,
+  trialStats,
+  trialUnlocked,
+  trialXp,
+  validTier,
+  type TrialProgress,
+} from './trial';
 import { Rng } from './rng';
 import * as saveCodec from './world/saveCodec';
 import * as offlineApply from './world/offlineApply';
@@ -152,6 +164,12 @@ export class World {
   autoAttack = false;
   /** menu das masmorras aberto (o jogador pisou no Portal das Masmorras); fecha ao sair de cima do portal */
   dungeonMenu = false;
+  /** menu do Trial aberto (o jogador pisou no portal sul da vila); fecha ao sair de cima do portal */
+  trialMenu = false;
+  /** corrida do Trial em andamento (chefe e nível escolhidos); null fora do Trial */
+  trialRun: { bossId: string; tier: number } | null = null;
+  /** maior nível do Trial vencido de cada chefe (salvo) */
+  trialProgress: TrialProgress = {};
 
   // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
   bossSummoned = false;
@@ -760,21 +778,30 @@ export class World {
 
   private checkPortals() {
     const p = this.player;
-    // portal de menu (masmorras): abre o menu ao pisar; fecha ao se afastar (folga de 1,5 tile)
-    let onMenu = false;
+    // portal de menu (masmorras, Trial): abre o menu ao pisar; fecha ao se afastar (folga de 1,5 tile)
+    let onMenu: string | null = null;
     for (const o of this.map.objects) {
       if (o.type !== 'portal' || !o.props.menu) continue;
-      const dx = Math.max(o.x - p.x, 0, p.x - (o.x + o.w)),
+      const trial = o.props.menu === 'trial',
+        dx = Math.max(o.x - p.x, 0, p.x - (o.x + o.w)),
         dy = Math.max(o.y - p.y, 0, p.y - (o.y + o.h));
-      if (dx === 0 && dy === 0) onMenu = true;
-      else if (this.dungeonMenu && Math.hypot(dx, dy) > 1.5) this.dungeonMenu = false;
+      if (dx === 0 && dy === 0) onMenu = String(o.props.menu);
+      else if (Math.hypot(dx, dy) > 1.5) {
+        if (trial) this.trialMenu = false;
+        else this.dungeonMenu = false;
+      }
     }
     if (!onMenu) this.onMenuPortal = false;
     else if (!this.onMenuPortal && this.portalCd <= 0) {
       this.onMenuPortal = true;
       p.path = [];
-      this.dungeonMenu = true;
-      this.emit({ type: 'dungeonMenu' });
+      if (onMenu === 'trial') {
+        this.trialMenu = true;
+        this.emit({ type: 'trialMenu' });
+      } else {
+        this.dungeonMenu = true;
+        this.emit({ type: 'dungeonMenu' });
+      }
     }
     if (this.portalCd > 0) return;
     for (const o of this.map.objects) {
@@ -804,6 +831,23 @@ export class World {
     this.auto.disable(); // o Auto não funciona na masmorra
     this.changeMap(d.map);
     this.emit({ type: 'dungeonEnter', dungeonId: d.id, cost: d.cost });
+    return null;
+  }
+
+  /** Menu do Trial: paga a entrada e entra na arena com o chefe e o nível escolhidos (nível liberado pelo progresso). */
+  enterTrial(bossId: string, tier: number): ActionError | null {
+    if (!isTrialBoss(bossId) || !validTier(tier) || !this.maps[TRIAL_MAP] || this.player.dead) return null;
+    if (this.player.level < TRIAL_MIN_LEVEL) return { code: 'needLevel', level: TRIAL_MIN_LEVEL };
+    if (tier > trialUnlocked(this.trialProgress, bossId)) return { code: 'trialLocked' };
+    const cost = trialCost(tier);
+    if (this.gold < cost) return { code: 'noGold' };
+    this.gold -= cost;
+    this.bumpInv();
+    this.trialMenu = false;
+    this.auto.disable(); // o Auto não funciona no Trial
+    this.trialRun = { bossId, tier };
+    this.changeMap(TRIAL_MAP);
+    this.emit({ type: 'trialEnter', bossId, tier, cost });
     return null;
   }
 
@@ -1092,7 +1136,11 @@ export class World {
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
       this.emit({ type: 'bossDefeated', name: m.name, respawnAt: at });
-      if (dungeon) this.emit({ type: 'dungeonCleared', dungeonId: dungeon });
+      if (this.trialRun) {
+        const { bossId, tier } = this.trialRun;
+        this.trialProgress[bossId] = Math.max(this.trialProgress[bossId] ?? 0, tier);
+        this.emit({ type: 'trialCleared', bossId, tier });
+      } else if (dungeon) this.emit({ type: 'dungeonCleared', dungeonId: dungeon });
     }
     if (this.targetId === m.id) {
       this.targetId = null;
@@ -1101,7 +1149,7 @@ export class World {
     this.emit({ type: 'death', id: m.id });
     this.emit({ type: 'kill', monsterId: m.monsterId, level: m.level });
     this.questKill(m.monsterId);
-    this.gainXp(Math.round(def.xpBase + def.xpPerLevel * (m.level - 1)));
+    this.gainXp(m.trial ? m.trial.xp : Math.round(def.xpBase + def.xpPerLevel * (m.level - 1)));
     this.dropLoot(m, def);
     if (m.summoned) this.monsters = this.monsters.filter((x) => x !== m);
   }
@@ -1302,7 +1350,9 @@ export class World {
     this.openNpc = null;
     this.npcGoal = null;
     this.dungeonMenu = false;
+    this.trialMenu = false;
     this.onMenuPortal = false;
+    if (!MAPS_CONFIG[mapId]?.trial) this.trialRun = null; // saiu do Trial: a corrida acaba
     this.telegraphs = [];
     this.arenas = [];
     this.bossSummoned = false;
@@ -1351,6 +1401,7 @@ export class World {
         this.npcs.push(n);
       }
     });
+    if (this.trialRun && MAPS_CONFIG[mapId]?.trial) this.spawnTrialBoss(this.trialRun.bossId, this.trialRun.tier);
     this.emit({ type: 'mapChange', mapId });
     this.questReach(mapId);
   }
@@ -1422,7 +1473,28 @@ export class World {
       e.derived.physDef *= def.defMul.phys;
       e.derived.spiritDef *= def.defMul.spirit;
     }
+    if (e.trial) {
+      // chefe do Trial: vida, ataque e defesas do nível escolhido (src/core/trial.ts)
+      const t = trialStats(def, level);
+      e.derived.maxHp = Math.max(1, Math.round(t.hp * bal('vida.monstros', def.id)));
+      e.derived.physAtk = e.derived.spiritAtk = t.atk;
+      e.derived.physDef = t.physDef;
+      e.derived.spiritDef = t.spiritDef;
+    }
     e.hp = e.derived.maxHp;
+  }
+
+  /** Chefe do Trial no centro da arena, no nível do Trial escolhido (não renasce: a corrida acaba ao vencê-lo). */
+  private spawnTrialBoss(bossId: string, tier: number) {
+    const def = MONSTERS[bossId],
+      a = MAPS_CONFIG[this.mapId]?.arena;
+    if (!def?.boss || !a) return;
+    const level = trialBossLevel(tier);
+    const m = this.makeMonster(def, { x: a.x, y: a.y }, [level, level]);
+    m.trial = { tier, xp: trialXp(tier) };
+    this.applyMonsterLevel(m, def, level);
+    this.monsters.push(m);
+    this.arenas.push({ x: a.x, y: a.y, r: def.boss.arenaRadius });
   }
 
   /** Interno: usado pelos módulos de src/core/world/. */

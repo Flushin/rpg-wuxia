@@ -7,6 +7,7 @@ import { tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { MONSTERS } from '../core/data';
+import { TRIAL_TIERS } from '../core/trial';
 import { skillById } from '../core/skills';
 import type { Hud } from '../ui/hud';
 import { audio } from './audio';
@@ -216,8 +217,33 @@ export class EventFeedback {
           '#ffd23f',
         );
         return true;
+      case 'trialEnter':
+        toast(
+          L(
+            `Trial nível ${ev.tier}: −${ev.cost} ouro. O Auto não funciona aqui.`,
+            `Trial level ${ev.tier}: −${ev.cost} gold. Auto doesn't work here.`,
+          ),
+          '#c08cff',
+        );
+        return true;
+      case 'trialCleared':
+        toast(
+          L(
+            ev.tier < TRIAL_TIERS
+              ? `Trial nível ${ev.tier} vencido! O nível ${ev.tier + 1} deste chefe está liberado. A saída é o portal da entrada.`
+              : `Trial nível ${ev.tier} vencido: o mais alto! A saída é o portal da entrada.`,
+            ev.tier < TRIAL_TIERS
+              ? `Trial level ${ev.tier} cleared! Level ${ev.tier + 1} of this boss is unlocked. The exit is the portal at the entrance.`
+              : `Trial level ${ev.tier} cleared: the highest! The exit is the portal at the entrance.`,
+          ),
+          '#ffd23f',
+        );
+        return true;
       case 'autoBlocked':
-        toast(L('O Auto não funciona nas masmorras.', "Auto doesn't work in dungeons."), '#ff8a80');
+        toast(
+          L('O Auto não funciona nas masmorras nem no Trial.', "Auto doesn't work in dungeons or the Trial."),
+          '#ff8a80',
+        );
         return true;
       case 'autoStopped':
         toast(

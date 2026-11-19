@@ -9,6 +9,7 @@ import type { SaveData } from '../types';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
+import { sanitizeTrialProgress } from '../trial';
 
 export function serialize(w: World): SaveData {
   return {
@@ -37,6 +38,7 @@ export function serialize(w: World): SaveData {
     respawns: Object.fromEntries(Object.entries(w.respawnAtMs).filter(([, t]) => t > w.clock())),
     quest: { ...w.quest },
     merchant: serializeMerchant(w),
+    trialProgress: Object.keys(w.trialProgress).length ? { ...w.trialProgress } : undefined,
   };
 }
 
@@ -72,10 +74,11 @@ export function restore(w: World, s: SaveData, now: number) {
     if (typeof k === 'string' && Number(v) > 0) w.bossRespawn[k] = Number(v);
   for (const [k, v] of Object.entries(s.respawns ?? {}))
     if (typeof k === 'string' && Number.isFinite(Number(v)) && Number(v) > now) w.respawnAtMs[k] = Number(v);
-  // masmorra não fica salva: quem fechou o jogo lá dentro volta para a vila (a corrida acaba)
+  // masmorra e Trial não ficam salvos: quem fechou o jogo lá dentro volta para a vila (a corrida acaba)
   w.changeMap(w.maps[s.mapId] && !isDungeonMap(s.mapId) ? s.mapId : HOME_MAP);
   w.clock = () => Date.now();
   w.auto.load(s.auto);
   w.quest = sanitizeQuest(s.quest);
   w.merchant = restoreMerchant(s.merchant);
+  w.trialProgress = sanitizeTrialProgress(s.trialProgress);
 }

@@ -17,7 +17,7 @@ const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: strin
 
 // páginas da wiki (as mesmas rotas de src/wiki/main.ts)
 const LISTAS = ['', 'novidades', 'mecanicas', 'seitas', 'skills', 'itens', 'monstros', 'npcs', 'missoes', 'mapas'];
-const MECANICAS = ['combate', 'morte', 'forja', 'auto'];
+const MECANICAS = ['combate', 'morte', 'forja', 'auto', 'trial'];
 function paginaExiste(p: string): boolean {
   const [a, b, ...resto] = p.split('/');
   if (resto.length) return false;

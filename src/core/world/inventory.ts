@@ -1,6 +1,7 @@
 // Inventário: mochila, equipar, poções, itens no chão, coleta e desgaste.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { DUNGEON_EQUIP_DROP_MUL, isDungeonMap } from '../dungeons';
+import { TRIAL_EQUIP_REQ_LEVEL, trialDropMul, trialGold } from '../trial';
 import { CLASSES, type MonsterDef } from '../data';
 import { L } from '../i18n';
 import {
@@ -168,6 +169,7 @@ export function tickGround(w: World) {
 }
 
 export function dropLoot(w: World, m: Entity, def: MonsterDef) {
+  if (m.trial) return trialLoot(w, m, def);
   const L = def.loot;
   if (!L) return;
   const spot = () => ({ x: m.x + w.rng.range(-0.4, 0.4), y: m.y + w.rng.range(-0.4, 0.4) });
@@ -221,6 +223,40 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
         L.guaranteed.reqLevel,
       );
   }
+}
+
+/** Chefe do Trial (src/core/trial.ts): ouro do nível, 1 Raro nv 15 garantido, 1 equipamento nv 15 e os materiais do
+ *  chefe. A chance de equipamento e de material é multiplicada pelo bônus do nível (×1,12 a ×1,186); o que passa de
+ *  100% vira chance de cair mais um. Os itens saem com o nível do chefe (bônus maiores). */
+function trialLoot(w: World, m: Entity, def: MonsterDef) {
+  const tier = m.trial!.tier,
+    mul = trialDropMul(tier),
+    spot = () => ({ x: m.x + w.rng.range(-0.4, 0.4), y: m.y + w.rng.range(-0.4, 0.4) }),
+    rolls = (chance: number) => Math.floor(chance) + (w.rng.next() < chance % 1 ? 1 : 0);
+  const [g0, g1] = trialGold(tier),
+    g = w.rng.int(g0, g1);
+  w.gold += g;
+  w.bumpInv();
+  w.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
+  w.emit({ type: 'goldPickup', amount: g });
+  for (const md of def.loot?.materials ?? [])
+    for (let n = rolls(md.chance * mul); n > 0; n--) {
+      const s = spot();
+      w.emit({ type: 'drop', x: s.x, y: s.y, color: MATERIALS[md.id]?.color ?? '#fff' });
+      collect(w, makePotion(md.id, w.rng.int(md.min ?? 1, md.max ?? md.min ?? 1)), s.x, s.y);
+    }
+  const ids = equipmentBaseIds().filter(
+    (id) => BASES[id].reqLevel === TRIAL_EQUIP_REQ_LEVEL && (!BASES[id].sect || BASES[id].sect === w.classId),
+  );
+  if (!ids.length) return;
+  const give = (rarity: Rarity) => {
+    const it = makeEquipment(ids[w.rng.int(0, ids.length - 1)], rarity, CLASSES[w.classId].element, w.rng, m.level);
+    const s = spot();
+    w.emit({ type: 'drop', x: s.x, y: s.y, color: itemColor(it) });
+    collect(w, it, s.x, s.y);
+  };
+  give('raro');
+  for (let n = rolls(mul); n > 0; n--) give(rollRarity(w.rng));
 }
 
 // devolve o motivo (código) ou null se pode equipar

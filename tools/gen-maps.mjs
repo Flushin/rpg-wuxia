@@ -351,6 +351,8 @@ function cidade() {
     area('Montanha Nevada', 'portal', 15, 1, 2, 2, { target: 'montanha', targetX: 16, targetY: 27.5, minLevel: 10 }),
     // saída oeste: portal das masmorras (abre o menu de escolha; src/core/dungeons.ts)
     area('Portal das Masmorras', 'portal', 1, 14, 2, 4, { menu: 'masmorras' }),
+    // saída sul: portal do Trial (menu de chefe e nível; src/core/trial.ts)
+    area('Trial', 'portal', 15, 29, 2, 2, { menu: 'trial' }),
   );
   return tiled('Vila das Nuvens', gr, objs);
 }
@@ -870,6 +872,41 @@ function covil() {
   return tiled('Covil dos Bandidos', gr, objs);
 }
 
+// ---- Trial: arena dos chefes (chefe nível 21–30) ----
+// Instância (src/core/trial.ts): só a arena, sem monstros comuns. O chefe escolhido no menu nasce no centro
+// (World.enterTrial), não há monsterSpawn no mapa. Entrada no sul por um jardim; pátio de lajes com 6 braseiros,
+// largo para desviar dos golpes; sem portal perto da arena (como nas masmorras).
+const TRIAL_ARENA = { x: 16, y: 9, r: 5.5 };
+function trial() {
+  const gr = makeGrid(T, T);
+  // muro de pilares em volta do pátio
+  gr.rect(6, 1, 20, 18, PI);
+  gr.rect(7, 2, 18, 16, RU);
+  gr.disc(TRIAL_ARENA.x, TRIAL_ARENA.y, 6.5, RU);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(TRIAL_ARENA.x + Math.cos(a) * 5), Math.floor(TRIAL_ARENA.y + Math.sin(a) * 5), PI);
+  }
+  // portão do pátio e estrada de pedra até a entrada (sul), com um jardim na frente
+  gr.rect(15, 18, 2, 13, P);
+  gr.disc(16, 24, 3.5, G);
+  gr.rect(15, 18, 2, 13, P);
+  gr.rect(13, 22, 6, 4, PL);
+  const seen = sealUnreachable(gr, 16, 27, T);
+  if (!seen.has(TRIAL_ARENA.y * W + TRIAL_ARENA.x)) throw new Error('trial: arena inalcançável');
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 27.5 }),
+  ];
+  for (const [i, j] of [
+    [13, 21],
+    [18, 21],
+  ])
+    objs.push(point('lanterna_pedra', 'decor', i + 0.5, j + 0.5, { sprite: 'lanterna_pedra', block: 1 }));
+  console.log(`trial: ${seen.size} tiles andáveis, arena em ${TRIAL_ARENA.x},${TRIAL_ARENA.y}`);
+  return tiled('Trial', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
@@ -878,5 +915,6 @@ writeFileSync('public/maps/montanha.json', JSON.stringify(montanha()));
 writeFileSync('public/maps/gruta.json', JSON.stringify(gruta()));
 writeFileSync('public/maps/mosteiro.json', JSON.stringify(mosteiro()));
 writeFileSync('public/maps/covil.json', JSON.stringify(covil()));
+writeFileSync('public/maps/trial.json', JSON.stringify(trial()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

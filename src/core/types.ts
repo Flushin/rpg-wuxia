@@ -104,6 +104,8 @@ export interface Entity {
   enraged?: boolean;
   /** chefe com golpe em linha (boss.line): quantos golpes marcados já deu, para alternar círculo e linha */
   strikes?: number;
+  /** chefe do Trial: nível do Trial e XP; vida, ataque e defesas vêm de src/core/trial.ts */
+  trial?: { tier: number; xp: number };
   spawnKey: string; // "mapa#índice" do ponto de spawn (renascimento com tempo); '' = sem ponto
   levels?: [number, number]; // faixa de nível do ponto do mapa (marco 9); sem = a do monstro
   // NPCs
@@ -139,6 +141,12 @@ export type GameEvent =
   | { type: 'dungeonEnter'; dungeonId: string; cost: number }
   /** chefe da masmorra derrotado */
   | { type: 'dungeonCleared'; dungeonId: string }
+  /** pisou no portal do Trial (saída sul da vila): a interface abre o menu de chefe e nível (World.trialMenu) */
+  | { type: 'trialMenu' }
+  /** entrou no Trial (já pagou a entrada) */
+  | { type: 'trialEnter'; bossId: string; tier: number; cost: number }
+  /** venceu o chefe do Trial: o próximo nível desse chefe fica liberado */
+  | { type: 'trialCleared'; bossId: string; tier: number }
   /** tentou ligar o Auto dentro de uma masmorra */
   | { type: 'autoBlocked' }
   | {
@@ -272,6 +280,8 @@ export interface SaveData {
   respawns?: Record<string, number>; // "mapa#índice" → ms (relógio real) em que o monstro comum renasce
   quest?: { stage: number; status: string; progress: number }; // cadeia principal de missões (marco 7)
   /** estoque do Mercador Ambulante (marco 9): janela de renovação e ofertas (item, preço, vendido) */
+  /** Trial: maior nível vencido de cada chefe (id do chefe → 1–10) */
+  trialProgress?: Record<string, number>;
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
@@ -287,4 +297,5 @@ export type ActionError =
   | { code: 'cannotForge' }
   | { code: 'noMaterials' }
   | { code: 'talkToMerchant' }
-  | { code: 'soldOut' };
+  | { code: 'soldOut' }
+  | { code: 'trialLocked' };

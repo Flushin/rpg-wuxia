@@ -7,6 +7,7 @@ import { SkillsPanel } from './skillsPanel';
 import { InventoryPanel } from './inventory';
 import { NpcWindow } from './npcWindow';
 import { DungeonWindow } from './dungeonWindow';
+import { TrialWindow } from './trialWindow';
 import { AutoPanel, showOfflineReport } from './autoPanel';
 import { Minimap } from './minimap';
 import { isTouch } from '../platform/input';
@@ -29,6 +30,7 @@ export class Hud {
   private inv: InventoryPanel;
   private npc: NpcWindow;
   private dungeon: DungeonWindow;
+  private trial: TrialWindow;
   private potions: PotionBar;
   private goldSig = -1;
   private autoPanel: AutoPanel;
@@ -49,6 +51,7 @@ export class Hud {
     );
     this.npc = new NpcWindow(world, (m, c) => this.toast(m, c));
     this.dungeon = new DungeonWindow(world, (m, c) => this.toast(m, c));
+    this.trial = new TrialWindow(world, (m, c) => this.toast(m, c));
     this.potions = new PotionBar(world);
     this.autoPanel = new AutoPanel(world);
     for (const id of ['btn-auto', 'btn-auto-cfg'])
@@ -95,7 +98,8 @@ export class Hud {
       this.inv.open ||
       this.autoPanel.open ||
       !!this.world.openNpc ||
-      this.world.dungeonMenu;
+      this.world.dungeonMenu ||
+      this.world.trialMenu;
     this.toggleMap(false);
     this.togglePanel(false);
     this.toggleSkills(false);
@@ -103,6 +107,7 @@ export class Hud {
     this.autoPanel.set(false);
     this.world.closeNpc();
     this.world.dungeonMenu = false;
+    this.world.trialMenu = false;
     return wasOpen;
   }
 
@@ -185,6 +190,7 @@ export class Hud {
     this.inv.update();
     this.npc.update();
     this.dungeon.update();
+    this.trial.update();
     this.potions.update();
     byId('dur-warn').classList.toggle('hidden', !w.lowDurability());
     const as = w.auto.state,

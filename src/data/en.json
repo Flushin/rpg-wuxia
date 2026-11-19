@@ -607,6 +607,7 @@
     "Yeti Ancestral": "Ancestral Yeti",
     "Desfiladeiro do Gelo Eterno": "Eternal Ice Gorge",
     "Portal das Masmorras": "Dungeon Portal",
+    "Trial": "Trial",
     "Monge Profanado": "Defiled Monk",
     "Alma Penada": "Restless Soul",
     "Guardião de Pedra": "Stone Guardian",
@@ -707,7 +708,7 @@
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [{"texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."}],
     "versoes": [
       {"itens": [{"texto": "Battery saver on Auto: hunting without touching the screen for a while, the game enters rest mode (black screen with a summary of gains and much less processing), losing nothing from the hunt, material drops included. While Auto is on, the phone no longer turns the screen off by itself. One tap brings it back. Set it in ⚙ Settings (30 s, 1 min, 2 min or off)."}]},
       {

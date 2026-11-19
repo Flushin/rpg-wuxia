@@ -226,7 +226,7 @@ console.log('== páginas ==');
   look('monstros', await monsterIndexPage());
   for (const id of Object.keys(W.MONSTERS)) look('monstro/' + id, await monsterPage(id));
   look('mecanicas', M.mechanicsPage());
-  for (const t of ['combate', 'morte', 'forja', 'auto']) look('mecanicas/' + t, M.mechanicsPage(t));
+  for (const t of ['combate', 'morte', 'forja', 'auto', 'trial']) look('mecanicas/' + t, M.mechanicsPage(t));
   look('missoes', await questIndexPage());
   look('mapas', await mapIndexPage());
   for (const id of MAP_IDS) look('mapa/' + id, await mapPage(id));

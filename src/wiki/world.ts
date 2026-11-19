@@ -1,6 +1,7 @@
 // Páginas de missões (a cadeia principal, em ordem) e de mapas (minimapa desenhado dos tiles, monstros, NPCs e saídas).
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
+import { TRIAL_BOSSES, TRIAL_MIN_LEVEL, TRIAL_TIERS, trialBossLevel, trialCost } from '../core/trial';
 import { MONSTERS, QUESTS, SLOT_NAMES, esc, type Quest } from './data';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterSprite } from './monsters';
@@ -77,6 +78,7 @@ function mapLevels(m: WikiMap): [number, number] | null {
 }
 /** Nível mínimo para entrar: o maior minLevel dos portais que levam a este mapa (0 = livre); masmorra: o do menu. */
 const entryLevel = (id: string, maps: WikiMap[]) =>
+  (MAPS_CONFIG[id]?.trial ? TRIAL_MIN_LEVEL : undefined) ??
   DUNGEONS.find((d) => d.map === id)?.minLevel ??
   Math.min(...maps.flatMap((m) => m.portals.filter((p) => p.target === id).map((p) => p.minLevel)).concat(Infinity));
 const dungeonOf = (id: string) => DUNGEONS.find((d) => d.map === id);
@@ -92,7 +94,9 @@ export async function mapIndexPage(): Promise<string> {
           entry = entryLevel(m.id, maps);
         const sub = MAPS_CONFIG[m.id]?.town
           ? 'Cidade'
-          : `${dungeonOf(m.id) ? 'Masmorra · ' : ''}${lv ? `monstros nível ${lv[0]}–${lv[1]}` : ''}`;
+          : MAPS_CONFIG[m.id]?.trial
+            ? `Trial · chefes nível ${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}`
+            : `${dungeonOf(m.id) ? 'Masmorra · ' : ''}${lv ? `monstros nível ${lv[0]}–${lv[1]}` : ''}`;
         return `<a class="card-link" href="#/mapa/${m.id}">${minimap(m.id)}<b>${esc(m.name)}</b><small>${sub}${entry > 0 && entry < Infinity ? ` · entrada nível ${entry}+` : ''}</small></a>`;
       })
       .join('')}</div>`;
@@ -112,7 +116,8 @@ export async function mapPage(id: string): Promise<string | null> {
     secret = mons.filter((k) => isSpoiler(MONSTERS[k], maps));
   const monRow = (k: string) =>
     `<li><a href="#/monstro/${k}">${monsterSprite(MONSTERS[k], 'mini')}</a> ${monsterLabel(k)} — ${count.get(k)} ponto(s)</li>`;
-  const dungeon = dungeonOf(id);
+  const dungeon = dungeonOf(id),
+    trial = !!MAPS_CONFIG[id]?.trial;
   const seenExit = new Set<string>();
   const exits = m.portals
     .filter((p) => {
@@ -122,6 +127,8 @@ export async function mapPage(id: string): Promise<string | null> {
       return true;
     })
     .map((p) => {
+      if (p.menu === 'trial')
+        return `<li><a href="#/mapa/trial">Trial</a> (escolha o chefe e o nível no menu) <small class="tag">nível ${TRIAL_MIN_LEVEL}+ · ${trialCost(1)}–${trialCost(TRIAL_TIERS)} ouro</small></li>`;
       if (p.menu)
         return `<li>Portal das Masmorras (escolha no menu): ${DUNGEONS.map((d) => {
           const t = maps.find((x) => x.id === d.map);
@@ -137,12 +144,13 @@ export async function mapPage(id: string): Promise<string | null> {
   const qOpen = qs.filter((q) => !isBossQuest(q)),
     qBoss = qs.filter(isBossQuest);
   return `<a class="back" href="#/mapas">‹ Mapas</a><h1>${esc(m.name)}</h1>
-    <div class="sub">${town ? 'Cidade (segura)' : dungeon ? 'Masmorra (instância)' : 'Área de caça'}${lv ? ` · monstros nível ${lv[0]}–${lv[1]}` : ''}${entry > 0 && entry < Infinity ? ` · entrada a partir do nível ${entry}` : ''}</div>
+    <div class="sub">${town ? 'Cidade (segura)' : trial ? 'Trial (instância)' : dungeon ? 'Masmorra (instância)' : 'Área de caça'}${lv ? ` · monstros nível ${lv[0]}–${lv[1]}` : ''}${entry > 0 && entry < Infinity ? ` · entrada a partir do nível ${entry}` : ''}</div>
     <section class="panel">${minimap(id, true)}
       <div class="legend"><span><i style="background:#f0d27a"></i>Saída</span><span><i style="background:#7fd4ff"></i>NPC</span><span><i style="background:#e04848"></i>Monstro</span></div></section>
     ${m.npcs.length ? `<section class="panel"><h2>NPCs</h2><ul>${m.npcs.map((n) => `<li><a href="#/npc/${n}">${esc(npcName(n))}</a></li>`).join('')}</ul></section>` : ''}
     ${mons.length ? `<section class="panel"><h2>Monstros</h2><ul class="mon-rows">${open.map(monRow).join('')}</ul>${secret.length ? spoiler(`<ul class="mon-rows">${secret.map(monRow).join('')}</ul>`, 'Chefe desta região') : ''}</section>` : ''}
     ${dungeon ? dungeonPanel(dungeon) : ''}
+    ${trial ? trialPanel() : ''}
     <section class="panel"><h2>Saídas</h2><ul>${exits}</ul></section>
     ${qs.length ? `<section class="panel"><h2>Missões aqui</h2><ul>${qOpen.map(qRow).join('')}</ul>${qBoss.length ? spoiler(`<ul>${qBoss.map(qRow).join('')}</ul>`, 'Missão de chefe') : ''}</section>` : ''}`;
 }
@@ -223,6 +231,16 @@ export async function fillMinimaps(root: ParentNode) {
         else if (o.type === 'monsterSpawn' && !MONSTERS[String(p.monster)]?.boss) dot(tx, ty, '#e04848', R);
       }
   }
+}
+
+/** Resumo do Trial na página do mapa; as regras completas ficam em Mecânicas › Trial. */
+function trialPanel(): string {
+  return `<section class="panel"><h2>Trial</h2><p class="lore">Uma arena de lajes e braseiros onde os chefes do jogo voltam mais fortes.</p><ul>
+      <li>Entrada pelo portal da saída sul da <a href="#/mapa/cidade">vila</a>, a partir do nível <b>${TRIAL_MIN_LEVEL}</b>: escolha o chefe e o nível (1 a ${TRIAL_TIERS}, chefe nível ${trialBossLevel(1)} a ${trialBossLevel(TRIAL_TIERS)}).</li>
+      <li>Chefes: ${TRIAL_BOSSES.map((b) => `<a href="#/monstro/${b}">${esc(MONSTERS[b]?.name ?? b)}</a>`).join(', ')}.</li>
+      <li>Entrada de ${trialCost(1)} a ${trialCost(TRIAL_TIERS)} ouro; vencer um nível libera o seguinte daquele chefe.</li>
+      <li>Regras, ponto fraco de cada chefe, tabela de níveis e drops: <a href="#/mecanicas/trial">Mecânicas › Trial</a>.</li>
+    </ul></section>`;
 }
 
 /** Regras da masmorra (src/core/dungeons.ts, World.enterDungeon/killMonster, AutoCombat). */
