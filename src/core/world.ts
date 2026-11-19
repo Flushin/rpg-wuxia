@@ -93,6 +93,9 @@ export interface OfflineReport {
   potionsUsed: Record<PotionKind, number>;
   soldCount: number;
   soldGold: number;
+  /** teto de ouro da volta (abates + vendas) e se foi atingido */
+  goldCap: number;
+  goldCapped: boolean;
 }
 
 export class World {

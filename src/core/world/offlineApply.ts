@@ -65,6 +65,15 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
       used[k]++;
     }
   }
+  // teto de ouro vale para abates + vendas: o que passar do teto se perde
+  let goldCapped = res.gold >= res.goldCap && res.goldCap > 0;
+  const over = res.gold + soldGold - res.goldCap;
+  if (over > 0) {
+    const cut = Math.min(over, soldGold);
+    w.gold -= cut;
+    soldGold -= cut;
+    goldCapped = true;
+  }
   w.player.hp = w.player.derived.maxHp;
   w.player.mana = w.player.derived.maxMana;
   w.events.length = 0; // sem toasts de nível/skill atrás do resumo
@@ -81,5 +90,7 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     potionsUsed: used,
     soldCount,
     soldGold,
+    goldCap: res.goldCap,
+    goldCapped,
   };
 }

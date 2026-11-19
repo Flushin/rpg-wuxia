@@ -31,7 +31,7 @@ Cada mudança mostra os números antes → depois (ex.: `Lobo: nv 1 8 XP → 9 X
 | Progressão | `xp.monstros`, `xp.missoes`, `xp.niveis` (XP **necessário**), `xp.skills` (+ = skills sobem mais rápido), `skills.bonus_por_nivel`, `skills.mana`, `skills.recarga` |
 | Economia | `ouro.monstros`, `ouro.missoes`, `precos.pocoes`, `venda.itens`, `conserto.custo`, `desgaste.equipamento` |
 | Drops | `drop.pocoes`, `drop.equipamento`, `drop.raros` (peso de Incomum e Raro) |
-| Mundo | `respawn.monstros` (+ = demora mais), `offline.eficiencia` (máximo 100%) |
+| Mundo | `respawn.monstros` (+ = demora mais), `offline.eficiencia` (máximo 100%), `offline.teto_ouro` (teto de ouro por volta do offline; 1 = 3 h de caça) |
 
 Observações:
 

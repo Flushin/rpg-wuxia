@@ -168,6 +168,7 @@ export function showOfflineReport(rep: OfflineReport, onClose: () => void) {
     ${items || row(L('Itens', 'Items'), L('nenhum', 'none'))}
     ${row(L('Poções gastas', 'Potions used'), pots ? L(`${rep.potionsUsed.hp} de vida, ${rep.potionsUsed.mp} de mana`, `${rep.potionsUsed.hp} health, ${rep.potionsUsed.mp} mana`) : L('nenhuma', 'none'))}
     ${rep.soldCount ? row(L('Vendido automaticamente', 'Sold automatically'), L(`${rep.soldCount} itens (+${rep.soldGold} ouro)`, `${rep.soldCount} items (+${rep.soldGold} gold)`)) : ''}
+    ${rep.goldCapped ? row(L('Teto de ouro atingido', 'Gold cap reached'), L(`máximo de ${rep.goldCap} por volta`, `max ${rep.goldCap} per return`)) : ''}
     <small class="muted">${L('O auto-combate volta a caçar assim que você continuar.', 'Auto-battle resumes hunting as soon as you continue.')}</small>
     <button class="primary" id="offline-ok">${L('Continuar', 'Continue')}</button></div>`;
   el.classList.remove('hidden');

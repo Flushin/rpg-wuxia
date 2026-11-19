@@ -71,7 +71,7 @@
   },
   "ganho_offline": {
     "title": "Ganhos enquanto você está fora",
-    "text": "Deixe o Auto ligado num mapa de caça ao fechar o jogo e você recebe XP, ouro, poções e equipamentos Comuns pelo tempo fora (materiais e itens Incomuns ou Raros só caem jogando), no ritmo que o auto media antes de você sair. Rende 60% até 12 h, 40% de 12 h a 18 h, 20% de 18 h a 24 h e nada depois disso. Sem mortes, e as poções são gastas no ritmo medido."
+    "text": "Deixe o Auto ligado num mapa de caça ao fechar o jogo e você recebe XP, ouro, poções e equipamentos Comuns pelo tempo fora (materiais e itens Incomuns ou Raros só caem jogando), no ritmo que o auto media antes de você sair. Rende 60% até 12 h, 40% de 12 h a 18 h, 20% de 18 h a 24 h e nada depois disso. Sem mortes, e as poções são gastas no ritmo medido. O ouro de cada volta tem teto: no máximo o que você ganharia em 3 h de caça."
   },
   "bandidos": {
     "title": "Bandidos",

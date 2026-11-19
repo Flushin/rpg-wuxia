@@ -1,7 +1,7 @@
 import { PROGRESSION } from './data';
 import { BASES, POTIONS } from './items';
 import { Rng } from './rng';
-import { balanceOffline } from './balance';
+import { bal, balanceOffline } from './balance';
 import type { AutoRate, PotionKind, Rarity } from './types';
 
 // Eficiência por faixa de tempo fora: 60% até 12 h, 40% de 12 a 18 h, 20% de 18 a 24 h, 0 depois.
@@ -12,6 +12,16 @@ export const OFFLINE_TIERS: { untilH: number; eff: number }[] = [
 ];
 balanceOffline(OFFLINE_TIERS); // multiplicadores de src/data/balance.json
 export const MAX_OFFLINE_DROPS = 2000;
+/** Teto de ouro por volta do offline, em horas de ouro de caça no ritmo medido (abates + vendas automáticas). */
+export const OFFLINE_GOLD_CAP_HOURS = 3;
+
+/** Ouro máximo que uma volta do offline pode dar, pelo ritmo medido do auto (acompanha o nível sozinho). */
+export function offlineGoldCap(rate: AutoRate): number {
+  return Math.max(
+    0,
+    Math.floor(rate.killsPerMin * 60 * rate.goldPerKill * OFFLINE_GOLD_CAP_HOURS * bal('offline.teto_ouro')),
+  );
+}
 /** Ao voltar do segundo plano (app minimizado, aba escondida): ganho offline só se ficou fora pelo menos isto (P3). */
 export const RESUME_OFFLINE_MIN_MS = 5 * 60_000;
 
@@ -39,6 +49,8 @@ export interface OfflineResult {
   kills: number;
   xp: number;
   gold: number;
+  /** teto de ouro desta volta (abates + vendas automáticas) */
+  goldCap: number;
   levelsGained: number;
   newLevel: number;
   newXp: number;
@@ -64,7 +76,8 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
   const elapsedMin = Number.isFinite(inp.elapsedMs) && inp.elapsedMs > 0 ? inp.elapsedMs / 60000 : 0;
   const effMin = effectiveMinutes(inp.elapsedMs);
   const kills = Math.max(0, Math.floor(rate.killsPerMin * effMin + 1e-6));
-  const gold = Math.floor(kills * rate.goldPerKill);
+  const goldCap = offlineGoldCap(rate);
+  const gold = Math.min(goldCap, Math.floor(kills * rate.goldPerKill));
   // XP respeitando o nível máximo e as regras normais de nível
   let level = inp.level,
     x = inp.xp,
@@ -103,6 +116,7 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
     kills,
     xp: gained,
     gold,
+    goldCap,
     levelsGained: level - inp.level,
     newLevel: level,
     newXp: x,

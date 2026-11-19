@@ -881,7 +881,11 @@ console.log('\n== offline: faixas de eficiência ==');
     ],
   };
   const r6 = computeOffline({ elapsedMs: 6 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 3 }, seed: 1 });
-  ok(r6.kills === 432 && r6.gold === 1728, `6 h: ${r6.kills} abates (2/min × 216 min) e ouro ${r6.gold}`);
+  ok(r6.kills === 432, `6 h: ${r6.kills} abates (2/min × 216 min)`);
+  // teto de ouro: 3 h no ritmo medido = 2/min × 60 × 4 ouro × 3 = 1440
+  ok(r6.goldCap === 1440 && r6.gold === 1440, `6 h: ouro limitado ao teto (${r6.gold} de ${432 * 4})`);
+  const r1 = computeOffline({ elapsedMs: 1 * HOUR, rate, level: 1, xp: 0, potions: { hp: 0, mp: 0 }, seed: 1 });
+  ok(r1.gold === r1.kills * 4 && r1.gold < r1.goldCap, `1 h: abaixo do teto, ouro cheio (${r1.gold})`);
   ok(
     r6.drops.length === 2 &&
       r6.drops.some((d) => d.baseId === 'espadas_ferro' && d.rarity === 'comum') &&
@@ -951,15 +955,19 @@ console.log('\n== offline: aplicando no jogo ==');
         CLASSES.lamina.baseAttributes.strength + CLASSES.lamina.levelUpAttributes.strength * gained,
       'pontos automáticos aplicados',
     );
-    ok(rep.gold === Math.floor(rep.kills * 4) && w.gold >= rep.gold, `ouro ${rep.gold}`);
+    // ritmo do teste: 3 abates/min × 4 ouro → teto de 3 h = 2160 (abates + vendas)
+    ok(
+      rep.goldCap === 2160 && rep.goldCapped && rep.gold + rep.soldGold === 2160 && w.gold >= rep.gold,
+      `teto de ouro: ${rep.gold} dos abates + ${rep.soldGold} de vendas = ${rep.goldCap}`,
+    );
     {
       // mochila só com espaço livre: lota de espadas Comuns, vende todas e continua
       const ws = mk('lamina', 1, 'floresta', base(), NOW);
       const r = ws.offlineReport!;
       const swords = r.items.find((i) => i.rarity === 'comum' && i.qty > BAG_TAB_SIZE)?.qty ?? 0;
       ok(
-        swords > BAG_TAB_SIZE && r.soldCount > 0 && r.soldGold > 0 && ws.freeSlots() >= 0,
-        `mochila lotou: vendeu ${r.soldCount} equipamentos (+${r.soldGold} ouro) e continuou (${swords} espadas no total)`,
+        swords > BAG_TAB_SIZE && r.soldCount > 0 && r.gold + r.soldGold <= r.goldCap,
+        `mochila lotou: vendeu ${r.soldCount} equipamentos e continuou (${swords} espadas no total; ouro dentro do teto)`,
       );
     }
     ok(

@@ -67,6 +67,10 @@ export const KNOBS = {
   // Mundo
   'respawn.monstros': { grupo: 'Mundo', desc: 'tempo para o monstro renascer (+ = demora mais)', scope: 'monstro' },
   'offline.eficiencia': { grupo: 'Mundo', desc: 'eficiência do ganho offline (máximo 100%)' },
+  'offline.teto_ouro': {
+    grupo: 'Mundo',
+    desc: 'teto de ouro por volta do offline (hoje: 3 h de ouro de caça no ritmo medido, abates + vendas)',
+  },
 } satisfies Record<string, Knob>;
 
 export type KnobKey = keyof typeof KNOBS;
