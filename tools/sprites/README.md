@@ -28,6 +28,8 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |
 | `bandido_*.json`, `terracota.json`, `general.json` | Monstros KayKit recoloridos (lenço/chapéu gerados com `attach`) |
 | `espectro_gelo.json`, `yeti.json`, `discipulo_caido.json`, `abade_caido.json` | Montanha Nevada (marco 9): Mage, Barbarian, Rogue e Mage (com cajado) recoloridos |
+| `assassino_sombras.json`, `serpente_jade.json`, `grou_espiritual.json`, `guardiao_jade.json`, `senhor_nevoa.json` | Nível 30: Rogue_Hooded (facas), Mage, Mage, Knight (com elmo) e Mage (com cajado) recoloridos |
+| `render_bambu.py` | Bosque de Bambu Sombrio (nível 30): moitas de bambu, brotos e folhas por script → `public/sprites/bambu.*` |
 | `montanha.json` | Objetos da montanha (`render_props.py`): pinheiros em 3 tons e rochas nevadas → `public/sprites/montanha.*` |
 | `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
 | `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |

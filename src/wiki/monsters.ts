@@ -21,6 +21,11 @@ export const SHEETS: Record<string, string> = {
   yeti: 'yeti',
   'fallen-disciple': 'discipulo_caido',
   'fallen-abbot': 'abade_caido',
+  'shadow-assassin': 'assassino_sombras',
+  'jade-serpent': 'serpente_jade',
+  'spirit-crane': 'grou_espiritual',
+  'jade-guardian': 'guardiao_jade',
+  'mist-lord': 'senhor_nevoa',
 };
 /** Quadro parado virado em 3/4 (direção 1), que mostra melhor o monstro que o de frente. */
 export const monsterSprite = (m: Monster, cls = '') => spriteHtml(SHEETS[m.sprite] ?? m.id, cls, 'idle_1_0');

@@ -1,0 +1,33 @@
+{
+ "frameWidth": 320,
+ "frameHeight": 256,
+ "scale": 0.5,
+ "top": 49,
+ "anchor": [
+  0.5,
+  0.71875
+ ],
+ "dirs": 8,
+ "anims": {
+  "idle": {
+   "frames": 6,
+   "fps": 8,
+   "loop": true
+  },
+  "walk": {
+   "frames": 8,
+   "fps": 9,
+   "loop": true
+  },
+  "attack": {
+   "frames": 8,
+   "fps": 11,
+   "loop": false
+  },
+  "death": {
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ }
+}

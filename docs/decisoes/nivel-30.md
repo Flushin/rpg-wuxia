@@ -30,4 +30,12 @@ Tormenta ~111 min, Geada ~102, Titã ~165, Víbora ~128 (média ~126). XP 10→2
   as receitas de itens nv 20+ (`JADE_FROM_LEVEL` em `forge.ts`), inclusive desmontar. Ouro da forja: ×5 (nv 20), ×6 (nv 25).
   Trial: `trialEquipReqLevel` (nv 20 nos níveis 1–5, nv 25 nos 6–10). Mercador: estoque nv 20 a partir do nível 20 e nv 25
   a partir do 25. Drops de jade e do tier novo pelos monstros entram na etapa 4.
+- **Etapa 4 (conteúdo):** mapas `bambu` e `pico` (`tools/gen-maps.mjs`; tile novo `bamboo` no fim da lista), portal
+  no passo leste da montanha (minLevel 20) e na saída norte do Bosque (minLevel 25); `MAPS_CONFIG`: `autoFromLevel`
+  20/25, `autoExitVia` e `offlineMul` 5/6. Monstros `assassino_sombras`, `serpente_jade` (projétil `poison`, lentidão),
+  `grou_espiritual` (projétil `qi`), `guardiao_jade` (golpe em área) e o chefe `senhor_nevoa` (nv 30: área, chama 2 grous
+  com metade da vida, fúria a 30%; garante Raro nv 25). Serpente e Grou são humanos de seita (os pacotes 3D não têm cobra
+  nem ave; decidido pelo Lucas). Sprites: `tools/sprites/<id>.json`; moitas de bambu: `tools/sprites/render_bambu.py`.
+  Missões: O passo do leste (20), Sombras entre o bambu (21), O veneno de jade (23, arma nv 20), Penas de grou (26) e
+  O Senhor da Névoa (28, tronco nv 25): 300 mil de XP. Teste: `npm run check:m10`. Simulador: `--m10` (`--only=<seita>`).
 - Fora do escopo: skills ou níveis de skill novos, masmorras/fases do Trial novas, mudar a progressão 1–20.

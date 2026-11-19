@@ -1,0 +1,74 @@
+{
+ "name": "assassino_sombras",
+ "model": ".cache/kaykit/Characters/gltf/Rogue_Hooded.glb",
+ "out": "../../public/sprites",
+ "samples": 24,
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "out_json": "../../src/data/sprites",
+ "hide": [
+  "1H_Crossbow",
+  "2H_Crossbow",
+  "Icosphere",
+  "Throwable",
+  "Rogue_Cape"
+ ],
+ "texture": {
+  "image": "rogue_texture",
+  "cells": {
+   "0,1": [
+    38,
+    42,
+    46
+   ],
+   "1,1": [
+    26,
+    28,
+    32
+   ],
+   "5,1": [
+    150,
+    34,
+    40
+   ],
+   "1,0": [
+    20,
+    22,
+    26
+   ]
+  }
+ },
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "Dualwield_Melee_Attack_Stab",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "portrait": "idle"
+}

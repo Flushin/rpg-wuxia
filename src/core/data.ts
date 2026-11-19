@@ -4,7 +4,7 @@ import progressionJson from '../data/progression.json';
 import npcsJson from '../data/npcs.json';
 import { localize } from './i18n';
 import { balanceClasses, balanceMonsters, balanceProgression } from './balance';
-import type { AttrKey, Attributes, DamageType, Element, ElementMap } from './types';
+import type { AttrKey, Attributes, DamageType, Element, ElementMap, ProjectileKind } from './types';
 
 export interface ClassDef {
   id: string;
@@ -46,7 +46,7 @@ export interface MonsterDef {
   scale?: number; // tamanho do sprite
   defMul?: { phys: number; spirit: number }; // multiplicadores sobre a defesa derivada
   keepDistance?: number; // arqueiro: recua se o jogador chegar mais perto que isso
-  projectile?: 'arrow' | 'ice';
+  projectile?: ProjectileKind;
   onHit?: { slow: number; duration: number }; // golpe normal deixa o alvo lento (Espectro de gelo)
   /** golpe em área marcado no chão em volta do próprio monstro (Yeti), além do ataque normal */
   slam?: { radius: number; delay: number; mult: number; interval: number };

@@ -2,6 +2,7 @@ import { L } from '../core/i18n';
 import { AUTO_MAX_LEVEL_LIMIT, BUCKET_SEC, MAX_BUCKETS, RATE_MIN_SEC, SHIELD_HP } from '../core/auto';
 import { GROUND_SECONDS, RARITIES } from '../core/items';
 import { OFFLINE_TIERS } from '../core/offline';
+import { MAPS_CONFIG, MAP_IDS } from '../core/mapsConfig';
 import { initials } from '../core/skills';
 import { skillIconHtml } from './icons';
 import type { World, OfflineReport } from '../core/world';
@@ -20,8 +21,20 @@ const tierText = (upTo: string, fromTo: string, after: string) => {
   );
   return [...parts, `<b>0%</b> ${after} ${OFFLINE_TIERS[OFFLINE_TIERS.length - 1].untilH} h`].join(' · ');
 };
-const tiersPt = tierText('até', 'de {a} h a {b} h', 'depois de'),
-  tiersEn = tierText('up to', 'from {a} h to {b} h', 'after');
+// mapas com rendimento offline reduzido (offlineMul em mapsConfig; nível 30: Bosque e Pico a 5/6)
+const reduced = MAP_IDS.filter((id) => (MAPS_CONFIG[id].offlineMul ?? 1) < 1);
+const reducedText = (pt: boolean) => {
+  if (!reduced.length) return '';
+  const mul = pct(MAPS_CONFIG[reduced[0]].offlineMul ?? 1),
+    names = reduced.map((id) => MAP_NAMES[id]?.[pt ? 0 : 1] ?? id).join(pt ? ' e ' : ' and ');
+  return pt ? ` Em ${names}: <b>${mul}</b> disso.` : ` In ${names}: <b>${mul}</b> of that.`;
+};
+const MAP_NAMES: Record<string, [string, string]> = {
+  bambu: ['Bosque de Bambu Sombrio', 'Shadow Bamboo Grove'],
+  pico: ['Pico da Névoa', 'Misty Peak'],
+};
+const tiersPt = tierText('até', 'de {a} h a {b} h', 'depois de') + reducedText(true),
+  tiersEn = tierText('up to', 'from {a} h to {b} h', 'after') + reducedText(false);
 
 const fmtDur = (ms: number) => {
   const m = Math.floor(ms / 60000),

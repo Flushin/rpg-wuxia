@@ -22,6 +22,9 @@ const ICE_FRAME = 15; // água na montanha: lago congelado (parado)
 const PINES = ['pinheiro', 'pinheiro', 'pinheiro_gelo', 'pinheiro_neve', 'pinheiro', 'pinheiro_gelo'];
 const SNOW_DECOR = ['pedra_neve', 'pedra_neve', 'rocha_neve'];
 const SNOW_DECOR_CHANCE = 0.035;
+// Bosque de Bambu Sombrio (atlas props-bambu, nível 30): moitas no tile 'bamboo'; brotos e folhas soltos na grama
+const BAMBOO = ['bambu_a', 'bambu_b', 'bambu_c', 'bambu_a', 'bambu_b'];
+const BAMBOO_DECOR = ['brotos', 'folhas', 'folhas'];
 const WATER_FRAMES = [9, 10, 11];
 const WATER_MS = 420; // tempo de cada quadro da água
 // ruínas (atlas props-ruinas): o que aparece em cada tile 'pillar' (bloqueado) e enfeites soltos no chão
@@ -91,7 +94,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       .setScale(SPRITE_SCALE)
       .setDepth(DEPTH.GROUND);
   };
-  const snowy = MAPS_CONFIG[map.id]?.trees === 'snow';
+  const snowy = MAPS_CONFIG[map.id]?.trees === 'snow',
+    bamboo = MAPS_CONFIG[map.id]?.trees === 'bamboo';
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
       const name = map.tiles[j * map.width + i],
@@ -125,15 +129,17 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         out.push(p);
         continue;
       }
-      if (name === 'tree' || name === 'pine') {
+      if (name === 'tree' || name === 'pine' || name === 'bamboo') {
         out.push(ground(name === 'pine' ? 'snow' : 'grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
         const [atlas, frame] =
           name === 'pine'
             ? ['props-montanha', pick(PINES, r)]
-            : MAPS_CONFIG[map.id]?.trees === 'city'
-              ? pick(CITY_TREES, r)
-              : ['props-floresta', pick(TREES, r)];
+            : name === 'bamboo'
+              ? ['props-bambu', pick(BAMBOO, r)]
+              : MAPS_CONFIG[map.id]?.trees === 'city'
+                ? pick(CITY_TREES, r)
+                : ['props-floresta', pick(TREES, r)];
         const tree = scene.add
           .image(pos.x, pos.y, atlas, frame)
           .setScale(SPRITE_SCALE * (0.9 + 0.2 * hash(i, j, 3)))
@@ -169,8 +175,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
             .image(
               pos.x + (hash(i, j, 6) - 0.5) * 20,
               pos.y + (hash(i, j, 7) - 0.5) * 8,
-              'props-floresta',
-              pick(DECOR, hash(i, j, 8)),
+              bamboo ? 'props-bambu' : 'props-floresta',
+              pick(bamboo ? BAMBOO_DECOR : DECOR, hash(i, j, 8)),
             )
             .setScale(SPRITE_SCALE)
             .setFlipX(hash(i, j, 9) < 0.5)

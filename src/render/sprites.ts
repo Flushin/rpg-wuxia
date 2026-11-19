@@ -12,6 +12,11 @@ import espectro from '../data/sprites/espectro_gelo.json';
 import yeti from '../data/sprites/yeti.json';
 import discipulo from '../data/sprites/discipulo_caido.json';
 import abade from '../data/sprites/abade_caido.json';
+import assassino from '../data/sprites/assassino_sombras.json';
+import serpente from '../data/sprites/serpente_jade.json';
+import grou from '../data/sprites/grou_espiritual.json';
+import guardiaoJade from '../data/sprites/guardiao_jade.json';
+import senhorNevoa from '../data/sprites/senhor_nevoa.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -62,6 +67,11 @@ const SHEETS: Record<string, SheetMeta> = {
   yeti: yeti as SheetMeta,
   discipulo_caido: discipulo as SheetMeta,
   abade_caido: abade as SheetMeta,
+  assassino_sombras: assassino as SheetMeta,
+  serpente_jade: serpente as SheetMeta,
+  grou_espiritual: grou as SheetMeta,
+  guardiao_jade: guardiaoJade as SheetMeta,
+  senhor_nevoa: senhorNevoa as SheetMeta,
   ...npcSheets,
 };
 
@@ -80,6 +90,11 @@ const BY_TEXTURE: Record<string, string> = {
   yeti: 'yeti',
   'fallen-disciple': 'discipulo_caido',
   'fallen-abbot': 'abade_caido',
+  'shadow-assassin': 'assassino_sombras',
+  'jade-serpent': 'serpente_jade',
+  'spirit-crane': 'grou_espiritual',
+  'jade-guardian': 'guardiao_jade',
+  'mist-lord': 'senhor_nevoa',
 };
 
 // retrato parado de frente, usado na mochila (por seita)
@@ -128,6 +143,7 @@ export function preloadSprites(scene: Phaser.Scene) {
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.atlas('props-montanha', 'sprites/montanha.png', 'sprites/montanha.json');
+  scene.load.atlas('props-bambu', 'sprites/bambu.png', 'sprites/bambu.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 

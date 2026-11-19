@@ -1,4 +1,6 @@
 export type Element = 'fire' | 'ice' | 'thunder' | 'poison';
+/** Projétil dos monstros à distância: flecha, gelo (espectro), veneno (Serpente de Jade), qi (Grou Espiritual). */
+export type ProjectileKind = 'arrow' | 'ice' | 'poison' | 'qi';
 export const ELEMENTS: Element[] = ['fire', 'ice', 'thunder', 'poison'];
 export type AttrKey = 'strength' | 'intelligence' | 'stamina' | 'agility' | 'willpower';
 export const ATTR_KEYS: AttrKey[] = ['strength', 'intelligence', 'stamina', 'agility', 'willpower'];
@@ -182,7 +184,7 @@ export type GameEvent =
   | { type: 'durabilityLost' }
   | { type: 'autoState'; state: AutoState }
   | { type: 'autoStopped'; reason: 'broken' }
-  | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: 'arrow' | 'ice' }
+  | { type: 'projectile'; fromX: number; fromY: number; toX: number; toY: number; kind: ProjectileKind }
   | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number; shape?: 'line' }
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }

@@ -40,6 +40,8 @@ import {
   trialXp,
 } from '../core/trial';
 import { itemLink } from './ui';
+import { MAPS_CONFIG, MAP_IDS } from '../core/mapsConfig';
+const MAP_TITLES: Record<string, string> = { bambu: 'Bosque de Bambu Sombrio', pico: 'Pico da Névoa' };
 
 const n1 = (v: number) => String(+v.toFixed(1)).replace('.', ',');
 const pc = (v: number) => `${n1(v * 100)}%`;
@@ -279,7 +281,12 @@ function auto(): string {
     <section class="panel"><h2>Ganho offline</h2><p>Se você fechar o jogo com o auto-combate ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora,
       calculados pelo ritmo que o auto estava tendo (monstros por minuto, XP, ouro, drops e poções por abate).</p>
       <table class="tbl"><thead><tr><th>Tempo fora</th><th>Eficiência</th></tr></thead><tbody>${tiers}<tr><td>mais de ${OFFLINE_TIERS[OFFLINE_TIERS.length - 1].untilH} h</td><td>0%</td></tr></tbody></table>
-      <ul><li><b>Teto de ouro:</b> cada volta dá no máximo ${OFFLINE_GOLD_CAP_HOURS} h de ouro de caça no seu ritmo.</li>
+      <ul><li><b>Mapas do nível 20 ao 30:</b> caçando no ${MAP_IDS.filter((id) => (MAPS_CONFIG[id].offlineMul ?? 1) < 1)
+        .map((id) => `<a href="#/mapa/${id}">${esc(MAP_TITLES[id] ?? id)}</a>`)
+        .join(
+          ' e no ',
+        )}, a eficiência é <b>${pc(MAPS_CONFIG.bambu.offlineMul ?? 1)}</b> da tabela acima (ex.: ${pc(OFFLINE_TIERS[0].eff * (MAPS_CONFIG.bambu.offlineMul ?? 1))} nas primeiras ${OFFLINE_TIERS[0].untilH} h).</li>
+      <li><b>Teto de ouro:</b> cada volta dá no máximo ${OFFLINE_GOLD_CAP_HOURS} h de ouro de caça no seu ritmo.</li>
       <li><b>Itens:</b> só poções e equipamentos Comuns. Materiais, consumíveis e equipamentos Incomuns/Raros só caem jogando.</li>
       <li>Offline não há morte nem desgaste. Gasta poções; se acabarem, os ganhos continuam.</li>
       <li>As skills <b>não</b> ganham experiência offline.</li>

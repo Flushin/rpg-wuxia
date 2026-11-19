@@ -8,8 +8,9 @@ export interface MapConfig {
   town?: boolean;
   /** Chave da música em src/data/audio.json ("music"); sem música = continua a que estava. */
   music?: string;
-  /** Árvores: 'city' mistura cerejeiras; 'forest' só árvores comuns; 'snow' = pinheiros (tile 'pine'). */
-  trees: 'city' | 'forest' | 'snow';
+  /** Árvores: 'city' mistura cerejeiras; 'forest' só árvores comuns; 'snow' = pinheiros (tile 'pine');
+   *  'bamboo' = moitas de bambu (tile 'bamboo', atlas props-bambu). */
+  trees: 'city' | 'forest' | 'snow' | 'bamboo';
   /** Chance (0–1) de um tile de grama ganhar enfeite (flor, cogumelo, pedra…). */
   grassDecor?: number;
   /** Arena do chefe: os pilares dentro deste círculo (em tiles) viram braseiros. */
@@ -22,6 +23,8 @@ export interface MapConfig {
   dungeon?: boolean;
   /** Trial (src/core/trial.ts): instância como a masmorra, mas o chefe é escolhido no menu do portal sul da vila. */
   trial?: boolean;
+  /** Ganho offline caçando aqui: multiplica a eficiência das faixas de tempo (nível 30: 5/6 nos mapas 20–30). */
+  offlineMul?: number;
 }
 
 export const MAPS_CONFIG: Record<string, MapConfig> = {
@@ -30,6 +33,23 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   ruinas: { trees: 'forest', arena: { x: 24.5, y: 16.5, r: 6.2 }, autoExitVia: 'floresta' },
   // marco 9: entrada pela saída norte da vila (portal com minLevel 10); arena = pátio do templo (tools/gen-maps.mjs)
   montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10 },
+  // nível 30: Bosque de Bambu Sombrio (nv 20–25), pelo passo leste da montanha (portal minLevel 20); offline a 5/6
+  bambu: {
+    music: 'music_floresta',
+    trees: 'bamboo',
+    grassDecor: 0.06,
+    autoFromLevel: 20,
+    autoExitVia: 'montanha',
+    offlineMul: 5 / 6,
+  },
+  // nível 30: Pico da Névoa (nv 25–30), saída norte do Bosque (minLevel 25); santuário = arena do Senhor da Névoa
+  pico: {
+    trees: 'snow',
+    arena: { x: 16, y: 6, r: 5.5 },
+    autoFromLevel: 25,
+    autoExitVia: 'bambu',
+    offlineMul: 5 / 6,
+  },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
   gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true },
   // masmorra: Mosteiro Profanado; salão do Patriarca Profanado no norte

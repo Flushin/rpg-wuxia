@@ -328,6 +328,23 @@ export class EventFeedback {
       g.fillTriangle(9, 0, -5, -3.5, -5, 3.5);
       g.lineStyle(1, 0x5fb6f0, 1);
       g.strokeTriangle(9, 0, -5, -3.5, -5, 3.5);
+    } else if (ev.kind === 'poison') {
+      // gota de veneno verde-jade (Serpente de Jade, nível 30)
+      g.fillStyle(0x5fe0a8, 0.3);
+      g.fillEllipse(-5, 0, 20, 8);
+      g.fillStyle(0x3fbf6a, 1);
+      g.fillCircle(3, 0, 4);
+      g.fillTriangle(-6, 0, 1, -3, 1, 3);
+      g.lineStyle(1, 0x1f6b3a, 1);
+      g.strokeCircle(3, 0, 4);
+    } else if (ev.kind === 'qi') {
+      // pena de qi branca com ponta vermelha (Grou Espiritual, nível 30)
+      g.fillStyle(0xffffff, 0.35);
+      g.fillEllipse(-4, 0, 22, 8);
+      g.fillStyle(0xf4f8ff, 1);
+      g.fillEllipse(0, 0, 16, 5);
+      g.fillStyle(0xd83a3a, 1);
+      g.fillCircle(7, 0, 2.5);
     } else {
       g.lineStyle(2, 0xe8d8a8, 1);
       g.lineBetween(-9, 0, 9, 0);

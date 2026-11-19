@@ -18,8 +18,10 @@ const TILES = [
   // marco 9 (montanha): sempre no fim da lista, para não mudar os gids dos mapas antigos
   { name: 'snow', walkable: true, color: [222, 230, 238] },
   { name: 'pine', walkable: false, color: [52, 84, 70] },
+  // nível 30 (Bosque de Bambu Sombrio): também no fim da lista
+  { name: 'bamboo', walkable: false, color: [44, 92, 56] },
 ];
-const [G, P, WA, T, HS, PL, RU, PI, SN, PN] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const [G, P, WA, T, HS, PL, RU, PI, SN, PN, BB] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const walkable = (id) => TILES[id - 1].walkable;
 
 function rngFn(seed) {
@@ -596,6 +598,12 @@ function montanha() {
   for (let n = 0; n < 2; n++) spectre(27, 13.5, 2.8, 15, 17);
   yeti(27, 13.5, 2.8, 16, 18);
   objs.push(point('Abade Caído', 'monsterSpawn', MONTANHA_ARENA.x, MONTANHA_ARENA.y, { monster: 'abade_caido' }));
+  // nível 30: passo leste da encosta alta (clareira nordeste) até o Bosque de Bambu Sombrio, liberado no nível 20.
+  // Aberto depois dos monstros, para não mudar o sorteio do mapa.
+  gr.rect(28, 13, 3, 2, SN);
+  objs.push(
+    area('Bosque de Bambu Sombrio', 'portal', 29, 13, 2, 2, { target: 'bambu', targetX: 3, targetY: 16, minLevel: 20 }),
+  );
   console.log(`montanha: ${seen.size} tiles andáveis, templo alcançável, ${used.length} monstros + Abade`);
   return tiled('Montanha Nevada', gr, objs);
 }
@@ -872,6 +880,183 @@ function covil() {
   return tiled('Covil dos Bandidos', gr, objs);
 }
 
+// ---- nível 30: monstros espalhados por clareiras (faixa por ponto: minLevel/maxLevel) ----
+function placer(name, gr, seen, rnd, objs, avoid) {
+  const used = [];
+  const place = (label, monster, cx, cy, r, minLevel, maxLevel) => {
+    const c = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (
+          Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
+          Math.hypot(i + 0.5 - avoid.x, j + 0.5 - avoid.y) >= 6 && // ninguém ataca quem acabou de chegar
+          seen.has(j * W + i) &&
+          walkable(gr.get(i, j))
+        )
+          c.push([i, j]);
+    for (let tries = 0; tries < 200 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 2.3)) continue;
+      used.push([i, j]);
+      objs.push(point(label, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel }));
+      return;
+    }
+    throw new Error(`${name}: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  return { place, used };
+}
+
+// ---- Bosque de Bambu Sombrio (nível 30, nv 20–25) ----
+// Entrada a oeste (vinda do passo leste da Montanha Nevada); trilha de terra serpenteia entre moitas fechadas de bambu
+// (tile 'bamboo', bloqueia) e um riacho. Clareiras do oeste e do centro com monstros nv 20–22; clareiras do leste e do
+// norte com nv 23–25. Saída norte para o Pico da Névoa (portal com minLevel 25).
+function bambu() {
+  const rnd = rngFn(2030);
+  const gr = makeGrid(G, BB);
+  for (let j = 1; j < H - 1; j++) for (let i = 1; i < W - 1; i++) if (rnd() < 0.42) gr.set(i, j, BB);
+  // trilha: entrada oeste (2,16) -> centro -> sobe para o norte (16,2)
+  gr.rect(1, 15, 9, 2, P);
+  gr.rect(8, 11, 2, 6, P);
+  gr.rect(8, 11, 9, 2, P);
+  gr.rect(15, 2, 2, 11, P);
+  // ramal para o leste
+  gr.rect(16, 18, 10, 2, P);
+  gr.rect(15, 12, 2, 8, P);
+  // clareiras (grama)
+  gr.disc(5, 22, 3.4, G); // sudoeste
+  gr.rect(4, 16, 2, 5, P);
+  gr.disc(12, 23, 3.0, G); // sul
+  gr.rect(11, 17, 2, 5, P);
+  gr.rect(9, 17, 4, 2, P);
+  gr.disc(22, 24, 3.4, G); // sudeste
+  gr.rect(21, 19, 2, 4, P);
+  gr.disc(26, 12, 3.4, G); // leste
+  gr.rect(24, 13, 2, 6, P);
+  gr.disc(8, 6, 3.2, G); // noroeste
+  gr.rect(9, 9, 2, 3, P);
+  gr.disc(24, 5, 3.2, G); // nordeste
+  gr.rect(17, 5, 5, 2, P);
+  // riacho atravessando o sul, com uma ponte (trilha) no ramal
+  for (let i = 13; i <= 19; i++) gr.set(i, 26, WA);
+  gr.disc(17, 27, 1.2, WA);
+  gr.disc(4, 9, 1.0, WA); // lago pequeno na clareira noroeste
+  // pequeno altar (lajes) na clareira do centro
+  gr.disc(16, 15, 1.6, PL);
+  const seen = sealUnreachable(gr, 2, 16, BB);
+  for (const [i, j, what] of [
+    [16, 2, 'saída norte'],
+    [26, 12, 'clareira leste'],
+    [5, 22, 'clareira sudoeste'],
+    [24, 5, 'clareira nordeste'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`bambu: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 3, 16),
+    area('Montanha Nevada', 'portal', 1, 15, 1, 2, { target: 'montanha', targetX: 27.5, targetY: 13.5 }),
+    area('Pico da Névoa', 'portal', 15, 1, 2, 1, { target: 'pico', targetX: 16, targetY: 27.5, minLevel: 25 }),
+  ];
+  const { place, used } = placer('bambu', gr, seen, rnd, objs, { x: 3, y: 16 });
+  const ass = (cx, cy, r, a, b) => place('Assassino das Sombras', 'assassino_sombras', cx, cy, r, a, b);
+  const ser = (cx, cy, r, a, b) => place('Serpente de Jade', 'serpente_jade', cx, cy, r, a, b);
+  // oeste e centro (nv 20–22)
+  ass(5, 22, 3.2, 20, 21);
+  ser(5, 22, 3.2, 21, 21);
+  ass(12, 23, 2.8, 20, 22);
+  ser(12, 23, 2.8, 21, 22);
+  ass(8, 6, 3.0, 21, 22);
+  ser(8, 6, 3.0, 21, 22);
+  ass(14, 16.5, 3, 21, 22);
+  // leste e norte (nv 23–25)
+  ass(22, 24, 3.2, 23, 24);
+  ser(22, 24, 3.2, 23, 24);
+  ass(22, 24, 3.2, 23, 24);
+  ass(26, 12, 3.2, 23, 25);
+  ser(26, 12, 3.2, 24, 25);
+  ser(26, 12, 3.2, 23, 24);
+  ass(24, 5, 3.0, 24, 25);
+  ser(24, 5, 3.0, 24, 25);
+  ass(24, 5, 3.0, 24, 25);
+  console.log(`bambu: ${seen.size} tiles andáveis, ${used.length} monstros`);
+  return tiled('Bosque de Bambu Sombrio', gr, objs);
+}
+
+// ---- Pico da Névoa (nível 30, nv 25–30) ----
+// Acima das nuvens: entrada no sul (vinda do Bosque); terraços de pedra sobem em zigue-zague entre pinheiros e rochas
+// nevadas até o Santuário de Jade no topo, arena do Senhor da Névoa (centro 16,6). Terraço baixo nv 25–27, terraço do
+// meio nv 26–28, terraço alto nv 28–30.
+const PICO_ARENA = { x: 16, y: 6, r: 5.5 };
+function pico() {
+  const rnd = rngFn(2031);
+  const gr = makeGrid(SN, PN);
+  for (let j = 1; j < H - 1; j++)
+    for (let i = 1; i < W - 1; i++) {
+      const r = rnd();
+      if (j < 12 || r < 0.4) gr.set(i, j, r < 0.12 ? PI : PN);
+    }
+  // trilha de lajes: entrada (16,28) -> terraço baixo -> meio -> alto -> santuário
+  gr.rect(15, 22, 2, 9, RU);
+  gr.rect(6, 22, 20, 2, RU);
+  gr.rect(6, 17, 2, 6, RU);
+  gr.rect(24, 17, 2, 6, RU);
+  gr.rect(6, 16, 20, 2, RU);
+  gr.rect(15, 11, 2, 6, RU);
+  // terraços (clareiras de neve)
+  gr.disc(7, 26, 3.0, SN);
+  gr.disc(25, 26, 3.0, SN);
+  gr.disc(4, 19.5, 2.6, SN);
+  gr.disc(28, 19.5, 2.6, SN);
+  gr.disc(16, 19.5, 2.4, SN);
+  gr.disc(5, 13, 2.6, SN);
+  gr.disc(27, 13, 2.6, SN);
+  gr.rect(5, 13, 2, 4, SN);
+  gr.rect(26, 13, 2, 4, SN);
+  // santuário: muro de pilares com portão no sul; pátio de lajes com 6 braseiros
+  gr.rect(8, 1, 16, 11, PI);
+  gr.rect(9, 1, 14, 10, RU);
+  gr.rect(15, 10, 2, 2, RU);
+  gr.disc(PICO_ARENA.x, PICO_ARENA.y, 4.6, RU);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(PICO_ARENA.x + Math.cos(a) * 4), Math.floor(PICO_ARENA.y + Math.sin(a) * 4), PI);
+  }
+  const seen = sealUnreachable(gr, 16, 27, PN);
+  for (const [i, j, what] of [
+    [16, 6, 'santuário'],
+    [5, 13, 'terraço alto oeste'],
+    [27, 13, 'terraço alto leste'],
+    [7, 26, 'terraço baixo oeste'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`pico: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Bosque de Bambu Sombrio', 'portal', 15, 29, 2, 2, { target: 'bambu', targetX: 16, targetY: 3 }),
+  ];
+  const { place, used } = placer('pico', gr, seen, rnd, objs, { x: 16, y: 27.5 });
+  const grou = (cx, cy, r, a, b) => place('Grou Espiritual', 'grou_espiritual', cx, cy, r, a, b);
+  const guard = (cx, cy, r, a, b) => place('Guardião de Jade', 'guardiao_jade', cx, cy, r, a, b);
+  // terraço baixo (nv 25–27)
+  grou(7, 26, 2.8, 25, 26);
+  grou(7, 26, 2.8, 25, 26);
+  guard(25, 26, 2.8, 26, 27);
+  grou(25, 26, 2.8, 25, 27);
+  // terraço do meio (nv 26–28)
+  grou(4, 19.5, 2.6, 26, 28);
+  guard(4, 19.5, 2.6, 26, 28);
+  grou(28, 19.5, 2.6, 26, 28);
+  guard(28, 19.5, 2.6, 27, 28);
+  guard(16, 19.5, 2.4, 26, 27);
+  // terraço alto (nv 28–30)
+  grou(5, 13, 2.8, 28, 30);
+  guard(5, 13, 2.8, 28, 29);
+  grou(5, 13, 2.8, 28, 29);
+  grou(27, 13, 2.8, 28, 30);
+  guard(27, 13, 2.8, 29, 30);
+  guard(27, 13, 2.8, 28, 29);
+  objs.push(point('Senhor da Névoa', 'monsterSpawn', PICO_ARENA.x, PICO_ARENA.y, { monster: 'senhor_nevoa' }));
+  console.log(`pico: ${seen.size} tiles andáveis, santuário alcançável, ${used.length} monstros + Senhor da Névoa`);
+  return tiled('Pico da Névoa', gr, objs);
+}
+
 // ---- Trial: arena dos chefes (chefe nível 21–30) ----
 // Instância (src/core/trial.ts): só a arena, sem monstros comuns. O chefe escolhido no menu nasce no centro
 // (World.enterTrial), não há monsterSpawn no mapa. Entrada no sul por um jardim; pátio de lajes com 6 braseiros,
@@ -916,5 +1101,7 @@ writeFileSync('public/maps/gruta.json', JSON.stringify(gruta()));
 writeFileSync('public/maps/mosteiro.json', JSON.stringify(mosteiro()));
 writeFileSync('public/maps/covil.json', JSON.stringify(covil()));
 writeFileSync('public/maps/trial.json', JSON.stringify(trial()));
+writeFileSync('public/maps/bambu.json', JSON.stringify(bambu()));
+writeFileSync('public/maps/pico.json', JSON.stringify(pico()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');
