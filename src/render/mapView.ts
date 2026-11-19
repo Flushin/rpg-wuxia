@@ -192,7 +192,12 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       out.push(img);
     }
   }
-  for (const o of map.objects) if (o.type === 'portal') out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name)));
+  for (const o of map.objects) {
+    if (o.type !== 'portal') continue;
+    // portal na borda de cima/baixo fica de frente para o outro eixo: espelha o sprite
+    const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
+    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns));
+  }
   if (water.length) {
     // água: cada tile troca de quadro com sua própria fase (sem todos piscarem juntos)
     let k = 0;
@@ -244,6 +249,7 @@ function portal(
   w: number,
   h: number,
   name: string,
+  flip = false,
 ): Phaser.GameObjects.GameObject[] {
   const out: Phaser.GameObjects.GameObject[] = [];
   const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
@@ -259,6 +265,7 @@ function portal(
   const gate = scene.add
     .image(c.x, c.y, 'props-ruinas', 'portal')
     .setScale(SPRITE_SCALE * Math.min(1, h / 3.2))
+    .setFlipX(flip)
     .setDepth(Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1);
   gate.setName('tree');
   out.push(gate);
