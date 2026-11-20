@@ -69,15 +69,15 @@
       "volume": 0.6
     },
     "potion": {
-      "file": "spell",
+      "file": "potion",
       "volume": 0.35
     },
     "repair": {
-      "file": "hit",
+      "file": "repair",
       "volume": 0.45
     },
     "bag_full": {
-      "file": "miss",
+      "file": "bag_full",
       "volume": 0.6
     }
   },

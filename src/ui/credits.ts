@@ -56,6 +56,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Efeitos sonoros de combate', 'Combat sound effects'),
+    who: 'CYBERDEViL, VishwaJai, Spring Spring, JaggedStone, CaveboyTup, pauliuw (OpenGameArt.org); stephan (Wikimedia Commons)',
+    license: CC0,
+  },
+  {
     what: L('Música da cidade: "Oriental"', 'Town music: "Oriental"'),
     who: 'Shadowfire452 (OpenGameArt.org)',
     license: CC0,

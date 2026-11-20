@@ -25,6 +25,20 @@ Não escreva uma licença de memória e não copie de outro pacote: se não cons
 | `ionfilesystem-android-1.1.1-LICENSE.txt` | `io.ionic.libs:ionfilesystem-android` 1.1.1 — **MIT**, © 2025 Ionic | Puxada pelo `@capacitor/filesystem` (vai no APK). Obtido em 18/11/2026 | `https://raw.githubusercontent.com/ionic-team/ion-android-filesystem/1.1.1/LICENSE` (o POM no Maven Central aponta para esse arquivo) | `de884404585e` |
 | `cordova-android-14.0.1-NOTICE.txt` | `org.apache.cordova:framework` 14.0.1 — **Apache-2.0** (POM no Maven Central), com o NOTICE exigido pela licença | Puxada pelo `@capacitor/android` (vai no APK). Obtido em 18/11/2026; texto da licença: `Apache-2.0.txt` | `https://raw.githubusercontent.com/apache/cordova-android/rel/14.0.1/NOTICE` | `e94707080ab2` |
 
+### Sons de combate (verificados em 20/11/2026)
+
+Licença conferida na página de origem (OpenGameArt: campo "License(s)"; Wikimedia Commons: caixa de licença). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `hit` | `https://opengameart.org/content/machete-vs-spatula` (machete_vs_spatula_7.wav) | CYBERDEViL | CC0 |
+| `crit` | `https://opengameart.org/content/blacksmiths-hammer` (blacksmithhammer_0.mp3) | VishwaJai | CC0 |
+| `miss` | `https://opengameart.org/content/various-sound-effects-0` (snd_throw1.wav) | Spring Spring | CC0 |
+| `spell` | `https://opengameart.org/content/magic-spell-sfx` (magical_6_0.ogg) | JaggedStone | CC0 |
+| `monster_attack` | `https://opengameart.org/content/wolf-monster-sound` (wolf_monster_6.mp3) | CaveboyTup | CC0 |
+| `monster_death` | `https://opengameart.org/content/slimy-monster-or-murder-sounds9` (slimy_monster_or_murderd_sound_3.mp3) | pauliuw | CC0 |
+| `player_death` | `https://commons.wikimedia.org/wiki/File:Gong55.ogg` | stephan | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)
