@@ -4,6 +4,7 @@ import {
   BONUS_POOL,
   CLASSES,
   CONSUMABLES,
+  EPIC_ITEMS,
   EQUIP_TIERS,
   MATERIALS,
   MERCHANT,
@@ -54,8 +55,17 @@ export function itemIndexPage(tab: string, params: URLSearchParams): string {
         )
         .join('')}</nav>`;
     const ids = Object.keys(BASES).filter((id) => !sect || !BASES[id].sect || BASES[id].sect === sect);
+    // Épicos: sem nível próprio nem página de item; o cartão leva à página de regras
+    const col = RARITIES.epico.color,
+      epics = EPIC_ITEMS.filter((e) => !sect || !e.sect || e.sect === sect)
+        .map(
+          (e) =>
+            `<a class="card-link item-card" href="#/mecanicas/epico" data-name="${esc(e.name.toLowerCase())}">${iconHtml(e.id)}<b style="color:${col}">${esc(e.name)}</b><small>Épico · ${SLOT_NAMES[e.slot]}${e.sect ? ' · ' + esc(sectName(e.sect)) : ''}</small></a>`,
+        )
+        .join('');
     body =
       filter +
+      `<h2 style="color:${col}">Épicos <small class="muted">(acompanham seu nível)</small></h2><div class="grid">${epics}</div>` +
       EQUIP_TIERS.map((lv) => {
         const row = ids.filter((id) => BASES[id].reqLevel === lv);
         return row.length
