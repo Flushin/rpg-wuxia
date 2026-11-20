@@ -108,6 +108,10 @@ for (const classId of ['lamina', 'pavilhao']) {
     else if (o.type === 'reach') w.changeMap(o.map);
     ok(w.questView().phase === 'ready', `"${q.name}" cumprida`);
     // Os abates acima soltam itens por sorteio (às vezes uma arma Incomum nv 1): olhar só o que a entrega acrescentou.
+    // Esses sorteios podem encher a aba de equipamentos, e com a mochila cheia a recompensa cai no chão: abre espaço antes.
+    w.bag.forEach((it, i) => {
+      if (it && BASES[it.baseId]) w.removeFromBag(i, it.qty ?? 1);
+    });
     const before = new Set(bagEquip().map((x) => x.uid));
     ok(w.questTurnIn(true), `entrega "${q.name}"`);
     const gained = bagEquip().filter((x) => !before.has(x.uid));
