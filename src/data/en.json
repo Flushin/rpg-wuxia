@@ -831,7 +831,7 @@
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."}],
     "versoes": [
       {"itens": [{"texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."}]},
       {"itens": [{"texto": "Wayfarer Master: a new NPC in the village square, next to a golden circle. For 200 gold, the Master takes you straight to any hunting map your level has unlocked. Coming back is on foot or with a Return Scroll. On the world map, the Master's destinations have the ✦ mark."}]},

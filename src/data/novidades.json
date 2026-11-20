@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{"texto": "Músicas novas: as Ruínas, a Montanha e o Pico da Névoa ganharam trilha própria (antes continuava tocando a música do mapa anterior)."}],
   "versoes": [
     {"versao": "0.4.5", "data": "2026-11-20", "itens": [{"texto": "No computador, cursor novo de manopla dourada: vira manopla com balão ao passar sobre um NPC e espada sobre um monstro. Volume padrão agora é 20 nos efeitos e 40 na música para quem começa a jogar agora."}]},
     {"versao": "0.4.4", "data": "2026-11-20", "itens": [{"texto": "Mestre dos Caminhos: NPC novo na praça da vila, ao lado de um círculo dourado. Por 200 de ouro, leva você direto a qualquer mapa de caça liberado pelo seu nível. A volta é a pé ou com o Pergaminho de Retorno. No mapa-múndi, os destinos dele têm a marca ✦.", "wiki": "npc/caminhos"}]},

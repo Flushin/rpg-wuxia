@@ -92,6 +92,9 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 |---|---|---|---|
 | `cidade` | `https://opengameart.org/content/hot-springs-town` (hot_spring_town.flac) | Kistol | CC0 |
 | `floresta` | `https://opengameart.org/content/bamboo-blitz` (bamboo_blitz_solo.flac) | Tsorthan Grove | CC0 |
+| `ruinas` | `https://opengameart.org/content/ancient-temple-1` (ancient_temple.wav) | Umplix | CC0 |
+| `montanha` | `https://opengameart.org/content/harmony-in-the-mists` (harmony_in_the_mists_loop.flac) | Tsorthan Grove | CC0 |
+| `pico` | `https://opengameart.org/content/kingdom-of-icereach` (kingdom_of_icereach.mp3, trecho 0:04–2:50) | Tsorthan Grove | CC0 |
 
 ### Ações, itens, forja e missões (verificados em 20/11/2026)
 

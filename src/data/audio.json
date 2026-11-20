@@ -189,6 +189,18 @@
     "music_floresta": {
       "file": "floresta",
       "volume": 0.6
+    },
+    "music_ruinas": {
+      "file": "ruinas",
+      "volume": 0.6
+    },
+    "music_montanha": {
+      "file": "montanha",
+      "volume": 0.6
+    },
+    "music_pico": {
+      "file": "pico",
+      "volume": 0.6
     }
   },
   "monsterAttack": {

@@ -85,6 +85,19 @@ const SOUND: Credit[] = [
     who: 'Tsorthan Grove (OpenGameArt.org)',
     license: CC0,
   },
+  {
+    what: L('Música das ruínas: "Ancient Temple"', 'Ruins music: "Ancient Temple"'),
+    who: 'Umplix (OpenGameArt.org)',
+    license: CC0,
+  },
+  {
+    what: L(
+      'Músicas da montanha e do pico: "Harmony in the Mists" e "Kingdom of Icereach"',
+      'Mountain and peak music: "Harmony in the Mists" and "Kingdom of Icereach"',
+    ),
+    who: 'Tsorthan Grove (OpenGameArt.org)',
+    license: CC0,
+  },
 ];
 
 interface Library {
