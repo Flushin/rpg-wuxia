@@ -82,6 +82,7 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `ui_open` | `https://freesound.org/people/LilMati/sounds/397548/` | LilMati | CC0 |
 | `ui_close` | `https://freesound.org/people/tia666/sounds/156927/` | tia666 | CC0 |
 | `tip` | `https://freesound.org/people/marcusgar/sounds/360948/` | marcusgar | CC0 |
+| `portal` | `https://freesound.org/people/LilMati/sounds/441225/` | LilMati | CC0 |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
