@@ -174,7 +174,7 @@ export function showOfflineReport(rep: OfflineReport, onClose: () => void) {
   const pots = rep.potionsUsed.hp + rep.potionsUsed.mp;
   el.innerHTML = `<div class="card"><h2>${L('Enquanto você esteve fora', 'While you were away')}</h2>
     ${row(L('Tempo fora', 'Time away'), fmtDur(rep.elapsedMs))}
-    ${row(L('Eficiência aplicada', 'Efficiency applied'), L(`${Math.round(rep.efficiency * 100)}% (${fmtDur(rep.effMin * 60000)} de caça)`, `${Math.round(rep.efficiency * 100)}% (${fmtDur(rep.effMin * 60000)} of hunting)`))}
+    ${row(L('Eficiência aplicada', 'Efficiency applied'), L(`${Math.round(rep.efficiency * 100)}% de ${fmtDur(rep.elapsedMs)} = ${fmtDur(rep.effMin * 60000)} de caça`, `${Math.round(rep.efficiency * 100)}% of ${fmtDur(rep.elapsedMs)} = ${fmtDur(rep.effMin * 60000)} of hunting`))}
     ${row(L('Monstros derrotados', 'Monsters defeated'), String(rep.kills))}
     ${row(L('Experiência', 'Experience'), rep.xp > 0 ? `+${rep.xp}${rep.levelsReady > 0 ? L(` (${rep.levelsReady} nível pronto para subir)`, ` (${rep.levelsReady} level${rep.levelsReady > 1 ? 's' : ''} ready to level up)`) : ''}` : rep.xpCapped ? L('0 (XP cheia)', '0 (XP full)') : L('0 (nível máximo)', '0 (max level)'))}
     ${row(L('Ouro', 'Gold'), `+${rep.gold}`)}
