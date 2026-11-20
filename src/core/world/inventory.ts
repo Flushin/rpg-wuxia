@@ -8,6 +8,9 @@ import {
   BAG_TAB_SIZE,
   BASES,
   type BagTab,
+  EPIC_CHANCE,
+  EPIC_GROUND_SECONDS,
+  EPIC_MAX_LEVELS_BELOW,
   GROUND_SECONDS,
   POTIONS,
   SLOTS,
@@ -22,6 +25,7 @@ import {
   itemColor,
   itemName,
   itemStats,
+  makeEpic,
   makeEquipment,
   makePotion,
   maxDurability,
@@ -131,7 +135,8 @@ export function collect(w: World, item: ItemInstance, x: number, y: number) {
       rarity: pickupRarity(item),
     });
   } else {
-    w.ground.push({ id: w.nextGround++, x, y, item, expires: w.time + GROUND_SECONDS });
+    const secs = item.rarity === 'epico' ? EPIC_GROUND_SECONDS : GROUND_SECONDS;
+    w.ground.push({ id: w.nextGround++, x, y, item, expires: w.time + secs });
     w.emit({ type: 'bagFull' });
   }
 }
@@ -168,7 +173,23 @@ export function tickGround(w: World) {
   }
 }
 
+/** Épico: só jogando (auto ligado não; offline nem passa por aqui), nunca de invocados, monstro até
+ *  EPIC_MAX_LEVELS_BELOW níveis abaixo; 1% em chefe, 0,5% nos outros. Peça sorteada entre todas as que o personagem
+ *  usa (armas só da seita). Sorteio em w.epicRng: não mexe na sequência dos outros drops. */
+function rollEpic(w: World, m: Entity, def: MonsterDef) {
+  if (w.auto.state === 'on' || m.summoned || m.level < w.player.level - EPIC_MAX_LEVELS_BELOW) return;
+  if (w.epicRng.next() >= (def.boss ? EPIC_CHANCE.boss : EPIC_CHANCE.mob)) return;
+  const ids = equipmentBaseIds().filter((id) => !BASES[id].sect || BASES[id].sect === w.classId);
+  if (!ids.length) return;
+  const it = makeEpic(ids[Math.min(ids.length - 1, Math.floor(w.epicRng.next() * ids.length))], w.player.level);
+  const x = m.x + w.epicRng.range(-0.4, 0.4),
+    y = m.y + w.epicRng.range(-0.4, 0.4);
+  w.emit({ type: 'drop', x, y, color: itemColor(it) });
+  collect(w, it, x, y);
+}
+
 export function dropLoot(w: World, m: Entity, def: MonsterDef) {
+  rollEpic(w, m, def);
   if (m.trial) return trialLoot(w, m, def);
   const L = def.loot;
   if (!L) return;

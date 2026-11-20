@@ -200,6 +200,8 @@ export class World {
   lastDamaged = -99;
   rng = new Rng((Date.now() & 0xffffffff) >>> 0);
   npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
+  /** Só para o drop do Épico: separado de `rng` para não mudar a sequência dos outros sorteios (drops e combate). */
+  epicRng = new Rng((Date.now() ^ 0x5bd1e995) >>> 0);
 
   // ---- privados do World
   private arenaSeen = false;

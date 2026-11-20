@@ -225,6 +225,25 @@ export function makeEquipment(
   };
 }
 
+/** Épico recém-dropado: +0, durabilidade cheia, sem bônus guardados (vêm da classe de quem usa); ilvl é só o nível
+ *  do personagem no drop (informativo: stats e conserto usam o nível atual). */
+export function makeEpic(baseId: string, level: number): ItemInstance {
+  return {
+    uid: newUid(),
+    baseId,
+    rarity: 'epico',
+    bonuses: [],
+    ilvl: Math.max(1, level),
+    durability: BASES[baseId].durability,
+  };
+}
+/** Chance de Épico por monstro morto jogando (não no auto nem offline); chefe = qualquer monstro com `boss`. */
+export const EPIC_CHANCE = { mob: 0.005, boss: 0.01 };
+/** O monstro precisa ter nível ≥ nível do personagem − isto (evita farm de monstro fraco). */
+export const EPIC_MAX_LEVELS_BELOW = 10;
+/** Épico no chão (mochila cheia): segundos até sumir (os outros itens: GROUND_SECONDS). */
+export const EPIC_GROUND_SECONDS = 600;
+
 /** Quem usa o item: o Épico calcula stats e bônus pelo nível e pela classe dele. */
 export interface ItemOwner {
   level: number;
