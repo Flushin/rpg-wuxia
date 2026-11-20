@@ -28,6 +28,7 @@
     "android:apk": "npm run android:prepare && cd android && ./gradlew assembleDebug",
     "check:wiki": "esbuild tools/wiki-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/wiki-check.mjs && node /tmp/wiki-check.mjs",
     "check:novidades": "esbuild tools/novidades-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/novidades-check.mjs && node /tmp/novidades-check.mjs",
+    "novidades:apk": "esbuild tools/novidades-apk.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/novidades-apk.mjs && node /tmp/novidades-apk.mjs",
     "novidades:loja": "esbuild tools/novidades-loja.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/novidades-loja.mjs && node /tmp/novidades-loja.mjs",
     "check:dungeon": "esbuild tools/dungeon-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/dungeon-check.mjs && node /tmp/dungeon-check.mjs",
     "check:worldmap": "esbuild tools/worldmap-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/worldmap-check.mjs && node /tmp/worldmap-check.mjs",
