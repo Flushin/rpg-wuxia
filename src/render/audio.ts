@@ -42,6 +42,8 @@ const MUSIC = data.music as Record<string, MusicDef>;
 const MONSTER_ATTACK = data.monsterAttack as Record<string, string>;
 /** som de cada efeito de skill ("fx" em skills.json -> chave em "sfx"); sem entrada = "spell" só à distância */
 const SKILL_FX = data.skillFx as Record<string, string>;
+/** sons do ataque de cada classe (disparo à distância, acerto e crítico); sem entrada = spell/hit/crit */
+const CLASS_ATTACK = data.classAttack as Record<string, { cast?: string; hit?: string; crit?: string }>;
 const MAX_INSTANCES = 3;
 /** segundos até o pico de aoe_warning */
 const AOE_WARNING_PEAK = 0.85;
@@ -150,18 +152,21 @@ class AudioManager {
     this.onChange();
   }
 
-  onEvent(ev: import('../core/types').GameEvent, playerId: number) {
+  onEvent(ev: import('../core/types').GameEvent, playerId: number, classId = '') {
+    const cls = CLASS_ATTACK[classId] ?? {};
     switch (ev.type) {
       case 'attack':
         if (ev.fromId === playerId) {
           this.lastRanged = ev.ranged;
-          if (ev.ranged) this.sfx('spell', 500);
+          if (ev.ranged) this.sfx(cls.cast ?? 'spell', cls.cast ? 0 : 500);
         } else this.sfx((ev.monster && MONSTER_ATTACK[ev.monster]) || 'monster_attack', 300);
         break;
       case 'hit':
         if (ev.targetKind === 'player') {
           if (ev.crit) this.sfx('crit', 300);
-        } else this.sfx(ev.crit ? 'crit' : this.lastRanged ? 'spell' : 'hit', 500);
+        } else if (ev.crit) this.sfx(cls.crit ?? 'crit', cls.crit ? 100 : 500);
+        else if (cls.hit) this.sfx(cls.hit, 150);
+        else this.sfx(this.lastRanged ? 'spell' : 'hit', 500);
         break;
       case 'miss':
         this.sfx('miss', 500);

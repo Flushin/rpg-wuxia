@@ -97,3 +97,15 @@ Escudo (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médi
 Golpe em área dos chefes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médio -18 dB):
 - aoe_warning    -> "Reverse Cymbal.wav" (primeiros 1,4 s; o pico cai junto com o golpe) — Lynx_5969 — https://freesound.org/people/Lynx_5969/sounds/418724/
 - aoe_impact     -> "Impact sfx 027.wav" (primeiros 0,5 s) — AudioPapkin — https://freesound.org/people/AudioPapkin/sounds/645898/
+
+Ataque de cada classe (20/11/2026; Freesound e OpenGameArt; cortados com fade, mono):
+- hit_lamina     -> "Deep Cut / Slash / Gash" (de 0,139 s até o fim) — SypherZent — https://freesound.org/people/SypherZent/sounds/420674/
+- crit_lamina    -> "Sword stab.wav" (primeiros 0,2 s) — ethanchase7744 — https://freesound.org/people/ethanchase7744/sounds/474575/
+- hit_tita       -> "Stick Hits the Head" (comprimido, mais alto) — maatre — https://freesound.org/people/maatre/sounds/735436/
+- crit_tita      -> "Hit Wood" (de 0,15 s a 0,6 s; comprimido, bem mais alto) — Abacagi — https://freesound.org/people/Abacagi/sounds/494476/
+- cast_geada     -> "Icy Magic Cast" (de 0,142 s a 0,688 s; volume baixo no jogo) — DustyWind — https://freesound.org/people/DustyWind/sounds/691005/
+- hit_geada      -> "Ice Splash 5" (primeiro 1 s) — giwake — https://freesound.org/people/giwake/sounds/666549/
+- crit_geada     -> "ICEBrk_Break04" (de 0,024 s a 0,304 s) — InMotionAudio — https://freesound.org/people/InMotionAudio/sounds/719973/
+- cast_vibora    -> "blade_03.ogg" do pacote "80 CC0 RPG SFX" (OpenGameArt) — rubberduck — https://opengameart.org/content/80-cc0-rpg-sfx
+- hit_vibora     -> "Knife throw 1.aif" (primeiros 0,68 s) — kylepyke — https://freesound.org/people/kylepyke/sounds/196562/
+- crit_vibora    -> "Sword stab 4" (primeiros 0,8 s) junto com o hit_vibora — ihitokage + kylepyke — https://freesound.org/people/ihitokage/sounds/395365/
