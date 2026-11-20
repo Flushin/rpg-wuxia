@@ -3,7 +3,7 @@ import './wiki.css';
 import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, itemName } from './data';
 import { itemIndexPage, itemPage } from './items';
 import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
-import { CLASSES, MONSTERS, SECT_ORDER, SKILLS } from './data';
+import { CLASSES, EPIC_ITEMS, MONSTERS, SECT_ORDER, SKILLS } from './data';
 import { mechanicsPage } from './mechanics';
 import { novidadesPage } from './novidades';
 import { fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
@@ -83,6 +83,12 @@ function searchIndex(): Hit[] {
               : id in CONSUMABLES
                 ? 'Consumível'
                 : '',
+    })),
+    ...EPIC_ITEMS.map((e) => ({
+      name: e.name,
+      href: '#/mecanicas/epico',
+      icon: iconHtml(e.id, 'sm'),
+      kind: 'Equipamento Épico',
     })),
     ...NPCS().map((n) => ({ name: n.name, href: `#/npc/${n.id}`, icon: spriteHtml(n.sheet, 'mini'), kind: 'NPC' })),
     ...SECT_ORDER.filter((id) => CLASSES[id]).map((id) => ({
