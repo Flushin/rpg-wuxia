@@ -84,6 +84,15 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `tip` | `https://freesound.org/people/marcusgar/sounds/360948/` | marcusgar | CC0 |
 | `portal` | `https://freesound.org/people/LilMati/sounds/441225/` | LilMati | CC0 |
 
+### Músicas (verificadas em 20/11/2026)
+
+Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/music/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `cidade` | `https://opengameart.org/content/hot-springs-town` (hot_spring_town.flac) | Kistol | CC0 |
+| `floresta` | `https://opengameart.org/content/bamboo-blitz` (bamboo_blitz_solo.flac) | Tsorthan Grove | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)
@@ -112,8 +121,6 @@ Baixe no seu computador e coloque aqui:
 | License.txt do **Kenney Nature Kit** (árvores, pedras, plantas, cerejeiras) | Download do pacote em `https://kenney.nl/assets/nature-kit` (o espelho usado no `fetch-assets.sh` não tem a licença do Nature Kit) | `kenney-nature-kit-License.txt` |
 | License.txt do **Kenney RPG Audio** | `https://kenney.nl/assets/rpg-audio` | `kenney-rpg-audio-License.txt` |
 | License.txt do **Kenney Impact Sounds** | `https://kenney.nl/assets/impact-sounds` | `kenney-impact-sounds-License.txt` |
-| Página do OpenGameArt de **"Oriental"** (Shadowfire452), mostrando "License(s): CC0" | `https://opengameart.org/node/15485` → salvar como PDF/print e criar uma cópia em `https://web.archive.org/save` | `oga-15485-oriental.pdf` + link do Wayback |
-| Página do OpenGameArt de **"Asian/Oriental 1"** (Tozan) | `https://opengameart.org/content/asianoriental1` → idem | `oga-asianoriental1.pdf` + link do Wayback |
 | Página oficial do **Quaternius Ultimate Animated Animals** (CC0) | `https://quaternius.com/packs/ultimateanimatedanimals.html` → print/PDF | `quaternius-animals.pdf` |
 | Os **arquivos originais das duas músicas**, que você guarda | Guardar aqui ou num lugar fora do repositório com backup (são ~5 MB). Se ficarem fora, anote onde | — |
 
