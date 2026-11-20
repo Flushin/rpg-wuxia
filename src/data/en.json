@@ -513,9 +513,9 @@
     },
     "primeiro_item": {
       "title": "You found equipment!",
-      "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
-      "textTouch": "Open the bag in ☰ › Bag. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button.",
-      "textTouchClassic": "Open the bag with the Bag button at the top of the screen. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button."
+      "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
+      "textTouch": "Open the bag in ☰ › Bag. The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Tap an item to see its details and use the Equip button.",
+      "textTouchClassic": "Open the bag with the Bag button at the top of the screen. The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Tap an item to see its details and use the Equip button."
     },
     "primeira_pocao": {
       "title": "Potions",

@@ -118,8 +118,10 @@ export class Hud {
     return !byId('offline-panel').classList.contains('hidden');
   }
 
-  toast(msg: string, color?: string) {
+  /** Aviso no centro; 'epic' = maior, com borda roxa (drop de Épico). */
+  toast(msg: string, color?: string, kind?: 'epic') {
     const t = byId('toast');
+    t.classList.toggle('epic', kind === 'epic');
     const line = { msg, color };
     this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), line] : [line];
     t.innerHTML = this.toastLines

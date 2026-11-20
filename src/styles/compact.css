@@ -113,6 +113,9 @@
     font-size: 14px;
     padding: 6px 12px;
   }
+  #toast.epic {
+    font-size: 17px;
+  }
   #loot-feed {
     width: 180px;
   }

@@ -20,6 +20,7 @@ import {
   repairCost,
   sellValue,
 } from '../core/items';
+import type { ItemOwner } from '../core/items';
 import type { ItemInstance } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
@@ -48,7 +49,8 @@ type SellFilter = 'all' | 'equip' | 'pot' | 'mat';
 const sellCat = (it: ItemInstance): Exclude<SellFilter, 'all'> =>
   POTIONS[it.baseId] || CONSUMABLES[it.baseId] ? 'pot' : MATERIALS[it.baseId] ? 'mat' : 'equip';
 /** ícone do item no mesmo estilo da mochila */
-const icon = (it: ItemInstance) => `<span class="cell mini" style="${cellStyle(it)}">${cellHtml(it)}</span>`;
+const icon = (it: ItemInstance, owner?: ItemOwner) =>
+  `<span class="cell mini" style="${cellStyle(it)}">${cellHtml(it, owner)}</span>`;
 
 // Janela dos NPCs (abre sozinha quando o personagem chega). Não bloqueia o jogo ao redor.
 export class NpcWindow {
@@ -426,7 +428,7 @@ export class NpcWindow {
     const pick: string[] = [];
     const chip = (it: ItemInstance, ref: string) =>
       pick.push(
-        `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b>${ref.startsWith('eq:') ? `<small>${L('equipado', 'equipped')}</small>` : ''}</span></button>`,
+        `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it, w.owner())}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b>${ref.startsWith('eq:') ? `<small>${L('equipado', 'equipped')}</small>` : ''}</span></button>`,
       );
     for (const sl of SLOTS) {
       const it = w.equipment[sl];
@@ -556,7 +558,7 @@ export class NpcWindow {
       const max = maxDurability(it),
         cost = repairCost(it, w.owner()),
         f = Math.max(0, it.durability / max);
-      rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b> <small>${where}</small>
+      rows.push(`<div class="srow">${icon(it, w.owner())}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b> <small>${where}</small>
         <div class="dbar ${f <= 0 ? 'zero' : f <= 0.2 ? 'low' : ''}"><u style="width:${f * 100}%"></u></div><small>${Math.round(it.durability)}/${max}${cost ? ` · ${cost} ${L('ouro', 'gold')}` : ` · ${L('perfeito', 'perfect')}`}</small></div>
         <button data-a="rep" data-v="${ref}" ${cost <= 0 || w.gold < cost ? 'disabled' : ''}>${L('Consertar', 'Repair')}</button></div>`);
     };
@@ -622,11 +624,11 @@ export class NpcWindow {
           : '';
       if (it.rarity === 'epico') {
         // Épico não se vende: aparece na lista, sem preço nem botão
-        rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
+        rows.push(`<div class="srow">${icon(it, w.owner())}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
         <small>${info}<span class="muted">${L('Não pode ser vendido', 'Cannot be sold')}</span></small></div></div>`);
         return;
       }
-      rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
+      rows.push(`<div class="srow">${icon(it, w.owner())}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
         <small>${info}<span class="tip-sell">${sellValue(it)} ${L('ouro', 'gold')}${stack ? ` ${L('(cada)', '(each)')}` : ''}</span></small></div>
         <div class="sbtns"><button class="${conf ? 'danger' : ''}" data-a="sell" data-v="${i}">${conf ? L('Confirmar?', 'Confirm?') : stack ? L('Vender 1', 'Sell 1') : L('Vender', 'Sell')}</button>
         ${stack ? `<button data-a="sellall" data-v="${i}">${L('Tudo', 'All')}</button>` : ''}</div></div>`);

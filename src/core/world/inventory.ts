@@ -184,7 +184,8 @@ function rollEpic(w: World, m: Entity, def: MonsterDef) {
   const it = makeEpic(ids[Math.min(ids.length - 1, Math.floor(w.epicRng.next() * ids.length))], w.player.level);
   const x = m.x + w.epicRng.range(-0.4, 0.4),
     y = m.y + w.epicRng.range(-0.4, 0.4);
-  w.emit({ type: 'drop', x, y, color: itemColor(it) });
+  w.emit({ type: 'drop', x, y, color: itemColor(it), epic: true });
+  w.emit({ type: 'epicDrop', name: itemName(it) });
   collect(w, it, x, y);
 }
 

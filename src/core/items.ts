@@ -151,8 +151,10 @@ export const fmtStat = (stat: string, v: number) =>
 export const baseOf = (it: ItemInstance): ItemBase | undefined => BASES[it.baseId];
 export const potionOf = (it: ItemInstance): PotionDef | undefined => POTIONS[it.baseId];
 export const itemName = (it: ItemInstance) => {
-  const n =
-    (BASES[it.baseId] ?? POTIONS[it.baseId] ?? MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId])?.name ?? it.baseId;
+  const eb = it.rarity === 'epico' ? BASES[it.baseId] : undefined;
+  const n = eb
+    ? epicName(eb.slot, eb.sect)
+    : ((BASES[it.baseId] ?? POTIONS[it.baseId] ?? MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId])?.name ?? it.baseId);
   return it.plus ? `${n} +${it.plus}` : n;
 };
 export const itemColor = (it: ItemInstance) =>

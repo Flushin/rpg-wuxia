@@ -49,7 +49,7 @@ export class Rewards {
   }
 
   item(name: string, color: string, qty: number, rarity: Rarity | undefined, potion: boolean) {
-    const notable = !potion && (rarity === 'incomum' || rarity === 'raro');
+    const notable = !potion && (rarity === 'incomum' || rarity === 'raro' || rarity === 'epico');
     if (!notable && this.filter !== 'all') return; // continua indo para a mochila normalmente
     const key = `${name}|${color}`,
       now = performance.now();

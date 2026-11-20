@@ -163,7 +163,7 @@ export class AutoPanel {
 export function showOfflineReport(rep: OfflineReport, onClose: () => void) {
   const el = byId('offline-panel');
   const row = (a: string, b: string) => `<div class="rep-row"><span>${a}</span><b>${b}</b></div>`;
-  const items = (['raro', 'incomum', 'comum'] as const)
+  const items = (['epico', 'raro', 'incomum', 'comum'] as const)
     .map((r) => {
       const list = rep.items.filter((i) => i.rarity === r);
       const n = list.reduce((a, i) => a + i.qty, 0);
