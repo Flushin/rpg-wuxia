@@ -163,6 +163,20 @@ export const RARITIES = I.rarities;
 export const BONUS_POOL = I.bonusPool;
 export const EPIC_NAMES = I.epicNames;
 export const EPIC_BONUSES = I.epicBonuses;
+/** Os 9 Épicos (um por slot; arma por seita). O id é o mesmo do ícone (epico_<slot> / epico_arma_<seita>). */
+export const EPIC_ITEMS: { id: string; slot: string; sect?: string; name: string }[] = [
+  ...['colar', 'tronco', 'cabeca', 'calca', 'bota'].map((slot) => ({
+    id: `epico_${slot}`,
+    slot,
+    name: I.epicNames[slot],
+  })),
+  ...['lamina', 'pavilhao', 'tita', 'vibora'].map((sect) => ({
+    id: `epico_arma_${sect}`,
+    slot: 'arma',
+    sect,
+    name: I.epicNames[`arma_${sect}`],
+  })),
+];
 /** Épico: cópia das regras de src/core/items.ts (EPIC_*) e src/core/world/inventory.ts (rollEpic). */
 export const EPIC = { mul: 1.3, chanceMob: 0.005, chanceBoss: 0.01, maxLevelsBelow: 10, groundSeconds: 600 };
 export const SELL_RATIO = I.sellRatio;
