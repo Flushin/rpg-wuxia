@@ -1,4 +1,4 @@
-import { MONSTERS } from '../core/data';
+import { MONSTERS, NPC_TEXT } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { GameMap } from '../core/map';
 import type { World } from '../core/world';
@@ -7,6 +7,7 @@ import { uiScale } from './uiScale';
 import { byId } from './dom';
 import { renderPanel } from './panelRender';
 import { MAPS_CONFIG } from '../core/mapsConfig';
+import { teleportById } from '../core/teleport';
 import { mapLevels, portalSide, worldLinks, worldRoute, type WorldLink } from '../core/worldRoutes';
 
 // Minimapa (melhoria aprovada em 15/11/2026): canto superior direito, mapa isométrico em losango.
@@ -296,7 +297,8 @@ export class Minimap {
     // uma linha por par de mapas (ida e volta)
     const pairs = new Map<string, { a: string; b: string; menu?: string; hot: boolean }>();
     for (const l of this.links) {
-      if (!MAPS_CONFIG[l.from]?.world || !MAPS_CONFIG[l.to]?.world) continue;
+      // teleporte: sem linha (com muitas regiões viraria uma teia); o cartão do destino ganha a marca ✦
+      if (l.menu === 'caminhos' || !MAPS_CONFIG[l.from]?.world || !MAPS_CONFIG[l.to]?.world) continue;
       const k = [l.from, l.to].sort().join('|');
       const p = pairs.get(k) ?? { a: l.from, b: l.to, menu: l.menu, hot: false };
       p.menu = p.menu ?? l.menu;
@@ -322,6 +324,7 @@ export class Minimap {
       const sub = [
         lv ? `${L('Nv', 'Lv')} ${lv[0]}–${lv[1]}` : MAPS_CONFIG[id].town ? L('cidade segura', 'safe town') : '',
         need > lvl ? `🔒 ${need}` : '',
+        teleportById(id) ? '✦' : '',
       ]
         .filter(Boolean)
         .join(' · ');
@@ -362,7 +365,10 @@ export class Minimap {
   /** Lista de passos da rota (ou a instrução de tocar num mapa). */
   private routeHtml(route: WorldLink[] | null): string {
     if (!this.dest)
-      return `<p class="wm-hint">${L('Toque num mapa da aba Mundo para ver o caminho até ele.', 'Tap a map on the World tab to see the way there.')}</p>`;
+      return `<p class="wm-hint">${L(
+        'Toque num mapa da aba Mundo para ver o caminho até ele. ✦ = o Mestre dos Caminhos, na praça da vila, leva até esse mapa.',
+        'Tap a map on the World tab to see the way there. ✦ = the Wayfarer Master, in the village square, takes you to that map.',
+      )}</p>`;
     const maps = this.world.maps,
       lvl = this.world.player.level,
       to = maps[this.dest]?.name ?? this.dest;
@@ -376,17 +382,25 @@ export class Minimap {
           pn = esc(tn(l.portal.name)),
           dn = esc(maps[l.to].name);
         const how =
-          l.menu === 'masmorras'
+          l.menu === 'caminhos'
             ? L(
-                `entre no <b>${pn}</b> (${side}) e escolha <b>${dn}</b>`,
-                `enter the <b>${pn}</b> (${side}) and pick <b>${dn}</b>`,
-              ) + (l.cost ? ` · ${l.cost} ${L('ouro', 'gold')}` : '')
-            : l.menu === 'trial'
+                `fale com o <b>${esc(NPC_TEXT.npcs.caminhos?.name ?? pn)}</b> na praça e escolha <b>${dn}</b>`,
+                `talk to the <b>${esc(NPC_TEXT.npcs.caminhos?.name ?? pn)}</b> in the square and pick <b>${dn}</b>`,
+              ) + ` · ${l.cost} ${L('ouro', 'gold')}`
+            : l.menu === 'masmorras'
               ? L(
-                  `entre no portal <b>${pn}</b> (${side}) e escolha o chefe`,
-                  `enter the <b>${pn}</b> portal (${side}) and pick the boss`,
-                )
-              : L(`saia pelo portal <b>${pn}</b> (${side}) → ${dn}`, `take the <b>${pn}</b> portal (${side}) → ${dn}`);
+                  `entre no <b>${pn}</b> (${side}) e escolha <b>${dn}</b>`,
+                  `enter the <b>${pn}</b> (${side}) and pick <b>${dn}</b>`,
+                ) + (l.cost ? ` · ${l.cost} ${L('ouro', 'gold')}` : '')
+              : l.menu === 'trial'
+                ? L(
+                    `entre no portal <b>${pn}</b> (${side}) e escolha o chefe`,
+                    `enter the <b>${pn}</b> portal (${side}) and pick the boss`,
+                  )
+                : L(
+                    `saia pelo portal <b>${pn}</b> (${side}) → ${dn}`,
+                    `take the <b>${pn}</b> portal (${side}) → ${dn}`,
+                  );
         const lock = l.minLevel > lvl ? ` <span class="wm-lock">🔒 ${L('nível', 'level')} ${l.minLevel}</span>` : '';
         return `<li class="${i === 0 ? 'now' : ''}"><span class="wm-from">${esc(m.name)}:</span> ${how}${lock}</li>`;
       })

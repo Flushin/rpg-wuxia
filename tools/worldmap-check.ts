@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { MAP_IDS, MAPS_CONFIG } from '../src/core/mapsConfig';
+import { TELEPORT_DESTS } from '../src/core/teleport';
 import { portalSide, worldLinks, worldRoute } from '../src/core/worldRoutes';
 
 let fails = 0;
@@ -40,6 +41,25 @@ ok(side('cidade', 'montanha') === 1, 'saída para a montanha: no alto à direita
 ok(side('cidade', 'floresta') === 3, 'saída para a floresta: embaixo à direita');
 ok(side('montanha', 'bambu') === 4, 'saída para o bosque: embaixo');
 ok(worldRoute(links, 'covil', 'pico')!.length === 4, 'da masmorra volta pela vila');
+
+// teleporte (Mestre dos Caminhos): ligações da vila para cada destino, mas a rota só usa sem caminho a pé
+const tps = links.filter((l) => l.menu === 'caminhos');
+ok(
+  tps.length === TELEPORT_DESTS.length && tps.every((l) => l.from === 'cidade' && l.cost === 200),
+  'teleporte: uma ligação da vila por destino',
+);
+ok(!pico.some((l) => l.menu === 'caminhos'), 'com caminho a pé, a rota não usa o teleporte');
+{
+  const noNorth = {
+    ...maps,
+    cidade: { ...maps.cidade, objects: maps.cidade.objects.filter((o) => o.props.target !== 'montanha') },
+  };
+  const r = worldRoute(worldLinks(noNorth), 'floresta', 'pico');
+  ok(
+    !!r && r.map((l) => l.menu ?? l.to).join('>') === 'cidade>caminhos',
+    `sem caminho a pé: volta à vila e usa o teleporte (${r?.map((l) => l.to)})`,
+  );
+}
 
 if (fails) {
   console.log(`${fails} falha(s)`);
