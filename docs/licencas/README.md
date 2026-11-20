@@ -35,9 +35,32 @@ Licença conferida na página de origem (OpenGameArt: campo "License(s)"; Wikime
 | `crit` | `https://opengameart.org/content/blacksmiths-hammer` (blacksmithhammer_0.mp3) | VishwaJai | CC0 |
 | `miss` | `https://opengameart.org/content/various-sound-effects-0` (snd_throw1.wav) | Spring Spring | CC0 |
 | `spell` | `https://opengameart.org/content/magic-spell-sfx` (magical_6_0.ogg) | JaggedStone | CC0 |
-| `monster_attack` | `https://opengameart.org/content/wolf-monster-sound` (wolf_monster_6.mp3) | CaveboyTup | CC0 |
 | `monster_death` | `https://opengameart.org/content/slimy-monster-or-murder-sounds9` (slimy_monster_or_murderd_sound_3.mp3) | pauliuw | CC0 |
 | `player_death` | `https://commons.wikimedia.org/wiki/File:Gong55.ogg` | stephan | CC0 |
+
+### Ataque de cada monstro (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link da licença `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Monstro | Origem | Autor | Licença na página |
+|---|---|---|---|---|
+| `atk_lobo` | Lobo | `https://freesound.org/people/Mrthenoronha/sounds/420449/` | Mrthenoronha | CC0 |
+| `atk_bandido` | Bandidos de espada (e reserva monster_attack) | `https://freesound.org/people/GaussTheWizard/sounds/367182/` | GaussTheWizard | CC0 |
+| `atk_arqueiro` | Arqueiros | `https://freesound.org/people/Ali_6868/sounds/384919/` | Ali_6868 | CC0 |
+| `atk_pedra` | Terracota/pedra | `https://freesound.org/people/CamoMano/sounds/431019/` | CamoMano | CC0 |
+| `atk_espectro` | Espectros | `https://freesound.org/people/LilMati/sounds/519438/` | LilMati | CC0 |
+| `atk_yeti` | Yeti | `https://freesound.org/people/Christopherderp/sounds/342204/` | Christopherderp | CC0 |
+| `atk_monge` | Monges caídos | `https://freesound.org/people/Sadiquecat/sounds/786323/` | Sadiquecat | CC0 |
+| `atk_assassino` | Assassino das Sombras | `https://freesound.org/people/erkanozan/sounds/51755/` | erkanozan | CC0 |
+| `atk_serpente` | Serpente de Jade | `https://freesound.org/people/TheKingOfGeeks360/sounds/846337/` | TheKingOfGeeks360 | CC0 |
+| `atk_grou` | Grou Espiritual | `https://freesound.org/people/qubodup/sounds/60013/` | qubodup | CC0 |
+| `atk_jade` | Guardião de Jade | `https://freesound.org/people/mark205/sounds/580649/` | mark205 | CC0 |
+| `atk_general` | General de Terracota | `https://freesound.org/people/AudioPapkin/sounds/541029/` | AudioPapkin | CC0 |
+| `atk_abade` | Abade Caído | `https://freesound.org/people/Nightflame/sounds/422513/` | Nightflame | CC0 |
+| `atk_yeti_ancestral` | Yeti Ancestral | `https://freesound.org/people/el_boss/sounds/751713/` | el_boss | CC0 |
+| `atk_patriarca` | Patriarca Profanado | `https://freesound.org/people/LilMati/sounds/659762/` | LilMati | CC0 |
+| `atk_rei_bandidos` | Rei dos Bandidos | `https://freesound.org/people/julianmateo_/sounds/522701/` | julianmateo_ | CC0 |
+| `atk_senhor_nevoa` | Senhor da Névoa | `https://freesound.org/people/PrdiChlp/sounds/181889/` | PrdiChlp | CC0 |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 

@@ -57,7 +57,12 @@ const SOUND: Credit[] = [
   },
   {
     what: L('Efeitos sonoros de combate', 'Combat sound effects'),
-    who: 'CYBERDEViL, VishwaJai, Spring Spring, JaggedStone, CaveboyTup, pauliuw (OpenGameArt.org); stephan (Wikimedia Commons)',
+    who: 'CYBERDEViL, VishwaJai, Spring Spring, JaggedStone, pauliuw (OpenGameArt.org); stephan (Wikimedia Commons)',
+    license: CC0,
+  },
+  {
+    what: L('Sons de ataque dos monstros', 'Monster attack sounds'),
+    who: 'Mrthenoronha, GaussTheWizard, Ali_6868, CamoMano, LilMati, Christopherderp, Sadiquecat, erkanozan, TheKingOfGeeks360, qubodup, mark205, AudioPapkin, Nightflame, el_boss, julianmateo_, PrdiChlp (Freesound.org)',
     license: CC0,
   },
   {

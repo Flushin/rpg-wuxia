@@ -17,7 +17,7 @@
       "volume": 0.7
     },
     "monster_attack": {
-      "file": "monster_attack",
+      "file": "atk_bandido",
       "volume": 0.7
     },
     "monster_death": {
@@ -79,6 +79,74 @@
     "bag_full": {
       "file": "bag_full",
       "volume": 0.6
+    },
+    "atk_lobo": {
+      "file": "atk_lobo",
+      "volume": 0.7
+    },
+    "atk_bandido": {
+      "file": "atk_bandido",
+      "volume": 0.7
+    },
+    "atk_arqueiro": {
+      "file": "atk_arqueiro",
+      "volume": 0.7
+    },
+    "atk_pedra": {
+      "file": "atk_pedra",
+      "volume": 0.7
+    },
+    "atk_espectro": {
+      "file": "atk_espectro",
+      "volume": 0.7
+    },
+    "atk_yeti": {
+      "file": "atk_yeti",
+      "volume": 0.7
+    },
+    "atk_monge": {
+      "file": "atk_monge",
+      "volume": 0.7
+    },
+    "atk_assassino": {
+      "file": "atk_assassino",
+      "volume": 0.7
+    },
+    "atk_serpente": {
+      "file": "atk_serpente",
+      "volume": 0.7
+    },
+    "atk_grou": {
+      "file": "atk_grou",
+      "volume": 0.7
+    },
+    "atk_jade": {
+      "file": "atk_jade",
+      "volume": 0.7
+    },
+    "atk_general": {
+      "file": "atk_general",
+      "volume": 0.85
+    },
+    "atk_abade": {
+      "file": "atk_abade",
+      "volume": 0.85
+    },
+    "atk_yeti_ancestral": {
+      "file": "atk_yeti_ancestral",
+      "volume": 0.85
+    },
+    "atk_patriarca": {
+      "file": "atk_patriarca",
+      "volume": 0.85
+    },
+    "atk_rei_bandidos": {
+      "file": "atk_rei_bandidos",
+      "volume": 0.85
+    },
+    "atk_senhor_nevoa": {
+      "file": "atk_senhor_nevoa",
+      "volume": 0.85
     }
   },
   "music": {
@@ -90,5 +158,30 @@
       "file": "floresta",
       "volume": 0.6
     }
+  },
+  "monsterAttack": {
+    "lobo": "atk_lobo",
+    "bandido_espadachim": "atk_bandido",
+    "salteador": "atk_bandido",
+    "brutamontes": "atk_bandido",
+    "bandido_arqueiro": "atk_arqueiro",
+    "besteiro": "atk_arqueiro",
+    "guerreiro_terracota": "atk_pedra",
+    "guardiao_pedra": "atk_pedra",
+    "espectro_gelo": "atk_espectro",
+    "alma_penada": "atk_espectro",
+    "yeti": "atk_yeti",
+    "discipulo_caido": "atk_monge",
+    "monge_profanado": "atk_monge",
+    "assassino_sombras": "atk_assassino",
+    "serpente_jade": "atk_serpente",
+    "grou_espiritual": "atk_grou",
+    "guardiao_jade": "atk_jade",
+    "general_terracota": "atk_general",
+    "abade_caido": "atk_abade",
+    "yeti_ancestral": "atk_yeti_ancestral",
+    "patriarca_profanado": "atk_patriarca",
+    "rei_bandidos": "atk_rei_bandidos",
+    "senhor_nevoa": "atk_senhor_nevoa"
   }
 }

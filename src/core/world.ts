@@ -1082,7 +1082,15 @@ export class World {
       const red = this.passiveValue('damageTaken');
       if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
     }
-    if (!skill) this.emit({ type: 'attack', fromId: a.id, toId: t.id, ranged: a.attackRange > 3 });
+    if (!skill)
+      this.emit({
+        type: 'attack',
+        fromId: a.id,
+        toId: t.id,
+        ranged: a.attackRange > 3,
+        // só para o som de ataque de cada monstro (src/data/audio.json "monsterAttack")
+        monster: a.kind === 'monster' ? a.monsterId : undefined,
+      });
     const proj = a.kind === 'monster' ? MONSTERS[a.monsterId]?.projectile : undefined;
     if (proj) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: proj });
     if (r.hit) {

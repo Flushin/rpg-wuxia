@@ -1,4 +1,4 @@
-Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia Commons abaixo, todos CC0 (domínio público).
+Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia Commons/Freesound abaixo, todos CC0 (domínio público).
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
@@ -19,10 +19,29 @@ Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume ig
 - crit           -> "Blacksmith's Hammer" — VishwaJai — https://opengameart.org/content/blacksmiths-hammer
 - miss           -> "Various Sound Effects" (snd_throw1) — Spring Spring — https://opengameart.org/content/various-sound-effects-0
 - spell          -> "Magic Spell SFX" (magical_6) — JaggedStone — https://opengameart.org/content/magic-spell-sfx
-- monster_attack -> "Wolf Monster Sound" — CaveboyTup — https://opengameart.org/content/wolf-monster-sound
 - monster_death  -> "Slimy monster or murder sounds(9)" (_3) — pauliuw — https://opengameart.org/content/slimy-monster-or-murder-sounds9
+- monster_attack.ogg/.mp3 (arquivo antigo, sem uso desde 20/11/2026; destino no item T8) -> "Wolf Monster Sound" — CaveboyTup — https://opengameart.org/content/wolf-monster-sound
 - player_death   -> "Gong55.ogg" (primeiros 3 s, com fade) — stephan — https://commons.wikimedia.org/wiki/File:Gong55.ogg
 
 Música (CC0):
 - cidade: "Oriental" — Shadowfire452 — https://opengameart.org/node/15485
 - floresta: "Asian/Oriental 1" — Tozan — https://opengameart.org/content/asianoriental1
+
+Ataque de cada monstro (20/11/2026; Freesound, prévia HQ; cortados, mono e com volume igualado; monster_attack = atk_bandido):
+- atk_lobo           -> Lobo: "Barking 2.wav" — Mrthenoronha — https://freesound.org/people/Mrthenoronha/sounds/420449/
+- atk_bandido        -> Bandidos de espada (e reserva monster_attack): "swing.mp3" — GaussTheWizard — https://freesound.org/people/GaussTheWizard/sounds/367182/
+- atk_arqueiro       -> Arqueiros: "Crossbow Firing and Hitting Target" — Ali_6868 — https://freesound.org/people/Ali_6868/sounds/384919/
+- atk_pedra          -> Terracota/pedra: "Stone hit" — CamoMano — https://freesound.org/people/CamoMano/sounds/431019/
+- atk_espectro       -> Espectros: "Frosty Exhale, Ice Cold Exhale, Icy Exhale" — LilMati — https://freesound.org/people/LilMati/sounds/519438/
+- atk_yeti           -> Yeti: "Beast Snarling" — Christopherderp — https://freesound.org/people/Christopherderp/sounds/342204/
+- atk_monge          -> Monges caídos: "Kung-Fu punch SFX (A-B) (Edited)" — Sadiquecat — https://freesound.org/people/Sadiquecat/sounds/786323/
+- atk_assassino      -> Assassino das Sombras: "Whip 01.wav" — erkanozan — https://freesound.org/people/erkanozan/sounds/51755/
+- atk_serpente       -> Serpente de Jade: "Mexican Black Kingsnake, Short Hiss and Lunge" — TheKingOfGeeks360 — https://freesound.org/people/TheKingOfGeeks360/sounds/846337/
+- atk_grou           -> Grou Espiritual: "Whoosh" — qubodup — https://freesound.org/people/qubodup/sounds/60013/
+- atk_jade           -> Guardião de Jade: "ding.wav" — mark205 — https://freesound.org/people/mark205/sounds/580649/
+- atk_general        -> General de Terracota: "Very low frequency impact.wav" — AudioPapkin — https://freesound.org/people/AudioPapkin/sounds/541029/
+- atk_abade          -> Abade Caído: "Swinging staff whoosh (strong) 04.wav" — Nightflame — https://freesound.org/people/Nightflame/sounds/422513/
+- atk_yeti_ancestral -> Yeti Ancestral: "Yeti Roar - Skiing Game (2 of 2)" — el_boss — https://freesound.org/people/el_boss/sounds/751713/
+- atk_patriarca      -> Patriarca Profanado: "Magic Spell 05 Remastered.wav" — LilMati — https://freesound.org/people/LilMati/sounds/659762/
+- atk_rei_bandidos   -> Rei dos Bandidos: "Weapon, Sword, Metal sword, Swing, fast, impact" — julianmateo_ — https://freesound.org/people/julianmateo_/sounds/522701/
+- atk_senhor_nevoa   -> Senhor da Névoa: "Whosh - Reversed/Reverbed breath" — PrdiChlp — https://freesound.org/people/PrdiChlp/sounds/181889/
