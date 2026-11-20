@@ -1,4 +1,4 @@
-Efeitos sonoros: Kenney (https://kenney.nl), licença CC0 (domínio público).
+Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia Commons abaixo, todos CC0 (domínio público).
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
@@ -6,12 +6,22 @@ Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório)
 - point_spent  -> UI Audio, "click3"
 - tip          -> UI Audio, "rollover3"
   (os três foram identificados em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
-- miss         -> RPG Audio, "clothBelt"
+- bag_full     -> RPG Audio, "clothBelt" (era o antigo "miss")
 - portal       -> RPG Audio, "door4"
 - ui_open      -> RPG Audio, "bookOpen"
 - ui_close     -> RPG Audio, "bookClose"
-- hit, crit, level_up, spell, monster_attack, monster_death, player_death
+- repair, potion, level_up
                -> Kenney (o autor está gravado nos próprios arquivos); o nome do arquivo original não foi registrado
+               (repair = antigo "hit"; potion = antigo "spell")
+
+Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume igualado ao som antigo):
+- hit            -> "Machete vs. Spatula" (machete_vs_spatula_7) — CYBERDEViL — https://opengameart.org/content/machete-vs-spatula
+- crit           -> "Blacksmith's Hammer" — VishwaJai — https://opengameart.org/content/blacksmiths-hammer
+- miss           -> "Various Sound Effects" (snd_throw1) — Spring Spring — https://opengameart.org/content/various-sound-effects-0
+- spell          -> "Magic Spell SFX" (magical_6) — JaggedStone — https://opengameart.org/content/magic-spell-sfx
+- monster_attack -> "Wolf Monster Sound" — CaveboyTup — https://opengameart.org/content/wolf-monster-sound
+- monster_death  -> "Slimy monster or murder sounds(9)" (_3) — pauliuw — https://opengameart.org/content/slimy-monster-or-murder-sounds9
+- player_death   -> "Gong55.ogg" (primeiros 3 s, com fade) — stephan — https://commons.wikimedia.org/wiki/File:Gong55.ogg
 
 Música (CC0):
 - cidade: "Oriental" — Shadowfire452 — https://opengameart.org/node/15485
