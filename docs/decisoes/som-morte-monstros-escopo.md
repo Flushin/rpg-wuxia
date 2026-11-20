@@ -2,7 +2,7 @@
 - **Origem (redefinida em 20/11/2026, cada som escolhido pelo Lucas):** só CC0/domínio público, do Freesound, OpenGameArt e Wikimedia Commons. Créditos em `public/audio/CREDITS.txt`; licença conferida de cada som em `docs/licencas/README.md`.
 - **Escopo:** efeitos de combate, progressão, interface, itens, forja e missões (cada evento com som próprio) + ataque com som por família de monstro e por chefe (`monsterAttack` em `src/data/audio.json`; sem entrada = `monster_attack`) + música ambiente (cidade: "Hot Springs Town"; floresta e bambu: "Bamboo Blitz"; mesmo volume, −20 LUFS; transição suave).
 - **Arquivos:** mono, ogg + mp3 (o APK leva só o ogg), até 30 KB por efeito e 1,5 MB por música.
-- **Controle:** volumes separados de efeitos e música + mudo, na engrenagem de configurações (padrão: efeitos 80, música 50). Por aparelho desde a B6 (17/11/2026).
+- **Controle:** volumes separados de efeitos e música + mudo, na engrenagem de configurações (padrão: efeitos 20, música 40, desde 20/11/2026). Por aparelho desde a B6 (17/11/2026).
 
 ### Regeneração e movimento em combate
 - **HP e mana só regeneram na cidade:** 3% por segundo (após 5 s sem tomar dano). No mapa de caça, só poções (e passivas).

@@ -426,7 +426,7 @@
   border-radius: 18px;
   color: #aab;
   font-size: 14px;
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
 }
 #auto-panel .seg input:checked + span {
   border-color: #d4a017;
@@ -575,7 +575,7 @@
   box-shadow: 0 0 0 2px #ffd86b inset;
 }
 .srow details summary {
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
   color: #aab;
 }
 .srow .si small .mat {

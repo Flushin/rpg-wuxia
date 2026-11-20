@@ -8,7 +8,7 @@ export interface AudioSettings {
   music: number;
   muted: boolean;
 }
-export const DEFAULT_AUDIO: AudioSettings = { sfx: 80, music: 50, muted: false };
+export const DEFAULT_AUDIO: AudioSettings = { sfx: 20, music: 40, muted: false };
 
 /**
  * Volumes do aparelho (decisão de 17/11/2026: por aparelho, não por personagem).

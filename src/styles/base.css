@@ -41,6 +41,34 @@ body {
 .hidden {
   display: none !important;
 }
+/* Cursores de manopla (só com mouse). Sobre o mapa, gameScene põe html.cur-npc / html.cur-mob
+   conforme o que está sob o mouse: NPC = manopla + balão, monstro = espada. */
+@media (hover: hover) and (pointer: fine) {
+  :root {
+    --cur-hand: url(/cursors/normal.svg) 4 3, pointer;
+    --cur-normal: url(/cursors/normal.svg) 4 3, default;
+  }
+  html,
+  button,
+  a,
+  label,
+  select,
+  summary {
+    cursor:
+      url(/cursors/normal.svg) 4 3,
+      auto;
+  }
+  html.cur-npc :is(#game canvas, #joy-zone) {
+    cursor:
+      url(/cursors/npc.svg) 4 3,
+      pointer;
+  }
+  html.cur-mob :is(#game canvas, #joy-zone) {
+    cursor:
+      url(/cursors/ataque.svg) 2 2,
+      crosshair;
+  }
+}
 /* Barras de rolagem invisíveis; só aparecem enquanto a área está rolando (ui/scrollbars.ts põe .is-scrolling). */
 * {
   scrollbar-width: thin;
