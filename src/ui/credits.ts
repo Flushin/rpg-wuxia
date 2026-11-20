@@ -111,6 +111,11 @@ const SOUND: Credit[] = [
     who: 'cynicmusic (OpenGameArt.org)',
     license: CC0,
   },
+  {
+    what: L('Música do Trial: "Epic Boss Battle"', 'Trial music: "Epic Boss Battle"'),
+    who: 'Juhani Junkala (SubspaceAudio, OpenGameArt.org)',
+    license: CC0,
+  },
 ];
 
 interface Library {

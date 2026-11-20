@@ -98,6 +98,7 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 | `gruta` | `https://opengameart.org/content/frozen-desert-112` (Frozen Desert_0.ogg) | Dizzy Crow | CC0 |
 | `mosteiro` | `https://opengameart.org/content/epic-endgame-cinematic` (ChoirChordsBassMaster.wav) | cynicmusic | CC0 |
 | `covil` | `https://opengameart.org/content/battle-theme-a` (battleThemeA.mp3) | cynicmusic | CC0 |
+| `trial` | `https://opengameart.org/content/boss-battle-music` (Juhani Junkala - Epic Boss Battle [Seamlessly Looping].wav) | Juhani Junkala (SubspaceAudio) | CC0 |
 
 ### Ações, itens, forja e missões (verificados em 20/11/2026)
 
