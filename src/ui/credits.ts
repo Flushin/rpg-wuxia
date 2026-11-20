@@ -98,6 +98,19 @@ const SOUND: Credit[] = [
     who: 'Tsorthan Grove (OpenGameArt.org)',
     license: CC0,
   },
+  {
+    what: L('Música do Desfiladeiro do Gelo Eterno: "Frozen Desert"', 'Eternal Ice Gorge music: "Frozen Desert"'),
+    who: 'Dizzy Crow (OpenGameArt.org)',
+    license: CC0,
+  },
+  {
+    what: L(
+      'Músicas do Mosteiro Profanado e do Covil dos Bandidos: "Epic Endgame Cinematic" e "Battle Theme A"',
+      'Defiled Monastery and Bandit Lair music: "Epic Endgame Cinematic" and "Battle Theme A"',
+    ),
+    who: 'cynicmusic (OpenGameArt.org)',
+    license: CC0,
+  },
 ];
 
 interface Library {

@@ -201,6 +201,18 @@
     "music_pico": {
       "file": "pico",
       "volume": 0.6
+    },
+    "music_gruta": {
+      "file": "gruta",
+      "volume": 0.6
+    },
+    "music_mosteiro": {
+      "file": "mosteiro",
+      "volume": 0.6
+    },
+    "music_covil": {
+      "file": "covil",
+      "volume": 0.6
     }
   },
   "monsterAttack": {

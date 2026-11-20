@@ -74,9 +74,16 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     world: { col: 2, row: 0 },
   },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
-  gruta: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, dungeon: true, world: { col: 0, row: 1 } },
+  gruta: {
+    music: 'music_gruta',
+    trees: 'snow',
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 0, row: 1 },
+  },
   // masmorra: Mosteiro Profanado; salão do Patriarca Profanado no norte
   mosteiro: {
+    music: 'music_mosteiro',
     trees: 'city',
     grassDecor: 0.08,
     arena: { x: 16, y: 6, r: 5.5 },
@@ -85,6 +92,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   },
   // masmorra: Covil dos Bandidos; terreiro do Rei dos Bandidos no norte
   covil: {
+    music: 'music_covil',
     trees: 'forest',
     grassDecor: 0.09,
     arena: { x: 16, y: 6, r: 5.5 },
