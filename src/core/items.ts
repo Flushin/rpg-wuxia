@@ -69,6 +69,7 @@ const J = localize('items', itemsJson) as unknown as {
   startingKit: Record<string, number>;
   startingWeapon: Record<string, string>;
   rarities: Record<Rarity, RarityDef>;
+  epicNames: Record<string, string>;
   bonusPool: BonusDef[];
   bases: Record<string, ItemBase>;
   potions: Record<string, PotionDef>;
@@ -96,7 +97,14 @@ export const RARITIES = J.rarities,
 /** Melhoria máxima (+10) e quanto cada nível soma aos stats da base (marco 9, craft). */
 export const MAX_PLUS = 10;
 export const UPGRADE_STEP = J.upgradeStep;
+/** Raridades do sorteio normal de drop e da forja (subir raridade). O Épico fica de fora: tem drop próprio. */
 export const RARITY_ORDER: Rarity[] = ['comum', 'incomum', 'raro'];
+/** Ordem de exibição (mochila): todas as raridades, Épico no topo. */
+const RARITY_RANK: Rarity[] = ['comum', 'incomum', 'raro', 'epico'];
+export const isEpic = (it: ItemInstance) => it.rarity === 'epico';
+/** Nome do Épico: um por slot; a arma tem um por seita (chave arma_<classe>). */
+export const epicName = (slot: Slot, sect?: string) =>
+  J.epicNames[slot === 'arma' && sect ? `arma_${sect}` : slot] ?? J.epicNames[slot] ?? slot;
 export const isPotionId = (id: string) => id in POTIONS;
 export const isMaterialId = (id: string) => id in MATERIALS;
 /** Empilha na mochila (até STACK_MAX): poções e materiais de forja. */
@@ -327,7 +335,7 @@ export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[]
   const all = [...items, ...stacks.values()].sort(
     (a, b) =>
       rank(a) - rank(b) ||
-      RARITY_ORDER.indexOf(b.rarity) - RARITY_ORDER.indexOf(a.rarity) ||
+      RARITY_RANK.indexOf(b.rarity) - RARITY_RANK.indexOf(a.rarity) ||
       b.ilvl - a.ilvl ||
       (b.plus ?? 0) - (a.plus ?? 0) ||
       (BASES[a.baseId]?.name ?? '').localeCompare(BASES[b.baseId]?.name ?? ''),

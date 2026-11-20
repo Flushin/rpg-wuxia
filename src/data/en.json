@@ -181,7 +181,21 @@
       },
       "raro": {
         "name": "Rare"
+      },
+      "epico": {
+        "name": "Epic"
       }
+    },
+    "epicNames": {
+      "colar": "Violet Lotus Necklace",
+      "tronco": "Celestial Emperor Robe",
+      "cabeca": "Crown of a Thousand Mists",
+      "calca": "Sleeping Dragon Trousers",
+      "bota": "Traceless Wind Boots",
+      "arma_lamina": "Celestial Thunder Blades",
+      "arma_pavilhao": "Eternal Frost Fan",
+      "arma_tita": "Unshakable Mountain Staff",
+      "arma_vibora": "Imperial Viper Needles"
     },
     "bases": {
       "colar_jade": {

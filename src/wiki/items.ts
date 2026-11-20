@@ -149,6 +149,7 @@ export function itemPage(id: string): string | null {
         .join('');
     const total = Object.values(RARITIES).reduce((t, r) => t + r.weight, 0);
     const rar = Object.values(RARITIES)
+      .filter((r) => r.weight > 0) // Épico tem drop próprio (fora do sorteio de raridade)
       .map(
         (r) =>
           `<tr><td><b style="color:${r.color}">${esc(r.name)}</b></td><td>${r.bonuses}</td><td>${+((r.weight / total) * 100).toFixed(1)}%</td><td>${sellPrice(b.value, r.valueMul)} ouro</td></tr>`,

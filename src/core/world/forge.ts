@@ -51,7 +51,7 @@ export function upgradeCost(it: ItemInstance): ForgeCost | null {
 
 /** Comum → Incomum → Raro (ganha um bônus aleatório novo; os que já tem ficam). */
 export function rarityCost(it: ItemInstance): ForgeCost | null {
-  if (!BASES[it.baseId] || it.rarity === 'raro') return null;
+  if (!BASES[it.baseId] || it.rarity === 'raro' || it.rarity === 'epico') return null;
   return it.rarity === 'comum'
     ? { mats: { [ORE]: 12, [rare(it)]: 1 }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
     : { mats: { [ORE]: 20, [rare(it)]: 4, [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
@@ -59,7 +59,7 @@ export function rarityCost(it: ItemInstance): ForgeCost | null {
 
 /** Sorteia de novo todos os bônus de um item Incomum ou Raro (a quantidade continua a mesma). */
 export function rerollCost(it: ItemInstance): ForgeCost | null {
-  if (!BASES[it.baseId] || it.rarity === 'comum') return null;
+  if (!BASES[it.baseId] || it.rarity === 'comum' || it.rarity === 'epico') return null; // Épico: bônus fixos da classe
   return it.rarity === 'incomum'
     ? { mats: { [ORE]: 6, [rare(it)]: 1 }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
     : { mats: { [ORE]: 10, [rare(it)]: 2 }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };

@@ -6,6 +6,7 @@
     "Bonus aleatorios: valor = sorteio(min..max) * (1 + 0.2 * (nivelDoItem - 1)); ints arredondados (minimo 1). 'elemAtk' vira o elemento da seita de quem recebeu o drop.",
     "value = valor de referencia em ouro; venda = value * multiplicador da raridade * sellRatio (15%). Pocoes: price = preco de compra; venda = price * sellRatio.",
     "Conserto: ceil(durabilidade faltando * nivelDoItem * repairCostPerPoint).",
+    "Épico (epico): peso 0, nunca sai no sorteio normal de raridade; tem drop próprio (src/core/world/inventory.ts). Sem nível: acompanha o do personagem. Nome em epicNames (slot; arma por seita: arma_<classe>). Não vende nem desmonta.",
     "Pocoes: curam percent do maximo ao longo de duration s; um efeito por tipo (hp/mp), usar outra do mesmo tipo reinicia; cooldown por tipo.",
     "Materiais (marco 9): empilham como poções; tier comum (mapas antigos), raro (montanha) e especial (chefes). value = referência; venda = value * sellRatio.",
     "Melhorar (+1 a +10): cada nível soma upgradeStep (fração) aos stats da base, não aos bônus.",
@@ -64,7 +65,25 @@
       "weight": 5,
       "bonuses": 2,
       "valueMul": 2.6
+    },
+    "epico": {
+      "name": "Épico",
+      "color": "#b45cff",
+      "weight": 0,
+      "bonuses": 2,
+      "valueMul": 0
     }
+  },
+  "epicNames": {
+    "colar": "Colar do Lótus Violeta",
+    "tronco": "Manto do Imperador Celeste",
+    "cabeca": "Coroa das Mil Névoas",
+    "calca": "Calça do Dragão Adormecido",
+    "bota": "Botas do Vento Sem Rastro",
+    "arma_lamina": "Espadas do Trovão Celestial",
+    "arma_pavilhao": "Leque da Geada Eterna",
+    "arma_tita": "Bastão do Monte Inabalável",
+    "arma_vibora": "Agulhas da Víbora Imperial"
   },
   "bonusPool": [
     {
