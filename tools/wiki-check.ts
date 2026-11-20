@@ -36,7 +36,17 @@ import * as M from '../src/wiki/mechanics';
 import { hitChance as cHit } from '../src/core/combat';
 import { DEATH_DURABILITY_LOSS, TOWN_REGEN } from '../src/core/world';
 import { FORGE, rarityCost, rerollCost, salvageYield, upgradeCost } from '../src/core/world/forge';
-import { EPIC_CHANCE, EPIC_GROUND_SECONDS, EPIC_MAX_LEVELS_BELOW, EPIC_MUL, epicBonuses } from '../src/core/items';
+import {
+  EPIC_CHANCE,
+  EPIC_GROUND_SECONDS,
+  EPIC_MAX_LEVELS_BELOW,
+  EPIC_MUL,
+  epicBonuses,
+  epicIconId,
+  epicTierBase as cEpicTierBase,
+  itemStats,
+  makeEpic,
+} from '../src/core/items';
 import { OFFLINE_GOLD_CAP_HOURS, OFFLINE_TIERS } from '../src/core/offline';
 
 let fails = 0;
@@ -201,6 +211,41 @@ console.log('== mecânicas (cópias) ==');
       ),
     'Épico (chances, ×1,3, níveis, chão e bônus por classe)',
   );
+  {
+    // páginas dos Épicos: ids iguais aos do jogo; peça da faixa e atributos no +0 iguais aos do jogo
+    const bad: string[] = [];
+    for (const e of W.EPIC_ITEMS) {
+      const baseId = Object.keys(C_BASES).find(
+        (id) => C_BASES[id].slot === e.slot && (C_BASES[id].sect ?? '') === (e.sect ?? ''),
+      );
+      if (!baseId) {
+        bad.push(`${e.id} sem peça no jogo`);
+        continue;
+      }
+      const it = makeEpic(baseId, 1);
+      if (epicIconId(it) !== e.id) bad.push(`${e.id} ≠ id do jogo ${epicIconId(it)}`);
+      for (const c of Object.keys(C_CLASSES))
+        for (let lv = 1; lv <= 30; lv++) {
+          if (W.epicTierBase(e.slot, e.sect, lv) !== cEpicTierBase(it, lv)) bad.push(`${e.id} nv${lv}: peça`);
+          if (!same(W.epicTierStats(e.slot, e.sect, lv), itemStats(it, { level: lv, classId: c }, false)))
+            bad.push(`${e.id} nv${lv} ${c}: atributos`);
+        }
+    }
+    ok(
+      !bad.length,
+      `páginas dos Épicos: ids, peça da faixa e atributos iguais aos do jogo ${bad.slice(0, 5).join('; ')}`,
+    );
+    const all = itemIndexPage('equip', new URLSearchParams()),
+      links = (h: string) => W.EPIC_ITEMS.filter((e) => h.includes(`href="#/item/${e.id}"`)).map((e) => e.id);
+    const sectOk = W.SECT_ORDER.every((s) => {
+      const got = links(itemIndexPage('equip', new URLSearchParams('seita=' + s)));
+      return got.length === 6 && got.includes(`epico_arma_${s}`);
+    });
+    ok(
+      links(all).length === 9 && sectOk,
+      'lista de equipamentos: 9 Épicos; com filtro de seita, 5 armaduras + a arma da seita',
+    );
+  }
   const rng = new Rng(3);
   const bad: string[] = [];
   for (const id of Object.keys(C_BASES))
@@ -234,6 +279,7 @@ console.log('== páginas ==');
     look('itens/' + t, itemIndexPage(t, new URLSearchParams()));
   for (const s of W.SECT_ORDER) look('itens/seita=' + s, itemIndexPage('equip', new URLSearchParams('seita=' + s)));
   for (const id of W.allItemIds()) look('item/' + id, itemPage(id));
+  for (const e of W.EPIC_ITEMS) look('item/' + e.id, itemPage(e.id));
   look('npcs', npcIndexPage());
   for (const n of NPCS()) look('npc/' + n.id, npcPage(n.id));
   look('seitas', sectIndexPage());

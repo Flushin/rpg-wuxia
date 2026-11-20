@@ -168,7 +168,7 @@ function epico(): string {
   ]
     .map(
       ([a, b, k]) =>
-        `<tr><td>${a}</td><td>${iconHtml(`epico_${k}`, 'sm')} <b style="color:${col}">${esc(b)}</b></td></tr>`,
+        `<tr><td>${a}</td><td><a href="#/item/epico_${k}">${iconHtml(`epico_${k}`, 'sm')} <b style="color:${col}">${esc(b)}</b></a></td></tr>`,
     )
     .join('');
   const bon = SECT.map((c) => {
