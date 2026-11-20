@@ -33,4 +33,25 @@ export function makeTextures(scene: Phaser.Scene) {
   g.generateTexture(PLACEHOLDER, 28, 44);
 
   g.destroy();
+
+  // coluna de luz (subida de nível): branca, forte no meio, some nas laterais, no alto e na base; tingida no uso
+  const beam = scene.textures.exists('fx-beam') ? null : scene.textures.createCanvas('fx-beam', 32, 128);
+  if (beam) {
+    const c = beam.getContext();
+    const across = c.createLinearGradient(0, 0, 32, 0);
+    across.addColorStop(0, 'rgba(255,255,255,0)');
+    across.addColorStop(0.5, 'rgba(255,255,255,1)');
+    across.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = across;
+    c.fillRect(0, 0, 32, 128);
+    const up = c.createLinearGradient(0, 0, 0, 128);
+    up.addColorStop(0, 'rgba(255,255,255,0)');
+    up.addColorStop(0.6, 'rgba(255,255,255,0.75)');
+    up.addColorStop(0.9, 'rgba(255,255,255,1)');
+    up.addColorStop(1, 'rgba(255,255,255,0)');
+    c.globalCompositeOperation = 'destination-in';
+    c.fillStyle = up;
+    c.fillRect(0, 0, 32, 128);
+    beam.refresh();
+  }
 }

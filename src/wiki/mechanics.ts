@@ -24,6 +24,7 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
+import { LEVELUP_POSE_S } from '../core/data';
 import {
   TRIAL_BOSSES,
   trialEquipReqLevel,
@@ -185,6 +186,9 @@ function combate(): string {
       ${cls.lifeSteal ? `<li><b>Roubo de vida</b> (Tormenta): ${pc(cls.lifeSteal)} do dano causado volta como vida.</li>` : ''}</ul>${ex}</section>
     <section class="panel"><h2>Níveis</h2><p>Nível máximo <b>${PROGRESSION.levelCap}</b>. A cada nível você ganha os atributos automáticos da sua <a href="#/seitas">seita</a>
       e <b>${freePointsText()}</b> para distribuir. Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
+      <p>Ao subir de nível o personagem ergue os braços envolto em luz dourada e fica <b>parado por ${String(LEVELUP_POSE_S).replace('.', ',')} s</b> (o Auto espera).
+      Nos níveis 10, 20 e 30 a luz é maior e mais longa. Vários níveis de uma vez tocam uma animação por nível (só a primeira para o personagem);
+      no ganho offline, até 3 animações tocam quando você fecha o resumo.</p>
       <details class="more"><summary>XP para cada nível</summary><table class="tbl"><thead><tr><th>Nível</th><th>XP</th></tr></thead><tbody>${xpRows}</tbody></table></details></section>`;
 }
 

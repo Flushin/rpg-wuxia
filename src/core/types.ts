@@ -132,7 +132,8 @@ export type GameEvent =
   | { type: 'kill'; monsterId: string; level?: number }
   | { type: 'quest'; kind: 'accepted' | 'progress' | 'ready' | 'completed'; questId: string; name: string }
   | { type: 'xp'; amount: number }
-  | { type: 'levelup'; level: number }
+  /** points: pontos livres ganhos; pose: primeira do lote (pose + parado); replay: animação do ganho offline (sem aviso) */
+  | { type: 'levelup'; level: number; points: number; pose: boolean; replay?: boolean }
   | { type: 'playerDeath' }
   | { type: 'mapChange'; mapId: string }
   | { type: 'portalLocked'; name: string; minLevel: number }

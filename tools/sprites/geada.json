@@ -28,7 +28,8 @@
   "idle": {"action": "Idle", "frames": 6, "fps": 8},
   "walk": {"action": "Running_A", "frames": 8, "fps": 12},
   "attack": {"action": "Spellcast_Shoot", "frames": 8, "fps": 14, "loop": false},
-  "death": {"action": "Death_A", "frames": 6, "fps": 10, "loop": false}
+  "death": {"action": "Death_A", "frames": 6, "fps": 10, "loop": false},
+  "levelup": {"action": "Cheer", "frames": 8, "fps": 12, "loop": false}
  },
  "out_json": "../../src/data/sprites",
  "portrait": "idle",

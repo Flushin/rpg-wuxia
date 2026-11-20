@@ -1,4 +1,6 @@
-import { CLASSES, MONSTERS, NPC_TEXT, PROGRESSION, freePointsAt, type MonsterDef } from './data';
+import { CLASSES, LEVELUP_POSE_S, MONSTERS, NPC_TEXT, PROGRESSION, freePointsAt, type MonsterDef } from './data';
+
+export { LEVELUP_POSE_S };
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
@@ -85,6 +87,15 @@ const DASH_STOP = 1.0; // distância final do Passo do Raio até o alvo
 const NPC_REACH = 1.8; // distância para abrir a janela do NPC
 const NPC_LEAVE = 3; // janela fecha ao se afastar mais que isso
 export const DEATH_DURABILITY_LOSS = 0.1;
+/** Níveis que tocam a animação depois do ganho offline (de `from` exclusivo até `to`): os últimos 3, trocando o
+ *  primeiro pelo maior nível marco (múltiplo de 10) se nenhum dos 3 for marco. */
+export function offlineCelebration(from: number, to: number, max = 3): number[] {
+  const all = Array.from({ length: Math.max(0, to - from) }, (_, i) => from + 1 + i);
+  const picked = all.slice(-max);
+  const milestone = all.filter((l) => l % 10 === 0).pop();
+  if (milestone !== undefined && !picked.includes(milestone)) picked[0] = milestone;
+  return picked;
+}
 const NPC_WALK_SPEED = 1.3; // moradores andando pela cidade
 const BOSS_LEASH_SLACK = 3; // chefe só larga o jogador além do raio da arena + isto (tiles)
 const BOSS_LEASH_GRACE = 3; // ...e depois de tantos segundos seguidos lá fora
@@ -118,6 +129,8 @@ export class World {
   classId: string;
   xp = 0;
   freePoints = 0;
+  /** segundos que ainda faltam da pose de subida de nível (não vai para o save) */
+  levelUpPose = 0;
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
@@ -465,7 +478,7 @@ export class World {
   useSkill(slot: number) {
     const p = this.player,
       def = this.activeSkills()[slot];
-    if (!def || p.dead) return;
+    if (!def || p.dead || this.levelUpPose > 0) return;
     if (!this.isUnlocked(def)) return this.fail(def, 'locked');
     const st = this.skills[def.id];
     if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
@@ -688,6 +701,8 @@ export class World {
     if (this.player.dead) {
       this.respawnTimer -= dt;
       if (this.respawnTimer <= 0) this.respawnPlayer();
+    } else if (this.levelUpPose > 0) {
+      this.levelUpPose = Math.max(0, this.levelUpPose - dt); // pose de subida de nível: nem o auto nem o jogador agem
     } else {
       this.auto.tick(dt);
       this.tickPlayer(dt);
@@ -1190,6 +1205,7 @@ export class World {
     if (p.level >= PROGRESSION.levelCap) return;
     this.xp += n;
     this.emit({ type: 'xp', amount: n });
+    let first = true;
     for (let need = this.xpToNext(); need !== null && this.xp >= need; need = this.xpToNext()) {
       this.xp -= need;
       p.level++;
@@ -1199,7 +1215,10 @@ export class World {
       this.recalc(p, false);
       p.hp = p.derived.maxHp;
       p.mana = p.derived.maxMana;
-      this.emit({ type: 'levelup', level: p.level });
+      // vários níveis de uma vez: uma animação por nível, em fila; só a primeira tem a pose (e deixa parado)
+      this.emit({ type: 'levelup', level: p.level, points: freePointsAt(p.level), pose: first });
+      if (first) this.levelUpPose = LEVELUP_POSE_S;
+      first = false;
       for (const s of this.classSkills()) if (s.unlock === p.level) this.emit({ type: 'skillUnlocked', skillId: s.id });
     }
     if (p.level >= PROGRESSION.levelCap) this.xp = 0;
@@ -1329,6 +1348,18 @@ export class World {
    * com o auto ligado. `autoAtPause` é o auto.serialize() do momento em que saiu. Com relatório, o auto fica
    * esperando o resumo ser fechado (auto.resume()).
    */
+  /**
+   * Resumo offline fechado: toca a animação dos níveis ganhos fora do jogo (até 3, sempre com o marco se houver).
+   * Só visual: os níveis já foram aplicados; `replay` evita repetir os avisos do resumo.
+   */
+  celebrateOfflineLevels(rep: OfflineReport) {
+    const levels = offlineCelebration(rep.newLevel - rep.levelsGained, rep.newLevel);
+    levels.forEach((level, i) =>
+      this.emit({ type: 'levelup', level, points: freePointsAt(level), pose: i === 0, replay: true }),
+    );
+    if (levels.length && !this.player.dead) this.levelUpPose = LEVELUP_POSE_S;
+  }
+
   applyResumeOffline(now: number, pausedAt: number, autoAtPause: SaveData['auto']): OfflineReport | null {
     if (now - pausedAt < RESUME_OFFLINE_MIN_MS) return null;
     const rep = this.applyOffline(now, pausedAt, autoAtPause);

@@ -94,6 +94,12 @@
    "frames": 6,
    "fps": 10,
    "loop": false
+  },
+  "levelup": {
+   "action": "Cheer",
+   "frames": 8,
+   "fps": 12,
+   "loop": false
   }
  },
  "out_json": "../../src/data/sprites",

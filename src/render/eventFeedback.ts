@@ -15,6 +15,7 @@ import { DEPTH } from './depth';
 import { TEXT_RES } from './display';
 import type { EntityView } from './entityView';
 import type { SkillFx } from './skillFx';
+import { LevelUpFx } from './levelUpFx';
 
 // Cores dos textos que sobem do mapa
 const FLOAT_COLOR = {
@@ -39,6 +40,7 @@ type Ev<T extends GameEvent['type']> = Extract<GameEvent, { type: T }>;
 const FLOAT_POOL_MAX = 24;
 
 export class EventFeedback {
+  private levelUpFx: LevelUpFx;
   private floatPool = new Map<number, Phaser.GameObjects.Text[]>(); // por tamanho da fonte (trocar a fonte remede)
   constructor(
     private scene: Phaser.Scene,
@@ -46,7 +48,9 @@ export class EventFeedback {
     private hud: Hud,
     private views: Map<number, EntityView>,
     private fx: SkillFx,
-  ) {}
+  ) {
+    this.levelUpFx = new LevelUpFx(scene, () => this.views.get(this.world.player.id));
+  }
 
   /** Devolve true se o evento foi tratado aqui. */
   handle(ev: GameEvent): boolean {
@@ -266,7 +270,15 @@ export class EventFeedback {
           toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
         return true;
       case 'levelup':
-        toast(L(`Nível ${ev.level}! +3 pontos de atributo`, `Level ${ev.level}! +3 attribute points`));
+        this.levelUpFx.request(ev.level, ev.pose);
+        // ganho offline: o resumo já mostrou os níveis e os pontos
+        if (!ev.replay)
+          toast(
+            L(
+              `Nível ${ev.level}! +${ev.points} pontos de atributo`,
+              `Level ${ev.level}! +${ev.points} attribute points`,
+            ),
+          );
         return true;
       case 'playerDeath':
         toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'));
