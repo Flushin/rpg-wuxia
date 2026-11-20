@@ -1,26 +1,23 @@
-# Gera o APK de teste (debug) do app Android sob demanda (aba Actions → "APK Android" → Run workflow) e nos PRs
-# que mexem em arquivos do lado Android (lista em `paths`); PR só de conteúdo/wiki não gera APK.
-# O APK fica no fim da página da execução, em "Artifacts" (mistpeak-debug-apk). Instalar no celular: ver docs/android.md.
-# A pasta android/ não está no repositório: é gerada aqui a partir do capacitor.config.ts.
+# Gera o APK de teste (debug) do app Android só quando pedido: aba Actions → "APK Android" → Run workflow.
+# Cada geração publica uma release "APK <versão>" (tag apk-v<versão>, pré-lançamento) com o APK e as novidades
+# acumuladas desde o APK anterior (npm run novidades:apk). O APK também fica em "Artifacts" (mistpeak-debug-apk).
+# Instalar no celular: ver docs/android.md. A pasta android/ não está no repositório: é gerada aqui.
 name: APK Android
 on:
-  pull_request:
-    paths:
-      - capacitor.config.ts
-      - package.json
-      - package-lock.json
-      - assets/**
-      - src/platform/**
-      - tools/android-*.mjs
-      - .github/workflows/android.yml
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: apk-android
 jobs:
   apk:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -30,11 +27,27 @@ jobs:
           distribution: temurin
           java-version: 21
       - run: npm ci
+      - name: Novidades desde o último APK
+        run: |
+          versao=$(node -p "require('./package.json').version")
+          ultima=$(git tag -l 'apk-v*' --sort=-v:refname | sed 's/^apk-v//' | grep -vx "$versao" | head -1 || true)
+          echo "versao=$versao" >> "$GITHUB_ENV"
+          npm run -s novidades:apk -- "$ultima" > NOVIDADES-APK.md
+          cat NOVIDADES-APK.md >> "$GITHUB_STEP_SUMMARY"
       - run: npm run android:prepare
       - run: ./gradlew assembleDebug --no-daemon
         working-directory: android
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk "mistpeak-$versao-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: mistpeak-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            mistpeak-*-debug.apk
+            NOVIDADES-APK.md
           retention-days: 14
+      - name: Release com APK e novidades
+        run: |
+          tag="apk-v$versao"
+          gh release delete "$tag" --cleanup-tag -y 2>/dev/null || true
+          gh release create "$tag" "mistpeak-$versao-debug.apk" --target "$GITHUB_SHA" --prerelease \
+            --title "APK $versao" --notes-file NOVIDADES-APK.md
