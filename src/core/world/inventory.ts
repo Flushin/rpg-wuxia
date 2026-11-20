@@ -263,7 +263,8 @@ function trialLoot(w: World, m: Entity, def: MonsterDef) {
 export function canEquip(w: World, it: ItemInstance): ActionError | null {
   const b = baseOf(it);
   if (!b) return { code: 'notEquippable' };
-  if (w.player.level < b.reqLevel) return { code: 'needLevel', level: b.reqLevel };
+  // Épico: sem nível próprio (usa a peça da faixa do personagem); só a trava de seita vale
+  if (it.rarity !== 'epico' && w.player.level < b.reqLevel) return { code: 'needLevel', level: b.reqLevel };
   if (b.sect && b.sect !== w.classId) return { code: 'sectOnly', sect: b.sect };
   return null;
 }
