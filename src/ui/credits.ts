@@ -71,6 +71,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons dos chefes (arena, fúria, invocação e vitória)', 'Boss sounds (arena, enrage, summon and victory)'),
+    who: 'SoundsExciting, Robson220pl, adharca, qubodup (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons de ataque dos monstros', 'Monster attack sounds'),
     who: 'Mrthenoronha, GaussTheWizard, Ali_6868, CamoMano, LilMati, Christopherderp, Sadiquecat, erkanozan, TheKingOfGeeks360, qubodup, mark205, AudioPapkin, Nightflame, el_boss, julianmateo_, PrdiChlp (Freesound.org)',
     license: CC0,

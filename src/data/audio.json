@@ -88,6 +88,22 @@
       "file": "portal",
       "volume": 0.8
     },
+    "boss_arena": {
+      "file": "boss_arena",
+      "volume": 0.8
+    },
+    "boss_enrage": {
+      "file": "boss_enrage",
+      "volume": 0.9
+    },
+    "boss_summon": {
+      "file": "boss_summon",
+      "volume": 0.8
+    },
+    "boss_defeated": {
+      "file": "boss_defeated",
+      "volume": 0.9
+    },
     "coin": {
       "file": "coin",
       "volume": 0.6

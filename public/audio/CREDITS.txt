@@ -69,3 +69,9 @@ Ações, itens, forja e missões (20/11/2026; Freesound, prévia HQ; mono, volum
 - salvage        -> "Stainless steel clatter.wav" — EntoClash — https://freesound.org/people/EntoClash/sounds/569286/
 - quest_ready    -> "Sleigh bells hit" — Selector — https://freesound.org/people/Selector/sounds/369506/
 - quest_accept   -> "Signing document, writing quickly" (primeiros 0,5 s) — UnderASpell — https://freesound.org/people/UnderASpell/sounds/611719/
+
+Chefes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, -18 LUFS):
+- boss_arena     -> "Gong with flute" (primeiros 4 s) — SoundsExciting — https://freesound.org/people/SoundsExciting/sounds/213096/
+- boss_enrage    -> "Low Monster Roar" (primeiros 3 s) — Robson220pl — https://freesound.org/people/Robson220pl/sounds/497056/
+- boss_summon    -> "war horn.wav" (primeiros 1,8 s) — adharca — https://freesound.org/people/adharca/sounds/539956/
+- boss_defeated  -> "Angelic Fanfare 2" (primeiros 4,5 s) — qubodup — https://freesound.org/people/qubodup/sounds/812468/

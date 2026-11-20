@@ -121,6 +121,17 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `quest_ready` | `https://freesound.org/people/Selector/sounds/369506/` | Selector | CC0 |
 | `quest_accept` | `https://freesound.org/people/UnderASpell/sounds/611719/` | UnderASpell | CC0 |
 
+### Chefes (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `boss_arena` | `https://freesound.org/people/SoundsExciting/sounds/213096/` | SoundsExciting | CC0 |
+| `boss_enrage` | `https://freesound.org/people/Robson220pl/sounds/497056/` | Robson220pl | CC0 |
+| `boss_summon` | `https://freesound.org/people/adharca/sounds/539956/` | adharca | CC0 |
+| `boss_defeated` | `https://freesound.org/people/qubodup/sounds/812468/` | qubodup | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)

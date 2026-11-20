@@ -202,6 +202,8 @@ export class World {
 
   // ---- privados do World
   private arenaSeen = false;
+  /** jogador estava dentro da arena no tick anterior (bossArenaEnter dispara a cada entrada com o chefe vivo) */
+  private wasInArena = false;
   private respawnTimer = 0;
   private portalCd = 0;
   /** está em cima de um portal de menu: o menu só abre de novo depois de sair e pisar outra vez */
@@ -711,10 +713,14 @@ export class World {
       this.auto.tick(dt);
       this.tickPlayer(dt);
       this.checkPortals();
-      if (this.arenas.length && !this.arenaSeen && this.inArena(this.player)) {
+      const inArena = this.arenas.length > 0 && this.inArena(this.player);
+      if (inArena && !this.arenaSeen) {
         this.arenaSeen = true;
         this.emit({ type: 'bossArena' });
       }
+      if (inArena && !this.wasInArena && this.monsters.some((m) => !m.dead && MONSTERS[m.monsterId]?.boss))
+        this.emit({ type: 'bossArenaEnter' });
+      this.wasInArena = inArena;
     }
     for (const m of this.monsters) this.tickMonster(m, dt);
     for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
@@ -1437,6 +1443,7 @@ export class World {
     this.arenas = [];
     this.bossSummoned = false;
     this.arenaSeen = false;
+    this.wasInArena = false;
     const now = this.clock();
     for (const [k, t] of Object.entries(this.bossRespawn)) if (t <= now) delete this.bossRespawn[k];
     for (const [k, t] of Object.entries(this.respawnAtMs)) if (t <= now) delete this.respawnAtMs[k];

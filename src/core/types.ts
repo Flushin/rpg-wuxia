@@ -194,6 +194,8 @@ export type GameEvent =
   | { type: 'telegraph'; id: number; x: number; y: number; radius: number; delay: number; shape?: 'line' }
   | { type: 'telegraphResolved'; id: number; x: number; y: number; radius: number; hit: boolean }
   | { type: 'bossArena' }
+  /** jogador entrou na arena com o chefe vivo (a cada entrada; bossArena só na primeira do mapa) */
+  | { type: 'bossArenaEnter' }
   | { type: 'bossSummon'; ids: number[]; name: string }
   /** chefe entrou em fúria (boss.enrage) */
   | { type: 'bossEnrage'; id: number; name: string }
