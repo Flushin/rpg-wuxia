@@ -104,6 +104,11 @@ export const RARITY_ORDER: Rarity[] = ['comum', 'incomum', 'raro'];
 /** Ordem de exibição (mochila): todas as raridades, Épico no topo. */
 const RARITY_RANK: Rarity[] = ['comum', 'incomum', 'raro', 'epico'];
 export const isEpic = (it: ItemInstance) => it.rarity === 'epico';
+/** Ícone do Épico (fixo, desenhado em tools/sprites/icons.py): epico_<slot>; arma: epico_arma_<seita>. */
+export const epicIconId = (it: ItemInstance) => {
+  const b = BASES[it.baseId];
+  return b ? `epico_${b.slot === 'arma' && b.sect ? `arma_${b.sect}` : b.slot}` : it.baseId;
+};
 /** Nome do Épico: um por slot; a arma tem um por seita (chave arma_<classe>). */
 export const epicName = (slot: Slot, sect?: string) =>
   J.epicNames[slot === 'arma' && sect ? `arma_${sect}` : slot] ?? J.epicNames[slot] ?? slot;

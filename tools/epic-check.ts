@@ -10,6 +10,7 @@ import {
   MAX_PLUS,
   RARITIES,
   epicBonuses,
+  epicIconId,
   epicTierBase,
   itemStats,
   makeEpic,
@@ -23,6 +24,7 @@ import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
 import { World } from '../src/core/world';
 import type { Entity, ItemInstance, SaveData } from '../src/core/types';
+import icons from '../src/data/sprites/icones.json';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -251,6 +253,15 @@ console.log('\n== forja, venda e desmonte ==');
   ok(
     w.sell(0)?.code === 'epicLocked' && w.sellRaw(0) === 0 && w.gold === gold && w.bag[0] === e,
     'não vende (nem pelo auto)',
+  );
+}
+
+console.log('\n== ícones ==');
+{
+  const ids = Object.keys(BASES).map((id) => epicIconId(makeEpic(id, 1)));
+  ok(
+    new Set(ids).size === 9 && ids.every((n) => n in icons.index),
+    `9 ícones épicos próprios na folha (${[...new Set(ids)].join(', ')})`,
   );
 }
 

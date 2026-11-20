@@ -9,7 +9,7 @@ import {
   SLOT_NAMES,
   baseOf,
   epicBonuses,
-  epicTierBase,
+  epicIconId,
   fmtStat,
   fmtStatValue,
   isBroken,
@@ -123,9 +123,8 @@ function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
     ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
     ${lines}${bonus}${dur}<div class="tip-sell">${L('Não pode ser vendido nem desmontado', 'Cannot be sold or salvaged')}</div>${compare ? compareHtml(w, it) : ''}`;
 }
-/** Ícone do item; o Épico usa o da peça da faixa do nível de quem usa (muda a cada 5 níveis). */
-const iconId = (it: ItemInstance, owner?: ItemOwner) =>
-  it.rarity === 'epico' && owner ? epicTierBase(it, owner.level) : it.baseId;
+/** Ícone do item; o Épico tem o seu próprio, fixo (não segue a peça da faixa). */
+const iconId = (it: ItemInstance) => (it.rarity === 'epico' ? epicIconId(it) : it.baseId);
 
 // marco 6: ícone desenhado de cada item (tools/sprites/icons.py); emoji só se faltar o ícone
 export const SLOT_ICON: Record<Slot, string> = {
@@ -141,7 +140,7 @@ export function cellHtml(it: ItemInstance | null, owner?: ItemOwner): string {
   const b = BASES[it.baseId],
     pot = POTIONS[it.baseId],
     stack = !b,
-    ico = iconId(it, owner);
+    ico = iconId(it);
   const label = iconHtml(
     ico,
     pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : b ? SLOT_ICON[b.slot] : CONSUMABLES[it.baseId] ? '📜' : '💎',

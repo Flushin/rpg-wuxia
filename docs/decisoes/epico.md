@@ -17,7 +17,7 @@ Wiki: `#/mecanicas/epico`.
 
 ## Força
 - Sem nível próprio: usa a base do mesmo slot (arma: mesma seita) com o maior nível exigido ≤ nível do personagem,
-  a mesma que um Raro daquele nível teria. Muda a cada 5 níveis; nome e ícone de faixa seguem essa peça.
+  a mesma que um Raro daquele nível teria. Muda a cada 5 níveis. Nome e ícone são fixos por épico (ícones `epico_*` desenhados em `tools/sprites/icons.py`).
 - Stats da base: `round(stat com a melhoria (+N) × 1,3)`. A forja soma por cima como no Raro, então +N épico ≈ 1,3 × +N raro.
 - 2 bônus fixos: 1,3 × o máximo que um Raro sortearia no nível do personagem (`max × (1 + 0,2 × (nível − 1)) × 1,3`).
   - Tormenta, Titã e Víbora: Força + elemento da seita; Geada: Inteligência + Gelo. Motivo: elemento soma direto ao
