@@ -2,6 +2,7 @@
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
 import { TRIAL_BOSSES, TRIAL_MIN_LEVEL, TRIAL_TIERS, trialBossLevel, trialCost } from '../core/trial';
+import { TELEPORT_COST, TELEPORT_DESTS, teleportById } from '../core/teleport';
 import { MONSTERS, QUESTS, SLOT_NAMES, esc, type Quest } from './data';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterSprite } from './monsters';
@@ -89,7 +90,8 @@ const minimap = (id: string, big = false) => `<canvas class="minimap${big ? ' bi
 export async function mapIndexPage(): Promise<string> {
   const maps = await loadMaps();
   return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. A vila é segura: lá a vida e a mana voltam sozinhas fora de combate.
-    No jogo, a aba <b>Mundo</b> do mapa (tecla M ou toque no minimapa) mostra todos os mapas; toque num deles para ver, passo a passo, por quais portais ir saindo de onde você está (o próximo portal pisca no minimapa).</p>
+    No jogo, a aba <b>Mundo</b> do mapa (tecla M ou toque no minimapa) mostra todos os mapas; toque num deles para ver, passo a passo, por quais portais ir saindo de onde você está (o próximo portal pisca no minimapa).
+    Na praça da vila, o <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> leva você direto aos mapas marcados com ✦, por ${TELEPORT_COST} ouro.</p>
     <div class="grid map-grid">${maps
       .map((m) => {
         const lv = mapLevels(m),
@@ -99,7 +101,7 @@ export async function mapIndexPage(): Promise<string> {
           : MAPS_CONFIG[m.id]?.trial
             ? `Trial · chefes nível ${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}`
             : `${dungeonOf(m.id) ? 'Masmorra · ' : ''}${lv ? `monstros nível ${lv[0]}–${lv[1]}` : ''}`;
-        return `<a class="card-link" href="#/mapa/${m.id}">${minimap(m.id)}<b>${esc(m.name)}</b><small>${sub}${entry > 0 && entry < Infinity ? ` · entrada nível ${entry}+` : ''}</small></a>`;
+        return `<a class="card-link" href="#/mapa/${m.id}">${minimap(m.id)}<b>${esc(m.name)}</b><small>${sub}${entry > 0 && entry < Infinity ? ` · entrada nível ${entry}+` : ''}${teleportById(m.id) ? ' · ✦ teleporte' : ''}</small></a>`;
       })
       .join('')}</div>`;
 }
@@ -140,6 +142,19 @@ export async function mapPage(id: string): Promise<string | null> {
       return `<li><a href="#/mapa/${p.target}">${esc(t?.name ?? p.target)}</a>${p.minLevel ? ` <small class="tag">nível ${p.minLevel}+</small>` : ''}</li>`;
     })
     .join('');
+  // teleporte do Mestre dos Caminhos: na vila, a lista de destinos; no destino, como chegar por ele
+  const tpFrom = m.npcs.includes('caminhos')
+    ? `<li><a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> (teleporte, ${TELEPORT_COST} ouro): ${TELEPORT_DESTS.map(
+        (d) => {
+          const t = maps.find((x) => x.id === d.map);
+          return `<a href="#/mapa/${d.map}">${esc(t?.name ?? d.map)}</a>${d.minLevel ? ` <small class="tag">nível ${d.minLevel}+</small>` : ''}`;
+        },
+      ).join(', ')}</li>`
+    : '';
+  const tpTo = teleportById(id);
+  const tpHere = tpTo
+    ? `<p>Também se chega aqui pelo <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a>, na praça da vila${tpTo.minLevel ? `, a partir do nível <b>${tpTo.minLevel}</b>` : ''}, por <b>${TELEPORT_COST} ouro</b>.</p>`
+    : '';
   const qs = QUESTS.filter((q) => q.objective.map === id || (q.objective.monster && count.has(q.objective.monster)));
   const qRow = (q: Quest) =>
     `<li><a href="#/missoes">${esc(q.name)}</a> <small class="muted">(nível ${q.minLevel})</small></li>`;
@@ -153,7 +168,7 @@ export async function mapPage(id: string): Promise<string | null> {
     ${mons.length ? `<section class="panel"><h2>Monstros</h2><ul class="mon-rows">${open.map(monRow).join('')}</ul>${secret.length ? spoiler(`<ul class="mon-rows">${secret.map(monRow).join('')}</ul>`, 'Chefe desta região') : ''}</section>` : ''}
     ${dungeon ? dungeonPanel(dungeon) : ''}
     ${trial ? trialPanel() : ''}
-    <section class="panel"><h2>Saídas</h2><ul>${exits}</ul></section>
+    <section class="panel"><h2>Saídas</h2><ul>${exits}${tpFrom}</ul>${tpHere}</section>
     ${qs.length ? `<section class="panel"><h2>Missões aqui</h2><ul>${qOpen.map(qRow).join('')}</ul>${qBoss.length ? spoiler(`<ul>${qBoss.map(qRow).join('')}</ul>`, 'Missão de chefe') : ''}</section>` : ''}`;
 }
 
