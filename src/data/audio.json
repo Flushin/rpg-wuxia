@@ -52,10 +52,6 @@
       "file": "ui_click",
       "volume": 0.6
     },
-    "action_click": {
-      "file": "action_click",
-      "volume": 0.6
-    },
     "fail": {
       "file": "fail",
       "volume": 0.6

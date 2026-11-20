@@ -2,8 +2,6 @@ Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia C
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
-- action_click -> UI Audio, "click1" (era o antigo "ui_click"; sem uso desde 20/11/2026, destino no item T8)
-  (identificado em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
 
 Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume igualado ao som antigo):
 - hit            -> "Machete vs. Spatula" (machete_vs_spatula_7) — CYBERDEViL — https://opengameart.org/content/machete-vs-spatula
@@ -11,7 +9,6 @@ Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume ig
 - miss           -> "Various Sound Effects" (snd_throw1) — Spring Spring — https://opengameart.org/content/various-sound-effects-0
 - spell          -> "Magic Spell SFX" (magical_6) — JaggedStone — https://opengameart.org/content/magic-spell-sfx
 - monster_death  -> "Slimy monster or murder sounds(9)" (_3) — pauliuw — https://opengameart.org/content/slimy-monster-or-murder-sounds9
-- monster_attack.ogg/.mp3 (arquivo antigo, sem uso desde 20/11/2026; destino no item T8) -> "Wolf Monster Sound" — CaveboyTup — https://opengameart.org/content/wolf-monster-sound
 - player_death   -> "Gong55.ogg" (primeiros 3 s, com fade) — stephan — https://commons.wikimedia.org/wiki/File:Gong55.ogg
 
 Música (CC0):
