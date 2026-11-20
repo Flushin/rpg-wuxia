@@ -818,8 +818,9 @@
     ]
   },
   "novidades": {
-    "proxima": [{"texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."}, {"texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."}],
+    "proxima": [],
     "versoes": [
+      {"itens": [{"texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."}, {"texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."}]},
       {"itens": [{"texto": "Cheaper repairs for shield users: a hit fully absorbed by a shield (Iron Skin, Mist Veil) no longer wears down your equipment."}]},
       {"itens": [{"texto": "Max level is now 30: from 21 to 30 each level gives 4 free points. Characters at level 20 earn XP again."}, {"texto": "Level 20 and 25 equipment and the Mist Jade forging material. The Merchant sells jade and the Trial gives the new items."}, {"texto": "New maps: Shadow Bamboo Grove (level 20+) and Misty Peak (level 25+), with 4 monsters, the boss Lord of the Mist and 5 quests."}]},
       {"itens": [{"texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."}]},
