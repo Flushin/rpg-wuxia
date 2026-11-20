@@ -457,7 +457,7 @@ console.log('\n== chefe: drop garantido ==');
     w.gold = 0;
     w.bag.fill(null);
     priv(w).killMonster(b);
-    const it = w.bag.find((x) => x && BASES[x.baseId]);
+    const it = w.bag.find((x) => x && BASES[x.baseId] && x.rarity !== 'epico'); // Épico: drop próprio (check:epic)
     if (!it) {
       allRare = false;
       continue;
@@ -496,7 +496,7 @@ console.log('\n== loot nível 5+ ==');
       gold += w.gold - g0;
       for (const b of w.bag) {
         if (b?.baseId === 'pocao_hp_g' || b?.baseId === 'pocao_mp_g') big++;
-        else if (b && BASES[b.baseId]?.reqLevel === 5) lvl5++;
+        else if (b && b.rarity !== 'epico' && BASES[b.baseId]?.reqLevel === 5) lvl5++; // Épico: drop próprio
       }
     }
     return { big, lvl5, gold: gold / n };
