@@ -36,6 +36,7 @@ import {
   STARTING_KIT,
   STARTING_WEAPON,
   makeEquipment,
+  type ItemOwner,
   makePotion,
   maxDurability,
 } from './items';
@@ -902,6 +903,10 @@ export class World {
   }
 
   /** Masmorra do mapa atual (null fora de uma). */
+  /** Quem usa os itens (o Épico acompanha nível e classe do personagem). */
+  owner(): ItemOwner {
+    return { level: this.player.level, classId: this.classId };
+  }
   get dungeonId(): string | null {
     return isDungeonMap(this.mapId) ? this.mapId : null;
   }

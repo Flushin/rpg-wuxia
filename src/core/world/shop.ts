@@ -56,7 +56,7 @@ export function repairTargets(w: World): ItemInstance[] {
 
 export function repair(w: World, it: ItemInstance): ActionError | null {
   if (w.npcRole() !== 'ferreiro') return { code: 'talkToBlacksmith' };
-  const cost = repairCost(it);
+  const cost = repairCost(it, w.owner());
   if (cost <= 0) return null;
   if (w.gold < cost) return { code: 'noGold' };
   w.gold -= cost;
@@ -68,7 +68,7 @@ export function repair(w: World, it: ItemInstance): ActionError | null {
 }
 
 export function repairAllCost(w: World): number {
-  return repairTargets(w).reduce((a, i) => a + repairCost(i), 0);
+  return repairTargets(w).reduce((a, i) => a + repairCost(i, w.owner()), 0);
 }
 
 export function repairAll(w: World): ActionError | null {

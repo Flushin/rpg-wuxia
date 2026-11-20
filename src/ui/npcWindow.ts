@@ -550,7 +550,7 @@ export class NpcWindow {
     const rows: string[] = [];
     const row = (it: ItemInstance, ref: string, where: string) => {
       const max = maxDurability(it),
-        cost = repairCost(it),
+        cost = repairCost(it, w.owner()),
         f = Math.max(0, it.durability / max);
       rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b> <small>${where}</small>
         <div class="dbar ${f <= 0 ? 'zero' : f <= 0.2 ? 'low' : ''}"><u style="width:${f * 100}%"></u></div><small>${Math.round(it.durability)}/${max}${cost ? ` · ${cost} ${L('ouro', 'gold')}` : ` · ${L('perfeito', 'perfect')}`}</small></div>

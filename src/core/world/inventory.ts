@@ -50,7 +50,7 @@ export function gearStats(w: World): Record<string, number> {
   for (const sl of SLOTS) {
     const it = w.equipment[sl];
     if (!it || isBroken(it)) continue;
-    for (const [k, v] of Object.entries(itemStats(it))) out[k] = (out[k] ?? 0) + v;
+    for (const [k, v] of Object.entries(itemStats(it, w.owner()))) out[k] = (out[k] ?? 0) + v;
   }
   return out;
 }

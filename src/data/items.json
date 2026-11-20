@@ -74,6 +74,12 @@
       "valueMul": 0
     }
   },
+  "epicBonuses": {
+    "lamina": ["strength", "elemAtk"],
+    "pavilhao": ["intelligence", "elemAtk"],
+    "tita": ["strength", "elemAtk"],
+    "vibora": ["strength", "elemAtk"]
+  },
   "epicNames": {
     "colar": "Colar do Lótus Violeta",
     "tronco": "Manto do Imperador Celeste",

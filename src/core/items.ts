@@ -1,6 +1,7 @@
 import itemsJson from '../data/items.json';
 import { L, localize } from './i18n';
 import { balanceItems } from './balance';
+import { CLASSES } from './data';
 import type { Rng } from './rng';
 import type { Bonus, ItemInstance, PotionKind, Rarity, Slot } from './types';
 
@@ -70,6 +71,7 @@ const J = localize('items', itemsJson) as unknown as {
   startingWeapon: Record<string, string>;
   rarities: Record<Rarity, RarityDef>;
   epicNames: Record<string, string>;
+  epicBonuses: Record<string, string[]>;
   bonusPool: BonusDef[];
   bases: Record<string, ItemBase>;
   potions: Record<string, PotionDef>;
@@ -223,13 +225,59 @@ export function makeEquipment(
   };
 }
 
-// atributos/stats nominais (base + bônus), ignorando durabilidade
-export function itemStats(it: ItemInstance): Record<string, number> {
+/** Quem usa o item: o Épico calcula stats e bônus pelo nível e pela classe dele. */
+export interface ItemOwner {
+  level: number;
+  classId: string;
+}
+/** Épico: quanto mais forte que um Raro do mesmo nível (base e bônus no máximo do Raro). */
+export const EPIC_MUL = 1.3;
+/** Peça da faixa do Épico: a base do mesmo slot (arma: da mesma seita) com o maior nível exigido até o nível do
+ *  personagem, a mesma que um Raro daquele nível teria. Muda a cada 5 níveis (nome do ícone e stats da base). */
+export function epicTierBase(it: ItemInstance, level: number): string {
+  const b = BASES[it.baseId];
+  if (!b) return it.baseId;
+  let best = '',
+    lowest = '';
+  for (const [id, x] of Object.entries(BASES)) {
+    if (x.slot !== b.slot || (x.sect ?? '') !== (b.sect ?? '')) continue;
+    if (!lowest || x.reqLevel < BASES[lowest].reqLevel) lowest = id;
+    if (x.reqLevel <= level && (!best || x.reqLevel > BASES[best].reqLevel)) best = id;
+  }
+  return best || lowest || it.baseId;
+}
+/** Bônus fixos do Épico para a classe de quem usa: 1,3 × o máximo que um Raro sortearia no mesmo nível. */
+export function epicBonuses(owner: ItemOwner): Bonus[] {
+  const el = CLASSES[owner.classId]?.element ?? null,
+    scale = 1 + 0.2 * (Math.max(1, owner.level) - 1);
+  return (J.epicBonuses[owner.classId] ?? []).flatMap((s) => {
+    const d = J.bonusPool.find((p) => p.stat === s);
+    if (!d) return [];
+    const stat = s === 'elemAtk' ? `elem_${el ?? 'fire'}` : s,
+      v = d.max * scale * EPIC_MUL;
+    return [{ stat, value: d.max >= 1 ? Math.max(1, Math.round(v)) : Math.round(v * 1000) / 1000 }];
+  });
+}
+const NO_OWNER: ItemOwner = { level: 1, classId: '' };
+
+/** Atributos/stats nominais (base com a melhoria + bônus), ignorando durabilidade. O Épico precisa de `owner`
+ *  (sem ele: nível 1, sem bônus); `withBonuses = false` devolve só a base (janela do item). */
+export function itemStats(it: ItemInstance, owner?: ItemOwner, withBonuses = true): Record<string, number> {
   const out: Record<string, number> = {};
   const b = BASES[it.baseId];
   if (!b) return out;
+  if (it.rarity === 'epico') {
+    const o = owner ?? NO_OWNER,
+      tb = BASES[epicTierBase(it, o.level)];
+    for (const [k, v] of Object.entries(tb.stats)) {
+      const x = upgraded(v, it.plus ?? 0) * EPIC_MUL;
+      out[k] = (out[k] ?? 0) + (Math.abs(v) >= 1 ? Math.round(x) : Math.round(x * 1000) / 1000);
+    }
+    if (withBonuses && owner) for (const bo of epicBonuses(owner)) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
+    return out;
+  }
   for (const [k, v] of Object.entries(b.stats)) out[k] = (out[k] ?? 0) + upgraded(v, it.plus ?? 0);
-  for (const bo of it.bonuses) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
+  if (withBonuses) for (const bo of it.bonuses) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
   return out;
 }
 
@@ -253,11 +301,13 @@ export function sellValue(it: ItemInstance): number {
   const b = BASES[it.baseId];
   return b ? Math.max(1, Math.floor(b.value * RARITIES[it.rarity].valueMul * J.sellRatio + 1e-9)) : 0;
 }
-export function repairCost(it: ItemInstance): number {
+/** Conserto; o Épico usa o nível de quem usa no lugar do nível do item (como um Raro dropado nesse nível). */
+export function repairCost(it: ItemInstance, owner?: ItemOwner): number {
   const b = BASES[it.baseId];
   if (!b) return 0;
-  const missing = Math.max(0, b.durability - it.durability);
-  return missing <= 0 ? 0 : Math.max(1, Math.ceil(missing * Math.max(1, it.ilvl) * J.repairCostPerPoint));
+  const missing = Math.max(0, b.durability - it.durability),
+    lv = it.rarity === 'epico' && owner ? owner.level : it.ilvl;
+  return missing <= 0 ? 0 : Math.max(1, Math.ceil(missing * Math.max(1, lv) * J.repairCostPerPoint));
 }
 
 export const equipmentBaseIds = (slot?: Slot) => Object.keys(BASES).filter((id) => !slot || BASES[id].slot === slot);

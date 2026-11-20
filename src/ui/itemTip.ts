@@ -25,15 +25,15 @@ import { hasIcon, iconHtml } from './icons';
 const GREEN = '#6fdc6f',
   RED = '#ff6b6b';
 
-const effStats = (it: ItemInstance | null) => (it && !isBroken(it) ? itemStats(it) : {});
+const effStats = (w: World, it: ItemInstance | null) => (it && !isBroken(it) ? itemStats(it, w.owner()) : {});
 
 export function compareHtml(w: World, it: ItemInstance): string {
   const b = baseOf(it);
   if (!b) return '';
   const cur = w.equipment[b.slot];
   if (cur === it) return '';
-  const a = effStats(it),
-    c = effStats(cur),
+  const a = effStats(w, it),
+    c = effStats(w, cur),
     keys = new Set([...Object.keys(a), ...Object.keys(c)]);
   const rows: string[] = [];
   for (const k of keys) {
@@ -68,7 +68,7 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     lvlBad = w.player.level < b.reqLevel,
     sectBad = !!b.sect && b.sect !== w.classId;
   // stats da base já com a melhoria (+N); os bônus aleatórios vêm à parte
-  const base = itemStats({ ...it, bonuses: [] });
+  const base = itemStats(it, w.owner(), false);
   const lines = Object.entries(base)
     .map(
       ([k, v]) =>
