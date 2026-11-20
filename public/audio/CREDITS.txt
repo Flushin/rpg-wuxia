@@ -22,8 +22,9 @@ Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume ig
 - player_death   -> "Gong55.ogg" (primeiros 3 s, com fade) — stephan — https://commons.wikimedia.org/wiki/File:Gong55.ogg
 
 Música (CC0):
-- cidade: "Oriental" — Shadowfire452 — https://opengameart.org/node/15485
-- floresta: "Asian/Oriental 1" — Tozan — https://opengameart.org/content/asianoriental1
+- cidade: "Hot Springs Town" — Kistol — https://opengameart.org/content/hot-springs-town
+- floresta (também no bambu): "Bamboo Blitz" (versão solo) — Tsorthan Grove — https://opengameart.org/content/bamboo-blitz
+  (trocadas em 20/11/2026; as duas com o mesmo volume, -20 LUFS)
 
 Ataque de cada monstro (20/11/2026; Freesound, prévia HQ; cortados, mono e com volume igualado; monster_attack = atk_bandido):
 - atk_lobo           -> Lobo: "Barking 2.wav" — Mrthenoronha — https://freesound.org/people/Mrthenoronha/sounds/420449/

@@ -76,13 +76,13 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
-    what: L('Música da cidade: "Oriental"', 'Town music: "Oriental"'),
-    who: 'Shadowfire452 (OpenGameArt.org)',
+    what: L('Música da cidade: "Hot Springs Town"', 'Town music: "Hot Springs Town"'),
+    who: 'Kistol (OpenGameArt.org)',
     license: CC0,
   },
   {
-    what: L('Música da floresta: "Asian/Oriental 1"', 'Forest music: "Asian/Oriental 1"'),
-    who: 'Tozan (OpenGameArt.org)',
+    what: L('Música da floresta: "Bamboo Blitz"', 'Forest music: "Bamboo Blitz"'),
+    who: 'Tsorthan Grove (OpenGameArt.org)',
     license: CC0,
   },
 ];
