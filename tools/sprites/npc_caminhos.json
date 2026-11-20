@@ -1,0 +1,105 @@
+{
+ "name": "npc_caminhos",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "mage_texture",
+  "cells": {
+   "0,1": [
+    238,
+    232,
+    214
+   ],
+   "1,1": [
+    238,
+    232,
+    214
+   ],
+   "7,1": [
+    140,
+    100,
+    35
+   ],
+   "2,1": [
+    215,
+    170,
+    60
+   ],
+   "1,2": [
+    215,
+    170,
+    60
+   ],
+   "2,2": [
+    215,
+    170,
+    60
+   ],
+   "0,3": [
+    232,
+    192,
+    82
+   ],
+   "2,3": [
+    215,
+    170,
+    60
+   ],
+   "5,3": [
+    215,
+    170,
+    60
+   ],
+   "1,3": [
+    110,
+    62,
+    40
+   ],
+   "4,3": [
+    255,
+    206,
+    90
+   ],
+   "6,2": [
+    255,
+    206,
+    90
+   ],
+   "1,0": [
+    55,
+    50,
+    45
+   ]
+  }
+ },
+ "frame": [
+  160,
+  128
+ ],
+ "anchor": [
+  80,
+  92
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "2H_Melee_Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

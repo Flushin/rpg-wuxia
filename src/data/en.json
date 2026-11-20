@@ -631,6 +631,14 @@
           "A return scroll takes you back to the village in the blink of an eye. Never leave without one."
         ]
       },
+      "caminhos": {
+        "name": "Wayfarer Master",
+        "lines": [
+          "Greetings, traveler. The roads of the world bend for those who know the right seals. For 200 gold, I will take you anywhere you are ready for.",
+          "I only open roads out of the village. To come back, use your own legs or a Return Scroll.",
+          "The further you advance in your cultivation, the more roads this circle will reveal."
+        ]
+      },
       "morador1": {
         "name": "Villager Mei",
         "lines": [

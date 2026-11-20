@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { tn } from '../core/i18n';
-import { tileToScreen } from '../core/iso';
+import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
@@ -196,7 +196,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         .setDepth(o.props.top ? DEPTH.GATE_TOP : Math.floor(o.x) + Math.floor(o.y) + 1);
       img.setName('tree'); // fica transparente se cobrir o jogador
       out.push(img);
-    }
+    } else if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
   }
   for (const o of map.objects) {
     if (o.type !== 'portal') continue;
@@ -250,6 +250,38 @@ function shore(scene: Phaser.Scene, map: GameMap, i: number, j: number): Phaser.
 }
 
 /** Portal: porta-lua de pedra com véu de luz, chão brilhando e faíscas subindo. Nome sempre por cima. */
+/** Círculo de teleporte do Mestre dos Caminhos: anéis dourados no chão (pulsam) e faíscas subindo. Não bloqueia. */
+function teleCircle(scene: Phaser.Scene, x: number, y: number, w: number, h: number): Phaser.GameObjects.GameObject[] {
+  const c = tileToScreen(x + w / 2, y + h / 2),
+    rx = (w * TILE_W) / 2,
+    ry = (h * TILE_H) / 2;
+  const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
+  g.fillStyle(0xffc94a, 0.18);
+  g.fillEllipse(c.x, c.y, rx * 1.7, ry * 1.7);
+  g.lineStyle(3, 0xffd36a, 0.85);
+  g.strokeEllipse(c.x, c.y, rx * 1.7, ry * 1.7);
+  g.lineStyle(2, 0xfff0b0, 0.7);
+  g.strokeEllipse(c.x, c.y, rx * 1.15, ry * 1.15);
+  g.lineStyle(1.5, 0xffd36a, 0.6);
+  g.strokeEllipse(c.x, c.y, rx * 0.55, ry * 0.55);
+  scene.tweens.add({ targets: g, alpha: 0.55, yoyo: true, repeat: -1, duration: 1300 });
+  const sparks = scene.add
+    .particles(c.x, c.y, 'fx-dot', {
+      x: { min: -rx * 0.75, max: rx * 0.75 },
+      y: { min: -ry * 0.6, max: ry * 0.6 },
+      lifespan: 1500,
+      speedY: { min: -34, max: -14 },
+      speedX: { min: -3, max: 3 },
+      scale: { start: 0.45, end: 0 },
+      alpha: { start: 0.9, end: 0 },
+      tint: [0xffe08a, 0xffc94a, 0xffffff],
+      frequency: 140,
+      blendMode: 'ADD',
+    })
+    .setDepth(Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1);
+  return [g, sparks];
+}
+
 function portal(
   scene: Phaser.Scene,
   x: number,

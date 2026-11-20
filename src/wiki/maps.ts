@@ -54,5 +54,12 @@ async function loadOne(id: string): Promise<WikiMap> {
 }
 
 let all: Promise<WikiMap[]> | null = null;
+const names: Record<string, string> = {};
 /** Todos os mapas do jogo, na ordem de src/core/mapsConfig.ts. */
-export const loadMaps = () => (all ??= Promise.all(MAP_IDS.map(loadOne)));
+export const loadMaps = () =>
+  (all ??= Promise.all(MAP_IDS.map(loadOne)).then((ms) => {
+    for (const m of ms) names[m.id] = m.name;
+    return ms;
+  }));
+/** Nome do mapa para páginas que não esperam os mapas (o id enquanto ainda não carregaram). */
+export const mapName = (id: string) => names[id] ?? id;

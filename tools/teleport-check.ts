@@ -83,6 +83,22 @@ console.log('\n== viagem ==');
 }
 ok(!teleportById('cidade') && [...TOWN_MAPS].every((t) => !teleportById(t)), 'vila não é destino');
 
+console.log('\n== vila ==');
+{
+  const npc = maps.cidade.objects.find((o) => o.type === 'npc' && o.props.npc === 'caminhos');
+  const circle = maps.cidade.objects.find((o) => o.type === 'teleCircle');
+  ok(!!npc, 'vila tem o Mestre dos Caminhos');
+  ok(
+    !!circle && !!npc && Math.hypot(npc.x - (circle.x + circle.w / 2), npc.y - (circle.y + circle.h / 2)) < 2.5,
+    'círculo de teleporte ao lado dele',
+  );
+  const w = fresh(1, 0);
+  ok(
+    w.npcs.some((n) => n.npcId === 'caminhos'),
+    'o NPC aparece no jogo',
+  );
+}
+
 if (fails) {
   console.error(`\n${fails} falha(s)`);
   process.exit(1);
