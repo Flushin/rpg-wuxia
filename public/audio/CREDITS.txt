@@ -2,14 +2,13 @@ Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia C
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
-- ui_click     -> UI Audio, "click1"
+- action_click -> UI Audio, "click1" (era o antigo "ui_click")
 - coin         -> UI Audio, "click3" (era o antigo "point_spent")
-- tip          -> UI Audio, "rollover3"
+- quest_ready  -> UI Audio, "rollover3" (era o antigo "tip")
   (os três foram identificados em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
 - bag_full     -> RPG Audio, "clothBelt" (era o antigo "miss")
 - portal       -> RPG Audio, "door4"
-- ui_open      -> RPG Audio, "bookOpen"
-- ui_close     -> RPG Audio, "bookClose"
+- quest_accept -> RPG Audio, "bookOpen" (era o antigo "ui_open")
 - repair, potion, skill_up
                -> Kenney (o autor está gravado nos próprios arquivos); o nome do arquivo original não foi registrado
                (repair = antigo "hit"; potion = antigo "spell"; skill_up = antigo "level_up")
@@ -50,3 +49,9 @@ Progressão (20/11/2026; Freesound, prévia HQ; mono, volume igualado ao som ant
 - level_up       -> mistura de "War Game Battle Level Up" (sem o 1º segundo) — qubodup — https://freesound.org/people/qubodup/sounds/161654/
                     com "Short Choir" — Breviceps — https://freesound.org/people/Breviceps/sounds/444491/
 - point_spent    -> "Woodblock-soft.wav" — hollandm — https://freesound.org/people/hollandm/sounds/692828/
+
+Interface (20/11/2026; Freesound, prévia HQ; mono, volume igualado ao som antigo):
+- ui_click       -> "Button Tick" — NenadSimic — https://freesound.org/people/NenadSimic/sounds/268108/
+- ui_open        -> "Page Turn 01" — LilMati — https://freesound.org/people/LilMati/sounds/397548/
+- ui_close       -> "bkClose.wav" — tia666 — https://freesound.org/people/tia666/sounds/156927/
+- tip            -> "Little bell" (cortado para 0,7 s) — marcusgar — https://freesound.org/people/marcusgar/sounds/360948/

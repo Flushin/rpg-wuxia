@@ -61,6 +61,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons da interface', 'Interface sounds'),
+    who: 'NenadSimic, LilMati, tia666, marcusgar (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons de subir de nível e de gastar pontos', 'Level-up and point sounds'),
     who: 'qubodup, Breviceps, hollandm (Freesound.org)',
     license: CC0,

@@ -88,7 +88,7 @@ export class NpcWindow {
       return;
     }
     if (a === 'qaccept') {
-      audio.ui('ui_open');
+      audio.ui('quest_accept');
       w.questAccept();
       return;
     }
@@ -165,7 +165,7 @@ export class NpcWindow {
         this.salvageAsk = false;
         err = w.forgeSalvage(+this.forgeSel.split(':')[1]);
         if (!err) {
-          audio.ui('ui_click');
+          audio.ui('action_click');
           this.toast(L('Item desmontado: materiais na mochila', 'Item salvaged: materials in your bag'), '#c9b8a0');
           this.forgeSel = '';
         }
@@ -173,7 +173,7 @@ export class NpcWindow {
         err = v === 'upgrade' ? w.forgeUpgrade(it) : v === 'rarity' ? w.forgeRarity(it) : w.forgeReroll(it);
         if (!err && v === 'upgrade') {
           const ok = (it.plus ?? 0) > before;
-          audio.ui(ok ? 'skill_up' : 'ui_click');
+          audio.ui(ok ? 'skill_up' : 'action_click');
           this.toast(
             ok
               ? L(`Sucesso! ${itemName(it)}`, `Success! ${itemName(it)}`)
@@ -187,10 +187,10 @@ export class NpcWindow {
       }
     } else if (a === 'moffer') {
       err = w.merchantBuy(+v);
-      if (!err) audio.ui('ui_click');
+      if (!err) audio.ui('action_click');
     } else if (a === 'mgoods') {
       err = w.merchantBuyGoods(v, this.qty);
-      if (!err) audio.ui('ui_click');
+      if (!err) audio.ui('action_click');
     } else if (a === 'buy') err = w.buy(v, this.qty);
     else if (a === 'sell' || a === 'sellall') {
       const i = +v,

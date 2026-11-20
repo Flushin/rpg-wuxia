@@ -44,8 +44,16 @@
       "file": "ui_click",
       "volume": 0.6
     },
+    "action_click": {
+      "file": "action_click",
+      "volume": 0.6
+    },
     "ui_open": {
       "file": "ui_open",
+      "volume": 0.7
+    },
+    "quest_accept": {
+      "file": "quest_accept",
       "volume": 0.7
     },
     "ui_close": {
@@ -54,6 +62,10 @@
     },
     "tip": {
       "file": "tip",
+      "volume": 0.6
+    },
+    "quest_ready": {
+      "file": "quest_ready",
       "volume": 0.6
     },
     "portal": {
@@ -65,11 +77,11 @@
       "volume": 0.6
     },
     "pickup": {
-      "file": "ui_click",
+      "file": "action_click",
       "volume": 0.5
     },
     "equip": {
-      "file": "ui_click",
+      "file": "action_click",
       "volume": 0.6
     },
     "potion": {
