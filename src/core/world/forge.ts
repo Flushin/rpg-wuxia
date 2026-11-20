@@ -3,7 +3,17 @@
 // Regras em docs/decisoes/roadmap-titas-pos-nivel-10.md ("Craft (marco 9)"). Os números ficam em FORGE, abaixo.
 import { CLASSES } from '../data';
 import { bal } from '../balance';
-import { BASES, MATERIALS, MAX_PLUS, RARITIES, RARITY_ORDER, makeStack, rollBonuses } from '../items';
+import {
+  BASES,
+  MATERIALS,
+  MAX_PLUS,
+  RARITIES,
+  RARITY_ORDER,
+  epicTierBase,
+  makeStack,
+  rollBonuses,
+  type ItemOwner,
+} from '../items';
 import type { ActionError, ItemInstance, Rarity } from '../types';
 import type { World } from '../world';
 
@@ -23,6 +33,8 @@ export const FORGE = {
   upgradeGold: { base: 30, perPlus: 30 },
   rarityGold: { incomum: 200, raro: 600 } as Record<Rarity, number>,
   rerollGold: { incomum: 100, raro: 200 } as Record<Rarity, number>,
+  /** Épico: melhorar custa o ouro do Raro da faixa × isto (materiais e chance iguais). */
+  epicGoldMul: 2,
 };
 const ORE = 'minerio_ferro',
   CRYSTAL = 'cristal_gelo',
@@ -32,26 +44,31 @@ const ORE = 'minerio_ferro',
 export const JADE_FROM_LEVEL = 20;
 /** Material raro da forja do item: Cristal de Gelo (nv 1–15) ou Jade da Névoa (nv 20+). */
 export const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? JADE : CRYSTAL);
-const rare = (it: ItemInstance) => rareMat(BASES[it.baseId]?.reqLevel ?? 1);
+/** Nível da base para a forja; o Épico usa a peça da faixa do nível de quem usa (sem dono: a própria base). */
+const forgeLevel = (it: ItemInstance, owner?: ItemOwner) =>
+  BASES[it.rarity === 'epico' && owner ? epicTierBase(it, owner.level) : it.baseId]?.reqLevel ?? 1;
+const rare = (it: ItemInstance, owner?: ItemOwner) => rareMat(forgeLevel(it, owner));
 
 /** Itens de nível mais alto custam mais ouro na forja: ×1 no nível 1, ×2 no 5, ×3 no 10, ×4 no 15, ×5 no 20, ×6 no 25. */
-const levelFactor = (it: ItemInstance) => 1 + (BASES[it.baseId]?.reqLevel ?? 1) / 5;
-const gold = (n: number, it: ItemInstance) => Math.round(n * levelFactor(it) * bal('forja.ouro'));
+const levelFactor = (it: ItemInstance, owner?: ItemOwner) => 1 + forgeLevel(it, owner) / 5;
+const gold = (n: number, it: ItemInstance, owner?: ItemOwner) =>
+  Math.round(n * levelFactor(it, owner) * bal('forja.ouro') * (it.rarity === 'epico' ? FORGE.epicGoldMul : 1));
 const clean = (m: Mats): Mats => Object.fromEntries(Object.entries(m).filter(([, n]) => n > 0));
 
-export function upgradeCost(it: ItemInstance): ForgeCost | null {
+/** Melhorar +n → +n+1 (máximo +10). Épico: custo da faixa do nível de `owner`, ouro × FORGE.epicGoldMul. */
+export function upgradeCost(it: ItemInstance, owner?: ItemOwner): ForgeCost | null {
   const n = it.plus ?? 0;
   if (!BASES[it.baseId] || n >= MAX_PLUS) return null;
   return {
-    mats: clean({ [ORE]: 2 + 2 * n, [rare(it)]: n >= 4 ? n - 3 : 0, [ESSENCE]: n >= 7 ? 1 : 0 }),
-    gold: gold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * n, it),
+    mats: clean({ [ORE]: 2 + 2 * n, [rare(it, owner)]: n >= 4 ? n - 3 : 0, [ESSENCE]: n >= 7 ? 1 : 0 }),
+    gold: gold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * n, it, owner),
     chance: Math.min(1, FORGE.upgradeChance[n] * bal('forja.chance')),
   };
 }
 
 /** Comum → Incomum → Raro (ganha um bônus aleatório novo; os que já tem ficam). */
 export function rarityCost(it: ItemInstance): ForgeCost | null {
-  if (!BASES[it.baseId] || it.rarity === 'raro') return null;
+  if (!BASES[it.baseId] || it.rarity === 'raro' || it.rarity === 'epico') return null;
   return it.rarity === 'comum'
     ? { mats: { [ORE]: 12, [rare(it)]: 1 }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
     : { mats: { [ORE]: 20, [rare(it)]: 4, [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
@@ -59,7 +76,7 @@ export function rarityCost(it: ItemInstance): ForgeCost | null {
 
 /** Sorteia de novo todos os bônus de um item Incomum ou Raro (a quantidade continua a mesma). */
 export function rerollCost(it: ItemInstance): ForgeCost | null {
-  if (!BASES[it.baseId] || it.rarity === 'comum') return null;
+  if (!BASES[it.baseId] || it.rarity === 'comum' || it.rarity === 'epico') return null; // Épico: bônus fixos da classe
   return it.rarity === 'incomum'
     ? { mats: { [ORE]: 6, [rare(it)]: 1 }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
     : { mats: { [ORE]: 10, [rare(it)]: 2 }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
@@ -117,7 +134,7 @@ function done(w: World, it: ItemInstance, kind: ForgeKind, success: boolean) {
 
 /** Melhorar (+1). Cobra materiais e ouro antes de sortear; falhou: o item fica como estava (não quebra nem volta). */
 export function upgrade(w: World, it: ItemInstance, force = false): ActionError | null {
-  const cost = upgradeCost(it),
+  const cost = upgradeCost(it, w.owner()),
     err = check(w, it, cost, force);
   if (err || !cost) return err;
   takeMats(w, cost.mats);
@@ -167,6 +184,7 @@ export function salvage(w: World, bagIndex: number, force = false): ActionError 
   const it = w.bag[bagIndex];
   if (!force && w.npcRole() !== 'ferreiro') return { code: 'talkToBlacksmith' };
   if (!it || !BASES[it.baseId]) return { code: 'cannotForge' };
+  if (it.rarity === 'epico') return { code: 'epicLocked' };
   const got = salvageYield(it);
   w.bag[bagIndex] = null;
   const lost: Mats = {};

@@ -36,6 +36,7 @@ import {
   STARTING_KIT,
   STARTING_WEAPON,
   makeEquipment,
+  type ItemOwner,
   makePotion,
   maxDurability,
 } from './items';
@@ -199,6 +200,8 @@ export class World {
   lastDamaged = -99;
   rng = new Rng((Date.now() & 0xffffffff) >>> 0);
   npcRng = new Rng(7); // só para os moradores andarem (não mexe no sorteio do combate)
+  /** Só para o drop do Épico: separado de `rng` para não mudar a sequência dos outros sorteios (drops e combate). */
+  epicRng = new Rng((Date.now() ^ 0x5bd1e995) >>> 0);
 
   // ---- privados do World
   private arenaSeen = false;
@@ -902,6 +905,10 @@ export class World {
   }
 
   /** Masmorra do mapa atual (null fora de uma). */
+  /** Quem usa os itens (o Épico acompanha nível e classe do personagem). */
+  owner(): ItemOwner {
+    return { level: this.player.level, classId: this.classId };
+  }
   get dungeonId(): string | null {
     return isDungeonMap(this.mapId) ? this.mapId : null;
   }

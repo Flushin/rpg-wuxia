@@ -6,7 +6,12 @@ import { computeDerived, emptyAttrs } from '../core/stats';
 import {
   BASES,
   CLASSES,
+  BONUS_POOL,
   CONSUMABLES,
+  ELEMENT_NAMES,
+  EPIC,
+  EPIC_BONUSES,
+  EPIC_NAMES,
   EQUIP_TIERS,
   GROUND_SECONDS,
   MERCHANT,
@@ -17,6 +22,7 @@ import {
   RARITIES,
   REPAIR_COST_PER_POINT,
   SELL_RATIO,
+  SLOT_NAMES,
   STAT_LABELS,
   UPGRADE_STEP,
   WEAR_PER_HIT,
@@ -65,7 +71,20 @@ export const FORGE = {
   upgradeGold: { base: 30, perPlus: 30 },
   rarityGold: { incomum: 200, raro: 600 } as Record<string, number>,
   rerollGold: { incomum: 100, raro: 200 } as Record<string, number>,
+  epicGoldMul: 2,
 };
+/** Bônus do Épico para a classe no nível (1,3 × máximo do Raro). */
+export function epicBonusesAt(classId: string, level: number) {
+  const scale = 1 + 0.2 * (Math.max(1, level) - 1);
+  return (EPIC_BONUSES[classId] ?? []).map((s) => {
+    const d = BONUS_POOL.find((p) => p.stat === s)!,
+      v = d.max * scale * EPIC.mul;
+    return {
+      stat: s === 'elemAtk' ? `elem_${CLASSES[classId].element}` : s,
+      value: d.max >= 1 ? Math.max(1, Math.round(v)) : Math.round(v * 1000) / 1000,
+    };
+  });
+}
 const levelFactor = (reqLevel: number) => 1 + reqLevel / 5;
 const fGold = (v: number, reqLevel: number) => Math.round(v * levelFactor(reqLevel) * bal('forja.ouro'));
 type Mats = Record<string, number>;
@@ -124,7 +143,10 @@ const TOPICS = [
   { id: 'forja', label: 'Forja e economia', icon: 'minerio_ferro' },
   { id: 'auto', label: 'Auto-combate e ganho offline', icon: 'pergaminho_retorno' },
   { id: 'trial', label: 'Trial (desafio de chefes)', icon: 'essencia_qi' },
+  { id: 'epico', label: 'Equipamento Épico', icon: 'epico_colar' },
 ];
+
+export { EPIC };
 
 export function mechanicsPage(topic?: string): string {
   const t = TOPICS.find((x) => x.id === topic);
@@ -132,8 +154,50 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
+}
+
+function epico(): string {
+  const col = RARITIES.epico.color,
+    lvs = [1, 10, 20, 30],
+    SECT = ['lamina', 'pavilhao', 'tita', 'vibora'];
+  const names = [
+    ...['colar', 'tronco', 'cabeca', 'calca', 'bota'].map((s) => [SLOT_NAMES[s], EPIC_NAMES[s], s]),
+    ...SECT.map((c) => [`Arma (${esc(CLASSES[c].name)})`, EPIC_NAMES[`arma_${c}`], `arma_${c}`]),
+  ]
+    .map(
+      ([a, b, k]) =>
+        `<tr><td>${a}</td><td>${iconHtml(`epico_${k}`, 'sm')} <b style="color:${col}">${esc(b)}</b></td></tr>`,
+    )
+    .join('');
+  const bon = SECT.map((c) => {
+    const st = epicBonusesAt(c, 1).map((b) => esc(STAT_LABELS[b.stat] ?? b.stat));
+    return `<tr><td>${esc(CLASSES[c].name)}</td><td>${st.join(' + ')}</td>${lvs
+      .map(
+        (lv) =>
+          `<td>${epicBonusesAt(c, lv)
+            .map((b) => `+${b.value}`)
+            .join(' / ')}</td>`,
+      )
+      .join('')}</tr>`;
+  }).join('');
+  return `<section class="panel"><h2>O que é</h2>
+      <p>A raridade <b style="color:${col}">${esc(RARITIES.epico.name)}</b> (roxa) fica acima do Raro. O item <b>não tem nível</b>: acompanha o
+      nível do personagem para sempre, então nunca fica velho. Ele usa a peça da sua faixa (a mesma que um Raro do seu nível teria; muda nos
+      níveis ${EQUIP_TIERS.filter((t) => t > 1).join(', ')}), com os atributos <b>×${n1(EPIC.mul)}</b>, e tem 2 bônus fixos feitos para a sua classe,
+      cada um ${n1(EPIC.mul)} × o máximo que um Raro do seu nível sortearia. Equipa em qualquer nível (a arma só na própria seita).</p></section>
+    <section class="panel"><h2>Como cai</h2><ul>
+      <li>Qualquer monstro: <b>${pc(EPIC.chanceMob)}</b> por abate. Chefes (mapa, masmorra e <a href="#/mecanicas/trial">Trial</a>): <b>${pc(EPIC.chanceBoss)}</b>.</li>
+      <li>Só jogando: com o <a href="#/mecanicas/auto">Auto</a> ligado e no ganho offline não cai. Ajudantes invocados por chefes também não dão.</li>
+      <li>O monstro precisa ter nível igual ou maior que o seu menos ${EPIC.maxLevelsBelow}.</li>
+      <li>A peça é sorteada entre todas as que você usa (armas só da sua seita). Sem garantia: é raro de propósito.</li>
+      <li>Mochila cheia: ele fica no chão por ${EPIC.groundSeconds / 60} minutos (os outros itens, ${GROUND_SECONDS} s). Sair do mapa limpa o chão.</li></ul></section>
+    <section class="panel"><h2>Nomes</h2><table class="tbl"><tbody>${names}</tbody></table></section>
+    <section class="panel"><h2>Bônus por classe</h2><div class="scroll"><table class="tbl"><thead><tr><th>Seita</th><th>Bônus</th>${lvs.map((lv) => `<th>Nível ${lv}</th>`).join('')}</tr></thead><tbody>${bon}</tbody></table></div>
+      <p class="muted">Elemento de cada seita: ${SECT.map((c) => `${esc(CLASSES[c].name)} ${ELEMENT_NAMES[CLASSES[c].element]}`).join(', ')}. Os bônus seguem a classe de quem está usando o item.</p></section>
+    <section class="panel"><h2>Forja</h2><p>Cai +0 e melhora até +10 no ferreiro, com os materiais e as chances do Raro da sua faixa e <b>${FORGE.epicGoldMul}× o ouro</b>.
+      Não sobe de raridade, não troca bônus, <b>não pode ser vendido nem desmontado</b>. Conserto pelo seu nível. Ver <a href="#/mecanicas/forja">Forja</a>.</p></section>`;
 }
 
 function combate(): string {
@@ -242,6 +306,7 @@ function forja(): string {
     )
     .join('');
   const rarRows = Object.values(RARITIES)
+    .filter((r) => r.valueMul > 0) // Épico não se vende
     .map(
       (r) =>
         `<tr><td style="color:${r.color}">${esc(r.name)}</td><td>×${n1(r.valueMul)}</td><td>${pc(SELL_RATIO * r.valueMul)}</td><td>${r.valueMul > 1 ? `${pc(MERCHANT.priceMul * r.valueMul)}` : '—'}</td></tr>`,
@@ -250,7 +315,8 @@ function forja(): string {
   return `<section class="panel"><h2>Melhorar (+1 a +10)</h2>
       <p>Cada + soma <b>${pc(UPGRADE_STEP)}</b> aos atributos base do item (não aos bônus aleatórios). Materiais e ouro são cobrados antes;
       se <b>falhar</b>, o item fica como estava (não quebra nem perde +). Os materiais da tabela são os de itens até o nível 15; em itens de
-      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade), aqui e em subir raridade, trocar bônus e desmontar.</p>
+      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade), aqui e em subir raridade, trocar bônus e desmontar.
+      O <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épico</a> usa a faixa do seu nível e custa <b>${FORGE.epicGoldMul}× o ouro</b>; não sobe raridade, não troca bônus nem é desmontado.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Melhoria</th><th>Chance</th><th>Materiais</th>${goldHead}</tr></thead><tbody>${up}</tbody></table></div></section>
     <section class="panel"><h2>Subir raridade e trocar bônus</h2>
       <p><b>Subir raridade</b> (Comum → Incomum → Raro) dá um bônus aleatório novo e mantém os que o item já tem. <b>Trocar bônus</b> sorteia de novo

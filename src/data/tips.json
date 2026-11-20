@@ -40,9 +40,9 @@
   },
   "primeiro_item": {
     "title": "Você achou um equipamento!",
-    "text": "Abra a mochila com a tecla I (ou botão Mochila). A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Clique duas vezes em um item para equipá-lo; passe o mouse para ver os detalhes e comparar com o que você usa.",
-    "textTouch": "Abra a mochila em ☰ › Mochila. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar.",
-    "textTouchClassic": "Abra a mochila no botão Mochila, no topo da tela. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus) e azul (raro, 2 bônus). Toque em um item para ver os detalhes e use o botão Equipar."
+    "text": "Abra a mochila com a tecla I (ou botão Mochila). A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus), azul (raro, 2 bônus) e roxo (épico: acompanha seu nível, com bônus da sua classe). Clique duas vezes em um item para equipá-lo; passe o mouse para ver os detalhes e comparar com o que você usa.",
+    "textTouch": "Abra a mochila em ☰ › Mochila. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus), azul (raro, 2 bônus) e roxo (épico: acompanha seu nível, com bônus da sua classe). Toque em um item para ver os detalhes e use o botão Equipar.",
+    "textTouchClassic": "Abra a mochila no botão Mochila, no topo da tela. A cor do nome mostra a raridade: branco (comum), verde (incomum, 1 bônus), azul (raro, 2 bônus) e roxo (épico: acompanha seu nível, com bônus da sua classe). Toque em um item para ver os detalhes e use o botão Equipar."
   },
   "primeira_pocao": {
     "title": "Poções",

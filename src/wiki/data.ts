@@ -131,6 +131,8 @@ const I = itemsJson as unknown as {
   groundSeconds: number;
   rarities: Record<string, { name: string; color: string; weight: number; bonuses: number; valueMul: number }>;
   bonusPool: { stat: string; min: number; max: number }[];
+  epicNames: Record<string, string>;
+  epicBonuses: Record<string, string[]>;
   bases: Record<string, Base>;
   potions: Record<string, Potion>;
   materials: Record<string, Material>;
@@ -159,6 +161,10 @@ export const SLOT_NAMES = I.slotNames;
 export const STARTING_WEAPON = I.startingWeapon;
 export const RARITIES = I.rarities;
 export const BONUS_POOL = I.bonusPool;
+export const EPIC_NAMES = I.epicNames;
+export const EPIC_BONUSES = I.epicBonuses;
+/** Épico: cópia das regras de src/core/items.ts (EPIC_*) e src/core/world/inventory.ts (rollEpic). */
+export const EPIC = { mul: 1.3, chanceMob: 0.005, chanceBoss: 0.01, maxLevelsBelow: 10, groundSeconds: 600 };
 export const SELL_RATIO = I.sellRatio;
 export const REPAIR_COST_PER_POINT = I.repairCostPerPoint;
 export const WEAR_PER_HIT = I.wearPerHit;

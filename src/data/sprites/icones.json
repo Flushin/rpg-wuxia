@@ -1,7 +1,7 @@
 {
  "size": 128,
  "cols": 8,
- "rows": 11,
+ "rows": 12,
  "index": {
   "colar_jade": 0,
   "colar_dragao": 1,
@@ -85,6 +85,15 @@
   "skill_chuva_agulhas": 79,
   "skill_nevoa_toxica": 80,
   "skill_seiva_jade": 81,
-  "skill_sangue_serpente": 82
+  "skill_sangue_serpente": 82,
+  "epico_colar": 83,
+  "epico_tronco": 84,
+  "epico_cabeca": 85,
+  "epico_calca": 86,
+  "epico_bota": 87,
+  "epico_arma_lamina": 88,
+  "epico_arma_pavilhao": 89,
+  "epico_arma_tita": 90,
+  "epico_arma_vibora": 91
  }
 }

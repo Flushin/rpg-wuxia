@@ -7,6 +7,7 @@ import { tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { MONSTERS } from '../core/data';
+import { RARITIES } from '../core/items';
 import { TRIAL_TIERS } from '../core/trial';
 import { skillById } from '../core/skills';
 import type { Hud } from '../ui/hud';
@@ -157,7 +158,10 @@ export class EventFeedback {
   private rewards(ev: GameEvent): boolean {
     switch (ev.type) {
       case 'drop':
-        this.dropGlow(ev.x, ev.y, ev.color);
+        this.dropGlow(ev.x, ev.y, ev.color, ev.epic);
+        return true;
+      case 'epicDrop':
+        this.hud.toast(L(`Item Épico! ${ev.name}`, `Epic item! ${ev.name}`), RARITIES.epico.color, 'epic');
         return true;
       case 'itemPickup':
         this.hud.rewards.item(ev.name, ev.color, ev.qty, ev.rarity, ev.potion);
@@ -384,20 +388,26 @@ export class EventFeedback {
   }
 
   // drop coletado: brilho que voa até o jogador
-  private dropGlow(x: number, y: number, color: string) {
+  /** Épico: bolinha maior, com aura, e sobe mais devagar. */
+  private dropGlow(x: number, y: number, color: string, epic = false) {
     const col = Phaser.Display.Color.HexStringToColor(color).color;
     const a = tileToScreen(x, y),
       b = tileToScreen(this.world.player.x, this.world.player.y);
-    const g = this.scene.add.graphics().setDepth(DEPTH.DROP_FX);
+    const g = this.scene.add.graphics().setDepth(DEPTH.DROP_FX),
+      r = epic ? 9 : 5;
+    if (epic) {
+      g.fillStyle(col, 0.35);
+      g.fillCircle(0, 0, r * 2);
+    }
     g.fillStyle(col, 1);
-    g.fillCircle(0, 0, 5);
+    g.fillCircle(0, 0, r);
     g.lineStyle(1, 0xffffff, 1);
-    g.strokeCircle(0, 0, 5);
+    g.strokeCircle(0, 0, r);
     g.setPosition(a.x, a.y - 10);
     this.scene.tweens.add({
       targets: g,
-      y: a.y - 34,
-      duration: 250,
+      y: a.y - (epic ? 46 : 34),
+      duration: epic ? 900 : 250,
       ease: 'Cubic.easeOut',
       onComplete: () => {
         this.scene.tweens.add({

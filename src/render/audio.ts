@@ -209,6 +209,9 @@ class AudioManager {
       case 'itemPickup':
         this.sfx('pickup', 200);
         break;
+      case 'epicDrop':
+        this.sfx('boss_defeated');
+        break;
       case 'goldPickup':
         this.sfx('coin', 200);
         break;

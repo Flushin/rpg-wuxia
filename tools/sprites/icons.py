@@ -911,12 +911,216 @@ SKILLS = {
 }
 
 
+# ---------- Épicos (raridade epico): 1 ícone fixo por nome épico, formas próprias em roxo e ouro com aura ----------
+EP_VIOLET = (190, 120, 255)
+EP_PURPLE = (140, 64, 214)
+EP_DEEP = (64, 22, 112)
+EP_GOLD = (246, 204, 92)
+EP_GOLD_D = (176, 120, 30)
+EP_AURA = (180, 92, 255)
+
+
+def ep_aura(im, strength=1.1):
+    """Aura roxa em volta de tudo o que já foi desenhado no ícone."""
+    a = im.getchannel('A')
+    out = glow(im, a, EP_AURA, 26, strength)
+    im.paste(out, (0, 0))
+
+
+def ep_petal(cx, cy, ang, length, width):
+    pts = [(cx, cy), (cx + width, cy - length * 0.5), (cx, cy - length), (cx - width, cy - length * 0.5)]
+    return rot_pts(pts, ang, cx, cy)
+
+
+def i_epico_colar(im):
+    """Colar do Lótus Violeta: corrente dourada e pingente de lótus aberto (8 pétalas) com gema de ouro."""
+    fill(im, mask_line([(118, 70), (172, 210), (256, 246), (340, 210), (394, 70)], 12), EP_GOLD, EP_GOLD_D, outline=6)
+    cx, cy = 256, 352
+    for k in range(8):  # pétalas de trás
+        fill(im, mask_poly(ep_petal(cx, cy, math.radians(k * 45 + 22.5), 128, 40)), EP_PURPLE, EP_DEEP, outline=7)
+    for k in range(8):  # pétalas da frente
+        fill(im, mask_poly(ep_petal(cx, cy, math.radians(k * 45), 104, 34)), lighten(EP_VIOLET, 0.25), EP_PURPLE, outline=7)
+    fill(im, mask_ellipse((cx - 34, cy - 34, cx + 34, cy + 34)), lighten(EP_GOLD, 0.4), EP_GOLD_D, outline=6)
+    ep_aura(im)
+
+
+def i_epico_tronco(im):
+    """Manto do Imperador Celeste: manto longo e largo, gola alta, ombreiras e faixa dourada com nuvem."""
+    cx = S / 2
+    body = [(cx - 62, 92), (cx - 150, 126), (cx - 222, 214), (cx - 186, 258), (cx - 138, 222), (cx - 168, 480),
+            (cx + 168, 480), (cx + 138, 222), (cx + 186, 258), (cx + 222, 214), (cx + 150, 126), (cx + 62, 92)]
+    fill(im, mask_poly(body), EP_PURPLE, EP_DEEP)
+    fill(im, mask_poly([(cx - 22, 120), (cx + 22, 120), (cx + 30, 480), (cx - 30, 480)]), EP_GOLD, EP_GOLD_D, outline=5)
+    fill(im, mask_poly([(cx - 168, 448), (cx + 168, 448), (cx + 170, 482), (cx - 170, 482)]), EP_GOLD, EP_GOLD_D, outline=5)
+    for sx in (-1, 1):  # ombreiras
+        fill(im, mask_poly([(cx + sx * 64, 100), (cx + sx * 154, 122), (cx + sx * 206, 196), (cx + sx * 150, 196), (cx + sx * 96, 150)]),
+             EP_GOLD, EP_GOLD_D, outline=6)
+    fill(im, mask_poly([(cx - 66, 56), (cx + 66, 56), (cx + 74, 118), (cx - 74, 118)]), lighten(EP_GOLD, 0.2), EP_GOLD_D, outline=6)
+    for x, y, r in ((cx - 92, 286, 24), (cx - 66, 272, 30), (cx - 40, 288, 22), (cx + 66, 340, 26), (cx + 90, 352, 20)):
+        fill(im, mask_ellipse((x - r, y - r * 0.8, x + r, y + r * 0.8)), lighten(EP_GOLD, 0.3), EP_GOLD, outline=4, shade=False)
+    ep_aura(im)
+
+
+def i_epico_cabeca(im):
+    """Coroa das Mil Névoas: três picos ondulados de névoa violeta, aro de ouro, gema e fitas."""
+    for sx in (-1, 1):
+        fill(im, mask_line([(256 + sx * 118, 362), (256 + sx * 150, 420), (256 + sx * 130, 486)], 22), EP_VIOLET, EP_PURPLE, outline=6)
+
+    def peak(cx, top, half):
+        return [(cx - half, 340), (cx - half * 0.55, 286), (cx - half * 0.95, 232), (cx - half * 0.35, 180), (cx, top),
+                (cx + half * 0.5, 196), (cx + half * 0.15, 248), (cx + half * 0.85, 290), (cx + half, 340)]
+    for cx, top, half in ((166, 150, 64), (346, 150, 64), (256, 62, 82)):
+        fill(im, mask_poly(peak(cx, top, half)), lighten(EP_VIOLET, 0.35), EP_PURPLE, outline=8)
+    fill(im, mask_poly([(122, 330), (390, 330), (378, 398), (134, 398)]), EP_GOLD, EP_GOLD_D, outline=8)
+    fill(im, mask_poly([(256, 334), (286, 364), (256, 394), (226, 364)]), lighten(EP_VIOLET, 0.5), EP_DEEP, outline=5)
+    for x in (172, 340):
+        fill(im, mask_ellipse((x - 13, 351, x + 13, 377)), lighten(EP_VIOLET, 0.4), EP_PURPLE, outline=4)
+    ep_aura(im)
+
+
+def i_epico_calca(im):
+    """Calça do Dragão Adormecido: calça larga (abre embaixo), escamas de ouro e medalhão de dragão no cinto."""
+    cx = S / 2
+    legs = [(cx - 112, 104), (cx + 112, 104), (cx + 182, 450), (cx + 32, 460), (cx, 232), (cx - 32, 460), (cx - 182, 450)]
+    m = mask_poly(legs)
+    fill(im, m, EP_PURPLE, EP_DEEP)
+    sc = new(); d = ImageDraw.Draw(sc)
+    for row, y in enumerate(range(250, 440, 34)):
+        for x in range(60, 460, 40):
+            ox = 20 if row % 2 else 0
+            d.arc((x + ox - 18, y - 14, x + ox + 18, y + 18), 200, 340, fill=EP_GOLD + (255,), width=6)
+    sc.putalpha(ImageChops.multiply(sc.getchannel('A'), m))
+    im.alpha_composite(sc)
+    fill(im, mask_poly([(cx - 116, 96), (cx + 116, 96), (cx + 118, 146), (cx - 118, 146)]), EP_GOLD, EP_GOLD_D, outline=6)
+    fill(im, mask_ellipse((cx - 48, 72, cx + 48, 168)), lighten(EP_GOLD, 0.3), EP_GOLD_D, outline=6)
+    fill(im, mask_ellipse((cx - 30, 90, cx + 30, 150)), EP_PURPLE, EP_DEEP, outline=4)
+    fill(im, mask_ellipse((cx - 14, 106, cx + 14, 134)), lighten(EP_GOLD, 0.5), EP_GOLD, outline=3)  # pérola do dragão
+    ep_aura(im)
+
+
+def i_epico_bota(im):
+    """Botas do Vento Sem Rastro: uma bota alta violeta com asa dourada e redemoinho de vento."""
+    for k, (a, b) in enumerate([((60, 440), (200, 446)), ((40, 400), (150, 404)), ((80, 470), (260, 476))]):
+        fill(im, mask_line([a, b], 10 - k * 2), lighten(EP_VIOLET, 0.5), outline=0, shade=False)
+    boot_pts = [(196, 64), (326, 64), (330, 318), (438, 356), (448, 432), (176, 432), (186, 250)]
+    fill(im, mask_poly(boot_pts), lighten(EP_VIOLET, 0.1), EP_DEEP)
+    fill(im, mask_poly([(172, 420), (452, 420), (452, 452), (172, 452)]), EP_GOLD_D, shade_of(EP_GOLD_D, 0.6), outline=6)
+    fill(im, mask_poly([(190, 58), (332, 58), (334, 108), (188, 108)]), EP_GOLD, EP_GOLD_D, outline=6)
+    for k, (dy, ln) in enumerate(((0, 170), (44, 140), (88, 104))):  # asa: 3 penas
+        y = 170 + dy
+        fill(im, mask_poly([(250, y), (250 - ln, y - 70 + k * 8), (250 - ln + 30, y - 30 + k * 6), (250, y + 30)]),
+             lighten(EP_GOLD, 0.3), EP_GOLD_D, outline=6)
+    ep_aura(im)
+
+
+def i_epico_arma_lamina(im):
+    """Espadas do Trovão Celestial: dois sabres curvos largos lado a lado (não cruzados), com raios violeta."""
+    def saber(x0, y0, k):
+        layer = new()
+        spine, edge = [], []
+        for n in range(21):
+            t = n / 20
+            y = y0 - 300 * k * t
+            x = x0 + 120 * k * t * t
+            w = 50 * k * (1 - t) + 8
+            spine.append((x, y)); edge.append((x + w, y + 14 * t))
+        m = mask_poly(spine + edge[::-1])
+        fill(layer, m, (226, 210, 255), (130, 90, 210), angle=0)
+        bolt = [(x0 + 22, y0 - 40), (x0 + 44, y0 - 90), (x0 + 26, y0 - 110), (x0 + 56, y0 - 170), (x0 + 42, y0 - 186), (x0 + 82, y0 - 240)]
+        bolt = [(x, y0 - (y0 - y) * k) for x, y in bolt]
+        bl = ImageChops.multiply(mask_line(bolt, 9), m)
+        layer.paste(Image.new('RGBA', (S, S), (255, 240, 255, 255)), (0, 0), bl)
+        layer = glow(layer, bl, EP_VIOLET, 10, 1.6)
+        hx = x0 + 26
+        fill(layer, mask_ellipse((hx - 44, y0 - 10, hx + 44, y0 + 22)), EP_GOLD, EP_GOLD_D, outline=6)
+        fill(layer, mask_poly([(hx - 14, y0 + 18), (hx + 14, y0 + 18), (hx + 12, y0 + 100), (hx - 12, y0 + 100)]), EP_DEEP, outline=6)
+        for y in (y0 + 40, y0 + 70):
+            fill(layer, mask_poly([(hx - 17, y), (hx + 17, y), (hx + 17, y + 10), (hx - 17, y + 10)]), EP_GOLD, outline=3, shade=False)
+        im.alpha_composite(layer)
+    saber(206, 392, 1.0)
+    saber(96, 404, 0.86)
+    ep_aura(im)
+
+
+def i_epico_arma_pavilhao(im):
+    """Leque da Geada Eterna: leque redondo de seda (tuanshan) com cristal de gelo violeta e cabo de jade."""
+    cx, cy, r = 256, 206, 160
+    fill(im, mask_line([(cx, cy + 120), (cx, 488)], 26), (110, 210, 180), (40, 120, 100), outline=7)
+    fill(im, mask_poly([(cx - 16, 470), (cx + 16, 470), (cx + 30, 506), (cx - 30, 506)]), EP_PURPLE, EP_DEEP, outline=5)
+    silk = mask_ellipse((cx - r, cy - r, cx + r, cy + r))
+    fill(im, silk, (240, 230, 255), (176, 140, 236), angle=60)
+    ring = ImageChops.subtract(silk, mask_ellipse((cx - r + 16, cy - r + 16, cx + r - 16, cy + r - 16)))
+    im.paste(gradient(EP_GOLD, EP_GOLD_D), (0, 0), ring)
+    flake = new()
+    for k in range(6):
+        a = math.radians(k * 60)
+        ex, ey = cx + math.cos(a) * 112, cy + math.sin(a) * 112
+        fill(flake, mask_line([(cx, cy), (ex, ey)], 14), EP_PURPLE, outline=4, shade=False)
+        for f in (0.55, 0.8):
+            bx, by = cx + math.cos(a) * 112 * f, cy + math.sin(a) * 112 * f
+            for da in (-0.6, 0.6):
+                fill(flake, mask_line([(bx, by), (bx + math.cos(a + da) * 30, by + math.sin(a + da) * 30)], 9), EP_PURPLE, outline=3, shade=False)
+    fill(flake, mask_ellipse((cx - 24, cy - 24, cx + 24, cy + 24)), lighten(EP_VIOLET, 0.5), EP_PURPLE, outline=4)
+    im.alpha_composite(glow(flake, flake.getchannel('A'), EP_VIOLET, 12, 1.2))
+    ep_aura(im)
+
+
+def i_epico_arma_tita(im):
+    """Bastão do Monte Inabalável: bastão com cabeça em forma de montanha vazada e anéis de ouro pendurados."""
+    fill(im, mask_line([(256, 230), (256, 492)], 30), EP_PURPLE, EP_DEEP, outline=7)
+    for y in (290, 400, 470):
+        fill(im, mask_poly([(236, y), (276, y), (276, y + 16), (236, y + 16)]), EP_GOLD, outline=4, shade=False)
+    outer = [(110, 250), (176, 120), (214, 170), (256, 48), (298, 170), (336, 120), (402, 250)]
+    inner = [(158, 226), (184, 176), (214, 214), (256, 116), (298, 214), (328, 176), (354, 226)]
+    m = ImageChops.subtract(mask_poly(outer), mask_poly(inner))
+    fill(im, m, lighten(EP_GOLD, 0.2), EP_GOLD_D, outline=8)
+    for x, y in ((128, 290), (384, 290), (98, 340), (414, 340)):
+        rm = ImageChops.subtract(mask_ellipse((x - 28, y - 28, x + 28, y + 28)), mask_ellipse((x - 16, y - 16, x + 16, y + 16)))
+        fill(im, rm, EP_GOLD, EP_GOLD_D, outline=5)
+    fill(im, mask_poly([(256, 150), (282, 190), (256, 226), (230, 190)]), lighten(EP_VIOLET, 0.4), EP_PURPLE, outline=5)
+    ep_aura(im)
+
+
+def i_epico_arma_vibora(im):
+    """Agulhas da Víbora Imperial: 5 agulhas violeta em leque saindo de uma serpente enrolada em anel, olhos de ouro."""
+    cx, cy = 256, 372
+    for k in range(5):
+        a = math.radians(-145 + k * 27.5)
+        tx, ty = cx + math.cos(a) * 250, cy + math.sin(a) * 250
+        bx, by = cx + math.cos(a) * 70, cy + math.sin(a) * 70
+        nx, ny = -math.sin(a) * 10, math.cos(a) * 10
+        fill(im, mask_poly([(bx + nx, by + ny), (tx, ty), (bx - nx, by - ny)]), lighten(EP_VIOLET, 0.4), EP_PURPLE, outline=6)
+    ring = ImageChops.subtract(mask_ellipse((cx - 96, cy - 96, cx + 96, cy + 96)), mask_ellipse((cx - 52, cy - 52, cx + 52, cy + 52)))
+    fill(im, ring, (120, 200, 110), (40, 110, 60))
+    d = ImageDraw.Draw(im)
+    for k in range(12):
+        a = math.radians(k * 30 + 15)
+        x, y = cx + math.cos(a) * 74, cy + math.sin(a) * 74
+        d.ellipse((x - 8, y - 6, x + 8, y + 6), fill=EP_PURPLE + (255,))
+    hx, hy = cx + 92, cy - 70
+    fill(im, mask_ellipse((hx - 46, hy - 34, hx + 46, hy + 34)), (140, 220, 120), (50, 120, 60), outline=7)
+    for ex in (hx - 16, hx + 16):
+        fill(im, mask_ellipse((ex - 9, hy - 14, ex + 9, hy + 2)), EP_GOLD, EP_GOLD_D, outline=3, shade=False)
+    fill(im, mask_line([(hx + 40, hy + 10), (hx + 70, hy + 22), (hx + 84, hy + 10)], 7), (220, 60, 80), outline=0, shade=False)
+    ep_aura(im)
+
+
+EPICS = {
+    'epico_colar': i_epico_colar, 'epico_tronco': i_epico_tronco, 'epico_cabeca': i_epico_cabeca,
+    'epico_calca': i_epico_calca, 'epico_bota': i_epico_bota,
+    'epico_arma_lamina': i_epico_arma_lamina, 'epico_arma_pavilhao': i_epico_arma_pavilhao,
+    'epico_arma_tita': i_epico_arma_tita, 'epico_arma_vibora': i_epico_arma_vibora,
+}
+
+
 def main():
     icons = []
     for name, fn in ITEMS.items():
         im = new(); fn(im); icons.append((name, im))
     for name, (fn, (c1, c2)) in SKILLS.items():
         im = bg_badge(c1, c2); fn(im); icons.append(('skill_' + name, im))
+    for name, fn in EPICS.items():  # depois das skills: os índices antigos não mudam
+        im = new(); fn(im); icons.append((name, im))
     rows = (len(icons) + COLS - 1) // COLS
     sheet = Image.new('RGBA', (COLS * OUT, rows * OUT), (0, 0, 0, 0))
     index = {}

@@ -234,6 +234,12 @@ button.primary {
 #toast.show {
   opacity: 1;
 }
+/* drop de Épico: aviso maior com borda roxa (cor da raridade epico em src/data/items.json) */
+#toast.epic {
+  font-size: 22px;
+  border: 2px solid #b45cff;
+  box-shadow: 0 0 18px rgba(180, 92, 255, 0.6);
+}
 /* Recompensas no HUD: ouro com "+N" que some, barra de XP que brilha, feed de itens à esquerda */
 .gold-line {
   display: flex;

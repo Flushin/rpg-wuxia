@@ -181,7 +181,21 @@
       },
       "raro": {
         "name": "Rare"
+      },
+      "epico": {
+        "name": "Epic"
       }
+    },
+    "epicNames": {
+      "colar": "Violet Lotus Necklace",
+      "tronco": "Celestial Emperor Robe",
+      "cabeca": "Crown of a Thousand Mists",
+      "calca": "Sleeping Dragon Trousers",
+      "bota": "Traceless Wind Boots",
+      "arma_lamina": "Celestial Thunder Blades",
+      "arma_pavilhao": "Eternal Frost Fan",
+      "arma_tita": "Unshakable Mountain Staff",
+      "arma_vibora": "Imperial Viper Needles"
     },
     "bases": {
       "colar_jade": {
@@ -499,9 +513,9 @@
     },
     "primeiro_item": {
       "title": "You found equipment!",
-      "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
-      "textTouch": "Open the bag in ☰ › Bag. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button.",
-      "textTouchClassic": "Open the bag with the Bag button at the top of the screen. The name color shows the rarity: white (common), green (uncommon, 1 bonus) and blue (rare, 2 bonuses). Tap an item to see its details and use the Equip button."
+      "text": "Open the bag with the I key (or the Bag button). The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Double-click an item to equip it; hover to see details and compare with what you are wearing.",
+      "textTouch": "Open the bag in ☰ › Bag. The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Tap an item to see its details and use the Equip button.",
+      "textTouchClassic": "Open the bag with the Bag button at the top of the screen. The name color shows the rarity: white (common), green (uncommon, 1 bonus), blue (rare, 2 bonuses) and purple (epic: scales with your level, with bonuses for your class). Tap an item to see its details and use the Equip button."
     },
     "primeira_pocao": {
       "title": "Potions",
@@ -831,7 +845,7 @@
     ]
   },
   "novidades": {
-    "proxima": [{"texto": "Each class now has its own attack sounds: sword cuts for the Tempest, a monk staff for the Titan, ice for the Frost and needles for the Viper, each with its own critical hit."}, {"texto": "Boss area strikes now have sound: a cymbal swells while the red circle is on the ground and an impact plays when the strike lands."}, {"texto": "Shields now have sound: a muffled impact when they absorb a hit and breaking glass when the damage depletes them."}, {"texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."}, {"texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."}, {"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."}],
+    "proxima": [{"texto": "Epic equipment (purple): any piece can drop as Epic, with a 0.5% chance from any monster and 1% from bosses, only while you play (not on Auto or offline). It has no level: it follows yours and is 30% stronger than a Rare, with bonuses made for your class. Forge it up to +10 (double gold); it cannot be sold or salvaged."}, {"texto": "Each class now has its own attack sounds: sword cuts for the Tempest, a monk staff for the Titan, ice for the Frost and needles for the Viper, each with its own critical hit."}, {"texto": "Boss area strikes now have sound: a cymbal swells while the red circle is on the ground and an impact plays when the strike lands."}, {"texto": "Shields now have sound: a muffled impact when they absorb a hit and breaking glass when the damage depletes them."}, {"texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."}, {"texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."}, {"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."}],
     "versoes": [
       {"itens": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."}]},
       {"itens": [{"texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."}]},

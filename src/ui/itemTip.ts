@@ -8,6 +8,8 @@ import {
   RARITIES,
   SLOT_NAMES,
   baseOf,
+  epicBonuses,
+  epicIconId,
   fmtStat,
   fmtStatValue,
   isBroken,
@@ -19,21 +21,22 @@ import {
   STAT_LABELS,
 } from '../core/items';
 import type { ItemInstance, Slot } from '../core/types';
+import type { ItemOwner } from '../core/items';
 import type { World } from '../core/world';
 import { hasIcon, iconHtml } from './icons';
 
 const GREEN = '#6fdc6f',
   RED = '#ff6b6b';
 
-const effStats = (it: ItemInstance | null) => (it && !isBroken(it) ? itemStats(it) : {});
+const effStats = (w: World, it: ItemInstance | null) => (it && !isBroken(it) ? itemStats(it, w.owner()) : {});
 
 export function compareHtml(w: World, it: ItemInstance): string {
   const b = baseOf(it);
   if (!b) return '';
   const cur = w.equipment[b.slot];
   if (cur === it) return '';
-  const a = effStats(it),
-    c = effStats(cur),
+  const a = effStats(w, it),
+    c = effStats(w, cur),
     keys = new Set([...Object.keys(a), ...Object.keys(c)]);
   const rows: string[] = [];
   for (const k of keys) {
@@ -64,11 +67,12 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
   }
   const b = BASES[it.baseId];
   if (!b) return `<b>${it.baseId}</b>`;
+  if (it.rarity === 'epico') return epicTipHtml(w, it, compare);
   const r = RARITIES[it.rarity],
     lvlBad = w.player.level < b.reqLevel,
     sectBad = !!b.sect && b.sect !== w.classId;
   // stats da base já com a melhoria (+N); os bônus aleatórios vêm à parte
-  const base = itemStats({ ...it, bonuses: [] });
+  const base = itemStats(it, w.owner(), false);
   const lines = Object.entries(base)
     .map(
       ([k, v]) =>
@@ -92,6 +96,36 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
+/** Janela do Épico: sem nível próprio (stats da peça da faixa do personagem), bônus da classe de quem usa, não vende. */
+function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
+  const b = BASES[it.baseId],
+    r = RARITIES.epico,
+    o = w.owner(),
+    sectBad = !!b.sect && b.sect !== w.classId;
+  const lines = Object.entries(itemStats(it, o, false))
+    .map(
+      ([k, v]) => `<div>${fmtStat(k, v)}${it.plus ? ` <small style="color:${GREEN}">(+${it.plus})</small>` : ''}</div>`,
+    )
+    .join('');
+  const bonus = epicBonuses(o)
+    .map(
+      (x) =>
+        `<div style="color:${r.color}">${fmtStat(x.stat, x.value)} <small>(${L('bônus da classe', 'class bonus')})</small></div>`,
+    )
+    .join('');
+  const max = maxDurability(it),
+    dur = isBroken(it)
+      ? `<div style="color:${RED}">${L(`Durabilidade 0/${max}. Quebrado — sem efeito`, `Durability 0/${max}. Broken — no effect`)}</div>`
+      : `<div>${L('Durabilidade', 'Durability')} ${Math.round(it.durability)}/${max}</div>`;
+  return `<b style="color:${r.color}">${itemName(it)}</b>
+    <div><small style="color:${r.color}">${r.name}</small> <small>· ${SLOT_NAMES[b.slot]}</small></div>
+    <div>${L(`Acompanha seu nível (nv ${o.level})`, `Scales with your level (lv ${o.level})`)}</div>
+    ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
+    ${lines}${bonus}${dur}<div class="tip-sell">${L('Não pode ser vendido nem desmontado', 'Cannot be sold or salvaged')}</div>${compare ? compareHtml(w, it) : ''}`;
+}
+/** Ícone do item; o Épico tem o seu próprio, fixo (não segue a peça da faixa). */
+const iconId = (it: ItemInstance) => (it.rarity === 'epico' ? epicIconId(it) : it.baseId);
+
 // marco 6: ícone desenhado de cada item (tools/sprites/icons.py); emoji só se faltar o ícone
 export const SLOT_ICON: Record<Slot, string> = {
   colar: '📿',
@@ -101,13 +135,14 @@ export const SLOT_ICON: Record<Slot, string> = {
   calca: '👖',
   bota: '👢',
 };
-export function cellHtml(it: ItemInstance | null): string {
+export function cellHtml(it: ItemInstance | null, owner?: ItemOwner): string {
   if (!it) return '';
   const b = BASES[it.baseId],
     pot = POTIONS[it.baseId],
-    stack = !b;
+    stack = !b,
+    ico = iconId(it);
   const label = iconHtml(
-    it.baseId,
+    ico,
     pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : b ? SLOT_ICON[b.slot] : CONSUMABLES[it.baseId] ? '📜' : '💎',
   );
   const col = itemColor(it);
@@ -118,6 +153,8 @@ export function cellHtml(it: ItemInstance | null): string {
       f = Math.max(0, Math.min(1, it.durability / max));
     extra += `<i class="dur ${f <= 0 ? 'zero' : f <= 0.2 ? 'low' : ''}"><u style="width:${f * 100}%"></u></i>`;
   }
-  return `<span class="ic${hasIcon(it.baseId) ? ' img' : pot ? '' : ' sym'}" style="--rc:${col}">${label}</span>${extra}`;
+  return `<span class="ic${hasIcon(ico) ? ' img' : pot ? '' : ' sym'}" style="--rc:${col}">${label}</span>${extra}`;
 }
-export const cellStyle = (it: ItemInstance | null) => (it ? `border-color:${itemColor(it)}` : '');
+/** Borda na cor da raridade; o Épico ganha um brilho roxo. */
+export const cellStyle = (it: ItemInstance | null) =>
+  it ? `border-color:${itemColor(it)}${it.rarity === 'epico' ? `;box-shadow:0 0 6px ${itemColor(it)}` : ''}` : '';
