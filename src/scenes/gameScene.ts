@@ -627,7 +627,7 @@ export class GameScene extends Phaser.Scene {
   private handle(ev: GameEvent) {
     this.tips.onEvent(ev);
     restMode.onEvent(ev);
-    audio.onEvent(ev, this.world.player.id);
+    audio.onEvent(ev, this.world.player.id, this.world.classId);
     if (ev.type === 'mapChange') this.onMapChange();
     else this.feedback.handle(ev);
   }

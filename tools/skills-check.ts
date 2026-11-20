@@ -503,5 +503,16 @@ console.log('\nSom das skills (audio.json "skillFx", N5)');
     }
 }
 
+console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
+{
+  const audio = JSON.parse(readFileSync('src/data/audio.json', 'utf8'));
+  const has = (key?: string) => !!key && !!audio.sfx[key] && existsSync(`public/audio/sfx/${audio.sfx[key].file}.ogg`);
+  for (const c of Object.values(CLASSES)) {
+    const a = audio.classAttack[c.id] ?? {};
+    ok(has(a.hit) && has(a.crit), `${c.id}: acerto e crítico próprios`);
+    if (c.attackRange > 3) ok(has(a.cast), `${c.id}: disparo próprio (ataca à distância)`);
+  }
+}
+
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

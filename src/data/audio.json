@@ -259,6 +259,46 @@
     "aoe_impact": {
       "file": "aoe_impact",
       "volume": 0.8
+    },
+    "hit_lamina": {
+      "file": "hit_lamina",
+      "volume": 0.7
+    },
+    "crit_lamina": {
+      "file": "crit_lamina",
+      "volume": 0.85
+    },
+    "hit_tita": {
+      "file": "hit_tita",
+      "volume": 0.85
+    },
+    "crit_tita": {
+      "file": "crit_tita",
+      "volume": 1.0
+    },
+    "cast_geada": {
+      "file": "cast_geada",
+      "volume": 0.3
+    },
+    "hit_geada": {
+      "file": "hit_geada",
+      "volume": 0.7
+    },
+    "crit_geada": {
+      "file": "crit_geada",
+      "volume": 0.85
+    },
+    "cast_vibora": {
+      "file": "cast_vibora",
+      "volume": 0.6
+    },
+    "hit_vibora": {
+      "file": "hit_vibora",
+      "volume": 0.7
+    },
+    "crit_vibora": {
+      "file": "crit_vibora",
+      "volume": 0.85
     }
   },
   "music": {
@@ -337,5 +377,25 @@
     "fistfire": "skill_fistfire",
     "needle": "skill_needle",
     "toxic": "skill_toxic"
+  },
+  "classAttack": {
+    "lamina": {
+      "hit": "hit_lamina",
+      "crit": "crit_lamina"
+    },
+    "pavilhao": {
+      "cast": "cast_geada",
+      "hit": "hit_geada",
+      "crit": "crit_geada"
+    },
+    "tita": {
+      "hit": "hit_tita",
+      "crit": "crit_tita"
+    },
+    "vibora": {
+      "cast": "cast_vibora",
+      "hit": "hit_vibora",
+      "crit": "crit_vibora"
+    }
   }
 }

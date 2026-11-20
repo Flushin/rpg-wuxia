@@ -169,6 +169,23 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `aoe_warning` | `https://freesound.org/people/Lynx_5969/sounds/418724/` | Lynx_5969 | CC0 |
 | `aoe_impact` | `https://freesound.org/people/AudioPapkin/sounds/645898/` | AudioPapkin | CC0 |
 
+### Ataque de cada classe (verificados em 20/11/2026)
+
+Licença conferida na página de cada som (Freesound: link `publicdomain/zero/1.0`; OpenGameArt: campo "License(s)" = CC0). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `hit_lamina` | `https://freesound.org/people/SypherZent/sounds/420674/` | SypherZent | CC0 |
+| `crit_lamina` | `https://freesound.org/people/ethanchase7744/sounds/474575/` | ethanchase7744 | CC0 |
+| `hit_tita` | `https://freesound.org/people/maatre/sounds/735436/` | maatre | CC0 |
+| `crit_tita` | `https://freesound.org/people/Abacagi/sounds/494476/` | Abacagi | CC0 |
+| `cast_geada` | `https://freesound.org/people/DustyWind/sounds/691005/` | DustyWind | CC0 |
+| `hit_geada` | `https://freesound.org/people/giwake/sounds/666549/` | giwake | CC0 |
+| `crit_geada` | `https://freesound.org/people/InMotionAudio/sounds/719973/` | InMotionAudio | CC0 |
+| `cast_vibora` | `https://opengameart.org/content/80-cc0-rpg-sfx` | rubberduck | CC0 |
+| `hit_vibora` | `https://freesound.org/people/kylepyke/sounds/196562/` | kylepyke | CC0 |
+| `crit_vibora` | `https://freesound.org/people/ihitokage/sounds/395365/` | ihitokage + kylepyke | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)
