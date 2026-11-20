@@ -18,6 +18,7 @@ Música (CC0):
 - gruta (masmorra Desfiladeiro do Gelo Eterno): "Frozen Desert" — Dizzy Crow — https://opengameart.org/content/frozen-desert-112
 - mosteiro (masmorra Mosteiro Profanado): "Epic Endgame Cinematic" — cynicmusic — https://opengameart.org/content/epic-endgame-cinematic
 - covil (masmorra Covil dos Bandidos): "Battle Theme A" — cynicmusic — https://opengameart.org/content/battle-theme-a
+- trial: "Epic Boss Battle" (versão em loop) — Juhani Junkala (publicada por SubspaceAudio) — https://opengameart.org/content/boss-battle-music
   (trocadas em 20/11/2026; as duas com o mesmo volume, -20 LUFS)
 
 Ataque de cada monstro (20/11/2026; Freesound, prévia HQ; cortados, mono e com volume igualado; monster_attack = atk_bandido):

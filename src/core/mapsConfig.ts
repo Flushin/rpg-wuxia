@@ -101,6 +101,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   },
   // Trial: arena única; o chefe escolhido no menu nasce no centro da arena (World.enterTrial)
   trial: {
+    music: 'music_trial',
     trees: 'city',
     grassDecor: 0.04,
     arena: { x: 16, y: 9, r: 5.5 },

@@ -213,6 +213,10 @@
     "music_covil": {
       "file": "covil",
       "volume": 0.6
+    },
+    "music_trial": {
+      "file": "trial",
+      "volume": 0.6
     }
   },
   "monsterAttack": {
