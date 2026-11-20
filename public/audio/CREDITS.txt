@@ -89,3 +89,7 @@ Skills das classes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, 
 - skill_fistfire -> "Combust.wav" (primeiros 1,8 s) — GrimGrum — https://freesound.org/people/GrimGrum/sounds/412558/
 - skill_needle   -> "Blowgun" — pfranzen — https://freesound.org/people/pfranzen/sounds/187707/
 - skill_toxic    -> "Acid Bubbling.wav" (de 0,15 s a 2 s) — spookymodem — https://freesound.org/people/spookymodem/sounds/202094/
+
+Escudo (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médio -18 dB):
+- shield_hit     -> "Sound Design Elements Impact SFX PS 070" (de 0,13 s a 1 s; volume baixo no jogo) — AudioPapkin — https://freesound.org/people/AudioPapkin/sounds/812736/
+- shield_break   -> "Glass Break" (de 0,32 s a 0,92 s) — unfa — https://freesound.org/people/unfa/sounds/221528/

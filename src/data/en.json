@@ -831,7 +831,7 @@
     ]
   },
   "novidades": {
-    "proxima": [{"texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."}, {"texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."}, {"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."}],
+    "proxima": [{"texto": "Shields now have sound: a muffled impact when they absorb a hit and breaking glass when the damage depletes them."}, {"texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."}, {"texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."}, {"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."}],
     "versoes": [
       {"itens": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."}]},
       {"itens": [{"texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."}]},

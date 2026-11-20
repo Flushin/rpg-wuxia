@@ -243,6 +243,14 @@
     "skill_toxic": {
       "file": "skill_toxic",
       "volume": 0.7
+    },
+    "shield_hit": {
+      "file": "shield_hit",
+      "volume": 0.35
+    },
+    "shield_break": {
+      "file": "shield_break",
+      "volume": 0.8
     }
   },
   "music": {

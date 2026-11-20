@@ -428,7 +428,14 @@ export class World {
     const gone = e.buffs.filter((b) => b.remaining <= 0 || (b.kind === 'shield' && b.value <= 0));
     if (!gone.length) return;
     e.buffs = e.buffs.filter((b) => !gone.includes(b));
-    for (const b of gone) this.emit({ type: 'buffExpired', targetId: e.id, id: b.id, kind: b.kind });
+    for (const b of gone)
+      this.emit({
+        type: 'buffExpired',
+        targetId: e.id,
+        id: b.id,
+        kind: b.kind,
+        broken: b.kind === 'shield' && b.value <= 0,
+      });
   }
   /** Um tique de veneno: dano direto (sem acerto/erro nem defesa; já foi calculado ao aplicar). */
   private poisonTick(e: Entity, amount: number) {
