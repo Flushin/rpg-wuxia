@@ -61,7 +61,7 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
-    what: L('Sons da interface', 'Interface sounds'),
+    what: L('Sons da interface e do portal', 'Interface and portal sounds'),
     who: 'NenadSimic, LilMati, tia666, marcusgar (Freesound.org)',
     license: CC0,
   },
