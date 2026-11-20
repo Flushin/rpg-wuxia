@@ -1,22 +1,25 @@
 // Mapa-múndi: o grafo de portais entre os mapas e a rota (menor número de portais) de qualquer mapa a qualquer outro.
 // Lido dos próprios mapas (objetos portal de public/maps/*.json): mapa ou portal novo entra sozinho.
 // Portais de menu (Portal das Masmorras, Trial) viram uma ligação para cada mapa que o menu oferece.
+// O Mestre dos Caminhos (teleporte, src/core/teleport.ts) vira uma ligação da vila para cada destino (menu 'caminhos');
+// a rota só usa o teleporte quando não há caminho a pé (decisão de 20/11/2026).
 import { MONSTERS } from './data';
 import { DUNGEONS } from './dungeons';
 import type { GameMap, MapObject } from './map';
 import { portalMinLevel } from './mapsConfig';
+import { TELEPORT_COST, TELEPORT_DESTS } from './teleport';
 import { TRIAL_MAP, TRIAL_MIN_LEVEL } from './trial';
 
 export interface WorldLink {
   from: string;
   to: string;
-  /** o portal no mapa de origem (nome, posição) */
+  /** o portal no mapa de origem (nome, posição); no teleporte, o próprio NPC */
   portal: MapObject;
   /** nível mínimo para atravessar (portal com minLevel ou entrada da masmorra/Trial) */
   minLevel: number;
-  /** 'masmorras' | 'trial' quando é um portal de menu (escolher o destino no menu) */
+  /** 'masmorras' | 'trial' quando é um portal de menu (escolher o destino no menu); 'caminhos' = teleporte do NPC */
   menu?: string;
-  /** ouro cobrado para entrar (masmorras) */
+  /** ouro cobrado para entrar (masmorras) ou viajar (teleporte) */
   cost?: number;
 }
 
@@ -35,11 +38,30 @@ export function worldLinks(maps: Record<string, GameMap>): WorldLink[] {
       } else if (o.props.target && maps[String(o.props.target)])
         out.push({ from: m.id, to: String(o.props.target), portal: o, minLevel: portalMinLevel(o) });
     }
+  for (const m of Object.values(maps)) {
+    const npc = m.objects.find((o) => o.type === 'npc' && o.props.npc === 'caminhos');
+    if (!npc) continue;
+    for (const d of TELEPORT_DESTS)
+      if (maps[d.map] && d.map !== m.id)
+        out.push({ from: m.id, to: d.map, portal: npc, minLevel: d.minLevel, menu: 'caminhos', cost: TELEPORT_COST });
+  }
   return out;
 }
 
-/** Caminho de `from` até `to` (busca em largura: menos portais). [] se já está lá; null se não há caminho. */
+/** Caminho de `from` até `to`: a pé (portais) sempre que der; o teleporte do Mestre dos Caminhos só se não houver
+ *  caminho a pé. [] se já está lá; null se não há caminho. */
 export function worldRoute(links: WorldLink[], from: string, to: string): WorldLink[] | null {
+  return (
+    shortestRoute(
+      links.filter((l) => l.menu !== 'caminhos'),
+      from,
+      to,
+    ) ?? shortestRoute(links, from, to)
+  );
+}
+
+/** Caminho de `from` até `to` (busca em largura: menos portais). [] se já está lá; null se não há caminho. */
+function shortestRoute(links: WorldLink[], from: string, to: string): WorldLink[] | null {
   if (from === to) return [];
   const prev = new Map<string, WorldLink>();
   const seen = new Set([from]);

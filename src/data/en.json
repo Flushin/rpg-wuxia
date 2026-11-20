@@ -631,6 +631,14 @@
           "A return scroll takes you back to the village in the blink of an eye. Never leave without one."
         ]
       },
+      "caminhos": {
+        "name": "Wayfarer Master",
+        "lines": [
+          "Greetings, traveler. The roads of the world bend for those who know the right seals. For 200 gold, I will take you anywhere you are ready for.",
+          "I only open roads out of the village. To come back, use your own legs or a Return Scroll.",
+          "The further you advance in your cultivation, the more roads this circle will reveal."
+        ]
+      },
       "morador1": {
         "name": "Villager Mei",
         "lines": [
@@ -825,6 +833,7 @@
   "novidades": {
     "proxima": [],
     "versoes": [
+      {"itens": [{"texto": "Wayfarer Master: a new NPC in the village square, next to a golden circle. For 200 gold, the Master takes you straight to any hunting map your level has unlocked. Coming back is on foot or with a Return Scroll. On the world map, the Master's destinations have the ✦ mark."}]},
       {"itens": [{"texto": "You choose when to level up: XP is stored (up to 3 ready levels) and your frame glows when a level is ready. Tap it (or press U) to level up, great for screenshots and videos; the animation is now 3× longer. With XP full, monsters stop giving XP and warn you on every kill."}]},
       {"itens": [{"texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."}, {"texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."}]},
       {"itens": [{"texto": "Cheaper repairs for shield users: a hit fully absorbed by a shield (Iron Skin, Mist Veil) no longer wears down your equipment."}]},

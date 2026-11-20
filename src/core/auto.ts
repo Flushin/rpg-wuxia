@@ -19,6 +19,7 @@ import type {
 } from './types';
 import type { World } from './world';
 import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { teleportBlock, teleportById } from './teleport';
 import { isDungeonMap } from './dungeons';
 import { inTelegraph, safeSpot } from './world/boss';
 
@@ -313,7 +314,8 @@ export class AutoCombat {
       this.tickTown(dt);
       return;
     }
-    if (!this.huntMap || !this.nextHop(w.mapId, this.huntMap)) this.huntMap = w.mapId;
+    if (!this.huntMap || (!this.nextHop(w.mapId, this.huntMap) && !this.byTeleport(this.huntMap)))
+      this.huntMap = w.mapId;
     this.cur.sec += dt;
     if (this.cur.sec >= BUCKET_SEC) {
       this.buckets.push(this.cur);
@@ -338,7 +340,10 @@ export class AutoCombat {
     }
     // de passagem por outro mapa a caminho do mapa de caça: só revida quem atacar
     if (!this.leaving && w.mapId !== this.huntMap) {
-      const p = this.portalTo(this.nextHop(w.mapId, this.huntMap));
+      // mapa de caça só pelo teleporte: volta para a vila e viaja de lá (tickTown)
+      const p =
+        this.portalTo(this.nextHop(w.mapId, this.huntMap)) ??
+        (this.byTeleport(this.huntMap) ? this.exitPortal() : null);
       if (p && !this.nearestAggressor()) {
         w.targetId = null;
         w.autoAttack = false;
@@ -468,11 +473,28 @@ export class AutoCombat {
     for (const id of MAP_IDS) {
       const lv = MAPS_CONFIG[id].autoFromLevel;
       if (lv === undefined || lv > w.player.level || lv <= bestLv || id === w.mapId) continue;
-      if (!w.maps[id]?.objects.some((o) => o.type === 'monsterSpawn') || !this.nextHop(w.mapId, id)) continue;
+      if (!w.maps[id]?.objects.some((o) => o.type === 'monsterSpawn')) continue;
+      if (!this.nextHop(w.mapId, id) && !this.teleportNpc(id)) continue;
       best = id;
       bestLv = lv;
     }
     return best;
+  }
+
+  /** Teleporte (Mestre dos Caminhos) até `map`: só da vila, só quando não há caminho a pé e com nível e ouro
+   *  (decisão de 20/11/2026: o Auto nunca paga o teleporte se der para ir andando). Retorna o NPC ou null. */
+  private teleportNpc(map: string): Entity | null {
+    const w = this.w;
+    if (!TOWN_MAPS.has(w.mapId) || this.nextHop(w.mapId, map)) return null;
+    const d = teleportById(map);
+    if (!d || !w.maps[map] || teleportBlock(d, w.player.level, w.gold)) return null;
+    return w.npcs.find((n) => w.npcRole(n) === 'caminhos') ?? null;
+  }
+
+  /** `map` é destino do teleporte liberado pelo nível (o ouro só é conferido na vila, na hora de viajar). */
+  private byTeleport(map: string): boolean {
+    const d = teleportById(map);
+    return !!d && d.minLevel <= this.w.player.level;
   }
 
   private portalTo(target: string | null) {
@@ -531,6 +553,13 @@ export class AutoCombat {
     if (pl.hp < pl.derived.maxHp * REST_DONE && this.restSec < REST_MAX_SEC) {
       this.restSec += dt;
       this.status = L('Descansando na vila', 'Resting in village');
+      return;
+    }
+    const tp = this.huntMap ? this.teleportNpc(this.huntMap) : null;
+    if (tp) {
+      this.status = L('Indo ao Mestre dos Caminhos', 'Going to the Wayfarer Master');
+      if (dist(w.player, tp) > 1.5) this.walkTo(tp);
+      else w.travelTo(this.huntMap);
       return;
     }
     this.status = L('Voltando para caçar', 'Heading back to hunt');

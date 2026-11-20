@@ -322,6 +322,10 @@ function cidade() {
   npc('Ancião', 'anciao', 14.2, 17.6);
   npc('Guarda do Portão', 'guarda', 26.3, 13.5);
   npc('Mercador Ambulante', 'mercador', 4.6, 13.5);
+  // Mestre dos Caminhos (teleporte, src/core/teleport.ts) e o círculo dourado no chão da praça (desenhado em
+  // src/render/mapView.ts; não bloqueia a passagem)
+  npc('Mestre dos Caminhos', 'caminhos', 19.5, 14.3);
+  objs.push(area('Círculo de Teleporte', 'teleCircle', 18, 15, 2, 2));
   const walkers = [
     ['morador1', 13.5, 14.2],
     ['morador2', 8.5, 17.5],

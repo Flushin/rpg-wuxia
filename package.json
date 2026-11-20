@@ -1,6 +1,6 @@
 {
   "name": "mistpeak",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9 && npm run check:m10 && npm run check:dungeon && npm run check:trial && npm run check:worldmap && npm run check:wiki && npm run check:novidades",
+    "test": "npm run check:items && npm run check:auto && npm run check:skills && npm run check:i18n && npm run check:m5 && npm run check:quests && npm run check:respawn && npm run check:balance && npm run check:m9 && npm run check:m10 && npm run check:dungeon && npm run check:trial && npm run check:teleport && npm run check:worldmap && npm run check:wiki && npm run check:novidades",
     "maps": "node tools/gen-maps.mjs",
     "check:items": "esbuild tools/items-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/items-check.mjs && node /tmp/items-check.mjs",
     "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
@@ -32,6 +32,7 @@
     "check:dungeon": "esbuild tools/dungeon-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/dungeon-check.mjs && node /tmp/dungeon-check.mjs",
     "check:worldmap": "esbuild tools/worldmap-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/worldmap-check.mjs && node /tmp/worldmap-check.mjs",
     "check:trial": "esbuild tools/trial-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/trial-check.mjs && node /tmp/trial-check.mjs",
+    "check:teleport": "esbuild tools/teleport-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/teleport-check.mjs && node /tmp/teleport-check.mjs",
     "check:m9": "esbuild tools/m9-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m9-check.mjs && node /tmp/m9-check.mjs",
     "check:m10": "esbuild tools/m10-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/m10-check.mjs && node /tmp/m10-check.mjs"
   },

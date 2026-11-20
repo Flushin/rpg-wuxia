@@ -145,6 +145,7 @@ export type GameEvent =
   | { type: 'dungeonMenu' }
   /** entrou numa masmorra (já pagou a entrada) */
   | { type: 'dungeonEnter'; dungeonId: string; cost: number }
+  | { type: 'teleport'; map: string; cost: number }
   /** chefe da masmorra derrotado */
   | { type: 'dungeonCleared'; dungeonId: string }
   /** pisou no portal do Trial (saída sul da vila): a interface abre o menu de chefe e nível (World.trialMenu) */

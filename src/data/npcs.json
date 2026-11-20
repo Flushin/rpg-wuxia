@@ -75,6 +75,14 @@
         "Um pergaminho de retorno leva você de volta à vila num piscar de olhos. Nunca saia sem um."
       ]
     },
+    "caminhos": {
+      "name": "Mestre dos Caminhos",
+      "lines": [
+        "Saudações, viajante. Os caminhos do mundo se dobram para quem conhece os selos certos. Por 200 de ouro, levo você a qualquer lugar para o qual já esteja pronto.",
+        "Só abro caminhos para fora da vila. Para voltar, use as próprias pernas ou um Pergaminho de Retorno.",
+        "Quanto mais você avançar no cultivo, mais caminhos este círculo vai mostrar."
+      ]
+    },
     "morador1": {
       "name": "Aldeã Mei",
       "lines": [

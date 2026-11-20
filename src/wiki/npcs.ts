@@ -12,6 +12,8 @@ import {
   questsOfNpc,
 } from './data';
 import { itemLink, questList } from './ui';
+import { mapName } from './maps';
+import { TELEPORT_COST, TELEPORT_DESTS } from '../core/teleport';
 
 interface NpcInfo {
   id: string;
@@ -97,6 +99,24 @@ function npcList(): NpcInfo[] {
          ]
            .map(([id, p]) => shopRow(id, p))
            .join('')}</ul>`,
+    },
+    {
+      id: 'caminhos',
+      name: t.caminhos?.name ?? 'Mestre dos Caminhos',
+      role: 'Teleporte',
+      sheet: 'npc_caminhos',
+      does: () => {
+        const regions = new Map<string, string[]>();
+        for (const d of TELEPORT_DESTS)
+          regions.set(d.region.pt, [
+            ...(regions.get(d.region.pt) ?? []),
+            `<a href="#/mapa/${d.map}">${esc(mapName(d.map))}</a>${d.minLevel ? ` (nível ${d.minLevel}+)` : ''}`,
+          ]);
+        return `<p>Fica na praça, ao lado do círculo dourado. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você da vila
+         direto a um mapa de caça, sem passar pelos mapas do caminho. Cada destino abre no mesmo nível em que você chegaria a pé.</p>
+         <p>Só leva da vila para fora: para voltar, vá a pé ou use um ${itemLink('pergaminho_retorno')}.</p>
+         <h3>Destinos</h3><ul>${[...regions].map(([r, ds]) => `<li><b>${esc(r)}:</b> ${ds.join(', ')}</li>`).join('')}</ul>`;
+      },
     },
     { id: 'anciao', name: t.anciao?.name ?? 'Ancião', role: 'História e missões', sheet: 'npc_anciao', does: talkOnly },
     {

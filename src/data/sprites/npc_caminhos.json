@@ -1,0 +1,21 @@
+{
+ "frameWidth": 320,
+ "frameHeight": 256,
+ "scale": 0.5,
+ "top": 49,
+ "anchor": [
+  0.5,
+  0.71875
+ ],
+ "dirs": 8,
+ "anims": {
+  "idle": {
+   "frames": 6,
+   "fps": 8,
+   "loop": true
+  }
+ },
+ "dirList": [
+  0
+ ]
+}

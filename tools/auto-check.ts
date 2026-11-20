@@ -1196,5 +1196,47 @@ console.log('\n== subida de nível: vários de uma vez (simulações) ==');
   );
 }
 
+console.log('\n== teleporte do Mestre dos Caminhos: só sem caminho a pé (20/11/2026) ==');
+{
+  // hoje todo mapa de caça tem caminho a pé: o Auto não paga o teleporte
+  const walk = mk('lamina', 26, 'cidade', { gold: 5000 });
+  walk.auto.toggle();
+  ok(walk.auto.huntMap === 'pico', 'nível 26 na vila: caça no Pico');
+  const arrived = run(walk, 90, () => walk.mapId === 'pico');
+  ok(
+    arrived && !drain(walk).some((e) => e.type === 'teleport'),
+    'com caminho a pé: chega ao Pico andando, sem pagar o teleporte',
+  );
+  // sem a saída norte da vila, Montanha, Bosque e Pico só se alcançam pelo teleporte
+  const saved = maps.cidade;
+  maps.cidade = {
+    ...saved,
+    objects: saved.objects.filter((o) => !(o.type === 'portal' && o.props.target === 'montanha')),
+  };
+  const tp = mk('lamina', 26, 'cidade', { gold: 1000 });
+  tp.auto.toggle();
+  ok(tp.auto.huntMap === 'pico', 'sem caminho a pé: escolhe o Pico pelo teleporte');
+  ok(
+    run(tp, 60, () => tp.mapId === 'pico'),
+    'anda até o Mestre dos Caminhos e viaja para o Pico',
+  );
+  ok(
+    drain(tp).some((e) => e.type === 'teleport' && e.map === 'pico' && e.cost === 200),
+    'paga os 200 de ouro da viagem',
+  );
+  const poor = mk('lamina', 26, 'cidade', { gold: 0 });
+  poor.auto.toggle();
+  ok(poor.auto.huntMap === 'floresta', 'sem ouro para o teleporte: caça onde dá para ir a pé');
+  // fora da vila, a caminho do mapa de caça só-teleporte: volta à vila e viaja de lá
+  const away = mk('lamina', 26, 'floresta', { gold: 1000 });
+  away.auto.toggle();
+  away.auto.huntMap = 'pico';
+  ok(
+    run(away, 120, () => away.mapId === 'pico'),
+    'da floresta: volta à vila e pega o teleporte para o Pico',
+  );
+  maps.cidade = saved;
+}
+
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);
