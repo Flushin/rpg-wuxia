@@ -158,7 +158,8 @@ export function itemPage(id: string): string | null {
     extra = `<section class="panel"><h2>Raridades</h2>
       <table class="tbl"><thead><tr><th>Raridade</th><th>Bônus aleatórios</th><th>Chance no drop</th><th>Venda</th></tr></thead><tbody>${rar}</tbody></table>
       <p class="muted">Bônus aleatórios possíveis: ${BONUS_POOL.map((p) => `${esc(STAT_LABELS[p.stat] ?? p.stat)} (${fmtStatValue(p.stat, p.min)}–${fmtStatValue(p.stat, p.max)})`).join(', ')}.
-      Os valores crescem 20% por nível do item acima do 1.</p></section>`;
+      Os valores crescem 20% por nível do item acima do 1.</p>
+      <p class="muted">Toda peça também pode cair <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épica</a> (roxa): sem nível, acompanha o seu, com bônus da sua classe.</p></section>`;
   } else if (kind === 'potion') {
     const p = POTIONS[id];
     name = p.name;

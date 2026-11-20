@@ -16,4 +16,5 @@ Leia só o arquivo do tema que for mexer. Regra geral: mudanças que alteram a j
 | [nivel-30.md](nivel-30.md) | Nível máximo 30: ritmo 3×, curva 20–30, 4 pontos por nível, saves, mapas, itens e offline da faixa |
 | [trial.md](trial.md) | Trial: chefes nível 21–30 à escolha, liberação por chefe, custo, bônus de drop, ponto fraco |
 | [teleporte.md](teleporte.md) | Teleporte do Mestre dos Caminhos: vila → mapas de caça, nível mínimo, 200 de ouro, só ida |
+| [epico.md](epico.md) | Equipamento Épico: drop 0,5%/1% só jogando, acompanha o nível, +30% sobre o Raro, bônus por classe, forja |
 | [melhorias.md](melhorias.md) | Melhorias feitas e futuras |

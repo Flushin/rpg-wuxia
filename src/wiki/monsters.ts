@@ -2,7 +2,7 @@
 import { bal } from '../core/balance';
 import { computeDerived } from '../core/stats';
 import type { Attributes } from '../core/types';
-import { EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from './data';
+import { EPIC, EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from './data';
 import { loadMaps, type WikiMap } from './maps';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
@@ -181,6 +181,11 @@ function drops(m: Monster): string {
        <small class="muted">· tipo sorteado; ver <a href="#/itens/equip">Equipamentos</a></small></li>`,
     );
   }
+  // Épico (src/core/world/inventory.ts rollEpic): todo monstro, chefe 1%; só jogando
+  rows.push(
+    `<li><a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Equipamento Épico</a> — <b>${chance(m.boss ? EPIC.chanceBoss : EPIC.chanceMob)}</b>
+     <small class="muted">· só jogando, monstro até ${EPIC.maxLevelsBelow} níveis abaixo do seu${summoners(m.id).length ? '; não quando invocado por um chefe' : ''}</small></li>`,
+  );
   if (L.guaranteed)
     rows.push(
       `<li><b style="color:${RARITIES[L.guaranteed.rarity]?.color}">1 equipamento ${esc(RARITIES[L.guaranteed.rarity]?.name ?? '')}</b> de nível ${L.guaranteed.reqLevel} — <b>garantido</b></li>`,

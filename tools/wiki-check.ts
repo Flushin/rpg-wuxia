@@ -36,6 +36,7 @@ import * as M from '../src/wiki/mechanics';
 import { hitChance as cHit } from '../src/core/combat';
 import { DEATH_DURABILITY_LOSS, TOWN_REGEN } from '../src/core/world';
 import { FORGE, rarityCost, rerollCost, salvageYield, upgradeCost } from '../src/core/world/forge';
+import { EPIC_CHANCE, EPIC_GROUND_SECONDS, EPIC_MAX_LEVELS_BELOW, EPIC_MUL, epicBonuses } from '../src/core/items';
 import { OFFLINE_GOLD_CAP_HOURS, OFFLINE_TIERS } from '../src/core/offline';
 
 let fails = 0;
@@ -185,6 +186,17 @@ console.log('== mecânicas (cópias) ==');
     'chance de acerto',
   );
   ok(same(M.FORGE, FORGE), 'tabela da forja (FORGE)');
+  ok(
+    M.EPIC.mul === EPIC_MUL &&
+      M.EPIC.chanceMob === EPIC_CHANCE.mob &&
+      M.EPIC.chanceBoss === EPIC_CHANCE.boss &&
+      M.EPIC.maxLevelsBelow === EPIC_MAX_LEVELS_BELOW &&
+      M.EPIC.groundSeconds === EPIC_GROUND_SECONDS &&
+      Object.keys(C_CLASSES).every((c) =>
+        [1, 7, 15, 22, 30].every((lv) => same(M.epicBonusesAt(c, lv), epicBonuses({ level: lv, classId: c }))),
+      ),
+    'Épico (chances, ×1,3, níveis, chão e bônus por classe)',
+  );
   const rng = new Rng(3);
   const bad: string[] = [];
   for (const id of Object.keys(C_BASES))
@@ -227,7 +239,7 @@ console.log('== páginas ==');
   look('monstros', await monsterIndexPage());
   for (const id of Object.keys(W.MONSTERS)) look('monstro/' + id, await monsterPage(id));
   look('mecanicas', M.mechanicsPage());
-  for (const t of ['combate', 'morte', 'forja', 'auto', 'trial']) look('mecanicas/' + t, M.mechanicsPage(t));
+  for (const t of ['combate', 'morte', 'forja', 'auto', 'trial', 'epico']) look('mecanicas/' + t, M.mechanicsPage(t));
   look('missoes', await questIndexPage());
   look('mapas', await mapIndexPage());
   for (const id of MAP_IDS) look('mapa/' + id, await mapPage(id));
