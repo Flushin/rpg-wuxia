@@ -37,6 +37,7 @@ const PREFETCH_DIST = 8;
 const RELEASE_DIST = 12;
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
+const HOVER_MS = 80; // de quanto em quanto tempo o cursor confere o que está sob o mouse
 const ZOOM_MIN = 1,
   ZOOM_MAX = 2;
 // Área de clique/toque para escolher alvo (px do mundo, em volta do ponto acima dos pés)
@@ -70,6 +71,8 @@ export class GameScene extends Phaser.Scene {
   private teleViews = new Map<number, Phaser.GameObjects.Graphics>();
   private userZoom = loadZoom();
   private pinch: { d: number; z: number } | null = null;
+  /** Última posição do mouse (só com mouse de verdade) e o cursor aplicado. */
+  private mouse: { x: number; y: number; at: number; kind: 'mob' | 'npc' | null } | null = null;
   private mapLoading = false;
   /** Mapas de destino cujas folhas já foram adiantadas neste mapa (prefetchNearPortal). */
   private prefetchedMaps = new Set<string>();
@@ -136,6 +139,16 @@ export class GameScene extends Phaser.Scene {
     const onResize = () => this.applyZoom();
     this.scale.on('resize', onResize);
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.onPointer(p));
+    const onMouse = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      this.mouse = { x: e.clientX, y: e.clientY, at: this.mouse?.at ?? 0, kind: this.mouse?.kind ?? null };
+    };
+    window.addEventListener('pointermove', onMouse);
+    this.events.once('shutdown', () => {
+      window.removeEventListener('pointermove', onMouse);
+      document.documentElement.classList.remove('cur-mob', 'cur-npc');
+      this.mouse = null;
+    });
     this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) =>
       this.setUserZoom(this.userZoom * (dy > 0 ? 1 / 1.1 : 1.1)),
     );
@@ -333,8 +346,8 @@ export class GameScene extends Phaser.Scene {
     this.world.moveTo(t.x, t.y);
   }
 
-  /** Seleciona o monstro ou fala com o NPC sob o ponto do mundo; devolve se acertou algum. */
-  private pickAt(wx: number, wy: number, touch: boolean): boolean {
+  /** Monstro (prioridade) ou NPC sob o ponto do mundo. */
+  private entityAt(wx: number, wy: number, touch: boolean): { kind: 'mob' | 'npc'; e: Entity } | null {
     const k = touch ? PICK.TOUCH_SCALE : 1;
     let best: Entity | null = null,
       bd = Infinity;
@@ -348,11 +361,7 @@ export class GameScene extends Phaser.Scene {
         best = m;
       }
     }
-    if (best) {
-      this.world.setTarget(best.id);
-      return true;
-    }
-    let npc: Entity | null = null;
+    if (best) return { kind: 'mob', e: best };
     bd = Infinity;
     for (const n of this.world.npcs) {
       const s = tileToScreen(n.x, n.y),
@@ -360,14 +369,35 @@ export class GameScene extends Phaser.Scene {
         dy = wy - (s.y - PICK.NPC_LIFT);
       if (Math.abs(dx) < PICK.NPC_HALF_W * k && Math.abs(dy) < PICK.NPC_HALF_H * k && Math.hypot(dx, dy) < bd) {
         bd = Math.hypot(dx, dy);
-        npc = n;
+        best = n;
       }
     }
-    if (npc) {
-      this.world.interactNpc(npc.id);
-      return true;
-    }
-    return false;
+    return best ? { kind: 'npc', e: best } : null;
+  }
+
+  /** Seleciona o monstro ou fala com o NPC sob o ponto do mundo; devolve se acertou algum. */
+  private pickAt(wx: number, wy: number, touch: boolean): boolean {
+    const hit = this.entityAt(wx, wy, touch);
+    if (!hit) return false;
+    if (hit.kind === 'mob') this.world.setTarget(hit.e.id);
+    else this.world.interactNpc(hit.e.id);
+    return true;
+  }
+
+  /** Cursor do mouse sobre o mapa: espada em monstro, manopla + balão em NPC (CSS em base.css). */
+  private updateHoverCursor() {
+    const m = this.mouse;
+    if (!m) return;
+    const now = performance.now();
+    if (now - m.at < HOVER_MS) return;
+    m.at = now;
+    const w = this.world.player.dead ? null : this.clientWorld(m.x, m.y);
+    const kind = w ? (this.entityAt(w.x, w.y, false)?.kind ?? null) : null;
+    if (kind === m.kind) return;
+    m.kind = kind;
+    const root = document.documentElement.classList;
+    root.toggle('cur-mob', kind === 'mob');
+    root.toggle('cur-npc', kind === 'npc');
   }
 
   update(_t: number, delta: number) {
@@ -378,6 +408,7 @@ export class GameScene extends Phaser.Scene {
     const w = this.world;
     this.updatePinch();
     w.advance(delta / 1000);
+    this.updateHoverCursor();
     const evs = w.events.splice(0);
     for (const ev of evs) this.handle(ev);
     if (this.mapLoading) return; // trocou de mapa neste quadro e as folhas ainda estão chegando

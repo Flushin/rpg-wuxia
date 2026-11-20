@@ -190,7 +190,7 @@ button {
   border: 1px solid #667;
   border-radius: 8px;
   padding: 8px 12px;
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
 }
 button:active {
   background: #3b4360;
@@ -279,7 +279,7 @@ button.primary {
 }
 /* XP guardada: nível pronto, o quadro do jogador vira botão de subir de nível */
 #player-frame.lv-ready {
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
   border-color: #ffd23f;
   animation: lv-ready 1.4s ease-in-out infinite;
 }

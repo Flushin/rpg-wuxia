@@ -38,7 +38,7 @@
 }
 button[disabled] {
   opacity: 0.45;
-  cursor: default;
+  cursor: var(--cur-normal, default);
 }
 #attrs-panel .card {
   max-height: 100%;

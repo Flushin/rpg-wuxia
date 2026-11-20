@@ -138,7 +138,7 @@ export class World {
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
-  audio = { sfx: 80, music: 50, muted: false };
+  audio = { sfx: 20, music: 40, muted: false };
   monsters: Entity[] = [];
   npcs: Entity[] = [];
   events: GameEvent[] = [];

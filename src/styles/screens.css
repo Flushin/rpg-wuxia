@@ -114,7 +114,7 @@ button.link {
   padding: 6px 8px;
 }
 .cr-lib summary {
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
 }
 .cr-lib pre {
   margin: 8px 0 0;
@@ -152,7 +152,7 @@ button.link {
   padding: 6px 8px;
 }
 .news-old summary {
-  cursor: pointer;
+  cursor: var(--cur-hand, pointer);
 }
 .news-old .news-list {
   margin-top: 6px;
