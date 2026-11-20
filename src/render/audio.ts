@@ -162,7 +162,7 @@ class AudioManager {
         if (ev.ranged) this.sfx('spell', 300);
         break;
       case 'skillFail':
-        this.sfx('action_click');
+        this.sfx('fail');
         break;
       case 'itemPickup':
         this.sfx('pickup', 200);
@@ -180,7 +180,7 @@ class AudioManager {
         this.sfx('potion');
         break;
       case 'potionFail':
-        this.sfx('action_click');
+        this.sfx('fail');
         break;
       case 'npcOpen':
         this.sfx('ui_open');

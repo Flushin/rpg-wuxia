@@ -2,15 +2,8 @@ Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia C
 Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
-- action_click -> UI Audio, "click1" (era o antigo "ui_click")
-- coin         -> UI Audio, "click3" (era o antigo "point_spent")
-- quest_ready  -> UI Audio, "rollover3" (era o antigo "tip")
-  (os três foram identificados em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
-- bag_full     -> RPG Audio, "clothBelt" (era o antigo "miss")
-- quest_accept -> RPG Audio, "bookOpen" (era o antigo "ui_open")
-- repair, potion, skill_up
-               -> Kenney (o autor está gravado nos próprios arquivos); o nome do arquivo original não foi registrado
-               (repair = antigo "hit"; potion = antigo "spell"; skill_up = antigo "level_up")
+- action_click -> UI Audio, "click1" (era o antigo "ui_click"; sem uso desde 20/11/2026, destino no item T8)
+  (identificado em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
 
 Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume igualado ao som antigo):
 - hit            -> "Machete vs. Spatula" (machete_vs_spatula_7) — CYBERDEViL — https://opengameart.org/content/machete-vs-spatula
@@ -58,3 +51,19 @@ Interface (20/11/2026; Freesound, prévia HQ; mono, volume igualado ao som antig
 
 Mapas (20/11/2026; Freesound, prévia HQ; sem os primeiros 402 ms, mono, 3 dB mais baixo que o som antigo):
 - portal         -> "Teleport" — LilMati — https://freesound.org/people/LilMati/sounds/441225/
+
+Ações, itens, forja e missões (20/11/2026; Freesound, prévia HQ; mono, volume igualado ao som antigo do evento):
+- coin           -> "Coins" — Mateusz_Chenc — https://freesound.org/people/Mateusz_Chenc/sounds/512216/
+- pickup         -> "Grab Item" — Err0rC0de — https://freesound.org/people/Err0rC0de/sounds/704749/
+- equip          -> "Item Equip" — mrickey13 — https://freesound.org/people/mrickey13/sounds/518850/
+- potion         -> "Potion - drink - swallow.wav" — ValentinPetiteau — https://freesound.org/people/ValentinPetiteau/sounds/574077/
+- repair         -> "Anvil Hit 1" — michorvath — https://freesound.org/people/michorvath/sounds/270589/
+- bag_full       -> "Coin Bag Jangling Shake.wav" — ralph.whitehead — https://freesound.org/people/ralph.whitehead/sounds/565700/
+- skill_up       -> "Item Sparkle" — Mr._Fritz_ — https://freesound.org/people/Mr._Fritz_/sounds/545238/
+- quest_turnin   -> "collect.wav" — Wagna — https://freesound.org/people/Wagna/sounds/325805/
+- forge_ok       -> "Anvil Hit 2" — michorvath — https://freesound.org/people/michorvath/sounds/270588/
+- forge_fail     -> "Shatter.wav" — Q.K. — https://freesound.org/people/Q.K./sounds/56262/
+- fail           -> "Cancel/miss chime" — Raclure — https://freesound.org/people/Raclure/sounds/405548/
+- salvage        -> "Stainless steel clatter.wav" — EntoClash — https://freesound.org/people/EntoClash/sounds/569286/
+- quest_ready    -> "Sleigh bells hit" — Selector — https://freesound.org/people/Selector/sounds/369506/
+- quest_accept   -> "Signing document, writing quickly" (primeiros 0,5 s) — UnderASpell — https://freesound.org/people/UnderASpell/sounds/611719/

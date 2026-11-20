@@ -13,7 +13,7 @@ Não escreva uma licença de memória e não copie de outro pacote: se não cons
 |---|---|---|---|---|
 | `kaykit-adventurers-1.0-LICENSE.txt` | KayKit Adventurers Character Pack 1.0 (Kay Lousberg) é **CC0** | Tormenta, Geada, NPCs, bandidos, terracota, General (`public/sprites/`) | `https://raw.githubusercontent.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0/main/LICENSE.txt` (repositório oficial, o mesmo de `tools/sprites/fetch-assets.sh`) | `ae3221418140` |
 | `quaternius-espelho-trebeljahr-LICENSES.md` | Ultimate Animated Animal Pack (Quaternius) é **CC0** upstream | Lobo (`public/sprites/lobo.*`) | `https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/LICENSES.md` — **espelho não oficial** (o mesmo de `fetch-assets.sh`); aponta para a página oficial `https://quaternius.com/packs/ultimateanimatedanimals.html` | `a59ca1463ae0` |
-| `kenney-ui-audio-LICENSE.txt` | Kenney UI Audio ("UI SFX Set", Kenney Vleugels) é **CC0** | `action_click` (= click1; era `ui_click`), `coin` (= click3; era `point_spent`), `quest_ready` (= rollover3; era `tip`) em `public/audio/sfx/` | `https://github.com/Calinou/kenney-ui-audio`, commit `8c3d81b9159d058c444f89d12d518276b0b09345`, arquivo `addons/kenney_ui_audio/LICENSE.txt` (cópia do pacote original, sem alteração) | `4f88ab3c885c` |
+| `kenney-ui-audio-LICENSE.txt` | Kenney UI Audio ("UI SFX Set", Kenney Vleugels) é **CC0** | `action_click` (= click1; era `ui_click`; sem uso desde 20/11/2026) em `public/audio/sfx/` | `https://github.com/Calinou/kenney-ui-audio`, commit `8c3d81b9159d058c444f89d12d518276b0b09345`, arquivo `addons/kenney_ui_audio/LICENSE.txt` (cópia do pacote original, sem alteração) | `4f88ab3c885c` |
 | `CC0-1.0.txt` | Texto legal completo da CC0 1.0 Universal (todos os assets acima) | — | SPDX: `https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC0-1.0.txt` | `a2010f343487` |
 | `phaser-3.90.0-LICENSE.md` | Phaser 3.90.0 — **MIT**, © 2024 Richard Davey, Phaser Studio Inc. | Motor do jogo (vai no bundle) | Pacote npm `phaser@3.90.0` (`npm pack`) | `080f3d5539e7` |
 | `eventemitter3-5.0.4-LICENSE.txt` | eventemitter3 5.0.4 — **MIT**, © 2014 Arnout Kazemier | Dependência do Phaser (vai no bundle) | Pacote npm `eventemitter3@5.0.4` | `3aecc12b1cb2` |
@@ -92,6 +92,27 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 |---|---|---|---|
 | `cidade` | `https://opengameart.org/content/hot-springs-town` (hot_spring_town.flac) | Kistol | CC0 |
 | `floresta` | `https://opengameart.org/content/bamboo-blitz` (bamboo_blitz_solo.flac) | Tsorthan Grove | CC0 |
+
+### Ações, itens, forja e missões (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `coin` | `https://freesound.org/people/Mateusz_Chenc/sounds/512216/` | Mateusz_Chenc | CC0 |
+| `pickup` | `https://freesound.org/people/Err0rC0de/sounds/704749/` | Err0rC0de | CC0 |
+| `equip` | `https://freesound.org/people/mrickey13/sounds/518850/` | mrickey13 | CC0 |
+| `potion` | `https://freesound.org/people/ValentinPetiteau/sounds/574077/` | ValentinPetiteau | CC0 |
+| `repair` | `https://freesound.org/people/michorvath/sounds/270589/` | michorvath | CC0 |
+| `bag_full` | `https://freesound.org/people/ralph.whitehead/sounds/565700/` | ralph.whitehead | CC0 |
+| `skill_up` | `https://freesound.org/people/Mr._Fritz_/sounds/545238/` | Mr._Fritz_ | CC0 |
+| `quest_turnin` | `https://freesound.org/people/Wagna/sounds/325805/` | Wagna | CC0 |
+| `forge_ok` | `https://freesound.org/people/michorvath/sounds/270588/` | michorvath | CC0 |
+| `forge_fail` | `https://freesound.org/people/Q.K./sounds/56262/` | Q.K. | CC0 |
+| `fail` | `https://freesound.org/people/Raclure/sounds/405548/` | Raclure | CC0 |
+| `salvage` | `https://freesound.org/people/EntoClash/sounds/569286/` | EntoClash | CC0 |
+| `quest_ready` | `https://freesound.org/people/Selector/sounds/369506/` | Selector | CC0 |
+| `quest_accept` | `https://freesound.org/people/UnderASpell/sounds/611719/` | UnderASpell | CC0 |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
