@@ -132,6 +132,25 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `boss_summon` | `https://freesound.org/people/adharca/sounds/539956/` | adharca | CC0 |
 | `boss_defeated` | `https://freesound.org/people/qubodup/sounds/812468/` | qubodup | CC0 |
 
+### Skills das classes (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `skill_slash2` | `https://freesound.org/people/gulfstreamav/sounds/842363/` | gulfstreamav | CC0 |
+| `skill_dash` | `https://freesound.org/people/CAT-FOX_ALEX/sounds/878374/` | CAT-FOX_ALEX | CC0 |
+| `skill_storm` | `https://freesound.org/people/mateusboga/sounds/614089/` | mateusboga | CC0 |
+| `skill_heavy` | `https://freesound.org/people/nekoninja/sounds/370203 + https://freesound.org/people/ElevatorFan2020/sounds/861044/` | nekoninja, ElevatorFan2020 | CC0 |
+| `skill_orb` | `https://freesound.org/people/lotteria001/sounds/709888/` | lotteria001 | CC0 |
+| `skill_lotus` | `https://freesound.org/people/PanxoZerok/sounds/411979/` | PanxoZerok | CC0 |
+| `skill_rain` | `https://freesound.org/people/qubodup/sounds/844260/` | qubodup | CC0 |
+| `skill_bubble` | `https://freesound.org/people/rafaelzimrp/sounds/570853/` | rafaelzimrp | CC0 |
+| `skill_quake` | `https://freesound.org/people/joseph.larralde/sounds/352500/` | joseph.larralde | CC0 |
+| `skill_fistfire` | `https://freesound.org/people/GrimGrum/sounds/412558/` | GrimGrum | CC0 |
+| `skill_needle` | `https://freesound.org/people/pfranzen/sounds/187707/` | pfranzen | CC0 |
+| `skill_toxic` | `https://freesound.org/people/spookymodem/sounds/202094/` | spookymodem | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)

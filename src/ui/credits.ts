@@ -76,6 +76,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons das skills das classes', 'Class skill sounds'),
+    who: 'gulfstreamav, CAT-FOX_ALEX, mateusboga, nekoninja, ElevatorFan2020, lotteria001, PanxoZerok, qubodup, rafaelzimrp, joseph.larralde, GrimGrum, pfranzen, spookymodem (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons de ataque dos monstros', 'Monster attack sounds'),
     who: 'Mrthenoronha, GaussTheWizard, Ali_6868, CamoMano, LilMati, Christopherderp, Sadiquecat, erkanozan, TheKingOfGeeks360, qubodup, mark205, AudioPapkin, Nightflame, el_boss, julianmateo_, PrdiChlp (Freesound.org)',
     license: CC0,
