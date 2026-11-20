@@ -32,6 +32,10 @@
       "file": "level_up",
       "volume": 0.9
     },
+    "skill_up": {
+      "file": "skill_up",
+      "volume": 0.9
+    },
     "point_spent": {
       "file": "point_spent",
       "volume": 0.7
@@ -57,7 +61,7 @@
       "volume": 0.8
     },
     "coin": {
-      "file": "point_spent",
+      "file": "coin",
       "volume": 0.6
     },
     "pickup": {

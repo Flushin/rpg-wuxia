@@ -3,16 +3,16 @@ Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
 
 Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
 - ui_click     -> UI Audio, "click1"
-- point_spent  -> UI Audio, "click3"
+- coin         -> UI Audio, "click3" (era o antigo "point_spent")
 - tip          -> UI Audio, "rollover3"
   (os três foram identificados em 17/11/2026 comparando o áudio com o pacote; ver docs/arquivo/AUDITORIA_DIREITOS.md, seção 2.2.1)
 - bag_full     -> RPG Audio, "clothBelt" (era o antigo "miss")
 - portal       -> RPG Audio, "door4"
 - ui_open      -> RPG Audio, "bookOpen"
 - ui_close     -> RPG Audio, "bookClose"
-- repair, potion, level_up
+- repair, potion, skill_up
                -> Kenney (o autor está gravado nos próprios arquivos); o nome do arquivo original não foi registrado
-               (repair = antigo "hit"; potion = antigo "spell")
+               (repair = antigo "hit"; potion = antigo "spell"; skill_up = antigo "level_up")
 
 Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume igualado ao som antigo):
 - hit            -> "Machete vs. Spatula" (machete_vs_spatula_7) — CYBERDEViL — https://opengameart.org/content/machete-vs-spatula
@@ -45,3 +45,8 @@ Ataque de cada monstro (20/11/2026; Freesound, prévia HQ; cortados, mono e com 
 - atk_patriarca      -> Patriarca Profanado: "Magic Spell 05 Remastered.wav" — LilMati — https://freesound.org/people/LilMati/sounds/659762/
 - atk_rei_bandidos   -> Rei dos Bandidos: "Weapon, Sword, Metal sword, Swing, fast, impact" — julianmateo_ — https://freesound.org/people/julianmateo_/sounds/522701/
 - atk_senhor_nevoa   -> Senhor da Névoa: "Whosh - Reversed/Reverbed breath" — PrdiChlp — https://freesound.org/people/PrdiChlp/sounds/181889/
+
+Progressão (20/11/2026; Freesound, prévia HQ; mono, volume igualado ao som antigo):
+- level_up       -> mistura de "War Game Battle Level Up" (sem o 1º segundo) — qubodup — https://freesound.org/people/qubodup/sounds/161654/
+                    com "Short Choir" — Breviceps — https://freesound.org/people/Breviceps/sounds/444491/
+- point_spent    -> "Woodblock-soft.wav" — hollandm — https://freesound.org/people/hollandm/sounds/692828/

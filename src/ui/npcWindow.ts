@@ -93,7 +93,7 @@ export class NpcWindow {
       return;
     }
     if (a === 'qturn') {
-      audio.ui('level_up');
+      audio.ui('skill_up');
       w.questTurnIn();
       return;
     }
@@ -173,7 +173,7 @@ export class NpcWindow {
         err = v === 'upgrade' ? w.forgeUpgrade(it) : v === 'rarity' ? w.forgeRarity(it) : w.forgeReroll(it);
         if (!err && v === 'upgrade') {
           const ok = (it.plus ?? 0) > before;
-          audio.ui(ok ? 'level_up' : 'ui_click');
+          audio.ui(ok ? 'skill_up' : 'ui_click');
           this.toast(
             ok
               ? L(`Sucesso! ${itemName(it)}`, `Success! ${itemName(it)}`)
@@ -181,7 +181,7 @@ export class NpcWindow {
             ok ? '#6fdc6f' : '#ff8a80',
           );
         } else if (!err) {
-          audio.ui('level_up');
+          audio.ui('skill_up');
           this.toast(L(`Pronto: ${itemName(it)}`, `Done: ${itemName(it)}`), RARITIES[it.rarity].color);
         }
       }
