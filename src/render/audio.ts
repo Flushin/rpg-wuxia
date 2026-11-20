@@ -194,6 +194,18 @@ class AudioManager {
       case 'repair':
         this.sfx('repair');
         break;
+      case 'bossArenaEnter':
+        this.sfx('boss_arena', 1000);
+        break;
+      case 'bossEnrage':
+        this.sfx('boss_enrage');
+        break;
+      case 'bossSummon':
+        this.sfx('boss_summon');
+        break;
+      case 'bossDefeated':
+        this.sfx('boss_defeated');
+        break;
       case 'mapChange':
         this.sfx('portal');
         this.playMusicForMap(ev.mapId);

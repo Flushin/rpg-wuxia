@@ -166,6 +166,38 @@ console.log('\n== mecânicas no Trial ==');
   ok(adds.length > 0 && adds.every((m) => m.level === trialBossLevel(5) - 3), 'invocados 3 níveis abaixo do chefe');
 }
 
+console.log('\n== som da arena (bossArenaEnter) ==');
+{
+  const w = fresh();
+  w.enterTrial('general_terracota', 1);
+  const a = w.arenas[0];
+  const put = (x: number, y: number) => {
+    w.player.x = x;
+    w.player.y = y;
+    w.player.path = [];
+  };
+  const enters = () => drain(w).filter((e) => e.type === 'bossArenaEnter').length;
+  put(a.x, a.y + a.r + 3);
+  w.tick(1 / 60);
+  drain(w);
+  put(a.x, a.y);
+  w.tick(1 / 60);
+  ok(enters() === 1, 'entrar na arena com o chefe vivo toca o gongo');
+  w.tick(1 / 60);
+  ok(enters() === 0, 'parado dentro da arena não repete');
+  put(a.x, a.y + a.r + 3);
+  w.tick(1 / 60);
+  put(a.x, a.y);
+  w.tick(1 / 60);
+  ok(enters() === 1, 'sair e voltar toca de novo');
+  kill(w, boss(w)!);
+  put(a.x, a.y + a.r + 3);
+  w.tick(1 / 60);
+  put(a.x, a.y);
+  w.tick(1 / 60);
+  ok(enters() === 0, 'com o chefe morto não toca');
+}
+
 if (fails) {
   console.error(`\ntrial-check: ${fails} falha(s)`);
   process.exit(1);
