@@ -140,8 +140,6 @@ Baixe no seu computador e coloque aqui:
 | O que | Onde conseguir | Nome sugerido |
 |---|---|---|
 | License.txt do **Kenney Nature Kit** (árvores, pedras, plantas, cerejeiras) | Download do pacote em `https://kenney.nl/assets/nature-kit` (o espelho usado no `fetch-assets.sh` não tem a licença do Nature Kit) | `kenney-nature-kit-License.txt` |
-| License.txt do **Kenney RPG Audio** | `https://kenney.nl/assets/rpg-audio` | `kenney-rpg-audio-License.txt` |
-| License.txt do **Kenney Impact Sounds** | `https://kenney.nl/assets/impact-sounds` | `kenney-impact-sounds-License.txt` |
 | Página oficial do **Quaternius Ultimate Animated Animals** (CC0) | `https://quaternius.com/packs/ultimateanimatedanimals.html` → print/PDF | `quaternius-animals.pdf` |
 | Os **arquivos originais das duas músicas**, que você guarda | Guardar aqui ou num lugar fora do repositório com backup (são ~5 MB). Se ficarem fora, anote onde | — |
 
