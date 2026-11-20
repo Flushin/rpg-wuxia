@@ -177,6 +177,28 @@ export const EPIC_ITEMS: { id: string; slot: string; sect?: string; name: string
     name: I.epicNames[`arma_${sect}`],
   })),
 ];
+/** Base da faixa do Épico no nível (cópia de epicTierBase em src/core/items.ts): mesmo slot (arma: mesma seita), maior
+ *  nível exigido até o nível do personagem. */
+export function epicTierBase(slot: string, sect: string | undefined, level: number): string {
+  let best = '',
+    lowest = '';
+  for (const [id, b] of Object.entries(I.bases)) {
+    if (b.slot !== slot || (b.sect ?? '') !== (sect ?? '')) continue;
+    if (!lowest || b.reqLevel < I.bases[lowest].reqLevel) lowest = id;
+    if (b.reqLevel <= level && (!best || b.reqLevel > I.bases[best].reqLevel)) best = id;
+  }
+  return best || lowest;
+}
+/** Atributos do Épico no +0 (sem os bônus da classe): base da faixa × EPIC.mul (cópia de itemStats em src/core/items.ts). */
+export function epicTierStats(slot: string, sect: string | undefined, level: number): Record<string, number> {
+  const b = I.bases[epicTierBase(slot, sect, level)];
+  return Object.fromEntries(
+    Object.entries(b.stats).map(([k, v]) => {
+      const x = v * EPIC.mul;
+      return [k, Math.abs(v) >= 1 ? Math.round(x) : Math.round(x * 1000) / 1000];
+    }),
+  );
+}
 /** Épico: cópia das regras de src/core/items.ts (EPIC_*) e src/core/world/inventory.ts (rollEpic). */
 export const EPIC = { mul: 1.3, chanceMob: 0.005, chanceBoss: 0.01, maxLevelsBelow: 10, groundSeconds: 600 };
 export const SELL_RATIO = I.sellRatio;

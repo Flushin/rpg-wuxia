@@ -86,7 +86,7 @@ function searchIndex(): Hit[] {
     })),
     ...EPIC_ITEMS.map((e) => ({
       name: e.name,
-      href: '#/mecanicas/epico',
+      href: `#/item/${e.id}`,
       icon: iconHtml(e.id, 'sm'),
       kind: 'Equipamento Épico',
     })),

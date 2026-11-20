@@ -4,8 +4,11 @@ import {
   BONUS_POOL,
   CLASSES,
   CONSUMABLES,
+  EPIC,
   EPIC_ITEMS,
   EQUIP_TIERS,
+  epicTierBase,
+  epicTierStats,
   MATERIALS,
   MERCHANT,
   POTIONS,
@@ -15,6 +18,8 @@ import {
   dropsOf,
   esc,
   fmtStatValue,
+  PROGRESSION,
+  SECT_ORDER,
   iconHtml,
   itemKind,
   KIND_NAMES,
@@ -23,7 +28,8 @@ import {
   sellPrice,
   type ItemKind,
 } from './data';
-import { chance, monsterLabel, spoiler } from './ui';
+import { chance, itemLink, monsterLabel, spoiler } from './ui';
+import { epicBonusesAt } from './mechanics';
 
 const TABS: { id: ItemKind; label: string }[] = [
   { id: 'equip', label: 'Equipamentos' },
@@ -60,7 +66,7 @@ export function itemIndexPage(tab: string, params: URLSearchParams): string {
       epics = EPIC_ITEMS.filter((e) => !sect || !e.sect || e.sect === sect)
         .map(
           (e) =>
-            `<a class="card-link item-card" href="#/mecanicas/epico" data-name="${esc(e.name.toLowerCase())}">${iconHtml(e.id)}<b style="color:${col}">${esc(e.name)}</b><small>Épico · ${SLOT_NAMES[e.slot]}${e.sect ? ' · ' + esc(sectName(e.sect)) : ''}</small></a>`,
+            `<a class="card-link item-card" href="#/item/${e.id}" data-name="${esc(e.name.toLowerCase())}">${iconHtml(e.id)}<b style="color:${col}">${esc(e.name)}</b><small>Épico · ${SLOT_NAMES[e.slot]}${e.sect ? ' · ' + esc(sectName(e.sect)) : ''}</small></a>`,
         )
         .join('');
     body =
@@ -139,7 +145,55 @@ function sources(id: string): string {
   return parts.join('') || '<p class="muted">Nenhuma fonte conhecida.</p>';
 }
 
+/** Página de um Épico (#/item/epico_<slot> ou epico_arma_<seita>): sem nível, atributos por faixa e bônus por seita. */
+function epicPage(id: string): string | null {
+  const e = EPIC_ITEMS.find((x) => x.id === id);
+  if (!e) return null;
+  const col = RARITIES.epico.color,
+    tiers = EQUIP_TIERS,
+    sects = e.sect ? [e.sect] : SECT_ORDER;
+  const rows = tiers
+    .map((lv, i) => {
+      const hi = i + 1 < tiers.length ? tiers[i + 1] - 1 : PROGRESSION.levelCap,
+        base = epicTierBase(e.slot, e.sect, lv),
+        st = epicTierStats(e.slot, e.sect, lv);
+      // uma coluna só (peça e, embaixo, os atributos): cabe no celular sem rolar para o lado
+      return `<tr><td>${lv}–${hi}</td><td>${itemLink(base)}<br><small>${Object.entries(st)
+        .map(([s, v]) => `+${fmtStatValue(s, v)} ${esc(STAT_LABELS[s] ?? s)}`)
+        .join(' · ')}</small></td></tr>`;
+    })
+    .join('');
+  const lvs = [1, 10, 20, 30];
+  const bon = sects
+    .map(
+      (c) =>
+        `<tr><td>${esc(sectName(c))}</td><td>${epicBonusesAt(c, 1)
+          .map((b) => esc(STAT_LABELS[b.stat] ?? b.stat))
+          .join(' + ')}</td>${lvs
+          .map(
+            (lv) =>
+              `<td>${epicBonusesAt(c, lv)
+                .map((b) => `+${b.value}`)
+                .join(' / ')}</td>`,
+          )
+          .join('')}</tr>`,
+    )
+    .join('');
+  const sub = `<b style="color:${col}">${esc(RARITIES.epico.name)}</b> · ${e.sect ? `Arma da seita ${esc(sectName(e.sect))}` : SLOT_NAMES[e.slot]}`;
+  return `<a class="back" href="#/itens/equip">‹ Equipamentos</a>
+    <div class="detail-head">${iconHtml(id, 'big')}<div><h1 style="color:${col}">${esc(e.name)}</h1><div class="sub">${sub}</div></div></div>
+    <section class="panel"><table class="tbl kv">${row('Nível', 'sem nível: acompanha o seu')}${row('Durabilidade', '100')}${row('Venda', 'não pode ser vendido nem desmontado')}</table></section>
+    <section class="panel"><h2>Atributos por faixa</h2><table class="tbl"><thead><tr><th>Seu nível</th><th>Peça usada e atributos (+0)</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="muted">Os atributos da peça da sua faixa ×${String(EPIC.mul).replace('.', ',')}. A forja (até +10) soma por cima, como no Raro, com o ouro em dobro.</p></section>
+    <section class="panel"><h2>Bônus da classe</h2><div class="scroll"><table class="tbl"><thead><tr><th>Seita</th><th>Bônus</th>${lvs.map((lv) => `<th>Nível ${lv}</th>`).join('')}</tr></thead><tbody>${bon}</tbody></table></div>
+      <p class="muted">${e.sect ? 'Arma só da própria seita.' : 'Os bônus seguem a classe de quem usa o item.'}</p></section>
+    <section class="panel"><h2>Onde conseguir</h2><p>Qualquer monstro: <b>${String(EPIC.chanceMob * 100).replace('.', ',')}%</b> por abate; chefes: <b>${String(EPIC.chanceBoss * 100).replace('.', ',')}%</b>.
+      Só jogando (não no Auto nem offline), nunca de ajudantes invocados, e o monstro precisa ter nível igual ou maior que o seu menos ${EPIC.maxLevelsBelow}.
+      A peça é sorteada entre todas as que você usa. Regras completas em <a href="#/mecanicas/epico">Equipamento Épico</a>.</p></section>`;
+}
+
 export function itemPage(id: string): string | null {
+  if (id.startsWith('epico_')) return epicPage(id);
   const kind = itemKind(id);
   if (!kind) return null;
   const tab = `#/itens/${kind}`;
