@@ -24,7 +24,7 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
-import { LEVELUP_POSE_S } from '../core/data';
+import { LEVELUP_POSE_S, XP_BANK_LEVELS } from '../core/data';
 import {
   TRIAL_BOSSES,
   trialEquipReqLevel,
@@ -186,9 +186,11 @@ function combate(): string {
       ${cls.lifeSteal ? `<li><b>Roubo de vida</b> (Tormenta): ${pc(cls.lifeSteal)} do dano causado volta como vida.</li>` : ''}</ul>${ex}</section>
     <section class="panel"><h2>Níveis</h2><p>Nível máximo <b>${PROGRESSION.levelCap}</b>. A cada nível você ganha os atributos automáticos da sua <a href="#/seitas">seita</a>
       e <b>${freePointsText()}</b> para distribuir. Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
-      <p>Ao subir de nível o personagem ergue os braços envolto em luz dourada e fica <b>parado por ${String(LEVELUP_POSE_S).replace('.', ',')} s</b> (o Auto espera).
-      Nos níveis 10, 20 e 30 a luz é maior e mais longa. Vários níveis de uma vez tocam uma animação por nível (só a primeira para o personagem);
-      no ganho offline, até 3 animações tocam quando você fecha o resumo.</p>
+      <p><b>Você escolhe a hora de subir.</b> A XP fica guardada: quando ela paga um nível, o seu quadro (canto de cima, à esquerda) brilha em dourado
+      e um aviso aparece. Clique/toque no quadro (ou aperte <b>U</b>) para subir um nível. Dá para guardar até <b>${XP_BANK_LEVELS} níveis prontos</b>;
+      com a XP cheia, os monstros, as missões e o ganho offline <b>não dão mais XP</b> (o excesso se perde) e cada abate avisa "XP cheia" até você subir.</p>
+      <p>Ao subir de nível o personagem ergue os braços envolto em luz dourada e fica <b>parado por ${String(LEVELUP_POSE_S).replace('.', ',')} s</b> (o Auto espera),
+      bom para prints e vídeos. Nos níveis 10, 20 e 30 a luz é maior e mais longa.</p>
       <details class="more"><summary>XP para cada nível</summary><table class="tbl"><thead><tr><th>Nível</th><th>XP</th></tr></thead><tbody>${xpRows}</tbody></table></details></section>`;
 }
 
@@ -294,6 +296,7 @@ function auto(): string {
       <li><b>Itens:</b> só poções e equipamentos Comuns. Materiais, consumíveis e equipamentos Incomuns/Raros só caem jogando.</li>
       <li>Offline não há morte nem desgaste. Gasta poções; se acabarem, os ganhos continuam.</li>
       <li>As skills <b>não</b> ganham experiência offline.</li>
+      <li>Offline o personagem <b>não sobe de nível</b>: a XP vai para a XP guardada (até ${XP_BANK_LEVELS} níveis prontos; o resto se perde) e você sobe quando quiser.</li>
       <li>Ao minimizar o app, o ganho conta se você ficar fora pelo menos 5 minutos.</li></ul></section>`;
 }
 

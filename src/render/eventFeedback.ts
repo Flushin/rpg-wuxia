@@ -168,6 +168,19 @@ export class EventFeedback {
       case 'xp':
         this.hud.rewards.xp();
         return true;
+      case 'levelReady':
+        this.hud.toast(
+          L(
+            `Nível ${ev.level} pronto! Toque no seu quadro (ou U) para subir`,
+            `Level ${ev.level} ready! Tap your frame (or U) to level up`,
+          ),
+          '#ffd23f',
+        );
+        return true;
+      case 'xpFull':
+        // a cada abate com a XP cheia: aviso em cima do personagem
+        this.overPlayer(80, L('XP cheia! Suba de nível', 'XP full! Level up'), FLOAT_COLOR.WARNING);
+        return true;
       case 'bagFull':
         this.hud.toast(L('Mochila cheia', 'Bag full'), '#ff8a80');
         return true;
@@ -270,15 +283,9 @@ export class EventFeedback {
           toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
         return true;
       case 'levelup':
+        // sem aviso no meio da tela: a animação já mostra "Nível N!" (tela limpa para prints/vídeos); os pontos
+        // aparecem no selo do botão Atributos
         this.levelUpFx.request(ev.level, ev.pose);
-        // ganho offline: o resumo já mostrou os níveis e os pontos
-        if (!ev.replay)
-          toast(
-            L(
-              `Nível ${ev.level}! +${ev.points} pontos de atributo`,
-              `Level ${ev.level}! +${ev.points} attribute points`,
-            ),
-          );
         return true;
       case 'playerDeath':
         toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'));

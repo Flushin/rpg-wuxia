@@ -1,4 +1,4 @@
-import { PROGRESSION } from './data';
+import { PROGRESSION, levelsReadyFor, xpBankCap } from './data';
 import { BASES, POTIONS } from './items';
 import { Rng } from './rng';
 import { bal, balanceOffline } from './balance';
@@ -53,9 +53,10 @@ export interface OfflineResult {
   gold: number;
   /** teto de ouro desta volta (abates + vendas automáticas) */
   goldCap: number;
-  levelsGained: number;
-  newLevel: number;
+  /** XP guardada depois da volta, níveis que ela paga e se encheu (o excesso se perdeu) */
   newXp: number;
+  levelsReady: number;
+  xpCapped: boolean;
   drops: { baseId: string; rarity: Rarity; qty: number }[];
   potionsUsed: Record<PotionKind, number>;
 }
@@ -80,23 +81,10 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
   const kills = Math.max(0, Math.floor(rate.killsPerMin * effMin + 1e-6));
   const goldCap = offlineGoldCap(rate);
   const gold = Math.min(goldCap, Math.floor(kills * rate.goldPerKill));
-  // XP respeitando o nível máximo e as regras normais de nível
-  let level = inp.level,
-    x = inp.xp,
-    gained = 0;
-  if (level < PROGRESSION.levelCap) {
-    x += Math.floor(kills * rate.xpPerKill);
-    gained = Math.floor(kills * rate.xpPerKill);
-    for (
-      let need = PROGRESSION.xpToNext[level - 1];
-      level < PROGRESSION.levelCap && x >= need;
-      need = PROGRESSION.xpToNext[level - 1]
-    ) {
-      x -= need;
-      level++;
-    }
-    if (level >= PROGRESSION.levelCap) x = 0;
-  }
+  // XP guardada (o jogador sobe de nível quando quiser): até XP_BANK_LEVELS níveis prontos, o excesso se perde
+  const raw = inp.level < PROGRESSION.levelCap ? Math.floor(kills * rate.xpPerKill) : 0;
+  const gained = Math.min(raw, Math.max(0, xpBankCap(inp.level) - inp.xp));
+  const x = inp.xp + gained;
   const drops: OfflineResult['drops'] = [];
   const potionDrops: Record<PotionKind, number> = { hp: 0, mp: 0 };
   for (const d of rate.drops) {
@@ -119,9 +107,9 @@ export function computeOffline(inp: OfflineInput): OfflineResult {
     xp: gained,
     gold,
     goldCap,
-    levelsGained: level - inp.level,
-    newLevel: level,
     newXp: x,
+    levelsReady: levelsReadyFor(inp.level, x),
+    xpCapped: gained < raw,
     drops,
     potionsUsed,
   };

@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{"texto": "Você escolhe a hora de subir de nível: a XP fica guardada (até 3 níveis prontos) e o seu quadro brilha quando há nível pronto. Toque nele (ou aperte U) para subir, ideal para prints e vídeos; a animação agora é 3× mais longa. Com a XP cheia, os monstros param de dar XP e avisam a cada abate.", "wiki": "mecanicas/combate"}],
   "versoes": [
     {"versao": "0.4.2", "data": "2026-11-20", "itens": [{"texto": "Mapa-múndi: o mapa (M ou toque no minimapa) ganhou a aba Mundo, com todos os mapas e os níveis de cada um. Toque num mapa para ver a rota passo a passo, portal por portal, de onde você está até lá; o próximo portal pisca em dourado no minimapa.", "wiki": "mapas"}, {"texto": "Subir de nível ficou marcante: o personagem ergue os braços envolto em luz dourada, com coluna de luz, anel no chão e faíscas. Nos níveis 10, 20 e 30 a celebração é maior. Por um instante (0,65 s) ele fica parado na pose.", "wiki": "mecanicas/combate"}]},
     {"versao": "0.4.1", "data": "2026-11-19", "itens": [{"texto": "Conserto mais barato para quem usa escudo: golpe todo absorvido pelo escudo (Pele de Ferro, Véu de Névoa) não gasta mais a durabilidade do equipamento.", "wiki": "mecanicas/morte"}]},

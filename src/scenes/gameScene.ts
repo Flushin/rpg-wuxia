@@ -541,10 +541,17 @@ export class GameScene extends Phaser.Scene {
       }
   }
 
-  /** Resumo offline fechado: o auto volta e toca a animação dos níveis ganhos fora do jogo. */
+  /** Resumo offline fechado: o auto volta; níveis prontos ganhos fora ficam para o jogador subir. */
   private afterOffline(rep: OfflineReport) {
     this.world.auto.resume();
-    this.world.celebrateOfflineLevels(rep);
+    if (rep.levelsReady > 0)
+      this.hud.toast(
+        L(
+          `${rep.levelsReady} nível(is) pronto(s)! Toque no seu quadro (ou U) para subir`,
+          `${rep.levelsReady} level(s) ready! Tap your frame (or U) to level up`,
+        ),
+        '#ffd23f',
+      );
   }
 
   private handle(ev: GameEvent) {

@@ -15,6 +15,7 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
     else if (e.key === 'k' || e.key === 'K') hud.toggleSkills();
     else if (e.key === 'i' || e.key === 'I') hud.toggleInventory();
     else if ((e.key === 'm' || e.key === 'M') && !e.repeat) hud.toggleMap();
+    else if ((e.key === 'u' || e.key === 'U') && !e.repeat) world.levelUp();
     else if ((e.key === 'q' || e.key === 'Q') && !e.repeat) world.usePotion('hp');
     else if ((e.key === 'e' || e.key === 'E') && !e.repeat) world.usePotion('mp');
     else if ((e.key === 'z' || e.key === 'Z') && !e.repeat) {
@@ -30,6 +31,8 @@ export function setupControls(world: World, hud: Hud, tapAt: (x: number, y: numb
   byId('btn-attrs').addEventListener('click', () => hud.togglePanel());
   byId('btn-skills').addEventListener('click', () => hud.toggleSkills());
   byId('btn-bag').addEventListener('click', () => hud.toggleInventory());
+  // XP guardada: tocar no quadro do jogador sobe um nível (só faz algo com nível pronto)
+  byId('player-frame').addEventListener('click', () => world.levelUp());
 
   if (!isTouch) return;
   setupJoystick(world, tapAt);

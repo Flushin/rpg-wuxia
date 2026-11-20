@@ -35,6 +35,7 @@ export class EntityView {
   private lastY = 0;
   private attacking = false;
   private posing = false; // pose de subida de nível tocando
+  private poseHold?: Phaser.Time.TimerEvent; // último quadro da pose parado até o fim do tempo da pose
   private glowSp?: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite; // brilho por cima do corpo
   private deadAt = 0;
   private movedAt = -1e9; // último instante em que se moveu (ms)
@@ -66,7 +67,7 @@ export class EntityView {
         if (this.anim === 'attack') {
           this.attacking = false;
           this.anim = '';
-        } else if (this.anim === 'levelup') {
+        } else if (this.anim === 'levelup' && !this.poseHold) {
           this.posing = false;
           this.anim = '';
         }
@@ -262,12 +263,22 @@ export class EntityView {
   }
 
   /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose;
-   *  pose = false (níveis seguintes da fila): só o brilho. */
-  levelUp(glowMs: number, color: number, intensity = 1, pose = true) {
+   *  pose = false (níveis seguintes da fila): só o brilho. holdMs: a pose (último quadro) fica parada até este tempo. */
+  levelUp(glowMs: number, color: number, intensity = 1, pose = true, holdMs = 0) {
     if (pose && this.sheet?.meta.anims.levelup && this.anim !== 'death') {
       this.attacking = false;
       this.posing = true;
       this.play('levelup', true);
+      this.poseHold?.remove();
+      this.poseHold = holdMs
+        ? this.scene.time.delayedCall(holdMs, () => {
+            this.poseHold = undefined;
+            if (this.anim === 'levelup') {
+              this.posing = false;
+              this.anim = '';
+            }
+          })
+        : undefined;
     }
     this.glow(glowMs, color, intensity);
   }

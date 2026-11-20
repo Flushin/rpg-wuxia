@@ -434,8 +434,8 @@ function checarRegras(cfg) {
   if (!Number.isInteger(p.level) || p.level < 1 || p.level > cfg.levelCap)
     bad('p.level', `nível impossível: ${p.level} (máximo ${cfg.levelCap})`, true);
   if (!fin(w.xp) || w.xp < 0) bad('xp', `XP inválido: ${w.xp}`, true);
-  if (p.level < cfg.levelCap && fin(w.xp) && w.xp >= cfg.xpToNext[p.level - 1] * 1.0001)
-    bad('xp>need', `XP ${w.xp} passou do necessário (${cfg.xpToNext[p.level - 1]}) e não subiu de nível`);
+  if (p.level < cfg.levelCap && fin(w.xp) && w.xp > w.xpBankCap() * 1.0001)
+    bad('xp>cap', `XP ${w.xp} passou do limite guardado (${w.xpBankCap()})`);
   if (!Number.isInteger(w.freePoints) || w.freePoints < 0)
     bad('pontos', `pontos livres inválidos: ${w.freePoints}`, true);
   if (!Number.isInteger(w.gold) || w.gold < 0) bad('ouro', `ouro inválido: ${w.gold}`, true);

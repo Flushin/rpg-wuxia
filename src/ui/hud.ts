@@ -147,14 +147,24 @@ export class Hud {
     setText(byId('p-hp-t'), `${Math.ceil(p.hp)} / ${d.maxHp}`);
     setStyle(byId('p-mp'), 'width', pct(p.mana, d.maxMana));
     setText(byId('p-mp-t'), `${Math.floor(p.mana)} / ${d.maxMana}`);
-    const need = w.xpToNext();
+    // XP guardada: com nível pronto o quadro do jogador vira botão (subir de nível quando quiser)
+    const need = w.xpToNext(),
+      ready = w.levelsReady(),
+      full = ready > 0 && w.xp >= w.xpBankCap();
     setStyle(byId('p-xp'), 'width', need === null ? '100%' : pct(w.xp, need));
     setText(
       byId('p-xp-t'),
       need === null
         ? L(`Nível máximo (${PROGRESSION.levelCap})`, `Max level (${PROGRESSION.levelCap})`)
-        : `XP ${Math.floor(w.xp)} / ${need}`,
+        : full
+          ? L(`XP cheia! ▲ Subir (${ready})`, `XP full! ▲ Level up (${ready})`)
+          : ready
+            ? L(`▲ Subir de nível (${ready})`, `▲ Level up (${ready})`)
+            : `XP ${Math.floor(w.xp)} / ${need}`,
     );
+    const pf = byId('player-frame');
+    pf.classList.toggle('lv-ready', ready > 0);
+    pf.classList.toggle('xp-full', full);
     setText(byId('map-name'), w.map.name);
     if (w.gold !== this.goldSig) {
       this.goldSig = w.gold;

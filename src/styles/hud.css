@@ -277,6 +277,24 @@ button.primary {
 .bar.xp.glow i {
   filter: brightness(1.45);
 }
+/* XP guardada: nível pronto, o quadro do jogador vira botão de subir de nível */
+#player-frame.lv-ready {
+  cursor: pointer;
+  border-color: #ffd23f;
+  animation: lv-ready 1.4s ease-in-out infinite;
+}
+#player-frame.lv-ready .bar.xp span {
+  color: #ffe07a;
+  font-weight: 700;
+}
+#player-frame.xp-full .bar.xp span {
+  color: #ff9a6a;
+}
+@keyframes lv-ready {
+  50% {
+    box-shadow: 0 0 10px 2px rgba(255, 210, 63, 0.7);
+  }
+}
 #loot-feed {
   position: absolute;
   top: 110px;
