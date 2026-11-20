@@ -278,7 +278,7 @@ export class EventFeedback {
         if (ev.kind === 'accepted') toast(L(`Missão aceita: ${ev.name}`, `Quest accepted: ${ev.name}`), '#f0d070');
         else if (ev.kind === 'ready') {
           toast(L(`Objetivo cumprido: ${ev.name}`, `Objective complete: ${ev.name}`), '#9fe8a0');
-          audio.ui('tip');
+          audio.ui('quest_ready');
         } else if (ev.kind === 'completed')
           toast(L(`Missão concluída: ${ev.name}`, `Quest complete: ${ev.name}`), '#ffd23f');
         return true;
