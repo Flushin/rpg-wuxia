@@ -4,6 +4,7 @@ import { L } from '../core/i18n';
 import { TILE_H, TILE_W, screenToTile, tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { OfflineReport, World } from '../core/world';
+import type { SaveData } from '../core/types';
 import { EntityView } from '../render/entityView';
 import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
@@ -11,7 +12,7 @@ import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
 import { restMode } from '../ui/restMode';
 import { keepScreenOn } from '../platform/keepAwake';
-import { writeSave } from '../save';
+import { writeSave, writeSaveOnExit } from '../save';
 import { setupControls } from '../ui/controls';
 import { Hud } from '../ui/hud';
 import { TipManager } from '../ui/tips';
@@ -35,6 +36,9 @@ import { TRIAL_MAP } from '../core/trial';
 const PREFETCH_DIST = 8;
 /** Distância (tiles) de todos os portais em que as folhas adiantadas são liberadas (folga para não ficar indo e vindo). */
 const RELEASE_DIST = 12;
+
+/** Quadro que chega mais de 1 s depois do anterior: o navegador parou ou desacelerou o laço (ver checkStall). */
+const STALL_FRAME_MS = 1000;
 
 // zoom do jogador: só aproxima (100% = visão normal, até 200%) para não dar vantagem de ver longe
 const HOVER_MS = 80; // de quanto em quanto tempo o cursor confere o que está sob o mouse
@@ -74,6 +78,10 @@ export class GameScene extends Phaser.Scene {
   /** Última posição do mouse (só com mouse de verdade) e o cursor aplicado. */
   private mouse: { x: number; y: number; at: number; kind: 'mob' | 'npc' | null } | null = null;
   private mapLoading = false;
+  /** Laço parado/desacelerado pelo navegador (ver checkStall): hora do último quadro e tempo não simulado. */
+  private lastFrameAt = 0;
+  private stalledMs = 0;
+  private autoAtStall: SaveData['auto'] = undefined;
   /** Mapas de destino cujas folhas já foram adiantadas neste mapa (prefetchNearPortal). */
   private prefetchedMaps = new Set<string>();
 
@@ -162,7 +170,7 @@ export class GameScene extends Phaser.Scene {
     let pausedAt = 0;
     let autoAtPause = this.world.auto.serialize();
     const offPause = onPause(() => {
-      save();
+      writeSaveOnExit(this.world.serialize());
       if (pausedAt) return; // web: visibilitychange e pagehide chegam juntos
       pausedAt = Date.now();
       autoAtPause = this.world.auto.serialize();
@@ -170,11 +178,10 @@ export class GameScene extends Phaser.Scene {
     const offResume = onResume(() => {
       const at = pausedAt;
       pausedAt = 0;
-      if (!at || this.hud.offlineOpen) return;
-      const rep = this.world.applyResumeOffline(Date.now(), at, autoAtPause);
-      if (!rep) return;
-      save();
-      this.hud.showOffline(rep, () => this.afterOffline(rep));
+      // a volta já conta o tempo todo desde a saída: o que o laço deixou de simular enquanto isso não soma de novo
+      this.lastFrameAt = Date.now();
+      this.stalledMs = 0;
+      if (at) this.catchUpOffline(Date.now(), at, autoAtPause);
     });
     // voltar: fecha a janela de cima; sem janela, no app pergunta se quer sair e na web avisa
     // (salva já, caso o jogador saia de verdade)
@@ -401,6 +408,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_t: number, delta: number) {
+    this.checkStall(delta);
     perf.tick(delta, this.children.length);
     restMode.update();
     keepScreenOn(this.world.auto.state === 'on'); // o celular não apaga a tela com o Auto caçando
@@ -570,6 +578,37 @@ export class GameScene extends Phaser.Scene {
         v.destroy();
         this.groundViews.delete(id);
       }
+  }
+
+  /**
+   * No computador, a proteção de tela, o bloqueio ou a suspensão podem parar (ou deixar a 1 quadro por minuto) o
+   * laço do jogo sem a página ficar "escondida": o aviso de segundo plano não chega e esse tempo se perdia.
+   * Quadro com mais de STALL_FRAME_MS desde o anterior conta como parado (menos o que foi simulado nele); quando os
+   * quadros voltam ao normal, o tempo parado vira ganho offline pela mesma regra da volta do segundo plano.
+   */
+  private checkStall(delta: number) {
+    const now = Date.now();
+    const gap = this.lastFrameAt ? now - this.lastFrameAt : 0;
+    this.lastFrameAt = now;
+    if (gap > STALL_FRAME_MS) {
+      if (!this.stalledMs) this.autoAtStall = this.world.auto.serialize(); // o Auto como estava ao parar
+      this.stalledMs += Math.max(0, gap - delta);
+      return;
+    }
+    if (!this.stalledMs) return;
+    const ms = this.stalledMs;
+    this.stalledMs = 0;
+    this.catchUpOffline(now, now - ms, this.autoAtStall);
+  }
+
+  /** Aplica o ganho offline de quem ficou fora desde `at` (se deu o mínimo) e mostra o resumo. */
+  private catchUpOffline(now: number, at: number, autoAt: SaveData['auto']) {
+    if (this.hud.offlineOpen) return;
+    const rep = this.world.applyResumeOffline(now, at, autoAt);
+    if (!rep) return;
+    void writeSave(this.world.serialize());
+    restMode.wakeNow(); // a tela preta do descanso fica por cima de tudo: o resumo precisa aparecer
+    this.hud.showOffline(rep, () => this.afterOffline(rep));
   }
 
   /** Resumo offline fechado: o auto volta; níveis prontos ganhos fora ficam para o jogador subir. */

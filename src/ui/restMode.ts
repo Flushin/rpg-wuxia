@@ -68,6 +68,12 @@ class RestMode {
     });
   }
 
+  /** Sai do descanso agora (ex.: o resumo offline vai abrir e não pode ficar atrás da tela preta). */
+  wakeNow() {
+    this.lastInput = performance.now();
+    this.wake();
+  }
+
   private poke(e?: PointerEvent) {
     this.lastInput = performance.now();
     if (!this.active) return;

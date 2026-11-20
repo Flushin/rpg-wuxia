@@ -46,6 +46,20 @@ export function migrateSaves(raw: unknown, legacy?: unknown): SaveFile {
   return out;
 }
 
+/**
+ * Cópia do personagem gravada às pressas ao sair (web: aba fechada; ver src/save.ts). Entra no arquivo se for de um
+ * espaço válido e mais nova (lastSeen) que a do arquivo; senão devolve null e a cópia é descartada.
+ */
+export function applyPendingSave(f: SaveFile, pending: unknown): SaveFile | null {
+  const p = pending as { slot?: unknown; save?: unknown } | null;
+  const i = Math.floor(Number(p?.slot));
+  if (!p || !(i >= 0 && i < SLOT_COUNT) || !isSave(p.save)) return null;
+  const s = migrateCharacter(p.save);
+  const cur = f.slots[i];
+  if (cur && !(Number(s.lastSeen) > Number(cur.lastSeen))) return null;
+  return setSlot(f, i, s);
+}
+
 export function setSlot(f: SaveFile, i: number, s: SaveData | null, played = true): SaveFile {
   const slots = [...f.slots];
   slots[i] = s;
