@@ -272,7 +272,17 @@ for (const classId of Object.keys(CLASSES)) {
       const abs = drain(w).some((e) => e.type === 'shieldAbsorb');
       ok(abs && p.hp === hp, 'escudo absorve dano antes do HP');
       run(w, 8.2);
-      ok(!p.buffs.length && drain(w).some((e) => e.type === 'buffExpired'), 'escudo expira em 8s');
+      ok(
+        !p.buffs.length && drain(w).some((e) => e.type === 'buffExpired' && !e.broken),
+        'escudo expira em 8s (sem quebrar)',
+      );
+      w.addBuff(p, def.id, 'shield', 5, 8);
+      w.absorb(p, 50);
+      run(w, 0.1);
+      ok(
+        !p.buffs.length && drain(w).some((e) => e.type === 'buffExpired' && e.broken),
+        'escudo esgotado pelo dano avisa que quebrou (som shield_break)',
+      );
     }
     // recarga / mana / sem alvo
     drain(w);

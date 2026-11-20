@@ -151,6 +151,15 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `skill_needle` | `https://freesound.org/people/pfranzen/sounds/187707/` | pfranzen | CC0 |
 | `skill_toxic` | `https://freesound.org/people/spookymodem/sounds/202094/` | spookymodem | CC0 |
 
+### Escudo (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `shield_hit` | `https://freesound.org/people/AudioPapkin/sounds/812736/` | AudioPapkin | CC0 |
+| `shield_break` | `https://freesound.org/people/unfa/sounds/221528/` | unfa | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)

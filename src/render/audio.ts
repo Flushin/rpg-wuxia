@@ -169,6 +169,12 @@ class AudioManager {
           else if (ev.ranged) this.sfx('spell', 300);
         }
         break;
+      case 'shieldAbsorb':
+        if (ev.targetId === playerId) this.sfx('shield_hit', 200);
+        break;
+      case 'buffExpired':
+        if (ev.broken && ev.targetId === playerId) this.sfx('shield_break');
+        break;
       case 'skillFail':
         this.sfx('fail');
         break;

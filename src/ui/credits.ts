@@ -81,6 +81,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons do escudo (golpe absorvido e quebra)', 'Shield sounds (absorbed hit and break)'),
+    who: 'AudioPapkin, unfa (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons de ataque dos monstros', 'Monster attack sounds'),
     who: 'Mrthenoronha, GaussTheWizard, Ali_6868, CamoMano, LilMati, Christopherderp, Sadiquecat, erkanozan, TheKingOfGeeks360, qubodup, mark205, AudioPapkin, Nightflame, el_boss, julianmateo_, PrdiChlp (Freesound.org)',
     license: CC0,

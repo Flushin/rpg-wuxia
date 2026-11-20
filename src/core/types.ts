@@ -172,7 +172,8 @@ export type GameEvent =
   | { type: 'skillUnlocked'; skillId: string }
   | { type: 'dash'; fromX: number; fromY: number; toX: number; toY: number }
   | { type: 'buffApplied'; targetId: number; id: string; kind: BuffKind; duration: number }
-  | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind }
+  /** broken: escudo esgotado pelo dano (não pelo tempo) */
+  | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind; broken?: boolean }
   | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number }
   | { type: 'drop'; x: number; y: number; color: string }
   | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
