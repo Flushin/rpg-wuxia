@@ -10,6 +10,7 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
   e falha por qualquer arquivo fora do estilo, até um que você não mexeu.
 - `npm run balance` / `sim:balance` (simulações de balanceamento)
 - `npm run novidades:loja` (texto "O que há de novo" da Play Store)
+- APK só sob pedido: Actions → "APK Android" → Run workflow (release com novidades desde o último APK; `npm run novidades:apk`)
 
 ## Mapa rápido
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save, masmorras em `dungeons.ts`, Trial em `trial.ts`, teleporte em `teleport.ts`, rotas do mapa-múndi em `worldRoutes.ts`; `world/`)

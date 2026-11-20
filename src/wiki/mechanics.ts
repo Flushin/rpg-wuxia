@@ -300,7 +300,7 @@ function auto(): string {
       <li>Offline não há morte nem desgaste. Gasta poções; se acabarem, os ganhos continuam.</li>
       <li>As skills <b>não</b> ganham experiência offline.</li>
       <li>Offline o personagem <b>não sobe de nível</b>: a XP vai para a XP guardada (até ${XP_BANK_LEVELS} níveis prontos; o resto se perde) e você sobe quando quiser.</li>
-      <li>Ao minimizar o app, o ganho conta se você ficar fora pelo menos 5 minutos.</li></ul></section>`;
+      <li>Ao minimizar o app ou trocar de aba, o ganho conta se você ficar fora pelo menos 5 minutos. No computador vale também fechar a aba e o tempo em que a proteção de tela, o bloqueio ou a suspensão pararam o jogo.</li></ul></section>`;
 }
 
 /** Trial (src/core/trial.ts, World.enterTrial/spawnTrialBoss, inventory.trialLoot). */

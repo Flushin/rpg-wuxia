@@ -7,7 +7,15 @@ import { BASES } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { findPath } from '../src/core/pathfinding';
 import { Rng } from '../src/core/rng';
-import { SLOT_COUNT, deleteSlot, emptySaveFile, migrateSaves, relativeTime, setSlot } from '../src/core/saves';
+import {
+  SLOT_COUNT,
+  applyPendingSave,
+  deleteSlot,
+  emptySaveFile,
+  migrateSaves,
+  relativeTime,
+  setSlot,
+} from '../src/core/saves';
 import { CHARACTER_MIGRATIONS, CHARACTER_SAVE_VERSION, migrateCharacter } from '../src/core/saveFormat';
 import { computeDerived } from '../src/core/stats';
 import { World } from '../src/core/world';
@@ -710,6 +718,26 @@ console.log('\n== vários personagens: CRUD dos espaços ==');
   );
   f = deleteSlot(f, 1);
   ok(f.slots.every((s) => !s) && f.lastPlayedSlot === 0, 'apagar todos volta ao vazio');
+  // cópia gravada ao fechar a aba (web): só entra se for mais nova que a do arquivo
+  {
+    const base = setSlot(emptySaveFile(), 2, mkSave('Caio'));
+    const newer = { ...mkSave('Caio'), level: 9, lastSeen: NOW + 60_000 };
+    const merged = applyPendingSave(base, { slot: 2, save: newer });
+    ok(merged?.slots[2]?.level === 9 && merged.lastPlayedSlot === 2, 'cópia de saída mais nova entra no arquivo');
+    ok(
+      applyPendingSave(base, { slot: 2, save: { ...newer, lastSeen: NOW - 1 } }) === null,
+      'cópia mais velha é ignorada',
+    );
+    ok(
+      applyPendingSave(base, { slot: 9, save: newer }) === null &&
+        applyPendingSave(base, { slot: 2, save: {} }) === null,
+      'cópia com espaço ou personagem inválido é ignorada',
+    );
+    ok(
+      applyPendingSave(emptySaveFile(), { slot: 0, save: newer })?.slots[0]?.name === 'Caio',
+      'cópia em espaço vazio entra',
+    );
+  }
   const a = World.fromSave(maps, mkSave('Ana'), NOW, false),
     b = World.fromSave(maps, mkSave('Bia'), NOW, false);
   a.gold = 500;

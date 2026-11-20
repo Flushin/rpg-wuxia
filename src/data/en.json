@@ -831,8 +831,9 @@
     ]
   },
   "novidades": {
-    "proxima": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing). The three dungeons also have their own, faster music."}],
+    "proxima": [{"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair): each one has its own, faster soundtrack."}],
     "versoes": [
+      {"itens": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."}]},
       {"itens": [{"texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."}]},
       {"itens": [{"texto": "Wayfarer Master: a new NPC in the village square, next to a golden circle. For 200 gold, the Master takes you straight to any hunting map your level has unlocked. Coming back is on foot or with a Return Scroll. On the world map, the Master's destinations have the ✦ mark."}]},
       {"itens": [{"texto": "You choose when to level up: XP is stored (up to 3 ready levels) and your frame glows when a level is ready. Tap it (or press U) to level up, great for screenshots and videos; the animation is now 3× longer. With XP full, monsters stop giving XP and warn you on every kill."}]},
