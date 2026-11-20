@@ -37,6 +37,8 @@ type SfxDef = { file: string; volume: number };
 type MusicDef = { file: string; volume: number };
 const SFX = data.sfx as Record<string, SfxDef>;
 const MUSIC = data.music as Record<string, MusicDef>;
+/** som de ataque de cada monstro (id do monstro -> chave em "sfx"); sem entrada = "monster_attack" */
+const MONSTER_ATTACK = data.monsterAttack as Record<string, string>;
 const MAX_INSTANCES = 3;
 const FADE_MS = 1000;
 
@@ -135,7 +137,7 @@ class AudioManager {
         if (ev.fromId === playerId) {
           this.lastRanged = ev.ranged;
           if (ev.ranged) this.sfx('spell', 500);
-        } else this.sfx('monster_attack', 300);
+        } else this.sfx((ev.monster && MONSTER_ATTACK[ev.monster]) || 'monster_attack', 300);
         break;
       case 'hit':
         if (ev.targetKind === 'player') {

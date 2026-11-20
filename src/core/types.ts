@@ -115,7 +115,7 @@ export interface Entity {
 }
 
 export type GameEvent =
-  | { type: 'attack'; fromId: number; toId: number; ranged: boolean }
+  | { type: 'attack'; fromId: number; toId: number; ranged: boolean; monster?: string }
   | {
       type: 'hit';
       targetId: number;
