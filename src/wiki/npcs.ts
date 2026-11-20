@@ -112,7 +112,7 @@ function npcList(): NpcInfo[] {
             ...(regions.get(d.region.pt) ?? []),
             `<a href="#/mapa/${d.map}">${esc(mapName(d.map))}</a>${d.minLevel ? ` (nível ${d.minLevel}+)` : ''}`,
           ]);
-        return `<p>Fica na praça, ao lado do círculo dourado. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você da vila
+        return `<p>Fica na praça, de pé sobre o círculo dourado, ao lado de uma lanterna de pedra. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você da vila
          direto a um mapa de caça, sem passar pelos mapas do caminho. Cada destino abre no mesmo nível em que você chegaria a pé.</p>
          <p>Só leva da vila para fora: para voltar, vá a pé ou use um ${itemLink('pergaminho_retorno')}.</p>
          <h3>Destinos</h3><ul>${[...regions].map(([r, ds]) => `<li><b>${esc(r)}:</b> ${ds.join(', ')}</li>`).join('')}</ul>`;
