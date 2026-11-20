@@ -95,6 +95,9 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 | `ruinas` | `https://opengameart.org/content/ancient-temple-1` (ancient_temple.wav) | Umplix | CC0 |
 | `montanha` | `https://opengameart.org/content/harmony-in-the-mists` (harmony_in_the_mists_loop.flac) | Tsorthan Grove | CC0 |
 | `pico` | `https://opengameart.org/content/kingdom-of-icereach` (kingdom_of_icereach.mp3, trecho 0:04–2:50) | Tsorthan Grove | CC0 |
+| `gruta` | `https://opengameart.org/content/frozen-desert-112` (Frozen Desert_0.ogg) | Dizzy Crow | CC0 |
+| `mosteiro` | `https://opengameart.org/content/epic-endgame-cinematic` (ChoirChordsBassMaster.wav) | cynicmusic | CC0 |
+| `covil` | `https://opengameart.org/content/battle-theme-a` (battleThemeA.mp3) | cynicmusic | CC0 |
 
 ### Ações, itens, forja e missões (verificados em 20/11/2026)
 

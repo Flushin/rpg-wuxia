@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{"texto": "Músicas novas nas três masmorras (Desfiladeiro do Gelo Eterno, Mosteiro Profanado e Covil dos Bandidos): cada uma tem trilha própria, mais acelerada."}],
   "versoes": [
     {"versao": "0.4.6", "data": "2026-11-20", "itens": [{"texto": "Músicas novas: as Ruínas, a Montanha e o Pico da Névoa ganharam trilha própria (antes continuava tocando a música do mapa anterior)."}]},
     {"versao": "0.4.5", "data": "2026-11-20", "itens": [{"texto": "No computador, cursor novo de manopla dourada: vira manopla com balão ao passar sobre um NPC e espada sobre um monstro. Volume padrão agora é 20 nos efeitos e 40 na música para quem começa a jogar agora."}]},
