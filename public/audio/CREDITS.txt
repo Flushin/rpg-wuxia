@@ -75,3 +75,17 @@ Chefes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, -18 LUFS):
 - boss_enrage    -> "Low Monster Roar" (primeiros 3 s) — Robson220pl — https://freesound.org/people/Robson220pl/sounds/497056/
 - boss_summon    -> "war horn.wav" (primeiros 1,8 s) — adharca — https://freesound.org/people/adharca/sounds/539956/
 - boss_defeated  -> "Angelic Fanfare 2" (primeiros 4,5 s) — qubodup — https://freesound.org/people/qubodup/sounds/812468/
+
+Skills das classes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médio -18 dB):
+- skill_slash2   -> "Sword Charge Double Slash" (trecho de 1,92 s a 2,92 s) — gulfstreamav — https://freesound.org/people/gulfstreamav/sounds/842363/
+- skill_dash     -> "Dash Woosh" — CAT-FOX_ALEX — https://freesound.org/people/CAT-FOX_ALEX/sounds/878374/
+- skill_storm    -> "Woosh 6" (tocado 4 vezes, subindo o tom) — mateusboga — https://freesound.org/people/mateusboga/sounds/614089/
+- skill_heavy    -> "shield guard" + "Hard Glass Break 3" (montagem) — nekoninja, ElevatorFan2020 — https://freesound.org/people/nekoninja/sounds/370203 + https://freesound.org/people/ElevatorFan2020/sounds/861044/
+- skill_orb      -> "Ice Magic Arrow_type 01" (até 1,25 s) — lotteria001 — https://freesound.org/people/lotteria001/sounds/709888/
+- skill_lotus    -> "instant chill 2.wav" (primeiros 0,69 s) — PanxoZerok — https://freesound.org/people/PanxoZerok/sounds/411979/
+- skill_rain     -> "Subzero Frost Loop (Short)" — qubodup — https://freesound.org/people/qubodup/sounds/844260/
+- skill_bubble   -> "magicShield_block.wav" (primeiros 1,77 s) — rafaelzimrp — https://freesound.org/people/rafaelzimrp/sounds/570853/
+- skill_quake    -> "hammer_earth.aif" (primeiros 1,72 s) — joseph.larralde — https://freesound.org/people/joseph.larralde/sounds/352500/
+- skill_fistfire -> "Combust.wav" (primeiros 1,8 s) — GrimGrum — https://freesound.org/people/GrimGrum/sounds/412558/
+- skill_needle   -> "Blowgun" — pfranzen — https://freesound.org/people/pfranzen/sounds/187707/
+- skill_toxic    -> "Acid Bubbling.wav" (de 0,15 s a 2 s) — spookymodem — https://freesound.org/people/spookymodem/sounds/202094/

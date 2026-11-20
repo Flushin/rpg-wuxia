@@ -1,6 +1,6 @@
 // Verificação headless das skills (não vai para o build do jogo).
 // Uso: npm run check:skills
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { CLASSES } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { SKILLS, skillScale, skillXpToNext } from '../src/core/skills';
@@ -476,6 +476,21 @@ console.log('\n== Seiva de Jade (Víbora) ==');
   run(w, 6.2);
   const expect = 1 + p.derived.maxHp * sap.heal!.percent;
   ok(Math.abs(p.hp - expect) < 2, `cura 20% do HP máx em 6 s (${p.hp.toFixed(1)} / ${expect.toFixed(1)})`);
+}
+
+console.log('\nSom das skills (audio.json "skillFx", N5)');
+{
+  const audio = JSON.parse(readFileSync('src/data/audio.json', 'utf8'));
+  const semSom = new Set(['sap']); // Seiva de Jade: som ainda não escolhido
+  for (const [cls, list] of Object.entries(SKILLS))
+    for (const s of list.filter((x) => x.type === 'active' && x.fx && !semSom.has(x.fx))) {
+      const key = audio.skillFx[s.fx!];
+      const file = key && audio.sfx[key]?.file;
+      ok(
+        !!file && existsSync(`public/audio/sfx/${file}.ogg`) && existsSync(`public/audio/sfx/${file}.mp3`),
+        `${cls}/${s.id} (${s.fx}) tem som próprio`,
+      );
+    }
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

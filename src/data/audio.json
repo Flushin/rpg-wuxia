@@ -195,6 +195,54 @@
     "atk_senhor_nevoa": {
       "file": "atk_senhor_nevoa",
       "volume": 0.85
+    },
+    "skill_slash2": {
+      "file": "skill_slash2",
+      "volume": 0.7
+    },
+    "skill_dash": {
+      "file": "skill_dash",
+      "volume": 0.7
+    },
+    "skill_storm": {
+      "file": "skill_storm",
+      "volume": 0.7
+    },
+    "skill_heavy": {
+      "file": "skill_heavy",
+      "volume": 0.7
+    },
+    "skill_orb": {
+      "file": "skill_orb",
+      "volume": 0.7
+    },
+    "skill_lotus": {
+      "file": "skill_lotus",
+      "volume": 0.7
+    },
+    "skill_rain": {
+      "file": "skill_rain",
+      "volume": 0.7
+    },
+    "skill_bubble": {
+      "file": "skill_bubble",
+      "volume": 0.7
+    },
+    "skill_quake": {
+      "file": "skill_quake",
+      "volume": 0.7
+    },
+    "skill_fistfire": {
+      "file": "skill_fistfire",
+      "volume": 0.7
+    },
+    "skill_needle": {
+      "file": "skill_needle",
+      "volume": 0.7
+    },
+    "skill_toxic": {
+      "file": "skill_toxic",
+      "volume": 0.7
     }
   },
   "music": {
@@ -259,5 +307,19 @@
     "patriarca_profanado": "atk_patriarca",
     "rei_bandidos": "atk_rei_bandidos",
     "senhor_nevoa": "atk_senhor_nevoa"
+  },
+  "skillFx": {
+    "slash2": "skill_slash2",
+    "dash": "skill_dash",
+    "storm": "skill_storm",
+    "heavy": "skill_heavy",
+    "orb": "skill_orb",
+    "lotus": "skill_lotus",
+    "rain": "skill_rain",
+    "bubble": "skill_bubble",
+    "quake": "skill_quake",
+    "fistfire": "skill_fistfire",
+    "needle": "skill_needle",
+    "toxic": "skill_toxic"
   }
 }

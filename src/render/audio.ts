@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import data from '../data/audio.json';
 import { MAPS_CONFIG } from '../core/mapsConfig';
+import { skillById } from '../core/skills';
 import { PREF, getPref, setPref } from '../platform/prefs';
 
 export interface AudioSettings {
@@ -39,6 +40,8 @@ const SFX = data.sfx as Record<string, SfxDef>;
 const MUSIC = data.music as Record<string, MusicDef>;
 /** som de ataque de cada monstro (id do monstro -> chave em "sfx"); sem entrada = "monster_attack" */
 const MONSTER_ATTACK = data.monsterAttack as Record<string, string>;
+/** som de cada efeito de skill ("fx" em skills.json -> chave em "sfx"); sem entrada = "spell" só à distância */
+const SKILL_FX = data.skillFx as Record<string, string>;
 const MAX_INSTANCES = 3;
 const FADE_MS = 1000;
 
@@ -159,7 +162,12 @@ class AudioManager {
         break;
       case 'skillCast':
         this.lastRanged = ev.ranged;
-        if (ev.ranged) this.sfx('spell', 300);
+        {
+          const fx = skillById(ev.skillId)?.fx;
+          const key = fx ? SKILL_FX[fx] : undefined;
+          if (key) this.sfx(key);
+          else if (ev.ranged) this.sfx('spell', 300);
+        }
         break;
       case 'skillFail':
         this.sfx('fail');
