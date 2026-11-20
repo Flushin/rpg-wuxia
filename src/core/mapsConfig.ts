@@ -38,9 +38,21 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     autoFromLevel: 1,
     world: { col: 2, row: 2 },
   },
-  ruinas: { trees: 'forest', arena: { x: 24.5, y: 16.5, r: 6.2 }, autoExitVia: 'floresta', world: { col: 3, row: 2 } },
+  ruinas: {
+    music: 'music_ruinas',
+    trees: 'forest',
+    arena: { x: 24.5, y: 16.5, r: 6.2 },
+    autoExitVia: 'floresta',
+    world: { col: 3, row: 2 },
+  },
   // marco 9: entrada pela saída norte da vila (portal com minLevel 10); arena = pátio do templo (tools/gen-maps.mjs)
-  montanha: { trees: 'snow', arena: { x: 16, y: 6, r: 5.5 }, autoFromLevel: 10, world: { col: 1, row: 1 } },
+  montanha: {
+    music: 'music_montanha',
+    trees: 'snow',
+    arena: { x: 16, y: 6, r: 5.5 },
+    autoFromLevel: 10,
+    world: { col: 1, row: 1 },
+  },
   // nível 30: Bosque de Bambu Sombrio (nv 20–25), pelo passo leste da montanha (portal minLevel 20); offline a 5/6
   bambu: {
     music: 'music_floresta',
@@ -53,6 +65,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   },
   // nível 30: Pico da Névoa (nv 25–30), saída norte do Bosque (minLevel 25); santuário = arena do Senhor da Névoa
   pico: {
+    music: 'music_pico',
     trees: 'snow',
     arena: { x: 16, y: 6, r: 5.5 },
     autoFromLevel: 25,
