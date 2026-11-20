@@ -25,10 +25,8 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     effMul: MAPS_CONFIG[saved.mapId]?.offlineMul ?? 1,
   });
   if (res.kills < 1) return null;
-  const lvl0 = w.player.level;
   w.gold += res.gold;
   w.gainXp(res.xp);
-  w.levelUpPose = 0; // ganho offline não trava o personagem (a animação toca depois do resumo)
   const items: OfflineReport['items'] = [];
   let soldCount = 0,
     soldGold = 0;
@@ -80,15 +78,15 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
   }
   w.player.hp = w.player.derived.maxHp;
   w.player.mana = w.player.derived.maxMana;
-  w.events.length = 0; // sem toasts de nível/skill atrás do resumo
+  w.events.length = 0; // sem avisos de XP atrás do resumo (o resumo já mostra)
   return {
     elapsedMs,
     effMin: res.effMin,
     efficiency: res.efficiency,
     kills: res.kills,
     xp: res.xp,
-    levelsGained: w.player.level - lvl0,
-    newLevel: w.player.level,
+    levelsReady: w.levelsReady(),
+    xpCapped: res.xpCapped,
     gold: res.gold,
     items,
     potionsUsed: used,

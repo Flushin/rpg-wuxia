@@ -133,7 +133,11 @@ export type GameEvent =
   | { type: 'quest'; kind: 'accepted' | 'progress' | 'ready' | 'completed'; questId: string; name: string }
   | { type: 'xp'; amount: number }
   /** points: pontos livres ganhos; pose: primeira do lote (pose + parado); replay: animação do ganho offline (sem aviso) */
-  | { type: 'levelup'; level: number; points: number; pose: boolean; replay?: boolean }
+  | { type: 'levelup'; level: number; points: number; pose: boolean }
+  /** XP guardada pagou mais um nível: `ready` níveis prontos, o próximo é `level` */
+  | { type: 'levelReady'; ready: number; level: number }
+  /** XP cheia (XP_BANK_LEVELS níveis prontos): `lost` de XP se perdeu */
+  | { type: 'xpFull'; lost: number }
   | { type: 'playerDeath' }
   | { type: 'mapChange'; mapId: string }
   | { type: 'portalLocked'; name: string; minLevel: number }

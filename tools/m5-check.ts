@@ -663,10 +663,13 @@ console.log('\n== versão do save e migrações (C8) ==');
     'nível 20 abre em 0% do 21',
   );
   w20.gainXp(PROGRESSION.xpToNext[19] - 1);
-  ok(w20.player.level === 20, 'XP abaixo do necessário não sobe');
+  ok(!w20.levelUp() && w20.player.level === 20, 'XP abaixo do necessário não sobe');
   w20.gainXp(1);
-  ok(w20.player.level === 21 && w20.freePoints === 4, 'nível 21: +4 pontos livres');
-  w20.gainXp(1e9);
+  ok(w20.levelUp() && w20.player.level === 21 && w20.freePoints === 4, 'nível 21: +4 pontos livres');
+  for (let i = 0; i < 10; i++) {
+    w20.gainXp(1e9);
+    w20.levelUpAll();
+  }
   ok(
     w20.player.level === 30 && w20.xp === 0 && w20.xpToNext() === null && w20.freePoints === 40,
     `sobe até o 30 e para (pontos ${w20.freePoints})`,

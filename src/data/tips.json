@@ -10,7 +10,12 @@
   },
   "primeiro_abate": {
     "title": "Primeiro abate",
-    "text": "Derrotar monstros dá experiência (XP). Acompanhe a barra amarela no seu painel: ao enchê-la você sobe de nível."
+    "text": "Derrotar monstros dá experiência (XP). Acompanhe a barra amarela no seu painel: ao enchê-la, um nível fica pronto para subir."
+  },
+  "nivel_pronto": {
+    "title": "Nível pronto!",
+    "text": "Você juntou XP para subir de nível. Aqui é você quem escolhe a hora: clique no seu quadro (canto de cima, à esquerda) ou aperte U. Dá para guardar até 3 níveis prontos; com a XP cheia, os monstros não dão mais XP até você subir.",
+    "textTouch": "Você juntou XP para subir de nível. Aqui é você quem escolhe a hora: toque no seu quadro, no canto de cima à esquerda. Dá para guardar até 3 níveis prontos; com a XP cheia, os monstros não dão mais XP até você subir."
   },
   "primeiro_nivel": {
     "title": "Subiu de nível!",

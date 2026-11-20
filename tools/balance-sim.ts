@@ -132,6 +132,7 @@ function huntRun(classId: string, seed: number): Run {
   const steps = Math.floor((MAX_MIN * 60) / DT);
   for (let i = 0; i < steps; i++) {
     w.tick(DT);
+    w.levelUpAll(); // jogador simulado sobe assim que a XP guardada paga o nível
     for (const ev of w.events.splice(0)) onEv(ev);
     if (w.time < nextPolicy) continue;
     nextPolicy = w.time + 1;
@@ -429,6 +430,7 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     lastLeaving: string | false = false;
   for (let i = 0; i < (MAX_MIN * 60) / DT; i++) {
     w.tick(DT);
+    w.levelUpAll(); // jogador simulado sobe assim que a XP guardada paga o nível
     for (const ev of w.events.splice(0)) {
       if (ev.type === 'levelup') {
         run.levelAt[ev.level - 1] = w.time / 60;

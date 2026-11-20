@@ -45,7 +45,7 @@ export function serialize(w: World): SaveData {
 // Preenche um World recém-criado (nome, seita, nível e atributos já vêm do construtor) com o resto do save.
 // Valores estranhos são corrigidos aqui (save antigo, editado ou corrompido). Não aplica o ganho offline.
 export function restore(w: World, s: SaveData, now: number) {
-  w.xp = s.xp;
+  w.xp = Math.min(Math.max(0, Number(s.xp) || 0), w.xpBankCap()); // XP guardada: no máximo XP_BANK_LEVELS níveis
   w.freePoints = s.freePoints;
   w.ratioCursor = s.ratioCursor ?? 0;
   w.seenTips = [...(s.seenTips ?? [])];

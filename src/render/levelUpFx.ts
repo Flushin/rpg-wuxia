@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { L } from '../core/i18n';
 import { TILE_H, TILE_W } from '../core/iso';
+import { LEVELUP_POSE_S } from '../core/data';
 import { audio } from './audio';
 import { DEPTH } from './depth';
 import { TEXT_RES } from './display';
@@ -10,8 +11,9 @@ import type { EntityView } from './entityView';
 // clarão no corpo, coluna de luz subindo, anel abrindo no chão e faíscas subindo. Tudo segue o personagem.
 // Níveis marco (múltiplos de 10): a mesma animação, maior, mais intensa, mais longa e com um tremor leve de câmera.
 // Vários níveis de uma vez: uma animação por nível, em fila; só a primeira tem a pose.
-export const LEVELUP_MS = 1200;
-export const LEVELUP_MILESTONE_MS = 1800;
+// O jogador escolhe a hora de subir (XP guardada), então a animação é longa (3× a original) para prints e vídeos.
+export const LEVELUP_MS = 3600;
+export const LEVELUP_MILESTONE_MS = 5400;
 export const isMilestoneLevel = (level: number) => level % 10 === 0;
 
 /** Medidas da versão normal e da versão marco. */
@@ -85,7 +87,7 @@ export class LevelUpFx {
     const milestone = isMilestoneLevel(level);
     const k = milestone ? LOOK.milestone : LOOK.normal;
     const ms = k.ms;
-    view.levelUp(ms, GOLD_LIGHT, k.glow, pose);
+    view.levelUp(ms, GOLD_LIGHT, k.glow, pose, LEVELUP_POSE_S * 1000);
     audio.levelUp(milestone);
     const h = Math.max(48, view.height);
 

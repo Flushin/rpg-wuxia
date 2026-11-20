@@ -64,6 +64,7 @@
 ### Progressão (v1)
 - Nível de personagem — **nível máximo 10** na v1 (**20** desde o marco 9, fase 1).
 - Nível de skills (ativas pelo uso, passivas pelo nível do personagem).
+- **Subida de nível manual (20/11/2026, pedido do Lucas):** a XP fica guardada e o jogador sobe quando quiser (toque no quadro do jogador ou tecla U), sempre manual, sem opção automática. Guarda até **3 níveis prontos** (`XP_BANK_LEVELS`); com a XP cheia o excesso se perde (monstros, missões e offline) e cada abate avisa "XP cheia". Offline não sobe de nível. Animação de subida e pose 3× mais longas (1,95 s parado). Simulações sobem sozinhas (`levelUpAll`).
 - Equipamentos: só alguns de cada tipo, para teste.
 
 ### Equipamentos e itens

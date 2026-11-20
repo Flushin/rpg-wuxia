@@ -102,8 +102,28 @@ balanceClasses(CLASSES);
 balanceMonsters(MONSTERS);
 balanceProgression(PROGRESSION);
 
-/** subida de nível: o jogador fica parado fazendo a pose (só visual; o auto espera). Igual à animação "levelup" (8 quadros a 12 fps). */
-export const LEVELUP_POSE_S = 0.65;
+/** subida de nível: o jogador fica parado fazendo a pose (só visual; o auto espera). A animação "levelup" (8 quadros a
+ *  12 fps, 0,65 s) toca e o último quadro fica parado até completar este tempo (3× a animação). */
+export const LEVELUP_POSE_S = 1.95;
+/** XP guardada: o jogador sobe de nível quando quiser (botão no HUD); a XP acumula até este número de níveis prontos
+ *  e o excesso se perde ("XP cheia"). */
+export const XP_BANK_LEVELS = 3;
+
+/** XP máxima guardada no nível `level`: a soma do necessário para os próximos XP_BANK_LEVELS níveis (até o máximo). */
+export function xpBankCap(level: number): number {
+  let sum = 0;
+  for (let l = level; l < Math.min(PROGRESSION.levelCap, level + XP_BANK_LEVELS); l++)
+    sum += PROGRESSION.xpToNext[l - 1];
+  return sum;
+}
+
+/** Quantos níveis a XP guardada `xp` já paga, a partir de `level`. */
+export function levelsReadyFor(level: number, xp: number): number {
+  let n = 0;
+  for (let l = level; l < PROGRESSION.levelCap && xp >= PROGRESSION.xpToNext[l - 1]; l++, n++)
+    xp -= PROGRESSION.xpToNext[l - 1];
+  return n;
+}
 
 /** Pontos livres ganhos ao chegar ao nível `level` (3 até o 20; 4 do 21 ao 30). */
 export function freePointsAt(level: number): number {

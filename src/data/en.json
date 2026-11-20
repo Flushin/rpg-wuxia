@@ -469,7 +469,12 @@
     },
     "primeiro_abate": {
       "title": "First kill",
-      "text": "Defeating monsters gives experience (XP). Watch the yellow bar on your panel: when it fills, you level up."
+      "text": "Defeating monsters gives experience (XP). Watch the yellow bar on your panel: when it fills, a level is ready to take."
+    },
+    "nivel_pronto": {
+      "title": "Level ready!",
+      "text": "You have enough XP to level up. Here you choose when: click your frame (top-left corner) or press U. You can store up to 3 ready levels; with XP full, monsters give no more XP until you level up.",
+      "textTouch": "You have enough XP to level up. Here you choose when: tap your frame in the top-left corner. You can store up to 3 ready levels; with XP full, monsters give no more XP until you level up."
     },
     "primeiro_nivel": {
       "title": "Level up!",
@@ -818,7 +823,7 @@
     ]
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [{"texto": "You choose when to level up: XP is stored (up to 3 ready levels) and your frame glows when a level is ready. Tap it (or press U) to level up, great for screenshots and videos; the animation is now 3× longer. With XP full, monsters stop giving XP and warn you on every kill."}],
     "versoes": [
       {"itens": [{"texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."}, {"texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."}]},
       {"itens": [{"texto": "Cheaper repairs for shield users: a hit fully absorbed by a shield (Iron Skin, Mist Veil) no longer wears down your equipment."}]},

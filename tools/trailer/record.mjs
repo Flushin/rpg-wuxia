@@ -136,7 +136,8 @@ async function installDirector() {
     },
     strong() {
       const w = D.w;
-      w.gainXp(1e7);
+      do w.gainXp(1e7);
+      while (w.levelUpAll() > 0); // XP guardada: sobe tudo de uma vez
       w.distributeRecommended();
       w.player.hp = w.player.derived.maxHp;
       w.player.mana = w.player.derived.maxMana;

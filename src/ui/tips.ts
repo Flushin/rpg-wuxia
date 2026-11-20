@@ -88,6 +88,7 @@ export class TipManager {
 
   onEvent(ev: GameEvent) {
     if (ev.type === 'kill' && ++this.kills === 1) this.trigger('primeiro_abate');
+    else if (ev.type === 'levelReady') this.trigger('nivel_pronto');
     else if (ev.type === 'levelup' && ++this.levelUps === 1) this.trigger('primeiro_nivel');
     else if (ev.type === 'skillLevelUp') this.trigger('skill_nivel');
     else if (ev.type === 'itemPickup' && !ev.potion) this.trigger('primeiro_item');
