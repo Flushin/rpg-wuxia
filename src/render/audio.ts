@@ -155,7 +155,7 @@ class AudioManager {
         break;
       // levelup: tocado por LevelUpFx junto com cada animação da fila (levelUp)
       case 'skillLevelUp':
-        this.sfx('level_up');
+        this.sfx('skill_up');
         break;
       case 'skillCast':
         this.lastRanged = ev.ranged;

@@ -13,7 +13,7 @@ Não escreva uma licença de memória e não copie de outro pacote: se não cons
 |---|---|---|---|---|
 | `kaykit-adventurers-1.0-LICENSE.txt` | KayKit Adventurers Character Pack 1.0 (Kay Lousberg) é **CC0** | Tormenta, Geada, NPCs, bandidos, terracota, General (`public/sprites/`) | `https://raw.githubusercontent.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0/main/LICENSE.txt` (repositório oficial, o mesmo de `tools/sprites/fetch-assets.sh`) | `ae3221418140` |
 | `quaternius-espelho-trebeljahr-LICENSES.md` | Ultimate Animated Animal Pack (Quaternius) é **CC0** upstream | Lobo (`public/sprites/lobo.*`) | `https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/LICENSES.md` — **espelho não oficial** (o mesmo de `fetch-assets.sh`); aponta para a página oficial `https://quaternius.com/packs/ultimateanimatedanimals.html` | `a59ca1463ae0` |
-| `kenney-ui-audio-LICENSE.txt` | Kenney UI Audio ("UI SFX Set", Kenney Vleugels) é **CC0** | `ui_click` (= click1), `point_spent` (= click3), `tip` (= rollover3) em `public/audio/sfx/` | `https://github.com/Calinou/kenney-ui-audio`, commit `8c3d81b9159d058c444f89d12d518276b0b09345`, arquivo `addons/kenney_ui_audio/LICENSE.txt` (cópia do pacote original, sem alteração) | `4f88ab3c885c` |
+| `kenney-ui-audio-LICENSE.txt` | Kenney UI Audio ("UI SFX Set", Kenney Vleugels) é **CC0** | `ui_click` (= click1), `coin` (= click3; era `point_spent`), `tip` (= rollover3) em `public/audio/sfx/` | `https://github.com/Calinou/kenney-ui-audio`, commit `8c3d81b9159d058c444f89d12d518276b0b09345`, arquivo `addons/kenney_ui_audio/LICENSE.txt` (cópia do pacote original, sem alteração) | `4f88ab3c885c` |
 | `CC0-1.0.txt` | Texto legal completo da CC0 1.0 Universal (todos os assets acima) | — | SPDX: `https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC0-1.0.txt` | `a2010f343487` |
 | `phaser-3.90.0-LICENSE.md` | Phaser 3.90.0 — **MIT**, © 2024 Richard Davey, Phaser Studio Inc. | Motor do jogo (vai no bundle) | Pacote npm `phaser@3.90.0` (`npm pack`) | `080f3d5539e7` |
 | `eventemitter3-5.0.4-LICENSE.txt` | eventemitter3 5.0.4 — **MIT**, © 2014 Arnout Kazemier | Dependência do Phaser (vai no bundle) | Pacote npm `eventemitter3@5.0.4` | `3aecc12b1cb2` |
@@ -61,6 +61,16 @@ Licença conferida na página de cada som no Freesound (link da licença `public
 | `atk_patriarca` | Patriarca Profanado | `https://freesound.org/people/LilMati/sounds/659762/` | LilMati | CC0 |
 | `atk_rei_bandidos` | Rei dos Bandidos | `https://freesound.org/people/julianmateo_/sounds/522701/` | julianmateo_ | CC0 |
 | `atk_senhor_nevoa` | Senhor da Névoa | `https://freesound.org/people/PrdiChlp/sounds/181889/` | PrdiChlp | CC0 |
+
+### Progressão (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `level_up` (mistura, parte 1) | `https://freesound.org/people/qubodup/sounds/161654/` | qubodup | CC0 |
+| `level_up` (mistura, parte 2) | `https://freesound.org/people/Breviceps/sounds/444491/` | Breviceps | CC0 |
+| `point_spent` | `https://freesound.org/people/hollandm/sounds/692828/` | hollandm | CC0 |
 
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
