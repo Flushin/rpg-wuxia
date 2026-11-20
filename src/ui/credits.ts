@@ -51,11 +51,6 @@ const ART: Credit[] = [
 
 const SOUND: Credit[] = [
   {
-    what: L('Efeitos sonoros', 'Sound effects'),
-    who: 'RPG Audio, Impact Sounds, UI Audio — Kenney (kenney.nl)',
-    license: CC0,
-  },
-  {
     what: L('Efeitos sonoros de combate', 'Combat sound effects'),
     who: 'CYBERDEViL, VishwaJai, Spring Spring, JaggedStone, pauliuw (OpenGameArt.org); stephan (Wikimedia Commons)',
     license: CC0,

@@ -1,7 +1,5 @@
-Efeitos sonoros: Kenney (https://kenney.nl) e autores do OpenGameArt/Wikimedia Commons/Freesound abaixo, todos CC0 (domínio público).
-Pacotes usados: RPG Audio, Impact Sounds, UI Audio.
-
-Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório):
+Efeitos sonoros e músicas: autores do Freesound, OpenGameArt e Wikimedia Commons abaixo, todos CC0 (domínio público).
+Escolhidos em 20/11/2026. Arquivo do jogo -> origem (provas e licenças em docs/licencas/ no repositório).
 
 Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume igualado ao som antigo):
 - hit            -> "Machete vs. Spatula" (machete_vs_spatula_7) — CYBERDEViL — https://opengameart.org/content/machete-vs-spatula
