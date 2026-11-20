@@ -59,6 +59,10 @@ console.log('== ícones e sprites ==');
   const idx = (atlas as { index: Record<string, number> }).index;
   const noIcon = W.allItemIds().filter((id) => idx[id] === undefined);
   ok(!noIcon.length, `todo item tem ícone ${noIcon.join(', ')}`);
+  const noEpic = [...['colar', 'tronco', 'cabeca', 'calca', 'bota'], ...W.SECT_ORDER.map((s) => `arma_${s}`)]
+    .map((k) => `epico_${k}`)
+    .filter((n) => idx[n] === undefined);
+  ok(!noEpic.length, `todo Épico tem ícone ${noEpic.join(', ')}`);
   const skills = Object.values(W.SKILLS).flat();
   const noSkillIcon = skills.filter((s) => idx['skill_' + s.id] === undefined).map((s) => s.id);
   ok(!noSkillIcon.length, `toda skill tem ícone ${noSkillIcon.join(', ')}`);

@@ -143,7 +143,7 @@ const TOPICS = [
   { id: 'forja', label: 'Forja e economia', icon: 'minerio_ferro' },
   { id: 'auto', label: 'Auto-combate e ganho offline', icon: 'pergaminho_retorno' },
   { id: 'trial', label: 'Trial (desafio de chefes)', icon: 'essencia_qi' },
-  { id: 'epico', label: 'Equipamento Épico', icon: 'colar_nevoa' },
+  { id: 'epico', label: 'Equipamento Épico', icon: 'epico_colar' },
 ];
 
 export { EPIC };
@@ -163,10 +163,13 @@ function epico(): string {
     lvs = [1, 10, 20, 30],
     SECT = ['lamina', 'pavilhao', 'tita', 'vibora'];
   const names = [
-    ...['colar', 'tronco', 'cabeca', 'calca', 'bota'].map((s) => [SLOT_NAMES[s], EPIC_NAMES[s]]),
-    ...SECT.map((c) => [`Arma (${esc(CLASSES[c].name)})`, EPIC_NAMES[`arma_${c}`]]),
+    ...['colar', 'tronco', 'cabeca', 'calca', 'bota'].map((s) => [SLOT_NAMES[s], EPIC_NAMES[s], s]),
+    ...SECT.map((c) => [`Arma (${esc(CLASSES[c].name)})`, EPIC_NAMES[`arma_${c}`], `arma_${c}`]),
   ]
-    .map(([a, b]) => `<tr><td>${a}</td><td><b style="color:${col}">${esc(b)}</b></td></tr>`)
+    .map(
+      ([a, b, k]) =>
+        `<tr><td>${a}</td><td>${iconHtml(`epico_${k}`, 'sm')} <b style="color:${col}">${esc(b)}</b></td></tr>`,
+    )
     .join('');
   const bon = SECT.map((c) => {
     const st = epicBonusesAt(c, 1).map((b) => esc(STAT_LABELS[b.stat] ?? b.stat));
