@@ -42,6 +42,7 @@ import {
 import { AutoCombat } from './auto';
 import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { dungeonById, isDungeonMap } from './dungeons';
+import { TELEPORT_COST, teleportBlock, teleportById } from './teleport';
 import {
   TRIAL_MAP,
   TRIAL_MIN_LEVEL,
@@ -854,6 +855,19 @@ export class World {
     this.auto.disable(); // o Auto não funciona na masmorra
     this.changeMap(d.map);
     this.emit({ type: 'dungeonEnter', dungeonId: d.id, cost: d.cost });
+    return null;
+  }
+
+  /** Teleporte do Mestre dos Caminhos: paga a viagem e vai da vila direto ao mapa escolhido (src/core/teleport.ts). */
+  travelTo(map: string): ActionError | null {
+    const d = teleportById(map);
+    if (!d || !this.maps[d.map] || this.player.dead || !TOWN_MAPS.has(this.mapId)) return null;
+    const block = teleportBlock(d, this.player.level, this.gold);
+    if (block) return block;
+    this.gold -= TELEPORT_COST;
+    this.bumpInv();
+    this.changeMap(d.map, d.x, d.y);
+    this.emit({ type: 'teleport', map: d.map, cost: TELEPORT_COST });
     return null;
   }
 
