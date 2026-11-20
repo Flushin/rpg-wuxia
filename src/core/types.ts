@@ -309,4 +309,5 @@ export type ActionError =
   | { code: 'noMaterials' }
   | { code: 'talkToMerchant' }
   | { code: 'soldOut' }
-  | { code: 'trialLocked' };
+  | { code: 'trialLocked' }
+  | { code: 'epicLocked' };

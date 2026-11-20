@@ -441,7 +441,7 @@ export class NpcWindow {
     const it = this.forgeItem();
     let detail = `<p class="muted">${L('Escolha um item para forjar.', 'Choose an item to forge.')}</p>`;
     if (it) {
-      const up = upgradeCost(it),
+      const up = upgradeCost(it, w.owner()),
         ra = rarityCost(it),
         re = rerollCost(it),
         plus = it.plus ?? 0;
@@ -468,14 +468,18 @@ export class NpcWindow {
           'rarity',
           ra,
           L('Ganha um bônus aleatório novo.', 'Gains a new random bonus.'),
-          L('Já é Raro.', 'Already Rare.'),
+          it.rarity === 'epico'
+            ? L('Épico já é a maior raridade.', 'Epic is already the highest rarity.')
+            : L('Já é Raro.', 'Already Rare.'),
         )}
         ${this.costRow(
           L('Trocar bônus', 'Reroll bonuses'),
           'reroll',
           re,
           L('Sorteia de novo todos os bônus.', 'Rerolls all bonuses.'),
-          L('Só itens Incomuns ou Raros têm bônus.', 'Only Uncommon or Rare items have bonuses.'),
+          it.rarity === 'epico'
+            ? L('Épico: bônus fixos da sua classe.', 'Epic: fixed bonuses for your class.')
+            : L('Só itens Incomuns ou Raros têm bônus.', 'Only Uncommon or Rare items have bonuses.'),
         )}
 <div class="tipbody ftip">${itemTipHtml(w, it, false)}</div>`;
     }
@@ -487,7 +491,7 @@ export class NpcWindow {
     const w = this.world;
     const pick: string[] = [];
     w.bag.forEach((it, i) => {
-      if (!it || !BASES[it.baseId]) return;
+      if (!it || !BASES[it.baseId] || it.rarity === 'epico') return; // Épico não se desmonta
       const ref = `bag:${i}`;
       pick.push(
         `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b></span></button>`,
@@ -616,6 +620,12 @@ export class NpcWindow {
         : isStackId(it.baseId)
           ? `x${it.qty ?? 1} · `
           : '';
+      if (it.rarity === 'epico') {
+        // Épico não se vende: aparece na lista, sem preço nem botão
+        rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
+        <small>${info}<span class="muted">${L('Não pode ser vendido', 'Cannot be sold')}</span></small></div></div>`);
+        return;
+      }
       rows.push(`<div class="srow">${icon(it)}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
         <small>${info}<span class="tip-sell">${sellValue(it)} ${L('ouro', 'gold')}${stack ? ` ${L('(cada)', '(each)')}` : ''}</span></small></div>
         <div class="sbtns"><button class="${conf ? 'danger' : ''}" data-a="sell" data-v="${i}">${conf ? L('Confirmar?', 'Confirm?') : stack ? L('Vender 1', 'Sell 1') : L('Vender', 'Sell')}</button>

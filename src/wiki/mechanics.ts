@@ -65,6 +65,7 @@ export const FORGE = {
   upgradeGold: { base: 30, perPlus: 30 },
   rarityGold: { incomum: 200, raro: 600 } as Record<string, number>,
   rerollGold: { incomum: 100, raro: 200 } as Record<string, number>,
+  epicGoldMul: 2,
 };
 const levelFactor = (reqLevel: number) => 1 + reqLevel / 5;
 const fGold = (v: number, reqLevel: number) => Math.round(v * levelFactor(reqLevel) * bal('forja.ouro'));

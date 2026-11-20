@@ -159,6 +159,7 @@ console.log('== fórmulas copiadas ==');
   const bad: string[] = [];
   for (const id of Object.keys(C_BASES))
     for (const r of Object.keys(C_RAR)) {
+      if (r === 'epico') continue; // Épico não se vende nem aparece no Mercador
       const it = makeEquipment(id, r as never, null, rng);
       if (W.sellPrice(W.BASES[id].value, W.RARITIES[r].valueMul) !== sellValue(it)) bad.push(`venda ${id} ${r}`);
       if (r !== 'comum' && W.merchantPrice(W.BASES[id].value, r) !== offerPrice(it)) bad.push(`mercador ${id} ${r}`);

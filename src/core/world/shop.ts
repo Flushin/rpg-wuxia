@@ -24,6 +24,7 @@ export function purchase(w: World, potionId: string, qty: number): ActionError |
 
 export function sell(w: World, bagIndex: number, qty = 1): ActionError | null {
   if (w.npcRole() !== 'vendedor') return { code: 'talkToSeller' };
+  if (w.bag[bagIndex]?.rarity === 'epico') return { code: 'epicLocked' };
   sellRaw(w, bagIndex, qty);
   return null;
 }
@@ -31,7 +32,7 @@ export function sell(w: World, bagIndex: number, qty = 1): ActionError | null {
 // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
 export function sellRaw(w: World, bagIndex: number, qty = 1): number {
   const it = w.bag[bagIndex];
-  if (!it) return 0;
+  if (!it || it.rarity === 'epico') return 0; // Épico não se vende (nem pelo auto)
   const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
     gold = sellValue(it) * n;
   w.removeFromBag(bagIndex, n);

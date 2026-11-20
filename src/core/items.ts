@@ -318,6 +318,7 @@ export function sellValue(it: ItemInstance): number {
   const c = CONSUMABLES[it.baseId];
   if (c) return Math.max(1, Math.floor(c.price * J.sellRatio + 1e-9));
   const b = BASES[it.baseId];
+  if (it.rarity === 'epico') return 0; // Épico não se vende
   return b ? Math.max(1, Math.floor(b.value * RARITIES[it.rarity].valueMul * J.sellRatio + 1e-9)) : 0;
 }
 /** Conserto; o Épico usa o nível de quem usa no lugar do nível do item (como um Raro dropado nesse nível). */
