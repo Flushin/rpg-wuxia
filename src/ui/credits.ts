@@ -61,6 +61,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons de itens, forja, missões e ações', 'Item, forge, quest and action sounds'),
+    who: 'Mateusz_Chenc, Err0rC0de, mrickey13, ValentinPetiteau, michorvath, ralph.whitehead, Mr._Fritz_, Wagna, Q.K., Raclure, EntoClash, Selector, UnderASpell (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons da interface e do portal', 'Interface and portal sounds'),
     who: 'NenadSimic, LilMati, tia666, marcusgar (Freesound.org)',
     license: CC0,

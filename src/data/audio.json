@@ -36,6 +36,14 @@
       "file": "skill_up",
       "volume": 0.9
     },
+    "quest_turnin": {
+      "file": "quest_turnin",
+      "volume": 0.9
+    },
+    "forge_ok": {
+      "file": "forge_ok",
+      "volume": 0.9
+    },
     "point_spent": {
       "file": "point_spent",
       "volume": 0.7
@@ -46,6 +54,18 @@
     },
     "action_click": {
       "file": "action_click",
+      "volume": 0.6
+    },
+    "fail": {
+      "file": "fail",
+      "volume": 0.6
+    },
+    "forge_fail": {
+      "file": "forge_fail",
+      "volume": 0.6
+    },
+    "salvage": {
+      "file": "salvage",
       "volume": 0.6
     },
     "ui_open": {
@@ -77,11 +97,11 @@
       "volume": 0.6
     },
     "pickup": {
-      "file": "action_click",
+      "file": "pickup",
       "volume": 0.5
     },
     "equip": {
-      "file": "action_click",
+      "file": "equip",
       "volume": 0.6
     },
     "potion": {
