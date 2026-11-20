@@ -251,6 +251,14 @@
     "shield_break": {
       "file": "shield_break",
       "volume": 0.8
+    },
+    "aoe_warning": {
+      "file": "aoe_warning",
+      "volume": 0.8
+    },
+    "aoe_impact": {
+      "file": "aoe_impact",
+      "volume": 0.8
     }
   },
   "music": {

@@ -93,3 +93,7 @@ Skills das classes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, 
 Escudo (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médio -18 dB):
 - shield_hit     -> "Sound Design Elements Impact SFX PS 070" (de 0,13 s a 1 s; volume baixo no jogo) — AudioPapkin — https://freesound.org/people/AudioPapkin/sounds/812736/
 - shield_break   -> "Glass Break" (de 0,32 s a 0,92 s) — unfa — https://freesound.org/people/unfa/sounds/221528/
+
+Golpe em área dos chefes (20/11/2026; Freesound, prévia HQ; cortados com fade, mono, volume médio -18 dB):
+- aoe_warning    -> "Reverse Cymbal.wav" (primeiros 1,4 s; o pico cai junto com o golpe) — Lynx_5969 — https://freesound.org/people/Lynx_5969/sounds/418724/
+- aoe_impact     -> "Impact sfx 027.wav" (primeiros 0,5 s) — AudioPapkin — https://freesound.org/people/AudioPapkin/sounds/645898/

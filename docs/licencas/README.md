@@ -160,6 +160,15 @@ Licença conferida na página de cada som no Freesound (link `publicdomain/zero/
 | `shield_hit` | `https://freesound.org/people/AudioPapkin/sounds/812736/` | AudioPapkin | CC0 |
 | `shield_break` | `https://freesound.org/people/unfa/sounds/221528/` | unfa | CC0 |
 
+### Golpe em área dos chefes (verificados em 20/11/2026)
+
+Licença conferida na página de cada som no Freesound (link `publicdomain/zero/1.0`). Texto legal: `CC0-1.0.txt`.
+
+| Arquivo do jogo (`public/audio/sfx/`) | Origem | Autor | Licença na página |
+|---|---|---|---|
+| `aoe_warning` | `https://freesound.org/people/Lynx_5969/sounds/418724/` | Lynx_5969 | CC0 |
+| `aoe_impact` | `https://freesound.org/people/AudioPapkin/sounds/645898/` | AudioPapkin | CC0 |
+
 Para conferir se um arquivo não mudou: `sha256sum docs/licencas/*`.
 
 ## Bibliotecas nativas do APK (Android)
