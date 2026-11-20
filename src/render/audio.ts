@@ -43,6 +43,8 @@ const MONSTER_ATTACK = data.monsterAttack as Record<string, string>;
 /** som de cada efeito de skill ("fx" em skills.json -> chave em "sfx"); sem entrada = "spell" só à distância */
 const SKILL_FX = data.skillFx as Record<string, string>;
 const MAX_INSTANCES = 3;
+/** segundos até o pico de aoe_warning */
+const AOE_WARNING_PEAK = 0.85;
 const FADE_MS = 1000;
 
 export const sfxFiles = () =>
@@ -57,6 +59,8 @@ class AudioManager {
   private missing = new Set<string>();
   private loading = new Set<string>();
   private lastRanged = false;
+  /** último toque de cada som limitado a 1 por rajada (ex.: leque de linhas do chefe) */
+  private lastAt = new Map<string, number>();
 
   bind(scene: Phaser.Scene, settings: AudioSettings, onChange?: () => void) {
     this.scene = scene;
@@ -86,7 +90,15 @@ class AudioManager {
     return this.settings.muted ? 0 : this.settings.music / 100;
   }
 
-  sfx(key: string, detune = 0) {
+  /** Toca no máximo 1 vez a cada `gapMs` (vários avisos no mesmo instante viram um som só). */
+  private sfxOnce(key: string, gapMs: number, delay = 0) {
+    const now = performance.now();
+    if (now - (this.lastAt.get(key) ?? -Infinity) < gapMs) return;
+    this.lastAt.set(key, now);
+    this.sfx(key, 0, delay);
+  }
+
+  sfx(key: string, detune = 0, delay = 0) {
     const s = this.scene,
       d = SFX[key];
     if (!s || !d || this.resting || !s.cache.audio.exists(key)) return;
@@ -95,7 +107,11 @@ class AudioManager {
     const n = this.playing.get(key) ?? 0;
     if (n >= MAX_INSTANCES) return;
     this.playing.set(key, n + 1);
-    const snd = s.sound.add(key, { volume: vol, detune: detune ? Phaser.Math.Between(-detune, detune) : 0 });
+    const snd = s.sound.add(key, {
+      volume: vol,
+      detune: detune ? Phaser.Math.Between(-detune, detune) : 0,
+      delay,
+    });
     const done = () => {
       this.playing.set(key, Math.max(0, (this.playing.get(key) ?? 1) - 1));
       snd.destroy();
@@ -168,6 +184,13 @@ class AudioManager {
           if (key) this.sfx(key);
           else if (ev.ranged) this.sfx('spell', 300);
         }
+        break;
+      case 'telegraph':
+        // o pico do prato ao contrário (~0,85 s) cai junto com o golpe
+        this.sfxOnce('aoe_warning', 200, Math.max(0, ev.delay - AOE_WARNING_PEAK));
+        break;
+      case 'telegraphResolved':
+        this.sfxOnce('aoe_impact', 200);
         break;
       case 'shieldAbsorb':
         if (ev.targetId === playerId) this.sfx('shield_hit', 200);

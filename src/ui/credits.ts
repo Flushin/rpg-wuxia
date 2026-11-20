@@ -86,6 +86,11 @@ const SOUND: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Sons do golpe em área dos chefes (aviso e impacto)', 'Boss area strike sounds (warning and impact)'),
+    who: 'Lynx_5969, AudioPapkin (Freesound.org)',
+    license: CC0,
+  },
+  {
     what: L('Sons de ataque dos monstros', 'Monster attack sounds'),
     who: 'Mrthenoronha, GaussTheWizard, Ali_6868, CamoMano, LilMati, Christopherderp, Sadiquecat, erkanozan, TheKingOfGeeks360, qubodup, mark205, AudioPapkin, Nightflame, el_boss, julianmateo_, PrdiChlp (Freesound.org)',
     license: CC0,

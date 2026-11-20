@@ -1,7 +1,7 @@
 // Verificação headless do Trial: portal e menu na saída sul da vila, entrada (nível 20, ouro, nível liberado),
 // chefe escolhido no nível 21–30 com os números de src/core/trial.ts, bônus de drop, progresso salvo e saída.
 // Uso: npm run check:trial
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { MONSTERS } from '../src/core/data';
 import { MAPS_CONFIG, MAP_IDS } from '../src/core/mapsConfig';
 import { parseTiledMap, type GameMap } from '../src/core/map';
@@ -196,6 +196,21 @@ console.log('\n== som da arena (bossArenaEnter) ==');
   put(a.x, a.y);
   w.tick(1 / 60);
   ok(enters() === 0, 'com o chefe morto não toca');
+}
+
+console.log('\n== som do golpe em área (N7) ==');
+{
+  const audio = JSON.parse(readFileSync('src/data/audio.json', 'utf8'));
+  for (const k of ['aoe_warning', 'aoe_impact'])
+    ok(!!audio.sfx[k] && existsSync(`public/audio/sfx/${audio.sfx[k].file}.ogg`), `${k} cadastrado e com arquivo`);
+  // o pico de aoe_warning fica a 0,85 s do início (AOE_WARNING_PEAK em src/render/audio.ts)
+  const delays = readdirSync('src/data')
+    .filter((f) => f.endsWith('.json'))
+    .flatMap((f) => [...readFileSync(`src/data/${f}`, 'utf8').matchAll(/"delay":\s*([\d.]+)/g)].map((m) => +m[1]));
+  ok(
+    delays.length > 0 && Math.min(...delays) >= 0.85,
+    `todo aviso dura ao menos 0,85 s (menor: ${Math.min(...delays)} s)`,
+  );
 }
 
 if (fails) {
