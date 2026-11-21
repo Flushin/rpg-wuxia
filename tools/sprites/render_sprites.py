@@ -56,11 +56,11 @@ def setup_scene(cfg):
         retexture(cfg['texture'])
     for img, cells in cfg.get('textures', {}).items():
         retexture({'image': img, 'cells': cells})
-    if cfg.get('glow_mesh'):
-        glow_meshes(cfg['glow_mesh'])
     arm = next((o for o in bpy.data.objects if o.type == 'ARMATURE'), None)
     for a in cfg.get('attach', []):
         attach(a, arm)
+    if cfg.get('glow_mesh'):  # depois do attach: acessórios ('Fan', 'Staff'…) também podem brilhar
+        glow_meshes(cfg['glow_mesh'])
     # raiz que gira para as 8 direções
     root = bpy.data.objects.new('SpriteRoot', None)
     sc.collection.objects.link(root)
