@@ -46,3 +46,10 @@ faixa), jogo ativo:
 - **Arte:** sprites e tiles novos no Blender (KayKit, como no 20–30).
 - **Feito na etapa 2:** `levelCap` 40 e a curva acima em `progression.json`; migração 2 → 3 em `saveFormat.ts`
   (teste em `check:m5`); tooltip da barra de skills mostrava "/10" fixo (corrigido para `SKILL_MAX_LEVEL`).
+- **Feito na etapa 3:** bases nv 35 `colar_sol_carmesim`, `tunica_palacio`, `espadas_asa_fenix`, `leque_aurora`
+  (Leque de Qi da Aurora Carmesim), `bastao_pilar_celeste`, `agulhas_escarlates`, `coroa_celeste`, `calca_nuvens_rubras`,
+  `botas_degrau_imperial` (Botas do Degrau Imperial); os nomes Lua Fria e Passo Celeste já existiam (nv 10/15) e foram
+  trocados pelo Lucas. Valor ~1,47× o nv 25 (arma 2.000). `RARE_DOUBLE_FROM_LEVEL` = 35 em `forge.ts`: material raro em
+  dobro em toda receita e no desmonte (wiki em `mechanics.ts`). Ouro ×8 sai da fórmula 1 + nível/5. Mercador e Épico
+  passam ao nv 35 no nível 35 sem código novo. Ícones em `tools/sprites/icons.py`. Teste: `npm run check:m11`. Drops
+  nos monstros e no Trial entram na etapa 4.

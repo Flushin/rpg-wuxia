@@ -864,6 +864,46 @@ def i_jade(im):
     fill(im, mask_ellipse((214, 190, 298, 274)), (240, 255, 248), (150, 230, 200), outline=4)
 
 
+# nível 40 (etapa 3): conjunto nv 35 do Palácio Celeste (carmesim e dourado)
+def i_colar_sol_carmesim(im):
+    colar_gema(im, (236, 200, 110), (255, 220, 170), (200, 40, 40), (255, 140, 90))
+
+
+def i_tunica_palacio(im):
+    robe(im, (176, 36, 44), (236, 196, 90), (90, 40, 40))
+
+
+def i_espadas_asa_fenix(im):
+    for a in (-0.55, 0.55):
+        jian(im, a, blade=(255, 236, 214), guard=(230, 170, 60), glow_c=(255, 150, 80), tassel=(210, 40, 40))
+
+
+def i_leque_aurora(im):
+    fan(im, (250, 226, 200), (120, 30, 36), accent=(230, 180, 70), cloud=(255, 150, 120))
+
+
+def i_bastao_pilar_celeste(im):
+    staff(im, (190, 60, 50), (250, 210, 110), glow_c=(255, 200, 120), band=(230, 180, 70))
+
+
+def i_agulhas_escarlates(im):
+    needles(im, (240, 90, 80), (250, 220, 150), glow_c=(255, 120, 100))
+
+
+def i_coroa_celeste(im):
+    fill(im, mask_poly([(130, 380), (130, 220), (190, 290), (256, 150), (322, 290), (382, 220), (382, 380)]), (250, 214, 110), (150, 90, 30))
+    for x, y in ((256, 250), (180, 330), (332, 330)):
+        fill(im, mask_ellipse((x - 18, y - 18, x + 18, y + 18)), (255, 160, 150), (190, 30, 40), outline=4)
+
+
+def i_calca_nuvens_rubras(im):
+    pants(im, (170, 40, 48), strap=(236, 196, 90), belt=(90, 40, 40))
+
+
+def i_botas_degrau_imperial(im):
+    boot(im, (160, 36, 44), (70, 40, 36), trim=(240, 200, 100))
+
+
 ITEMS = {
     'colar_jade': i_colar_jade, 'colar_dragao': i_colar_dragao,
     'tunica_algodao': i_tunica, 'manto_seda': i_manto,
@@ -896,6 +936,11 @@ ITEMS = {
     'bastao_pico': i_bastao_pico, 'agulhas_jade_celeste': i_agulhas_jade_celeste,
     'coroa_jade': i_coroa_jade, 'calca_nuvens': i_calca_nuvens, 'botas_nebulosas': i_botas_nebulosas,
     'jade_nevoa': i_jade,
+    'colar_sol_carmesim': i_colar_sol_carmesim, 'tunica_palacio': i_tunica_palacio,
+    'espadas_asa_fenix': i_espadas_asa_fenix, 'leque_aurora': i_leque_aurora,
+    'bastao_pilar_celeste': i_bastao_pilar_celeste, 'agulhas_escarlates': i_agulhas_escarlates,
+    'coroa_celeste': i_coroa_celeste, 'calca_nuvens_rubras': i_calca_nuvens_rubras,
+    'botas_degrau_imperial': i_botas_degrau_imperial,
 }
 SKILLS = {
     'corte_duplo': (s_corte_duplo, THUNDER_BG), 'passo_fantasma': (s_passo, THUNDER_BG),

@@ -92,11 +92,14 @@ const clean = (m: Mats): Mats => Object.fromEntries(Object.entries(m).filter(([,
 /** Material raro: Cristal de Gelo nos itens nv 1–15, Jade da Névoa nos nv 20+ (JADE_FROM_LEVEL em forge.ts). */
 const JADE_FROM_LEVEL = 20;
 const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? 'jade_nevoa' : 'cristal_gelo');
+/** Itens nv 35+ pedem o dobro do material raro (RARE_DOUBLE_FROM_LEVEL em forge.ts). */
+const RARE_DOUBLE_FROM_LEVEL = 35;
+const rq = (reqLevel: number, n: number) => (reqLevel >= RARE_DOUBLE_FROM_LEVEL ? 2 * n : n);
 export function upgradeCost(reqLevel: number, plus: number) {
   return {
     mats: clean({
       minerio_ferro: 2 + 2 * plus,
-      [rareMat(reqLevel)]: plus >= 4 ? plus - 3 : 0,
+      [rareMat(reqLevel)]: rq(reqLevel, plus >= 4 ? plus - 3 : 0),
       essencia_qi: plus >= 7 ? 1 : 0,
     }),
     gold: fGold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * plus, reqLevel),
@@ -105,20 +108,29 @@ export function upgradeCost(reqLevel: number, plus: number) {
 }
 export const rarityCost = (reqLevel: number, from: string) =>
   from === 'comum'
-    ? { mats: { minerio_ferro: 12, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rarityGold.incomum, reqLevel) }
+    ? {
+        mats: { minerio_ferro: 12, [rareMat(reqLevel)]: rq(reqLevel, 1) } as Mats,
+        gold: fGold(FORGE.rarityGold.incomum, reqLevel),
+      }
     : {
-        mats: { minerio_ferro: 20, [rareMat(reqLevel)]: 4, essencia_qi: 1 } as Mats,
+        mats: { minerio_ferro: 20, [rareMat(reqLevel)]: rq(reqLevel, 4), essencia_qi: 1 } as Mats,
         gold: fGold(FORGE.rarityGold.raro, reqLevel),
       };
 export const rerollCost = (reqLevel: number, rarity: string) =>
   rarity === 'incomum'
-    ? { mats: { minerio_ferro: 6, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rerollGold.incomum, reqLevel) }
-    : { mats: { minerio_ferro: 10, [rareMat(reqLevel)]: 2 } as Mats, gold: fGold(FORGE.rerollGold.raro, reqLevel) };
+    ? {
+        mats: { minerio_ferro: 6, [rareMat(reqLevel)]: rq(reqLevel, 1) } as Mats,
+        gold: fGold(FORGE.rerollGold.incomum, reqLevel),
+      }
+    : {
+        mats: { minerio_ferro: 10, [rareMat(reqLevel)]: rq(reqLevel, 2) } as Mats,
+        gold: fGold(FORGE.rerollGold.raro, reqLevel),
+      };
 export const salvageYield = (reqLevel: number, rarity: string, plus: number): Mats =>
   clean({
     minerio_ferro:
       1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : rarity === 'raro' ? 3 : 0) + Math.floor(plus / 2),
-    [rareMat(reqLevel)]: (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0),
+    [rareMat(reqLevel)]: rq(reqLevel, (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0)),
   });
 /** OFFLINE_TIERS e OFFLINE_GOLD_CAP_HOURS em src/core/offline.ts */
 export const OFFLINE_TIERS = [
@@ -315,7 +327,7 @@ function forja(): string {
   return `<section class="panel"><h2>Melhorar (+1 a +10)</h2>
       <p>Cada + soma <b>${pc(UPGRADE_STEP)}</b> aos atributos base do item (não aos bônus aleatórios). Materiais e ouro são cobrados antes;
       se <b>falhar</b>, o item fica como estava (não quebra nem perde +). Os materiais da tabela são os de itens até o nível 15; em itens de
-      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade), aqui e em subir raridade, trocar bônus e desmontar.
+      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade; em itens de nível ${RARE_DOUBLE_FROM_LEVEL} ou mais, o <b>dobro</b>), aqui e em subir raridade, trocar bônus e desmontar.
       O <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épico</a> usa a faixa do seu nível e custa <b>${FORGE.epicGoldMul}× o ouro</b>; não sobe raridade, não troca bônus nem é desmontado.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Melhoria</th><th>Chance</th><th>Materiais</th>${goldHead}</tr></thead><tbody>${up}</tbody></table></div></section>
     <section class="panel"><h2>Subir raridade e trocar bônus</h2>
