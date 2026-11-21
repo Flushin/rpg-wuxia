@@ -95,6 +95,8 @@ export class AttrsPanel {
       [L('Chance de crítico', 'Crit chance'), `${(d.critChance * 100).toFixed(1)}%`],
       [L('Dano crítico', 'Crit damage'), `${Math.round(d.critDamage * 100)}%`],
     ];
+    // roubo de vida da seita (Tormenta): só aparece para quem tem
+    if (cls.lifeSteal) der.push([L('Roubo de vida', 'Life steal'), `${+(cls.lifeSteal * 100).toFixed(1)}%`]);
     const els = ELEMENTS.map(
       (e) =>
         `<div class="at-el el-${e}"><span>${ELEMENT_LABELS[e]}</span><b class="${p.elemAtk[e] ? '' : 'zero'}">${p.elemAtk[e]}</b><b class="${p.elemRes[e] ? '' : 'zero'}">${p.elemRes[e]}</b></div>`,

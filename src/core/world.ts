@@ -1132,12 +1132,15 @@ export class World {
       const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
       // desgaste: só golpe que passa do escudo (o escudo protege o equipamento; decidido pelo Lucas em 19/11/2026)
       if (t.kind === 'player' && a.kind === 'monster' && dealt > 0) this.wearGear();
+      const hpBefore = Math.max(0, t.hp);
       t.hp -= dealt;
       if (dealt > 0)
         this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
-      // roubo de vida da seita (Tormenta): parte do dano causado volta como vida
+      // roubo de vida da seita (Tormenta): parte do dano causado volta como vida;
+      // conta só o dano que o alvo podia levar (excesso sobre a vida restante não cura)
       const ls = a.kind === 'player' ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
-      if (ls > 0 && dealt > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + dealt * ls);
+      const stolen = Math.min(dealt, hpBefore);
+      if (ls > 0 && stolen > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + stolen * ls);
       // golpe que deixa lento (Espectro de gelo, marco 9)
       const oh = a.kind === 'monster' && !skill ? MONSTERS[a.monsterId]?.onHit : undefined;
       if (oh && t.hp > 0) this.addBuff(t, a.monsterId, 'slow', oh.slow, oh.duration);
