@@ -33,6 +33,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `espectro_gelo.json`, `yeti.json`, `discipulo_caido.json`, `abade_caido.json` | Montanha Nevada (marco 9): Mage, Barbarian, Rogue e Mage (com cajado) recoloridos |
 | `assassino_sombras.json`, `serpente_jade.json`, `grou_espiritual.json`, `guardiao_jade.json`, `senhor_nevoa.json` | Nível 30: Rogue_Hooded (facas), Mage, Mage, Knight (com elmo) e Mage (com cajado) recoloridos |
 | `geada_ameixa.json` | Traje da Geada (Ameixa Nevada): mesmo modelo da Tormenta Celeste; `glow_mesh` também vale para acessórios (`Fan`) |
+| `vibora_lotus.json` | Traje da Víbora (Lótus Venenosa): mesmo modelo da Tormenta Celeste, lenço (`mask`) + chapéu + agulhas; `glow_mesh` em `Needles` |
 | `render_bambu.py` | Bosque de Bambu Sombrio (nível 30): moitas de bambu, brotos e folhas por script → `public/sprites/bambu.*` |
 | `montanha.json` | Objetos da montanha (`render_props.py`): pinheiros em 3 tons e rochas nevadas → `public/sprites/montanha.*` |
 | `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
