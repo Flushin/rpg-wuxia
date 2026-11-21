@@ -10,5 +10,11 @@
     "name": "Ameixa Nevada",
     "desc": "Túnica vinho de botões de prata, braçadeiras de aço claro, chapéu largo de palha branca com fitas cor de ameixa e leque que brilha como gelo.",
     "price": 50000
+  },
+  "vibora_lotus": {
+    "sect": "vibora",
+    "name": "Lótus Venenosa",
+    "desc": "Túnica negra de botões dourados, véu cor de ameixa no rosto, chapéu de palha roxo com fitas verde-veneno e agulhas que brilham como peçonha.",
+    "price": 50000
   }
 }
