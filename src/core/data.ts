@@ -92,6 +92,8 @@ export interface Progression {
   freePointsPerLevel: number;
   /** A partir deste nível, cada nível dá estes pontos livres em vez de freePointsPerLevel (nível 30: 4 do 21 ao 30). */
   freePointsHigh?: { fromLevel: number; points: number };
+  /** Ouro cobrado pelo Monge do Pagode (Cidadela) para devolver todos os pontos livres distribuídos. */
+  attrResetCost: number;
 }
 
 export const CLASSES = localize('classes', classesJson) as unknown as Record<string, ClassDef>;

@@ -6,6 +6,7 @@ import {
   MERCHANT,
   NPC_TEXT,
   POTIONS,
+  PROGRESSION,
   RARITIES,
   SELL_RATIO,
   esc,
@@ -42,6 +43,12 @@ const PLACES: Record<string, string> = { cidade: 'Vila das Nuvens', cidadela: 'C
 const placeName = (n: NpcInfo) => PLACES[n.place ?? 'cidade'];
 const talkCitadel = () =>
   '<p>Conversa com você e conta histórias sobre a <a href="#/mapa/cidadela">Cidadela de Jade</a> e o que vem pela frente. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
+/** Monge do Pagode: realinhar meridianos (World.resetAttributes). */
+const meridians = () =>
+  `${talkCitadel()}<p><b>Realinhar meridianos:</b> por <span class="price">${PROGRESSION.attrResetCost.toLocaleString('pt-BR')} ouro</span>, devolve todos os
+  pontos livres que você distribuiu, para redistribuir como quiser no painel de Atributos (tecla <b>C</b>). Os atributos da sua
+  <a href="#/seitas">seita</a> e os ganhos automáticos de cada nível não mudam. Pode ser feito quantas vezes quiser; o botão pede confirmação
+  e fica bloqueado sem ouro suficiente ou sem nenhum ponto distribuído.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
 const sameAs = (id: string, name: string) => () =>
   `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;
@@ -143,7 +150,7 @@ function npcList(): NpcInfo[] {
         ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
         ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
         ['governador', 'Autoridade da Cidadela e missões', talkCitadel],
-        ['monge_pagode', 'Guardião do pagode e missões', talkCitadel],
+        ['monge_pagode', 'Guardião do pagode, realinhar atributos e missões', meridians],
         ['guarda_jade', 'Guarda dos portões e missões', talkCitadel],
       ] as [string, string, () => string][]
     )

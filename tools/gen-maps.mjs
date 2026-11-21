@@ -1414,7 +1414,7 @@ function cidadela() {
   npc('Mercadora Jin', 'mercadora_jin', 25.6, 9.5, { role: 'mercador' });
   // conversa: governador na escadaria do salão, monge diante do pagode, guardas junto dos portões
   npc('Governador Bai', 'governador', 16, 7.5);
-  npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5);
+  npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5, { role: 'meridianos' });
   for (const [x, y] of [
     [13.5, 28.4],
     [18.5, 28.4],

@@ -5,6 +5,7 @@ import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS } from '../src/core/mapsConfig';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { TELEPORT_COST, TELEPORT_DESTS, teleportById, teleportCost, teleportDestsFrom } from '../src/core/teleport';
 import { World } from '../src/core/world';
+import { PROGRESSION, totalFreePoints } from '../src/core/data';
 import { worldLinks, worldRoute } from '../src/core/worldRoutes';
 import type { GameEvent, SaveData } from '../src/core/types';
 
@@ -142,7 +143,7 @@ console.log('\n== NPCs da Cidadela ==');
     ['boticario_wen', 'vendedor'],
     ['mercadora_jin', 'mercador'],
     ['governador', 'governador'],
-    ['monge_pagode', 'monge_pagode'],
+    ['monge_pagode', 'meridianos'],
     ['guarda_jade', 'guarda_jade'],
   ]) {
     const n = by(id);
@@ -159,6 +160,26 @@ console.log('\n== NPCs da Cidadela ==');
   w.closeNpc();
   w.openNpcWindow(by('mercadora_jin')!);
   ok(w.merchantStock().offers.length > 0, 'a mercadora tem o estoque do mercador');
+  w.closeNpc();
+
+  // Monge do Pagode: realinhar meridianos (devolve os pontos distribuídos por PROGRESSION.attrResetCost)
+  const cost = PROGRESSION.attrResetCost;
+  w.distributeRecommended();
+  const spent = Object.values(w.spentPoints()).reduce((a, b) => a + b, 0);
+  ok(w.freePoints === 0 && spent > 0, `pontos distribuídos contados (${spent})`);
+  ok(w.resetAttributes()?.code === 'talkToMonk', 'sem falar com o monge não realinha');
+  w.openNpcWindow(by('monge_pagode')!);
+  w.gold = cost - 1;
+  ok(w.resetAttributes()?.code === 'noGold', 'sem ouro suficiente não realinha');
+  w.gold = cost + 50;
+  const hp = w.player.derived.maxHp;
+  ok(w.resetAttributes() === null && w.gold === 50, 'realinhar cobra o custo');
+  ok(w.freePoints === totalFreePoints(30) && w.player.derived.maxHp !== hp, 'todos os pontos voltam livres');
+  ok(
+    Object.values(w.spentPoints()).every((v) => v === 0),
+    'nenhum ponto distribuído depois do reset',
+  );
+  ok(w.resetAttributes()?.code === 'nothingToReset', 'sem pontos distribuídos não cobra de novo');
 }
 
 if (fails) {
