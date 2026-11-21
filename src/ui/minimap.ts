@@ -355,15 +355,19 @@ export class Minimap {
         dest ? 'dest' : '',
         need > lvl ? 'locked' : '',
         MAPS_CONFIG[id].dungeon ? 'inst' : '',
+        MAPS_CONFIG[id].town ? 'town' : '',
       ]
         .filter(Boolean)
         .join(' ');
       const ty = l2 ? -14 : -6;
+      // cidade: cartão dourado com selo "CIDADE" no canto (o jogador vê de longe onde fica seguro e há serviços)
+      const town = !!MAPS_CONFIG[id].town;
       nodes += `<g class="${cls}" data-map="${id}" transform="translate(${c.x},${c.y})" role="button">
         <rect x="${-NODE_W / 2}" y="${-NODE_H / 2}" width="${NODE_W}" height="${NODE_H}" rx="9"/>
         <text y="${ty}" class="wm-name">${esc(l1)}</text>${l2 ? `<text y="${ty + 14}" class="wm-name">${esc(l2)}</text>` : ''}
         <text y="${l2 ? 20 : 14}" class="wm-sub">${esc(sub)}</text>
-        ${here ? `<text y="${-NODE_H / 2 - 5}" class="wm-here">● ${L('você está aqui', 'you are here')}</text>` : ''}
+        ${town ? `<g class="wm-badge" transform="translate(${-NODE_W / 2 + 8},${-NODE_H / 2 - 9})"><rect width="74" height="18" rx="9"/><text x="37" y="9.5">🏯 ${L('CIDADE', 'CITY')}</text></g>` : ''}
+        ${here ? `<text ${town ? `x="${NODE_W / 2}" style="text-anchor:end" ` : ''}y="${-NODE_H / 2 - 5}" class="wm-here">● ${L('você está aqui', 'you are here')}</text>` : ''}
       </g>`;
     }
     return `<svg viewBox="0 -12 ${cols * CELL_W} ${rows * CELL_H + 12}" class="wm-svg">${edges}${nodes}</svg>`;

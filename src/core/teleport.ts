@@ -28,6 +28,11 @@ const CITIES = { pt: 'Cidades', en: 'Cities' };
 const CITADEL = { pt: 'Além da Cidadela', en: 'Beyond the Citadel' };
 
 export const TELEPORT_DESTS: TeleportDest[] = [
+  // cidades sempre primeiro na lista: o jogador vê logo que existem outras cidades
+  // Cidadela de Jade: cidade do meio do jogo, só pelo teleporte; da Cidadela, a volta à vila não cobra (sem ouro
+  // ninguém fica preso lá: o Pergaminho de Retorno não funciona dentro de uma cidade)
+  { map: 'cidade', region: CITIES, minLevel: 0, cost: 0 },
+  { map: 'cidadela', region: CITIES, minLevel: 30 },
   { map: 'floresta', region: EAST, minLevel: 0 },
   { map: 'ruinas', region: EAST, minLevel: 0 },
   { map: 'montanha', region: NORTH, minLevel: 10 },
@@ -36,10 +41,6 @@ export const TELEPORT_DESTS: TeleportDest[] = [
   // nível 40: mapas além do portão leste da Cidadela de Jade
   { map: 'vale', region: CITADEL, minLevel: 30 },
   { map: 'palacio', region: CITADEL, minLevel: 35 },
-  // Cidadela de Jade: cidade do meio do jogo, só pelo teleporte; da Cidadela, a volta à vila não cobra (sem ouro
-  // ninguém fica preso lá: o Pergaminho de Retorno não funciona dentro de uma cidade)
-  { map: 'cidade', region: CITIES, minLevel: 0, cost: 0 },
-  { map: 'cidadela', region: CITIES, minLevel: 30 },
 ];
 
 export const teleportById = (map: string) => TELEPORT_DESTS.find((d) => d.map === map);

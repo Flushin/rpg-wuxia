@@ -140,6 +140,26 @@
 .wm-node.inst rect {
   fill: #33283f;
 }
+.wm-node.town rect {
+  fill: #4a3b16;
+  stroke: #e0b84a;
+  stroke-width: 3;
+}
+.wm-node.town .wm-name {
+  fill: #ffe7a3;
+}
+.wm-node.town .wm-badge rect {
+  fill: #e0b84a;
+  stroke: #0e1218;
+  stroke-width: 1.5;
+}
+.wm-badge text {
+  fill: #1c1405;
+  font:
+    800 11px system-ui,
+    sans-serif;
+  letter-spacing: 0.5px;
+}
 .wm-node.locked rect {
   fill: #23252c;
 }
