@@ -1,5 +1,5 @@
 import { L } from '../core/i18n';
-import { initials, skillScale, type SkillDef } from '../core/skills';
+import { initials, skillScale, SKILL_MAX_LEVEL, type SkillDef } from '../core/skills';
 import type { World } from '../core/world';
 import { isTouch } from '../platform/input';
 import { skillIconHtml } from './icons';
@@ -198,7 +198,7 @@ export function skillTipHtml(w: World, d: SkillDef): string {
   return (
     `<b>${d.name}</b>${d.type === 'passive' ? ` <small>(${L('Passiva', 'Passive')})</small>` : ''}<p>${d.description}</p>${stats}` +
     (unlocked
-      ? `${L('Nível', 'Level')} ${lvl}/10 · ${L('efeito', 'effect')} +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}`
+      ? `${L('Nível', 'Level')} ${lvl}/${SKILL_MAX_LEVEL} · ${L('efeito', 'effect')} +${Math.round((skillScale(lvl) - 1) * 100)}%${xp}`
       : `<span class="st">${L(`Desbloqueia no nível ${d.unlock}`, `Unlocks at level ${d.unlock}`)}</span>`)
   );
 }
