@@ -227,7 +227,8 @@ console.log('\n== loot ==');
       }
       if (e.type === 'itemPickup' && e.potion) gotPotion = true;
     }
-    for (const b of w.bag) if (b && BASES[b.baseId] && !gotEquip) gotEquip = b;
+    // o Épico (sorteio com semente do relógio, epicRng) tem nível próprio: fora desta conferência
+    for (const b of w.bag) if (b && BASES[b.baseId] && b.rarity !== 'epico' && !gotEquip) gotEquip = b;
     if (w.freeSlots() < 5) {
       for (let i = 0; i < w.bag.length; i++)
         if (w.bag[i] && BASES[w.bag[i]!.baseId]) {

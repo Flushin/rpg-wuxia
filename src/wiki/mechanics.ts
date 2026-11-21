@@ -137,6 +137,9 @@ export const salvageYield = (reqLevel: number, rarity: string, plus: number): Ma
       1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : rarity === 'raro' ? 3 : 0) + Math.floor(plus / 2),
     [rareMat(reqLevel)]: rq(reqLevel, (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0)),
   });
+/** LOW_WEAR_FROM_LEVEL e LOW_WEAR_MUL em src/core/world/inventory.ts (nível 40): itens nv 35+ gastam metade. */
+export const LOW_WEAR_FROM_LEVEL = 35;
+export const LOW_WEAR_MUL = 0.5;
 /** OFFLINE_TIERS e OFFLINE_GOLD_CAP_HOURS em src/core/offline.ts */
 export const OFFLINE_TIERS = [
   { untilH: 12, eff: 0.6 },
@@ -294,7 +297,7 @@ function morte(): string {
       <li>Cada item equipado perde <b>${pc(loss)} da durabilidade máxima</b>.</li>
       <li>Você <b>não</b> perde XP, ouro nem itens. Efeitos de poção ativos acabam.</li></ul></section>
     <section class="panel"><h2>Durabilidade</h2><ul>
-      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado. Golpe <b>todo absorvido por um escudo</b> (Pele de Ferro, Véu de Névoa…) não desgasta.</li>
+      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado; itens de nível <b>${LOW_WEAR_FROM_LEVEL}</b> ou mais perdem só <b>${pc(LOW_WEAR_MUL)}</b> disso (o Épico conta pela faixa do seu nível). Golpe <b>todo absorvido por um escudo</b> (Pele de Ferro, Véu de Névoa…) não desgasta.</li>
       <li>Com durabilidade <b>0</b>, o item para de dar bônus (mas não some). Um aviso ⚠ aparece no topo da tela quando algo está gasto.</li>
       <li>O <a href="#/npc/ferreiro">Ferreiro</a> conserta:</li></ul>
       ${formula('Conserto = durabilidade que falta × nível do item × ' + n1(REPAIR_COST_PER_POINT * bal('conserto.custo')) + ' (arredondado para cima)')}

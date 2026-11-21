@@ -7,6 +7,7 @@ import { L } from '../i18n';
 import {
   BAG_TAB_SIZE,
   BASES,
+  epicTierBase,
   type BagTab,
   EPIC_CHANCE,
   EPIC_GROUND_SECONDS,
@@ -38,12 +39,21 @@ import type { ActionError } from '../types';
 import type { World } from '../world';
 import { dist } from './geometry';
 
+/** Nível 40 (decidido pelo Lucas em 21/11/2026): itens nv 35+ gastam metade da durabilidade por golpe recebido (o
+ *  conserto cobra pelo nível do item, e a faixa 30–40 é longa). Épico: pela base da faixa do nível de quem usa. */
+export const LOW_WEAR_FROM_LEVEL = 35;
+export const LOW_WEAR_MUL = 0.5;
+const wearMul = (it: ItemInstance, level: number) =>
+  (BASES[it.rarity === 'epico' ? epicTierBase(it, level) : it.baseId]?.reqLevel ?? 0) >= LOW_WEAR_FROM_LEVEL
+    ? LOW_WEAR_MUL
+    : 1;
+
 export function wearGear(w: World) {
   if (WEAR_PER_HIT <= 0) return;
   const worn = SLOTS.map((sl) => w.equipment[sl]).filter((i): i is ItemInstance => !!i && i.durability > 0);
   if (!worn.length) return;
   const it = worn[Math.min(worn.length - 1, Math.floor(w.rng.next() * worn.length))];
-  it.durability = Math.max(0, it.durability - WEAR_PER_HIT);
+  it.durability = Math.max(0, it.durability - WEAR_PER_HIT * wearMul(it, w.player.level));
   if (it.durability <= 0) w.recalc(w.player, false);
   w.bumpInv();
 }

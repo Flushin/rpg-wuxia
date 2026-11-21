@@ -80,3 +80,25 @@ faixa), jogo ativo:
 - **Medição ao fim da 4b** (`--m11 --seeds=1`, com as missões): Tormenta 1.835 min (5,8×), Geada 2.367 (7,2×; 1.233
   idas à cidade por vida no Palácio), Víbora 2.125 (6,6×), Titã parou no 38 (1.196 idas por mana). Conserto: Titã
   86% do ouro, Tormenta 35%. Tudo isso fica para o ajuste fino da etapa 5.
+- **Etapa 5 (ajuste fino, 21/11/2026):** a Titã quebrava o equipamento e ficava sem ouro para o conserto (86% do ouro);
+  decidido pelo Lucas: **itens nv 35+ gastam metade da durabilidade por golpe** (`LOW_WEAR_FROM_LEVEL`/`LOW_WEAR_MUL` em
+  `world/inventory.ts`; o Épico conta pela faixa do nível). Monstros novos: vida −12% (Vale) e −15% (Palácio), depois
+  defesa física ×0,8 com vida +10% (Guarda ×0,5; Feiticeira ×0,55: a defesa física alta deixava a Titã com 40% do
+  ritmo de abate da Tormenta, contra 58% no Pico, porque o dano elemental passa por fora da defesa); Guarda e Andarilho
+  batem um pouco mais fraco e a Feiticeira ~12% mais fraco (Geada); poção de vida grande 40% (Vale) e 45% (Palácio) e de
+  mana grande 90% (os laços de ida à cidade da Geada e da Titã: o Auto compra 10 poções pequenas). Testadas e não
+  adotadas: XP por abate +7% (média 4,6×, perto do piso) e mais vida na Feiticeira (prendia a Geada no Palácio).
+  Imperador Carmesim com força 80 (era 48). Simulador: `abates/min` na linha de resumo; o jogador simulado sobe ao
+  Palácio no 35.
+- **Resultado final** (`npm run sim:balance -- --m11 --seeds=3`, referência `--m10 --seeds=3` no mesmo código):
+
+  | Seita | 20→30 | 30→40 | Razão | Só offline 20→30 / 30→40 (estimativa) |
+  |---|---|---|---|---|
+  | Tormenta | 317 min | 1.437 min | 4,53× | 10,7 h / 48,4 h (4,5×) |
+  | Geada | 329 min | 1.692 min | 5,14× | 11,0 h / 57,5 h (5,2×) |
+  | Titã | 548 min | 3.168 min | 5,78× | 18,8 h / 105,5 h (5,6×) |
+  | Víbora | 320 min | 1.457 min | 4,55× | 10,8 h / 49,5 h (4,6×) |
+
+  Média 5,0× (margem 4×–6× por seita: ok). Mortes 0–1 na faixa. Ouro ganho ~1,3 milhão; conserto: Titã 30%,
+  Tormenta 14%, Geada 9%, Víbora 7%. ~40 idas à cidade (quase todas para vender). Imperador (`--imperador`): com Raro
+  nv 35, 6/6 para todas nos níveis 38 e 40; com Incomum, Geada 4–5/6 e as outras 6/6 (Titã leva ~350 s e ~21 poções).

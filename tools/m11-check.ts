@@ -17,6 +17,7 @@ import { World } from '../src/core/world';
 import type { SaveData } from '../src/core/types';
 import { Rng } from '../src/core/rng';
 import { stockLevel } from '../src/core/world/merchant';
+import { wearGear } from '../src/core/world/inventory';
 import { rareQty, rarityCost, rerollCost, salvageYield, upgradeCost } from '../src/core/world/forge';
 import { PROGRESSION } from '../src/core/data';
 
@@ -185,8 +186,8 @@ console.log('\n== monstros ==');
     'resistem a veneno; defesa espiritual alta',
   );
   ok(
-    MONSTERS.guarda_celeste.defMul?.phys === 0.6 && !!MONSTERS.guarda_celeste.slam,
-    'Guarda: golpe em área e defesa física ×0,6',
+    (MONSTERS.guarda_celeste.defMul?.phys ?? 1) <= 0.6 && !!MONSTERS.guarda_celeste.slam,
+    'Guarda: golpe em área e defesa física baixa (Titã)',
   );
   ok(
     MONSTERS.monge_fogo_rubro.projectile === 'fire' && !!MONSTERS.feiticeira_lua_fria.onHit,
@@ -279,6 +280,21 @@ console.log('\n== missões 31–40 ==');
   ok(
     qs.filter((q) => q.reward.item).every((q) => q.reward.itemLevel === 35),
     'recompensas de item são nv 35 (arma no 35, túnica no 39)',
+  );
+}
+
+console.log('\n== desgaste ==');
+{
+  const w = mk(36, 'palacio');
+  w.equipment.tronco = makeEquipment('tunica_palacio', 'comum', null, w.rng, 35);
+  w.equipment.cabeca = makeEquipment('coroa_jade', 'comum', null, w.rng, 25);
+  for (const sl of Object.keys(w.equipment)) if (sl !== 'tronco' && sl !== 'cabeca') delete w.equipment[sl as 'arma'];
+  for (let i = 0; i < 400; i++) wearGear(w);
+  const lost35 = 100 - w.equipment.tronco!.durability,
+    lost25 = 100 - w.equipment.cabeca!.durability;
+  ok(
+    Math.abs(lost35 + lost25 - 400 * 0.3 * 0.75) < 400 * 0.3 * 0.2 && lost35 < lost25 * 0.7,
+    `item nv 35 gasta metade (${lost35.toFixed(1)} contra ${lost25.toFixed(1)})`,
   );
 }
 

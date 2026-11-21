@@ -517,7 +517,7 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5, 
     lastMap = w.mapId;
     if (process.argv.includes('--status') && Math.round(w.time) % 30 === 0)
       console.log(
-        `${classId} ${(w.time / 60).toFixed(1)}m nv${w.player.level} ${w.mapId} [${w.auto.status}] hp ${Math.round(w.player.hp)}/${w.player.derived.maxHp} pos ${w.player.x.toFixed(1)},${w.player.y.toFixed(1)} alvo ${w.getTarget()?.monsterId ?? '-'}${w.getTarget()?.level ?? ''} pots ${w.kindCount('hp')} ouro ${w.gold}`,
+        `${classId} ${(w.time / 60).toFixed(1)}m nv${w.player.level} ${w.mapId} [${w.auto.status}] hp ${Math.round(w.player.hp)}/${w.player.derived.maxHp} pos ${w.player.x.toFixed(1)},${w.player.y.toFixed(1)} alvo ${w.getTarget()?.monsterId ?? '-'}${w.getTarget()?.level ?? ''} pots ${w.kindCount('hp')} ouro ${w.gold} livres ${w.freeSlots()}`,
       );
     policy(w, run);
     if (w.player.level >= end) break;
@@ -676,7 +676,7 @@ if (process.argv.includes('--m10')) {
     const de = Number(process.argv.find((a) => a.startsWith('--de='))?.split('=')[1] ?? 20); // diagnóstico: começa mais alto
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1, de, 30, de >= 25 ? 20 : 15));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     const t30 = mean(rs.map((r) => r.levelAt[29]));
@@ -719,7 +719,7 @@ if (process.argv.includes('--m11')) {
       highRun(classId, i + 1, de, 40, de >= 35 ? 35 : 25, de >= 35 ? undefined : [35, 35]),
     );
     console.log(
-      `   ${classId}: idas à cidade ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à cidade ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     const t40 = mean(rs.map((r) => r.levelAt[39]));
@@ -754,7 +754,7 @@ if (process.argv.includes('--m9')) {
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     console.log(

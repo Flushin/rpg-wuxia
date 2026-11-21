@@ -48,6 +48,7 @@ import {
   makeEpic,
 } from '../src/core/items';
 import { OFFLINE_GOLD_CAP_HOURS, OFFLINE_TIERS } from '../src/core/offline';
+import { LOW_WEAR_FROM_LEVEL, LOW_WEAR_MUL } from '../src/core/world/inventory';
 
 let fails = 0;
 const ok = (c: boolean, m: string) => {
@@ -265,6 +266,10 @@ console.log('== mecânicas (cópias) ==');
   ok(
     same(M.OFFLINE_TIERS, OFFLINE_TIERS) && M.OFFLINE_GOLD_CAP_HOURS === OFFLINE_GOLD_CAP_HOURS,
     'ganho offline (faixas e teto)',
+  );
+  ok(
+    M.LOW_WEAR_FROM_LEVEL === LOW_WEAR_FROM_LEVEL && M.LOW_WEAR_MUL === LOW_WEAR_MUL,
+    'desgaste menor nos itens nv 35+',
   );
 }
 
