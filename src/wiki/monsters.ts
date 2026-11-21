@@ -30,6 +30,7 @@ export const SHEETS: Record<string, string> = {
   'crimson-monk': 'monge_fogo_rubro',
   'celestial-guard': 'guarda_celeste',
   'frost-moon-sorceress': 'feiticeira_lua_fria',
+  'crimson-emperor': 'imperador_carmesim',
 };
 /** Quadro parado virado em 3/4 (direção 1), que mostra melhor o monstro que o de frente. */
 export const monsterSprite = (m: Monster, cls = '') => spriteHtml(SHEETS[m.sprite] ?? m.id, cls, 'idle_1_0');

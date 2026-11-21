@@ -21,6 +21,7 @@ import andarilhoCinzas from '../data/sprites/andarilho_cinzas.json';
 import mongeFogo from '../data/sprites/monge_fogo_rubro.json';
 import guardaCeleste from '../data/sprites/guarda_celeste.json';
 import feiticeiraLua from '../data/sprites/feiticeira_lua_fria.json';
+import imperador from '../data/sprites/imperador_carmesim.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -81,6 +82,7 @@ const SHEETS: Record<string, SheetMeta> = {
   monge_fogo_rubro: mongeFogo as SheetMeta,
   guarda_celeste: guardaCeleste as SheetMeta,
   feiticeira_lua_fria: feiticeiraLua as SheetMeta,
+  imperador_carmesim: imperador as SheetMeta,
   ...npcSheets,
 };
 
@@ -108,6 +110,7 @@ const BY_TEXTURE: Record<string, string> = {
   'crimson-monk': 'monge_fogo_rubro',
   'celestial-guard': 'guarda_celeste',
   'frost-moon-sorceress': 'feiticeira_lua_fria',
+  'crimson-emperor': 'imperador_carmesim',
 };
 
 // retrato parado de frente, usado na mochila (por seita)

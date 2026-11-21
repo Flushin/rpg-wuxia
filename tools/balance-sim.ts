@@ -401,7 +401,11 @@ function highWorld(
     lastSeen: 0,
     gold: 500,
     // nível 40: no 30 a cadeia 1–30 já foi toda entregue
-    quest: { stage: level >= 30 ? QUESTS.length : level >= 20 ? 14 : 8, status: 'pending', progress: 0 },
+    quest: {
+      stage: level >= 30 ? QUESTS.findIndex((q) => q.minLevel > 30) : level >= 20 ? 14 : 8,
+      status: 'pending',
+      progress: 0,
+    },
   };
   const w = World.fromSave(maps, s, SIM_EPOCH_MS, false);
   priv(w).rng = new Rng(seed * 7919 + 101);
@@ -534,6 +538,18 @@ function mistLordFight(classId: string, seed: number, rarity: Rarity, level = 30
   return fightBoss(w, classId, rarity, false);
 }
 
+/** Imperador Carmesim (nível 40) no Salão do Trono do Palácio, com o conjunto nv 35. */
+function emperorFight(classId: string, seed: number, rarity: Rarity, level = 40): BossRun {
+  const w = highWorld(classId, level, seed, 35, rarity);
+  w.changeMap('palacio');
+  for (const m of w.monsters)
+    if (!MONSTERS[m.monsterId].boss) {
+      m.dead = true;
+      m.respawnAt = Infinity;
+    }
+  return fightBoss(w, classId, rarity, false);
+}
+
 function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
   const w = highWorld(classId, 20, seed, 15, rarity);
   w.changeMap('montanha');
@@ -613,6 +629,23 @@ if (trialArg) {
 // ---------- nível 30: do 20 ao 30 (Bosque de Bambu Sombrio e Pico da Névoa) ----------
 // Personagem pronto no nível 20 (pontos pelo recomendado, skills no nível 10, equipamento Incomum nv 15, missões do
 // nível 30 liberadas), Auto ligado na vila. Compara com o 10→20 (--m9) de cada seita: meta ~3× (±20%).
+if (process.argv.includes('--imperador')) {
+  const N = Math.max(5, SEEDS * 2);
+  console.log('| Seita | Nível | Equipamento nv 35 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
+  console.log('|---|---|---|---|---|---|---|');
+  for (const classId of Object.keys(CLASSES))
+    for (const level of [38, 40])
+      for (const tier of ['incomum', 'raro'] as Rarity[]) {
+        const bs = Array.from({ length: N }, (_, i) => emperorFight(classId, i + 1, tier, level));
+        const wins = bs.filter((b) => b.win),
+          lost = bs.filter((b) => !b.win);
+        console.log(
+          `| ${CLASSES[classId].name} | ${level} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
+        );
+      }
+  process.exit(0);
+}
+
 if (process.argv.includes('--senhor')) {
   const N = Math.max(5, SEEDS * 2);
   console.log('| Seita | Nível | Equipamento nv 25 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');

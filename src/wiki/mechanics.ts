@@ -423,7 +423,7 @@ function trial(): string {
       <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th></tr></thead><tbody>${tiers}</tbody></table></section>
     <section class="panel"><h2>Recompensa</h2><ul>
       <li>Ouro da tabela acima e ${trialXp(1)} de XP no nível 1 (+${trialXp(2) - trialXp(1)} por nível).</li>
-      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 6–10 (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (21–30): mais fortes que os mesmos itens caídos no mundo.</li>
+      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial, de nível ${trialEquipReqLevel(6)} nos níveis 6–14 e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 15–${TRIAL_TIERS} (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}): mais fortes que os mesmos itens caídos no mundo.</li>
       <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
       <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1; a cada nível o bônus cresce 5%: 12,60%, 13,23% … ${pct2(trialDropPct(TRIAL_TIERS))}%). O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
 }

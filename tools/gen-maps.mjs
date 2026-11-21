@@ -1197,8 +1197,8 @@ function vale() {
 
 // ---- Ruínas do Palácio Celeste (nível 40, nv 35–40) ----
 // Sobre o mar de nuvens (tile 'cloud', bloqueia): entrada no sul (vinda do Vale); terraços de mármore sobem entre
-// colunas caídas (tile 'pillar') e jardins de cerejeiras até o Salão do Trono no topo (arena do chefe, etapa 4b;
-// centro 16,6). Terraço baixo nv 35–37, terraço do meio nv 36–38, terraço alto nv 38–40.
+// colunas caídas (tile 'pillar') e jardins de cerejeiras até o Salão do Trono no topo, arena do Imperador Carmesim
+// (centro 16,6). Terraço baixo nv 35–37, terraço do meio nv 36–38, terraço alto nv 38–40.
 const PALACIO_ARENA = { x: 16, y: 6, r: 5.5 };
 function palacio() {
   const rnd = rngFn(4031);
@@ -1267,7 +1267,10 @@ function palacio() {
   fei(27, 13, 2.8, 38, 40);
   gua(27, 13, 2.8, 39, 40);
   gua(27, 13, 2.8, 38, 39);
-  console.log(`palacio: ${seen.size} tiles andáveis, salão alcançável, ${used.length} monstros`);
+  objs.push(
+    point('Imperador Carmesim', 'monsterSpawn', PALACIO_ARENA.x, PALACIO_ARENA.y, { monster: 'imperador_carmesim' }),
+  );
+  console.log(`palacio: ${seen.size} tiles andáveis, salão alcançável, ${used.length} monstros + Imperador Carmesim`);
   return tiled('Ruínas do Palácio Celeste', gr, objs);
 }
 

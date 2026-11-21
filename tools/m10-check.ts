@@ -249,13 +249,13 @@ console.log('== offline a 5/6 nos mapas novos ==');
 
 console.log('== missões 21–30 ==');
 {
-  const ids = QUESTS.slice(14).map((q) => q.id);
+  const ids = QUESTS.slice(14, 19).map((q) => q.id);
   ok(ids.join() === 'passo_leste,sombras_bambu,veneno_jade,penas_grou,senhor_nevoa', 'cinco etapas novas, em ordem');
   ok(
-    QUESTS.slice(14).every((q, i, a) => q.minLevel >= 20 && (i === 0 || q.minLevel >= a[i - 1].minLevel)),
+    QUESTS.slice(14, 19).every((q, i, a) => q.minLevel >= 20 && (i === 0 || q.minLevel >= a[i - 1].minLevel)),
     'níveis 20+ e crescentes',
   );
-  const xp = QUESTS.slice(14).reduce((s, q) => s + q.reward.xp, 0);
+  const xp = QUESTS.slice(14, 19).reduce((s, q) => s + q.reward.xp, 0);
   ok(xp >= 250_000 && xp <= 350_000, `XP das missões ~15% da faixa (${xp})`);
   const w = mk(20, 'cidade', 'lamina', { quest: { stage: 14, status: 'pending', progress: 0 } } as Partial<SaveData>);
   ok(w.questView().phase === 'available', 'quem terminou a cadeia antiga recebe a missão nova');

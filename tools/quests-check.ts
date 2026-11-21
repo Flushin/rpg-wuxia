@@ -16,7 +16,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico', 'cidadela', 'vale', 'palacio'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 type Priv = { killMonster: (m: Entity) => void; questTalk: (id: string) => void; openNpcWindow: (n: Entity) => void };
 const priv = (w: World) => w as unknown as Priv;
@@ -38,7 +38,7 @@ const talkTo = (w: World, role: string) => {
 };
 
 console.log('== dados ==');
-ok(QUESTS.length === 19, '19 etapas na cadeia (8 até o nível 10 + 6 do marco 9 + 5 do nível 30)');
+ok(QUESTS.length === 24, '24 etapas na cadeia (8 até o nível 10 + 6 do marco 9 + 5 do nível 30 + 5 do nível 40)');
 ok(
   QUESTS.slice(8).every((q) => q.minLevel >= 10) && QUESTS[QUESTS.length - 1].objective.type === 'kill',
   'etapas do marco 9 a partir do nível 10, terminando num abate (o Abade)',
@@ -54,8 +54,9 @@ ok(
 ok(
   QUESTS.filter((q) => q.reward.item)
     .map((q) => q.id)
-    .join() === 'acampamentos,barro_bronze,fera_branca,guardioes_templo,veneno_jade,senhor_nevoa',
-  'itens nas etapas 4, 7, 11, 13, 17 e 19',
+    .join() ===
+    'acampamentos,barro_bronze,fera_branca,guardioes_templo,veneno_jade,senhor_nevoa,fogo_rubro,imperador_carmesim',
+  'itens nas etapas 4, 7, 11, 13, 17, 19, 22 e 24',
 );
 
 for (const classId of ['lamina', 'pavilhao']) {

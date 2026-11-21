@@ -366,6 +366,104 @@
       "offer": "Agora tudo faz sentido. Quem envia os assassinos e as serpentes é o Senhor da Névoa, um antigo mestre que se fundiu à névoa do pico para viver para sempre. Suba ao Santuário de Jade e acabe com isso. Com metade da vida ele chama os grous; perto do fim, fica furioso.",
       "goal": "Derrote o Senhor da Névoa",
       "done": "A névoa se abriu sobre o pico pela primeira vez em mil anos. Daqui da vila dá para ver o santuário brilhando ao sol. Vista este manto: ele é seu por direito, mestre."
+    },
+    {
+      "id": "portao_leste",
+      "giver": "governador",
+      "turnIn": "governador",
+      "minLevel": 31,
+      "objective": {
+        "type": "reach",
+        "map": "vale"
+      },
+      "reward": {
+        "xp": 150000,
+        "gold": 4000
+      },
+      "name": "O portão do leste",
+      "offer": "Lembra que eu disse que precisaria de você? A fumaça vermelha voltou a subir além do portão leste, que estava fechado desde a guerra das seitas. Mandei abri-lo. Atravesse e diga-me o que há no vale.",
+      "goal": "Chegue ao Vale das Cinzas Rubras",
+      "done": "Cinzas e lava onde antes havia arrozais... e gente andando no meio disso. O vale acordou. Descanse; amanhã a Cidadela vai precisar da sua lâmina."
+    },
+    {
+      "id": "andarilhos_cinzas",
+      "giver": "guarda_jade",
+      "turnIn": "guarda_jade",
+      "minLevel": 33,
+      "objective": {
+        "type": "kill",
+        "monster": "andarilho_cinzas",
+        "count": 15
+      },
+      "reward": {
+        "xp": 220000,
+        "gold": 5000
+      },
+      "name": "Os que andam nas cinzas",
+      "offer": "Desde que o portão abriu, vultos cobertos de cinza rondam a muralha à noite. Atacam com duas lâminas e não dizem uma palavra. Derrote 15 andarilhos das cinzas antes que achem um jeito de subir.",
+      "goal": "Derrote andarilhos das cinzas",
+      "done": "As noites ficaram quietas de novo. Um deles tinha um selo carmesim costurado no peito... Leve isso ao Monge do Pagode; ele conhece os selos antigos."
+    },
+    {
+      "id": "fogo_rubro",
+      "giver": "monge_pagode",
+      "turnIn": "monge_pagode",
+      "minLevel": 35,
+      "objective": {
+        "type": "kill",
+        "monster": "monge_fogo_rubro",
+        "count": 15
+      },
+      "reward": {
+        "xp": 280000,
+        "gold": 6000,
+        "item": "arma",
+        "itemLevel": 35
+      },
+      "name": "O fogo rubro",
+      "offer": "Este selo é do Palácio Celeste, a corte que flutuava sobre as nuvens. Os monges que guardavam seu fogo sagrado desceram ao vale e queimam tudo de longe. Derrote 15 monges do fogo rubro; o fogo deles alimenta as cinzas.",
+      "goal": "Derrote monges do fogo rubro",
+      "done": "O fogo do vale enfraqueceu. Tome esta arma, forjada para quem vai subir ao palácio: lá em cima, nada menos que isso vai bastar."
+    },
+    {
+      "id": "lua_fria",
+      "giver": "monge_pagode",
+      "turnIn": "monge_pagode",
+      "minLevel": 37,
+      "objective": {
+        "type": "kill",
+        "monster": "feiticeira_lua_fria",
+        "count": 15
+      },
+      "reward": {
+        "xp": 320000,
+        "gold": 7000
+      },
+      "name": "A lua fria",
+      "offer": "Nas ruínas do palácio, as feiticeiras da lua fria guardam as escadarias. O gelo delas prende os pés de quem sobe, e os guardas celestes fazem o resto. Derrote 15 feiticeiras e o caminho até o salão fica aberto.",
+      "goal": "Derrote feiticeiras da lua fria",
+      "done": "Senti o frio sumir até daqui do pagode. Agora só resta quem está sentado no trono. Fale com o Governador quando estiver pronto."
+    },
+    {
+      "id": "imperador_carmesim",
+      "giver": "governador",
+      "turnIn": "governador",
+      "minLevel": 39,
+      "objective": {
+        "type": "kill",
+        "monster": "imperador_carmesim",
+        "count": 1
+      },
+      "reward": {
+        "xp": 380000,
+        "gold": 12000,
+        "item": "tronco",
+        "itemLevel": 35
+      },
+      "name": "O Imperador Carmesim",
+      "offer": "O último senhor do Palácio Celeste nunca morreu: chamam-no de Imperador Carmesim. É ele quem acende o vale e manda as cinzas contra a nossa muralha. Suba ao Salão do Trono e termine o que as quatro seitas não conseguiram. Cuidado com o golpe em linha: perto da metade, ele chama os guardas e o golpe se abre em leque.",
+      "goal": "Derrote o Imperador Carmesim",
+      "done": "O trono está vazio e a fumaça baixou. As quatro seitas vão contar esta história por mil anos. Vista esta túnica do palácio: a Cidadela é sua casa, mestre."
     }
   ]
 }

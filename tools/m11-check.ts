@@ -1,7 +1,8 @@
 // Verificação headless do conteúdo do nível 40 (faixa 30–40). Etapa 3: conjunto nv 35 (9 peças, arma por seita),
 // forja com o dobro de Jade da Névoa nos itens nv 35+, Mercador e Épico usando o nv 35 a partir do nível 35.
 // Etapa 4a: Vale das Cinzas Rubras e Ruínas do Palácio Celeste pelo portão leste da Cidadela, monstros nas faixas,
-// morte e Pergaminho de Retorno levando à Cidadela, Auto pelo nível e offline a 5/6.
+// morte e Pergaminho de Retorno levando à Cidadela, Auto pelo nível e offline a 5/6. Etapa 4b: Imperador Carmesim,
+// missões 31–40 com os NPCs da Cidadela e Trial 11–20.
 // Uso: npm run check:m11
 import { readFileSync } from 'node:fs';
 import { BASES, epicTierBase, makeEquipment, makeStack } from '../src/core/items';
@@ -9,6 +10,9 @@ import { CLASSES, MONSTERS } from '../src/core/data';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { MAPS_CONFIG, homeTownOf, portalMinLevel } from '../src/core/mapsConfig';
 import { teleportById } from '../src/core/teleport';
+import { QUESTS } from '../src/core/quests';
+import { TRIAL_BOSSES, TRIAL_TIERS, trialBossLevel, trialEquipReqLevel } from '../src/core/trial';
+import type { Entity } from '../src/core/types';
 import { World } from '../src/core/world';
 import type { SaveData } from '../src/core/types';
 import { Rng } from '../src/core/rng';
@@ -228,6 +232,59 @@ for (const [lv, want] of [
   w.auto.toggle();
   ok(w.auto.huntMap === want, `nível ${lv}: Auto vai para ${want} (${w.auto.huntMap})`);
 }
+
+console.log('\n== Imperador Carmesim ==');
+{
+  const def = MONSTERS.imperador_carmesim;
+  ok(!!def.boss && def.minLevel === 40 && (def.scale ?? 1) >= 1.5, 'chefe nível 40 e grande');
+  ok(
+    def.boss?.summon?.monsterId === 'guarda_celeste' && !!def.boss?.enrage && !!def.boss?.line?.fanCount,
+    'golpe em linha que vira leque, chama guardas e fica furioso',
+  );
+  ok(TRIAL_BOSSES.at(-1) === 'imperador_carmesim', 'entra no Trial (o mais forte)');
+  const w = mk(40, 'palacio');
+  const b = w.monsters.find((m) => m.monsterId === 'imperador_carmesim');
+  ok(!!b && b.level === 40, 'nasce no Salão do Trono, nível 40');
+  if (b) {
+    w.events.splice(0);
+    (w as unknown as { killMonster: (m: Entity) => void }).killMonster(b);
+    const items = [...w.bag, ...w.ground.map((g) => g.item)].filter((it) => it && BASES[it.baseId]);
+    ok(
+      items.some((it) => BASES[it!.baseId].reqLevel === 35 && it!.rarity === 'raro'),
+      'garante um Raro nv 35',
+    );
+    ok(w.potionCount('jade_nevoa') >= 8, 'solta jade (o dobro, para a forja nv 35)');
+  }
+}
+
+console.log('\n== missões 31–40 ==');
+{
+  const qs = QUESTS.slice(19);
+  ok(
+    qs.map((q) => q.id).join() === 'portao_leste,andarilhos_cinzas,fogo_rubro,lua_fria,imperador_carmesim',
+    'cinco etapas novas, em ordem',
+  );
+  ok(qs.map((q) => q.minLevel).join() === '31,33,35,37,39', 'níveis 31, 33, 35, 37 e 39');
+  ok(
+    qs.every((q) => ['governador', 'monge_pagode', 'guarda_jade'].includes(q.giver)),
+    'dadas pelos NPCs da Cidadela',
+  );
+  ok(
+    qs.every((q) => maps.cidadela.objects.some((o) => o.type === 'npc' && o.props.npc === q.giver)),
+    'NPCs estão na Cidadela',
+  );
+  const xp = qs.reduce((a, q) => a + q.reward.xp, 0),
+    band = PROGRESSION.xpToNext.slice(30, 40).reduce((a, b) => a + b, 0);
+  ok(Math.abs(xp / band - 0.14) < 0.02, `XP das missões ~14% da faixa (${Math.round((100 * xp) / band)}%)`);
+  ok(
+    qs.filter((q) => q.reward.item).every((q) => q.reward.itemLevel === 35),
+    'recompensas de item são nv 35 (arma no 35, túnica no 39)',
+  );
+}
+
+console.log('\n== Trial 11–20 ==');
+ok(TRIAL_TIERS === 20 && trialBossLevel(20) === 40, 'níveis 1–20, chefe até o nível 40');
+ok(trialEquipReqLevel(14) === 25 && trialEquipReqLevel(15) === 35, 'nv 25 até o 14, nv 35 do 15 ao 20');
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

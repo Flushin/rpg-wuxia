@@ -66,3 +66,17 @@ faixa), jogo ativo:
 - **Primeira medição da 4a** (`--m11 --seeds=1`, ainda sem as missões 31–40): Tormenta 2.018 min (6,4×), Geada 2.090
   (6,4×), Víbora 2.191 (6,8×), Titã parou no 38 aos 3.438 min (465 idas à cidade por mana). Conserto 15–64% do ouro
   ganho (~1,3 milhão). Ajuste fino na etapa 5.
+- **Feito na etapa 4b:** chefe `imperador_carmesim` (nv 40, dano físico, vida ~2× o Senhor da Névoa; golpe em área,
+  golpe em linha que vira leque de 3 a 50%, chama 2 Guardas Celestes nv 37 a 50%, fúria a 30%; garante Raro nv 35;
+  150 mil de XP, 6–8 mil de ouro, 8–12 jades) no Salão do Trono (16,6); sprite Mage com cajado em carmesim e dourado.
+  Missões (`quests.json`, ~15% da XP da faixa): O portão do leste (31, Governador, chegar ao Vale), Os que andam nas
+  cinzas (33, Guarda de Jade, 15 andarilhos), O fogo rubro (35, Monge do Pagode, 15 monges; arma nv 35), A lua fria
+  (37, Monge, 15 feiticeiras) e O Imperador Carmesim (39, Governador; túnica nv 35): 1,35 milhão de XP. Falas do
+  Governador e do Guarda atualizadas (portão leste aberto). Trial: `TRIAL_TIERS` 20, `trialEquipReqLevel` nv 25 nos
+  níveis 6–14 e nv 35 nos 15–20; custo e XP pelas fórmulas (4.800 de ouro e 28 mil de XP no 20). Simulador:
+  `--imperador` (nível 38/40, conjunto nv 35) e, no `--m11`, a cadeia começa na primeira missão do 31.
+- **Imperador (4b, `--imperador`):** 6/6 vitórias para todas as seitas, com Incomum e Raro, nos níveis 38 e 40
+  (70–140 s; Titã 235–355 s). Fácil demais: ajustar na etapa 5.
+- **Medição ao fim da 4b** (`--m11 --seeds=1`, com as missões): Tormenta 1.835 min (5,8×), Geada 2.367 (7,2×; 1.233
+  idas à cidade por vida no Palácio), Víbora 2.125 (6,6×), Titã parou no 38 (1.196 idas por mana). Conserto: Titã
+  86% do ouro, Tormenta 35%. Tudo isso fica para o ajuste fino da etapa 5.
