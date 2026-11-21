@@ -65,7 +65,14 @@ export function sectPage(id: string): string | null {
     ['Alcance', `${esc(c.rangeLabel)} (${s1(c.attackRange)} tiles)`],
     ['Ataque básico', `um a cada ${s1(c.attackInterval)} s${c.attackWhileMoving ? ', <b>ataca andando</b>' : ''}`],
     ['Velocidade', s1(c.moveSpeed)],
-    ...(c.lifeSteal ? [['Roubo de vida', `${pc(c.lifeSteal)} do dano causado volta como vida`]] : []),
+    ...(c.lifeSteal
+      ? [
+          [
+            'Roubo de vida',
+            `${pc(c.lifeSteal)} do dano causado volta como vida (só o dano que o alvo ainda podia levar; o excesso não cura)`,
+          ],
+        ]
+      : []),
     ['Arma inicial', STARTING_WEAPON[id] ? itemLink(STARTING_WEAPON[id]) : '—'],
   ];
   return `<a class="back" href="#/seitas">‹ Seitas</a>
