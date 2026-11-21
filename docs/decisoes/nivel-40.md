@@ -102,3 +102,7 @@ faixa), jogo ativo:
   Média 5,0× (margem 4×–6× por seita: ok). Mortes 0–1 na faixa. Ouro ganho ~1,3 milhão; conserto: Titã 30%,
   Tormenta 14%, Geada 9%, Víbora 7%. ~40 idas à cidade (quase todas para vender). Imperador (`--imperador`): com Raro
   nv 35, 6/6 para todas nos níveis 38 e 40; com Incomum, Geada 4–5/6 e as outras 6/6 (Titã leva ~350 s e ~21 poções).
+- **Mapa-múndi (21/11/2026, decidido pelo Lucas):** para manter 4 colunas (cartões legíveis no celular), a Cidadela de
+  Jade desce para baixo da Floresta Sombria (col 2, linha 3), o Vale fica à direita dela (col 3, linha 3) e o Palácio
+  abaixo do Vale (col 3, linha 4). Minimapa com as cores dos tiles novos (e do bambu, que faltava); a legenda do ✦
+  cita o Mestre dos Caminhos da vila e da Cidadela.

@@ -26,6 +26,13 @@ const TILE_COLOR: Record<string, string> = {
   pillar: '#55595e',
   snow: '#dfe6ee',
   pine: '#2e5446',
+  bamboo: '#2f5a34',
+  // nível 40: Vale das Cinzas Rubras e Ruínas do Palácio Celeste
+  ash: '#4a403e',
+  basalt: '#2a2626',
+  lava: '#d2501e',
+  marble: '#d8d4c8',
+  cloud: '#9fb4da',
 };
 const COLOR = {
   player: '#ffffff',
@@ -366,8 +373,8 @@ export class Minimap {
   private routeHtml(route: WorldLink[] | null): string {
     if (!this.dest)
       return `<p class="wm-hint">${L(
-        'Toque num mapa da aba Mundo para ver o caminho até ele. ✦ = o Mestre dos Caminhos, na praça da vila, leva até esse mapa.',
-        'Tap a map on the World tab to see the way there. ✦ = the Wayfarer Master, in the village square, takes you to that map.',
+        'Toque num mapa da aba Mundo para ver o caminho até ele. ✦ = o Mestre dos Caminhos, na praça da vila e da Cidadela de Jade, leva até esse mapa.',
+        'Tap a map on the World tab to see the way there. ✦ = the Wayfarer Master, in the village and Jade Citadel squares, takes you to that map.',
       )}</p>`;
     const maps = this.world.maps,
       lvl = this.world.player.level,

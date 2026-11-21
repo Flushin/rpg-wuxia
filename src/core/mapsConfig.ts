@@ -38,7 +38,7 @@ export interface MapConfig {
 export const MAPS_CONFIG: Record<string, MapConfig> = {
   cidade: { town: true, world: { col: 1, row: 2 }, music: 'music_cidade', trees: 'city', grassDecor: 0.035 },
   // Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte do Mestre dos Caminhos (nível 30)
-  cidadela: { town: true, world: { col: 3, row: 0 }, music: 'music_cidadela', trees: 'city', grassDecor: 0.03 },
+  cidadela: { town: true, world: { col: 2, row: 3 }, music: 'music_cidadela', trees: 'city', grassDecor: 0.03 },
   floresta: {
     music: 'music_floresta',
     trees: 'forest',
@@ -88,7 +88,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     autoFromLevel: 30,
     offlineMul: 5 / 6,
     homeTown: 'cidadela',
-    world: { col: 4, row: 0 },
+    world: { col: 3, row: 3 },
   },
   // nível 40: Ruínas do Palácio Celeste (nv 35–40), saída noroeste do Vale (minLevel 35); Salão do Trono = arena do chefe
   palacio: {
@@ -100,7 +100,7 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     autoExitVia: 'vale',
     offlineMul: 5 / 6,
     homeTown: 'cidadela',
-    world: { col: 4, row: 1 },
+    world: { col: 3, row: 4 },
   },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
   gruta: {
