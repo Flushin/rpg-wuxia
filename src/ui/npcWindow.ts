@@ -1,7 +1,7 @@
 import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
 import { L, tn } from '../core/i18n';
-import { NPC_TEXT, PROGRESSION } from '../core/data';
+import { CLASSES, NPC_TEXT, PROGRESSION, SKINS } from '../core/data';
 import { ATTR_KEYS } from '../core/types';
 import { ATTR_LABELS } from './labels';
 import {
@@ -26,9 +26,10 @@ import type { ItemOwner } from '../core/items';
 import type { ItemInstance } from '../core/types';
 import type { World } from '../core/world';
 import { audio } from '../render/audio';
-import { MASTER_PORTRAITS } from '../render/sprites';
+import { MASTER_PORTRAITS, PORTRAITS } from '../render/sprites';
 import { npcName, rewardText } from './questTracker';
 import { renderPanel, resetScroll } from './panelRender';
+import { spinHtml } from './spinView';
 import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import {
@@ -62,6 +63,7 @@ export class NpcWindow {
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
   private salvageAsk = false; // desmontar aguardando confirmação
   private resetAsk = false; // realinhar meridianos aguardando confirmação
+  private skinAsk = ''; // traje aguardando confirmação da compra
   private qty = 1;
   private pending = -1; // venda aguardando confirmação (incomum/raro)
   private npcId = -1;
@@ -117,6 +119,24 @@ export class NpcWindow {
           ),
           '#9be7c4',
         );
+      return;
+    }
+    if (a === 'skinbuy') {
+      if (this.skinAsk !== v) {
+        audio.ui('ui_click');
+        this.skinAsk = v;
+        return;
+      }
+      this.skinAsk = '';
+      const err = w.buySkin(v);
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else this.toast(L(`Traje vestido: ${SKINS[v].name}`, `Outfit equipped: ${SKINS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'skinwear') {
+      audio.ui('ui_click');
+      this.skinAsk = '';
+      w.wearSkin(v || null);
       return;
     }
     if (a === 'mcancel') {
@@ -268,6 +288,7 @@ export class NpcWindow {
       this.forgeSel = '';
       this.salvageAsk = false;
       this.resetAsk = false;
+      this.skinAsk = '';
       this.pending = -1;
       this.sig = '';
       this.line = 0;
@@ -275,7 +296,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${w.skin}|${w.skinsOwned.length}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -284,7 +305,12 @@ export class NpcWindow {
     const role = w.npcRole(n),
       who = n.npcId;
     const shop =
-      role === 'ferreiro' || role === 'vendedor' || role === 'mercador' || role === 'caminhos' || role === 'meridianos';
+      role === 'ferreiro' ||
+      role === 'vendedor' ||
+      role === 'mercador' ||
+      role === 'caminhos' ||
+      role === 'meridianos' ||
+      role === 'governador';
     let view: View,
       sub = '';
     if (role === 'ferreiro') {
@@ -295,6 +321,7 @@ export class NpcWindow {
     else if (role === 'mercador') view = this.merchant(who);
     else if (role === 'caminhos') view = this.travel(who);
     else if (role === 'meridianos') view = { list: this.talk(who) + this.meridians() };
+    else if (role === 'governador') view = { list: this.talk(who) + this.skinShop() };
     else if (role.startsWith('mestre_')) {
       const m = this.master(role.slice(7));
       view = { list: m.body };
@@ -413,6 +440,41 @@ export class NpcWindow {
         ${btn}
         ${why ? `<small class="muted">${why}</small>` : ''}
       </div>`;
+  }
+
+  /** Governador Bai: trajes (skins) da seita do jogador; compra com confirmação, vestir e voltar ao traje da seita. */
+  private skinShop(): string {
+    const w = this.world,
+      sect = CLASSES[w.classId]?.name ?? w.classId;
+    const row = (id: string | null) => {
+      const s = id ? SKINS[id] : null,
+        owned = !id || w.skinsOwned.includes(id),
+        worn = (id ?? null) === w.skin,
+        pic = PORTRAITS[id ?? w.classId],
+        price = s ? s.price.toLocaleString('pt-BR') : '';
+      let btn: string;
+      if (worn) btn = `<button disabled>${L('Vestindo', 'Wearing')}</button>`;
+      else if (owned)
+        btn = `<button class="primary" data-a="skinwear" data-v="${id ?? ''}">${L('Vestir', 'Wear')}</button>`;
+      else if (this.skinAsk === id)
+        btn = `<div class="mr-ask"><button class="danger" data-a="skinbuy" data-v="${id}">${L(`Confirmar (${price} ouro)`, `Confirm (${price} gold)`)}</button><button data-a="skinwear" data-v="${w.skin ?? ''}">${L('Cancelar', 'Cancel')}</button></div>`;
+      else
+        btn = `<button class="primary" data-a="skinbuy" data-v="${id}" ${w.gold < s!.price ? 'disabled' : ''}>${L(`Comprar (${price} ouro)`, `Buy (${price} gold)`)}</button>`;
+      const why =
+        s && !owned && w.gold < s.price
+          ? `<small class="muted">${L(`Faltam ${(s.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(s.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
+          : '';
+      const key = id ?? w.classId;
+      return `<div class="dg-row sk-row">${pic ? spinHtml(key, `<img class="sk-pic" src="${pic}" alt="">`, 'sk-spin') : ''}<div class="sk-body">
+        <b>${escapeHtml(s ? s.name : L(`Traje da ${sect}`, `${sect} outfit`))}</b>
+        <div class="dg-info">${escapeHtml(s ? s.desc : L('O traje com que você entrou na seita.', 'The outfit you joined the sect with.'))}</div>
+        ${btn}${why}</div></div>`;
+    };
+    const mine = Object.keys(SKINS).filter((id) => SKINS[id].sect === w.classId);
+    return `<h4>${L('Trajes da seita', 'Sect outfits')}</h4>
+      <small class="muted">${L(`Só mudam a aparência. Cada traje é de uma seita: aqui, apenas os da ${sect}.`, `Appearance only. Each outfit belongs to one sect: here, only ${sect} ones.`)}</small>
+      ${row(null)}${mine.map(row).join('')}
+      ${mine.length ? '' : `<p class="muted">${L('Ainda não há trajes para a sua seita.', 'No outfits for your sect yet.')}</p>`}`;
   }
 
   /** Mestre dos Caminhos: destinos do teleporte (src/core/teleport.ts) agrupados por região, com o motivo do bloqueio. */

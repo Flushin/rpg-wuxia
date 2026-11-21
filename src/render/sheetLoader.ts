@@ -5,16 +5,16 @@ import type Phaser from 'phaser';
 import { MONSTERS } from '../core/data';
 import type { GameMap } from '../core/map';
 import type { World } from '../core/world';
-import { createSheetAnims, queueSheet, releaseSheet, sheetFor, sheetTexture } from './sprites';
+import { createSheetAnims, playerTexture, queueSheet, releaseSheet, sheetFor, sheetTexture } from './sprites';
 
-/** Folhas que um mapa usa (seita do jogador + monstros, invocações do chefe e NPCs). */
-function sheetsOf(map: GameMap, classId: string): Set<string> {
+/** Folhas que um mapa usa (sprite do jogador: seita ou skin + monstros, invocações do chefe e NPCs). */
+function sheetsOf(map: GameMap, player: string): Set<string> {
   const keys = new Set<string>();
   const add = (texture: string) => {
     const s = sheetFor(texture);
     if (s) keys.add(s.key);
   };
-  add('player-' + classId);
+  add(player);
   for (const o of map.objects) {
     if (o.type === 'npc') add('npc-' + String(o.props.npc ?? ''));
     if (o.type !== 'monsterSpawn') continue;
@@ -29,7 +29,7 @@ function sheetsOf(map: GameMap, classId: string): Set<string> {
 
 /** Folhas que o mapa atual do mundo usa (mais os monstros vivos que não vêm do mapa: o chefe do Trial). */
 export function sheetsForMap(world: World): Set<string> {
-  const keys = sheetsOf(world.map, world.classId);
+  const keys = sheetsOf(world.map, playerTexture(world.classId, world.skin));
   for (const m of world.monsters) {
     const def = MONSTERS[m.monsterId],
       summon = def?.boss?.summon && MONSTERS[def.boss.summon.monsterId];
@@ -49,9 +49,9 @@ let prefetched = new Set<string>();
  * Jogador perto de um portal: começa a carregar em segundo plano as folhas do mapa de destino, para a troca
  * de mapa não ficar parada esperando. As que o novo mapa não usar são liberadas na próxima troca.
  */
-export function prefetchSheets(scene: Phaser.Scene, map: GameMap, classId: string) {
+export function prefetchSheets(scene: Phaser.Scene, map: GameMap, player: string) {
   let any = false;
-  for (const k of sheetsOf(map, classId)) {
+  for (const k of sheetsOf(map, player)) {
     if (loaded.has(k) || prefetched.has(k)) continue;
     prefetched.add(k);
     if (scene.textures.exists(sheetTexture(k))) continue;

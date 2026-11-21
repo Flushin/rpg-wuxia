@@ -11,6 +11,7 @@ import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
 import { renderPanel } from './panelRender';
 import { byId, escapeHtml } from './dom';
 import { PORTRAIT_ANIMS, PORTRAITS } from '../render/sprites';
+import { spinHtml } from './spinView';
 import { SLOT_NAMES } from '../core/items';
 import type { Slot } from '../core/types';
 import { slotIconHtml } from './icons';
@@ -191,7 +192,7 @@ export class CharacterPanel {
       const it = w.equipment[sl];
       return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel === sl ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it, w.owner()) : `<span class="ic empty img">${slotIconHtml(sl, w.classId)}</span>`}</button></div>`;
     };
-    const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${bodyFigure(w.classId, cls.color ?? '#889')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
+    const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${spinHtml(w.skin ?? w.classId, bodyFigure(w.skin ?? w.classId, cls.color ?? '#889'), 'body-spin')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
     const selIt = this.sel ? w.equipment[this.sel] : null;
     const detail = selIt
       ? `<div class="tipbody">${itemTipHtml(w, selIt, false)}</div><button class="primary" data-unequip="1">${L('Desequipar', 'Unequip')}</button>`

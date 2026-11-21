@@ -22,6 +22,22 @@ import mongeFogo from '../data/sprites/monge_fogo_rubro.json';
 import guardaCeleste from '../data/sprites/guarda_celeste.json';
 import feiticeiraLua from '../data/sprites/feiticeira_lua_fria.json';
 import imperador from '../data/sprites/imperador_carmesim.json';
+import { SKINS } from '../core/data';
+
+// skins do jogador (src/data/skins.json): folha com o mesmo nome do id
+const SKIN_SHEETS = import.meta.glob('../data/sprites/*.json', { eager: true, import: 'default' }) as Record<
+  string,
+  SheetMeta
+>;
+const skinSheets = Object.fromEntries(
+  Object.keys(SKINS).flatMap((id) => {
+    const m = SKIN_SHEETS[`../data/sprites/${id}.json`];
+    return m ? [[id, m]] : [];
+  }),
+);
+/** Nome do sprite do jogador: a skin vestida ou o traje da seita. */
+export const playerTexture = (classId: string, skin: string | null) =>
+  skin && skinSheets[skin] ? 'skin-' + skin : 'player-' + classId;
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -84,6 +100,7 @@ const SHEETS: Record<string, SheetMeta> = {
   feiticeira_lua_fria: feiticeiraLua as SheetMeta,
   imperador_carmesim: imperador as SheetMeta,
   ...npcSheets,
+  ...skinSheets,
 };
 
 // nome do sprite nos dados (monsters.json, 'player-' + seita) -> folha animada. Sem folha: figura genérica (PLACEHOLDER).
@@ -113,12 +130,13 @@ const BY_TEXTURE: Record<string, string> = {
   'crimson-emperor': 'imperador_carmesim',
 };
 
-// retrato parado de frente, usado na mochila (por seita)
+// retrato parado de frente, usado na mochila (por seita ou id da skin)
 export const PORTRAITS: Record<string, string> = {
   lamina: 'sprites/tormenta_retrato.png',
   pavilhao: 'sprites/geada_retrato.png',
   tita: 'sprites/tita_retrato.png',
   vibora: 'sprites/vibora_retrato.png',
+  ...Object.fromEntries(Object.keys(skinSheets).map((id) => [id, `sprites/${id}_retrato.png`])),
 };
 
 // retrato animado da mochila: a animação parada em alta resolução, numa tira horizontal (tools/sprites, portrait_anim)
@@ -141,6 +159,26 @@ export const PORTRAIT_ANIMS: Record<string, PortraitAnim> = Object.fromEntries(
   }),
 );
 
+// retrato das 8 direções (girar o personagem na janela Personagem, na loja de trajes e em tela cheia):
+// tira horizontal com a direção 0..7 (tools/sprites, portrait_dirs), mesma chave de PORTRAITS
+export interface PortraitDirs {
+  src: string;
+  dirs: number;
+  w: number;
+  h: number;
+}
+const PORTRAIT_DIRS_META = import.meta.glob('../data/sprites/*_retrato_dirs.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, Omit<PortraitDirs, 'src'>>;
+export const PORTRAIT_DIRS: Record<string, PortraitDirs> = Object.fromEntries(
+  Object.entries(PORTRAITS).flatMap(([key, still]) => {
+    const name = still.replace(/^sprites\/(.*)_retrato\.png$/, '$1');
+    const m = PORTRAIT_DIRS_META[`../data/sprites/${name}_retrato_dirs.json`];
+    return m ? [[key, { ...m, src: `sprites/${name}_retrato_dirs.png` }]] : [];
+  }),
+);
+
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
   Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),
@@ -149,6 +187,7 @@ export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
 export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | null => {
   const key =
     BY_TEXTURE[texture] ??
+    (texture.startsWith('skin-') && skinSheets[texture.slice(5)] ? texture.slice(5) : undefined) ??
     (texture.startsWith('npc-') && SHEETS[npcSheetKey(texture.slice(4))] ? npcSheetKey(texture.slice(4)) : undefined);
   return key ? { key, meta: SHEETS[key] } : null;
 };

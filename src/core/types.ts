@@ -190,6 +190,7 @@ export type GameEvent =
   | { type: 'potionFail'; kind: PotionKind; reason: 'none' | 'cooldown' | 'full' }
   | { type: 'npcOpen'; npcId: string; entityId: number }
   | { type: 'npcClose' }
+  | { type: 'skinChange' }
   | { type: 'trade'; kind: 'buy' | 'sell'; gold: number }
   | { type: 'repair'; gold: number }
   | { type: 'forge'; kind: 'upgrade' | 'rarity' | 'reroll' | 'salvage'; success: boolean; plus: number; rarity: Rarity }
@@ -297,6 +298,9 @@ export interface SaveData {
   /** estoque do Mercador Ambulante (marco 9): janela de renovação e ofertas (item, preço, vendido) */
   /** Trial: maior nível vencido de cada chefe (id do chefe → 1–10) */
   trialProgress?: Record<string, number>;
+  /** skins compradas (ids de skins.json) e a vestida (ausente = traje da seita) */
+  skins?: string[];
+  skin?: string;
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
@@ -316,4 +320,6 @@ export type ActionError =
   | { code: 'trialLocked' }
   | { code: 'epicLocked' }
   | { code: 'talkToMonk' }
-  | { code: 'nothingToReset' };
+  | { code: 'nothingToReset' }
+  | { code: 'talkToGovernor' }
+  | { code: 'skinOwned' };

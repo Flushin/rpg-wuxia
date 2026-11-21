@@ -2,6 +2,7 @@ import classesJson from '../data/classes.json';
 import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
 import npcsJson from '../data/npcs.json';
+import skinsJson from '../data/skins.json';
 import { localize } from './i18n';
 import { balanceClasses, balanceMonsters, balanceProgression } from './balance';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap, ProjectileKind } from './types';
@@ -157,4 +158,14 @@ export const NPC_TEXT = localize('npcs', npcsJson) as unknown as {
   npcs: Record<string, NpcText>;
 };
 /** Seitas na ordem da criação: jogáveis primeiro, depois as que ainda virão. */
+/** Skin (traje) do jogador: troca só o desenho, sem efeito no combate. Vendida pelo Governador Bai (Cidadela),
+ * apenas para a própria seita. A folha de sprites tem o mesmo nome do id (tools/sprites/<id>.json). */
+export interface SkinDef {
+  sect: string;
+  name: string;
+  desc: string;
+  price: number;
+}
+export const SKINS = localize('skins', skinsJson) as unknown as Record<string, SkinDef>;
+
 export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];

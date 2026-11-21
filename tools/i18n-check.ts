@@ -8,6 +8,7 @@ import tips from '../src/data/tips.json';
 import npcs from '../src/data/npcs.json';
 import quests from '../src/data/quests.json';
 import novidades from '../src/data/novidades.json';
+import skins from '../src/data/skins.json';
 import { readFileSync, readdirSync } from 'node:fs';
 
 type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -63,6 +64,7 @@ const sections: [string, unknown][] = [
   ['npcs', npcs],
   ['quests', quests],
   ['novidades', novidades],
+  ['skins', skins],
 ];
 for (const [name, data] of sections) orphans(E[name], data, name);
 
@@ -92,6 +94,9 @@ for (const [id, t] of Object.entries(tips as J)) {
     if (f in t) need(t[f], E.tips?.[id]?.[f], `tips.${id}.${f}`);
   if (t.byClass) need(t.byClass, E.tips?.[id]?.byClass, `tips.${id}.byClass`);
 }
+// skins (trajes): nome e descrição
+for (const [id, k] of Object.entries(skins as J))
+  for (const f of ['name', 'desc']) need(k[f], E.skins?.[id]?.[f], `skins.${id}.${f}`);
 // npcs (falas dos NPCs e mestres): todo texto
 need(npcs, E.npcs, 'npcs');
 // missões (marco 7): nome, oferta, objetivo e fala de entrega de cada etapa
@@ -126,7 +131,7 @@ for (const f of readdirSync('public/maps').filter((x) => x.endsWith('.json'))) {
 for (const n of used) if (!E.names?.[n]) bad(`names: "${n}" (mapas) sem tradução EN`);
 for (const k of Object.keys(E.names ?? {})) if (!used.has(k)) bad(`names: chave órfã "${k}" (não aparece nos mapas)`);
 for (const k of Object.keys(E))
-  if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'novidades', 'names'].includes(k))
+  if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'novidades', 'names', 'skins'].includes(k))
     bad(`seção desconhecida "${k}"`);
 
 console.log(fails ? `${fails} problema(s)` : 'i18n-check: tudo ok');

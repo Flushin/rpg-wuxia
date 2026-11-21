@@ -37,5 +37,9 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Monge do Pagode', 'Talk to the Pagoda Monk');
     case 'nothingToReset':
       return L('Nenhum ponto distribuído para devolver', 'No distributed points to return');
+    case 'talkToGovernor':
+      return L('Fale com o Governador Bai', 'Talk to Governor Bai');
+    case 'skinOwned':
+      return L('Você já tem este traje', 'You already own this outfit');
   }
 }

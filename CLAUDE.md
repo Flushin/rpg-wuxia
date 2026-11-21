@@ -14,7 +14,7 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 
 ## Mapa rápido
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save, masmorras em `dungeons.ts`, Trial em `trial.ts`, teleporte em `teleport.ts`, rotas do mapa-múndi em `worldRoutes.ts`; `world/`)
-- `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en
+- `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en; trajes (skins) por seita em `skins.json` (Governador Bai)
 - `src/scenes/`, `src/ui/`, `src/render/`, `src/platform/`, `src/styles/` telas, interface, desenho, Android, CSS
 - Janelas que se redesenham abertas usam `renderPanel()` de `src/ui/panelRender.ts` (mantém rolagem); nunca `innerHTML` direto
 - `wiki/index.html` + `src/wiki/`: wiki para jogadores (PT), gerada dos JSON de `src/data/`; publicada em `<site>/wiki/`; `npm run check:wiki` confere contra o jogo
