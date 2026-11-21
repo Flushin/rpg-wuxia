@@ -53,3 +53,16 @@ faixa), jogo ativo:
   dobro em toda receita e no desmonte (wiki em `mechanics.ts`). Ouro ×8 sai da fórmula 1 + nível/5. Mercador e Épico
   passam ao nv 35 no nível 35 sem código novo. Ícones em `tools/sprites/icons.py`. Teste: `npm run check:m11`. Drops
   nos monstros e no Trial entram na etapa 4.
+- **Feito na etapa 4a (conteúdo):** mapas `vale` e `palacio` (`tools/gen-maps.mjs`; tiles novos no fim da lista:
+  `ash`, `basalt`, `lava`, `marble`, `cloud`; pisos em `ground_tiles.py`; objetos do Vale em `tools/sprites/vale.json`,
+  atlas `props-vale`). Portal no portão leste da Cidadela (minLevel 30) e saída noroeste do Vale (minLevel 35), longe
+  das clareiras. `MAPS_CONFIG`: `autoFromLevel` 30/35, `offlineMul` 5/6, `homeTown: 'cidadela'` (morte e Pergaminho de
+  Retorno; `homeTownOf` em `mapsConfig.ts`), `pillarGround` (mármore sob as colunas do Palácio). Teleporte: região
+  "Além da Cidadela" (30/35). Monstros `andarilho_cinzas`, `monge_fogo_rubro` (projétil novo `fire`, só visual),
+  `guarda_celeste` (golpe em área, defesa física ×0,6) e `feiticeira_lua_fria` (projétil `ice`, lentidão); nenhum recua;
+  sprites KayKit recoloridos (Rogue, Mage, Knight, Mage com chapéu). No nível 30 o Auto vai ao Vale (antes: Pico).
+  Simulador: `--m11` (30→40; troca para o conjunto nv 35 Incomum no 35; `--ref` mede o 20→30), e o jogador simulado
+  conserta e vende também na Cidadela. Teste: `npm run check:m11`.
+- **Primeira medição da 4a** (`--m11 --seeds=1`, ainda sem as missões 31–40): Tormenta 2.018 min (6,4×), Geada 2.090
+  (6,4×), Víbora 2.191 (6,8×), Titã parou no 38 aos 3.438 min (465 idas à cidade por mana). Conserto 15–64% do ouro
+  ganho (~1,3 milhão). Ajuste fino na etapa 5.

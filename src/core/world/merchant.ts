@@ -12,7 +12,7 @@ import {
   makeStack,
   sanitizeItem,
 } from '../items';
-import { HOME_MAP, TOWN_MAPS } from '../mapsConfig';
+import { TOWN_MAPS, homeTownOf } from '../mapsConfig';
 import type { ActionError, ItemInstance } from '../types';
 import type { World } from '../world';
 
@@ -104,13 +104,13 @@ export function buyGoods(w: World, id: string, qty: number, force = false): Acti
   return null;
 }
 
-/** Pergaminho de retorno: volta para a vila (não funciona já na vila nem morto). */
+/** Pergaminho de retorno: volta para a vila (ou a cidade de apoio do mapa, homeTown); não funciona em cidade nem morto. */
 export function useReturnScroll(w: World, bagIndex: number): boolean {
   const it = w.bag[bagIndex];
   if (!it || it.baseId !== 'pergaminho_retorno' || w.player.dead || TOWN_MAPS.has(w.mapId)) return false;
   w.removeFromBag(bagIndex);
   w.auto.manualMove();
-  w.changeMap(HOME_MAP);
+  w.changeMap(homeTownOf(w.mapId));
   return true;
 }
 

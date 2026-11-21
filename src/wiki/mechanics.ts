@@ -49,7 +49,12 @@ import {
 } from '../core/trial';
 import { itemLink } from './ui';
 import { MAPS_CONFIG, MAP_IDS } from '../core/mapsConfig';
-const MAP_TITLES: Record<string, string> = { bambu: 'Bosque de Bambu Sombrio', pico: 'Pico da Névoa' };
+const MAP_TITLES: Record<string, string> = {
+  bambu: 'Bosque de Bambu Sombrio',
+  pico: 'Pico da Névoa',
+  vale: 'Vale das Cinzas Rubras',
+  palacio: 'Ruínas do Palácio Celeste',
+};
 
 const n1 = (v: number) => String(+v.toFixed(1)).replace('.', ',');
 const pc = (v: number) => `${n1(v * 100)}%`;
@@ -285,7 +290,7 @@ function morte(): string {
     )
     .join('');
   return `<section class="panel"><h2>Ao morrer</h2><ul>
-      <li>Depois de ${RESPAWN_SECONDS} s você volta à <a href="#/mapa/cidade">Vila das Nuvens</a> com vida e mana cheias.</li>
+      <li>Depois de ${RESPAWN_SECONDS} s você volta à <a href="#/mapa/cidade">Vila das Nuvens</a> com vida e mana cheias. Nos mapas além do portão leste da <a href="#/mapa/cidadela">Cidadela de Jade</a> (<a href="#/mapa/vale">Vale das Cinzas Rubras</a> e <a href="#/mapa/palacio">Ruínas do Palácio Celeste</a>), volta à Cidadela; o Pergaminho de Retorno também leva para lá.</li>
       <li>Cada item equipado perde <b>${pc(loss)} da durabilidade máxima</b>.</li>
       <li>Você <b>não</b> perde XP, ouro nem itens. Efeitos de poção ativos acabam.</li></ul></section>
     <section class="panel"><h2>Durabilidade</h2><ul>

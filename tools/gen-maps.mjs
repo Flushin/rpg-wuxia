@@ -20,8 +20,16 @@ const TILES = [
   { name: 'pine', walkable: false, color: [52, 84, 70] },
   // nível 30 (Bosque de Bambu Sombrio): também no fim da lista
   { name: 'bamboo', walkable: false, color: [44, 92, 56] },
+  // nível 40 (Vale das Cinzas Rubras e Ruínas do Palácio Celeste): também no fim da lista
+  { name: 'ash', walkable: true, color: [74, 64, 62] },
+  { name: 'basalt', walkable: false, color: [44, 40, 40] },
+  { name: 'lava', walkable: false, color: [200, 70, 30] },
+  { name: 'marble', walkable: true, color: [220, 216, 206] },
+  { name: 'cloud', walkable: false, color: [236, 240, 248] },
 ];
-const [G, P, WA, T, HS, PL, RU, PI, SN, PN, BB] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const [G, P, WA, T, HS, PL, RU, PI, SN, PN, BB, AS, BS, LV, MB, CL] = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+];
 const walkable = (id) => TILES[id - 1].walkable;
 
 function rngFn(seed) {
@@ -1103,6 +1111,166 @@ function trial() {
   return tiled('Trial', gr, objs);
 }
 
+// ---- Vale das Cinzas Rubras (nível 40, nv 30–35) ----
+// Entrada a oeste (vinda do portão leste da Cidadela de Jade); trilha de terra entre rochas de basalto e árvores
+// queimadas (tile 'basalt', bloqueia) sobre cinza vulcânica, cortada por um rio de lava. Clareiras do oeste e do
+// centro com monstros nv 30–32; clareiras do leste e do norte com nv 33–35. A trilha das Ruínas do Palácio Celeste
+// (portal com minLevel 35) sai junto da entrada, pela beira oeste, longe das clareiras (lição do nível 30).
+function vale() {
+  const rnd = rngFn(4030);
+  const gr = makeGrid(AS, BS);
+  for (let j = 1; j < H - 1; j++) for (let i = 1; i < W - 1; i++) if (rnd() < 0.4) gr.set(i, j, BS);
+  gr.rect(1, 15, 9, 2, P);
+  gr.rect(1, 10, 2, 6, P); // trilha do Palácio, pela beira oeste
+  gr.rect(8, 11, 2, 6, P);
+  gr.rect(8, 11, 9, 2, P);
+  gr.rect(15, 2, 2, 11, P);
+  gr.rect(16, 18, 10, 2, P);
+  gr.rect(15, 12, 2, 8, P);
+  // clareiras de cinza
+  gr.disc(5, 22, 3.4, AS);
+  gr.rect(4, 16, 2, 5, P);
+  gr.disc(12, 23, 3.0, AS);
+  gr.rect(11, 17, 2, 5, P);
+  gr.rect(9, 17, 4, 2, P);
+  gr.disc(22, 24, 3.4, AS);
+  gr.rect(21, 19, 2, 4, P);
+  gr.disc(26, 12, 3.4, AS);
+  gr.rect(24, 13, 2, 6, P);
+  gr.disc(8, 6, 3.2, AS);
+  gr.rect(9, 9, 2, 3, P);
+  gr.disc(24, 5, 3.2, AS);
+  gr.rect(17, 5, 5, 2, P);
+  // rio de lava atravessando o sul (a trilha do ramal passa por cima, numa ponte de pedra) e poças de lava
+  for (let i = 13; i <= 19; i++) gr.set(i, 26, LV);
+  gr.disc(17, 27, 1.2, LV);
+  gr.disc(4, 9, 1.0, LV);
+  gr.disc(28, 20, 1.0, LV);
+  // altar de pedra (lajes) na clareira do centro
+  gr.disc(16, 15, 1.6, RU);
+  const seen = sealUnreachable(gr, 2, 16, BS);
+  for (const [i, j, what] of [
+    [1, 10, 'trilha do Palácio'],
+    [16, 2, 'clareira norte'],
+    [26, 12, 'clareira leste'],
+    [5, 22, 'clareira sudoeste'],
+    [24, 5, 'clareira nordeste'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`vale: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 3, 16),
+    area('Cidadela de Jade', 'portal', 1, 15, 1, 2, { target: 'cidadela', targetX: 26, targetY: 16 }),
+    area('Ruínas do Palácio Celeste', 'portal', 1, 10, 1, 2, {
+      target: 'palacio',
+      targetX: 16,
+      targetY: 27.5,
+      minLevel: 35,
+    }),
+  ];
+  const { place, used } = placer('vale', gr, seen, rnd, objs, [
+    { x: 3, y: 16 },
+    { x: 1.5, y: 11 },
+  ]);
+  const and = (cx, cy, r, a, b) => place('Andarilho das Cinzas', 'andarilho_cinzas', cx, cy, r, a, b);
+  const mon = (cx, cy, r, a, b) => place('Monge do Fogo Rubro', 'monge_fogo_rubro', cx, cy, r, a, b);
+  // oeste e centro (nv 30–32)
+  and(5, 22, 3.2, 30, 31);
+  mon(5, 22, 3.2, 30, 31);
+  and(12, 23, 2.8, 30, 32);
+  mon(12, 23, 2.8, 31, 32);
+  and(8, 6, 3.0, 31, 32);
+  mon(8, 6, 3.0, 31, 32);
+  and(14, 16.5, 3, 31, 32);
+  // leste e norte (nv 33–35)
+  and(22, 24, 3.2, 33, 34);
+  mon(22, 24, 3.2, 33, 34);
+  and(22, 24, 3.2, 33, 34);
+  and(26, 12, 3.2, 33, 35);
+  mon(26, 12, 3.2, 34, 35);
+  mon(26, 12, 3.2, 33, 34);
+  and(24, 5, 3.0, 34, 35);
+  mon(24, 5, 3.0, 34, 35);
+  and(24, 5, 3.0, 34, 35);
+  console.log(`vale: ${seen.size} tiles andáveis, ${used.length} monstros`);
+  return tiled('Vale das Cinzas Rubras', gr, objs);
+}
+
+// ---- Ruínas do Palácio Celeste (nível 40, nv 35–40) ----
+// Sobre o mar de nuvens (tile 'cloud', bloqueia): entrada no sul (vinda do Vale); terraços de mármore sobem entre
+// colunas caídas (tile 'pillar') e jardins de cerejeiras até o Salão do Trono no topo (arena do chefe, etapa 4b;
+// centro 16,6). Terraço baixo nv 35–37, terraço do meio nv 36–38, terraço alto nv 38–40.
+const PALACIO_ARENA = { x: 16, y: 6, r: 5.5 };
+function palacio() {
+  const rnd = rngFn(4031);
+  const gr = makeGrid(MB, CL);
+  for (let j = 1; j < H - 1; j++)
+    for (let i = 1; i < W - 1; i++) {
+      const r = rnd();
+      if (j < 12 || r < 0.4) gr.set(i, j, r < 0.1 ? PI : r < 0.16 ? T : CL);
+    }
+  // escadarias de lajes: entrada (16,28) -> terraço baixo -> meio -> alto -> salão
+  gr.rect(15, 22, 2, 9, RU);
+  gr.rect(6, 22, 20, 2, RU);
+  gr.rect(6, 17, 2, 6, RU);
+  gr.rect(24, 17, 2, 6, RU);
+  gr.rect(6, 16, 20, 2, RU);
+  gr.rect(15, 11, 2, 6, RU);
+  // terraços de mármore
+  gr.disc(7, 26, 3.0, MB);
+  gr.disc(25, 26, 3.0, MB);
+  gr.disc(4, 19.5, 2.6, MB);
+  gr.disc(28, 19.5, 2.6, MB);
+  gr.disc(16, 19.5, 2.4, MB);
+  gr.disc(5, 13, 2.6, MB);
+  gr.disc(27, 13, 2.6, MB);
+  gr.rect(5, 13, 2, 4, MB);
+  gr.rect(26, 13, 2, 4, MB);
+  // Salão do Trono: muro de colunas com portão no sul; pátio de mármore com 6 braseiros
+  gr.rect(8, 1, 16, 11, PI);
+  gr.rect(9, 1, 14, 10, MB);
+  gr.rect(15, 10, 2, 2, RU);
+  gr.disc(PALACIO_ARENA.x, PALACIO_ARENA.y, 4.6, MB);
+  for (let n = 0; n < 6; n++) {
+    const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
+    gr.set(Math.floor(PALACIO_ARENA.x + Math.cos(a) * 4), Math.floor(PALACIO_ARENA.y + Math.sin(a) * 4), PI);
+  }
+  const seen = sealUnreachable(gr, 16, 27, CL);
+  for (const [i, j, what] of [
+    [16, 6, 'salão'],
+    [5, 13, 'terraço alto oeste'],
+    [27, 13, 'terraço alto leste'],
+    [7, 26, 'terraço baixo oeste'],
+  ])
+    if (!seen.has(j * W + i)) throw new Error(`palacio: ${what} inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vale das Cinzas Rubras', 'portal', 15, 29, 2, 2, { target: 'vale', targetX: 2.5, targetY: 11 }),
+  ];
+  const { place, used } = placer('palacio', gr, seen, rnd, objs, { x: 16, y: 27.5 });
+  const fei = (cx, cy, r, a, b) => place('Feiticeira da Lua Fria', 'feiticeira_lua_fria', cx, cy, r, a, b);
+  const gua = (cx, cy, r, a, b) => place('Guarda Celeste', 'guarda_celeste', cx, cy, r, a, b);
+  // terraço baixo (nv 35–37)
+  fei(7, 26, 2.8, 35, 36);
+  fei(7, 26, 2.8, 35, 36);
+  gua(25, 26, 2.8, 36, 37);
+  fei(25, 26, 2.8, 35, 37);
+  // terraço do meio (nv 36–38)
+  fei(4, 19.5, 2.6, 36, 38);
+  gua(4, 19.5, 2.6, 36, 38);
+  fei(28, 19.5, 2.6, 36, 38);
+  gua(28, 19.5, 2.6, 37, 38);
+  gua(16, 19.5, 2.4, 36, 37);
+  // terraço alto (nv 38–40)
+  fei(5, 13, 2.8, 38, 40);
+  gua(5, 13, 2.8, 38, 39);
+  fei(5, 13, 2.8, 38, 39);
+  fei(27, 13, 2.8, 38, 40);
+  gua(27, 13, 2.8, 39, 40);
+  gua(27, 13, 2.8, 38, 39);
+  console.log(`palacio: ${seen.size} tiles andáveis, salão alcançável, ${used.length} monstros`);
+  return tiled('Ruínas do Palácio Celeste', gr, objs);
+}
+
 // ---- cidadela ----
 // Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte (nível 30). Cercada por muralha (torres nos
 // cantos, portões fechados ao sul, a oeste e a leste); avenidas de pedra; ao norte o salão principal e o pagode; praça
@@ -1160,6 +1328,10 @@ function cidadela() {
   }
   building('portao_muralha_j', 1, 14, 2, 4);
   building('portao_muralha_j', 29, 14, 2, 4);
+  // nível 40: o portão leste leva ao Vale das Cinzas Rubras (portal junto do portão, na ponta da avenida)
+  objs.push(
+    area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, { target: 'vale', targetX: 2.5, targetY: 16, minLevel: 30 }),
+  );
 
   // norte: salão principal no fim da avenida, pagode ao lado
   building('jade_salao', 13, 3, 6, 4);
@@ -1286,5 +1458,7 @@ writeFileSync('public/maps/trial.json', JSON.stringify(trial()));
 writeFileSync('public/maps/bambu.json', JSON.stringify(bambu()));
 writeFileSync('public/maps/pico.json', JSON.stringify(pico()));
 writeFileSync('public/maps/cidadela.json', JSON.stringify(cidadela()));
+writeFileSync('public/maps/vale.json', JSON.stringify(vale()));
+writeFileSync('public/maps/palacio.json', JSON.stringify(palacio()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

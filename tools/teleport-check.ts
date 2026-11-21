@@ -108,7 +108,14 @@ console.log('\n== Cidadela de Jade ==');
 {
   ok(!!MAPS_CONFIG.cidadela?.town, 'é cidade');
   ok(teleportById('cidadela')?.minLevel === 30, 'destino a partir do nível 30');
-  ok(!maps.cidadela.objects.some((o) => o.type === 'portal'), 'sem saída a pé (só o teleporte)');
+  {
+    // nível 40: a única saída a pé é o portão leste, para o Vale das Cinzas Rubras (nível 30)
+    const ps = maps.cidadela.objects.filter((o) => o.type === 'portal');
+    ok(
+      ps.length === 1 && ps[0].props.target === 'vale' && Number(ps[0].props.minLevel) === 30,
+      'saída a pé só pelo portão leste (Vale, nível 30)',
+    );
+  }
   const npc = maps.cidadela.objects.find((o) => o.type === 'npc' && o.props.npc === 'caminhos');
   const circle = maps.cidadela.objects.find((o) => o.type === 'teleCircle');
   ok(!!npc && !!circle, 'tem o Mestre dos Caminhos e o círculo');

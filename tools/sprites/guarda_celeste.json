@@ -1,0 +1,127 @@
+{
+ "name": "guarda_celeste",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword",
+  "1H_Sword_Offhand",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield",
+  "Knight_Cape"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "0,0": [
+    224,
+    231,
+    243
+   ],
+   "1,0": [
+    194,
+    201,
+    211
+   ],
+   "2,0": [
+    139,
+    144,
+    151
+   ],
+   "3,0": [
+    216,
+    223,
+    235
+   ],
+   "7,0": [
+    201,
+    207,
+    218
+   ],
+   "4,0": [
+    207,
+    214,
+    225
+   ],
+   "6,0": [
+    212,
+    219,
+    230
+   ],
+   "7,1": [
+    188,
+    195,
+    205
+   ],
+   "2,1": [
+    210,
+    218,
+    229
+   ],
+   "0,1": [
+    205,
+    212,
+    223
+   ],
+   "1,1": [
+    195,
+    202,
+    212
+   ],
+   "3,1": [
+    226,
+    184,
+    84
+   ],
+   "5,1": [
+    155,
+    161,
+    169
+   ],
+   "2,2": [
+    226,
+    184,
+    84
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "2H_Melee_Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Walking_A",
+   "frames": 8,
+   "fps": 10
+  },
+  "attack": {
+   "action": "2H_Melee_Attack_Chop",
+   "frames": 8,
+   "fps": 13,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_B",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle"
+}

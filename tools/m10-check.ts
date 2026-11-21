@@ -194,7 +194,7 @@ console.log('== Auto pelo nível ==');
     [20, 'bambu'],
     [24, 'bambu'],
     [25, 'pico'],
-    [30, 'pico'],
+    [29, 'pico'], // no 30 o Auto vai ao Vale das Cinzas Rubras (nível 40, check:m11)
   ] as const) {
     const w = mk(lv, 'cidade');
     w.auto.toggle();

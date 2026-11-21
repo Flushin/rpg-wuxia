@@ -1,0 +1,88 @@
+{
+ "name": "vale",
+ "dir": ".cache/kenney-nature",
+ "out": "../../public/sprites",
+ "samples": 6,
+ "props": {
+  "arvore_cinza": {
+   "file": "tree_oak.glb",
+   "scale": 1.9,
+   "recolor": {
+    "leafsGreen": [
+     70,
+     62,
+     62
+    ],
+    "woodBark": [
+     52,
+     44,
+     42
+    ]
+   }
+  },
+  "arvore_brasa": {
+   "file": "tree_default.glb",
+   "scale": 1.8,
+   "recolor": {
+    "leafsGreen": [
+     176,
+     64,
+     36
+    ],
+    "woodBark": [
+     52,
+     44,
+     42
+    ]
+   }
+  },
+  "rocha_basalto": {
+   "file": "rock_largeA.glb",
+   "scale": 1.2,
+   "recolor": {
+    "dirt": [
+     58,
+     52,
+     54
+    ],
+    "grass": [
+     84,
+     74,
+     70
+    ]
+   }
+  },
+  "pedra_brasa": {
+   "file": "rock_smallA.glb",
+   "recolor": {
+    "dirt": [
+     60,
+     46,
+     44
+    ],
+    "grass": [
+     226,
+     104,
+     42
+    ]
+   }
+  },
+  "tronco_queimado": {
+   "file": "log.glb",
+   "recolor": {
+    "woodBark": [
+     46,
+     38,
+     36
+    ],
+    "woodInner": [
+     120,
+     56,
+     36
+    ]
+   }
+  }
+ },
+ "recolor": {},
+ "out_json": "../../public/sprites"
+}

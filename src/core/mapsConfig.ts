@@ -9,8 +9,11 @@ export interface MapConfig {
   /** Chave da música em src/data/audio.json ("music"); sem música = continua a que estava. */
   music?: string;
   /** Árvores: 'city' mistura cerejeiras; 'forest' só árvores comuns; 'snow' = pinheiros (tile 'pine');
-   *  'bamboo' = moitas de bambu (tile 'bamboo', atlas props-bambu). */
-  trees: 'city' | 'forest' | 'snow' | 'bamboo';
+   *  'bamboo' = moitas de bambu (tile 'bamboo', atlas props-bambu); 'ash' = Vale das Cinzas Rubras (tile 'basalt':
+   *  rochas de basalto e árvores queimadas do atlas props-vale; brasas e troncos soltos na cinza). */
+  trees: 'city' | 'forest' | 'snow' | 'bamboo' | 'ash';
+  /** Piso debaixo dos pilares (tile 'pillar'); sem ele, lajes das ruínas. Palácio Celeste: 'marble'. */
+  pillarGround?: string;
   /** Chance (0–1) de um tile de grama ganhar enfeite (flor, cogumelo, pedra…). */
   grassDecor?: number;
   /** Arena do chefe: os pilares dentro deste círculo (em tiles) viram braseiros. */
@@ -25,6 +28,9 @@ export interface MapConfig {
   trial?: boolean;
   /** Ganho offline caçando aqui: multiplica a eficiência das faixas de tempo (nível 30: 5/6 nos mapas 20–30). */
   offlineMul?: number;
+  /** Cidade de apoio: morrer ou usar o Pergaminho de Retorno aqui leva a esta cidade (sem ela, à vila). Nível 40:
+   *  Cidadela de Jade nos mapas além do portão leste (decidido pelo Lucas em 21/11/2026). */
+  homeTown?: string;
   /** Posição no mapa-múndi (janela do mapa, aba Mundo): coluna e linha de uma grade; mapa sem ela não aparece. */
   world?: { col: number; row: number };
 }
@@ -75,6 +81,27 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     offlineMul: 5 / 6,
     world: { col: 2, row: 0 },
   },
+  // nível 40: Vale das Cinzas Rubras (nv 30–35), pelo portão leste da Cidadela de Jade (portal minLevel 30); offline a 5/6
+  vale: {
+    music: 'music_ruinas',
+    trees: 'ash',
+    autoFromLevel: 30,
+    offlineMul: 5 / 6,
+    homeTown: 'cidadela',
+    world: { col: 4, row: 0 },
+  },
+  // nível 40: Ruínas do Palácio Celeste (nv 35–40), saída noroeste do Vale (minLevel 35); Salão do Trono = arena do chefe
+  palacio: {
+    music: 'music_pico',
+    trees: 'city',
+    pillarGround: 'marble',
+    arena: { x: 16, y: 6, r: 5.5 },
+    autoFromLevel: 35,
+    autoExitVia: 'vale',
+    offlineMul: 5 / 6,
+    homeTown: 'cidadela',
+    world: { col: 4, row: 1 },
+  },
   // masmorra (src/core/dungeons.ts): Desfiladeiro do Gelo Eterno; arena do Yeti Ancestral no norte
   gruta: {
     music: 'music_gruta',
@@ -117,6 +144,8 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
 export const MAP_IDS = Object.keys(MAPS_CONFIG);
 /** Onde o personagem começa, renasce ao morrer e para onde vai um save com mapa desconhecido. */
 export const HOME_MAP = 'cidade';
+/** Cidade para onde a morte e o Pergaminho de Retorno levam a partir de `mapId` (MapConfig.homeTown ou a vila). */
+export const homeTownOf = (mapId: string) => MAPS_CONFIG[mapId]?.homeTown ?? HOME_MAP;
 export const TOWN_MAPS = new Set(MAP_IDS.filter((id) => MAPS_CONFIG[id].town));
 
 /** Nível mínimo para atravessar um portal (propriedade minLevel do objeto no mapa); 0 = livre. */
