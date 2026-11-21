@@ -67,6 +67,7 @@ arquivo de pacote foi usado; a configuração de cada folha fica em `tools/sprit
 | `public/sprites/npc_guarda.*` | NPC | `Knight.glb` | KayKit Adventurers | CC0 | Recolorido (armadura vermelha) | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/floresta.*` | Cenário | `tree_oak`, `tree_default`, `tree_fat`, `tree_pineRoundA`, `rock_largeA`, `rock_smallA`, `plant_bush`, `plant_bushLarge`, `grass`, `grass_large`, `flower_redA`, `flower_yellowA`, `mushroom_red`, `stump_round`, `log` (.glb) | Kenney Nature Kit | CC0 | Cores trocadas para a paleta da floresta | 2026-11-15 | Lucas/Claude | 🟡 (prova oficial) |
 | `public/sprites/cidade.*` | Cenário | Cerejeiras/carvalhos: árvores do Nature Kit · casas, portão, lanternas, estandartes, incensário, poço, carroça: **geometria própria** (`render_town.py`) | Kenney Nature Kit + próprio | CC0 + próprio | Folhas recoloridas em rosa | 2026-11-16 | Lucas/Claude | 🟡 (prova do Nature Kit) |
+| `public/sprites/cidadela.*` | Cenário | Casas, salão, pagode, muralha, torres, portões, colunas (huabiao), lanternas duplas: **geometria própria** (`render_cidadela.py`) | Próprio | Próprio | — | 2026-11-21 | Lucas/Claude | 🟢 |
 | `public/sprites/ruinas.*` | Cenário | Geometria própria (`render_ruins.py`) | — | Própria | — | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/pisos.png` | Pisos e água | Desenho por código (`ground_tiles.py`) | — | Própria | — | 2026-11-15 | Lucas/Claude | 🟢 |
 | `public/sprites/icones.png` | Ícones de itens e skills | Desenho por código (`icons.py`) | — | Própria | — | 2026-11-16 | Lucas/Claude | 🟢 |

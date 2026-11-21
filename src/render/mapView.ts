@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
-import type { GameMap } from '../core/map';
+import type { GameMap, MapObject } from '../core/map';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
 // 9-11 água (3 quadros em ciclo), 12-14 neve e 15 lago congelado (marco 9).
-// Casas ('house') só bloqueiam: o desenho vem dos objetos "building" do mapa (atlas props-cidade).
+// Casas ('house') só bloqueiam: o desenho vem dos objetos "building" do mapa (atlas props-cidade, ou o da prop atlas).
 const GROUND: Record<string, number[]> = {
   grass: [0, 0, 0, 1, 2],
   path: [3],
@@ -186,11 +186,11 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       }
     }
   for (const o of map.objects) {
-    if (o.type === 'building') out.push(...building(scene, String(o.props.sprite), o.x, o.y, o.w, o.h));
+    if (o.type === 'building') out.push(...building(scene, propsAtlas(o), String(o.props.sprite), o.x, o.y, o.w, o.h));
     else if (o.type === 'decor') {
       const p = tileToScreen(o.x, o.y);
       const img = scene.add
-        .image(p.x, p.y, 'props-cidade', String(o.props.sprite))
+        .image(p.x, p.y, propsAtlas(o), String(o.props.sprite))
         .setScale(SPRITE_SCALE)
         // parte de cima do portão: sempre por cima de quem passa embaixo
         .setDepth(o.props.top ? DEPTH.GATE_TOP : Math.floor(o.x) + Math.floor(o.y) + 1);
@@ -338,6 +338,9 @@ function portal(
   return out;
 }
 
+/** Atlas de casas e enfeites: o da vila, ou o indicado na propriedade `atlas` do objeto (Cidadela: 'cidadela'). */
+const propsAtlas = (o: MapObject) => `props-${o.props.atlas ? String(o.props.atlas) : 'cidade'}`;
+
 /**
  * Casa (pegada w x h tiles a partir do tile x, y) em fatias verticais de STRIP px: cada fatia tem a
  * profundidade do ponto mais à frente da pegada naquela coluna da tela. Assim o personagem fica na
@@ -345,13 +348,14 @@ function portal(
  */
 function building(
   scene: Phaser.Scene,
+  atlas: string,
   sprite: string,
   x: number,
   y: number,
   w: number,
   h: number,
 ): Phaser.GameObjects.Image[] {
-  const tex = scene.textures.get('props-cidade');
+  const tex = scene.textures.get(atlas);
   const fr = tex.get(sprite);
   if (!fr || fr.name !== sprite) return [];
   const c = tileToScreen(x + w / 2, y + h / 2);
@@ -370,7 +374,7 @@ function building(
     // ponto mais à frente da pegada com i - j = cIJ: maior i + j dentro do retângulo
     const front = Math.min(2 * (x + w) - cIJ, 2 * (y + h) + cIJ);
     const img = scene.add
-      .image(c.x + (sx - px) * SPRITE_SCALE, c.y - py * SPRITE_SCALE, 'props-cidade', key)
+      .image(c.x + (sx - px) * SPRITE_SCALE, c.y - py * SPRITE_SCALE, atlas, key)
       .setOrigin(0, 0)
       .setScale(SPRITE_SCALE)
       .setDepth(front - 0.3);

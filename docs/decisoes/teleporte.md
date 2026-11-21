@@ -30,4 +30,7 @@ Decidido com o Lucas em 20/11/2026. Motivo: as quatro saídas da vila estão ocu
   (`cost: 0` em `TELEPORT_DESTS`), para ninguém ficar preso sem ouro (o Pergaminho de Retorno não funciona em cidade).
 - Morrer, o Pergaminho de Retorno e o save com mapa desconhecido continuam levando à vila (`HOME_MAP`).
 - Auto: na Cidadela, viaja direto ao mapa de caça; sem ouro para isso, volta de graça à vila.
-- **Próximo passo:** sprites novos (muralha, pagode, salão, casas de telhado jade e dourado) no lugar dos da vila.
+- **Sprites próprios** (`tools/sprites/render_cidadela.py`, atlas `cidadela`): muralha com torres nos cantos e portões
+  fechados ao sul, oeste e leste; salão principal ao norte da avenida; pagode de cinco andares; casas de dois andares
+  com telhado de jade e detalhes dourados; colunas ornamentais (huabiao) e lanternas duplas. Objetos do mapa escolhem o
+  atlas pela propriedade `atlas` (sem ela, o da vila).

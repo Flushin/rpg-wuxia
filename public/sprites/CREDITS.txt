@@ -33,6 +33,8 @@ Cenário:
   Neve e lago congelado: pisos 2D gerados por tools/sprites/ground_tiles.py.
 - Casas, portão, lanternas, estandartes, incensário, poço, carroça e enfeites da cidade: gerados por
   tools/sprites/render_town.py (sem modelos de terceiros).
+- Cidadela de Jade (casas de telhado de jade, salão, pagode, muralha, torres, portões, colunas e lanternas duplas):
+  gerados por tools/sprites/render_cidadela.py (sem modelos de terceiros).
 - Ruínas (colunas, entulho, cacos, braseiros) e o portal de pedra: gerados por tools/sprites/render_ruins.py
   (sem modelos de terceiros).
 - Pisos (grama, caminho, lajotas da praça e das ruínas, água): gerados por tools/sprites/ground_tiles.py.

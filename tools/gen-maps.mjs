@@ -1104,31 +1104,33 @@ function trial() {
 }
 
 // ---- cidadela ----
-// Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte (nível 30). Mais rica que a vila: praça
-// maior (12×12), avenidas de pedra nos dois eixos com portões nas pontas leste e oeste, lagos nos jardins dos quatro
-// cantos e mais casas e lanternas. Lotes de obra (caixotes) a oeste e a leste guardam lugar para os sistemas que virão.
-// Sem saída a pé: chega-se e sai-se pelo Mestre dos Caminhos (círculo dourado na praça). Sprites provisórios da vila.
+// Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte (nível 30). Cercada por muralha (torres nos
+// cantos, portões fechados ao sul, a oeste e a leste); avenidas de pedra; ao norte o salão principal e o pagode; praça
+// 12×12 com o incensário; lagos nos jardins; casas de dois andares com telhado de jade. Lotes de obra (caixotes) a
+// oeste e a leste guardam lugar para os sistemas que virão. Sem saída a pé: chega-se e sai-se pelo Mestre dos
+// Caminhos (círculo dourado na praça). Casas, muralha e colunas no atlas 'cidadela' (tools/sprites/render_cidadela.py).
 function cidadela() {
   const rnd = rngFn(23);
-  const gr = makeGrid();
-  gr.rect(1, 15, 30, 2, PL);
-  gr.rect(15, 1, 2, 30, PL);
+  const gr = makeGrid(G, G); // fora da muralha: grama (árvores na borda cobririam a muralha da frente)
+  gr.rect(3, 15, 26, 2, PL);
+  gr.rect(15, 7, 2, 22, PL);
   gr.rect(10, 10, 12, 12, PL);
   const objs = [];
   const used = new Set();
   const reserve = (i, j, pad = 0) => {
     for (let y = j - pad; y <= j + pad; y++) for (let x = i - pad; x <= i + pad; x++) used.add(y * W + x);
   };
-  const building = (sprite, i, j, w, h) => {
+  const building = (sprite, i, j, w, h, atlas = 'cidadela') => {
     gr.rect(i, j, w, h, HS);
-    for (let y = j - 1; y <= j + h + 1; y++) for (let x = i - 1; x <= i + w + 1; x++) reserve(x, y);
-    objs.push(area(sprite, 'building', i, j, w, h, { sprite }));
+    for (let y = j - 1; y <= j + h; y++) for (let x = i - 1; x <= i + w; x++) reserve(x, y);
+    objs.push(area(sprite, 'building', i, j, w, h, atlas ? { sprite, atlas } : { sprite }));
   };
-  const decor = (sprite, i, j, block = 1, extra = {}) => {
-    if (block) gr.set(i, j, gr.get(i, j) === PL ? PL : G);
+  const decor = (sprite, i, j, extra = {}) => {
+    gr.set(i, j, gr.get(i, j) === PL ? PL : G);
     reserve(i, j, 1);
-    objs.push(point(sprite, 'decor', i + 0.5, j + 0.5, { sprite, block, ...extra }));
+    objs.push(point(sprite, 'decor', i + 0.5, j + 0.5, { sprite, block: 1, ...extra }));
   };
+  const jade = { atlas: 'cidadela' };
   const npc = (name, id, x, y, extra = {}) => {
     reserve(Math.floor(x), Math.floor(y), 1);
     objs.push(point(name, 'npc', x, y, { npc: id, ...extra }));
@@ -1138,24 +1140,45 @@ function cidadela() {
     for (let y = j - 1; y <= j + 3; y++) for (let x = i - 1; x <= i + 3; x++) reserve(x, y);
   };
 
-  // casas: três por quadrante, com um lago no jardim de cada canto
-  building('casa_4x3', 2, 2, 4, 3);
-  building('casa_3x4', 7, 2, 3, 4);
-  building('casa_3x3', 2, 8, 3, 3);
-  pond(6, 8);
-  building('casa_3x4', 22, 2, 3, 4);
-  building('casa_4x3', 26, 2, 4, 3);
-  building('casa_3x3b', 27, 8, 3, 3);
-  pond(23, 8);
-  building('casa_3x3', 2, 21, 3, 3);
-  building('casa_3x4', 2, 26, 3, 4);
-  building('casa_4x3', 6, 26, 4, 3);
-  pond(6, 21);
-  building('casa_3x3', 26, 21, 3, 3);
-  building('casa_3x4', 22, 25, 3, 4);
-  building('casa_4x3', 26, 26, 4, 3);
-  pond(22, 21);
-  building('incensario', 15, 15, 2, 2);
+  // muralha: torres nos cantos, trechos de 11 tiles e portões (fechados) no meio do sul, do oeste e do leste
+  for (const [i, j] of [
+    [1, 1],
+    [29, 1],
+    [1, 29],
+    [29, 29],
+  ])
+    building('muralha_torre', i, j, 2, 2);
+  building('muralha_i11', 3, 1, 11, 1);
+  building('muralha_i4', 14, 1, 4, 1);
+  building('muralha_i11', 18, 1, 11, 1);
+  building('muralha_i11', 3, 30, 11, 1);
+  building('portao_muralha_i', 14, 29, 4, 2);
+  building('muralha_i11', 18, 30, 11, 1);
+  for (const x of [1, 30]) {
+    building('muralha_j11', x, 3, 1, 11);
+    building('muralha_j11', x, 18, 1, 11);
+  }
+  building('portao_muralha_j', 1, 14, 2, 4);
+  building('portao_muralha_j', 29, 14, 2, 4);
+
+  // norte: salão principal no fim da avenida, pagode ao lado
+  building('jade_salao', 13, 3, 6, 4);
+  building('jade_pagode', 21, 4, 3, 3);
+  // casas e lagos dos jardins
+  building('jade_casa_4x3', 4, 4, 4, 3);
+  building('jade_casa_3x4', 9, 4, 3, 4);
+  pond(4, 8);
+  building('jade_casa_4x3', 25, 4, 4, 3);
+  pond(24, 8);
+  building('jade_casa_3x3', 4, 20, 3, 3);
+  building('jade_casa_3x4', 8, 24, 3, 4);
+  building('jade_casa_4x3', 3, 26, 4, 3);
+  pond(12, 24);
+  building('jade_casa_3x3b', 25, 20, 3, 3);
+  building('jade_casa_3x4', 22, 24, 3, 4);
+  building('jade_casa_4x3', 25, 26, 4, 3);
+  pond(18, 24);
+  building('incensario', 15, 15, 2, 2, null);
 
   // praça: estandartes das quatro seitas nos cantos e lanternas de pedra nas bordas
   for (const [banner, i, j] of [
@@ -1176,40 +1199,37 @@ function cidadela() {
     [21, 18],
   ])
     decor('lanterna_pedra', i, j);
-  // portões (pailou) nas avenidas leste e oeste
-  for (const gx of [4, 27]) {
-    decor('portao_coluna', gx, 14);
-    decor('portao_coluna', gx, 17);
-    objs.push(point('portao_topo', 'decor', gx + 0.5, 16, { sprite: 'portao_topo', block: 0, top: 1 }));
-  }
-  // lanternas ao longo das quatro avenidas
+  // colunas ornamentais diante do salão e do portão sul; lanternas duplas nas avenidas
   for (const [i, j] of [
-    [14, 3],
-    [17, 3],
-    [14, 7],
-    [17, 7],
-    [14, 24],
-    [17, 24],
-    [14, 28],
-    [17, 28],
-    [7, 14],
-    [7, 17],
-    [24, 14],
-    [24, 17],
+    [13, 8],
+    [18, 8],
+    [13, 27],
+    [18, 27],
   ])
-    decor('lanterna', i, j);
+    decor('huabiao', i, j, jade);
+  for (const [i, j] of [
+    [5, 14],
+    [5, 17],
+    [8, 14],
+    [8, 17],
+    [23, 14],
+    [23, 17],
+    [26, 14],
+    [26, 17],
+    [14, 23],
+    [17, 23],
+  ])
+    decor('lanterna_dupla', i, j, jade);
   // lotes de obra (oeste e leste da praça): reservados para os sistemas do meio do jogo
   for (const [s2, i, j] of [
-    ['caixotes', 3, 12],
-    ['barril', 5, 12],
-    ['carroca', 7, 11],
+    ['caixotes', 4, 12],
+    ['barril', 6, 12],
+    ['carroca', 8, 11],
     ['caixotes', 24, 12],
     ['caixotes', 26, 11],
-    ['barril', 28, 12],
-    ['vaso', 12, 3],
-    ['vaso', 19, 3],
-    ['vaso', 12, 28],
-    ['vaso', 19, 28],
+    ['barril', 27, 12],
+    ['vaso', 12, 7],
+    ['vaso', 19, 7],
   ])
     decor(s2, i, j);
 
@@ -1219,17 +1239,17 @@ function cidadela() {
   for (const [id, x, y] of [
     ['morador1', 18.5, 12.5],
     ['morador2', 19.5, 19.5],
-    ['morador3', 8.5, 15.5],
-    ['morador4', 15.5, 7.5],
+    ['morador3', 7.5, 15.5],
+    ['morador4', 15.5, 8.5],
   ])
     objs.push(point('Morador', 'npc', x, y, { npc: id, wander: 4 }));
 
   // cerejeiras e carvalhos só na grama livre, longe das avenidas e da praça
   reserve(13, 18, 1);
   let n = 0;
-  for (let tries = 0; tries < 2000 && n < 24; tries++) {
-    const x = 1 + Math.floor(rnd() * 30),
-      y = 1 + Math.floor(rnd() * 30);
+  for (let tries = 0; tries < 2000 && n < 18; tries++) {
+    const x = 3 + Math.floor(rnd() * 26),
+      y = 3 + Math.floor(rnd() * 26);
     if (gr.get(x, y) !== G || used.has(y * W + x)) continue;
     let nearRoad = false;
     for (let dy = -1; dy <= 1; dy++)
@@ -1238,7 +1258,7 @@ function cidadela() {
     gr.set(x, y, T);
     n++;
   }
-  sealUnreachable(gr, 13, 18);
+  sealUnreachable(gr, 13, 18, G);
   objs.unshift(point('player', 'spawn', 13.5, 18.5));
   return tiled('Cidadela de Jade', gr, objs);
 }
