@@ -4,5 +4,11 @@
     "name": "Tormenta Celeste",
     "desc": "Túnica índigo de botões dourados, braçadeiras de aço escuro, chapéu de palha laqueado com fitas e adagas carregadas de raio.",
     "price": 50000
+  },
+  "geada_ameixa": {
+    "sect": "pavilhao",
+    "name": "Ameixa Nevada",
+    "desc": "Túnica vinho de botões de prata, braçadeiras de aço claro, chapéu largo de palha branca com fitas cor de ameixa e leque que brilha como gelo.",
+    "price": 50000
   }
 }

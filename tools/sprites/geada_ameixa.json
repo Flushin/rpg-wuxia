@@ -1,0 +1,224 @@
+{
+ "name": "geada_ameixa",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "2H_Staff",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat",
+  "Mage_ArmLeft",
+  "Mage_ArmRight"
+ ],
+ "samples": 24,
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "Spellcast_Shoot",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  },
+  "levelup": {
+   "action": "Cheer",
+   "frames": 8,
+   "fps": 12,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "portrait_png": true,
+ "portrait_anim": true,
+ "parts": {
+  "Knight": [
+   "Knight_ArmLeft",
+   "Knight_ArmRight"
+  ]
+ },
+ "textures": {
+  "mage_texture": {
+   "0,1": [
+    150,
+    46,
+    96
+   ],
+   "2,1": [
+    236,
+    226,
+    214
+   ],
+   "7,1": [
+    90,
+    26,
+    62
+   ],
+   "2,2": [
+    250,
+    236,
+    240
+   ],
+   "5,0": [
+    200,
+    204,
+    214
+   ],
+   "1,0": [
+    205,
+    210,
+    222
+   ],
+   "3,2": [
+    120,
+    36,
+    80
+   ]
+  },
+  "knight_texture": {
+   "3,0": [
+    196,
+    202,
+    216
+   ],
+   "7,0": [
+    236,
+    226,
+    214
+   ],
+   "4,0": [
+    120,
+    128,
+    150
+   ]
+  }
+ },
+ "attach": [
+  {
+   "kind": "hat",
+   "bone": "head",
+   "offset": [
+    0,
+    0.72,
+    0
+   ],
+   "rot": [
+    -8,
+    0,
+    0
+   ],
+   "scale": 1.0,
+   "color": [
+    238,
+    240,
+    246
+   ],
+   "band": [
+    118,
+    40,
+    78
+   ],
+   "radius": 0.78,
+   "height": 0.32,
+   "thickness": 0.008,
+   "straw": {
+    "dark": [
+     214,
+     218,
+     230
+    ],
+    "light": [
+     250,
+     250,
+     254
+    ],
+    "scale": 10
+   },
+   "ribbons": [
+    [
+     118,
+     40,
+     78
+    ],
+    [
+     236,
+     150,
+     180
+    ]
+   ]
+  },
+  {
+   "kind": "fan",
+   "bone": "handslot.r",
+   "offset": [
+    0,
+    0,
+    0
+   ],
+   "rot": [
+    90,
+    0,
+    180
+   ],
+   "scale": 1.15,
+   "color": [
+    246,
+    226,
+    234
+   ],
+   "rib": [
+    96,
+    28,
+    64
+   ]
+  }
+ ],
+ "portrait_dirs": true,
+ "glow_mesh": {
+  "meshes": [
+   "Fan"
+  ],
+  "color": [
+   90,
+   180,
+   255
+  ],
+  "emit": [
+   110,
+   200,
+   255
+  ],
+  "strength": 0.9
+ },
+ "glow_halo": [
+  120,
+  200,
+  255
+ ]
+}
