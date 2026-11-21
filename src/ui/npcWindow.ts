@@ -29,6 +29,7 @@ import { audio } from '../render/audio';
 import { MASTER_PORTRAITS, PORTRAITS } from '../render/sprites';
 import { npcName, rewardText } from './questTracker';
 import { renderPanel, resetScroll } from './panelRender';
+import { spinHtml } from './spinView';
 import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import {
@@ -463,7 +464,8 @@ export class NpcWindow {
         s && !owned && w.gold < s.price
           ? `<small class="muted">${L(`Faltam ${(s.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(s.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
           : '';
-      return `<div class="dg-row sk-row">${pic ? `<img class="sk-pic" src="${pic}" alt="">` : ''}<div class="sk-body">
+      const key = id ?? w.classId;
+      return `<div class="dg-row sk-row">${pic ? spinHtml(key, `<img class="sk-pic" src="${pic}" alt="">`, 'sk-spin') : ''}<div class="sk-body">
         <b>${escapeHtml(s ? s.name : L(`Traje da ${sect}`, `${sect} outfit`))}</b>
         <div class="dg-info">${escapeHtml(s ? s.desc : L('O traje com que você entrou na seita.', 'The outfit you joined the sect with.'))}</div>
         ${btn}${why}</div></div>`;

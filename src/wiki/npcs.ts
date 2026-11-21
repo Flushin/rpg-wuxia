@@ -54,7 +54,8 @@ const meridians = () =>
 const outfits = () =>
   `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem. Cada traje é de uma
   <a href="#/seitas">seita</a> e só aparece para quem é dela; só muda a aparência (no jogo e no retrato da mochila), sem efeito
-  no combate. Depois de comprado, o traje fica seu: vista e volte ao traje da seita quando quiser, de graça, na mesma janela.</p>
+  no combate. Depois de comprado, o traje fica seu: vista e volte ao traje da seita quando quiser, de graça, na mesma janela. Antes de comprar, dá para girar cada traje 360° (arrastando ou
+  pelas setas) e abrir em tela cheia (⛶); o mesmo vale para o seu personagem na janela Personagem (tecla <b>C</b>).</p>
   <ul>${Object.entries(SKINS)
     .map(
       ([id, s]) =>

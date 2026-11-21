@@ -159,6 +159,26 @@ export const PORTRAIT_ANIMS: Record<string, PortraitAnim> = Object.fromEntries(
   }),
 );
 
+// retrato das 8 direções (girar o personagem na janela Personagem, na loja de trajes e em tela cheia):
+// tira horizontal com a direção 0..7 (tools/sprites, portrait_dirs), mesma chave de PORTRAITS
+export interface PortraitDirs {
+  src: string;
+  dirs: number;
+  w: number;
+  h: number;
+}
+const PORTRAIT_DIRS_META = import.meta.glob('../data/sprites/*_retrato_dirs.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, Omit<PortraitDirs, 'src'>>;
+export const PORTRAIT_DIRS: Record<string, PortraitDirs> = Object.fromEntries(
+  Object.entries(PORTRAITS).flatMap(([key, still]) => {
+    const name = still.replace(/^sprites\/(.*)_retrato\.png$/, '$1');
+    const m = PORTRAIT_DIRS_META[`../data/sprites/${name}_retrato_dirs.json`];
+    return m ? [[key, { ...m, src: `sprites/${name}_retrato_dirs.png` }]] : [];
+  }),
+);
+
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
   Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),

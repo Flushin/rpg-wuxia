@@ -263,7 +263,7 @@ def straw_rings(m, st):
     """Palha trançada: anéis finos em volta da ponta do chapéu. st = {dark, light, scale}."""
     nt = m.node_tree; bs = nt.nodes['Principled BSDF']
     tc = nt.nodes.new('ShaderNodeTexCoord')
-    wv = nt.nodes.new('ShaderNodeTexWave'); wv.wave_type = 'RINGS'
+    wv = nt.nodes.new('ShaderNodeTexWave'); wv.wave_type = 'RINGS'; wv.rings_direction = 'Y'  # eixo do chapéu
     wv.inputs['Scale'].default_value = st.get('scale', 14); wv.inputs['Distortion'].default_value = 0
     nz = nt.nodes.new('ShaderNodeTexWave'); nz.wave_type = 'BANDS'; nz.bands_direction = 'Z'
     nz.inputs['Scale'].default_value = 40
@@ -429,6 +429,8 @@ def render(cfg):
         print('ok', anim_name, flush=True)
     if cfg.get('portrait_png'):
         render_portrait(cfg, sc, arm, root)
+    if cfg.get('portrait_dirs'):
+        render_portrait_dirs(cfg, sc, arm, root)
     return rows, meta_anims, rs
 
 
@@ -497,6 +499,48 @@ def render_portrait_anim(cfg, sc, act, ps):
     with open(os.path.join(jdir, cfg['name'] + '_retrato_idle.json'), 'w') as f:
         json.dump({'frames': n, 'fps': fps, 'w': fw, 'h': fh}, f, indent=1)
     print('retrato animado', strip.size, n, 'quadros', fps, 'fps ->', out, flush=True)
+
+
+def render_portrait_dirs(cfg, sc, arm, root):
+    """Retrato das 8 direções (parado, 1º quadro) em alta resolução para girar o personagem na interface
+    (janela Personagem, loja de trajes, tela cheia). Mesmo recorte em todas: tira <nome>_retrato_dirs.png
+    (direção 0..7 da esquerda para a direita) + <out_json>/<nome>_retrato_dirs.json {dirs, w, h}."""
+    from PIL import Image
+    ps = cfg.get('portrait_dirs_scale', 12)
+    w, h = cfg['frame']
+    act = bpy.data.actions[cfg['anims'][cfg['portrait']]['action']]
+    arm.animation_data.action = act
+    if hasattr(arm.animation_data, 'action_slot') and act.slots:
+        arm.animation_data.action_slot = act.slots[0]
+    sc.frame_set(int(act.frame_range[0]))
+    sc.render.resolution_x, sc.render.resolution_y = w * ps, h * ps
+    if sc.render.engine == 'CYCLES':
+        sc.cycles.samples = max(cfg.get('samples', 32), 48)
+    tmp = tempfile.mkdtemp()
+    ims = []
+    for k in range(8):
+        root.rotation_euler = (0, 0, facing_rot(k))
+        fp = os.path.join(tmp, f'd{k}.png')
+        sc.render.filepath = fp
+        bpy.ops.render.render(write_still=True)
+        im = Image.open(fp).convert('RGBA')
+        if cfg.get('glow_halo'):
+            im = glow_halo(im, cfg['glow_halo'])
+        ims.append(im)
+    boxes = [im.getchannel('A').point(lambda v: 255 if v > 4 else 0).getbbox() for im in ims]
+    pad = ps
+    bb = (max(0, min(b[0] for b in boxes) - pad), max(0, min(b[1] for b in boxes) - pad),
+          min(ims[0].width, max(b[2] for b in boxes) + pad), min(ims[0].height, max(b[3] for b in boxes) + pad))
+    fw, fh = bb[2] - bb[0], bb[3] - bb[1]
+    strip = Image.new('RGBA', (fw * 8, fh), (0, 0, 0, 0))
+    for i, im in enumerate(ims):
+        strip.paste(im.crop(bb), (i * fw, 0))
+    out = os.path.join(cfg['out'], cfg['name'] + '_retrato_dirs.png')
+    save_png(strip, out, cfg.get('portrait_colors', 256))
+    jdir = cfg.get('out_json', cfg['out'])
+    with open(os.path.join(jdir, cfg['name'] + '_retrato_dirs.json'), 'w') as f:
+        json.dump({'dirs': 8, 'w': fw, 'h': fh}, f, indent=1)
+    print('retrato 8 direções', strip.size, '->', out, flush=True)
 
 
 def assemble(cfg, rows, meta_anims, rs):
@@ -605,6 +649,12 @@ def add_outline(im, rgba):
 
 if __name__ == '__main__':
     c = load_cfg()
+    if os.environ.get('PORTRAIT_DIRS_ONLY'):  # só o retrato das 8 direções (girar na interface)
+        _, a, ro = setup_scene(c)
+        if a.animation_data is None:
+            a.animation_data_create()
+        render_portrait_dirs(c, bpy.context.scene, a, ro)
+        sys.exit(0)
     if os.environ.get('PORTRAIT_ONLY'):  # só o retrato da interface, sem refazer a folha do jogo
         _, a, ro = setup_scene(c)
         if a.animation_data is None:

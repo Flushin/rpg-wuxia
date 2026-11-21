@@ -99,5 +99,6 @@
    "spread": 16
   }
  ],
- "portrait_anim": true
+ "portrait_anim": true,
+ "portrait_dirs": true
 }

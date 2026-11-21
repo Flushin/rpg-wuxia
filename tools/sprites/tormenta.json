@@ -77,5 +77,6 @@
  "out_json": "../../src/data/sprites",
  "portrait": "idle",
  "portrait_png": true,
- "portrait_anim": true
+ "portrait_anim": true,
+ "portrait_dirs": true
 }
