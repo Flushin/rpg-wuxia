@@ -15,7 +15,7 @@ import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
 import { Rewards } from './rewards';
 import { QuestTracker } from './questTracker';
-import { AttrsPanel } from './attrsPanel';
+import { CharacterPanel } from './characterPanel';
 import { byId, setStyle, setText } from './dom';
 import { applyHudLayout, updateHudMenu } from './hudLayout';
 
@@ -24,7 +24,7 @@ const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) *
 export class Hud {
   private toastTimer = 0;
   private toastLines: { msg: string; color?: string }[] = [];
-  private attrs: AttrsPanel;
+  private attrs: CharacterPanel;
   private hotbar: Hotbar;
   private skills: SkillsPanel;
   private inv: InventoryPanel;
@@ -41,7 +41,11 @@ export class Hud {
   constructor(private world: World) {
     applyHudLayout(); // antes da Hotbar: o arco das skills depende do layout (novo/clássico)
     this.minimap = new Minimap(world);
-    this.attrs = new AttrsPanel(world, () => this.togglePanel(false));
+    this.attrs = new CharacterPanel(
+      world,
+      (m, c) => this.toast(m, c),
+      () => this.togglePanel(false),
+    );
     this.hotbar = new Hotbar(world);
     this.skills = new SkillsPanel(world, () => this.toggleSkills(false));
     this.inv = new InventoryPanel(
@@ -61,7 +65,7 @@ export class Hud {
       world.auto.toggle();
     });
     byId('btn-auto-cfg').addEventListener('click', () => this.autoPanel.set(!this.autoPanel.open));
-    byId('dur-warn').addEventListener('click', () => this.toggleInventory(true));
+    byId('dur-warn').addEventListener('click', () => this.togglePanel(true));
     byId('hud').classList.remove('hidden');
   }
 

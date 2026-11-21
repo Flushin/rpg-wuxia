@@ -54,7 +54,7 @@ export function applyHudLayout() {
 function labels() {
   const t: Record<(typeof MENU_IDS)[number], string> = {
     'btn-skills': L('Skills', 'Skills'),
-    'btn-attrs': L('Atributos', 'Attributes'),
+    'btn-attrs': L('Personagem', 'Character'),
     'btn-bag': L('Mochila', 'Bag'),
     'btn-settings': L('Configurações', 'Settings'),
   };

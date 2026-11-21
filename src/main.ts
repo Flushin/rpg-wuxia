@@ -47,7 +47,7 @@ function applyStaticText() {
   attr('btn-auto-cfg', 'aria-label', L('Menu do auto-combate', 'Auto-battle menu'));
   attr('btn-settings', 'aria-label', L('Configurações', 'Settings'));
   const attrs = document.getElementById('btn-attrs');
-  if (attrs?.firstChild) attrs.firstChild.textContent = L('Atributos (C)', 'Attributes (C)');
+  if (attrs?.firstChild) attrs.firstChild.textContent = L('Personagem (C)', 'Character (C)');
   txt('btn-bag', L('Mochila (I)', 'Bag (I)'));
   txt('dur-warn', `⚠ ${L('Reparar', 'Repair')}`);
   attr('dur-warn', 'aria-label', L('Equipamento com pouca durabilidade', 'Equipment low on durability'));
