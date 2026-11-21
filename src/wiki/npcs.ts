@@ -7,6 +7,7 @@ import {
   NPC_TEXT,
   POTIONS,
   PROGRESSION,
+  SKINS,
   RARITIES,
   SELL_RATIO,
   esc,
@@ -49,6 +50,17 @@ const meridians = () =>
   pontos livres que você distribuiu, para redistribuir como quiser na janela Personagem (tecla <b>C</b>). Os atributos da sua
   <a href="#/seitas">seita</a> e os ganhos automáticos de cada nível não mudam. Pode ser feito quantas vezes quiser; o botão pede confirmação
   e fica bloqueado sem ouro suficiente ou sem nenhum ponto distribuído.</p>`;
+/** Governador Bai: trajes (skins) por seita (World.buySkin, src/data/skins.json). */
+const outfits = () =>
+  `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem. Cada traje é de uma
+  <a href="#/seitas">seita</a> e só aparece para quem é dela; só muda a aparência (no jogo e no retrato da mochila), sem efeito
+  no combate. Depois de comprado, o traje fica seu: vista e volte ao traje da seita quando quiser, de graça, na mesma janela.</p>
+  <ul>${Object.entries(SKINS)
+    .map(
+      ([id, s]) =>
+        `<li><img class="skin-pic" src="../sprites/${id}_retrato.png" alt="" loading="lazy"> <b>${esc(s.name)}</b> (${esc(CLASSES[s.sect]?.name ?? s.sect)}): ${esc(s.desc)} <span class="price">${s.price.toLocaleString('pt-BR')} ouro</span></li>`,
+    )
+    .join('')}</ul>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
 const sameAs = (id: string, name: string) => () =>
   `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;
@@ -149,7 +161,7 @@ function npcList(): NpcInfo[] {
         ['ferreira_lin', 'Conserto e forja', sameAs('ferreiro', 'Ferreiro')],
         ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
         ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
-        ['governador', 'Autoridade da Cidadela e missões', talkCitadel],
+        ['governador', 'Autoridade da Cidadela, trajes das seitas e missões', outfits],
         ['monge_pagode', 'Guardião do pagode, realinhar atributos e missões', meridians],
         ['guarda_jade', 'Guarda dos portões e missões', talkCitadel],
       ] as [string, string, () => string][]

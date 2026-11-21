@@ -611,6 +611,22 @@
 .dg-row button {
   width: 100%;
 }
+/* Governador Bai: trajes (skins) da seita (src/ui/npcWindow.ts) */
+.sk-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.sk-pic {
+  width: 64px;
+  height: 96px;
+  object-fit: contain;
+  flex: none;
+}
+.sk-body {
+  flex: 1;
+  min-width: 0;
+}
 /* Monge do Pagode: realinhar meridianos (src/ui/npcWindow.ts) */
 .mr-list {
   font-size: 13px;

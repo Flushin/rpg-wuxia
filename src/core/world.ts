@@ -7,6 +7,7 @@ import {
   xpBankCap,
   NPC_TEXT,
   PROGRESSION,
+  SKINS,
   freePointsAt,
   totalFreePoints,
   type MonsterDef,
@@ -149,6 +150,9 @@ export class World {
   skills: Record<string, SkillState> = {};
   gcd = 0;
   gold = 0;
+  /** skins compradas e a vestida (null = traje da seita); ver SKINS */
+  skinsOwned: string[] = [];
+  skin: string | null = null;
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
   equipment: Record<Slot, ItemInstance | null> = {
     colar: null,
@@ -402,6 +406,31 @@ export class World {
     this.bumpInv();
     this.emit({ type: 'trade', kind: 'buy', gold: cost });
     return null;
+  }
+
+  /** Governador Bai (Cidadela): compra um traje da própria seita (sem efeito no combate). */
+  buySkin(id: string): ActionError | null {
+    if (this.npcRole() !== 'governador') return { code: 'talkToGovernor' };
+    const s = SKINS[id];
+    if (!s) return { code: 'notEquippable' };
+    if (s.sect !== this.classId) return { code: 'sectOnly', sect: s.sect };
+    if (this.skinsOwned.includes(id)) return { code: 'skinOwned' };
+    if (this.gold < s.price) return { code: 'noGold' };
+    this.gold -= s.price;
+    this.skinsOwned.push(id);
+    this.bumpInv();
+    this.emit({ type: 'trade', kind: 'buy', gold: s.price });
+    this.wearSkin(id);
+    return null;
+  }
+
+  /** Veste um traje comprado (null = volta ao traje da seita). Vale em qualquer lugar. */
+  wearSkin(id: string | null) {
+    const next = id && this.skinsOwned.includes(id) && SKINS[id]?.sect === this.classId ? id : null;
+    if (next === this.skin) return;
+    this.skin = next;
+    this.bumpInv();
+    this.emit({ type: 'skinChange' });
   }
 
   // ---------- skills ----------

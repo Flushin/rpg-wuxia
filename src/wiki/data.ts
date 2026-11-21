@@ -8,6 +8,7 @@ import questsRaw from '../data/quests.json';
 import classesRaw from '../data/classes.json';
 import skillsRaw from '../data/skills.json';
 import progressionRaw from '../data/progression.json';
+import skinsJson from '../data/skins.json';
 import atlas from '../data/sprites/icones.json';
 import {
   bal,
@@ -237,6 +238,9 @@ export const CLASSES = classesJson as unknown as Record<string, ClassDef>;
 /** Ordem das seitas no jogo (SECT_ORDER em src/core/data.ts). */
 export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];
 export const ELEMENT_NAMES: Record<string, string> = { fire: 'Fogo', ice: 'Gelo', thunder: 'Trovão', poison: 'Veneno' };
+/** Trajes (skins) vendidos pelo Governador Bai: só da própria seita, sem efeito no combate. */
+export const SKINS = skinsJson as Record<string, { sect: string; name: string; desc: string; price: number }>;
+
 export const PROGRESSION = progressionJson as unknown as {
   levelCap: number;
   xpToNext: number[];

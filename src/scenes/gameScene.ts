@@ -23,7 +23,7 @@ import { DPR, TEXT_RES, cssSize } from '../render/display';
 import { EventFeedback } from '../render/eventFeedback';
 import { DEPTH } from '../render/depth';
 import { prefetchSheets, releasePrefetched, sheetsForMap, syncSheets } from '../render/sheetLoader';
-import { queueSheet, sheetTexture } from '../render/sprites';
+import { playerTexture, queueSheet, sheetTexture } from '../render/sprites';
 import { PREF, getPref, setPref } from '../platform/prefs';
 import { exitApp, onBackButton } from '../platform/backButton';
 import { askExit, closeTopWindow } from '../ui/backAction';
@@ -268,13 +268,23 @@ export class GameScene extends Phaser.Scene {
         const target = w.maps[id];
         if (!target || this.prefetchedMaps.has(id) || d > PREFETCH_DIST) continue;
         this.prefetchedMaps.add(id);
-        prefetchSheets(this, target, w.classId);
+        prefetchSheets(this, target, playerTexture(w.classId, w.skin));
       }
     }
     if (nearest > RELEASE_DIST && this.prefetchedMaps.size) {
       this.prefetchedMaps.clear();
       releasePrefetched(this);
     }
+  }
+
+  /** Trocou de traje: carrega a folha nova e recria só o desenho do jogador (a câmera volta a segui-lo). */
+  private onSkinChange() {
+    syncSheets(this, this.world, () => {
+      const id = this.world.player.id;
+      this.views.get(id)?.destroy();
+      this.views.delete(id);
+      this.cameras.main.startFollow(this.viewFor(this.world.player).container, true, 0.12, 0.12);
+    });
   }
 
   private rebuildMap() {
@@ -291,7 +301,7 @@ export class GameScene extends Phaser.Scene {
 
   /** Nome do sprite da entidade; sheetFor() acha a folha animada (sem folha: figura genérica). */
   private textureFor(e: Entity): string {
-    if (e.kind === 'player') return 'player-' + this.world.classId;
+    if (e.kind === 'player') return playerTexture(this.world.classId, this.world.skin);
     if (e.kind === 'monster') return MONSTERS[e.monsterId].sprite;
     return 'npc-' + (e.npcId ?? '');
   }
@@ -629,6 +639,7 @@ export class GameScene extends Phaser.Scene {
     restMode.onEvent(ev);
     audio.onEvent(ev, this.world.player.id, this.world.classId);
     if (ev.type === 'mapChange') this.onMapChange();
+    else if (ev.type === 'skinChange') this.onSkinChange();
     else this.feedback.handle(ev);
   }
 }

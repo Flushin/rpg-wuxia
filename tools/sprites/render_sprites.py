@@ -34,6 +34,8 @@ def setup_scene(cfg):
         bpy.ops.import_scene.gltf(filepath=cfg['model'])
     if cfg.get('build'):
         cfg['build']()  # objetos gerados por script (cidade: casas, lanternas...)
+    if cfg.get('parts'):
+        import_parts(cfg)
     sc = bpy.context.scene
     keep = cfg.get('keep')
     for o in list(bpy.data.objects):
@@ -52,6 +54,10 @@ def setup_scene(cfg):
                 bsdf.inputs['Base Color'].default_value = (*rgb, 1)
     if cfg.get('texture'):
         retexture(cfg['texture'])
+    for img, cells in cfg.get('textures', {}).items():
+        retexture({'image': img, 'cells': cells})
+    if cfg.get('glow_mesh'):
+        glow_meshes(cfg['glow_mesh'])
     arm = next((o for o in bpy.data.objects if o.type == 'ARMATURE'), None)
     for a in cfg.get('attach', []):
         attach(a, arm)
@@ -110,7 +116,49 @@ def setup_scene(cfg):
     sun_d = bpy.data.lights.new('Sun', 'SUN'); sun_d.energy = cfg.get('sun', 3.0); sun_d.angle = math.radians(10)
     sun = bpy.data.objects.new('Sun', sun_d); sc.collection.objects.link(sun)
     sun.rotation_euler = (math.radians(40), 0, az - math.radians(60))
+    if cfg.get('look'):  # luz de skin: AgX com contraste + luz de contorno (as folhas base usam a luz acima)
+        lk = cfg['look']
+        sc.view_settings.view_transform = 'AgX'
+        try:
+            sc.view_settings.look = lk.get('look', 'AgX - Medium High Contrast')
+        except Exception:
+            pass
+        sc.cycles.max_bounces = 4
+        if 'rim' in lk:
+            rd = bpy.data.lights.new('Rim', 'SUN'); rd.energy = lk['rim']; rd.color = srgb(lk.get('rim_color', [180, 210, 255]))[:3]
+            rim = bpy.data.objects.new('Rim', rd); sc.collection.objects.link(rim)
+            rim.rotation_euler = (math.radians(-60), 0, az + math.radians(150))
     return sc, arm, root
+
+
+def import_parts(cfg):
+    """Peças de outros personagens KayKit (mesmo esqueleto): parts = {"Mage": ["Mage_Body"], ...}, glb na pasta
+    do modelo. As malhas passam a seguir o esqueleto do modelo principal; o resto do arquivo é descartado."""
+    arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
+    for model, meshes in cfg['parts'].items():
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.gltf(filepath=os.path.join(os.path.dirname(cfg['model']), model + '.glb'))
+        for o in [o for o in bpy.data.objects if o not in before]:
+            if o.type == 'MESH' and o.name.split('.')[0] in meshes:
+                mw = o.matrix_world.copy(); o.parent = arm; o.matrix_world = mw
+                for md in o.modifiers:
+                    if md.type == 'ARMATURE':
+                        md.object = arm
+            else:
+                bpy.data.objects.remove(o, do_unlink=True)
+
+
+def glow_meshes(g):
+    """Arma brilhando (skin): g = {meshes: [...], color: [r,g,b], emit: [r,g,b], strength}."""
+    m = bpy.data.materials.new('Glow'); m.use_nodes = True
+    b = m.node_tree.nodes['Principled BSDF']
+    b.inputs['Base Color'].default_value = srgb(g.get('color', [90, 180, 255]))
+    b.inputs['Emission Color'].default_value = srgb(g.get('emit', [100, 195, 255]))
+    b.inputs['Emission Strength'].default_value = g.get('strength', 1.6)
+    for n in g['meshes']:
+        o = bpy.data.objects.get(n)
+        if o:
+            o.data.materials.clear(); o.data.materials.append(m)
 
 
 def retexture(t):
@@ -203,8 +251,50 @@ def make_hat(a):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(me); bm.free()
     o = bpy.data.objects.new('Hat', me)
-    o.modifiers.new('Solid', 'SOLIDIFY').thickness = 0.02
+    o.modifiers.new('Solid', 'SOLIDIFY').thickness = a.get('thickness', 0.02)
+    if a.get('straw'):
+        straw_rings(me.materials[0], a['straw'])
+    if a.get('ribbons'):
+        hat_ribbons(o, a['ribbons'])
     return o
+
+
+def straw_rings(m, st):
+    """Palha trançada: anéis finos em volta da ponta do chapéu. st = {dark, light, scale}."""
+    nt = m.node_tree; bs = nt.nodes['Principled BSDF']
+    tc = nt.nodes.new('ShaderNodeTexCoord')
+    wv = nt.nodes.new('ShaderNodeTexWave'); wv.wave_type = 'RINGS'
+    wv.inputs['Scale'].default_value = st.get('scale', 14); wv.inputs['Distortion'].default_value = 0
+    nz = nt.nodes.new('ShaderNodeTexWave'); nz.wave_type = 'BANDS'; nz.bands_direction = 'Z'
+    nz.inputs['Scale'].default_value = 40
+    ramp = nt.nodes.new('ShaderNodeValToRGB')
+    ramp.color_ramp.elements[0].color = srgb(st['dark']); ramp.color_ramp.elements[1].color = srgb(st['light'])
+    mx = nt.nodes.new('ShaderNodeMix'); mx.data_type = 'RGBA'; mx.blend_type = 'MULTIPLY'
+    mx.inputs['Factor'].default_value = 0.12
+    nt.links.new(tc.outputs['Object'], wv.inputs['Vector']); nt.links.new(tc.outputs['Object'], nz.inputs['Vector'])
+    nt.links.new(wv.outputs['Fac'], ramp.inputs['Fac'])
+    nt.links.new(ramp.outputs['Color'], mx.inputs[6]); nt.links.new(nz.outputs['Color'], mx.inputs[7])
+    nt.links.new(mx.outputs[2], bs.inputs['Base Color'])
+
+
+def hat_ribbons(hat, colors):
+    """Duas fitas longas caindo da nuca (filhas do chapéu). colors = [[r,g,b], [r,g,b]]."""
+    import bmesh
+    me = bpy.data.meshes.new('Fitas'); bm = bmesh.new()
+    for i, c in enumerate(colors):
+        me.materials.append(_mat(f'Fita{i}', c))
+    for i, x0 in enumerate((-0.16, 0.16)[:len(colors)]):
+        prev, n = None, 8
+        for k in range(n + 1):
+            t = k / n
+            y, z, x = -0.02 - t * 1.05, -0.5 - 0.6 * t * t, x0 * (1 + 1.2 * t) + 0.06 * math.sin(t * 5 + i)
+            row = (bm.verts.new((x - 0.085, y, z)), bm.verts.new((x + 0.085, y, z)))
+            if prev:
+                bm.faces.new((prev[0], prev[1], row[1], row[0])).material_index = i
+            prev = row
+    bm.to_mesh(me); bm.free()
+    f = bpy.data.objects.new('Fitas', me); f.modifiers.new('Solid', 'SOLIDIFY').thickness = 0.015
+    bpy.context.scene.collection.objects.link(f); f.parent = hat
 
 
 def make_mask(a):
@@ -423,6 +513,8 @@ def assemble(cfg, rows, meta_anims, rs):
         for n, d in enumerate(dirs):
             for i, fp in enumerate(rows[a['row'] + n]):
                 im = Image.open(fp).convert('RGBA')
+                if cfg.get('glow_halo'):
+                    im = glow_halo(im, cfg['glow_halo'])
                 if cfg.get('outline'):
                     im = add_outline(im, tuple(cfg['outline']))
                 bb = im.getchannel('A').point(lambda v: 255 if v > 4 else 0).getbbox() or (0, 0, 1, 1)
@@ -484,6 +576,19 @@ def pack(pieces, src_size, width=2048):
                      'spriteSourceSize': {'x': bb[0], 'y': bb[1], 'w': im.width, 'h': im.height},
                      'sourceSize': {'w': fw, 'h': fh}}
     return sheet, frames
+
+
+def glow_halo(im, rgb):
+    """Halo em volta dos pixels azul-brilhantes (arma com glow_mesh)."""
+    import numpy as np
+    from PIL import Image, ImageFilter
+    p = np.asarray(im).astype(int)
+    m = ((p[..., 2] > 200) & (p[..., 0] < 200) & (p[..., 2] - p[..., 0] > 40) & (p[..., 3] > 0)).astype(np.uint8) * 255
+    r = max(2, im.width // 70)
+    g = Image.fromarray(m).filter(ImageFilter.GaussianBlur(r)).point(lambda v: min(255, v * 2))
+    halo = Image.new('RGBA', im.size, tuple(rgb) + (0,)); halo.putalpha(g)
+    out = Image.new('RGBA', im.size, (0, 0, 0, 0)); out.alpha_composite(halo); out.alpha_composite(im)
+    return out
 
 
 def add_outline(im, rgba):

@@ -6,6 +6,7 @@ import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
 import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
+import { SKINS } from '../data';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
@@ -39,6 +40,8 @@ export function serialize(w: World): SaveData {
     quest: { ...w.quest },
     merchant: serializeMerchant(w),
     trialProgress: Object.keys(w.trialProgress).length ? { ...w.trialProgress } : undefined,
+    skins: w.skinsOwned.length ? [...w.skinsOwned] : undefined,
+    skin: w.skin ?? undefined,
   };
 }
 
@@ -58,6 +61,10 @@ export function restore(w: World, s: SaveData, now: number) {
     cur.xp = cur.level >= SKILL_MAX_LEVEL ? 0 : Math.max(0, Number(st.xp) || 0);
   }
   w.gold = Math.max(0, Math.floor(Number(s.gold) || 0));
+  w.skinsOwned = (Array.isArray(s.skins) ? s.skins : []).filter(
+    (id, i, a) => typeof id === 'string' && SKINS[id]?.sect === w.classId && a.indexOf(id) === i,
+  );
+  w.skin = s.skin && w.skinsOwned.includes(s.skin) ? s.skin : null;
   (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
     w.bag[i] = sanitizeItem(raw);
   });

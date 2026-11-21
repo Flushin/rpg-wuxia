@@ -660,3 +660,8 @@ ol.plain {
     width: 90px;
   }
 }
+/* retrato dos trajes (skins) na página do Governador Bai */
+.skin-pic {
+  height: 72px;
+  vertical-align: middle;
+}

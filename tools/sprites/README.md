@@ -27,6 +27,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_ruins.py` | Ruínas e portais: colunas de pedra, entulho, cacos, braseiros e a porta-lua do portal → `public/sprites/ruinas.*` |
 | `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água, neve e lago congelado) → `public/sprites/pisos.png` |
 | `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |
+| `tormenta_celeste.json` | Traje (skin) da Tormenta: `parts` (peças de outros KayKit, mesmo esqueleto), `textures` (recolorir várias texturas), `glow_mesh`/`glow_halo` (arma brilhando), `look` (luz AgX + contorno), chapéu com `straw` e `ribbons`, `outline` |
 | `bandido_*.json`, `terracota.json`, `general.json` | Monstros KayKit recoloridos (lenço/chapéu gerados com `attach`) |
 | `espectro_gelo.json`, `yeti.json`, `discipulo_caido.json`, `abade_caido.json` | Montanha Nevada (marco 9): Mage, Barbarian, Rogue e Mage (com cajado) recoloridos |
 | `assassino_sombras.json`, `serpente_jade.json`, `grou_espiritual.json`, `guardiao_jade.json`, `senhor_nevoa.json` | Nível 30: Rogue_Hooded (facas), Mage, Mage, Knight (com elmo) e Mage (com cajado) recoloridos |
