@@ -70,7 +70,7 @@ import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
-import { computeDerived, emptyElements } from './stats';
+import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
 import { bal } from './balance';
 import {
   ATTR_KEYS,
@@ -683,7 +683,10 @@ export class World {
 
   private applyPassives() {
     const p = this.player;
-    p.derived = { ...p.derived, critChance: Math.min(0.95, p.derived.critChance + this.passiveValue('crit')) };
+    p.derived = {
+      ...p.derived,
+      critChance: Math.min(CRIT_TOTAL_MAX, p.derived.critChance + this.passiveValue('crit')),
+    };
     p.attackInterval = CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed'));
     const hpBonus = this.passiveValue('maxHp'),
       hpMul = (1 + hpBonus) * bal('vida.jogador', this.classId);
@@ -1364,7 +1367,7 @@ export class World {
       'critDamage',
     ] as const)
       d[k] += g[k] ?? 0;
-    d.critChance = Math.min(0.95, d.critChance);
+    d.critChance = Math.min(CRIT_TOTAL_MAX, d.critChance);
     e.derived = d;
     e.elemAtk = { ...emptyElements(), ...CLASSES[this.classId].elementAttack };
     for (const el of ELEMENTS) e.elemAtk[el] += g[`elem_${el}`] ?? 0;

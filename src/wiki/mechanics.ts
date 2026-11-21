@@ -2,11 +2,13 @@
 // Tabelas e exemplos saem das fórmulas do jogo; as que são cópias (marcadas) são conferidas por tools/wiki-check.ts.
 import { TELEPORT_COST } from '../core/teleport';
 import { bal } from '../core/balance';
-import { computeDerived, emptyAttrs } from '../core/stats';
+import { CRIT_AGILITY_MAX, CRIT_TOTAL_MAX, computeDerived, emptyAttrs } from '../core/stats';
+import { SKILL_MAX_LEVEL, skillScale } from '../core/skills';
 import {
   BASES,
   CLASSES,
   BONUS_POOL,
+  SKILLS,
   CONSUMABLES,
   ELEMENT_NAMES,
   EPIC,
@@ -220,6 +222,63 @@ function epico(): string {
       Não sobe de raridade, não troca bônus, <b>não pode ser vendido nem desmontado</b>. Conserto pelo seu nível. Ver <a href="#/mecanicas/forja">Forja</a>.</p></section>`;
 }
 
+/** Seção "Crítico" de Combate: de onde vem a chance de crítico e os dois tetos. */
+function critico(): string {
+  const base = computeDerived(emptyAttrs());
+  const perAgi = computeDerived({ ...emptyAttrs(), agility: 1 });
+  const perChance = perAgi.critChance - base.critChance,
+    perDmg = perAgi.critDamage - base.critDamage;
+  const agiCap = Math.ceil((CRIT_AGILITY_MAX - base.critChance) / perChance - 1e-9);
+  const weapons = Object.entries(BASES)
+    .filter(([, b]) => b.slot === 'arma' && b.stats?.critChance)
+    .sort(([, a], [, b]) => a.reqLevel - b.reqLevel);
+  const byLevel = [...new Set(weapons.map(([, b]) => b.reqLevel))]
+    .map((lv) => {
+      const ws = weapons.filter(([, b]) => b.reqLevel === lv);
+      const v = ws[0][1].stats!.critChance!;
+      return `<tr><td>${lv}</td><td>${ws.map(([, b]) => esc(b.name)).join(', ')}</td><td>+${pc(v)}</td><td>+${pc(v * (1 + UPGRADE_STEP * 10))}</td><td>+${pc(v * (1 + UPGRADE_STEP * 10) * EPIC.mul)}</td></tr>`;
+    })
+    .join('');
+  const bonus = BONUS_POOL.find((b) => b.stat === 'critChance');
+  const passives = Object.entries(SKILLS).flatMap(([c, list]) =>
+    list
+      .filter((d) => d.type === 'passive' && d.passive?.crit)
+      .map(
+        (d) =>
+          `<li><b>${esc(d.name)}</b> (passiva da ${esc(CLASSES[c].name)}, nível ${d.unlock}): +${pc(d.passive!.crit!)} no nível 1 da skill, +${pc(
+            d.passive!.crit! * skillScale(SKILL_MAX_LEVEL),
+          )} no nível ${SKILL_MAX_LEVEL}.</li>`,
+      ),
+  );
+  const top = weapons[weapons.length - 1]?.[1].stats?.critChance ?? 0,
+    topWeapon = top * (1 + UPGRADE_STEP * 10) * EPIC.mul;
+  const pas =
+    Object.values(SKILLS)
+      .flat()
+      .reduce((m, d) => Math.max(m, d.type === 'passive' ? (d.passive?.crit ?? 0) : 0), 0) *
+    skillScale(SKILL_MAX_LEVEL);
+  const ex = `Exemplo: ${agiCap} de Agilidade (${pc(CRIT_AGILITY_MAX)}) + a arma Épica +10 mais alta (+${pc(topWeapon)})${
+    pas ? ` + passiva no nível ${SKILL_MAX_LEVEL} (+${pc(pas)})` : ''
+  } = <b>${pc(Math.min(CRIT_TOTAL_MAX, CRIT_AGILITY_MAX + topWeapon + pas))}</b>; o resto só vem de bônus de crítico nas outras peças.`;
+  return `<section class="panel"><h2>Crítico</h2>
+      <p>Um golpe crítico multiplica o dano pelo <b>Dano crítico</b>. A chance de crítico soma três fontes e tem <b>dois tetos</b>.</p>
+      <h3>1. Agilidade (até ${pc(CRIT_AGILITY_MAX)})</h3>
+      ${formula(`Chance de crítico = ${pc(base.critChance)} + ${pc(perChance)} por ponto de Agilidade (máximo ${pc(CRIT_AGILITY_MAX)})`)}
+      <p>O teto de <b>${pc(CRIT_AGILITY_MAX)}</b> chega com <b>${agiCap} de Agilidade</b> (somando base, níveis, pontos e equipamento).
+      Acima disso a Agilidade <b>não dá mais chance de crítico</b>, mas continua dando <b>+${pc(perDmg)} de Dano crítico</b> por ponto (sem limite),
+      além de Precisão e Esquiva.</p>
+      ${formula(`Dano crítico = ${pc(base.critDamage)} + ${pc(perDmg)} por ponto de Agilidade`)}
+      <h3>2. Equipamento</h3>
+      <p>Soma por cima do teto da Agilidade. As armas a partir do nível ${weapons[0]?.[1].reqLevel ?? '?'} têm chance de crítico na base, que a
+      <a href="#/mecanicas/forja">forja</a> aumenta (${pc(UPGRADE_STEP)} do valor por +) e o <a href="#/mecanicas/epico">Épico</a> multiplica por ${n1(EPIC.mul)}:</p>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Nível</th><th>Armas</th><th>+0</th><th>+10</th><th>Épico +10</th></tr></thead><tbody>${byLevel}</tbody></table></div>
+      ${bonus ? `<p>Itens Incomuns e Raros também podem sortear o bônus <b>Chance de crítico</b> (de +${pc(bonus.min)} a +${pc(bonus.max)}, crescendo com o nível do item), em qualquer peça.</p>` : ''}
+      <h3>3. Passivas</h3><ul>${passives.join('') || '<li>Nenhuma no momento.</li>'}</ul>
+      <h3>Teto final: ${pc(CRIT_TOTAL_MAX)}</h3>
+      <p>Somando tudo, a chance de crítico nunca passa de <b>${pc(CRIT_TOTAL_MAX)}</b>. ${ex} Para subir mais, o caminho é equipamento com crítico,
+      não mais Agilidade. A ficha do personagem mostra o valor final.</p></section>`;
+}
+
 function combate(): string {
   const ATTRS: AttrKey[] = ['strength', 'intelligence', 'stamina', 'agility', 'willpower'];
   const base = computeDerived(emptyAttrs());
@@ -256,10 +315,11 @@ function combate(): string {
   return `<section class="panel"><h2>Atributos</h2>
       <p>Cada ponto em um atributo dá:</p><table class="tbl kv">${per}</table>
       <p class="muted">Base com 0 em tudo: ${base.maxHp} de vida, ${base.maxMana} de mana, ${base.physAtk} de ataque, ${base.hit} de precisão,
-      ${pc(base.critChance)} de crítico (máximo ${pc(computeDerived({ ...emptyAttrs(), agility: 1e4 }).critChance)}) e dano crítico de ${pc(base.critDamage)}.
+      ${pc(base.critChance)} de crítico (ver <b>Crítico</b> abaixo) e dano crítico de ${pc(base.critDamage)}.
       Equipamentos somam atributos e status direto.</p></section>
     <section class="panel"><h2>Acerto</h2>${formula('Chance de acertar = 50% + (Precisão do atacante − Esquiva do alvo) ÷ 200')}
       <p>Fica sempre entre <b>5%</b> e <b>95%</b>. Vale para você e para os monstros.</p></section>
+${critico()}
     <section class="panel"><h2>Dano</h2>
       ${formula('Dano = Ataque × (90% a 110%) × (1 − Defesa ÷ (Defesa + 100)) + Ataque elemental')}
       <ul><li>Dano <b>físico</b> usa Ataque físico contra Defesa física; <b>espiritual</b> usa Ataque espiritual contra Defesa espiritual.</li>
