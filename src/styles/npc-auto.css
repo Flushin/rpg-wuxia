@@ -611,7 +611,28 @@
 .dg-row button {
   width: 100%;
 }
-/* Menu do Trial (src/ui/trialWindow.ts): escolha do nível com − e + */
+/* Monge do Pagode: realinhar meridianos (src/ui/npcWindow.ts) */
+.mr-list {
+  font-size: 13px;
+  margin: 6px 0;
+}
+.mr-list div {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.mr-total {
+  border-top: 1px solid #445;
+  padding-top: 4px;
+}
+.mr-ask {
+  display: flex;
+  gap: 8px;
+}
+.dg-row .mr-ask button {
+  flex: 1;
+}
+: escolha do nível com − e + */
 .tr-tier {
   display: flex;
   align-items: center;

@@ -314,4 +314,6 @@ export type ActionError =
   | { code: 'talkToMerchant' }
   | { code: 'soldOut' }
   | { code: 'trialLocked' }
-  | { code: 'epicLocked' };
+  | { code: 'epicLocked' }
+  | { code: 'talkToMonk' }
+  | { code: 'nothingToReset' };

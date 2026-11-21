@@ -242,6 +242,7 @@ export const PROGRESSION = progressionJson as unknown as {
   xpToNext: number[];
   freePointsPerLevel: number;
   freePointsHigh?: { fromLevel: number; points: number };
+  attrResetCost: number;
 };
 /** Texto dos pontos livres por nível (ex.: "3 pontos livres por nível (4 do nível 21 em diante)"). */
 export function freePointsText(): string {

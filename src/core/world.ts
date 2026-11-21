@@ -8,6 +8,7 @@ import {
   NPC_TEXT,
   PROGRESSION,
   freePointsAt,
+  totalFreePoints,
   type MonsterDef,
 } from './data';
 
@@ -373,6 +374,34 @@ export class World {
     this.freePoints -= r.spent;
     this.ratioCursor = r.cursor;
     this.recalc(this.player, true);
+  }
+
+  /** Pontos livres gastos em cada atributo: atributo atual menos a base da seita e os ganhos automáticos por nível. */
+  spentPoints(): Record<AttrKey, number> {
+    const cls = CLASSES[this.classId],
+      p = this.player;
+    const out = {} as Record<AttrKey, number>;
+    for (const k of ATTR_KEYS)
+      out[k] = Math.max(0, p.attrs[k] - cls.baseAttributes[k] - (p.level - 1) * cls.levelUpAttributes[k]);
+    return out;
+  }
+
+  /** Monge do Pagode (Cidadela): cobra PROGRESSION.attrResetCost e devolve todos os pontos livres para redistribuir. */
+  resetAttributes(): ActionError | null {
+    if (this.npcRole() !== 'meridianos') return { code: 'talkToMonk' };
+    const spent = this.spentPoints();
+    if (!ATTR_KEYS.some((k) => spent[k] > 0)) return { code: 'nothingToReset' };
+    const cost = PROGRESSION.attrResetCost;
+    if (this.gold < cost) return { code: 'noGold' };
+    const cls = CLASSES[this.classId],
+      p = this.player;
+    this.gold -= cost;
+    for (const k of ATTR_KEYS) p.attrs[k] = cls.baseAttributes[k] + (p.level - 1) * cls.levelUpAttributes[k];
+    this.freePoints = totalFreePoints(p.level);
+    this.recalc(p, true);
+    this.bumpInv();
+    this.emit({ type: 'trade', kind: 'buy', gold: cost });
+    return null;
   }
 
   // ---------- skills ----------

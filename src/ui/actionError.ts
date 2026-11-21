@@ -33,5 +33,9 @@ export function actionErrorText(e: ActionError): string {
       return L('Vença o nível anterior deste chefe', 'Beat the previous level of this boss');
     case 'epicLocked':
       return L('Itens épicos não podem ser vendidos nem desmontados', 'Epic items cannot be sold or salvaged');
+    case 'talkToMonk':
+      return L('Fale com o Monge do Pagode', 'Talk to the Pagoda Monk');
+    case 'nothingToReset':
+      return L('Nenhum ponto distribuído para devolver', 'No distributed points to return');
   }
 }

@@ -1,7 +1,9 @@
 import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
 import { L, tn } from '../core/i18n';
-import { NPC_TEXT } from '../core/data';
+import { NPC_TEXT, PROGRESSION } from '../core/data';
+import { ATTR_KEYS } from '../core/types';
+import { ATTR_LABELS } from './labels';
 import {
   BASES,
   CONSUMABLES,
@@ -59,6 +61,7 @@ export class NpcWindow {
   private smithTab: 'repair' | 'forge' | 'salvage' = 'repair';
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
   private salvageAsk = false; // desmontar aguardando confirmação
+  private resetAsk = false; // realinhar meridianos aguardando confirmação
   private qty = 1;
   private pending = -1; // venda aguardando confirmação (incomum/raro)
   private npcId = -1;
@@ -95,6 +98,30 @@ export class NpcWindow {
       const err = w.travelTo(v);
       if (err) this.toast(actionErrorText(err), '#ff8a80');
       else audio.ui('ui_click');
+      return;
+    }
+    if (a === 'mreset') {
+      if (!this.resetAsk) {
+        audio.ui('ui_click');
+        this.resetAsk = true;
+        return;
+      }
+      this.resetAsk = false;
+      const err = w.resetAttributes();
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else
+        this.toast(
+          L(
+            `Meridianos realinhados: ${w.freePoints} pontos livres (Atributos, tecla C)`,
+            `Meridians realigned: ${w.freePoints} free points (Attributes, C key)`,
+          ),
+          '#9be7c4',
+        );
+      return;
+    }
+    if (a === 'mcancel') {
+      audio.ui('ui_click');
+      this.resetAsk = false;
       return;
     }
     if (a === 'qaccept') {
@@ -240,6 +267,7 @@ export class NpcWindow {
       this.smithTab = 'repair';
       this.forgeSel = '';
       this.salvageAsk = false;
+      this.resetAsk = false;
       this.pending = -1;
       this.sig = '';
       this.line = 0;
@@ -247,7 +275,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -255,7 +283,8 @@ export class NpcWindow {
     // a Mestra Ferreira Lin tem o papel 'ferreiro' (prop role no mapa).
     const role = w.npcRole(n),
       who = n.npcId;
-    const shop = role === 'ferreiro' || role === 'vendedor' || role === 'mercador' || role === 'caminhos';
+    const shop =
+      role === 'ferreiro' || role === 'vendedor' || role === 'mercador' || role === 'caminhos' || role === 'meridianos';
     let view: View,
       sub = '';
     if (role === 'ferreiro') {
@@ -265,6 +294,7 @@ export class NpcWindow {
     } else if (role === 'vendedor') view = this.shop();
     else if (role === 'mercador') view = this.merchant(who);
     else if (role === 'caminhos') view = this.travel(who);
+    else if (role === 'meridianos') view = { list: this.talk(who) + this.meridians() };
     else if (role.startsWith('mestre_')) {
       const m = this.master(role.slice(7));
       view = { list: m.body };
@@ -347,6 +377,42 @@ export class NpcWindow {
     const k = this.line % t.lines.length;
     return `<p class="lore">“${escapeHtml(t.lines[k])}”</p>
       ${t.lines.length > 1 ? `<div class="npc-next"><small class="muted">${k + 1}/${t.lines.length}</small><button data-a="next">${k + 1 < t.lines.length ? L('Continuar ›', 'Continue ›') : L('Do começo ↺', 'From the start ↺')}</button></div>` : ''}`;
+  }
+
+  /** Monge do Pagode: pontos distribuídos em cada atributo e o botão de devolvê-los (com confirmação). */
+  private meridians(): string {
+    const w = this.world,
+      spent = w.spentPoints(),
+      cost = PROGRESSION.attrResetCost;
+    const total = ATTR_KEYS.reduce((n, k) => n + spent[k], 0);
+    const rows = ATTR_KEYS.filter((k) => spent[k] > 0)
+      .map((k) => `<div><span>${ATTR_LABELS[k]}</span><b>${spent[k]} ${L('pts', 'pts')}</b></div>`)
+      .join('');
+    const costTxt = cost.toLocaleString('pt-BR');
+    const why = !total
+      ? L('Você ainda não distribuiu nenhum ponto.', 'You have not distributed any points yet.')
+      : w.gold < cost
+        ? L(
+            `Faltam ${(cost - w.gold).toLocaleString('pt-BR')} de ouro.`,
+            `You need ${(cost - w.gold).toLocaleString('pt-BR')} more gold.`,
+          )
+        : '';
+    const btn = this.resetAsk
+      ? `<div class="mr-ask"><button class="danger" data-a="mreset">${L(`Confirmar (${costTxt} ouro)`, `Confirm (${costTxt} gold)`)}</button><button data-a="mcancel">${L('Cancelar', 'Cancel')}</button></div>`
+      : `<button class="primary" data-a="mreset" ${why ? 'disabled' : ''}>${L(`Realinhar (${costTxt} ouro)`, `Realign (${costTxt} gold)`)}</button>`;
+    return `<h4>${L('Realinhar meridianos', 'Realign meridians')}</h4>
+      <div class="dg-row mr-box">
+        <div class="dg-info">${L(
+          'Devolve todos os pontos que você distribuiu. Os atributos da seita e os ganhos de nível ficam. Depois, redistribua no painel de Atributos (tecla C).',
+          'Returns every point you distributed. Sect attributes and level gains stay. Then redistribute them in the Attributes panel (C key).',
+        )}</div>
+        ${rows ? `<div class="mr-list">${rows}</div>` : ''}
+        <div class="mr-list mr-total"><div><span>${L('Pontos devolvidos', 'Points returned')}</span><b>${total}</b></div>
+          <div><span>${L('Pontos livres depois', 'Free points after')}</span><b>${w.freePoints + total}</b></div>
+          <div><span>${L('Custo', 'Cost')}</span><b class="gold">${costTxt} ${L('ouro', 'gold')}</b></div></div>
+        ${btn}
+        ${why ? `<small class="muted">${why}</small>` : ''}
+      </div>`;
   }
 
   /** Mestre dos Caminhos: destinos do teleporte (src/core/teleport.ts) agrupados por região, com o motivo do bloqueio. */

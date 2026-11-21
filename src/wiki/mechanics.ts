@@ -270,7 +270,7 @@ function combate(): string {
       <li><b>Escudos</b> absorvem o dano antes da vida. <b>Redução de defesa</b> diminui as duas defesas do alvo. <b>Lentidão</b> e <b>atordoamento</b> não mudam o dano.</li>
       ${cls.lifeSteal ? `<li><b>Roubo de vida</b> (Tormenta): ${pc(cls.lifeSteal)} do dano causado volta como vida (só o dano que o alvo ainda podia levar; o excesso não cura).</li>` : ''}</ul>${ex}</section>
     <section class="panel"><h2>Níveis</h2><p>Nível máximo <b>${PROGRESSION.levelCap}</b>. A cada nível você ganha os atributos automáticos da sua <a href="#/seitas">seita</a>
-      e <b>${freePointsText()}</b> para distribuir. Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
+      e <b>${freePointsText()}</b> para distribuir (o <a href="#/npc/monge_pagode">Monge do Pagode</a>, na Cidadela de Jade, devolve todos os pontos distribuídos por ${PROGRESSION.attrResetCost.toLocaleString('pt-BR')} de ouro). Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>
       <p><b>Você escolhe a hora de subir.</b> A XP fica guardada: quando ela paga um nível, o seu quadro (canto de cima, à esquerda) brilha em dourado
       e um aviso aparece. Clique/toque no quadro (ou aperte <b>U</b>) para subir um nível. Dá para guardar até <b>${XP_BANK_LEVELS} níveis prontos</b>;
       com a XP cheia, os monstros, as missões e o ganho offline <b>não dão mais XP</b> (o excesso se perde) e cada abate avisa "XP cheia" até você subir.</p>
