@@ -30,7 +30,8 @@ Toda mudança no jogo que afete algo mostrado na wiki atualiza a wiki **no mesmo
 ## Novidades (regra)
 PR com **conteúdo novo** para o jogador (não correção nem ajuste) acrescenta um item em `"proxima"` de `src/data/novidades.json`
 (+ tradução em `en.json` "novidades"). Ao subir a `version` do `package.json`, mova os itens para uma entrada nova no topo de
-`"versoes"` (com data); `npm run check:novidades` exige essa entrada. Texto da Play Store: `npm run novidades:loja`.
+`"versoes"` (com data); `npm run check:novidades` exige essa entrada. Se o texto da loja passar de 500 caracteres,
+ponha um resumo em `"loja"` na entrada (PT e EN). Texto da Play Store: `npm run novidades:loja`.
 
 ## Economia de contexto
 - Não leia docs grandes inteiros: use grep e leia só a seção relevante.
