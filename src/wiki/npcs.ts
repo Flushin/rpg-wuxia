@@ -13,7 +13,7 @@ import {
 } from './data';
 import { itemLink, questList } from './ui';
 import { mapName } from './maps';
-import { TELEPORT_COST, TELEPORT_DESTS } from '../core/teleport';
+import { TELEPORT_COST, TELEPORT_DESTS, teleportCost } from '../core/teleport';
 
 interface NpcInfo {
   id: string;
@@ -110,11 +110,12 @@ function npcList(): NpcInfo[] {
         for (const d of TELEPORT_DESTS)
           regions.set(d.region.pt, [
             ...(regions.get(d.region.pt) ?? []),
-            `<a href="#/mapa/${d.map}">${esc(mapName(d.map))}</a>${d.minLevel ? ` (nível ${d.minLevel}+)` : ''}`,
+            `<a href="#/mapa/${d.map}">${esc(mapName(d.map))}</a>${d.minLevel ? ` (nível ${d.minLevel}+)` : ''}${teleportCost(d) ? '' : ' (grátis)'}`,
           ]);
-        return `<p>Fica na praça, de pé sobre o círculo dourado, ao lado de uma lanterna de pedra. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você da vila
+        return `<p>Fica na praça da <a href="#/mapa/cidade">Vila das Nuvens</a> e da <a href="#/mapa/cidadela">Cidadela de Jade</a>, de pé sobre o círculo dourado. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você
          direto a um mapa de caça, sem passar pelos mapas do caminho. Cada destino abre no mesmo nível em que você chegaria a pé.</p>
-         <p>Só leva da vila para fora: para voltar, vá a pé ou use um ${itemLink('pergaminho_retorno')}.</p>
+         <p>Também leva às cidades: a Cidadela de Jade (só se chega lá por ele) e, de lá, de volta à vila de graça.</p>
+         <p>Só leva de uma cidade para fora: para voltar de um mapa de caça, vá a pé ou use um ${itemLink('pergaminho_retorno')}.</p>
          <h3>Destinos</h3><ul>${[...regions].map(([r, ds]) => `<li><b>${esc(r)}:</b> ${ds.join(', ')}</li>`).join('')}</ul>`;
       },
     },
@@ -173,7 +174,7 @@ export function npcIndexPage(): string {
     `<a class="card-link npc-card" href="#/npc/${n.id}">${spriteHtml(n.sheet)}<b>${esc(n.name)}</b><small>${esc(n.role)}</small></a>`;
   const masters = NPCS().filter((n) => n.sect),
     others = NPCS().filter((n) => !n.sect);
-  return `<h1>NPCs</h1><p class="intro">Todos ficam na <b>Vila das Nuvens</b>. Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
+  return `<h1>NPCs</h1><p class="intro">Todos ficam na <b>Vila das Nuvens</b> (o Mestre dos Caminhos também na <a href="#/mapa/cidadela">Cidadela de Jade</a>). Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
     <h2>Mestres das seitas</h2><div class="grid npc-grid">${masters.map(card).join('')}</div>
     <h2>Moradores e lojas</h2><div class="grid npc-grid">${others.map(card).join('')}</div>`;
 }

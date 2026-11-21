@@ -1,13 +1,13 @@
 // Mapa-múndi: o grafo de portais entre os mapas e a rota (menor número de portais) de qualquer mapa a qualquer outro.
 // Lido dos próprios mapas (objetos portal de public/maps/*.json): mapa ou portal novo entra sozinho.
 // Portais de menu (Portal das Masmorras, Trial) viram uma ligação para cada mapa que o menu oferece.
-// O Mestre dos Caminhos (teleporte, src/core/teleport.ts) vira uma ligação da vila para cada destino (menu 'caminhos');
+// O Mestre dos Caminhos (teleporte, src/core/teleport.ts) vira uma ligação de cada cidade com ele para cada destino (menu 'caminhos');
 // a rota só usa o teleporte quando não há caminho a pé (decisão de 20/11/2026).
 import { MONSTERS } from './data';
 import { DUNGEONS } from './dungeons';
 import type { GameMap, MapObject } from './map';
 import { portalMinLevel } from './mapsConfig';
-import { TELEPORT_COST, TELEPORT_DESTS } from './teleport';
+import { teleportCost, teleportDestsFrom } from './teleport';
 import { TRIAL_MAP, TRIAL_MIN_LEVEL } from './trial';
 
 export interface WorldLink {
@@ -41,9 +41,9 @@ export function worldLinks(maps: Record<string, GameMap>): WorldLink[] {
   for (const m of Object.values(maps)) {
     const npc = m.objects.find((o) => o.type === 'npc' && o.props.npc === 'caminhos');
     if (!npc) continue;
-    for (const d of TELEPORT_DESTS)
-      if (maps[d.map] && d.map !== m.id)
-        out.push({ from: m.id, to: d.map, portal: npc, minLevel: d.minLevel, menu: 'caminhos', cost: TELEPORT_COST });
+    for (const d of teleportDestsFrom(m.id))
+      if (maps[d.map])
+        out.push({ from: m.id, to: d.map, portal: npc, minLevel: d.minLevel, menu: 'caminhos', cost: teleportCost(d) });
   }
   return out;
 }

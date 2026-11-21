@@ -91,6 +91,7 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 | Arquivo do jogo (`public/audio/music/`) | Origem | Autor | Licença na página |
 |---|---|---|---|
 | `cidade` | `https://opengameart.org/content/hot-springs-town` (hot_spring_town.flac) | Kistol | CC0 |
+| `cidadela` | `https://opengameart.org/content/orien2` (orien2.mid, verificada em 21/11/2026; tocado com FluidSynth e o banco FluidR3_GM, MIT: `fluidr3-gm-copyright.txt`) | Tozan | CC0 |
 | `floresta` | `https://opengameart.org/content/bamboo-blitz` (bamboo_blitz_solo.flac) | Tsorthan Grove | CC0 |
 | `ruinas` | `https://opengameart.org/content/ancient-temple-1` (ancient_temple.wav) | Umplix | CC0 |
 | `montanha` | `https://opengameart.org/content/harmony-in-the-mists` (harmony_in_the_mists_loop.flac) | Tsorthan Grove | CC0 |

@@ -20,3 +20,14 @@ Decidido com o Lucas em 20/11/2026. Motivo: as quatro saídas da vila estão ocu
 - **Mapa-múndi:** a rota é sempre a pé; o teleporte só entra quando não há caminho a pé ("fale com o Mestre dos
   Caminhos… · 200 ouro"). Sem linhas novas da vila; os cartões dos destinos ganham a marca ✦.
 - **Fora por enquanto:** atalho "Viajar" na aba Mundo e estelas por região (possível evolução futura).
+
+## Cidadela de Jade (21/11/2026)
+
+- **Cidade nova do meio do jogo**, mapa `cidadela` (EN: Jade Citadel): praça maior que a da vila, avenidas de pedra,
+  portões, lagos e lotes de obra reservados para os sistemas que virão. Música própria: "Orien2" (Tozan, CC0).
+- **Acesso só pelo teleporte**, região "Cidades", **nível 30**, 200 de ouro. Sem saída a pé; a vila não mudou.
+- **Outro Mestre dos Caminhos na Cidadela**: leva aos mapas de caça (200 de ouro) e **de volta à vila de graça**
+  (`cost: 0` em `TELEPORT_DESTS`), para ninguém ficar preso sem ouro (o Pergaminho de Retorno não funciona em cidade).
+- Morrer, o Pergaminho de Retorno e o save com mapa desconhecido continuam levando à vila (`HOME_MAP`).
+- Auto: na Cidadela, viaja direto ao mapa de caça; sem ouro para isso, volta de graça à vila.
+- **Próximo passo:** sprites novos (muralha, pagode, salão, casas de telhado jade e dourado) no lugar dos da vila.

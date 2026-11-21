@@ -1,6 +1,7 @@
-// Teleporte do Mestre dos Caminhos (NPC da vila): viagem paga da vila direto para um mapa de caça.
-// Regras (aprovadas pelo Lucas em 20/11/2026, docs/decisoes/teleporte.md): só da vila para fora (a volta é a pé ou
-// com o Pergaminho de Retorno); liberação só por nível mínimo (nada novo no save); custo fixo em ouro por viagem.
+// Teleporte do Mestre dos Caminhos (NPC das cidades): viagem paga de uma cidade direto para um mapa de caça ou para
+// outra cidade. Regras (aprovadas pelo Lucas em 20/11/2026, docs/decisoes/teleporte.md): só de uma cidade para fora (a
+// volta dos mapas de caça é a pé ou com o Pergaminho de Retorno); liberação só por nível mínimo (nada novo no save);
+// custo fixo em ouro por viagem. Cidadela de Jade (21/11/2026): só pelo teleporte, nível 30; a volta à vila é grátis.
 // Destino novo: acrescentar uma entrada aqui; o nível mínimo nunca pode ser menor que o do caminho a pé
 // (npm run check:teleport confere).
 
@@ -11,6 +12,8 @@ export interface TeleportDest {
   region: { pt: string; en: string };
   /** nível mínimo do personagem para viajar */
   minLevel: number;
+  /** ouro cobrado; sem ele, TELEPORT_COST */
+  cost?: number;
   /** ponto de chegada (tiles); sem ele, chega no spawn do mapa */
   x?: number;
   y?: number;
@@ -21,6 +24,7 @@ export const TELEPORT_COST = 200;
 
 const EAST = { pt: 'Caminho do Leste', en: 'Eastern Road' };
 const NORTH = { pt: 'Caminho do Norte', en: 'Northern Road' };
+const CITIES = { pt: 'Cidades', en: 'Cities' };
 
 export const TELEPORT_DESTS: TeleportDest[] = [
   { map: 'floresta', region: EAST, minLevel: 0 },
@@ -28,9 +32,17 @@ export const TELEPORT_DESTS: TeleportDest[] = [
   { map: 'montanha', region: NORTH, minLevel: 10 },
   { map: 'bambu', region: NORTH, minLevel: 20 },
   { map: 'pico', region: NORTH, minLevel: 25 },
+  // Cidadela de Jade: cidade do meio do jogo, só pelo teleporte; da Cidadela, a volta à vila não cobra (sem ouro
+  // ninguém fica preso lá: o Pergaminho de Retorno não funciona dentro de uma cidade)
+  { map: 'cidade', region: CITIES, minLevel: 0, cost: 0 },
+  { map: 'cidadela', region: CITIES, minLevel: 30 },
 ];
 
 export const teleportById = (map: string) => TELEPORT_DESTS.find((d) => d.map === map);
+/** Ouro cobrado para viajar até `d`. */
+export const teleportCost = (d: TeleportDest) => d.cost ?? TELEPORT_COST;
+/** Destinos oferecidos estando em `from` (nunca o próprio mapa). */
+export const teleportDestsFrom = (from: string) => TELEPORT_DESTS.filter((d) => d.map !== from);
 
 /** Por que não dá para viajar agora (null = pode). */
 export function teleportBlock(
@@ -39,6 +51,6 @@ export function teleportBlock(
   gold: number,
 ): { code: 'needLevel'; level: number } | { code: 'noGold' } | null {
   if (level < d.minLevel) return { code: 'needLevel', level: d.minLevel };
-  if (gold < TELEPORT_COST) return { code: 'noGold' };
+  if (gold < teleportCost(d)) return { code: 'noGold' };
   return null;
 }

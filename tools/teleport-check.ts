@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS } from '../src/core/mapsConfig';
 import { parseTiledMap, type GameMap } from '../src/core/map';
-import { TELEPORT_COST, TELEPORT_DESTS, teleportById } from '../src/core/teleport';
+import { TELEPORT_COST, TELEPORT_DESTS, teleportById, teleportCost, teleportDestsFrom } from '../src/core/teleport';
 import { World } from '../src/core/world';
 import { worldLinks, worldRoute } from '../src/core/worldRoutes';
 import type { GameEvent, SaveData } from '../src/core/types';
@@ -40,7 +40,8 @@ ok(new Set(TELEPORT_DESTS.map((d) => d.map)).size === TELEPORT_DESTS.length, 'de
 const links = worldLinks(maps);
 for (const d of TELEPORT_DESTS) {
   const c = MAPS_CONFIG[d.map];
-  ok(!!maps[d.map] && !!c && !c.town && !c.dungeon, `${d.map}: mapa existe e é mapa aberto (não cidade/instância)`);
+  ok(!!maps[d.map] && !!c && !c.dungeon, `${d.map}: mapa existe e não é instância`);
+  ok(!!c?.town || teleportCost(d) === TELEPORT_COST, `${d.map}: mapa de caça custa ${TELEPORT_COST}`);
   ok(!!d.region.pt && !!d.region.en, `${d.map}: região com texto PT e EN`);
   const path = worldRoute(links, 'cidade', d.map);
   const walk = Math.max(0, ...(path ?? []).map((l) => l.minLevel));
@@ -81,7 +82,11 @@ console.log('\n== viagem ==');
   w.player.dead = true;
   ok(w.travelTo('floresta') === null && w.mapId === 'cidade' && w.gold === 1000, 'morto não viaja');
 }
-ok(!teleportById('cidade') && [...TOWN_MAPS].every((t) => !teleportById(t)), 'vila não é destino');
+ok(
+  [...TOWN_MAPS].every((t) => !teleportDestsFrom(t).some((d) => d.map === t)),
+  'uma cidade nunca oferece viagem para ela mesma',
+);
+ok(teleportById('cidade')?.minLevel === 0 && teleportCost(teleportById('cidade')!) === 0, 'volta à vila é grátis');
 
 console.log('\n== vila ==');
 {
@@ -96,6 +101,28 @@ console.log('\n== vila ==');
   ok(
     w.npcs.some((n) => n.npcId === 'caminhos'),
     'o NPC aparece no jogo',
+  );
+}
+
+console.log('\n== Cidadela de Jade ==');
+{
+  ok(!!MAPS_CONFIG.cidadela?.town, 'é cidade');
+  ok(teleportById('cidadela')?.minLevel === 30, 'destino a partir do nível 30');
+  ok(!maps.cidadela.objects.some((o) => o.type === 'portal'), 'sem saída a pé (só o teleporte)');
+  const npc = maps.cidadela.objects.find((o) => o.type === 'npc' && o.props.npc === 'caminhos');
+  const circle = maps.cidadela.objects.find((o) => o.type === 'teleCircle');
+  ok(!!npc && !!circle, 'tem o Mestre dos Caminhos e o círculo');
+  const w29 = fresh(29, 1000);
+  ok(w29.travelTo('cidadela')?.code === 'needLevel' && w29.mapId === 'cidade', 'nível 29 não viaja');
+  const w = fresh(30, 1000);
+  ok(w.travelTo('cidadela') === null && w.mapId === 'cidadela' && w.gold === 800, 'nível 30 viaja por 200');
+  ok(w.travelTo('cidadela') === null && w.gold === 800, 'não viaja para a cidade em que está');
+  ok(w.travelTo('pico') === null && w.mapId === 'pico' && w.gold === 600, 'da Cidadela vai ao Pico por 200');
+  const broke = fresh(30, 0, 'cidadela');
+  ok(broke.mapId === 'cidadela', 'save na Cidadela carrega lá');
+  ok(
+    broke.travelTo('cidade') === null && broke.mapId === 'cidade' && broke.gold === 0,
+    'sem ouro, volta à vila grátis',
   );
 }
 

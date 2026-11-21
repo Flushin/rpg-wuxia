@@ -11,6 +11,9 @@ Combate (trocados em 20/11/2026; cortados, convertidos para mono e com volume ig
 
 Música (CC0):
 - cidade: "Hot Springs Town" — Kistol — https://opengameart.org/content/hot-springs-town
+- cidadela (Cidadela de Jade): "Orien2" — Tozan — https://opengameart.org/content/orien2
+  (21/11/2026; o original é MIDI: tocado com o FluidSynth e o banco de sons FluidR3_GM (licença MIT), sem o silêncio
+  final e com o volume igualado ao da vila, -20 LUFS)
 - floresta (também no bambu): "Bamboo Blitz" (versão solo) — Tsorthan Grove — https://opengameart.org/content/bamboo-blitz
 - ruinas: "Ancient Temple" — Umplix — https://opengameart.org/content/ancient-temple-1
 - montanha: "Harmony in the Mists" (versão loop) — Tsorthan Grove — https://opengameart.org/content/harmony-in-the-mists
