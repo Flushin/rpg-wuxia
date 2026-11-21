@@ -150,6 +150,7 @@ console.log('\n== chance de equipamento ==');
     const y = w.monsters.find((m) => m.monsterId === 'yeti')!;
     w.applyMonsterLevel(y, MONSTERS.yeti, 12);
     w.rng.next = () => 0.08;
+    w.epicRng.next = () => 0.99; // sem Épico (semente do relógio): só conta o drop normal
     const count = () =>
       w.bag.filter((it) => it && it.rarity && !it.qty).length + w.ground.filter((g) => g.item && !g.item.qty).length;
     const before = count();
