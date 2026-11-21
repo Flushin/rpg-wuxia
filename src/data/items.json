@@ -11,7 +11,8 @@
     "Materiais (marco 9): empilham como poções; tier comum (mapas antigos), raro (montanha) e especial (chefes). value = referência; venda = value * sellRatio.",
     "Melhorar (+1 a +10): cada nível soma upgradeStep (fração) aos stats da base, não aos bônus.",
     "Consumíveis (marco 9): empilham; price = preço no Mercador Ambulante. Mercador: merchant (estoque, preços e renovação).",
-    "Nível 30 (etapa 3): bases nv 20 (Bambu Sombrio) e nv 25 (Névoa); Jade da Névoa substitui o Cristal de Gelo na forja de itens nv 20+."
+    "Nível 30 (etapa 3): bases nv 20 (Bambu Sombrio) e nv 25 (Névoa); Jade da Névoa substitui o Cristal de Gelo na forja de itens nv 20+.",
+    "Nível 40 (etapa 3): um conjunto só, nv 35 (Palácio Celeste; arma 100, ~1,47× o nv 25); itens nv 35+ pedem o dobro de Jade da Névoa na forja e no desmonte."
   ],
   "slots": [
     "colar",
@@ -800,6 +801,117 @@
         "agility": 9,
         "evasion": 19
       }
+    },
+    "colar_sol_carmesim": {
+      "name": "Colar do Sol Carmesim",
+      "slot": "colar",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 1205,
+      "stats": {
+        "willpower": 13,
+        "maxMana": 175,
+        "spiritDef": 25
+      }
+    },
+    "tunica_palacio": {
+      "name": "Túnica do Palácio Celeste",
+      "slot": "tronco",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 1600,
+      "stats": {
+        "physDef": 54,
+        "spiritDef": 32,
+        "maxHp": 250
+      }
+    },
+    "espadas_asa_fenix": {
+      "name": "Espadas Duplas Asa de Fênix",
+      "slot": "arma",
+      "sect": "lamina",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 2000,
+      "stats": {
+        "physAtk": 100,
+        "hit": 26,
+        "critChance": 0.05
+      }
+    },
+    "leque_aurora": {
+      "name": "Leque de Qi da Aurora Carmesim",
+      "slot": "arma",
+      "sect": "pavilhao",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 2000,
+      "stats": {
+        "spiritAtk": 100,
+        "hit": 26,
+        "critChance": 0.05
+      }
+    },
+    "bastao_pilar_celeste": {
+      "name": "Bastão do Pilar Celeste",
+      "slot": "arma",
+      "sect": "tita",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 2000,
+      "stats": {
+        "physAtk": 100,
+        "hit": 26,
+        "critChance": 0.05
+      }
+    },
+    "agulhas_escarlates": {
+      "name": "Agulhas Escarlates",
+      "slot": "arma",
+      "sect": "vibora",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 2000,
+      "stats": {
+        "physAtk": 100,
+        "hit": 26,
+        "critChance": 0.05
+      }
+    },
+    "coroa_celeste": {
+      "name": "Coroa Celeste",
+      "slot": "cabeca",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 1000,
+      "stats": {
+        "physDef": 28,
+        "spiritDef": 28,
+        "stamina": 7
+      }
+    },
+    "calca_nuvens_rubras": {
+      "name": "Calça das Nuvens Rubras",
+      "slot": "calca",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 1205,
+      "stats": {
+        "physDef": 40,
+        "maxHp": 162,
+        "stamina": 7
+      }
+    },
+    "botas_degrau_imperial": {
+      "name": "Botas do Degrau Imperial",
+      "slot": "bota",
+      "reqLevel": 35,
+      "durability": 100,
+      "value": 1000,
+      "stats": {
+        "agility": 13,
+        "evasion": 28
+      }
     }
   },
   "potions": {
@@ -876,7 +988,7 @@
       "name": "Pergaminho de Retorno",
       "price": 80,
       "color": "#f0d27a",
-      "desc": "Leva você de volta à Vila das Nuvens na hora."
+      "desc": "Leva você de volta à Vila das Nuvens na hora (dos mapas além do portão leste, à Cidadela de Jade)."
     }
   },
   "merchant": {

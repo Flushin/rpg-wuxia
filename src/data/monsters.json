@@ -1855,5 +1855,465 @@
         }
       ]
     }
+  },
+  "andarilho_cinzas": {
+    "id": "andarilho_cinzas",
+    "name": "Andarilho das Cinzas",
+    "sprite": "ash-wanderer",
+    "minLevel": 30,
+    "maxLevel": 35,
+    "baseAttributes": {
+      "strength": 8,
+      "intelligence": 0,
+      "stamina": 29.04,
+      "agility": 9,
+      "willpower": 5
+    },
+    "perLevel": {
+      "strength": 0.85,
+      "intelligence": 0,
+      "stamina": 12.1,
+      "agility": 0.7,
+      "willpower": 0.7
+    },
+    "damageType": "physical",
+    "aggroRange": 5,
+    "leashRange": 13,
+    "attackRange": 1.5,
+    "attackInterval": 1.6,
+    "moveSpeed": 3.4,
+    "defMul": {
+      "phys": 0.8,
+      "spirit": 2.2
+    },
+    "poisonRes": 0.4,
+    "xpBase": 150,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 24,
+        "max": 34,
+        "perLevel": 2.2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.4
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.9
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 25,
+          "maxReqLevel": 25
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.3,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.13
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "monge_fogo_rubro": {
+    "id": "monge_fogo_rubro",
+    "name": "Monge do Fogo Rubro",
+    "sprite": "crimson-monk",
+    "minLevel": 30,
+    "maxLevel": 35,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 6,
+      "stamina": 24.2,
+      "agility": 8,
+      "willpower": 11
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.75,
+      "stamina": 11.81,
+      "agility": 0.7,
+      "willpower": 1.25
+    },
+    "damageType": "spiritual",
+    "aggroRange": 5,
+    "leashRange": 14,
+    "attackRange": 5.5,
+    "attackInterval": 2.1,
+    "moveSpeed": 3.2,
+    "projectile": "fire",
+    "defMul": {
+      "phys": 0.8,
+      "spirit": 2.4
+    },
+    "poisonRes": 0.4,
+    "xpBase": 140,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 22,
+        "max": 32,
+        "perLevel": 2.2
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.4
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.9
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.07,
+          "minReqLevel": 25,
+          "maxReqLevel": 25
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.15
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "guarda_celeste": {
+    "id": "guarda_celeste",
+    "name": "Guarda Celeste",
+    "sprite": "celestial-guard",
+    "minLevel": 35,
+    "maxLevel": 40,
+    "scale": 1.4,
+    "baseAttributes": {
+      "strength": 10,
+      "intelligence": 0,
+      "stamina": 37.4,
+      "agility": 3,
+      "willpower": 6
+    },
+    "perLevel": {
+      "strength": 0.88,
+      "intelligence": 0,
+      "stamina": 17.67,
+      "agility": 0.45,
+      "willpower": 0.8
+    },
+    "damageType": "physical",
+    "aggroRange": 4,
+    "leashRange": 12,
+    "attackRange": 1.8,
+    "attackInterval": 2.6,
+    "moveSpeed": 2,
+    "slam": {
+      "radius": 2.3,
+      "delay": 1.3,
+      "mult": 1.6,
+      "interval": 9
+    },
+    "defMul": {
+      "phys": 0.5,
+      "spirit": 2
+    },
+    "poisonRes": 0.5,
+    "xpBase": 190,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 28,
+        "max": 40,
+        "perLevel": 2.4
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.45
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.9
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.04,
+          "minReqLevel": 25,
+          "maxReqLevel": 25
+        },
+        {
+          "chance": 0.06,
+          "minReqLevel": 35,
+          "maxReqLevel": 35,
+          "minMonsterLevel": 35
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.35,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.17
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "feiticeira_lua_fria": {
+    "id": "feiticeira_lua_fria",
+    "name": "Feiticeira da Lua Fria",
+    "sprite": "frost-moon-sorceress",
+    "minLevel": 35,
+    "maxLevel": 40,
+    "baseAttributes": {
+      "strength": 0,
+      "intelligence": 6,
+      "stamina": 28.05,
+      "agility": 9,
+      "willpower": 12
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0.7,
+      "stamina": 14.21,
+      "agility": 0.75,
+      "willpower": 1.35
+    },
+    "damageType": "spiritual",
+    "aggroRange": 5,
+    "leashRange": 14,
+    "attackRange": 5.5,
+    "attackInterval": 2.2,
+    "moveSpeed": 3.2,
+    "projectile": "ice",
+    "onHit": {
+      "slow": 0.25,
+      "duration": 2
+    },
+    "defMul": {
+      "phys": 0.55,
+      "spirit": 2.4
+    },
+    "poisonRes": 0.4,
+    "xpBase": 175,
+    "xpPerLevel": 22,
+    "respawnSeconds": 30,
+    "loot": {
+      "gold": {
+        "min": 26,
+        "max": 38,
+        "perLevel": 2.4
+      },
+      "potions": [
+        {
+          "id": "pocao_hp_p",
+          "chance": 0.03
+        },
+        {
+          "id": "pocao_mp_p",
+          "chance": 0.02
+        },
+        {
+          "id": "pocao_hp_g",
+          "chance": 0.45
+        },
+        {
+          "id": "pocao_mp_g",
+          "chance": 0.9
+        }
+      ],
+      "equipment": [
+        {
+          "chance": 0.04,
+          "minReqLevel": 25,
+          "maxReqLevel": 25
+        },
+        {
+          "chance": 0.06,
+          "minReqLevel": 35,
+          "maxReqLevel": 35,
+          "minMonsterLevel": 35
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 0.25,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 0.15
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 0.04
+        }
+      ]
+    }
+  },
+  "imperador_carmesim": {
+    "id": "imperador_carmesim",
+    "name": "Imperador Carmesim",
+    "sprite": "crimson-emperor",
+    "minLevel": 40,
+    "maxLevel": 40,
+    "scale": 1.55,
+    "baseAttributes": {
+      "strength": 80,
+      "intelligence": 0,
+      "stamina": 3800,
+      "agility": 24,
+      "willpower": 320
+    },
+    "perLevel": {
+      "strength": 0,
+      "intelligence": 0,
+      "stamina": 0,
+      "agility": 0,
+      "willpower": 0
+    },
+    "damageType": "physical",
+    "aggroRange": 8,
+    "leashRange": 16,
+    "attackRange": 2.2,
+    "attackInterval": 2.4,
+    "moveSpeed": 2.3,
+    "defMul": {
+      "phys": 0.18,
+      "spirit": 0.45
+    },
+    "boss": {
+      "arenaRadius": 6,
+      "aoe": {
+        "radius": 2.6,
+        "delay": 1.4,
+        "mult": 2.1,
+        "interval": 6,
+        "intervalPhase2": 4.2
+      },
+      "line": {
+        "length": 9,
+        "width": 1.8,
+        "delay": 1.2,
+        "mult": 2.3,
+        "fanAtHpPct": 0.5,
+        "fanCount": 3,
+        "fanSpread": 0.55
+      },
+      "summon": {
+        "monsterId": "guarda_celeste",
+        "count": 2,
+        "level": 37,
+        "atHpPct": 0.5
+      },
+      "enrage": {
+        "atHpPct": 0.3,
+        "attackIntervalMul": 0.75,
+        "damageMul": 1.25,
+        "moveSpeedMul": 1.2
+      }
+    },
+    "xpBase": 150000,
+    "xpPerLevel": 0,
+    "respawnSeconds": 900,
+    "loot": {
+      "gold": {
+        "min": 6000,
+        "max": 8000
+      },
+      "guaranteed": {
+        "rarity": "raro",
+        "reqLevel": 35
+      },
+      "equipment": [
+        {
+          "chance": 1,
+          "minReqLevel": 35,
+          "maxReqLevel": 35
+        }
+      ],
+      "materials": [
+        {
+          "id": "minerio_ferro",
+          "chance": 1,
+          "min": 8,
+          "max": 10
+        },
+        {
+          "id": "jade_nevoa",
+          "chance": 1,
+          "min": 8,
+          "max": 12
+        },
+        {
+          "id": "essencia_qi",
+          "chance": 1,
+          "min": 4,
+          "max": 4
+        }
+      ]
+    }
   }
 }

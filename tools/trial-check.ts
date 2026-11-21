@@ -59,7 +59,10 @@ ok(
   TRIAL_BOSSES.length === Object.values(MONSTERS).filter((m) => m.boss).length && TRIAL_BOSSES.length >= 5,
   `todos os chefes do jogo no Trial (${TRIAL_BOSSES.length})`,
 );
-ok(trialBossLevel(1) === 21 && trialBossLevel(TRIAL_TIERS) === 30 && TRIAL_TIERS === 10, 'chefe nível 21 a 30');
+ok(
+  trialBossLevel(1) === 21 && trialBossLevel(TRIAL_TIERS) === 40 && TRIAL_TIERS === 20,
+  'chefe nível 21 a 40 (níveis 1–20)',
+);
 const table = [12, 12.6, 13.23, 13.89, 14.59, 15.32, 16.08, 16.89, 17.73, 18.62];
 ok(
   table.every((v, i) => trialDropPct(i + 1) === v),
@@ -124,9 +127,10 @@ console.log('\n== entrada ==');
     'nível 1 do Trial: bases nv 20',
   );
   ok(
-    trialEquipReqLevel(5) === 20 && trialEquipReqLevel(6) === 25 && trialEquipReqLevel(10) === 25,
-    'níveis 6–10: bases nv 25',
+    trialEquipReqLevel(5) === 20 && trialEquipReqLevel(6) === 25 && trialEquipReqLevel(14) === 25,
+    'níveis 6–14: bases nv 25',
   );
+  ok(trialEquipReqLevel(15) === 35 && trialEquipReqLevel(20) === 35, 'níveis 15–20: bases nv 35');
 
   console.log('\n== save e saída ==');
   const s = w.serialize();

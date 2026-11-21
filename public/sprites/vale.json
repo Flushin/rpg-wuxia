@@ -1,0 +1,132 @@
+{
+ "frames": {
+  "arvore_brasa": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 257
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 257
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 257
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9416
+   }
+  },
+  "arvore_cinza": {
+   "frame": {
+    "x": 122,
+    "y": 0,
+    "w": 124,
+    "h": 217
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 217
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 217
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8894
+   }
+  },
+  "rocha_basalto": {
+   "frame": {
+    "x": 248,
+    "y": 0,
+    "w": 79,
+    "h": 65
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 79,
+    "h": 65
+   },
+   "sourceSize": {
+    "w": 79,
+    "h": 65
+   },
+   "pivot": {
+    "x": 0.3418,
+    "y": 0.5846
+   }
+  },
+  "tronco_queimado": {
+   "frame": {
+    "x": 329,
+    "y": 0,
+    "w": 60,
+    "h": 38
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 60,
+    "h": 38
+   },
+   "sourceSize": {
+    "w": 60,
+    "h": 38
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5789
+   }
+  },
+  "pedra_brasa": {
+   "frame": {
+    "x": 391,
+    "y": 0,
+    "w": 35,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 35,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 35,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.4286,
+    "y": 0.6
+   }
+  }
+ },
+ "meta": {
+  "image": "vale.png",
+  "size": {
+   "w": 1024,
+   "h": 257
+  },
+  "scale": "0.5"
+ }
+}

@@ -16,6 +16,12 @@ const GROUND: Record<string, number[]> = {
   house: [0, 0, 0, 1, 2],
   ruin: [6, 6, 7, 8],
   snow: [12, 12, 13, 14],
+  // nível 40: cinza vulcânica e lava (Vale das Cinzas Rubras), mármore e mar de nuvens (Palácio Celeste)
+  ash: [16, 16, 17, 18],
+  basalt: [16, 17],
+  lava: [19],
+  marble: [20, 21],
+  cloud: [22],
 };
 const ICE_FRAME = 15; // água na montanha: lago congelado (parado)
 // Montanha Nevada (atlas props-montanha): pinheiros (mais escuros, com geada e com neve) e pedras nevadas
@@ -25,6 +31,10 @@ const SNOW_DECOR_CHANCE = 0.035;
 // Bosque de Bambu Sombrio (atlas props-bambu, nível 30): moitas no tile 'bamboo'; brotos e folhas soltos na grama
 const BAMBOO = ['bambu_a', 'bambu_b', 'bambu_c', 'bambu_a', 'bambu_b'];
 const BAMBOO_DECOR = ['brotos', 'folhas', 'folhas'];
+// Vale das Cinzas Rubras (atlas props-vale, nível 40): o tile 'basalt' vira rocha ou árvore queimada; brasas na cinza
+const VALE_OBST = ['rocha_basalto', 'arvore_cinza', 'rocha_basalto', 'arvore_brasa', 'arvore_cinza', 'rocha_basalto'];
+const VALE_DECOR = ['pedra_brasa', 'tronco_queimado', 'pedra_brasa'];
+const VALE_DECOR_CHANCE = 0.04;
 const WATER_FRAMES = [9, 10, 11];
 const WATER_MS = 420; // tempo de cada quadro da água
 // ruínas (atlas props-ruinas): o que aparece em cada tile 'pillar' (bloqueado) e enfeites soltos no chão
@@ -116,7 +126,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (name === 'pillar') {
         // montanha: pedra solta na encosta vira rocha nevada; os pilares do templo (junto às lajes) continuam colunas
         const rock = snowy && !inside(map, i, j, 'ruin');
-        out.push(ground(rock ? 'snow' : 'ruin', i, j, pos.x, pos.y));
+        out.push(ground(rock ? 'snow' : (MAPS_CONFIG[map.id]?.pillarGround ?? 'ruin'), i, j, pos.x, pos.y));
         const arena = MAPS_CONFIG[map.id]?.arena;
         const inArena = !!arena && Math.hypot(i + 0.5 - arena.x, j + 0.5 - arena.y) < arena.r;
         const frame = rock ? 'rocha_neve' : inArena ? 'braseiro' : pick(PILLARS, hash(i, j, 12));
@@ -129,17 +139,19 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         out.push(p);
         continue;
       }
-      if (name === 'tree' || name === 'pine' || name === 'bamboo') {
-        out.push(ground(name === 'pine' ? 'snow' : 'grass', i, j, pos.x, pos.y));
+      if (name === 'tree' || name === 'pine' || name === 'bamboo' || name === 'basalt') {
+        out.push(ground(name === 'pine' ? 'snow' : name === 'basalt' ? 'ash' : 'grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
         const [atlas, frame] =
           name === 'pine'
             ? ['props-montanha', pick(PINES, r)]
-            : name === 'bamboo'
-              ? ['props-bambu', pick(BAMBOO, r)]
-              : MAPS_CONFIG[map.id]?.trees === 'city'
-                ? pick(CITY_TREES, r)
-                : ['props-floresta', pick(TREES, r)];
+            : name === 'basalt'
+              ? ['props-vale', pick(VALE_OBST, r)]
+              : name === 'bamboo'
+                ? ['props-bambu', pick(BAMBOO, r)]
+                : MAPS_CONFIG[map.id]?.trees === 'city'
+                  ? pick(CITY_TREES, r)
+                  : ['props-floresta', pick(TREES, r)];
         const tree = scene.add
           .image(pos.x, pos.y, atlas, frame)
           .setScale(SPRITE_SCALE * (0.9 + 0.2 * hash(i, j, 3)))
@@ -154,6 +166,14 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
             .image(pos.x + (hash(i, j, 22) - 0.5) * 16, pos.y, 'props-montanha', pick(SNOW_DECOR, hash(i, j, 23)))
             .setScale(SPRITE_SCALE * 0.8)
             .setFlipX(hash(i, j, 24) < 0.5)
+            .setDepth(i + j + 1);
+          out.push(d);
+        }
+        if (name === 'ash' && hash(i, j, 25) < VALE_DECOR_CHANCE) {
+          const d = scene.add
+            .image(pos.x + (hash(i, j, 26) - 0.5) * 16, pos.y, 'props-vale', pick(VALE_DECOR, hash(i, j, 27)))
+            .setScale(SPRITE_SCALE * 0.8)
+            .setFlipX(hash(i, j, 28) < 0.5)
             .setDepth(i + j + 1);
           out.push(d);
         }

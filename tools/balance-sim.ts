@@ -3,7 +3,8 @@
 import { isWalkable } from '../src/core/pathfinding';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { CLASSES, MONSTERS, PROGRESSION, totalFreePoints } from '../src/core/data';
-import { MAPS_CONFIG } from '../src/core/mapsConfig';
+import { MAPS_CONFIG, TOWN_MAPS } from '../src/core/mapsConfig';
+import { QUESTS } from '../src/core/quests';
 import { OFFLINE_TIERS } from '../src/core/offline';
 import { BASES, SLOTS, equipmentBaseIds, itemStats, makeEquipment, makePotion, isBroken } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
@@ -14,7 +15,21 @@ import { inTelegraph, safeSpot } from '../src/core/world/boss';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'gruta', 'mosteiro', 'covil', 'trial', 'bambu', 'pico'])
+for (const id of [
+  'cidade',
+  'floresta',
+  'ruinas',
+  'montanha',
+  'gruta',
+  'mosteiro',
+  'covil',
+  'trial',
+  'bambu',
+  'pico',
+  'cidadela',
+  'vale',
+  'palacio',
+])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -169,7 +184,8 @@ function policy(w: World, run: Run) {
       w.equip(i);
     }
   }
-  if (w.mapId === 'cidade') {
+  if (TOWN_MAPS.has(w.mapId)) {
+    // vila ou Cidadela (nível 40: quem caça além do portão leste volta à Cidadela)
     const smith = w.npcs.find((n) => w.npcRole(n) === 'ferreiro'),
       shop = w.npcs.find((n) => w.npcRole(n) === 'vendedor');
     if (smith && w.repairAllCost() > 0 && w.gold >= w.repairAllCost()) {
@@ -186,6 +202,9 @@ function policy(w: World, run: Run) {
       w.openNpc = null;
     }
     if (w.auto.state === 'off') w.auto.toggle(); // item quebrado parou o auto: já consertou, volta
+  } else if (w.mapId === 'vale' && w.player.level >= 35 && !w.player.dead && w.auto.status === 'Caçando') {
+    w.changeMap('palacio'); // nível 40: no 35 o jogador vai às Ruínas do Palácio Celeste (caminhada ignorada)
+    w.auto.huntMap = 'palacio';
   } else if (w.mapId === 'bambu' && w.player.level >= 25 && !w.player.dead && w.auto.status === 'Caçando') {
     w.changeMap('pico'); // nível 30: no 25 o jogador sobe ao Pico da Névoa (como nas ruínas, a caminhada é ignorada)
     w.auto.huntMap = 'pico';
@@ -381,13 +400,18 @@ function highWorld(
     mapId: 'cidade',
     lastSeen: 0,
     gold: 500,
-    quest: { stage: level >= 20 ? 14 : 8, status: 'pending', progress: 0 },
+    // nível 40: no 30 a cadeia 1–30 já foi toda entregue
+    quest: {
+      stage: level >= 30 ? QUESTS.findIndex((q) => q.minLevel > 30) : level >= 20 ? 14 : 8,
+      status: 'pending',
+      progress: 0,
+    },
   };
   const w = World.fromSave(maps, s, SIM_EPOCH_MS, false);
   priv(w).rng = new Rng(seed * 7919 + 101);
   useSimClock(w);
   w.distributeRecommended();
-  for (const st of Object.values(w.skills)) st.level = Math.max(st.level, level >= 20 ? 10 : 5);
+  for (const st of Object.values(w.skills)) st.level = Math.max(st.level, level >= 30 ? 13 : level >= 20 ? 10 : 5);
   for (const sl of SLOTS) {
     const id = equipmentBaseIds(sl).find(
       (b) => BASES[b].reqLevel === gearLevel && (!BASES[b].sect || BASES[b].sect === classId),
@@ -403,7 +427,8 @@ function highWorld(
 }
 
 const tripWhy: Record<string, number> = {};
-function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5): Run {
+/** `upgradeAt`: [nível, nível da base] troca o equipamento todo por Incomum daquela base ao chegar no nível (m11: nv 35). */
+function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5, upgradeAt?: [number, number]): Run {
   const w = highWorld(classId, start, seed, gear, 'incomum');
   const run: Run = {
     classId,
@@ -434,6 +459,15 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     for (const ev of w.events.splice(0)) {
       if (ev.type === 'levelup') {
         run.levelAt[ev.level - 1] = w.time / 60;
+        if (upgradeAt && ev.level === upgradeAt[0]) {
+          for (const sl of SLOTS) {
+            const id = equipmentBaseIds(sl).find(
+              (b) => BASES[b].reqLevel === upgradeAt[1] && (!BASES[b].sect || BASES[b].sect === classId),
+            );
+            if (id) w.equipment[sl] = makeEquipment(id, 'incomum', CLASSES[classId].element, priv(w).rng, upgradeAt[1]);
+          }
+          priv(w).recalc(w.player, false);
+        }
         // offline: o mesmo nível só com o ganho offline, no ritmo que o Auto tinha (primeira faixa, 0–12 h)
         const r = w.auto.rate(),
           eff = OFFLINE_TIERS[0].eff * (MAPS_CONFIG[w.auto.huntMap]?.offlineMul ?? 1);
@@ -464,7 +498,7 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     if (w.time < nextPolicy) continue;
     nextPolicy = w.time + 1;
     if (w.mapId !== w.auto.huntMap) run.awayMin! += 1 / 60;
-    if (w.mapId === 'cidade' && lastMap !== 'cidade') run.townTrips!++;
+    if (TOWN_MAPS.has(w.mapId) && !TOWN_MAPS.has(lastMap)) run.townTrips!++;
     const lv = (w.auto as unknown as { leaving: string | false }).leaving;
     if (lv && !lastLeaving) {
       const why =
@@ -483,7 +517,7 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
     lastMap = w.mapId;
     if (process.argv.includes('--status') && Math.round(w.time) % 30 === 0)
       console.log(
-        `${classId} ${(w.time / 60).toFixed(1)}m nv${w.player.level} ${w.mapId} [${w.auto.status}] hp ${Math.round(w.player.hp)}/${w.player.derived.maxHp} pos ${w.player.x.toFixed(1)},${w.player.y.toFixed(1)} alvo ${w.getTarget()?.monsterId ?? '-'}${w.getTarget()?.level ?? ''} pots ${w.kindCount('hp')} ouro ${w.gold}`,
+        `${classId} ${(w.time / 60).toFixed(1)}m nv${w.player.level} ${w.mapId} [${w.auto.status}] hp ${Math.round(w.player.hp)}/${w.player.derived.maxHp} pos ${w.player.x.toFixed(1)},${w.player.y.toFixed(1)} alvo ${w.getTarget()?.monsterId ?? '-'}${w.getTarget()?.level ?? ''} pots ${w.kindCount('hp')} ouro ${w.gold} livres ${w.freeSlots()}`,
       );
     policy(w, run);
     if (w.player.level >= end) break;
@@ -496,6 +530,18 @@ function highRun(classId: string, seed: number, start = 10, end = 20, gear = 5):
 function mistLordFight(classId: string, seed: number, rarity: Rarity, level = 30): BossRun {
   const w = highWorld(classId, level, seed, 25, rarity);
   w.changeMap('pico');
+  for (const m of w.monsters)
+    if (!MONSTERS[m.monsterId].boss) {
+      m.dead = true;
+      m.respawnAt = Infinity;
+    }
+  return fightBoss(w, classId, rarity, false);
+}
+
+/** Imperador Carmesim (nível 40) no Salão do Trono do Palácio, com o conjunto nv 35. */
+function emperorFight(classId: string, seed: number, rarity: Rarity, level = 40): BossRun {
+  const w = highWorld(classId, level, seed, 35, rarity);
+  w.changeMap('palacio');
   for (const m of w.monsters)
     if (!MONSTERS[m.monsterId].boss) {
       m.dead = true;
@@ -583,6 +629,23 @@ if (trialArg) {
 // ---------- nível 30: do 20 ao 30 (Bosque de Bambu Sombrio e Pico da Névoa) ----------
 // Personagem pronto no nível 20 (pontos pelo recomendado, skills no nível 10, equipamento Incomum nv 15, missões do
 // nível 30 liberadas), Auto ligado na vila. Compara com o 10→20 (--m9) de cada seita: meta ~3× (±20%).
+if (process.argv.includes('--imperador')) {
+  const N = Math.max(5, SEEDS * 2);
+  console.log('| Seita | Nível | Equipamento nv 35 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
+  console.log('|---|---|---|---|---|---|---|');
+  for (const classId of Object.keys(CLASSES))
+    for (const level of [38, 40])
+      for (const tier of ['incomum', 'raro'] as Rarity[]) {
+        const bs = Array.from({ length: N }, (_, i) => emperorFight(classId, i + 1, tier, level));
+        const wins = bs.filter((b) => b.win),
+          lost = bs.filter((b) => !b.win);
+        console.log(
+          `| ${CLASSES[classId].name} | ${level} | ${tier} | ${wins.length}/${bs.length} | ${fmt(mean(wins.map((b) => b.seconds)), 0)} | ${fmt(mean(bs.map((b) => b.potions)))} | ${lost.length ? fmt(mean(lost.map((b) => b.hpLeftPct)), 0) + '%' : '-'} |`,
+        );
+      }
+  process.exit(0);
+}
+
 if (process.argv.includes('--senhor')) {
   const N = Math.max(5, SEEDS * 2);
   console.log('| Seita | Nível | Equipamento nv 25 | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
@@ -613,7 +676,7 @@ if (process.argv.includes('--m10')) {
     const de = Number(process.argv.find((a) => a.startsWith('--de='))?.split('=')[1] ?? 20); // diagnóstico: começa mais alto
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1, de, 30, de >= 25 ? 20 : 15));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     const t30 = mean(rs.map((r) => r.levelAt[29]));
@@ -638,6 +701,49 @@ if (process.argv.includes('--m10')) {
   process.exit(0);
 }
 
+// nível 40: 30→40 com equipamento nv 25 Incomum, trocado pelo nv 35 Incomum no nível 35 (Mercador/drops do Palácio).
+// --ref mede o 20→30 no mesmo código (referência do ritmo 5×).
+if (process.argv.includes('--m11')) {
+  const N = SEEDS,
+    lvls = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
+  const ref = process.argv.includes('--ref');
+  console.log(
+    '| Seita | ' + lvls.join(' | ') + ' | Mortes | Ouro ganho | Conserto |' + (ref ? ' 20→30 | Razão |' : ''),
+  );
+  console.log('|---|' + lvls.map(() => '---|').join('') + '---|---|---|' + (ref ? '---|---|' : ''));
+  const only = process.argv.find((a) => a.startsWith('--only='))?.split('=')[1];
+  for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
+    const de = Number(process.argv.find((a) => a.startsWith('--de='))?.split('=')[1] ?? 30);
+    for (const k of Object.keys(tripWhy)) delete tripWhy[k];
+    const rs = Array.from({ length: N }, (_, i) =>
+      highRun(classId, i + 1, de, 40, de >= 35 ? 35 : 25, de >= 35 ? undefined : [35, 35]),
+    );
+    console.log(
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à cidade ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+    );
+    const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
+    const t40 = mean(rs.map((r) => r.levelAt[39]));
+    let extra = '';
+    if (ref) {
+      const t30 = mean(Array.from({ length: N }, (_, i) => highRun(classId, i + 1, 20, 30, 15).levelAt[29]));
+      extra = ` ${fmt(t30)} | ${fmt(t40 / t30, 2)}× |`;
+    }
+    console.log(
+      `| ${CLASSES[classId].name} | ${lvls.map(lv).join(' | ')} | ${fmt(mean(rs.map((r) => r.deaths)))} | ${fmt(mean(rs.map((r) => r.goldEarned)), 0)} | ${fmt(mean(rs.map((r) => r.goldSpent.repair)), 0)} |${extra}`,
+    );
+    if (process.argv.includes('--detail'))
+      for (let L = 30; L < 40; L++) {
+        const k = mean(rs.map((r) => r.levelKills[L])),
+          x = mean(rs.map((r) => r.levelXp[L]));
+        console.log(
+          `   nv ${L}: abates ${fmt(k, 0)}, XP/abate ${fmt(x / k, 0)}, mortes ${fmt(mean(rs.map((r) => r.levelDeaths[L])))}`,
+        );
+      }
+  }
+  console.log('\nTempo (min) a partir do nível 30 para chegar a cada nível; média de ' + N + ' execuções.');
+  process.exit(0);
+}
+
 if (process.argv.includes('--m9')) {
   const N = SEEDS;
   console.log(
@@ -648,7 +754,7 @@ if (process.argv.includes('--m9')) {
   for (const classId of Object.keys(CLASSES).filter((c) => !only || c === only)) {
     const rs = Array.from({ length: N }, (_, i) => highRun(classId, i + 1));
     console.log(
-      `   ${classId}: idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
+      `   ${classId}: abates/min ${fmt(mean(rs.map((r) => r.kills / Math.max(1, r.minutes))), 2)}, idas à vila ${fmt(mean(rs.map((r) => r.townTrips ?? 0)))}, fora da caça ${fmt(mean(rs.map((r) => r.awayMin ?? 0)))} min, só offline ~${fmt(mean(rs.map((r) => r.offlineMin ?? 0)) / 60)} h, motivos ${JSON.stringify(tripWhy)}`,
     );
     const lv = (n: number) => fmt(mean(rs.map((r) => r.levelAt[n - 1])));
     console.log(

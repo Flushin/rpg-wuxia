@@ -142,9 +142,9 @@ function npcList(): NpcInfo[] {
         ['ferreira_lin', 'Conserto e forja', sameAs('ferreiro', 'Ferreiro')],
         ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
         ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
-        ['governador', 'Autoridade da Cidadela', talkCitadel],
-        ['monge_pagode', 'Guardião do pagode', talkCitadel],
-        ['guarda_jade', 'Guarda dos portões', talkCitadel],
+        ['governador', 'Autoridade da Cidadela e missões', talkCitadel],
+        ['monge_pagode', 'Guardião do pagode e missões', talkCitadel],
+        ['guarda_jade', 'Guarda dos portões e missões', talkCitadel],
       ] as [string, string, () => string][]
     )
       .filter(([id]) => t[id])

@@ -1,6 +1,6 @@
 export type Element = 'fire' | 'ice' | 'thunder' | 'poison';
 /** Projétil dos monstros à distância: flecha, gelo (espectro), veneno (Serpente de Jade), qi (Grou Espiritual). */
-export type ProjectileKind = 'arrow' | 'ice' | 'poison' | 'qi';
+export type ProjectileKind = 'arrow' | 'ice' | 'poison' | 'qi' | 'fire';
 export const ELEMENTS: Element[] = ['fire', 'ice', 'thunder', 'poison'];
 export type AttrKey = 'strength' | 'intelligence' | 'stamina' | 'agility' | 'willpower';
 export const ATTR_KEYS: AttrKey[] = ['strength', 'intelligence', 'stamina', 'agility', 'willpower'];

@@ -10,7 +10,7 @@
 // falta ou vem estranho. Migração é para quando um campo muda de sentido, de nome ou de formato.
 
 export const SAVE_FILE_VERSION = 2;
-export const CHARACTER_SAVE_VERSION = 2;
+export const CHARACTER_SAVE_VERSION = 3;
 
 type RawSave = Record<string, unknown>;
 
@@ -22,6 +22,9 @@ export const CHARACTER_MIGRATIONS: Record<number, (s: RawSave) => RawSave> = {
   // 1 → 2 (nível máximo 20 → 30, decidido pelo Lucas em 19/11/2026): quem estava no antigo nível máximo (20)
   // continua no 20 com a barra do 21 em 0%. A XP guardada não vira níveis.
   1: (s) => (Number(s.level) >= 20 ? { ...s, level: 20, xp: 0 } : s),
+  // 2 → 3 (nível máximo 30 → 40, decidido pelo Lucas em 21/11/2026): quem estava no nível 30 continua no 30 com a
+  // barra do 31 em 0%.
+  2: (s) => (Number(s.level) >= 30 ? { ...s, level: 30, xp: 0 } : s),
 };
 
 /**

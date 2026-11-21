@@ -115,6 +115,14 @@ tiles = {
   'snow2':  tile((222, 230, 240), 0.06, 42, [((200, 214, 230), 0.3)]),
   'snow3':  tile((230, 236, 244), 0.05, 43, [((240, 246, 252), 0.3)]),
   'ice':    ice(44),
+  # nível 40: Vale das Cinzas Rubras (cinza vulcânica e lava) e Ruínas do Palácio Celeste (mármore e nuvens), no fim
+  'ash1':   tile((74, 64, 62), 0.14, 51, [((58, 50, 50), 0.35)]),
+  'ash2':   tile((70, 60, 58), 0.16, 52, [((96, 70, 58), 0.25)]),
+  'ash3':   tile((78, 66, 62), 0.14, 53, [((150, 64, 40), 0.12)]),
+  'lava':   tile((210, 70, 30), 0.18, 54, [((255, 170, 60), 0.35), ((90, 30, 24), 0.3)]),
+  'marble1': flagstone((222, 218, 208), 55, grout=(170, 160, 140)),
+  'marble2': flagstone((214, 212, 204), 56, grout=(168, 156, 136)),
+  'cloud':  tile((150, 172, 212), 0.12, 57, [((246, 248, 255), 0.45), ((196, 212, 240), 0.35)]),
 }
 sheet = Image.new('RGBA', (W * len(tiles), H))
 for i, im in enumerate(tiles.values()): sheet.paste(im, (i * W, 0))

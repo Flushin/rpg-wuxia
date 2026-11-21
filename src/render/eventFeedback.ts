@@ -7,6 +7,7 @@ import { tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
 import { MONSTERS } from '../core/data';
+import { homeTownOf } from '../core/mapsConfig';
 import { RARITIES } from '../core/items';
 import { TRIAL_TIERS } from '../core/trial';
 import { skillById } from '../core/skills';
@@ -292,7 +293,12 @@ export class EventFeedback {
         this.levelUpFx.request(ev.level, ev.pose);
         return true;
       case 'playerDeath':
-        toast(L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'));
+        // nível 40: nos mapas além do portão leste, renasce na Cidadela de Jade (MapConfig.homeTown)
+        toast(
+          homeTownOf(this.world.mapId) === 'cidadela'
+            ? L('Você morreu... Renascendo na Cidadela de Jade', 'You died... Respawning in the Jade Citadel')
+            : L('Você morreu... Renascendo na vila', 'You died... Respawning in the village'),
+        );
         return true;
     }
     return false;
@@ -368,6 +374,14 @@ export class EventFeedback {
       g.fillEllipse(0, 0, 16, 5);
       g.fillStyle(0xd83a3a, 1);
       g.fillCircle(7, 0, 2.5);
+    } else if (ev.kind === 'fire') {
+      // brasa rubra com rastro (Monge do Fogo Rubro, nível 40)
+      g.fillStyle(0xff7a2a, 0.35);
+      g.fillEllipse(-6, 0, 24, 9);
+      g.fillStyle(0xff4a1a, 1);
+      g.fillCircle(3, 0, 4.5);
+      g.fillStyle(0xffe08a, 1);
+      g.fillCircle(4, 0, 2);
     } else {
       g.lineStyle(2, 0xe8d8a8, 1);
       g.lineBetween(-9, 0, 9, 0);

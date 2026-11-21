@@ -17,6 +17,11 @@ import serpente from '../data/sprites/serpente_jade.json';
 import grou from '../data/sprites/grou_espiritual.json';
 import guardiaoJade from '../data/sprites/guardiao_jade.json';
 import senhorNevoa from '../data/sprites/senhor_nevoa.json';
+import andarilhoCinzas from '../data/sprites/andarilho_cinzas.json';
+import mongeFogo from '../data/sprites/monge_fogo_rubro.json';
+import guardaCeleste from '../data/sprites/guarda_celeste.json';
+import feiticeiraLua from '../data/sprites/feiticeira_lua_fria.json';
+import imperador from '../data/sprites/imperador_carmesim.json';
 
 // NPCs da cidade (marco 6): personagens KayKit recoloridos. Parados = só a animação parada, de frente;
 // moradores = parado + andar nas 8 direções.
@@ -73,6 +78,11 @@ const SHEETS: Record<string, SheetMeta> = {
   grou_espiritual: grou as SheetMeta,
   guardiao_jade: guardiaoJade as SheetMeta,
   senhor_nevoa: senhorNevoa as SheetMeta,
+  andarilho_cinzas: andarilhoCinzas as SheetMeta,
+  monge_fogo_rubro: mongeFogo as SheetMeta,
+  guarda_celeste: guardaCeleste as SheetMeta,
+  feiticeira_lua_fria: feiticeiraLua as SheetMeta,
+  imperador_carmesim: imperador as SheetMeta,
   ...npcSheets,
 };
 
@@ -96,6 +106,11 @@ const BY_TEXTURE: Record<string, string> = {
   'spirit-crane': 'grou_espiritual',
   'jade-guardian': 'guardiao_jade',
   'mist-lord': 'senhor_nevoa',
+  'ash-wanderer': 'andarilho_cinzas',
+  'crimson-monk': 'monge_fogo_rubro',
+  'celestial-guard': 'guarda_celeste',
+  'frost-moon-sorceress': 'feiticeira_lua_fria',
+  'crimson-emperor': 'imperador_carmesim',
 };
 
 // retrato parado de frente, usado na mochila (por seita)
@@ -146,6 +161,7 @@ export function preloadSprites(scene: Phaser.Scene) {
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.atlas('props-montanha', 'sprites/montanha.png', 'sprites/montanha.json');
   scene.load.atlas('props-bambu', 'sprites/bambu.png', 'sprites/bambu.json');
+  scene.load.atlas('props-vale', 'sprites/vale.png', 'sprites/vale.json');
   scene.load.spritesheet('pisos', 'sprites/pisos.png', { frameWidth: 128, frameHeight: 64 });
 }
 

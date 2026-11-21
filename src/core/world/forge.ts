@@ -44,12 +44,17 @@ const ORE = 'minerio_ferro',
 export const JADE_FROM_LEVEL = 20;
 /** Material raro da forja do item: Cristal de Gelo (nv 1–15) ou Jade da Névoa (nv 20+). */
 export const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? JADE : CRYSTAL);
+/** Itens deste nível em diante pedem o dobro do material raro, em toda receita e no desmonte (nível 40, etapa 3). */
+export const RARE_DOUBLE_FROM_LEVEL = 35;
+/** Quantidade de material raro: ×2 nos itens nv 35+. */
+export const rareQty = (reqLevel: number, n: number) => (reqLevel >= RARE_DOUBLE_FROM_LEVEL ? 2 * n : n);
 /** Nível da base para a forja; o Épico usa a peça da faixa do nível de quem usa (sem dono: a própria base). */
 const forgeLevel = (it: ItemInstance, owner?: ItemOwner) =>
   BASES[it.rarity === 'epico' && owner ? epicTierBase(it, owner.level) : it.baseId]?.reqLevel ?? 1;
 const rare = (it: ItemInstance, owner?: ItemOwner) => rareMat(forgeLevel(it, owner));
+const rq = (it: ItemInstance, n: number, owner?: ItemOwner) => rareQty(forgeLevel(it, owner), n);
 
-/** Itens de nível mais alto custam mais ouro na forja: ×1 no nível 1, ×2 no 5, ×3 no 10, ×4 no 15, ×5 no 20, ×6 no 25. */
+/** Itens de nível mais alto custam mais ouro na forja: ×1 no nível 1, ×2 no 5 … ×6 no 25, ×8 no 35. */
 const levelFactor = (it: ItemInstance, owner?: ItemOwner) => 1 + forgeLevel(it, owner) / 5;
 const gold = (n: number, it: ItemInstance, owner?: ItemOwner) =>
   Math.round(n * levelFactor(it, owner) * bal('forja.ouro') * (it.rarity === 'epico' ? FORGE.epicGoldMul : 1));
@@ -60,7 +65,7 @@ export function upgradeCost(it: ItemInstance, owner?: ItemOwner): ForgeCost | nu
   const n = it.plus ?? 0;
   if (!BASES[it.baseId] || n >= MAX_PLUS) return null;
   return {
-    mats: clean({ [ORE]: 2 + 2 * n, [rare(it, owner)]: n >= 4 ? n - 3 : 0, [ESSENCE]: n >= 7 ? 1 : 0 }),
+    mats: clean({ [ORE]: 2 + 2 * n, [rare(it, owner)]: rq(it, n >= 4 ? n - 3 : 0, owner), [ESSENCE]: n >= 7 ? 1 : 0 }),
     gold: gold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * n, it, owner),
     chance: Math.min(1, FORGE.upgradeChance[n] * bal('forja.chance')),
   };
@@ -70,16 +75,16 @@ export function upgradeCost(it: ItemInstance, owner?: ItemOwner): ForgeCost | nu
 export function rarityCost(it: ItemInstance): ForgeCost | null {
   if (!BASES[it.baseId] || it.rarity === 'raro' || it.rarity === 'epico') return null;
   return it.rarity === 'comum'
-    ? { mats: { [ORE]: 12, [rare(it)]: 1 }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
-    : { mats: { [ORE]: 20, [rare(it)]: 4, [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
+    ? { mats: { [ORE]: 12, [rare(it)]: rq(it, 1) }, gold: gold(FORGE.rarityGold.incomum, it), chance: 1 }
+    : { mats: { [ORE]: 20, [rare(it)]: rq(it, 4), [ESSENCE]: 1 }, gold: gold(FORGE.rarityGold.raro, it), chance: 1 };
 }
 
 /** Sorteia de novo todos os bônus de um item Incomum ou Raro (a quantidade continua a mesma). */
 export function rerollCost(it: ItemInstance): ForgeCost | null {
   if (!BASES[it.baseId] || it.rarity === 'comum' || it.rarity === 'epico') return null; // Épico: bônus fixos da classe
   return it.rarity === 'incomum'
-    ? { mats: { [ORE]: 6, [rare(it)]: 1 }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
-    : { mats: { [ORE]: 10, [rare(it)]: 2 }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
+    ? { mats: { [ORE]: 6, [rare(it)]: rq(it, 1) }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
+    : { mats: { [ORE]: 10, [rare(it)]: rq(it, 2) }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
 }
 
 /** Materiais que desmontar o item devolve. */
@@ -90,7 +95,10 @@ export function salvageYield(it: ItemInstance): Mats {
   return clean({
     [ORE]:
       1 + Math.floor(b.reqLevel / 5) + (r === 'incomum' ? 2 : r === 'raro' ? 3 : 0) + Math.floor((it.plus ?? 0) / 2),
-    [rare(it)]: (b.reqLevel >= 10 ? 1 : 0) + (r === 'raro' ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0),
+    [rare(it)]: rareQty(
+      b.reqLevel,
+      (b.reqLevel >= 10 ? 1 : 0) + (r === 'raro' ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0),
+    ),
   });
 }
 

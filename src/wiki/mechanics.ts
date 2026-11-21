@@ -49,7 +49,12 @@ import {
 } from '../core/trial';
 import { itemLink } from './ui';
 import { MAPS_CONFIG, MAP_IDS } from '../core/mapsConfig';
-const MAP_TITLES: Record<string, string> = { bambu: 'Bosque de Bambu Sombrio', pico: 'Pico da Névoa' };
+const MAP_TITLES: Record<string, string> = {
+  bambu: 'Bosque de Bambu Sombrio',
+  pico: 'Pico da Névoa',
+  vale: 'Vale das Cinzas Rubras',
+  palacio: 'Ruínas do Palácio Celeste',
+};
 
 const n1 = (v: number) => String(+v.toFixed(1)).replace('.', ',');
 const pc = (v: number) => `${n1(v * 100)}%`;
@@ -92,11 +97,14 @@ const clean = (m: Mats): Mats => Object.fromEntries(Object.entries(m).filter(([,
 /** Material raro: Cristal de Gelo nos itens nv 1–15, Jade da Névoa nos nv 20+ (JADE_FROM_LEVEL em forge.ts). */
 const JADE_FROM_LEVEL = 20;
 const rareMat = (reqLevel: number) => (reqLevel >= JADE_FROM_LEVEL ? 'jade_nevoa' : 'cristal_gelo');
+/** Itens nv 35+ pedem o dobro do material raro (RARE_DOUBLE_FROM_LEVEL em forge.ts). */
+const RARE_DOUBLE_FROM_LEVEL = 35;
+const rq = (reqLevel: number, n: number) => (reqLevel >= RARE_DOUBLE_FROM_LEVEL ? 2 * n : n);
 export function upgradeCost(reqLevel: number, plus: number) {
   return {
     mats: clean({
       minerio_ferro: 2 + 2 * plus,
-      [rareMat(reqLevel)]: plus >= 4 ? plus - 3 : 0,
+      [rareMat(reqLevel)]: rq(reqLevel, plus >= 4 ? plus - 3 : 0),
       essencia_qi: plus >= 7 ? 1 : 0,
     }),
     gold: fGold(FORGE.upgradeGold.base + FORGE.upgradeGold.perPlus * plus, reqLevel),
@@ -105,21 +113,33 @@ export function upgradeCost(reqLevel: number, plus: number) {
 }
 export const rarityCost = (reqLevel: number, from: string) =>
   from === 'comum'
-    ? { mats: { minerio_ferro: 12, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rarityGold.incomum, reqLevel) }
+    ? {
+        mats: { minerio_ferro: 12, [rareMat(reqLevel)]: rq(reqLevel, 1) } as Mats,
+        gold: fGold(FORGE.rarityGold.incomum, reqLevel),
+      }
     : {
-        mats: { minerio_ferro: 20, [rareMat(reqLevel)]: 4, essencia_qi: 1 } as Mats,
+        mats: { minerio_ferro: 20, [rareMat(reqLevel)]: rq(reqLevel, 4), essencia_qi: 1 } as Mats,
         gold: fGold(FORGE.rarityGold.raro, reqLevel),
       };
 export const rerollCost = (reqLevel: number, rarity: string) =>
   rarity === 'incomum'
-    ? { mats: { minerio_ferro: 6, [rareMat(reqLevel)]: 1 } as Mats, gold: fGold(FORGE.rerollGold.incomum, reqLevel) }
-    : { mats: { minerio_ferro: 10, [rareMat(reqLevel)]: 2 } as Mats, gold: fGold(FORGE.rerollGold.raro, reqLevel) };
+    ? {
+        mats: { minerio_ferro: 6, [rareMat(reqLevel)]: rq(reqLevel, 1) } as Mats,
+        gold: fGold(FORGE.rerollGold.incomum, reqLevel),
+      }
+    : {
+        mats: { minerio_ferro: 10, [rareMat(reqLevel)]: rq(reqLevel, 2) } as Mats,
+        gold: fGold(FORGE.rerollGold.raro, reqLevel),
+      };
 export const salvageYield = (reqLevel: number, rarity: string, plus: number): Mats =>
   clean({
     minerio_ferro:
       1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : rarity === 'raro' ? 3 : 0) + Math.floor(plus / 2),
-    [rareMat(reqLevel)]: (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0),
+    [rareMat(reqLevel)]: rq(reqLevel, (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0)),
   });
+/** LOW_WEAR_FROM_LEVEL e LOW_WEAR_MUL em src/core/world/inventory.ts (nível 40): itens nv 35+ gastam metade. */
+export const LOW_WEAR_FROM_LEVEL = 35;
+export const LOW_WEAR_MUL = 0.5;
 /** OFFLINE_TIERS e OFFLINE_GOLD_CAP_HOURS em src/core/offline.ts */
 export const OFFLINE_TIERS = [
   { untilH: 12, eff: 0.6 },
@@ -273,11 +293,11 @@ function morte(): string {
     )
     .join('');
   return `<section class="panel"><h2>Ao morrer</h2><ul>
-      <li>Depois de ${RESPAWN_SECONDS} s você volta à <a href="#/mapa/cidade">Vila das Nuvens</a> com vida e mana cheias.</li>
+      <li>Depois de ${RESPAWN_SECONDS} s você volta à <a href="#/mapa/cidade">Vila das Nuvens</a> com vida e mana cheias. Nos mapas além do portão leste da <a href="#/mapa/cidadela">Cidadela de Jade</a> (<a href="#/mapa/vale">Vale das Cinzas Rubras</a> e <a href="#/mapa/palacio">Ruínas do Palácio Celeste</a>), volta à Cidadela; o Pergaminho de Retorno também leva para lá.</li>
       <li>Cada item equipado perde <b>${pc(loss)} da durabilidade máxima</b>.</li>
       <li>Você <b>não</b> perde XP, ouro nem itens. Efeitos de poção ativos acabam.</li></ul></section>
     <section class="panel"><h2>Durabilidade</h2><ul>
-      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado. Golpe <b>todo absorvido por um escudo</b> (Pele de Ferro, Véu de Névoa…) não desgasta.</li>
+      <li>Cada golpe que você <b>leva</b> tira ${n1(WEAR_PER_HIT * bal('desgaste.equipamento'))} de durabilidade de um item equipado sorteado; itens de nível <b>${LOW_WEAR_FROM_LEVEL}</b> ou mais perdem só <b>${pc(LOW_WEAR_MUL)}</b> disso (o Épico conta pela faixa do seu nível). Golpe <b>todo absorvido por um escudo</b> (Pele de Ferro, Véu de Névoa…) não desgasta.</li>
       <li>Com durabilidade <b>0</b>, o item para de dar bônus (mas não some). Um aviso ⚠ aparece no topo da tela quando algo está gasto.</li>
       <li>O <a href="#/npc/ferreiro">Ferreiro</a> conserta:</li></ul>
       ${formula('Conserto = durabilidade que falta × nível do item × ' + n1(REPAIR_COST_PER_POINT * bal('conserto.custo')) + ' (arredondado para cima)')}
@@ -315,7 +335,7 @@ function forja(): string {
   return `<section class="panel"><h2>Melhorar (+1 a +10)</h2>
       <p>Cada + soma <b>${pc(UPGRADE_STEP)}</b> aos atributos base do item (não aos bônus aleatórios). Materiais e ouro são cobrados antes;
       se <b>falhar</b>, o item fica como estava (não quebra nem perde +). Os materiais da tabela são os de itens até o nível 15; em itens de
-      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade), aqui e em subir raridade, trocar bônus e desmontar.
+      nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade; em itens de nível ${RARE_DOUBLE_FROM_LEVEL} ou mais, o <b>dobro</b>), aqui e em subir raridade, trocar bônus e desmontar.
       O <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épico</a> usa a faixa do seu nível e custa <b>${FORGE.epicGoldMul}× o ouro</b>; não sobe raridade, não troca bônus nem é desmontado.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Melhoria</th><th>Chance</th><th>Materiais</th>${goldHead}</tr></thead><tbody>${up}</tbody></table></div></section>
     <section class="panel"><h2>Subir raridade e trocar bônus</h2>
@@ -406,7 +426,7 @@ function trial(): string {
       <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th></tr></thead><tbody>${tiers}</tbody></table></section>
     <section class="panel"><h2>Recompensa</h2><ul>
       <li>Ouro da tabela acima e ${trialXp(1)} de XP no nível 1 (+${trialXp(2) - trialXp(1)} por nível).</li>
-      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 6–10 (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (21–30): mais fortes que os mesmos itens caídos no mundo.</li>
+      <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial, de nível ${trialEquipReqLevel(6)} nos níveis 6–14 e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 15–${TRIAL_TIERS} (da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}): mais fortes que os mesmos itens caídos no mundo.</li>
       <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
       <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1; a cada nível o bônus cresce 5%: 12,60%, 13,23% … ${pct2(trialDropPct(TRIAL_TIERS))}%). O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
 }

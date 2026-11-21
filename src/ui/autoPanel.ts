@@ -32,6 +32,8 @@ const reducedText = (pt: boolean) => {
 const MAP_NAMES: Record<string, [string, string]> = {
   bambu: ['Bosque de Bambu Sombrio', 'Shadow Bamboo Grove'],
   pico: ['Pico da Névoa', 'Misty Peak'],
+  vale: ['Vale das Cinzas Rubras', 'Crimson Ash Valley'],
+  palacio: ['Ruínas do Palácio Celeste', 'Celestial Palace Ruins'],
 };
 const tiersPt = tierText('até', 'de {a} h a {b} h', 'depois de') + reducedText(true),
   tiersEn = tierText('up to', 'from {a} h to {b} h', 'after') + reducedText(false);

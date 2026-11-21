@@ -66,6 +66,11 @@ const TILE_COLORS: Record<string, string> = {
   snow: '#dfe6ee',
   pine: '#2c4a3c',
   bamboo: '#2f5a34',
+  ash: '#4a403e',
+  basalt: '#2c2828',
+  lava: '#c4461e',
+  marble: '#d8d4c8',
+  cloud: '#eef2f8',
 };
 
 /** Faixa de nível dos monstros comuns do mapa. */

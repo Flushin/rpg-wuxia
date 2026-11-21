@@ -41,7 +41,7 @@ import {
   maxDurability,
 } from './items';
 import { AutoCombat } from './auto';
-import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, homeTownOf, portalMinLevel } from './mapsConfig';
 import { dungeonById, isDungeonMap } from './dungeons';
 import { teleportBlock, teleportById, teleportCost } from './teleport';
 import {
@@ -1242,7 +1242,7 @@ export class World {
     p.dead = false;
     p.hp = p.derived.maxHp;
     p.mana = p.derived.maxMana;
-    this.changeMap(HOME_MAP);
+    this.changeMap(homeTownOf(this.mapId)); // nível 40: nos mapas além da Cidadela, renasce na Cidadela
   }
 
   /** Interno: usado pelos módulos de src/core/world/. A XP fica guardada (o jogador sobe quando quiser, levelUp()),

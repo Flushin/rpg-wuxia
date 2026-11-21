@@ -25,6 +25,7 @@ export const TELEPORT_COST = 200;
 const EAST = { pt: 'Caminho do Leste', en: 'Eastern Road' };
 const NORTH = { pt: 'Caminho do Norte', en: 'Northern Road' };
 const CITIES = { pt: 'Cidades', en: 'Cities' };
+const CITADEL = { pt: 'Além da Cidadela', en: 'Beyond the Citadel' };
 
 export const TELEPORT_DESTS: TeleportDest[] = [
   { map: 'floresta', region: EAST, minLevel: 0 },
@@ -32,6 +33,9 @@ export const TELEPORT_DESTS: TeleportDest[] = [
   { map: 'montanha', region: NORTH, minLevel: 10 },
   { map: 'bambu', region: NORTH, minLevel: 20 },
   { map: 'pico', region: NORTH, minLevel: 25 },
+  // nível 40: mapas além do portão leste da Cidadela de Jade
+  { map: 'vale', region: CITADEL, minLevel: 30 },
+  { map: 'palacio', region: CITADEL, minLevel: 35 },
   // Cidadela de Jade: cidade do meio do jogo, só pelo teleporte; da Cidadela, a volta à vila não cobra (sem ouro
   // ninguém fica preso lá: o Pergaminho de Retorno não funciona dentro de uma cidade)
   { map: 'cidade', region: CITIES, minLevel: 0, cost: 0 },
