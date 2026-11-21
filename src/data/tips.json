@@ -19,9 +19,9 @@
   },
   "primeiro_nivel": {
     "title": "Subiu de nível!",
-    "text": "Você ganhou pontos livres de atributo. Abra o painel com a tecla C (ou botão Atributos) e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
-    "textTouch": "Você ganhou pontos livres de atributo (a bolinha dourada no botão ☰ avisa). Toque em ☰ › Atributos e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
-    "textTouchClassic": "Você ganhou pontos livres de atributo. Toque no botão Atributos, no topo da tela, e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez."
+    "text": "Você ganhou pontos livres de atributo. Abra o painel com a tecla C (ou botão Personagem) e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
+    "textTouch": "Você ganhou pontos livres de atributo (a bolinha dourada no botão ☰ avisa). Toque em ☰ › Personagem e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez.",
+    "textTouchClassic": "Você ganhou pontos livres de atributo. Toque no botão Personagem, no topo da tela, e gaste-os. Os atributos recomendados para sua classe aparecem marcados, e o botão \"Distribuir recomendado\" gasta tudo de uma vez."
   },
   "primeira_morte": {
     "title": "De volta à vila",
@@ -57,8 +57,8 @@
   },
   "durabilidade_baixa": {
     "title": "Equipamento gastando",
-    "text": "Algum item equipado está com pouca durabilidade (o aviso ⚠ Reparar aparece no topo da tela e abre a mochila). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some).",
-    "textTouch": "Algum item equipado está com pouca durabilidade (o aviso ⚠ aparece no topo da tela e abre a mochila). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some)."
+    "text": "Algum item equipado está com pouca durabilidade (o aviso ⚠ Reparar aparece no topo da tela e abre a janela Personagem). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some).",
+    "textTouch": "Algum item equipado está com pouca durabilidade (o aviso ⚠ aparece no topo da tela e abre a janela Personagem). Conserte-o com o Ferreiro na vila. Com durabilidade 0, o item para de dar bônus (mas não some)."
   },
   "mochila_cheia": {
     "title": "Mochila cheia",

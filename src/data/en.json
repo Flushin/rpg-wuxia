@@ -534,9 +534,9 @@
     },
     "primeiro_nivel": {
       "title": "Level up!",
-      "text": "You gained free attribute points. Open the panel with the C key (or the Attributes button) and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
-      "textTouch": "You gained free attribute points (the gold dot on the ☰ button lets you know). Tap ☰ › Attributes and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
-      "textTouchClassic": "You gained free attribute points. Tap the Attributes button at the top of the screen and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once."
+      "text": "You gained free attribute points. Open the panel with the C key (or the Character button) and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
+      "textTouch": "You gained free attribute points (the gold dot on the ☰ button lets you know). Tap ☰ › Character and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once.",
+      "textTouchClassic": "You gained free attribute points. Tap the Character button at the top of the screen and spend them. The recommended attributes for your class are marked, and the \"Distribute recommended\" button spends everything at once."
     },
     "primeira_morte": {
       "title": "Back to the village",
@@ -572,8 +572,8 @@
     },
     "durabilidade_baixa": {
       "title": "Gear wearing out",
-      "text": "An equipped item is low on durability (the ⚠ Repair warning shows up at the top of the screen and opens the bag). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost).",
-      "textTouch": "An equipped item is low on durability (the ⚠ warning shows up at the top of the screen and opens the bag). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost)."
+      "text": "An equipped item is low on durability (the ⚠ Repair warning shows up at the top of the screen and opens the Character window). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost).",
+      "textTouch": "An equipped item is low on durability (the ⚠ warning shows up at the top of the screen and opens the Character window). Repair it with the Blacksmith in the village. At 0 durability, the item stops giving bonuses (but is not lost)."
     },
     "mochila_cheia": {
       "title": "Bag full",

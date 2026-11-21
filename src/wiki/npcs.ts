@@ -46,7 +46,7 @@ const talkCitadel = () =>
 /** Monge do Pagode: realinhar meridianos (World.resetAttributes). */
 const meridians = () =>
   `${talkCitadel()}<p><b>Realinhar meridianos:</b> por <span class="price">${PROGRESSION.attrResetCost.toLocaleString('pt-BR')} ouro</span>, devolve todos os
-  pontos livres que você distribuiu, para redistribuir como quiser no painel de Atributos (tecla <b>C</b>). Os atributos da sua
+  pontos livres que você distribuiu, para redistribuir como quiser na janela Personagem (tecla <b>C</b>). Os atributos da sua
   <a href="#/seitas">seita</a> e os ganhos automáticos de cada nível não mudam. Pode ser feito quantas vezes quiser; o botão pede confirmação
   e fica bloqueado sem ouro suficiente ou sem nenhum ponto distribuído.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */

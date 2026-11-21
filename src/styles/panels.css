@@ -223,7 +223,7 @@ button[disabled] {
   margin: 0;
 }
 
-/* Painel de Atributos (C): lista de atributos em cartões, derivados em grade e elementos */
+/* Janela Personagem (C): equipados + retrato, lista de atributos em cartões, derivados em grade e elementos */
 .at-card {
   width: min(440px, 100%);
   border-top: 3px solid var(--c, #d4a017);
@@ -431,5 +431,33 @@ button[disabled] {
 @media (max-width: 360px) {
   .at-der {
     grid-template-columns: 1fr;
+  }
+}
+/* Personagem (C): equipados em volta do retrato à esquerda, atributos à direita; derivados e elementos embaixo.
+   Em tela estreita tudo empilha. */
+.ch-card {
+  position: relative;
+}
+.ch-card .ch-detail {
+  position: static;
+  max-height: none;
+  margin-top: 12px;
+  border-left: 0;
+  border-top: 1px solid #445;
+  padding: 8px 0;
+}
+.ch-card .ch-detail:has(.muted) {
+  border-top: 0;
+}
+@media (min-width: 600px) {
+  .ch-card {
+    width: min(860px, 100%);
+  }
+  .ch-top,
+  .ch-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
   }
 }
