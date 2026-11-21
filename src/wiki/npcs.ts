@@ -22,6 +22,8 @@ interface NpcInfo {
   sheet: string; // spritesheet em public/sprites/
   portrait?: string;
   sect?: string;
+  /** Onde fica (id do mapa); sem = Vila das Nuvens. */
+  place?: string;
   /** O que o NPC faz, em HTML. */
   does: () => string;
 }
@@ -35,6 +37,14 @@ const MASTER_SHEETS: Record<string, string> = {
 
 const talkOnly = () =>
   '<p>Conversa com você e conta histórias e dicas sobre a vila e os arredores. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
+
+const PLACES: Record<string, string> = { cidade: 'Vila das Nuvens', cidadela: 'Cidadela de Jade' };
+const placeName = (n: NpcInfo) => PLACES[n.place ?? 'cidade'];
+const talkCitadel = () =>
+  '<p>Conversa com você e conta histórias sobre a <a href="#/mapa/cidadela">Cidadela de Jade</a> e o que vem pela frente. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
+/** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
+const sameAs = (id: string, name: string) => () =>
+  `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;
 
 const shopRow = (id: string, price: number) => `<li>${itemLink(id)} <span class="price">${price} ouro</span></li>`;
 
@@ -127,6 +137,20 @@ function npcList(): NpcInfo[] {
       sheet: 'npc_guarda',
       does: talkOnly,
     },
+    ...(
+      [
+        ['ferreira_lin', 'Conserto e forja', sameAs('ferreiro', 'Ferreiro')],
+        ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
+        ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
+        ['governador', 'Autoridade da Cidadela', talkCitadel],
+        ['monge_pagode', 'Guardião do pagode', talkCitadel],
+        ['guarda_jade', 'Guarda dos portões', talkCitadel],
+      ] as [string, string, () => string][]
+    )
+      .filter(([id]) => t[id])
+      .map(
+        ([id, role, does]): NpcInfo => ({ id, name: t[id].name, role, sheet: 'npc_' + id, place: 'cidadela', does }),
+      ),
     ...['morador1', 'morador2', 'morador3', 'morador4']
       .filter((id) => t[id])
       .map((id): NpcInfo => ({ id, name: t[id].name, role: 'Morador da vila', sheet: 'npc_' + id, does: talkOnly })),
@@ -173,10 +197,12 @@ export function npcIndexPage(): string {
   const card = (n: NpcInfo) =>
     `<a class="card-link npc-card" href="#/npc/${n.id}">${spriteHtml(n.sheet)}<b>${esc(n.name)}</b><small>${esc(n.role)}</small></a>`;
   const masters = NPCS().filter((n) => n.sect),
-    others = NPCS().filter((n) => !n.sect);
-  return `<h1>NPCs</h1><p class="intro">Todos ficam na <b>Vila das Nuvens</b> (o Mestre dos Caminhos também na <a href="#/mapa/cidadela">Cidadela de Jade</a>). Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
+    others = NPCS().filter((n) => !n.sect && !n.place),
+    citadel = NPCS().filter((n) => n.place === 'cidadela');
+  return `<h1>NPCs</h1><p class="intro">Quase todos ficam na <b>Vila das Nuvens</b>; os da <a href="#/mapa/cidadela">Cidadela de Jade</a> (nível 30) estão no fim da página, e o Mestre dos Caminhos fica nas duas cidades. Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
     <h2>Mestres das seitas</h2><div class="grid npc-grid">${masters.map(card).join('')}</div>
-    <h2>Moradores e lojas</h2><div class="grid npc-grid">${others.map(card).join('')}</div>`;
+    <h2>Moradores e lojas</h2><div class="grid npc-grid">${others.map(card).join('')}</div>
+    <h2>Cidadela de Jade</h2><div class="grid npc-grid">${citadel.map(card).join('')}</div>`;
 }
 
 export function npcPage(id: string): string | null {
@@ -186,7 +212,7 @@ export function npcPage(id: string): string | null {
   const qs = questsOfNpc(id);
   const pic = n.portrait ? `<img class="portrait" src="../sprites/${n.portrait}" alt="">` : spriteHtml(n.sheet, 'big');
   return `<a class="back" href="#/npcs">‹ NPCs</a>
-    <div class="detail-head">${pic}<div><h1>${esc(n.name)}</h1><div class="sub">${esc(n.role)} · Vila das Nuvens</div></div></div>
+    <div class="detail-head">${pic}<div><h1>${esc(n.name)}</h1><div class="sub">${esc(n.role)} · ${n.id === 'caminhos' ? 'Vila das Nuvens e Cidadela de Jade' : placeName(n)}</div></div></div>
     <section class="panel"><h2>O que faz</h2>${n.does()}</section>
     ${qs.length ? `<section class="panel"><h2>Missões</h2>${n.sect ? '<p class="muted">Missões do “mestre” são passadas pelo mestre da <i>sua</i> seita.</p>' : ''}${questList(qs, id)}</section>` : ''}
     ${lines.length ? `<section class="panel"><h2>Falas</h2><ol class="lines">${lines.map((l) => `<li class="lore">“${esc(l)}”</li>`).join('')}</ol></section>` : ''}`;

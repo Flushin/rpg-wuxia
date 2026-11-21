@@ -1495,6 +1495,7 @@ export class World {
           x: o.x,
           y: o.y,
           npcId: id,
+          npcRole: o.props.role ? String(o.props.role) : undefined,
           wander: Number(o.props.wander) || 0,
         };
         n.home = { x: o.x, y: o.y };

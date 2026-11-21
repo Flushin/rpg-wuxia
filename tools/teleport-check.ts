@@ -126,6 +126,34 @@ console.log('\n== Cidadela de Jade ==');
   );
 }
 
+console.log('\n== NPCs da Cidadela ==');
+{
+  const w = fresh(30, 5000, 'cidadela');
+  const by = (id: string) => w.npcs.find((n) => n.npcId === id);
+  for (const [id, role] of [
+    ['ferreira_lin', 'ferreiro'],
+    ['boticario_wen', 'vendedor'],
+    ['mercadora_jin', 'mercador'],
+    ['governador', 'governador'],
+    ['monge_pagode', 'monge_pagode'],
+    ['guarda_jade', 'guarda_jade'],
+  ]) {
+    const n = by(id);
+    ok(!!n && w.npcRole(n) === role, `${id}: está na Cidadela com o papel ${role}`);
+  }
+  ok(w.npcs.filter((n) => n.npcId === 'guarda_jade').length === 4, 'quatro guardas nos portões');
+  ok(w.buy('pocao_hp_p', 1)?.code === 'talkToSeller', 'sem falar com o boticário não compra');
+  w.openNpcWindow(by('boticario_wen')!);
+  const gold = w.gold;
+  ok(w.buy('pocao_hp_p', 1) === null && w.gold < gold, 'o boticário vende como o vendedor da vila');
+  w.closeNpc();
+  w.openNpcWindow(by('ferreira_lin')!);
+  ok(w.repairAll()?.code !== 'talkToBlacksmith', 'o ferreiro Lin conserta como o da vila');
+  w.closeNpc();
+  w.openNpcWindow(by('mercadora_jin')!);
+  ok(w.merchantStock().offers.length > 0, 'a mercadora tem o estoque do mercador');
+}
+
 if (fails) {
   console.error(`\n${fails} falha(s)`);
   process.exit(1);

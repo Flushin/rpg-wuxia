@@ -70,7 +70,7 @@ def facade(a, b, z, h, door):
         window(0, -b - 0.02, z + 0.42, 'y')
 
 
-def jade_house(w, h, door='y', floors=2, wh=1.15, hr=0.8, roof_rgb=JADE, lanterns=True):
+def jade_house(w, h, door='y', floors=2, wh=1.15, hr=0.8, roof_rgb=JADE, lanterns=True, extras=None):
     """Casa da Cidadela: plataforma de mármore, paredes claras com colunas vermelhas, faixa dourada e telhado de
     jade. Com floors=2 ganha um beiral no meio (telhado duplo) e um andar de cima mais estreito."""
     a, b = w / 2 - 0.45, h / 2 - 0.45
@@ -82,6 +82,8 @@ def jade_house(w, h, door='y', floors=2, wh=1.15, hr=0.8, roof_rgb=JADE, lantern
     facade(a, b, z, wh, door)
     box(0, 0, z + wh - 0.16, 2 * a + 0.04, 2 * b + 0.04, 0.16, RED)
     box(0, 0, z + wh - 0.2, 2 * a + 0.05, 2 * b + 0.05, 0.04, GOLD)
+    for fn in extras or []:  # forja, bancada e placa das lojas (peças de render_town.py)
+        fn(a, b, wh)
     z += wh
     if lanterns:
         for sx in (-1, 1):
@@ -313,6 +315,24 @@ def double_lantern():
     sphere(0, 0, 1.76, 0.06, GOLD)
 
 
+def stall():
+    """Banca da mercadora (2x2): balcão de madeira com mercadorias, quatro postes vermelhos e toldo de jade."""
+    box(0, 0, 0, 1.8, 1.8, 0.1, MARBLE_D)
+    box(0, -0.35, 0.1, 1.4, 0.5, 0.55, rt.WOOD)
+    box(0, -0.35, 0.65, 1.5, 0.6, 0.05, WOOD_D)
+    for k, c in enumerate([(200, 60, 60), (214, 172, 64), (70, 110, 200), (52, 150, 116)]):
+        box(-0.5 + k * 0.33, -0.35, 0.7, 0.24, 0.3, 0.12 + 0.05 * (k % 2), c)
+    rt.p_crates()
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cyl(sx * 0.75, sy * 0.75, 0.1, 0.05, 1.45, RED)
+    roof(0, 0, 0.75, 0.75, 1.52, 0.4, JADE, over=0.22, lift=0.16, n=28)
+    gold_finial(1.9, 0.6)
+    for sx in (-1, 1):
+        cyl(sx * 0.6, -0.95, 1.35, 0.008, 0.12, WOOD_D)
+        lantern(sx * 0.6, -0.95, 1.25, 0.09, (230, 60, 40))
+
+
 SET = {
     # nome: (função, pegada [w, h] em tiles, altura máxima em unidades para a moldura)
     'jade_casa_3x3': (lambda: jade_house(3, 3), (3, 3), 4.2),
@@ -320,6 +340,9 @@ SET = {
     'jade_casa_4x3': (lambda: jade_house(4, 3), (4, 3), 4.2),
     'jade_casa_3x4': (lambda: jade_house(3, 4, door='x', roof_rgb=JADE_D), (3, 4), 4.2),
     'jade_salao': (hall, (6, 4), 5.4),
+    'jade_ferraria': (lambda: jade_house(4, 3, extras=[rt.shop_sign((60, 60, 70)), rt.forge]), (4, 3), 4.2),
+    'jade_botica': (lambda: jade_house(4, 3, extras=[rt.shop_sign((176, 36, 32)), rt.potion_display]), (4, 3), 4.2),
+    'jade_banca': (stall, (2, 2), 2.6),
     'jade_pagode': (pagoda, (3, 3), 7.2),
     'muralha_i11': (lambda: wall(11, 'i'), (11, 1), 2.2),
     'muralha_i4': (lambda: wall(4, 'i'), (4, 1), 2.2),

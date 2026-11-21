@@ -30,6 +30,10 @@ Decidido com o Lucas em 20/11/2026. Motivo: as quatro saídas da vila estão ocu
   (`cost: 0` em `TELEPORT_DESTS`), para ninguém ficar preso sem ouro (o Pergaminho de Retorno não funciona em cidade).
 - Morrer, o Pergaminho de Retorno e o save com mapa desconhecido continuam levando à vila (`HOME_MAP`).
 - Auto: na Cidadela, viaja direto ao mapa de caça; sem ouro para isso, volta de graça à vila.
+- **NPCs (21/11/2026):** lojas com personagens próprios e o mesmo serviço das da vila (prop `role` do NPC no mapa;
+  `npcRole` devolve o papel, falas e missões seguem o id do personagem): Mestre Ferreiro Lin (forja, oeste da praça),
+  Boticário Wen (botica, leste) e Mercadora Jin (banca junto do pagode). De conversa: Governador Bai (escadaria do
+  salão), Monge do Pagode e quatro Guardas de Jade nos portões. O Auto compra e vende com o Boticário.
 - **Sprites próprios** (`tools/sprites/render_cidadela.py`, atlas `cidadela`): muralha com torres nos cantos e portões
   fechados ao sul, oeste e leste; salão principal ao norte da avenida; pagode de cinco andares; casas de dois andares
   com telhado de jade e detalhes dourados; colunas ornamentais (huabiao) e lanternas duplas. Objetos do mapa escolhem o

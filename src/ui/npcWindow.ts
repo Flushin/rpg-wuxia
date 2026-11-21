@@ -251,7 +251,10 @@ export class NpcWindow {
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
-    const role = w.npcRole(n);
+    // role = função (loja, viagem, mestre); who = o personagem (falas e missões). Na vila são iguais; na Cidadela,
+    // a Mestra Ferreira Lin tem o papel 'ferreiro' (prop role no mapa).
+    const role = w.npcRole(n),
+      who = n.npcId;
     const shop = role === 'ferreiro' || role === 'vendedor' || role === 'mercador' || role === 'caminhos';
     let view: View,
       sub = '';
@@ -260,14 +263,17 @@ export class NpcWindow {
         this.smithTab === 'forge' ? this.forge() : this.smithTab === 'salvage' ? this.salvageView() : this.smith();
       view = { ...v, top: this.smithTabs() + (v.top ?? '') };
     } else if (role === 'vendedor') view = this.shop();
-    else if (role === 'mercador') view = this.merchant(role);
-    else if (role === 'caminhos') view = this.travel(role);
+    else if (role === 'mercador') view = this.merchant(who);
+    else if (role === 'caminhos') view = this.travel(who);
     else if (role.startsWith('mestre_')) {
       const m = this.master(role.slice(7));
       view = { list: m.body };
       sub = m.sub;
-    } else view = { list: this.talk(role) };
-    const quest = this.questBox(role);
+    } else view = { list: this.talk(who) };
+    // ferreiro e vendedor com falas próprias (Cidadela): a primeira fala no alto da lista
+    const intro = (role === 'ferreiro' || role === 'vendedor') && who !== role ? NPC_TEXT.npcs[who]?.lines[0] : '';
+    if (intro) view = { ...view, list: `<p class="lore">“${escapeHtml(intro)}”</p>${view.list}` };
+    const quest = this.questBox(who);
     const gold = shop ? `<span class="gold">${w.gold} ${L('ouro', 'gold')}</span>` : '';
     // renderPanel mantém os elementos (e a rolagem de cada coluna) entre atualizações; trocar de NPC, aba ou filtro
     // volta ao topo.

@@ -10,7 +10,8 @@ Personagens:
 - Víbora: "Rogue_Hooded" do mesmo pacote KayKit — Kay Lousberg, CC0. Recolorido (verde), sem facas nem besta;
   as agulhas são geradas pelo script.
 
-- NPCs da cidade (ferreiro, vendedor, ancião, guarda, mercador, Mestre dos Caminhos, 4 mestres das seitas e 4 moradores):
+- NPCs da cidade (ferreiro, vendedor, ancião, guarda, mercador, Mestre dos Caminhos, 4 mestres das seitas e 4 moradores)
+  e da Cidadela de Jade (Ferreiro Lin, Boticário Wen, Mercadora Jin, Governador Bai, Monge do Pagode, Guarda de Jade):
   "Rogue", "Rogue_Hooded", "Mage", "Knight" e "Barbarian" do mesmo pacote KayKit — Kay Lousberg, CC0. Recoloridos.
 
 Monstros:

@@ -19,15 +19,16 @@ export function interactNpc(w: World, entityId: number) {
   w.npcGoal = entityId;
 }
 
-/** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'... */
+/** Papel do NPC: 'ferreiro', 'vendedor', 'anciao', 'guarda', 'mercador', 'mestre_<seita>', 'morador1'...
+ *  Um personagem com outro id pode ter o papel de uma loja (prop role no mapa: Mestra Ferreira Lin = 'ferreiro'). */
 export function npcRole(w: World, n: Entity | null = w.openNpc): string {
-  return n?.npcId ?? '';
+  return n?.npcRole ?? n?.npcId ?? '';
 }
 
 export function openNpcWindow(w: World, n: Entity) {
   if (w.openNpc === n) return;
   w.openNpc = n;
-  w.questTalk(npcRole(w, n));
+  w.questTalk(n.npcId); // missões são do personagem, não do papel
   w.emit({ type: 'npcOpen', npcId: npcRole(w, n), entityId: n.id });
 }
 

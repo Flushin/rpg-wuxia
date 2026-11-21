@@ -112,6 +112,8 @@ export interface Entity {
   levels?: [number, number]; // faixa de nível do ponto do mapa (marco 9); sem = a do monstro
   // NPCs
   npcId: string; // id em npcs.json / papel (ferreiro, vendedor, mestre_lamina, morador1...)
+  /** papel (loja) quando difere do personagem: prop role do NPC no mapa (ex.: ferreira_lin -> 'ferreiro') */
+  npcRole?: string;
   wander: number; // raio em tiles para andar pela cidade (0 = parado)
 }
 

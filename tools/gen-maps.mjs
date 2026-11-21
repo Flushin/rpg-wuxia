@@ -1106,9 +1106,9 @@ function trial() {
 // ---- cidadela ----
 // Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte (nível 30). Cercada por muralha (torres nos
 // cantos, portões fechados ao sul, a oeste e a leste); avenidas de pedra; ao norte o salão principal e o pagode; praça
-// 12×12 com o incensário; lagos nos jardins; casas de dois andares com telhado de jade. Lotes de obra (caixotes) a
-// oeste e a leste guardam lugar para os sistemas que virão. Sem saída a pé: chega-se e sai-se pelo Mestre dos
-// Caminhos (círculo dourado na praça). Casas, muralha e colunas no atlas 'cidadela' (tools/sprites/render_cidadela.py).
+// 12×12 com o incensário; lagos nos jardins; casas de dois andares com telhado de jade. Lojas com personagens
+// próprios: forja (oeste), botica (leste) e banca da mercadora (junto do pagode); governador, monge e guardas de
+// conversa. Sem saída a pé: chega-se e sai-se pelo Mestre dos Caminhos (círculo dourado na praça). Casas, muralha e colunas no atlas 'cidadela' (tools/sprites/render_cidadela.py).
 function cidadela() {
   const rnd = rngFn(23);
   const gr = makeGrid(G, G); // fora da muralha: grama (árvores na borda cobririam a muralha da frente)
@@ -1167,9 +1167,11 @@ function cidadela() {
   // casas e lagos dos jardins
   building('jade_casa_4x3', 4, 4, 4, 3);
   building('jade_casa_3x4', 9, 4, 3, 4);
-  pond(4, 8);
   building('jade_casa_4x3', 25, 4, 4, 3);
-  pond(24, 8);
+  // lojas: forja a oeste e botica a leste da praça, de frente para a avenida; banca da mercadora junto do pagode
+  building('jade_ferraria', 4, 10, 4, 3);
+  building('jade_botica', 24, 10, 4, 3);
+  building('jade_banca', 25, 7, 2, 2);
   building('jade_casa_3x3', 4, 20, 3, 3);
   building('jade_casa_3x4', 8, 24, 3, 4);
   building('jade_casa_4x3', 3, 26, 4, 3);
@@ -1220,14 +1222,9 @@ function cidadela() {
     [17, 23],
   ])
     decor('lanterna_dupla', i, j, jade);
-  // lotes de obra (oeste e leste da praça): reservados para os sistemas do meio do jogo
   for (const [s2, i, j] of [
-    ['caixotes', 4, 12],
-    ['barril', 6, 12],
-    ['carroca', 8, 11],
-    ['caixotes', 24, 12],
-    ['caixotes', 26, 11],
-    ['barril', 27, 12],
+    ['barril', 9, 11],
+    ['caixotes', 23, 11],
     ['vaso', 12, 7],
     ['vaso', 19, 7],
   ])
@@ -1236,6 +1233,20 @@ function cidadela() {
   // Mestre dos Caminhos sobre o círculo dourado, no lado oeste da praça; chega-se ao lado dele
   npc('Mestre dos Caminhos', 'caminhos', 12.5, 17.5);
   objs.push(area('Círculo de Teleporte', 'teleCircle', 11.75, 16.75, 1.5, 1.5));
+  // lojas da Cidadela: personagens próprios com o papel (role) das lojas da vila
+  npc('Mestre Ferreiro Lin', 'ferreira_lin', 6.5, 13.5, { role: 'ferreiro' });
+  npc('Boticário Wen', 'boticario_wen', 25.5, 13.5, { role: 'vendedor' });
+  npc('Mercadora Jin', 'mercadora_jin', 25.6, 9.5, { role: 'mercador' });
+  // conversa: governador na escadaria do salão, monge diante do pagode, guardas junto dos portões
+  npc('Governador Bai', 'governador', 16, 7.5);
+  npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5);
+  for (const [x, y] of [
+    [13.5, 28.4],
+    [18.5, 28.4],
+    [3.5, 13.5],
+    [28.5, 13.5],
+  ])
+    npc('Guarda de Jade', 'guarda_jade', x, y);
   for (const [id, x, y] of [
     ['morador1', 18.5, 12.5],
     ['morador2', 19.5, 19.5],
