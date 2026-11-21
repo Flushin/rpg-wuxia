@@ -1,0 +1,75 @@
+{
+ "name": "npc_governador",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "mage_texture",
+  "cells": {
+   "0,1": [
+    60,
+    160,
+    124
+   ],
+   "1,1": [
+    60,
+    160,
+    124
+   ],
+   "2,1": [
+    214,
+    172,
+    64
+   ],
+   "1,2": [
+    214,
+    172,
+    64
+   ],
+   "7,1": [
+    34,
+    104,
+    82
+   ],
+   "2,2": [
+    214,
+    172,
+    64
+   ],
+   "1,0": [
+    40,
+    36,
+    32
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

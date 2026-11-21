@@ -1103,6 +1103,177 @@ function trial() {
   return tiled('Trial', gr, objs);
 }
 
+// ---- cidadela ----
+// Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte (nível 30). Cercada por muralha (torres nos
+// cantos, portões fechados ao sul, a oeste e a leste); avenidas de pedra; ao norte o salão principal e o pagode; praça
+// 12×12 com o incensário; lagos nos jardins; casas de dois andares com telhado de jade. Lojas com personagens
+// próprios: forja (oeste), botica (leste) e banca da mercadora (junto do pagode); governador, monge e guardas de
+// conversa. Sem saída a pé: chega-se e sai-se pelo Mestre dos Caminhos (círculo dourado na praça). Casas, muralha e colunas no atlas 'cidadela' (tools/sprites/render_cidadela.py).
+function cidadela() {
+  const rnd = rngFn(23);
+  const gr = makeGrid(G, G); // fora da muralha: grama (árvores na borda cobririam a muralha da frente)
+  gr.rect(3, 15, 26, 2, PL);
+  gr.rect(15, 7, 2, 22, PL);
+  gr.rect(10, 10, 12, 12, PL);
+  const objs = [];
+  const used = new Set();
+  const reserve = (i, j, pad = 0) => {
+    for (let y = j - pad; y <= j + pad; y++) for (let x = i - pad; x <= i + pad; x++) used.add(y * W + x);
+  };
+  const building = (sprite, i, j, w, h, atlas = 'cidadela') => {
+    gr.rect(i, j, w, h, HS);
+    for (let y = j - 1; y <= j + h; y++) for (let x = i - 1; x <= i + w; x++) reserve(x, y);
+    objs.push(area(sprite, 'building', i, j, w, h, atlas ? { sprite, atlas } : { sprite }));
+  };
+  const decor = (sprite, i, j, extra = {}) => {
+    gr.set(i, j, gr.get(i, j) === PL ? PL : G);
+    reserve(i, j, 1);
+    objs.push(point(sprite, 'decor', i + 0.5, j + 0.5, { sprite, block: 1, ...extra }));
+  };
+  const jade = { atlas: 'cidadela' };
+  const npc = (name, id, x, y, extra = {}) => {
+    reserve(Math.floor(x), Math.floor(y), 1);
+    objs.push(point(name, 'npc', x, y, { npc: id, ...extra }));
+  };
+  const pond = (i, j) => {
+    gr.rect(i, j, 3, 3, WA);
+    for (let y = j - 1; y <= j + 3; y++) for (let x = i - 1; x <= i + 3; x++) reserve(x, y);
+  };
+
+  // muralha: torres nos cantos, trechos de 11 tiles e portões (fechados) no meio do sul, do oeste e do leste
+  for (const [i, j] of [
+    [1, 1],
+    [29, 1],
+    [1, 29],
+    [29, 29],
+  ])
+    building('muralha_torre', i, j, 2, 2);
+  building('muralha_i11', 3, 1, 11, 1);
+  building('muralha_i4', 14, 1, 4, 1);
+  building('muralha_i11', 18, 1, 11, 1);
+  building('muralha_i11', 3, 30, 11, 1);
+  building('portao_muralha_i', 14, 29, 4, 2);
+  building('muralha_i11', 18, 30, 11, 1);
+  for (const x of [1, 30]) {
+    building('muralha_j11', x, 3, 1, 11);
+    building('muralha_j11', x, 18, 1, 11);
+  }
+  building('portao_muralha_j', 1, 14, 2, 4);
+  building('portao_muralha_j', 29, 14, 2, 4);
+
+  // norte: salão principal no fim da avenida, pagode ao lado
+  building('jade_salao', 13, 3, 6, 4);
+  building('jade_pagode', 21, 4, 3, 3);
+  // casas e lagos dos jardins
+  building('jade_casa_4x3', 4, 4, 4, 3);
+  building('jade_casa_3x4', 9, 4, 3, 4);
+  building('jade_casa_4x3', 25, 4, 4, 3);
+  // lojas: forja a oeste e botica a leste da praça, de frente para a avenida; banca da mercadora junto do pagode
+  building('jade_ferraria', 4, 10, 4, 3);
+  building('jade_botica', 24, 10, 4, 3);
+  building('jade_banca', 25, 7, 2, 2);
+  building('jade_casa_3x3', 4, 20, 3, 3);
+  building('jade_casa_3x4', 8, 24, 3, 4);
+  building('jade_casa_4x3', 3, 26, 4, 3);
+  pond(12, 24);
+  building('jade_casa_3x3b', 25, 20, 3, 3);
+  building('jade_casa_3x4', 22, 24, 3, 4);
+  building('jade_casa_4x3', 25, 26, 4, 3);
+  pond(18, 24);
+  building('incensario', 15, 15, 2, 2, null);
+
+  // praça: estandartes das quatro seitas nos cantos e lanternas de pedra nas bordas
+  for (const [banner, i, j] of [
+    ['tormenta', 10, 10],
+    ['geada', 21, 10],
+    ['tita', 10, 21],
+    ['vibora', 21, 21],
+  ])
+    decor('estandarte_' + banner, i, j);
+  for (const [i, j] of [
+    [13, 10],
+    [18, 10],
+    [13, 21],
+    [18, 21],
+    [10, 13],
+    [21, 13],
+    [10, 18],
+    [21, 18],
+  ])
+    decor('lanterna_pedra', i, j);
+  // colunas ornamentais diante do salão e do portão sul; lanternas duplas nas avenidas
+  for (const [i, j] of [
+    [13, 8],
+    [18, 8],
+    [13, 27],
+    [18, 27],
+  ])
+    decor('huabiao', i, j, jade);
+  for (const [i, j] of [
+    [5, 14],
+    [5, 17],
+    [8, 14],
+    [8, 17],
+    [23, 14],
+    [23, 17],
+    [26, 14],
+    [26, 17],
+    [14, 23],
+    [17, 23],
+  ])
+    decor('lanterna_dupla', i, j, jade);
+  for (const [s2, i, j] of [
+    ['barril', 9, 11],
+    ['caixotes', 23, 11],
+    ['vaso', 12, 7],
+    ['vaso', 19, 7],
+  ])
+    decor(s2, i, j);
+
+  // Mestre dos Caminhos sobre o círculo dourado, no lado oeste da praça; chega-se ao lado dele
+  npc('Mestre dos Caminhos', 'caminhos', 12.5, 17.5);
+  objs.push(area('Círculo de Teleporte', 'teleCircle', 11.75, 16.75, 1.5, 1.5));
+  // lojas da Cidadela: personagens próprios com o papel (role) das lojas da vila
+  npc('Mestre Ferreiro Lin', 'ferreira_lin', 6.5, 13.5, { role: 'ferreiro' });
+  npc('Boticário Wen', 'boticario_wen', 25.5, 13.5, { role: 'vendedor' });
+  npc('Mercadora Jin', 'mercadora_jin', 25.6, 9.5, { role: 'mercador' });
+  // conversa: governador na escadaria do salão, monge diante do pagode, guardas junto dos portões
+  npc('Governador Bai', 'governador', 16, 7.5);
+  npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5);
+  for (const [x, y] of [
+    [13.5, 28.4],
+    [18.5, 28.4],
+    [3.5, 13.5],
+    [28.5, 13.5],
+  ])
+    npc('Guarda de Jade', 'guarda_jade', x, y);
+  for (const [id, x, y] of [
+    ['morador1', 18.5, 12.5],
+    ['morador2', 19.5, 19.5],
+    ['morador3', 7.5, 15.5],
+    ['morador4', 15.5, 8.5],
+  ])
+    objs.push(point('Morador', 'npc', x, y, { npc: id, wander: 4 }));
+
+  // cerejeiras e carvalhos só na grama livre, longe das avenidas e da praça
+  reserve(13, 18, 1);
+  let n = 0;
+  for (let tries = 0; tries < 2000 && n < 18; tries++) {
+    const x = 3 + Math.floor(rnd() * 26),
+      y = 3 + Math.floor(rnd() * 26);
+    if (gr.get(x, y) !== G || used.has(y * W + x)) continue;
+    let nearRoad = false;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) if (gr.get(x + dx, y + dy) === PL) nearRoad = true;
+    if (nearRoad) continue;
+    gr.set(x, y, T);
+    n++;
+  }
+  sealUnreachable(gr, 13, 18, G);
+  objs.unshift(point('player', 'spawn', 13.5, 18.5));
+  return tiled('Cidadela de Jade', gr, objs);
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
@@ -1114,5 +1285,6 @@ writeFileSync('public/maps/covil.json', JSON.stringify(covil()));
 writeFileSync('public/maps/trial.json', JSON.stringify(trial()));
 writeFileSync('public/maps/bambu.json', JSON.stringify(bambu()));
 writeFileSync('public/maps/pico.json', JSON.stringify(pico()));
+writeFileSync('public/maps/cidadela.json', JSON.stringify(cidadela()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

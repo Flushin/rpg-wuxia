@@ -8,6 +8,7 @@ for c in tormenta geada tita vibora lobo bandido_espadachim bandido_arqueiro ter
 SPRITE_CFG=floresta.json $PY render_props.py
 SPRITE_CFG=montanha.json $PY render_props.py
 $PY render_town.py
+$PY render_cidadela.py
 $PY render_ruins.py
 $PY render_bambu.py
 $PY icons.py

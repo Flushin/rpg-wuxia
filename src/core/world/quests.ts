@@ -43,21 +43,21 @@ export function questTalkTarget(w: World): string {
 /** Aceita a missão atual (precisa estar falando com quem dá; force = simulador/testes). */
 export function questAccept(w: World, force = false): boolean {
   const v = questView(w);
-  if (!v.def || v.phase !== 'available' || (!force && w.npcRole() !== v.giver)) return false;
+  if (!v.def || v.phase !== 'available' || (!force && w.openNpc?.npcId !== v.giver)) return false;
   w.quest.status = 'active';
   w.quest.progress = 0;
   w.emit({ type: 'quest', kind: 'accepted', questId: v.def.id, name: v.def.name });
   // objetivo já cumprido na hora de aceitar (ex.: falar com quem está aberto, já estar no mapa)
   const o = v.def.objective;
   if (o.type === 'reach' && w.mapId === o.map) questReady(w, v.def);
-  if (o.type === 'talk' && w.npcRole() === resolveNpc(o.npc, w.classId)) questReady(w, v.def);
+  if (o.type === 'talk' && w.openNpc?.npcId === resolveNpc(o.npc, w.classId)) questReady(w, v.def);
   return true;
 }
 
 /** Entrega a missão pronta e dá as recompensas (precisa estar falando com quem recebe; force = simulador/testes). */
 export function questTurnIn(w: World, force = false): boolean {
   const v = questView(w);
-  if (!v.def || v.phase !== 'ready' || (!force && w.npcRole() !== v.turnIn)) return false;
+  if (!v.def || v.phase !== 'ready' || (!force && w.openNpc?.npcId !== v.turnIn)) return false;
   const r = v.def.reward;
   w.quest = { stage: w.quest.stage + 1, status: 'pending', progress: 0 };
   w.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });

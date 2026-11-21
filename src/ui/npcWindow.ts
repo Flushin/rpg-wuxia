@@ -39,7 +39,7 @@ import {
   type Mats,
 } from '../core/world/forge';
 import { merchantGoods, merchantRefreshIn } from '../core/world/merchant';
-import { TELEPORT_COST, TELEPORT_DESTS, teleportBlock } from '../core/teleport';
+import { teleportBlock, teleportCost, teleportDestsFrom } from '../core/teleport';
 import { mapLevels } from '../core/worldRoutes';
 
 /** Partes de uma janela de NPC: `top` fica fixo (abas, quantidade, filtros), `list` e `side` rolam cada um por si
@@ -251,7 +251,10 @@ export class NpcWindow {
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
-    const role = w.npcRole(n);
+    // role = função (loja, viagem, mestre); who = o personagem (falas e missões). Na vila são iguais; na Cidadela,
+    // a Mestra Ferreira Lin tem o papel 'ferreiro' (prop role no mapa).
+    const role = w.npcRole(n),
+      who = n.npcId;
     const shop = role === 'ferreiro' || role === 'vendedor' || role === 'mercador' || role === 'caminhos';
     let view: View,
       sub = '';
@@ -260,14 +263,17 @@ export class NpcWindow {
         this.smithTab === 'forge' ? this.forge() : this.smithTab === 'salvage' ? this.salvageView() : this.smith();
       view = { ...v, top: this.smithTabs() + (v.top ?? '') };
     } else if (role === 'vendedor') view = this.shop();
-    else if (role === 'mercador') view = this.merchant(role);
-    else if (role === 'caminhos') view = this.travel(role);
+    else if (role === 'mercador') view = this.merchant(who);
+    else if (role === 'caminhos') view = this.travel(who);
     else if (role.startsWith('mestre_')) {
       const m = this.master(role.slice(7));
       view = { list: m.body };
       sub = m.sub;
-    } else view = { list: this.talk(role) };
-    const quest = this.questBox(role);
+    } else view = { list: this.talk(who) };
+    // ferreiro e vendedor com falas próprias (Cidadela): a primeira fala no alto da lista
+    const intro = (role === 'ferreiro' || role === 'vendedor') && who !== role ? NPC_TEXT.npcs[who]?.lines[0] : '';
+    if (intro) view = { ...view, list: `<p class="lore">“${escapeHtml(intro)}”</p>${view.list}` };
+    const quest = this.questBox(who);
     const gold = shop ? `<span class="gold">${w.gold} ${L('ouro', 'gold')}</span>` : '';
     // renderPanel mantém os elementos (e a rolagem de cada coluna) entre atualizações; trocar de NPC, aba ou filtro
     // volta ao topo.
@@ -348,10 +354,11 @@ export class NpcWindow {
     const w = this.world;
     const line = NPC_TEXT.npcs[role]?.lines[0];
     const groups = new Map<string, string>();
-    for (const d of TELEPORT_DESTS) {
+    for (const d of teleportDestsFrom(w.mapId)) {
       const m = w.maps[d.map];
       if (!m) continue;
       const block = teleportBlock(d, w.player.level, w.gold),
+        cost = teleportCost(d),
         lv = mapLevels(m),
         why =
           block?.code === 'needLevel'
@@ -361,7 +368,7 @@ export class NpcWindow {
               : '';
       const row = `<div class="dg-row${block?.code === 'needLevel' ? ' locked' : ''}">
         <div class="dg-name"><b>${escapeHtml(m.name)}</b>${lv ? ` <small class="tag">${L(`Nv ${lv[0]}–${lv[1]}`, `Lv ${lv[0]}–${lv[1]}`)}</small>` : ''}</div>
-        <button class="primary" data-a="travel" data-v="${d.map}" ${why ? 'disabled' : ''}>${L(`Viajar (${TELEPORT_COST} ouro)`, `Travel (${TELEPORT_COST} gold)`)}</button>
+        <button class="primary" data-a="travel" data-v="${d.map}" ${why ? 'disabled' : ''}>${cost ? L(`Viajar (${cost} ouro)`, `Travel (${cost} gold)`) : L('Viajar (grátis)', 'Travel (free)')}</button>
         ${why ? `<small class="muted">${why}</small>` : ''}
       </div>`;
       const region = L(d.region.pt, d.region.en);
@@ -371,8 +378,8 @@ export class NpcWindow {
     return {
       list: `${line ? `<p class="lore">“${escapeHtml(line)}”</p>` : ''}<h3>${L('Viagem', 'Travel')}</h3>${list}`,
       foot: `<small class="muted">${L(
-        'Só leva da vila para fora. Para voltar, vá a pé ou use um Pergaminho de Retorno.',
-        'Only takes you out of the village. To come back, walk or use a Return Scroll.',
+        'Só leva de uma cidade para fora. Para voltar de um mapa de caça, vá a pé ou use um Pergaminho de Retorno.',
+        'Only takes you out of a town. To come back from a hunting map, walk or use a Return Scroll.',
       )}</small>`,
     };
   }

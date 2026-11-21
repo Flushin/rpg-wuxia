@@ -3,7 +3,7 @@
 // (A tradução EN de cada item é conferida pelo check:i18n.) Uso: npm run check:novidades
 import { readFileSync } from 'node:fs';
 import en from '../src/data/en.json';
-import { LOJA_LIMITE, NOVIDADES, novidadesDa, textoLoja } from '../src/core/novidades';
+import { LOJA_LIMITE, NOVIDADES, novidadesDa, textoLoja, itensLoja } from '../src/core/novidades';
 import { MAP_IDS } from '../src/core/mapsConfig';
 import { CLASSES, MONSTERS, allItemIds, skillById } from '../src/wiki/data';
 import { NPCS } from '../src/wiki/npcs';
@@ -64,9 +64,8 @@ for (const [onde, itens] of [
 // texto da Play Store da versão atual (pt e en) cabe no limite
 const atual = NOVIDADES.versoes.findIndex((v) => v.versao === pkg.version);
 if (atual >= 0) {
-  const pt = textoLoja(NOVIDADES.versoes[atual].itens.map((n) => n.texto));
-  const enItens = (en.novidades.versoes[atual]?.itens ?? []) as { texto: string }[];
-  const ing = textoLoja(enItens.map((n) => n.texto));
+  const pt = textoLoja(itensLoja(NOVIDADES.versoes[atual]));
+  const ing = textoLoja(itensLoja(en.novidades.versoes[atual] as Parameters<typeof itensLoja>[0]));
   if (pt.length > LOJA_LIMITE) bad(`texto da loja (pt) com ${pt.length} caracteres; limite ${LOJA_LIMITE}`);
   if (ing.length > LOJA_LIMITE) bad(`texto da loja (en) com ${ing.length} caracteres; limite ${LOJA_LIMITE}`);
 }

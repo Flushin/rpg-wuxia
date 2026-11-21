@@ -18,7 +18,7 @@ import type {
   Point,
 } from './types';
 import type { World } from './world';
-import { MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
+import { HOME_MAP, MAPS_CONFIG, MAP_IDS, TOWN_MAPS, portalMinLevel } from './mapsConfig';
 import { teleportBlock, teleportById } from './teleport';
 import { isDungeonMap } from './dungeons';
 import { inTelegraph, safeSpot } from './world/boss';
@@ -568,6 +568,13 @@ export class AutoCombat {
     if (p) {
       if (!hop) this.huntMap = p.target;
       this.walkTo({ x: p.o.x + p.o.w / 2, y: p.o.y + p.o.h / 2 });
+      return;
+    }
+    // cidade sem saída a pé (Cidadela de Jade) e sem ouro para o mapa de caça: volta à vila (viagem grátis)
+    const home = w.mapId !== HOME_MAP ? this.teleportNpc(HOME_MAP) : null;
+    if (home) {
+      if (dist(w.player, home) > 1.5) this.walkTo(home);
+      else w.travelTo(HOME_MAP);
     }
   }
 

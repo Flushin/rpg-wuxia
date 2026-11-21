@@ -2,7 +2,7 @@
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEONS, DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
 import { TRIAL_BOSSES, TRIAL_MIN_LEVEL, TRIAL_TIERS, trialBossLevel, trialCost } from '../core/trial';
-import { TELEPORT_COST, TELEPORT_DESTS, teleportById } from '../core/teleport';
+import { TELEPORT_COST, teleportById, teleportCost, teleportDestsFrom } from '../core/teleport';
 import { MONSTERS, QUESTS, SLOT_NAMES, esc, type Quest } from './data';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterSprite } from './monsters';
@@ -89,9 +89,9 @@ const minimap = (id: string, big = false) => `<canvas class="minimap${big ? ' bi
 
 export async function mapIndexPage(): Promise<string> {
   const maps = await loadMaps();
-  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. A vila é segura: lá a vida e a mana voltam sozinhas fora de combate.
+  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. As cidades (a vila e a Cidadela de Jade) são seguras: lá a vida e a mana voltam sozinhas fora de combate.
     No jogo, a aba <b>Mundo</b> do mapa (tecla M ou toque no minimapa) mostra todos os mapas; toque num deles para ver, passo a passo, por quais portais ir saindo de onde você está (o próximo portal pisca no minimapa).
-    Na praça da vila, o <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> leva você direto aos mapas marcados com ✦, por ${TELEPORT_COST} ouro.</p>
+    Na praça da vila, o <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> leva você direto aos mapas marcados com ✦, por ${TELEPORT_COST} ouro; a <a href="#/mapa/cidadela">Cidadela de Jade</a> (nível 30) só se alcança assim.</p>
     <div class="grid map-grid">${maps
       .map((m) => {
         const lv = mapLevels(m),
@@ -144,16 +144,22 @@ export async function mapPage(id: string): Promise<string | null> {
     .join('');
   // teleporte do Mestre dos Caminhos: na vila, a lista de destinos; no destino, como chegar por ele
   const tpFrom = m.npcs.includes('caminhos')
-    ? `<li><a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> (teleporte, ${TELEPORT_COST} ouro): ${TELEPORT_DESTS.map(
-        (d) => {
+    ? `<li><a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> (teleporte): ${teleportDestsFrom(id)
+        .map((d) => {
           const t = maps.find((x) => x.id === d.map);
-          return `<a href="#/mapa/${d.map}">${esc(t?.name ?? d.map)}</a>${d.minLevel ? ` <small class="tag">nível ${d.minLevel}+</small>` : ''}`;
-        },
-      ).join(', ')}</li>`
+          const tags = [
+            d.minLevel ? `nível ${d.minLevel}+` : '',
+            teleportCost(d) ? `${teleportCost(d)} ouro` : 'grátis',
+          ]
+            .filter(Boolean)
+            .join(' · ');
+          return `<a href="#/mapa/${d.map}">${esc(t?.name ?? d.map)}</a> <small class="tag">${tags}</small>`;
+        })
+        .join(', ')}</li>`
     : '';
   const tpTo = teleportById(id);
   const tpHere = tpTo
-    ? `<p>Também se chega aqui pelo <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a>, na praça da vila${tpTo.minLevel ? `, a partir do nível <b>${tpTo.minLevel}</b>` : ''}, por <b>${TELEPORT_COST} ouro</b>.</p>`
+    ? `<p>${id === 'cidadela' ? 'Só se chega aqui' : 'Também se chega aqui'} pelo <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a>, numa cidade${tpTo.minLevel ? `, a partir do nível <b>${tpTo.minLevel}</b>` : ''}, ${teleportCost(tpTo) ? `por <b>${teleportCost(tpTo)} ouro</b>` : '<b>de graça</b>'}.</p>`
     : '';
   const qs = QUESTS.filter((q) => q.objective.map === id || (q.objective.monster && count.has(q.objective.monster)));
   const qRow = (q: Quest) =>

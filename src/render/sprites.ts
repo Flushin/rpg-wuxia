@@ -142,6 +142,7 @@ export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | nu
 export function preloadSprites(scene: Phaser.Scene) {
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
+  scene.load.atlas('props-cidadela', 'sprites/cidadela.png', 'sprites/cidadela.json');
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.atlas('props-montanha', 'sprites/montanha.png', 'sprites/montanha.json');
   scene.load.atlas('props-bambu', 'sprites/bambu.png', 'sprites/bambu.json');

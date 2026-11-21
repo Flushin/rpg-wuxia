@@ -15,6 +15,8 @@ export interface VersaoNovidades {
   /** AAAA-MM-DD */
   data: string;
   itens: Novidade[];
+  /** resumo curto para a Play Store (limite LOJA_LIMITE), quando os itens completos não cabem */
+  loja?: string[];
 }
 export interface NovidadesData {
   proxima: Novidade[];
@@ -31,6 +33,9 @@ export const LOJA_LIMITE = 500;
 
 /** Texto da Play Store: um item por linha, com marcador. */
 export const textoLoja = (itens: string[]) => itens.map((t) => `• ${t}`).join('\n');
+/** Linhas do texto da loja de uma versão: o resumo `loja` se houver, senão os itens. */
+export const itensLoja = (v: { itens: { texto: string }[]; loja?: string[] } | undefined) =>
+  v?.loja ?? (v?.itens ?? []).map((n) => n.texto);
 
 /** "2026-11-19" → "19/11/2026" (pt) ou "Nov 19, 2026" (en). */
 export function dataNovidade(iso: string, lang: 'pt' | 'en' = 'pt'): string {

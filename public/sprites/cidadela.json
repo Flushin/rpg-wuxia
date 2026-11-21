@@ -1,0 +1,420 @@
+{
+ "frames": {
+  "jade_salao": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 630,
+    "h": 522
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 630,
+    "h": 522
+   },
+   "sourceSize": {
+    "w": 630,
+    "h": 522
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7299
+   }
+  },
+  "jade_pagode": {
+   "frame": {
+    "x": 632,
+    "y": 0,
+    "w": 360,
+    "h": 497
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 360,
+    "h": 497
+   },
+   "sourceSize": {
+    "w": 360,
+    "h": 497
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.837
+   }
+  },
+  "muralha_j11": {
+   "frame": {
+    "x": 0,
+    "y": 524,
+    "w": 764,
+    "h": 491
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 764,
+    "h": 491
+   },
+   "sourceSize": {
+    "w": 764,
+    "h": 491
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6517
+   }
+  },
+  "muralha_i11": {
+   "frame": {
+    "x": 0,
+    "y": 1017,
+    "w": 764,
+    "h": 489
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 764,
+    "h": 489
+   },
+   "sourceSize": {
+    "w": 764,
+    "h": 489
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6524
+   }
+  },
+  "portao_muralha_i": {
+   "frame": {
+    "x": 0,
+    "y": 1508,
+    "w": 376,
+    "h": 436
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 376,
+    "h": 436
+   },
+   "sourceSize": {
+    "w": 376,
+    "h": 436
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8073
+   }
+  },
+  "portao_muralha_j": {
+   "frame": {
+    "x": 378,
+    "y": 1508,
+    "w": 376,
+    "h": 435
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 376,
+    "h": 435
+   },
+   "sourceSize": {
+    "w": 376,
+    "h": 435
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8069
+   }
+  },
+  "jade_casa_4x3": {
+   "frame": {
+    "x": 0,
+    "y": 1946,
+    "w": 448,
+    "h": 405
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 448,
+    "h": 405
+   },
+   "sourceSize": {
+    "w": 448,
+    "h": 405
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.758
+   }
+  },
+  "jade_ferraria": {
+   "frame": {
+    "x": 450,
+    "y": 1946,
+    "w": 448,
+    "h": 405
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 448,
+    "h": 405
+   },
+   "sourceSize": {
+    "w": 448,
+    "h": 405
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.758
+   }
+  },
+  "jade_botica": {
+   "frame": {
+    "x": 0,
+    "y": 2353,
+    "w": 448,
+    "h": 405
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 448,
+    "h": 405
+   },
+   "sourceSize": {
+    "w": 448,
+    "h": 405
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.758
+   }
+  },
+  "jade_casa_3x4": {
+   "frame": {
+    "x": 450,
+    "y": 2353,
+    "w": 448,
+    "h": 404
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 448,
+    "h": 404
+   },
+   "sourceSize": {
+    "w": 448,
+    "h": 404
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7574
+   }
+  },
+  "jade_casa_3x3": {
+   "frame": {
+    "x": 0,
+    "y": 2760,
+    "w": 384,
+    "h": 385
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 384,
+    "h": 385
+   },
+   "sourceSize": {
+    "w": 384,
+    "h": 385
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7818
+   }
+  },
+  "muralha_torre": {
+   "frame": {
+    "x": 386,
+    "y": 2760,
+    "w": 248,
+    "h": 349
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 248,
+    "h": 349
+   },
+   "sourceSize": {
+    "w": 248,
+    "h": 349
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8395
+   }
+  },
+  "jade_casa_3x3b": {
+   "frame": {
+    "x": 636,
+    "y": 2760,
+    "w": 382,
+    "h": 329
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 382,
+    "h": 329
+   },
+   "sourceSize": {
+    "w": 382,
+    "h": 329
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7447
+   }
+  },
+  "muralha_i4": {
+   "frame": {
+    "x": 0,
+    "y": 3147,
+    "w": 316,
+    "h": 290
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 316,
+    "h": 290
+   },
+   "sourceSize": {
+    "w": 316,
+    "h": 290
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7552
+   }
+  },
+  "jade_banca": {
+   "frame": {
+    "x": 318,
+    "y": 3147,
+    "w": 257,
+    "h": 244
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 257,
+    "h": 244
+   },
+   "sourceSize": {
+    "w": 257,
+    "h": 244
+   },
+   "pivot": {
+    "x": 0.4981,
+    "y": 0.7869
+   }
+  },
+  "huabiao": {
+   "frame": {
+    "x": 577,
+    "y": 3147,
+    "w": 64,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9402
+   }
+  },
+  "lanterna_dupla": {
+   "frame": {
+    "x": 643,
+    "y": 3147,
+    "w": 62,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 62,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 62,
+    "h": 160
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9313
+   }
+  }
+ },
+ "meta": {
+  "image": "cidadela.png",
+  "size": {
+   "w": 1024,
+   "h": 3437
+  },
+  "scale": "0.5"
+ }
+}

@@ -31,6 +31,8 @@ export interface MapConfig {
 
 export const MAPS_CONFIG: Record<string, MapConfig> = {
   cidade: { town: true, world: { col: 1, row: 2 }, music: 'music_cidade', trees: 'city', grassDecor: 0.035 },
+  // Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte do Mestre dos Caminhos (nível 30)
+  cidadela: { town: true, world: { col: 3, row: 0 }, music: 'music_cidadela', trees: 'city', grassDecor: 0.03 },
   floresta: {
     music: 'music_floresta',
     trees: 'forest',

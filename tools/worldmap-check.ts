@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { MAP_IDS, MAPS_CONFIG } from '../src/core/mapsConfig';
-import { TELEPORT_DESTS } from '../src/core/teleport';
+import { teleportCost, teleportDestsFrom, teleportById } from '../src/core/teleport';
 import { portalSide, worldLinks, worldRoute } from '../src/core/worldRoutes';
 
 let fails = 0;
@@ -45,8 +45,15 @@ ok(worldRoute(links, 'covil', 'pico')!.length === 4, 'da masmorra volta pela vil
 // teleporte (Mestre dos Caminhos): ligações da vila para cada destino, mas a rota só usa sem caminho a pé
 const tps = links.filter((l) => l.menu === 'caminhos');
 ok(
-  tps.length === TELEPORT_DESTS.length && tps.every((l) => l.from === 'cidade' && l.cost === 200),
-  'teleporte: uma ligação da vila por destino',
+  ['cidade', 'cidadela'].every((t) => tps.filter((l) => l.from === t).length === teleportDestsFrom(t).length) &&
+    tps.every((l) => l.cost === teleportCost(teleportById(l.to)!)),
+  'teleporte: uma ligação de cada cidade com o Mestre por destino',
+);
+ok(
+  worldRoute(links, 'cidade', 'cidadela')
+    ?.map((l) => l.menu)
+    .join() === 'caminhos',
+  'Cidadela: só pelo teleporte',
 );
 ok(!pico.some((l) => l.menu === 'caminhos'), 'com caminho a pé, a rota não usa o teleporte');
 {
