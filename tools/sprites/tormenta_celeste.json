@@ -210,26 +210,5 @@
   ],
   "strength": 1.6
  },
- "glow_halo": [
-  90,
-  170,
-  255
- ],
- "look": {
-  "rim": 3.5,
-  "rim_color": [
-   160,
-   205,
-   255
-  ]
- },
- "ambient": 0.5,
- "sun": 4.5,
- "outline": [
-  14,
-  18,
-  40,
-  235
- ],
  "portrait_dirs": true
 }
