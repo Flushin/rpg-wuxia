@@ -70,7 +70,14 @@ export class CharacterPanel {
       const t = (e.target as HTMLElement).closest(
         '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip]',
       ) as HTMLElement | null;
-      if (!t) return;
+      if (!t) {
+        // toque fora de um equipado (e fora do detalhe): desfaz a seleção e o detalhe some
+        if (this.sel && !(e.target as HTMLElement).closest('.ch-detail')) {
+          this.sel = null;
+          this.sig = '';
+        }
+        return;
+      }
       if (t.dataset.eq) {
         const slot = t.dataset.eq as Slot,
           now = performance.now();
@@ -194,14 +201,14 @@ export class CharacterPanel {
       `<div class="card at-card ch-card" style="--c:${cls.color}">${closeX('data-close="1"')}
       <h2>${L('Personagem', 'Character')}</h2>
       <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
-      <div class="ch-top"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="inv-detail ch-detail">${detail}</div></div>
-      <div class="ch-attrs"><div class="at-pts ${free > 0 ? 'has' : ''}"><span>${L('Pontos livres', 'Free points')}</span><b>${free}</b>
+      <div class="ch-top"><div class="ch-left"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="inv-detail ch-detail">${detail}</div></div>
+      <div class="ch-der"><h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
+      <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div></div></div>
+      <div class="ch-right"><div class="ch-attrs"><div class="at-pts ${free > 0 ? 'has' : ''}"><span>${L('Pontos livres', 'Free points')}</span><b>${free}</b>
         ${free > 0 ? `<button class="at-dist" data-dist="1">${L('Distribuir recomendado', 'Distribute recommended')}</button>` : ''}</div>
-      <div class="at-list">${rows}</div></div></div>
-      <div class="ch-bottom"><div><h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
-      <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div></div>
-      <div><h3 class="at-h">${L('Elementos', 'Elements')}</h3>
-      <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div></div></div>`,
+      <div class="at-list">${rows}</div></div>
+      <div class="ch-els"><h3 class="at-h">${L('Elementos', 'Elements')}</h3>
+      <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div></div></div></div>`,
     );
   }
 }

@@ -433,31 +433,60 @@ button[disabled] {
     grid-template-columns: 1fr;
   }
 }
-/* Personagem (C): equipados em volta do retrato à esquerda, atributos à direita; derivados e elementos embaixo.
-   Em tela estreita tudo empilha. */
+/* Personagem (C): coluna da esquerda = equipados + retrato, detalhe do item (só quando há um selecionado) e derivados;
+   direita = atributos e elementos. Colunas independentes: nada de buraco quando uma fica mais alta.
+   Em tela estreita tudo empilha na ordem equipados, atributos, derivados, elementos. */
 .ch-card {
   position: relative;
 }
 .ch-card .ch-detail {
   position: static;
   max-height: none;
-  margin-top: 12px;
+  margin-top: 8px;
   border-left: 0;
   border-top: 1px solid #445;
   padding: 8px 0;
 }
 .ch-card .ch-detail:has(.muted) {
   border-top: 0;
+  padding: 0;
+  font-size: 12px;
+}
+.ch-top,
+.ch-left,
+.ch-right {
+  display: flex;
+  flex-direction: column;
+}
+.ch-left,
+.ch-right {
+  display: contents;
+}
+.ch-gear {
+  order: 1;
+}
+.ch-attrs {
+  order: 2;
+}
+.ch-der {
+  order: 3;
+}
+.ch-els {
+  order: 4;
 }
 @media (min-width: 600px) {
   .ch-card {
     width: min(860px, 100%);
   }
-  .ch-top,
-  .ch-bottom {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  .ch-top {
+    flex-direction: row;
     gap: 16px;
-    align-items: start;
+    align-items: flex-start;
+  }
+  .ch-left,
+  .ch-right {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
