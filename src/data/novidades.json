@@ -1,6 +1,34 @@
 {
-  "proxima": [{"texto": "Mochila e vendedor: cadeado para proteger itens, aviso de item novo e ▲ nos melhores que o equipado (com filtro), venda em lote de Comuns + Incomuns e aba Recomprar. Nas Configurações: ligar/desligar números de dano, tremor de tela e vibração."}, { "texto": "Itens Épicos: agora dá para trocar os bônus no ferreiro (3× o custo do Raro) e desmontar o Épico repetido." }, { "texto": "Trial virou torre de chefes: ao vencer, escolha seguir para o próximo nível, repetir o mesmo (paga a entrada na hora) ou sair, sem voltar à vila." }, { "texto": "Trial: a entrada agora sobe 12% a cada nível (o ouro do chefe acompanha)." }, { "texto": "Bolsa: novo botão Destruir (com confirmação) para liberar espaço longe da vila." }],
+  "proxima": [],
   "versoes": [
+    {
+      "versao": "0.7.0",
+      "data": "2026-11-22",
+      "loja": [
+        "Trial virou torre de chefes: siga para o próximo nível, repita ou saia sem voltar à vila.",
+        "Épicos: troque os bônus no ferreiro e desmonte os repetidos.",
+        "Mochila: cadeado nos itens, aviso de item novo, ▲ nos melhores e botão Destruir.",
+        "Vendedor: venda em lote de Comuns + Incomuns e aba Recomprar.",
+        "Opções para números de dano, tremor e vibração."
+      ],
+      "itens": [
+        {
+          "texto": "Mochila e vendedor: cadeado para proteger itens, aviso de item novo e ▲ nos melhores que o equipado (com filtro), venda em lote de Comuns + Incomuns e aba Recomprar. Nas Configurações: ligar/desligar números de dano, tremor de tela e vibração."
+        },
+        {
+          "texto": "Itens Épicos: agora dá para trocar os bônus no ferreiro (3× o custo do Raro) e desmontar o Épico repetido."
+        },
+        {
+          "texto": "Trial virou torre de chefes: ao vencer, escolha seguir para o próximo nível, repetir o mesmo (paga a entrada na hora) ou sair, sem voltar à vila."
+        },
+        {
+          "texto": "Trial: a entrada agora sobe 12% a cada nível (o ouro do chefe acompanha)."
+        },
+        {
+          "texto": "Bolsa: novo botão Destruir (com confirmação) para liberar espaço longe da vila."
+        }
+      ]
+    },
     {
       "versao": "0.6.0",
       "data": "2026-11-22",
