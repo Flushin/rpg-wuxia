@@ -15,8 +15,8 @@ const PALE = 0xfff3a0;
 const VIOLET = 0xc8a8ff;
 const CORE = 0xfffbe0;
 // faíscas e raios por segundo, por nível (0..6); os três primeiros são rápidos para aparecer andando
-const SPARK_RATE = [0, 3, 5, 7, 7.5, 8, 9];
-const BOLT_RATE = [0, 0, 0, 1.6, 1.8, 2.2, 2.8];
+const SPARK_RATE = [0, 6, 8, 10, 10, 11, 12];
+const BOLT_RATE = [0, 0.6, 1.2, 2, 2.2, 2.5, 3];
 // a arte da aura foi feita para um corpo de ~67 unidades (cabeça aos pés)
 const BODY = 67;
 
@@ -114,14 +114,14 @@ export class ElementAura {
         y: Math.sin(a) * r * 1.3,
         vx: (Math.random() - 0.5) * 20 * fast,
         vy: (-10 - Math.random() * 20) * fast,
-        life: (0.35 + Math.random() * 0.3) / (tier <= 3 ? 1.4 : 1),
+        life: (0.35 + Math.random() * 0.3) / (tier <= 3 ? 1.15 : 1),
         violet: Math.random() < 0.3,
       });
     }
     if (Math.random() < BOLT_RATE[tier] * dt) {
       const a = Math.random() * Math.PI * 2;
       const r1 = 14;
-      const r2 = r1 + 8 + tier * 4;
+      const r2 = r1 + 12 + tier * 4;
       this.bolts.push({
         p: bolt(
           Math.cos(a) * r1,
@@ -141,16 +141,17 @@ export class ElementAura {
       const x = s.x * k;
       const y = cy + s.y * k;
       const al = Math.min(1, s.life * 3);
-      f.fillStyle(s.violet ? VIOLET : PALE, al).fillRect(x - k, y - k, 2 * k, 2 * k);
-      f.lineStyle(0.8 * k, GOLD, al)
-        .lineBetween(x - 2 * k, y, x + 2 * k, y)
-        .lineBetween(x, y - 2 * k, x, y + 2 * k);
+      f.fillStyle(GOLD, al * 0.35).fillCircle(x, y, 3.5 * k);
+      f.fillStyle(s.violet ? VIOLET : PALE, al).fillRect(x - 1.5 * k, y - 1.5 * k, 3 * k, 3 * k);
+      f.lineStyle(1.5 * k, GOLD, al)
+        .lineBetween(x - 4 * k, y, x + 4 * k, y)
+        .lineBetween(x, y - 4 * k, x, y + 4 * k);
     }
     this.bolts = this.bolts.filter((bl) => (bl.life -= dt) > 0);
     for (const bl of this.bolts) {
       for (const [w, c, al] of [
-        [3, VIOLET, 0.5],
-        [1.2, CORE, 1],
+        [5.5, VIOLET, 0.5],
+        [2.2, CORE, 1],
       ]) {
         f.lineStyle(w * k, c, al).beginPath();
         for (let i = 0; i < bl.p.length; i += 2) {
