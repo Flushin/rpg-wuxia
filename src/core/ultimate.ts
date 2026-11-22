@@ -4,7 +4,7 @@ import ultJson from '../data/ultimates.json';
 import { localize } from './i18n';
 import type { BuffKind } from './types';
 
-/** efeito num monstro atingido (mesmo formato do `debuff` das skills) */
+/** efeito num monstro atingido (mesmo formato do `debuff` das skills); no veneno, value = fração do dano ao longo da duração */
 export interface UltDebuff {
   kind: BuffKind;
   value: number;

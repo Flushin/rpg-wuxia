@@ -731,6 +731,7 @@ export class SkillFx {
     const col: UltColors = { main: hex(u.color), glow: hex(u.glow), core: hex(u.core), dur: u.duration * 1000 };
     if (u.fx === 'geada') this.ultGeada(ev, col, u.finalDebuff?.duration ?? 0);
     else if (u.fx === 'tita') this.ultTita(ev, col);
+    else if (u.fx === 'vibora') this.ultVibora(ev, col);
     else this.ultTormenta(ev, col);
   }
 
@@ -1035,6 +1036,259 @@ export class SkillFx {
         });
         if (!big) shakeCamera(this.scene, 80, 0.004);
       },
+    });
+  }
+
+  // Víbora (prévia aprovada: previews/ultimate-vibora.html, junção "A + C": enxame de agulhas com a teia)
+  /** Agulha fina apontando para `ang`: corpo esmeralda, miolo claro e o buraco (olho) atrás; sem pena nem ponta larga. */
+  private needle(
+    g: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    ang: number,
+    len: number,
+    col: UltColors,
+    a = 1,
+  ) {
+    const cs = Math.cos(ang),
+      sn = Math.sin(ang);
+    g.lineStyle(2.4, col.main, 0.95 * a);
+    g.lineBetween(x - cs * len, y - sn * len, x - cs * 2, y - sn * 2);
+    g.lineStyle(1, col.core, a);
+    g.lineBetween(x - cs * len * 0.85, y - sn * len * 0.85, x + cs * 1.5, y + sn * 1.5);
+    g.lineStyle(0.8, col.glow, 0.6 * a);
+    g.strokeCircle(x - cs * (len - 2), y - sn * (len - 2), 1.1);
+  }
+  /** Víbora de agulhas (corpo em S e capelo); s = 0 enrolada no alto, 1 = cabeça no chão (bote). */
+  private viperOf(c: Pt, col: UltColors) {
+    const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
+    const draw = (s: number) => {
+      g.clear();
+      const hx = c.x + 110 - s * 110,
+        hy = c.y - 300 + s * 280;
+      for (let q = 0; q < 42; q++) {
+        const u = q / 42,
+          bx = c.x - 190 + u * 300 + Math.sin(u * 9) * 40 * (1 - u),
+          by = c.y - 120 - u * 180 + Math.cos(u * 6) * 26,
+          px = bx + (hx - bx) * Math.pow(u, 3) * s,
+          py = by + (hy - by) * Math.pow(u, 3) * s,
+          wd = 6 + u * 22;
+        for (let n = 0; n < 4; n++)
+          this.needle(g, px + (Math.random() - 0.5) * wd, py + (Math.random() - 0.5) * wd, u * 2 + n * 0.6, 16, col);
+      }
+      for (let n = 0; n < 26; n++) {
+        const an = (n / 26) * Math.PI * 2;
+        this.needle(g, hx + Math.cos(an) * 40, hy + Math.sin(an) * 24, an, 18, col);
+        this.needle(g, hx + Math.cos(an) * 24, hy + Math.sin(an) * 14, an, 14, col);
+      }
+      g.fillStyle(0xf4ff60, 1);
+      g.fillCircle(hx - 11, hy - 5, 4.5);
+      g.fillCircle(hx + 11, hy - 5, 4.5);
+    };
+    return { g, draw };
+  }
+  private viper: { g: Phaser.GameObjects.Graphics; draw: (s: number) => void } | null = null;
+  private viperSwarm: Phaser.GameObjects.Graphics | null = null;
+  private ultVibora(ev: UltEvent, col: UltColors) {
+    const c = tileToScreen(ev.x, ev.y);
+    const hand = { x: c.x, y: c.y - 78 };
+    const tints = [col.core, col.main, col.glow];
+    if (ev.phase === 'start') {
+      const cam = this.scene.cameras.main;
+      const tint = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x04120e, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: tint,
+        fillAlpha: 0.45,
+        duration: 400,
+        yoyo: true,
+        hold: col.dur - 600,
+        onComplete: () => tint.destroy(),
+      });
+      // selo de jade (hexágonos girando) no chão e enxame de agulhas em volta dela, redesenhados a cada quadro
+      const seal = this.gfx(FX - 1).setPosition(c.x, c.y);
+      this.viperSwarm?.destroy();
+      const sw = this.gfx(FX + 1).setBlendMode(Phaser.BlendModes.ADD);
+      this.viperSwarm = sw;
+      const r = this.iso(2.2);
+      const bugs = Array.from({ length: 46 }, () => ({
+        a: Math.random() * Math.PI * 2,
+        r: 0.7 + Math.random() * 0.4,
+        h: Math.random() * 70,
+        sp: 0.0025 + Math.random() * 0.002,
+      }));
+      const st = { k: 0, t: 0 };
+      this.scene.tweens.add({ targets: st, k: 1, duration: 400, ease: 'Back.easeOut' });
+      this.scene.tweens.add({
+        targets: st,
+        t: col.dur,
+        duration: col.dur,
+        onUpdate: () => {
+          seal.clear();
+          for (const [f, w] of [
+            [1, 3],
+            [0.74, 2],
+          ]) {
+            seal.lineStyle(w, col.main, 0.85 * st.k);
+            const pts = [];
+            for (let q = 0; q <= 6; q++) {
+              const a = st.t * 0.0011 + (q * Math.PI) / 3;
+              pts.push({ x: Math.cos(a) * r.w * 0.5 * f * st.k, y: Math.sin(a) * r.h * 0.5 * f * st.k });
+            }
+            seal.strokePoints(pts);
+          }
+          if (sw !== this.viperSwarm) return;
+          sw.clear();
+          for (const b of bugs) {
+            const a = b.a + st.t * b.sp,
+              x = c.x + Math.cos(a) * 125 * b.r * st.k,
+              y = c.y - 30 - b.h * 0.6 + Math.sin(a) * 46 * b.r * st.k;
+            this.needle(sw, x, y, a + Math.PI / 2, 13, col, 0.9);
+          }
+        },
+        onComplete: () => this.fade(seal, 300),
+      });
+      // nos últimos 0,65 s o enxame se junta no alto na forma de uma víbora (o bote vem no evento final)
+      this.scene.time.delayedCall(Math.max(0, col.dur - 650), () => {
+        if (this.viperSwarm !== sw) return;
+        this.viperSwarm = null;
+        this.fade(sw, 250);
+        this.viper?.g.destroy();
+        const v = this.viperOf(c, col);
+        this.viper = v;
+        v.draw(0);
+        v.g.setAlpha(0);
+        this.scene.tweens.add({ targets: v.g, alpha: 1, duration: 300 });
+        // jitter das agulhas enquanto espera o bote
+        const jit = this.scene.time.addEvent({ delay: 70, repeat: 8, callback: () => this.viper === v && v.draw(0) });
+        // se for interrompida (morte, troca de mapa), some sozinha
+        this.scene.time.delayedCall(1500, () => {
+          jit.remove();
+          if (this.viper !== v) return;
+          this.viper = null;
+          this.fade(v.g, 300);
+        });
+      });
+      this.burst(c.x, c.y - 60, 26, {
+        speed: { min: 50, max: 160 },
+        lifespan: 800,
+        scale: { start: 0.5, end: 0 },
+        tint: tints,
+      });
+      return;
+    }
+    if (ev.phase === 'strike') {
+      for (const t of ev.targets) {
+        const p = tileToScreen(t.x, t.y),
+          to = { x: p.x + (Math.random() - 0.5) * 14, y: p.y - 16 - Math.random() * 10 };
+        // corrente de 5 agulhas saindo do enxame; a primeira puxa um fio preso na mão dela
+        for (let k = 0; k < 5; k++) {
+          const from = { x: c.x + (Math.random() - 0.5) * 90, y: c.y - 40 + (Math.random() - 0.5) * 40 },
+            ang = Math.atan2(to.y - from.y, to.x - from.x);
+          const n = this.gfx(FX + 2).setPosition(from.x, from.y);
+          this.needle(n, 0, 0, ang, 16, col);
+          const thread = k === 0 ? this.gfx(FX + 1) : null;
+          this.scene.tweens.add({
+            targets: n,
+            x: to.x,
+            y: to.y,
+            duration: 130,
+            delay: k * 45,
+            onUpdate: () => {
+              if (!thread) return;
+              thread.clear();
+              thread.lineStyle(1.2, col.main, 0.7);
+              thread.lineBetween(hand.x, hand.y, n.x, n.y);
+            },
+            onComplete: () => {
+              this.fade(n, 300, { delay: 400 });
+              if (thread) this.fade(thread, 400, { delay: 500 });
+              if (k > 0) return;
+              const ring = this.gfx(FX - 1).setPosition(p.x, p.y);
+              ring.lineStyle(3, col.main, 0.9);
+              ring.strokeEllipse(0, 0, 30, 15);
+              ring.setScale(0.4);
+              this.scene.tweens.add({ targets: ring, scaleX: 1.5, scaleY: 1.5, duration: 340, ease: 'Cubic.easeOut' });
+              this.fade(ring, 360);
+              this.burst(to.x, to.y, 8, {
+                speed: { min: 30, max: 110 },
+                lifespan: 450,
+                scale: { start: 0.45, end: 0 },
+                tint: tints,
+              });
+            },
+          });
+        }
+      }
+      return;
+    }
+    // fim: a víbora (formada nos últimos 0,65 s) dá o bote no centro junto com o dano; ela puxa todos os fios
+    this.viperSwarm?.destroy();
+    this.viperSwarm = null;
+    const v = this.viper;
+    this.viper = null;
+    if (v) {
+      const sv = { s: 0 };
+      this.scene.tweens.add({
+        targets: sv,
+        s: 1,
+        duration: 150,
+        ease: 'Quad.easeIn',
+        onUpdate: () => v.draw(sv.s),
+        onComplete: () => this.fade(v.g, 500, { delay: 120 }),
+      });
+    }
+    // a teia: fios da mão até cada alvo, acesos e puxados (a curva estica)
+    const web = this.gfx(FX + 1).setBlendMode(Phaser.BlendModes.ADD);
+    const pts = ev.targets.filter((t) => t.hit !== false).map((t) => tileToScreen(t.x, t.y));
+    const pull = { k: 0 };
+    this.scene.tweens.add({
+      targets: pull,
+      k: 1,
+      duration: 260,
+      onUpdate: () => {
+        web.clear();
+        for (const p of pts) {
+          const sag = 26 * (1 - pull.k);
+          web.lineStyle(3, col.main, 0.5);
+          const mid = { x: (hand.x + p.x) / 2, y: (hand.y + p.y - 14) / 2 + sag };
+          web.strokePoints([hand, mid, { x: p.x, y: p.y - 14 }]);
+          web.lineStyle(1.2, col.core, 0.95);
+          web.strokePoints([hand, mid, { x: p.x, y: p.y - 14 }]);
+        }
+      },
+      onComplete: () => this.fade(web, 600, { delay: 150 }),
+    });
+    // bote: clarão, tremor, anel e nuvem de veneno em cada alvo
+    this.scene.time.delayedCall(150, () => {
+      this.scene.cameras.main.flash(240, 200, 255, 225);
+      shakeCamera(this.scene, 320, 0.009);
+      const r = this.iso(ev.radius);
+      const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+      ring.lineStyle(10, col.main, 1);
+      ring.strokeEllipse(0, 0, r.w, r.h);
+      ring.lineStyle(4, col.glow, 0.8);
+      ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+      ring.setScale(0.1);
+      this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+      this.fade(ring, 820);
+      for (const p of pts)
+        this.burst(p.x, p.y - 14, 16, {
+          speed: { min: 10, max: 50 },
+          lifespan: 1300,
+          scale: { start: 1.4, end: 0 },
+          alpha: { start: 0.55, end: 0 },
+          tint: [col.main, col.glow],
+        });
+      this.burst(c.x, c.y - 20, 36, {
+        speed: { min: 80, max: 260 },
+        lifespan: 900,
+        scale: { start: 0.7, end: 0 },
+        tint: tints,
+      });
     });
   }
 

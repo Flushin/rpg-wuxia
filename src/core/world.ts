@@ -793,7 +793,7 @@ export class World {
         radius: u.radius,
         targets: [{ x: m.x, y: m.y }],
       });
-      this.ultHit(m, u.strikeMult * k, u.strikeDebuff);
+      this.ultHit(m, u.strikeMult * k, u.strikeDebuff, k);
       this.lastCombat = this.time;
     }
     if (c.t >= u.duration) {
@@ -803,9 +803,22 @@ export class World {
     p.attackCd = Math.max(p.attackCd, 0.3);
   }
   /** golpe da ultimate: conta das skills, sem roubo de vida; o efeito (lentidão, congelar...) só se acertar */
-  private ultHit(m: Entity, mult: number, debuff?: UltDebuff): boolean {
+  private ultHit(m: Entity, mult: number, debuff?: UltDebuff, split = 1): boolean {
     const r = this.attack(this.player, m, mult, true, false);
-    if (debuff && r.hit && !m.dead) this.addBuff(m, `ult_${this.classId}`, debuff.kind, debuff.value, debuff.duration);
+    if (!debuff || !r.hit || m.dead) return r.hit;
+    let value = debuff.value;
+    if (debuff.kind === 'poison') {
+      // veneno: value = fração do dano (como o "poison.percent" das skills), espalhada pela duração
+      const res = m.kind === 'monster' ? Math.min(0.9, MONSTERS[m.monsterId]?.poisonRes ?? 0) : 0;
+      value =
+        (expectedDamage(this.player, this.defender(m)) *
+          debuff.value *
+          split *
+          bal('dano.jogador', this.classId) *
+          (1 - res)) /
+        debuff.duration;
+    }
+    this.addBuff(m, `ult_${this.classId}`, debuff.kind, value, debuff.duration);
     return r.hit;
   }
   private ultInside(u: UltimateDef) {
@@ -818,7 +831,7 @@ export class World {
       inside = this.ultInside(u),
       k = ultSplit(u, inside.length);
     // golpeia antes de avisar o desenho: o alvo leva `hit` (errou = sem efeito, ex.: não congela)
-    const targets = inside.map((m) => ({ x: m.x, y: m.y, hit: this.ultHit(m, u.finalMult * k, u.finalDebuff) }));
+    const targets = inside.map((m) => ({ x: m.x, y: m.y, hit: this.ultHit(m, u.finalMult * k, u.finalDebuff, k) }));
     this.emit({ type: 'ultimate', sect: this.classId, phase: 'final', x: c.x, y: c.y, radius: u.radius, targets });
     this.lastCombat = this.time;
   }

@@ -99,5 +99,37 @@
     "fullTargets": 8,
     "idleDelay": 20,
     "idleDrain": 1
+  },
+  "vibora": {
+    "id": "vibora_mil_agulhas",
+    "name": "Víbora de Mil Agulhas",
+    "unlock": 10,
+    "color": "#2fe89a",
+    "glow": "#a05ae6",
+    "core": "#e0fff0",
+    "dark": "#1a7a50",
+    "ink": "#04261a",
+    "icon": "毒",
+    "fx": "vibora",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_needle",
+      "final": "skill_toxic"
+    },
+    "description": "Um enxame de agulhas esmeralda gira em volta dela e perfura por 3 s todos os monstros num raio de 7 tiles, prendendo um fio em cada um: 6 correntes de 80% do dano e, no fim, o enxame vira uma víbora que dá o bote de 250% enquanto ela puxa os fios, envenenando com mais 200% do dano ao longo de 6 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 7,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.8,
+    "finalMult": 2.5,
+    "finalDebuff": {
+      "kind": "poison",
+      "value": 2,
+      "duration": 6
+    },
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
   }
 }

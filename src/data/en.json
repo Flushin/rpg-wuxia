@@ -1006,6 +1006,9 @@
       },
       {
         "texto": "Titã ultimate (level 10): Giant's Fists summons an ember giant that punches monsters for 3 s, keeping them stunned, and smashes the ground at the end."
+      },
+      {
+        "texto": "Víbora ultimate (level 10): Thousand-Needle Viper sends swarms of emerald needles that tie threads to monsters; at the end, a viper made of needles strikes and poisons them all."
       }
     ],
     "versoes": [
@@ -1227,6 +1230,10 @@
     "tita": {
       "name": "Giant's Fists",
       "description": "An ember giant rises behind him and punches every monster within 6 tiles for 3 s: 6 punches of 90% damage, each stunning for 0.5 s, and a final smash of 300% that stuns for 2 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
+    },
+    "vibora": {
+      "name": "Thousand-Needle Viper",
+      "description": "A swarm of emerald needles circles her and pierces every monster within 7 tiles for 3 s, tying a thread to each: 6 streams of 80% damage and, at the end, the swarm becomes a viper that strikes for 250% while she pulls the threads, poisoning for another 200% damage over 6 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
     }
   }
 }

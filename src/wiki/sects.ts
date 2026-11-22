@@ -105,7 +105,7 @@ const sec = (n: number) => String(n).replace('.', ',');
 const DEBUFF_TEXT: Record<string, (d: { value: number; duration: number }, el: string) => string> = {
   slow: (d) => `fica ${pc(d.value)} mais lento por ${sec(d.duration)} s`,
   stun: (d, el) => `fica ${el === 'ice' ? 'congelado (atordoado)' : 'atordoado'} por ${sec(d.duration)} s`,
-  poison: (d) => `fica envenenado por ${sec(d.duration)} s`,
+  poison: (d) => `fica envenenado e perde mais ${pc(d.value)} do dano ao longo de ${sec(d.duration)} s`,
   defReduction: (d) => `perde ${pc(d.value)} da defesa por ${sec(d.duration)} s`,
 };
 const debuffText = (el: string, d?: { kind: string; value: number; duration: number }) =>
