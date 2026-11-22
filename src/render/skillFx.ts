@@ -789,6 +789,16 @@ export class SkillFx {
         hold: 2400,
         onComplete: () => dark.destroy(),
       });
+      // raios soltos no céu o tempo todo (um a cada ~0,1 s): a tempestade nunca para, mesmo sem monstro perto
+      this.scene.time.addEvent({
+        delay: 110,
+        repeat: 26,
+        callback: () => {
+          const x = c.x + (Math.random() - 0.5) * 560,
+            y = c.y - 120 + (Math.random() - 0.5) * 220;
+          this.ultBolt({ x, y: y - 220 }, { x: x + (Math.random() - 0.5) * 60, y }, 1.6, 18, 6);
+        },
+      });
       // faíscas subindo das mãos
       this.burst(c.x, c.y - 70, 24, {
         speed: { min: 60, max: 160 },
@@ -816,16 +826,8 @@ export class SkillFx {
         tint: [0xffd23a, 0xffffff, 0x9fe6ff],
       });
     }
-    // raios soltos no céu em volta, para encher a tela
-    for (let k = 0; k < 3; k++) {
-      const x = c.x + (Math.random() - 0.5) * 520,
-        y = c.y - 140 + (Math.random() - 0.5) * 200;
-      this.scene.time.delayedCall(k * 120, () =>
-        this.ultBolt({ x, y: y - 220 }, { x: x + (Math.random() - 0.5) * 60, y }, 1.6, 18, 6),
-      );
-    }
     if (!final) {
-      shakeCamera(this.scene, 120, 0.004);
+      shakeCamera(this.scene, 90, 0.003);
       return;
     }
     // estouro final: raio gigante no personagem, clarão amarelado e anel do tamanho da área

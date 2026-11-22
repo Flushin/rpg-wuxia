@@ -555,15 +555,22 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
   drain(w);
   ok(w.useUltimate(), 'barra cheia: solta');
   w.useSkill(0);
-  run(w, u.duration + 0.2);
-  const evs = drain(w);
+  const evs: GameEvent[] = [];
+  let strikeTicks = 0;
+  for (let i = 0; i < (u.duration + 0.2) * 60; i++) {
+    w.tick(1 / 60);
+    const e = drain(w);
+    if (e.some((x) => x.type === 'ultimate' && x.phase === 'strike')) strikeTicks++;
+    evs.push(...e);
+  }
   ok(!evs.some((e) => e.type === 'skillCast'), 'durante a ultimate não lança skill');
   ok(w.ultCast === null && w.ultCharge === 0, 'termina em 3 s e esvazia a barra');
   const strikes = evs.filter((e) => e.type === 'ultimate' && e.phase === 'strike').length;
   ok(
-    strikes === u.strikes && evs.some((e) => e.type === 'ultimate' && e.phase === 'final'),
-    `${u.strikes} raios + estouro final`,
+    strikes === u.strikes * near.length && evs.some((e) => e.type === 'ultimate' && e.phase === 'final'),
+    `${u.strikes} raios por monstro + estouro final`,
   );
+  ok(strikeTicks === strikes, 'raios intercalados: nunca dois no mesmo instante');
   const one = dmgOf(evs, near[0].id) / (u.strikes * u.strikeMult + u.finalMult);
   const hitsOf = (es: GameEvent[], id: number) =>
     es.filter((e) => e.type === 'hit' && e.targetId === id).map((e) => (e as { amount: number }).amount);

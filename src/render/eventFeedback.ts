@@ -141,7 +141,9 @@ export class EventFeedback {
       case 'ultimate':
         // pose de subir de nível (braços para cima) durante os 3 s, com brilho amarelo
         if (ev.phase === 'start') {
-          this.views.get(this.world.player.id)?.levelUp(3000, 0xffd23a, 1.3, true, 3000);
+          const v = this.views.get(this.world.player.id);
+          v?.levelUp(3000, 0xffd23a, 1.3, true, 3000);
+          v?.levitate(3000);
           vibrate();
         }
         this.fx.onEvent(ev);
