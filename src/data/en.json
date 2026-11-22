@@ -994,8 +994,34 @@
     }
   },
   "novidades": {
-    "proxima": [{"texto": "Bag and seller: lock to protect items, new-item dot and ▲ on upgrades over your gear (with a filter), bulk sale of Common + Uncommon and a Buy back tab. In Settings: toggle damage numbers, screen shake and vibration."}, { "texto": "Epic items: you can now reroll their bonuses at the blacksmith (3× the Rare cost) and salvage duplicate Epics." }, { "texto": "Trial is now a boss tower: after a win, choose to go on to the next level, repeat the same one (paying its entry right there) or leave, without returning to the village." }, { "texto": "Trial: the entry now rises 12% per level (boss gold follows)." }, { "texto": "Inventory: new Destroy button (with confirmation) to free space away from the village." }],
+    "proxima": [],
     "versoes": [
+      {
+        "loja": [
+          "Trial is now a boss tower: go on, repeat or leave without returning to the village.",
+          "Epics: reroll bonuses at the blacksmith and salvage duplicates.",
+          "Bag: item lock, new-item dot, ▲ on upgrades and a Destroy button.",
+          "Seller: bulk sale of Common + Uncommon and a Buy back tab.",
+          "Toggles for damage numbers, screen shake and vibration."
+        ],
+        "itens": [
+          {
+            "texto": "Bag and seller: lock to protect items, new-item dot and ▲ on upgrades over your gear (with a filter), bulk sale of Common + Uncommon and a Buy back tab. In Settings: toggle damage numbers, screen shake and vibration."
+          },
+          {
+            "texto": "Epic items: you can now reroll their bonuses at the blacksmith (3× the Rare cost) and salvage duplicate Epics."
+          },
+          {
+            "texto": "Trial is now a boss tower: after a win, choose to go on to the next level, repeat the same one (paying its entry right there) or leave, without returning to the village."
+          },
+          {
+            "texto": "Trial: the entry now rises 12% per level (boss gold follows)."
+          },
+          {
+            "texto": "Inventory: new Destroy button (with confirmation) to free space away from the village."
+          }
+        ]
+      },
       {
         "loja": [
           "Max level 40, with the Celestial Palace set (level 35) and attack 100 weapons.",
