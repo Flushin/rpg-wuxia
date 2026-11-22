@@ -139,7 +139,7 @@ function bossMechanics(m: Monster, inDungeon: boolean): string {
   const k = bossPctScale(m.minLevel);
   if (k > 0)
     li.push(
-      `Golpes dele tiram também uma parte da sua <b>vida máxima</b>, que a defesa não reduz: ${pc(BOSS_PCT_HP.basic * (m.attackInterval / BOSS_PCT_HP.refInterval) * k)} por golpe normal e ${pc(BOSS_PCT_HP.telegraph * k)} por 1× de dano dos golpes marcados no chão. No Trial o valor segue o nível do chefe ali (total a partir do nível ${BOSS_PCT_HP.fullLevel}).`,
+      `Golpes dele tiram também uma parte da sua <b>vida máxima</b>, que a defesa não reduz: ${pc(BOSS_PCT_HP.basic * (m.attackInterval / BOSS_PCT_HP.refInterval) * k)} por golpe normal e ${pc(BOSS_PCT_HP.telegraph * k)} por 1× de dano dos golpes marcados no chão. No Trial vale sempre o valor total.`,
     );
   if (b.aoe && b.line) {
     const l = b.line;

@@ -83,4 +83,4 @@
 
 
 ## Dano dos chefes em % da vida (22/11/2026)
-Todo golpe de chefe soma uma parte da vida máxima do jogador, sem redução pela defesa (a parte normal segue reduzida pela defesa física/espiritual): 4% por golpe normal (chefe que bate a cada 2,4 s; proporcional ao intervalo) e 9% por 1× de mult nos golpes marcados no chão. Vale inteiro para chefe nv 30+, sobe em linha do nv 10 (0) ao 30; chefes iniciais não mudam. Constantes em `BOSS_PCT_HP` (`src/core/world/boss.ts`).
+Todo golpe de chefe soma uma parte da vida máxima do jogador, sem redução pela defesa (a parte normal segue reduzida pela defesa física/espiritual): 4% por golpe normal (chefe que bate a cada 2,4 s; proporcional ao intervalo) e 9% por 1× de mult nos golpes marcados no chão. Vale inteiro para chefe nv 20+ (todo o Trial), sobe em linha do nv 10 (0) ao 20; chefes iniciais não mudam. Constantes em `BOSS_PCT_HP` (`src/core/world/boss.ts`).
