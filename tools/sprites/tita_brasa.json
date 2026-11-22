@@ -1,0 +1,223 @@
+{
+ "name": "tita_brasa",
+ "model": ".cache/kaykit/Characters/gltf/Barbarian.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Axe",
+  "1H_Axe_Offhand",
+  "2H_Axe",
+  "Barbarian_Round_Shield",
+  "Icosphere",
+  "Mug",
+  "Barbarian_Hat",
+  "Barbarian_Body",
+  "Barbarian_ArmLeft",
+  "Barbarian_ArmRight",
+  "Barbarian_LegLeft",
+  "Barbarian_LegRight"
+ ],
+ "samples": 24,
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "2H_Melee_Attack_Chop",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  },
+  "levelup": {
+   "action": "Cheer",
+   "frames": 8,
+   "fps": 12,
+   "loop": false
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "portrait_png": true,
+ "attach": [
+  {
+   "kind": "staff",
+   "bone": "handslot.r",
+   "offset": [
+    0,
+    0,
+    0
+   ],
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "length": 1.9,
+   "radius": 0.055,
+   "grip": 0.6
+  },
+  {
+   "kind": "hat",
+   "bone": "head",
+   "offset": [
+    0,
+    0.7,
+    0
+   ],
+   "rot": [
+    -10,
+    0,
+    0
+   ],
+   "scale": 1.05,
+   "color": [
+    40,
+    30,
+    30
+   ],
+   "band": [
+    196,
+    120,
+    52
+   ],
+   "radius": 0.7,
+   "height": 0.46,
+   "thickness": 0.008,
+   "straw": {
+    "dark": [
+     34,
+     26,
+     26
+    ],
+    "light": [
+     70,
+     46,
+     40
+    ],
+    "scale": 10
+   },
+   "ribbons": [
+    [
+     255,
+     120,
+     30
+    ],
+    [
+     150,
+     34,
+     24
+    ]
+   ]
+  }
+ ],
+ "portrait_anim": true,
+ "portrait_dirs": true,
+ "parts": {
+  "Knight": [
+   "Knight_Body",
+   "Knight_ArmLeft",
+   "Knight_ArmRight",
+   "Knight_LegLeft",
+   "Knight_LegRight"
+  ]
+ },
+ "textures": {
+  "knight_texture": {
+   "3,0": [
+    46,
+    40,
+    40
+   ],
+   "4,0": [
+    28,
+    24,
+    26
+   ],
+   "7,0": [
+    196,
+    120,
+    52
+   ],
+   "0,1": [
+    120,
+    28,
+    22
+   ],
+   "1,1": [
+    70,
+    20,
+    18
+   ]
+  },
+  "barbarian_texture": {
+   "0,1": [
+    140,
+    32,
+    24
+   ],
+   "1,1": [
+    90,
+    22,
+    18
+   ],
+   "7,1": [
+    60,
+    34,
+    24
+   ],
+   "3,0": [
+    60,
+    34,
+    24
+   ],
+   "6,0": [
+    196,
+    120,
+    52
+   ],
+   "2,2": [
+    150,
+    40,
+    26
+   ]
+  }
+ },
+ "glow_mesh": {
+  "meshes": [
+   "Staff"
+  ],
+  "color": [
+   255,
+   80,
+   20
+  ],
+  "emit": [
+   255,
+   90,
+   20
+  ],
+  "strength": 2.2
+ }
+}

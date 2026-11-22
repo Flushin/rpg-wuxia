@@ -16,5 +16,11 @@
     "name": "Lótus Venenosa",
     "desc": "Túnica negra de botões dourados, véu cor de ameixa no rosto, chapéu de palha roxo com fitas verde-veneno e agulhas que brilham como peçonha.",
     "price": 50000
+  },
+  "tita_brasa": {
+    "sect": "tita",
+    "name": "Brasa Vulcânica",
+    "desc": "Armadura de ferro negro com faixas cor de brasa e cinto de bronze, chapéu de palha escura com fitas de fogo e bastão que brilha como magma.",
+    "price": 50000
   }
 }
