@@ -59,3 +59,4 @@ Sempre mande perguntas e decisões como opções clicáveis (ferramenta AskUserQ
 
 ## Git
 Desenvolva na branch indicada pela sessão; commits em português.
+Antes de merge na `main`: `npm test` completo local e o check "Testes" do PR verde (o deploy roda `npm test` e não publica se falhar).

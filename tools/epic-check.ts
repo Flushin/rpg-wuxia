@@ -370,7 +370,9 @@ for (const [label, fill, drop] of [
   w.bag = w.bag.map(() => null);
   for (let i = 0; i < w.bag.length; i++) {
     const it =
-      fill === 'equip' ? makeEpic(Object.keys(BASES)[0], 10) : { ...makePotion(Object.keys(POTIONS)[1]), qty: 99 };
+      fill === 'equip'
+        ? { ...makeEpic(Object.keys(BASES)[0], 10), rarity: 'comum' as const } // Épico não se destrói: enche com Comuns
+        : { ...makePotion(Object.keys(POTIONS)[1]), qty: 99 };
     if (w.freeSlots(fill as 'equip') > 0) w.bag[i] = it;
   }
   const it = drop(),
@@ -384,6 +386,12 @@ for (const [label, fill, drop] of [
     `${label}: passando por cima com a bolsa cheia, continua no chão`,
   );
   ok(w.destroyItem(w.bag.findIndex((b) => !!b)), `${label}: Destruir remove um item`);
+  if (fill === 'equip') {
+    const ep = w.bag.findIndex((b) => !b);
+    w.bag[ep] = makeEpic(Object.keys(BASES)[0], 10);
+    ok(!w.destroyItem(ep) && !!w.bag[ep], 'Épico na bolsa não pode ser destruído');
+    w.bag[ep] = null;
+  }
   w.tickGround();
   ok(
     !w.ground.some((g) => g.item === it) && w.bag.some((b) => b?.uid === it.uid),
