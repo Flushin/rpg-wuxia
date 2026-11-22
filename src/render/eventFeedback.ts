@@ -187,7 +187,20 @@ export class EventFeedback {
         this.overPlayer(80, L('XP cheia! Suba de nível', 'XP full! Level up'), FLOAT_COLOR.WARNING);
         return true;
       case 'bagFull':
-        this.hud.toast(L('Mochila cheia', 'Bag full'), '#ff8a80');
+        {
+          const tab = {
+            equip: L('Equipamento', 'Equipment'),
+            pot: L('Consumíveis', 'Consumables'),
+            mat: L('Materiais', 'Materials'),
+          }[ev.tab ?? 'equip'];
+          this.hud.toast(
+            L(
+              `Aba ${tab} cheia: destrua ou venda um item dessa aba para pegar`,
+              `${tab} tab full: destroy or sell an item from that tab to pick it up`,
+            ),
+            '#ff8a80',
+          );
+        }
         return true;
       case 'potionFail': {
         const msg = {
