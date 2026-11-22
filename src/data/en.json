@@ -994,7 +994,7 @@
     }
   },
   "novidades": {
-    "proxima": [{ "texto": "Epic items: you can now reroll their bonuses at the blacksmith (3× the Rare cost) and salvage duplicate Epics." }],
+    "proxima": [{ "texto": "Epic items: you can now reroll their bonuses at the blacksmith (3× the Rare cost) and salvage duplicate Epics." }, { "texto": "Inventory: new Destroy button (with confirmation) to free space away from the village." }],
     "versoes": [
       {
         "loja": [
