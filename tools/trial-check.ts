@@ -220,6 +220,28 @@ console.log('\n== som do golpe em área (N7) ==');
   );
 }
 
+{
+  // torre: repetir/subir zera a arena (chefe novo, sem ajudantes nem invocação da luta anterior)
+  const w = fresh(20, 50000);
+  const id = TRIAL_BOSSES[0];
+  w.enterTrial(id, 1);
+  for (const tier of [1, 2]) {
+    w.trialPrompt = { bossId: id, tier };
+    w.bossSummoned = true;
+    w.monsters.push({ ...boss(w)!, id: 99999, summoned: true });
+    const repeat = tier === 1;
+    ok(w.trialNext(repeat) === null, repeat ? 'repetir nível aceito' : 'próximo nível aceito');
+    ok(
+      !w.bossSummoned &&
+        w.monsters.length === 1 &&
+        !w.monsters[0].enraged &&
+        w.monsters[0].hp === w.monsters[0].derived.maxHp,
+      repeat ? 'repetir: chefe zerado e sem ajudantes' : 'próximo: chefe zerado e sem ajudantes',
+    );
+  }
+  ok(w.trialRun?.tier === 3, 'repetir mantém o nível; próximo sobe');
+}
+
 if (fails) {
   console.error(`\ntrial-check: ${fails} falha(s)`);
   process.exit(1);
