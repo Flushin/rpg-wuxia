@@ -43,6 +43,7 @@ import {
   makePotion,
   maxDurability,
   isStackId,
+  itemHasGems,
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, homeTownOf, portalMinLevel } from './mapsConfig';
@@ -69,6 +70,7 @@ import * as boss from './world/boss';
 import * as quests from './world/quests';
 import * as shop from './world/shop';
 import * as forge from './world/forge';
+import * as gems from './world/gems';
 import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
@@ -1612,7 +1614,7 @@ export class World {
   // destrói o item (a pilha inteira) da mochila, sem ganho: libera espaço longe da vila
   destroyItem(bagIndex: number): boolean {
     const it = this.bag[bagIndex];
-    if (!it || it.locked || it.rarity === 'epico') return false; // Épico não se destrói: só desmonta no ferreiro
+    if (!it || it.locked || it.rarity === 'epico' || itemHasGems(it)) return false; // Épico não se destrói: só desmonta no ferreiro
     this.removeFromBag(bagIndex, it.qty ?? 1);
     this.bumpInv();
     return true;
@@ -1654,6 +1656,23 @@ export class World {
   }
   forgeSalvage(bagIndex: number, force = false): ActionError | null {
     return forge.salvage(this, bagIndex, force);
+  }
+
+  // ---------- gemas e encaixes (Porto Noturno): src/core/world/gems.ts ----------
+  buyGem(id: string, qty = 1): ActionError | null {
+    return gems.buyGem(this, id, qty);
+  }
+  fuseGem(id: string): ActionError | null {
+    return gems.fuseGem(this, id);
+  }
+  openSocket(it: ItemInstance): ActionError | null {
+    return gems.openSocket(this, it);
+  }
+  insertGem(it: ItemInstance, id: string, slot = -1): ActionError | null {
+    return gems.insertGem(this, it, id, slot);
+  }
+  removeGem(it: ItemInstance, slot: number): ActionError | null {
+    return gems.removeGem(this, it, slot);
   }
 
   // ---------- Mercador Ambulante (marco 9): src/core/world/merchant.ts ----------

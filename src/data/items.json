@@ -76,10 +76,22 @@
     }
   },
   "epicBonuses": {
-    "lamina": ["strength", "elemAtk"],
-    "pavilhao": ["intelligence", "elemAtk"],
-    "tita": ["strength", "elemAtk"],
-    "vibora": ["strength", "elemAtk"]
+    "lamina": [
+      "strength",
+      "elemAtk"
+    ],
+    "pavilhao": [
+      "intelligence",
+      "elemAtk"
+    ],
+    "tita": [
+      "strength",
+      "elemAtk"
+    ],
+    "vibora": [
+      "strength",
+      "elemAtk"
+    ]
   },
   "epicNames": {
     "colar": "Colar do Lótus Violeta",
@@ -981,6 +993,13 @@
       "value": 200,
       "color": "#5fe0a8",
       "desc": "Material raro de forja para itens nível 20 ou mais. Cai dos monstros do Bosque de Bambu Sombrio e do Pico da Névoa e de itens nv 20+ desmontados."
+    },
+    "po_estrela": {
+      "name": "Pó de Estrela",
+      "tier": "raro",
+      "value": 1000,
+      "color": "#fff3a8",
+      "desc": "Material raro do Ferreiro-mestre: abrir o 3º encaixe de um item pede 1. Vendido pelo Joalheiro."
     }
   },
   "consumables": {
@@ -1000,6 +1019,155 @@
     "materials": {
       "cristal_gelo": 450,
       "jade_nevoa": 750
+    }
+  },
+  "gems": {
+    "_doc": [
+      "Gemas e encaixes (Porto Noturno, etapa 2; docs/decisoes/gemas.md). Cada tipo dá stats por nível I–V (índice 0–4).",
+      "Valor do nível n = price × levelValueMul^(n−1) (3 gemas iguais fundem em 1 do nível seguinte). Fundir custa fuseCostPct do valor da gema nova; retirar do item custa removeCostPct do valor da gema.",
+      "socketsByRarity = encaixes máximos; socketCost[i] = custo de abrir o encaixe i+1 (ouro e materiais)."
+    ],
+    "price": 800,
+    "levelValueMul": 3,
+    "fuse": 3,
+    "fuseCostPct": 0.1,
+    "removeCostPct": 0.2,
+    "starDustPrice": 3000,
+    "socketsByRarity": {
+      "comum": 1,
+      "incomum": 1,
+      "raro": 2,
+      "epico": 3
+    },
+    "socketCost": [
+      {
+        "gold": 2000,
+        "mats": {}
+      },
+      {
+        "gold": 6000,
+        "mats": {}
+      },
+      {
+        "gold": 15000,
+        "mats": {
+          "po_estrela": 1
+        }
+      }
+    ],
+    "levelNames": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "types": {
+      "rubi": {
+        "name": "Rubi",
+        "color": "#e0384a",
+        "stats": {
+          "physAtk": [
+            8,
+            18,
+            29,
+            42,
+            56
+          ]
+        }
+      },
+      "ametista": {
+        "name": "Ametista",
+        "color": "#a35cff",
+        "stats": {
+          "spiritAtk": [
+            8,
+            18,
+            29,
+            42,
+            56
+          ]
+        }
+      },
+      "jade": {
+        "name": "Jade",
+        "color": "#3ccf7e",
+        "stats": {
+          "maxHp": [
+            60,
+            130,
+            215,
+            310,
+            420
+          ]
+        }
+      },
+      "perola": {
+        "name": "Pérola",
+        "color": "#f2ecdf",
+        "stats": {
+          "maxMana": [
+            30,
+            65,
+            110,
+            155,
+            210
+          ]
+        }
+      },
+      "safira": {
+        "name": "Safira",
+        "color": "#3a7bff",
+        "stats": {
+          "critChance": [
+            0.01,
+            0.02,
+            0.035,
+            0.05,
+            0.07
+          ]
+        }
+      },
+      "onix": {
+        "name": "Ônix",
+        "color": "#4a4a58",
+        "stats": {
+          "physDef": [
+            6,
+            13,
+            21,
+            30,
+            40
+          ],
+          "spiritDef": [
+            6,
+            13,
+            21,
+            30,
+            40
+          ]
+        }
+      },
+      "topazio": {
+        "name": "Topázio",
+        "color": "#ffb830",
+        "stats": {
+          "hit": [
+            5,
+            11,
+            18,
+            26,
+            35
+          ],
+          "evasion": [
+            5,
+            11,
+            18,
+            26,
+            35
+          ]
+        }
+      }
     }
   }
 }

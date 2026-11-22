@@ -17,6 +17,9 @@ import {
   EPIC_BONUSES,
   EPIC_NAMES,
   EQUIP_TIERS,
+  GEM_CFG,
+  gemValue,
+  sellPrice,
   GROUND_SECONDS,
   MERCHANT,
   MONSTERS,
@@ -172,6 +175,7 @@ const TOPICS = [
   { id: 'auto', label: 'Auto-combate e ganho offline', icon: 'pergaminho_retorno' },
   { id: 'trial', label: 'Trial (desafio de chefes)', icon: 'essencia_qi' },
   { id: 'epico', label: 'Equipamento Épico', icon: 'epico_colar' },
+  { id: 'gemas', label: 'Gemas e encaixes', icon: 'po_estrela' },
 ];
 
 export { EPIC };
@@ -182,8 +186,56 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico, gemas }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
+}
+
+/** Gemas e encaixes (Porto Noturno): regras em src/core/world/gems.ts; números de items.json "gems". */
+function gemas(): string {
+  const lvs = GEM_CFG.levelNames,
+    fmtG = (n: number) => n.toLocaleString('pt-BR'),
+    gem = (c: string, l = '') =>
+      `<span style="display:inline-block;width:10px;height:10px;transform:rotate(45deg);background:${c};margin-right:6px;border:1px solid #0006"></span>${l}`;
+  const val = (stat: string, v: number) => (stat === 'critChance' ? `${+(v * 100).toFixed(1)}%` : `${v}`);
+  const rows = Object.values(GEM_CFG.types)
+    .map((t) => {
+      const stats = Object.keys(t.stats);
+      return `<tr><td>${gem(t.color)}<b>${esc(t.name)}</b></td><td>${stats.map((k) => esc(STAT_LABELS[k] ?? k)).join(' + ')}</td>${lvs
+        .map((_, i) => `<td>+${val(stats[0], t.stats[stats[0]][i])}</td>`)
+        .join('')}</tr>`;
+    })
+    .join('');
+  const price = lvs
+    .map((l, i) => {
+      const fuse = i ? fmtG(Math.round(gemValue(i + 1) * GEM_CFG.fuseCostPct)) : '—';
+      return `<tr><td>${l}</td><td>${fmtG(gemValue(i + 1))}</td><td>${i ? `${GEM_CFG.fuse}× ${lvs[i - 1]} + ${fuse} ouro` : `${fmtG(GEM_CFG.price)} ouro no Joalheiro`}</td><td>${fmtG(Math.round(gemValue(i + 1) * GEM_CFG.removeCostPct))}</td><td>${sellPrice(gemValue(i + 1))}</td></tr>`;
+    })
+    .join('');
+  const sock = (['comum', 'incomum', 'raro', 'epico'] as const)
+    .map(
+      (r) =>
+        `<td style="color:${RARITIES[r].color}">${esc(RARITIES[r].name)}: <b>${GEM_CFG.socketsByRarity[r]}</b></td>`,
+    )
+    .join('');
+  const open = GEM_CFG.socketCost
+    .map(
+      (c, i) =>
+        `<li>${i + 1}º encaixe: <b>${fmtG(c.gold)} ouro</b>${Object.keys(c.mats).length ? ' + ' + mats(c.mats) : ''}</li>`,
+    )
+    .join('');
+  return `<section class="panel"><h2>O que é</h2>
+      <p>Equipamentos ganham <b>encaixes</b> no <a href="#/npc/ferreiro_mestre">Ferreiro-mestre</a>, e cada encaixe recebe uma <b>gema</b>,
+      que soma atributos ao item. As gemas são vendidas pelo <a href="#/npc/joalheiro">Joalheiro</a> e vão de nível ${lvs[0]} a ${lvs[lvs.length - 1]}.
+      Ficam na aba de materiais da mochila e empilham. Item quebrado (durabilidade 0) perde também o efeito das gemas.</p></section>
+    <section class="panel"><h2>Gemas</h2><div class="scroll"><table class="tbl"><thead><tr><th>Gema</th><th>Atributo</th>${lvs.map((l) => `<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="muted">Ônix soma o valor nas duas defesas; Topázio, na precisão e na esquiva.</p></section>
+    <section class="panel"><h2>Comprar e fundir</h2><p>O Joalheiro só vende gemas de nível ${lvs[0]}. <b>${GEM_CFG.fuse} gemas iguais</b> viram 1 do nível
+      seguinte, pagando ${pc(GEM_CFG.fuseCostPct)} do valor da gema nova. Ele também vende ${itemLink('po_estrela')} por ${fmtG(GEM_CFG.starDustPrice)} ouro.</p>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Nível</th><th>Valor</th><th>Como conseguir</th><th>Retirar (ouro)</th><th>Venda</th></tr></thead><tbody>${price}</tbody></table></div></section>
+    <section class="panel"><h2>Encaixes</h2><p>Máximo por raridade:</p><table class="tbl"><tbody><tr>${sock}</tr></tbody></table>
+      <p>Abrir (um de cada vez, na ordem):</p><ul>${open}</ul>
+      <p><b>Colocar</b> uma gema num encaixe vazio é grátis. <b>Retirar</b> custa ${pc(GEM_CFG.removeCostPct)} do valor da gema, que volta inteira para a mochila.
+      Item com gema <b>não pode ser vendido, destruído nem desmontado</b> (nem pelo Auto): retire as gemas antes.</p></section>`;
 }
 
 function epico(): string {

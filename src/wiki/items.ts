@@ -27,6 +27,7 @@ import {
   questRewardsFor,
   sellPrice,
   type ItemKind,
+  GEM_CFG,
 } from './data';
 import { chance, itemLink, monsterLabel, spoiler } from './ui';
 import { epicBonusesAt } from './mechanics';
@@ -125,6 +126,8 @@ function sources(id: string): string {
     shops.push(`<li><a href="#/npc/vendedor">Vendedor de Poções</a> — <b>${POTIONS[id].price} ouro</b></li>`);
   if (MERCHANT.materials[id])
     shops.push(`<li><a href="#/npc/mercador">Mercador Ambulante</a> — <b>${MERCHANT.materials[id]} ouro</b></li>`);
+  if (id === 'po_estrela')
+    shops.push(`<li><a href="#/npc/joalheiro">Joalheiro</a> — <b>${GEM_CFG.starDustPrice} ouro</b></li>`);
   if (CONSUMABLES[id])
     shops.push(`<li><a href="#/npc/mercador">Mercador Ambulante</a> — <b>${CONSUMABLES[id].price} ouro</b></li>`);
   const b = BASES[id];
