@@ -56,6 +56,54 @@ export class TrialWindow {
         else audio.ui('ui_click');
       }
     });
+    byId('trial-prompt').addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest('[data-a]') as HTMLButtonElement | null;
+      if (!t || t.disabled) return;
+      audio.ui('ui_click');
+      if (t.dataset.a === 'next') {
+        const err = this.world.trialNext();
+        if (err) this.toast(actionErrorText(err), '#ff8a80');
+      } else if (t.dataset.a === 'leave') this.world.leaveTrial();
+    });
+  }
+
+  private promptSig = '';
+  /** Janela do fim da luta no Trial (torre de chefes): seguir para o próximo nível pagando a entrada, ou sair. */
+  private updatePrompt() {
+    const w = this.world,
+      el = byId('trial-prompt'),
+      p = w.trialPrompt;
+    if (!p) {
+      if (!el.classList.contains('hidden')) el.classList.add('hidden');
+      this.promptSig = '';
+      return;
+    }
+    const sig = `${p.bossId}|${p.tier}|${w.gold}`;
+    if (sig === this.promptSig) return;
+    this.promptSig = sig;
+    el.classList.remove('hidden');
+    const last = p.tier >= TRIAL_TIERS,
+      next = p.tier + 1,
+      cost = last ? 0 : trialCost(next),
+      poor = w.gold < cost;
+    renderPanel(
+      el,
+      `<div class="card npc-card"><h2>${L(`Nível ${p.tier} vencido!`, `Level ${p.tier} cleared!`)}</h2>
+      <p>${
+        last
+          ? L('Você venceu o nível mais alto deste chefe.', 'You beat the highest level of this boss.')
+          : L(
+              `Seguir para o nível ${next} (chefe nv ${trialBossLevel(next)}) por ${cost} ouro?`,
+              `Go on to level ${next} (boss lv ${trialBossLevel(next)}) for ${cost} gold?`,
+            )
+      }</p>
+      <small class="gold">${w.gold} ${L('ouro', 'gold')}</small>
+      <div class="tp-btns">
+        ${last ? '' : `<button class="primary" data-a="next" ${poor ? 'disabled' : ''}>${L(`Próximo nível (${cost})`, `Next level (${cost})`)}</button>`}
+        <button data-a="leave">${L('Sair do Trial', 'Leave Trial')}</button>
+      </div>
+      ${!last && poor ? `<small class="muted">${L('Ouro insuficiente', 'Not enough gold')}</small>` : ''}</div>`,
+    );
   }
 
   private tierOf(bossId: string): number {
@@ -64,6 +112,7 @@ export class TrialWindow {
   }
 
   update() {
+    this.updatePrompt();
     const w = this.world,
       el = byId('trial-panel');
     if (!w.trialMenu) {

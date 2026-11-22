@@ -482,7 +482,7 @@ function trial(): string {
       <li><b>Liberação:</b> vencer o nível N de um chefe libera o N+1 <b>daquele chefe</b>. O progresso fica salvo.</li>
       <li><b>Entrada:</b> ${trialCost(1)} de ouro no nível 1, +${trialCost(2) - trialCost(1)} por nível.</li>
       <li>Como nas masmorras: o <a href="#/mecanicas/auto">Auto</a> não funciona, nada renasce e morrer, sair pelo portal ou fechar o jogo encerra a luta (paga de novo para tentar).</li>
-      <li>Depois da vitória, a saída é o portal da entrada (ao sul da arena).</li></ul></section>
+      <li><b>Torre de chefes:</b> ao vencer, uma janela pergunta se você quer seguir para o próximo nível (paga a entrada dele e o chefe volta na hora, sem sair da arena) ou sair do Trial (volta para a vila). O portal da entrada também leva de volta.</li></ul></section>
     <section class="panel"><h2>Ponto fraco</h2><p>No Trial todos os chefes têm a <b>mesma vida e o mesmo dano por segundo</b> no mesmo nível. O que muda é o jeito de lutar e o ponto fraco:
       defesa alta contra um tipo de dano e baixa contra o outro. Tormenta, Titã e Víbora causam dano físico; Geada, espiritual.
       Quem bate mais devagar bate mais forte (dano proporcional ao intervalo entre golpes). Além disso, todo golpe de chefe tira <b>${Math.round(BOSS_PCT_HP.basic * 100)}% da sua vida máxima</b> por golpe normal (proporcional ao intervalo) e ${Math.round(BOSS_PCT_HP.telegraph * 100)}% por 1× de dano dos golpes marcados no chão, sem redução pela defesa (valores para chefe nível ${BOSS_PCT_HP.fullLevel}+; menos nos níveis abaixo). A defesa reduz só a outra parte do golpe.</p>
