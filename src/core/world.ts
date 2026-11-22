@@ -205,6 +205,8 @@ export class World {
   trialPrompt: { bossId: string; tier: number } | null = null;
   /** maior nível do Trial vencido de cada chefe (salvo) */
   trialProgress: TrialProgress = {};
+  /** tempo de jogo (s, só com o jogo aberto): com o auto ligado e com o auto desligado (jogo ativo) */
+  playTime = { auto: 0, manual: 0 };
 
   // ---- estado interno: usado só pelo World e pelos módulos de src/core/world/ (a interface não mexe) ----
   bossSummoned = false;
@@ -870,6 +872,8 @@ export class World {
 
   tick(dt: number) {
     this.time += dt;
+    if (this.auto.state === 'on') this.playTime.auto += dt;
+    else this.playTime.manual += dt;
     this.drainUltimate(dt);
     this.gcd = Math.max(0, this.gcd - dt);
     for (const st of Object.values(this.skills)) st.cd = Math.max(0, st.cd - dt);

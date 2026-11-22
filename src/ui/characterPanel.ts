@@ -134,6 +134,8 @@ export class CharacterPanel {
       p.level,
       w.invVersion,
       this.sel,
+      Math.floor(w.playTime.auto / 60),
+      Math.floor(w.playTime.manual / 60),
     ]);
     if (sig === this.sig) return;
     this.sig = sig;
@@ -183,6 +185,16 @@ export class CharacterPanel {
     ];
     // roubo de vida da seita (Tormenta): só aparece para quem tem
     if (cls.lifeSteal) der.push([L('Roubo de vida', 'Life steal'), `${+(cls.lifeSteal * 100).toFixed(1)}%`]);
+    const fmtPlay = (s: number) => {
+      const m = Math.floor(s / 60);
+      return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min`;
+    };
+    const pt = w.playTime;
+    const playRows = [
+      [L('Jogando (auto desligado)', 'Playing (auto off)'), fmtPlay(pt.manual)],
+      [L('Com o auto ligado', 'With auto on'), fmtPlay(pt.auto)],
+      [L('Total', 'Total'), fmtPlay(pt.manual + pt.auto)],
+    ];
     const els = ELEMENTS.map(
       (e) =>
         `<div class="at-el el-${e}"><span>${ELEMENT_LABELS[e]}</span><b class="${p.elemAtk[e] ? '' : 'zero'}">${p.elemAtk[e]}</b><b class="${p.elemRes[e] ? '' : 'zero'}">${p.elemRes[e]}</b></div>`,
@@ -204,7 +216,9 @@ export class CharacterPanel {
       <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
       <div class="ch-top"><div class="ch-left"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="inv-detail ch-detail">${detail}</div></div>
       <div class="ch-der"><h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
-      <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div></div></div>
+      <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
+      <h3 class="at-h">${L('Tempo de jogo', 'Play time')}</h3>
+      <div class="at-der">${playRows.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div></div></div>
       <div class="ch-right"><div class="ch-attrs"><div class="at-pts ${free > 0 ? 'has' : ''}"><span>${L('Pontos livres', 'Free points')}</span><b>${free}</b>
         ${free > 0 ? `<button class="at-dist" data-dist="1">${L('Distribuir recomendado', 'Distribute recommended')}</button>` : ''}</div>
       <div class="at-list">${rows}</div></div>

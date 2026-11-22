@@ -995,6 +995,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Play time in the Character panel: split between playing with auto off and with auto on." },
       {
         "texto": "Elemental aura: every sect gets an aura of its element that grows every 100 elemental attack (up to 600), with any outfit. Tormenta with sparks and bolts, Geada with snowflakes and crystals, Titã with embers and flames, Víbora with bubbles and poison."
       },

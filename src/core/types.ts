@@ -309,6 +309,8 @@ export interface SaveData {
   /** estoque do Mercador Ambulante (marco 9): janela de renovação e ofertas (item, preço, vendido) */
   /** Trial: maior nível vencido de cada chefe (id do chefe → 1–10) */
   trialProgress?: Record<string, number>;
+  /** tempo de jogo em segundos (jogo aberto): com o auto ligado e desligado */
+  playTime?: { auto: number; manual: number };
   /** skins compradas (ids de skins.json) e a vestida (ausente = traje da seita) */
   skins?: string[];
   skin?: string;
