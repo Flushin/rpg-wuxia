@@ -7,7 +7,6 @@ import {
   NPC_TEXT,
   POTIONS,
   PROGRESSION,
-  SKINS,
   RARITIES,
   SELL_RATIO,
   esc,
@@ -52,16 +51,8 @@ const meridians = () =>
   e fica bloqueado sem ouro suficiente ou sem nenhum ponto distribuído.</p>`;
 /** Governador Bai: trajes (skins) por seita (World.buySkin, src/data/skins.json). */
 const outfits = () =>
-  `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem. Cada traje é de uma
-  <a href="#/seitas">seita</a> e só aparece para quem é dela; só muda a aparência (no jogo e no retrato da mochila), sem efeito
-  no combate. Depois de comprado, o traje fica seu: vista e volte ao traje da seita quando quiser, de graça, na mesma janela. Antes de comprar, dá para girar cada traje 360° (arrastando ou
-  pelas setas) e abrir em tela cheia (⛶); o mesmo vale para o seu personagem na janela Personagem (tecla <b>C</b>).</p>
-  <ul>${Object.entries(SKINS)
-    .map(
-      ([id, s]) =>
-        `<li><img class="skin-pic" src="../sprites/${id}_retrato.png" alt="" loading="lazy"> <b>${esc(s.name)}</b> (${esc(CLASSES[s.sect]?.name ?? s.sect)}): ${esc(s.desc)} <span class="price">${s.price.toLocaleString('pt-BR')} ouro</span></li>`,
-    )
-    .join('')}</ul>`;
+  `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem, só da sua seita e sem efeito no
+  combate. Veja todos os trajes, preços e como funcionam na página <a href="#/trajes">Trajes</a>.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
 const sameAs = (id: string, name: string) => () =>
   `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;

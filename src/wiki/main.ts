@@ -1,4 +1,5 @@
 // Wiki do Mistpeak (página wiki/index.html, publicada em <site>/wiki/). Navegação por hash: #/itens, #/item/<id>, #/npc/<id>...
+import { skinIndexPage } from './skins';
 import './wiki.css';
 import { BASES, CONSUMABLES, MATERIALS, POTIONS, allItemIds, esc, iconHtml, itemName } from './data';
 import { itemIndexPage, itemPage } from './items';
@@ -26,6 +27,7 @@ const CATS: Cat[] = [
   { id: 'itens', label: 'Itens', icon: 'espadas_ferro', ready: true },
   { id: 'monstros', label: 'Monstros', icon: '🐺', ready: true },
   { id: 'npcs', label: 'NPCs', icon: '🧙', ready: true },
+  { id: 'trajes', label: 'Trajes', icon: '👘', ready: true },
   { id: 'missoes', label: 'Missões', icon: '❗', ready: true },
   { id: 'mapas', label: 'Mapas', icon: '🗺', ready: true },
 ];
@@ -159,6 +161,7 @@ async function route() {
     html = skillPage(parts[1] ?? '');
     active = 'skills';
   } else if (parts[0] === 'novidades') html = novidadesPage();
+  else if (parts[0] === 'trajes') html = skinIndexPage();
   else if (parts[0] === 'mecanicas') html = mechanicsPage(parts[1]);
   else if (parts[0] === 'missoes') html = questIndexPage();
   else if (parts[0] === 'mapas') html = mapIndexPage();

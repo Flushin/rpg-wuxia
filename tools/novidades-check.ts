@@ -16,7 +16,19 @@ const bad = (m: string) => {
 const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: string };
 
 // páginas da wiki (as mesmas rotas de src/wiki/main.ts)
-const LISTAS = ['', 'novidades', 'mecanicas', 'seitas', 'skills', 'itens', 'monstros', 'npcs', 'missoes', 'mapas'];
+const LISTAS = [
+  '',
+  'novidades',
+  'mecanicas',
+  'seitas',
+  'skills',
+  'itens',
+  'monstros',
+  'npcs',
+  'trajes',
+  'missoes',
+  'mapas',
+];
 const MECANICAS = ['combate', 'morte', 'forja', 'auto', 'trial', 'epico'];
 function paginaExiste(p: string): boolean {
   const [a, b, ...resto] = p.split('/');
