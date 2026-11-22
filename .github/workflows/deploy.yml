@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,5 +30,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
+      # o deploy-pages às vezes não acha o artefato recém-enviado ("No artifacts named github-pages"): falha
+      # passageira do GitHub. Espera e tenta de novo em vez de derrubar a publicação (antes era preciso re-run manual).
       - id: deployment
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 45
+      - id: deployment2
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
