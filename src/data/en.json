@@ -994,16 +994,36 @@
     }
   },
   "novidades": {
-    "proxima": [
-      { "texto": "Play time in the Character panel: split between playing with auto off and with auto on." },
-      {
-        "texto": "Elemental aura: every sect gets an aura of its element that grows every 100 elemental attack (up to 600), with any outfit. Tormenta with sparks and bolts, Geada with snowflakes and crystals, Titã with embers and flames, Víbora with bubbles and poison."
-      },
-      {
-        "texto": "Tormenta ultimate (level 10): Storm's Fury charges with skills that hit and calls lightning for 3 s around you. On mobile, tap the arc around the skills; on PC, press R. Mobile buttons rearranged with even spacing."
-      }
-    ],
+    "proxima": [],
     "versoes": [
+      {
+        "loja": [
+          "Ultimates for all 4 sects (level 10): Storm's Fury, Thousand Crystal Fan, Giant's Fists and Thousand-Needle Viper.",
+          "They charge with skills that hit; tap the arc (mobile) or press R (PC).",
+          "Elemental aura for every sect, growing with elemental attack.",
+          "Play time split between auto on and auto off."
+        ],
+        "itens": [
+          {
+            "texto": "Play time in the Character panel: split between playing with auto off and with auto on."
+          },
+          {
+            "texto": "Elemental aura: every sect gets an aura of its element that grows every 100 elemental attack (up to 600), with any outfit. Tormenta with sparks and bolts, Geada with snowflakes and crystals, Titã with embers and flames, Víbora with bubbles and poison."
+          },
+          {
+            "texto": "Tormenta ultimate (level 10): Storm's Fury charges with skills that hit and calls lightning for 3 s around you. On mobile, tap the arc around the skills; on PC, press R. Mobile buttons rearranged with even spacing."
+          },
+          {
+            "texto": "Geada ultimate (level 10): Thousand Crystal Fan sends spiraling waves of ice blades for 3 s, slows monsters and freezes them at the end."
+          },
+          {
+            "texto": "Titã ultimate (level 10): Giant's Fists summons an ember giant that punches monsters for 3 s, keeping them stunned, and smashes the ground at the end."
+          },
+          {
+            "texto": "Víbora ultimate (level 10): Thousand-Needle Viper sends swarms of emerald needles that tie threads to monsters; at the end, a viper made of needles strikes and poisons them all."
+          }
+        ]
+      },
       {
         "loja": [
           "Trial is now a boss tower: go on, repeat or leave without returning to the village.",
@@ -1214,6 +1234,18 @@
     "lamina": {
       "name": "Storm's Fury",
       "description": "Raises the blades to the sky and calls lightning for 3 s on every monster within 7 tiles: 6 bolts of 100% damage and a final burst of 300%. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit, and does not heal."
+    },
+    "pavilhao": {
+      "name": "Thousand Crystal Fan",
+      "description": "Spins the fan and sends spiraling waves of crystal blades for 3 s at every monster within 8 tiles: 6 hits of 80% damage, each slowing the target by 40%, and a final burst of 300% that freezes for 1.5 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
+    },
+    "tita": {
+      "name": "Giant's Fists",
+      "description": "An ember giant rises behind him and punches every monster within 6 tiles for 3 s: 6 punches of 90% damage, each stunning for 0.5 s, and a final smash of 300% that stuns for 2 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
+    },
+    "vibora": {
+      "name": "Thousand-Needle Viper",
+      "description": "A swarm of emerald needles circles her and pierces every monster within 7 tiles for 3 s, tying a thread to each: 6 streams of 80% damage and, at the end, the swarm becomes a viper that strikes for 250% while she pulls the threads, poisoning for another 200% damage over 6 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
     }
   }
 }

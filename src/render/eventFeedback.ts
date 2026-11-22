@@ -11,6 +11,7 @@ import { homeTownOf } from '../core/mapsConfig';
 import { RARITIES } from '../core/items';
 import { TRIAL_TIERS } from '../core/trial';
 import { skillById } from '../core/skills';
+import { ultimateOf } from '../core/ultimate';
 import type { Hud } from '../ui/hud';
 import { audio } from './audio';
 import { DEPTH } from './depth';
@@ -109,7 +110,8 @@ export class EventFeedback {
           this.overPlayer(64, L('Escudo', 'Shield'), FLOAT_COLOR.SHIELD);
         else if (ev.kind === 'regen' && ev.targetId === this.world.player.id)
           this.overPlayer(64, L('Cura', 'Heal'), FLOAT_COLOR.HEAL);
-        else if (ev.kind === 'stun') {
+        else if (ev.kind === 'stun' && !ev.refresh) {
+          // renovar (ex.: cada soco da ultimate do Titã) não repete o texto
           const m = this.world.monsters.find((x) => x.id === ev.targetId);
           if (m) {
             const s = tileToScreen(m.x, m.y);
@@ -139,11 +141,13 @@ export class EventFeedback {
         this.fx.onEvent(ev);
         return true;
       case 'ultimate':
-        // pose de subir de nível (braços para cima) durante os 3 s, com brilho amarelo
+        // pose de subir de nível (braços para cima) durante a ultimate, com o brilho na cor da seita
         if (ev.phase === 'start') {
-          const v = this.views.get(this.world.player.id);
-          v?.levelUp(3000, 0xffd23a, 1.3, true, 3000);
-          v?.levitate(3000);
+          const v = this.views.get(this.world.player.id),
+            u = ultimateOf(ev.sect),
+            ms = (u?.duration ?? 3) * 1000;
+          v?.levelUp(ms, parseInt((u?.color ?? '#ffd23a').slice(1), 16), 1.3, true, ms);
+          v?.levitate(ms);
           vibrate();
         }
         this.fx.onEvent(ev);

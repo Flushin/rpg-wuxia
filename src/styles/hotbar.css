@@ -340,7 +340,7 @@
   right: 0;
   bottom: 0;
   height: calc(var(--f, 0) * 100%);
-  background: linear-gradient(0deg, #b8860b, #ffd23a);
+  background: linear-gradient(0deg, var(--ult-dark, #b8860b), var(--ult, #ffd23a));
   opacity: 0.8;
 }
 .ult-btn .ic {
@@ -372,17 +372,17 @@
   display: none;
 }
 .ult-btn.ready {
-  border-color: #ffd23a;
+  border-color: var(--ult, #ffd23a);
   animation: ult-pulse 1.1s ease-in-out infinite alternate;
 }
 @keyframes ult-pulse {
   from {
-    box-shadow: 0 0 4px #ffd23a88;
+    box-shadow: 0 0 4px var(--ult, #ffd23a);
   }
   to {
     box-shadow:
-      0 0 16px #ffd23a,
-      0 0 26px #9fe6ff88;
+      0 0 16px var(--ult, #ffd23a),
+      0 0 26px var(--ult-glow, #9fe6ff);
   }
 }
 #hotbar.touch .ult-btn {
@@ -409,7 +409,7 @@
   touch-action: none;
 }
 .ult-arc .ua-fill {
-  stroke: #e0b020;
+  stroke: var(--ult, #e0b020);
   transition: stroke-dashoffset 0.3s;
 }
 .ult-arc .ua-label {
@@ -422,15 +422,15 @@
   opacity: 0.5;
 }
 .ult-arc.ready .ua-border {
-  stroke: #ffd23a;
-  filter: drop-shadow(0 0 6px #ffd23a) drop-shadow(0 0 10px #9fe6ff);
+  stroke: var(--ult, #ffd23a);
+  filter: drop-shadow(0 0 6px var(--ult, #ffd23a)) drop-shadow(0 0 10px var(--ult-glow, #9fe6ff));
   animation: ult-arc-pulse 1.1s ease-in-out infinite alternate;
 }
 .ult-arc.ready .ua-fill {
-  stroke: #fff3b0;
+  stroke: var(--ult-core, #fff3b0);
 }
 .ult-arc.ready .ua-label {
-  fill: #3a2a00;
+  fill: var(--ult-ink, #3a2a00);
   opacity: 1;
   font-weight: 700;
 }

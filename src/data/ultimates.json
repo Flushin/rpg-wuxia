@@ -4,6 +4,17 @@
     "name": "Fúria da Tormenta",
     "unlock": 10,
     "color": "#ffd23a",
+    "glow": "#9fe6ff",
+    "core": "#fff3b0",
+    "dark": "#b8860b",
+    "ink": "#3a2a00",
+    "icon": "雷",
+    "fx": "tormenta",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_dash",
+      "final": "aoe_impact"
+    },
     "description": "Ergue as lâminas para o céu e chama raios por 3 s em todos os monstros num raio de 7 tiles: 6 raios de 100% do dano e um estouro final de 300%. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico, e não recupera vida.",
     "charge": 25,
     "radius": 7,
@@ -11,6 +22,112 @@
     "strikes": 6,
     "strikeMult": 1,
     "finalMult": 3,
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
+  },
+  "pavilhao": {
+    "id": "leque_mil_cristais",
+    "name": "Leque dos Mil Cristais",
+    "unlock": 10,
+    "color": "#9fdcff",
+    "glow": "#b9a6ff",
+    "core": "#ffffff",
+    "dark": "#2a6fa8",
+    "ink": "#0b2440",
+    "icon": "霜",
+    "fx": "geada",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "cast_geada",
+      "final": "crit_geada"
+    },
+    "description": "Gira o leque e solta ondas de lâminas de cristal em espiral por 3 s em todos os monstros num raio de 8 tiles: 6 golpes de 80% do dano, cada um deixando o alvo 40% mais lento, e um estouro final de 300% que congela por 1,5 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 8,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.8,
+    "finalMult": 3,
+    "strikeDebuff": {
+      "kind": "slow",
+      "value": 0.4,
+      "duration": 1
+    },
+    "finalDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 1.5
+    },
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
+  },
+  "tita": {
+    "id": "punhos_gigante",
+    "name": "Punhos do Gigante",
+    "unlock": 10,
+    "color": "#ff8a2a",
+    "glow": "#ff3a10",
+    "core": "#fff0b0",
+    "dark": "#b0400c",
+    "ink": "#3a1000",
+    "icon": "炎",
+    "fx": "tita",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_fistfire",
+      "final": "skill_quake"
+    },
+    "description": "Um gigante de brasa surge atrás dele e soca por 3 s todos os monstros num raio de 6 tiles: 6 socos de 90% do dano, cada um atordoando por 0,5 s, e um esmagamento final de 300% que atordoa por 2 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 6,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.9,
+    "finalMult": 3,
+    "strikeDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 0.5
+    },
+    "finalDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 2
+    },
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
+  },
+  "vibora": {
+    "id": "vibora_mil_agulhas",
+    "name": "Víbora de Mil Agulhas",
+    "unlock": 10,
+    "color": "#2fe89a",
+    "glow": "#a05ae6",
+    "core": "#e0fff0",
+    "dark": "#1a7a50",
+    "ink": "#04261a",
+    "icon": "毒",
+    "fx": "vibora",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_needle",
+      "final": "skill_toxic"
+    },
+    "description": "Um enxame de agulhas esmeralda gira em volta dela e perfura por 3 s todos os monstros num raio de 7 tiles, prendendo um fio em cada um: 6 correntes de 80% do dano e, no fim, o enxame vira uma víbora que dá o bote de 250% enquanto ela puxa os fios, envenenando com mais 200% do dano ao longo de 6 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 7,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.8,
+    "finalMult": 2.5,
+    "finalDebuff": {
+      "kind": "poison",
+      "value": 2,
+      "duration": 6
+    },
     "fullTargets": 8,
     "idleDelay": 20,
     "idleDrain": 1

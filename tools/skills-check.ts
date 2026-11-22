@@ -515,10 +515,17 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
   }
 }
 
-// ---------- ultimate da Tormenta (src/core/ultimate.ts) ----------
-{
-  console.log('ultimate (Tormenta)');
-  const u = ULTIMATES.lamina;
+// ---------- ultimate (src/core/ultimate.ts): o mesmo bloco roda para cada seita ----------
+function ultCheck(sect: string) {
+  console.log(`ultimate (${CLASSES[sect].name})`);
+  const u = ULTIMATES[sect],
+    total = Math.round((u.strikes * u.strikeMult + u.finalMult) * 100) / 100;
+  // só os golpes da ultimate (os tiques do veneno também são "hit", com poison: true)
+  const direct = (e: GameEvent, id: number) =>
+    e.type === 'hit' && e.targetId === id && !(e as { poison?: boolean }).poison;
+  const dmgOf = (es: GameEvent[], id: number) =>
+    es.filter((e) => direct(e, id)).reduce((a, e) => a + (e as { amount: number }).amount, 0);
+  ok(!!u.icon && !!u.fx && !!u.sounds?.strike && /^#[0-9a-f]{6}$/i.test(u.glow), 'ícone, efeito, cores e sons');
   const place = (w: World, n: number, r: number) => {
     freezeMonsters(w);
     for (const m of w.monsters.slice(n)) Object.assign(m, { dead: true, respawnAt: 1e9 });
@@ -537,10 +544,10 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
       return m;
     });
   };
-  const w9 = mk('lamina', 9);
+  const w9 = mk(sect, 9);
   for (let i = 0; i < 30; i++) (w9 as any).chargeUltimate(); // eslint-disable-line
   ok(w9.ultFill() === 0 && !w9.useUltimate(), 'antes do nível 10 a barra não enche');
-  const w = mk('lamina', 10);
+  const w = mk(sect, 10);
   for (let i = 0; i < u.charge - 1; i++) (w as any).chargeUltimate(); // eslint-disable-line
   ok(!w.useUltimate(), `com ${u.charge - 1} cargas ainda não solta`);
   (w as any).chargeUltimate(); // eslint-disable-line
@@ -564,28 +571,30 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
     evs.push(...e);
   }
   ok(!evs.some((e) => e.type === 'skillCast'), 'durante a ultimate não lança skill');
-  ok(w.ultCast === null && w.ultCharge === 0, 'termina em 3 s e esvazia a barra');
+  ok(w.ultCast === null && w.ultCharge === 0, `termina em ${u.duration} s e esvazia a barra`);
   const strikes = evs.filter((e) => e.type === 'ultimate' && e.phase === 'strike').length;
   ok(
     strikes === u.strikes * near.length && evs.some((e) => e.type === 'ultimate' && e.phase === 'final'),
-    `${u.strikes} raios por monstro + estouro final`,
+    `${u.strikes} golpes por monstro + estouro final`,
   );
-  ok(strikeTicks === strikes, 'raios intercalados: nunca dois no mesmo instante');
-  const one = dmgOf(evs, near[0].id) / (u.strikes * u.strikeMult + u.finalMult);
+  ok(strikeTicks === strikes, 'golpes intercalados: nunca dois no mesmo instante');
+  const one = dmgOf(evs, near[0].id) / total;
   const hitsOf = (es: GameEvent[], id: number) =>
-    es.filter((e) => e.type === 'hit' && e.targetId === id).map((e) => (e as { amount: number }).amount);
+    es.filter((e) => direct(e, id)).map((e) => (e as { amount: number }).amount);
   ok(
     near.every((m) => {
       const h = hitsOf(evs, m.id);
-      return h.length === u.strikes + 1 && Math.abs(h[h.length - 1] / h[0] - u.finalMult / u.strikeMult) < 0.05;
+      // dano inteiro: o arredondamento de cada golpe (±0,5) cresce na razão estouro/golpe
+      const r = u.finalMult / u.strikeMult;
+      return h.length === u.strikes + 1 && Math.abs(h[h.length - 1] - h[0] * r) <= Math.max(0.05 * h[0] * r, r + 1);
     }),
-    `cada monstro no raio leva ${u.strikes} raios + o estouro de ${u.finalMult}× (9× no total)`,
+    `cada monstro no raio leva ${u.strikes} golpes + o estouro de ${u.finalMult}× (${total}× no total)`,
   );
   ok(dmgOf(evs, far.id) === 0, 'monstro fora do raio não leva dano');
   ok(w.player.hp === 10, 'não recupera vida');
   ok(w.ultCharge === 0, 'o dano da própria ultimate não carrega a barra');
   // muitos alvos: dano dividido
-  const w2 = mk('lamina', 10);
+  const w2 = mk(sect, 10);
   const many = place(w2, 12, 3);
   w2.ultCharge = u.charge;
   drain(w2);
@@ -593,11 +602,11 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
   run(w2, u.duration + 0.2);
   const e2 = drain(w2);
   ok(
-    Math.abs(dmgOf(e2, many[0].id) / one - 9 * (u.fullTargets / 12)) < 0.3,
+    Math.abs(dmgOf(e2, many[0].id) / one - total * (u.fullTargets / 12)) < 0.3,
     `12 monstros: cada um leva ${u.fullTargets}/12 do dano`,
   );
   // fora de combate esvazia
-  const w3 = mk('lamina', 10);
+  const w3 = mk(sect, 10);
   place(w3, 0, 0);
   w3.ultCharge = u.charge;
   w3.lastCombat = w3.time;
@@ -605,7 +614,47 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
   const before = w3.ultCharge;
   run(w3, 5);
   ok(before === u.charge && w3.ultCharge < u.charge, `esvazia só depois de ${u.idleDelay} s sem combate`);
+  return { w, near, far, evs };
 }
+// efeitos opcionais (strikeDebuff em cada golpe que acerta, finalDebuff no estouro): só no raio
+function ultDebuffCheck(sect: string) {
+  const { w, near, far, evs } = ultCheck(sect);
+  const u = ULTIMATES[sect],
+    id = `ult_${sect}`,
+    applied = (kind: string, t?: number) =>
+      evs.filter(
+        (e) => e.type === 'buffApplied' && e.kind === kind && e.id === id && (t === undefined || e.targetId === t),
+      );
+  if (u.strikeDebuff)
+    ok(
+      near.every((m) => applied(u.strikeDebuff!.kind, m.id).length >= u.strikes) &&
+        !applied(u.strikeDebuff.kind, far.id).length,
+      `cada golpe aplica ${u.strikeDebuff.kind} ${u.strikeDebuff.value || ''} por ${u.strikeDebuff.duration} s (só no raio)`,
+    );
+  if (u.finalDebuff) {
+    const d = u.finalDebuff;
+    ok(
+      near.every((m) =>
+        m.buffs.some((b) => b.kind === d.kind && b.id === id && Math.abs(b.remaining - d.duration) < 0.25),
+      ),
+      `estouro aplica ${d.kind} por ${d.duration} s`,
+    );
+    if (d.kind === 'stun') ok(near.every((m) => w.isStunned(m)) && !w.isStunned(far), 'fora do raio não atordoa');
+    if (d.kind === 'poison') {
+      // veneno pela conta das skills: fração do dano ao longo da duração (dano por segundo positivo)
+      const dps = near.map((m) => m.buffs.find((b) => b.kind === 'poison' && b.id === id)?.value ?? 0);
+      ok(
+        dps.every((v) => v > 0) && !far.buffs.some((b) => b.kind === 'poison'),
+        `veneno de ${d.value * 100}% do dano em ${d.duration} s`,
+      );
+    }
+  }
+}
+ultCheck('lamina');
+ok(!ULTIMATES.lamina.strikeDebuff && !ULTIMATES.lamina.finalDebuff, 'Tormenta: só dano, sem efeito');
+ultDebuffCheck('pavilhao');
+ultDebuffCheck('tita');
+ultDebuffCheck('vibora');
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

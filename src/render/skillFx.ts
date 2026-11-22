@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import { skillById } from '../core/skills';
 import type { GameEvent } from '../core/types';
+import { ultimateOf } from '../core/ultimate';
+import { FIST_ORIGIN, GIANT_ORIGIN, GIANT_RES, ensureGiantTextures } from './ultGiant';
 import { DEPTH } from './depth';
 import { shakeCamera } from './fxPrefs';
 
@@ -21,6 +23,10 @@ const POISON_DEEP = 0x2f7a3a;
 const JADE = [0xe0fff0, 0x90f0b8, 0x40c080];
 
 type Pt = { x: number; y: number };
+type UltEvent = Extract<GameEvent, { type: 'ultimate' }>;
+/** cores da ultimate da seita (ultimates.json) e duração em ms */
+type UltColors = { main: number; glow: number; core: number; dur: number };
+const hex = (s: string) => parseInt(s.slice(1), 16);
 
 /**
  * Efeitos visuais das skills (marco 6): só visuais, não mudam regras.
@@ -718,9 +724,20 @@ export class SkillFx {
     });
   }
 
-  // ---------- ultimate da Tormenta (prévia aprovada: previews/ultimate-tormenta-a.html) ----------
-  /** Raio da ultimate: halo azul-gelo, corpo amarelo e miolo branco, com galhos. */
-  private ultBolt(a: Pt, b: Pt, w: number, jag: number, segs = 10) {
+  // ---------- ultimates (src/data/ultimates.json: "fx" escolhe o efeito; cores color/glow/core) ----------
+  private ultimate(ev: UltEvent) {
+    const u = ultimateOf(ev.sect);
+    if (!u) return;
+    const col: UltColors = { main: hex(u.color), glow: hex(u.glow), core: hex(u.core), dur: u.duration * 1000 };
+    if (u.fx === 'geada') this.ultGeada(ev, col, u.finalDebuff?.duration ?? 0);
+    else if (u.fx === 'tita') this.ultTita(ev, col);
+    else if (u.fx === 'vibora') this.ultVibora(ev, col);
+    else this.ultTormenta(ev, col);
+  }
+
+  // Tormenta (prévia aprovada: previews/ultimate-tormenta-a.html)
+  /** Raio da ultimate: halo (glow), corpo (main) e miolo (core), com galhos. */
+  private ultBolt(a: Pt, b: Pt, w: number, jag: number, col: UltColors, segs = 10) {
     const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
     const pts: Pt[] = [a];
     for (let i = 1; i < segs; i++) {
@@ -731,38 +748,38 @@ export class SkillFx {
       });
     }
     pts.push(b);
-    g.lineStyle(w * 2.8, 0x9fe6ff, 0.3);
+    g.lineStyle(w * 2.8, col.glow, 0.3);
     g.strokePoints(pts);
-    g.lineStyle(w * 1.3, 0xffd23a, 0.95);
+    g.lineStyle(w * 1.3, col.main, 0.95);
     g.strokePoints(pts);
-    g.lineStyle(w * 0.45, 0xfffdf2, 1);
+    g.lineStyle(w * 0.45, col.core, 1);
     g.strokePoints(pts);
     for (let k = 0; k < 2; k++) {
       const q = pts[1 + Math.floor(Math.random() * (pts.length - 2))];
-      g.lineStyle(Math.max(1, w * 0.3), 0xb4ebff, 0.85);
+      g.lineStyle(Math.max(1, w * 0.3), col.glow, 0.85);
       g.lineBetween(q.x, q.y, q.x + (Math.random() - 0.5) * 50, q.y + Math.random() * 30);
     }
     this.fade(g, 260);
   }
-  private ultimate(ev: Extract<GameEvent, { type: 'ultimate' }>) {
+  private ultTormenta(ev: UltEvent, col: UltColors) {
     const c = tileToScreen(ev.x, ev.y);
     const sky = (p: Pt) => ({ x: p.x + (Math.random() - 0.5) * 60, y: p.y - 320 });
     if (ev.phase === 'start') {
-      // círculo de runas amarelas no chão, girando durante os 3 s
+      // círculo de runas no chão, girando durante os 3 s
       const r = this.iso(2.2);
       const g = this.gfx(FX - 1).setPosition(c.x, c.y);
       const st = { a: 0, k: 0 };
       const draw = () => {
         g.clear();
-        g.lineStyle(3, 0xffd23a, 0.85 * st.k);
+        g.lineStyle(3, col.main, 0.85 * st.k);
         g.strokeEllipse(0, 0, r.w * st.k, r.h * st.k);
-        g.lineStyle(2, 0x9fe6ff, 0.6 * st.k);
+        g.lineStyle(2, col.glow, 0.6 * st.k);
         g.strokeEllipse(0, 0, r.w * 0.74 * st.k, r.h * 0.74 * st.k);
         for (let i = 0; i < 8; i++) {
           const t = st.a + (i / 8) * Math.PI * 2,
             cs = Math.cos(t),
             sn = Math.sin(t);
-          g.lineStyle(3, 0xffd23a, 0.85 * st.k);
+          g.lineStyle(3, col.main, 0.85 * st.k);
           g.lineBetween(cs * r.w * 0.37 * st.k, sn * r.h * 0.37 * st.k, cs * r.w * 0.5 * st.k, sn * r.h * 0.5 * st.k);
         }
       };
@@ -770,7 +787,7 @@ export class SkillFx {
       this.scene.tweens.add({
         targets: st,
         a: Math.PI * 3,
-        duration: 3000,
+        duration: col.dur,
         onUpdate: draw,
         onComplete: () => this.fade(g, 300),
       });
@@ -786,17 +803,17 @@ export class SkillFx {
         fillAlpha: 0.45,
         duration: 400,
         yoyo: true,
-        hold: 2400,
+        hold: col.dur - 600,
         onComplete: () => dark.destroy(),
       });
       // raios soltos no céu o tempo todo (um a cada ~0,1 s): a tempestade nunca para, mesmo sem monstro perto
       this.scene.time.addEvent({
         delay: 110,
-        repeat: 26,
+        repeat: Math.round(col.dur / 110) - 1,
         callback: () => {
           const x = c.x + (Math.random() - 0.5) * 560,
             y = c.y - 120 + (Math.random() - 0.5) * 220;
-          this.ultBolt({ x, y: y - 220 }, { x: x + (Math.random() - 0.5) * 60, y }, 1.6, 18, 6);
+          this.ultBolt({ x, y: y - 220 }, { x: x + (Math.random() - 0.5) * 60, y }, 1.6, 18, col, 6);
         },
       });
       // faíscas subindo das mãos
@@ -805,16 +822,16 @@ export class SkillFx {
         angle: { min: 230, max: 310 },
         lifespan: 700,
         scale: { start: 0.6, end: 0 },
-        tint: [0xffd23a, 0xffffff, 0x9fe6ff],
+        tint: [col.main, col.core, col.glow],
       });
       return;
     }
     const final = ev.phase === 'final';
     for (const t of ev.targets) {
       const p = tileToScreen(t.x, t.y);
-      this.ultBolt(sky(p), { x: p.x, y: p.y - 10 }, final ? 4 : 3, 24);
+      this.ultBolt(sky(p), { x: p.x, y: p.y - 10 }, final ? 4 : 3, 24, col);
       const ring = this.gfx(FX - 1).setPosition(p.x, p.y);
-      ring.lineStyle(3, 0xffd23a, 0.9);
+      ring.lineStyle(3, col.main, 0.9);
       ring.strokeEllipse(0, 0, 30, 15);
       ring.setScale(0.4);
       this.scene.tweens.add({ targets: ring, scaleX: 1.6, scaleY: 1.6, duration: 360, ease: 'Cubic.easeOut' });
@@ -823,7 +840,7 @@ export class SkillFx {
         speed: { min: 40, max: 150 },
         lifespan: 450,
         scale: { start: 0.5, end: 0 },
-        tint: [0xffd23a, 0xffffff, 0x9fe6ff],
+        tint: [col.main, col.core, col.glow],
       });
     }
     if (!final) {
@@ -831,14 +848,14 @@ export class SkillFx {
       return;
     }
     // estouro final: raio gigante no personagem, clarão amarelado e anel do tamanho da área
-    this.ultBolt({ x: c.x, y: c.y - 420 }, { x: c.x, y: c.y - 40 }, 10, 30, 14);
+    this.ultBolt({ x: c.x, y: c.y - 420 }, { x: c.x, y: c.y - 40 }, 10, 30, col, 14);
     this.scene.cameras.main.flash(260, 255, 244, 200);
     shakeCamera(this.scene, 380, 0.012);
     const r = this.iso(ev.radius);
     const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
-    ring.lineStyle(10, 0xffd23a, 1);
+    ring.lineStyle(10, col.main, 1);
     ring.strokeEllipse(0, 0, r.w, r.h);
-    ring.lineStyle(4, 0x9fe6ff, 0.8);
+    ring.lineStyle(4, col.glow, 0.8);
     ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
     ring.setScale(0.1);
     this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
@@ -847,7 +864,671 @@ export class SkillFx {
       speed: { min: 120, max: 320 },
       lifespan: 800,
       scale: { start: 0.8, end: 0 },
-      tint: [0xffd23a, 0xffffff, 0x9fe6ff],
+      tint: [col.main, col.core, col.glow],
+    });
+  }
+
+  // Titã (prévia aprovada: previews/ultimate-tita.html, opção B "Punhos do Gigante")
+  /** gigante de brasa atrás do Titã durante a ultimate (troca de pose a cada soco) */
+  private giant: Phaser.GameObjects.Image | null = null;
+  private ultTita(ev: UltEvent, col: UltColors) {
+    ensureGiantTextures(this.scene);
+    const c = tileToScreen(ev.x, ev.y);
+    const K = 1.25 / GIANT_RES; // prévia → mundo (o personagem do jogo é 1,25× o da prévia)
+    const tints = [col.core, col.main, col.glow];
+    if (ev.phase === 'start') {
+      // brasa no chão e tela avermelhada
+      const r = this.iso(2.6);
+      const floor = this.gfx(FX - 1).setPosition(c.x, c.y);
+      floor.fillStyle(col.glow, 0.22);
+      floor.fillEllipse(0, 0, r.w, r.h);
+      floor.fillStyle(col.main, 0.25);
+      floor.fillEllipse(0, 0, r.w * 0.55, r.h * 0.55);
+      floor.setScale(0.2);
+      this.scene.tweens.add({ targets: floor, scaleX: 1, scaleY: 1, duration: 400, ease: 'Back.easeOut' });
+      this.fade(floor, 400, { delay: col.dur });
+      const cam = this.scene.cameras.main;
+      const tint = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x280800, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: tint,
+        fillAlpha: 0.4,
+        duration: 400,
+        yoyo: true,
+        hold: col.dur - 600,
+        onComplete: () => tint.destroy(),
+      });
+      // o gigante sobe atrás dele (profundidade logo abaixo da do personagem) e respira
+      this.giant?.destroy();
+      const g = this.scene.add
+        .image(c.x, c.y - 98 + 40, 'ult-giant-up')
+        .setOrigin(GIANT_ORIGIN.x, GIANT_ORIGIN.y)
+        .setScale(K)
+        .setAlpha(0)
+        .setDepth(ev.x + ev.y - 0.5);
+      this.giant = g;
+      // se a ultimate for interrompida (morte, troca de mapa) o estouro não vem: some sozinho
+      this.scene.time.delayedCall(col.dur + 1500, () => {
+        if (this.giant !== g) return;
+        this.giant = null;
+        this.fade(g, 400);
+      });
+      this.scene.tweens.add({ targets: g, alpha: 0.9, y: c.y - 98, duration: 400, ease: 'Cubic.easeOut' });
+      this.scene.tweens.add({
+        targets: g,
+        scaleX: K * 1.03,
+        scaleY: K * 1.03,
+        duration: 260,
+        yoyo: true,
+        repeat: Math.round(col.dur / 520),
+      });
+      // fagulhas subindo do gigante o tempo todo
+      this.scene.time.addEvent({
+        delay: 120,
+        repeat: Math.round(col.dur / 120) - 1,
+        callback: () =>
+          this.burst(c.x + (Math.random() - 0.5) * 220, c.y - 60 - Math.random() * 120, 3, {
+            speedY: { min: -90, max: -40 },
+            speedX: { min: -20, max: 20 },
+            lifespan: 700,
+            scale: { start: 0.45, end: 0 },
+            tint: tints,
+          }),
+      });
+      this.burst(c.x, c.y - 60, 30, {
+        speed: { min: 60, max: 180 },
+        angle: { min: 200, max: 340 },
+        lifespan: 800,
+        scale: { start: 0.6, end: 0 },
+        tint: tints,
+      });
+      return;
+    }
+    const final = ev.phase === 'final';
+    if (final) {
+      // esmagamento: as duas mãos caem no centro
+      for (const s of [-1, 1]) this.giantFist({ x: c.x + s * 50, y: c.y + 6 }, ev.x + ev.y + 1, K * 1.7, col, true);
+      this.scene.time.delayedCall(110, () => {
+        this.scene.cameras.main.flash(260, 255, 210, 150);
+        shakeCamera(this.scene, 420, 0.016);
+        const r = this.iso(ev.radius);
+        const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+        ring.lineStyle(12, col.main, 1);
+        ring.strokeEllipse(0, 0, r.w, r.h);
+        ring.lineStyle(5, col.glow, 0.85);
+        ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+        ring.setScale(0.1);
+        this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+        this.fade(ring, 820);
+        this.burst(c.x, c.y - 20, 50, {
+          speed: { min: 120, max: 340 },
+          angle: { min: 180, max: 360 },
+          gravityY: 300,
+          lifespan: 900,
+          scale: { start: 0.9, end: 0 },
+          tint: tints,
+        });
+      });
+      const g = this.giant;
+      this.giant = null;
+      if (g)
+        this.scene.tweens.add({
+          targets: g,
+          alpha: 0,
+          y: g.y - 30,
+          duration: 700,
+          delay: 250,
+          onComplete: () => g.destroy(),
+        });
+      return;
+    }
+    for (const t of ev.targets) {
+      const p = tileToScreen(t.x, t.y);
+      // o braço daquele lado desce enquanto o punho cai no monstro
+      const side = p.x < c.x ? 'l' : 'r';
+      if (this.giant) {
+        const g = this.giant;
+        g.setTexture(`ult-giant-${side}`);
+        this.scene.time.delayedCall(260, () => g.active && g === this.giant && g.setTexture('ult-giant-up'));
+      }
+      this.giantFist({ x: p.x, y: p.y + 4 }, t.x + t.y + 0.5, K * 0.75, col, false);
+    }
+  }
+  /** Punho de fogo caindo do alto até `at`, com impacto (anel, pedras e fagulhas). */
+  private giantFist(at: Pt, depth: number, scale: number, col: UltColors, big: boolean) {
+    const f = this.scene.add
+      .image(at.x, at.y - 170, 'ult-fist')
+      .setOrigin(FIST_ORIGIN.x, FIST_ORIGIN.y)
+      .setScale(scale)
+      .setDepth(depth)
+      .setBlendMode(Phaser.BlendModes.ADD);
+    this.scene.tweens.add({
+      targets: f,
+      y: at.y,
+      duration: 110,
+      ease: 'Quad.easeIn',
+      onComplete: () => {
+        this.fade(f, big ? 500 : 260, { delay: big ? 150 : 40 });
+        const ring = this.gfx(FX - 1).setPosition(at.x, at.y);
+        ring.lineStyle(big ? 6 : 4, col.main, 0.95);
+        ring.strokeEllipse(0, 0, 34, 17);
+        ring.setScale(0.4);
+        this.scene.tweens.add({ targets: ring, scaleX: 1.8, scaleY: 1.8, duration: 380, ease: 'Cubic.easeOut' });
+        this.fade(ring, 400);
+        // pedras e fagulhas
+        this.burst(at.x, at.y - 6, big ? 20 : 10, {
+          speed: { min: 60, max: 180 },
+          angle: { min: 200, max: 340 },
+          gravityY: 500,
+          lifespan: 600,
+          scale: { start: big ? 0.8 : 0.55, end: 0 },
+          tint: [0x5a3a2a, 0x7a4a2a, col.main],
+          blendMode: 'NORMAL',
+        });
+        this.burst(at.x, at.y - 10, big ? 16 : 9, {
+          speed: { min: 40, max: 150 },
+          lifespan: 450,
+          scale: { start: 0.5, end: 0 },
+          tint: [col.core, col.main, col.glow],
+        });
+        if (!big) shakeCamera(this.scene, 80, 0.004);
+      },
+    });
+  }
+
+  // Víbora (prévia aprovada: previews/ultimate-vibora.html, junção "A + C": enxame de agulhas com a teia)
+  /** Agulha fina apontando para `ang`: corpo esmeralda, miolo claro e o buraco (olho) atrás; sem pena nem ponta larga. */
+  private needle(
+    g: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    ang: number,
+    len: number,
+    col: UltColors,
+    a = 1,
+  ) {
+    const cs = Math.cos(ang),
+      sn = Math.sin(ang);
+    g.lineStyle(2.4, col.main, 0.95 * a);
+    g.lineBetween(x - cs * len, y - sn * len, x - cs * 2, y - sn * 2);
+    g.lineStyle(1, col.core, a);
+    g.lineBetween(x - cs * len * 0.85, y - sn * len * 0.85, x + cs * 1.5, y + sn * 1.5);
+    g.lineStyle(0.8, col.glow, 0.6 * a);
+    g.strokeCircle(x - cs * (len - 2), y - sn * (len - 2), 1.1);
+  }
+  /** Víbora de agulhas (corpo em S e capelo); s = 0 enrolada no alto, 1 = cabeça no chão (bote). */
+  private viperOf(c: Pt, col: UltColors) {
+    const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
+    const draw = (s: number) => {
+      g.clear();
+      const hx = c.x + 110 - s * 110,
+        hy = c.y - 300 + s * 280;
+      for (let q = 0; q < 42; q++) {
+        const u = q / 42,
+          bx = c.x - 190 + u * 300 + Math.sin(u * 9) * 40 * (1 - u),
+          by = c.y - 120 - u * 180 + Math.cos(u * 6) * 26,
+          px = bx + (hx - bx) * Math.pow(u, 3) * s,
+          py = by + (hy - by) * Math.pow(u, 3) * s,
+          wd = 6 + u * 22;
+        for (let n = 0; n < 4; n++)
+          this.needle(g, px + (Math.random() - 0.5) * wd, py + (Math.random() - 0.5) * wd, u * 2 + n * 0.6, 16, col);
+      }
+      for (let n = 0; n < 26; n++) {
+        const an = (n / 26) * Math.PI * 2;
+        this.needle(g, hx + Math.cos(an) * 40, hy + Math.sin(an) * 24, an, 18, col);
+        this.needle(g, hx + Math.cos(an) * 24, hy + Math.sin(an) * 14, an, 14, col);
+      }
+      g.fillStyle(0xf4ff60, 1);
+      g.fillCircle(hx - 11, hy - 5, 4.5);
+      g.fillCircle(hx + 11, hy - 5, 4.5);
+    };
+    return { g, draw };
+  }
+  private viper: { g: Phaser.GameObjects.Graphics; draw: (s: number) => void } | null = null;
+  private viperSwarm: Phaser.GameObjects.Graphics | null = null;
+  private ultVibora(ev: UltEvent, col: UltColors) {
+    const c = tileToScreen(ev.x, ev.y);
+    const hand = { x: c.x, y: c.y - 78 };
+    const tints = [col.core, col.main, col.glow];
+    if (ev.phase === 'start') {
+      const cam = this.scene.cameras.main;
+      const tint = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x04120e, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: tint,
+        fillAlpha: 0.45,
+        duration: 400,
+        yoyo: true,
+        hold: col.dur - 600,
+        onComplete: () => tint.destroy(),
+      });
+      // selo de jade (hexágonos girando) no chão e enxame de agulhas em volta dela, redesenhados a cada quadro
+      const seal = this.gfx(FX - 1).setPosition(c.x, c.y);
+      this.viperSwarm?.destroy();
+      const sw = this.gfx(FX + 1).setBlendMode(Phaser.BlendModes.ADD);
+      this.viperSwarm = sw;
+      const r = this.iso(2.2);
+      const bugs = Array.from({ length: 46 }, () => ({
+        a: Math.random() * Math.PI * 2,
+        r: 0.7 + Math.random() * 0.4,
+        h: Math.random() * 70,
+        sp: 0.0025 + Math.random() * 0.002,
+      }));
+      const st = { k: 0, t: 0 };
+      this.scene.tweens.add({ targets: st, k: 1, duration: 400, ease: 'Back.easeOut' });
+      this.scene.tweens.add({
+        targets: st,
+        t: col.dur,
+        duration: col.dur,
+        onUpdate: () => {
+          seal.clear();
+          for (const [f, w] of [
+            [1, 3],
+            [0.74, 2],
+          ]) {
+            seal.lineStyle(w, col.main, 0.85 * st.k);
+            const pts = [];
+            for (let q = 0; q <= 6; q++) {
+              const a = st.t * 0.0011 + (q * Math.PI) / 3;
+              pts.push({ x: Math.cos(a) * r.w * 0.5 * f * st.k, y: Math.sin(a) * r.h * 0.5 * f * st.k });
+            }
+            seal.strokePoints(pts);
+          }
+          if (sw !== this.viperSwarm) return;
+          sw.clear();
+          for (const b of bugs) {
+            const a = b.a + st.t * b.sp,
+              x = c.x + Math.cos(a) * 125 * b.r * st.k,
+              y = c.y - 30 - b.h * 0.6 + Math.sin(a) * 46 * b.r * st.k;
+            this.needle(sw, x, y, a + Math.PI / 2, 13, col, 0.9);
+          }
+        },
+        onComplete: () => this.fade(seal, 300),
+      });
+      // nos últimos 0,65 s o enxame se junta no alto na forma de uma víbora (o bote vem no evento final)
+      this.scene.time.delayedCall(Math.max(0, col.dur - 650), () => {
+        if (this.viperSwarm !== sw) return;
+        this.viperSwarm = null;
+        this.fade(sw, 250);
+        this.viper?.g.destroy();
+        const v = this.viperOf(c, col);
+        this.viper = v;
+        v.draw(0);
+        v.g.setAlpha(0);
+        this.scene.tweens.add({ targets: v.g, alpha: 1, duration: 300 });
+        // jitter das agulhas enquanto espera o bote
+        const jit = this.scene.time.addEvent({ delay: 70, repeat: 8, callback: () => this.viper === v && v.draw(0) });
+        // se for interrompida (morte, troca de mapa), some sozinha
+        this.scene.time.delayedCall(1500, () => {
+          jit.remove();
+          if (this.viper !== v) return;
+          this.viper = null;
+          this.fade(v.g, 300);
+        });
+      });
+      this.burst(c.x, c.y - 60, 26, {
+        speed: { min: 50, max: 160 },
+        lifespan: 800,
+        scale: { start: 0.5, end: 0 },
+        tint: tints,
+      });
+      return;
+    }
+    if (ev.phase === 'strike') {
+      for (const t of ev.targets) {
+        const p = tileToScreen(t.x, t.y),
+          to = { x: p.x + (Math.random() - 0.5) * 14, y: p.y - 16 - Math.random() * 10 };
+        // corrente de 5 agulhas saindo do enxame; a primeira puxa um fio preso na mão dela
+        for (let k = 0; k < 5; k++) {
+          const from = { x: c.x + (Math.random() - 0.5) * 90, y: c.y - 40 + (Math.random() - 0.5) * 40 },
+            ang = Math.atan2(to.y - from.y, to.x - from.x);
+          const n = this.gfx(FX + 2).setPosition(from.x, from.y);
+          this.needle(n, 0, 0, ang, 16, col);
+          const thread = k === 0 ? this.gfx(FX + 1) : null;
+          this.scene.tweens.add({
+            targets: n,
+            x: to.x,
+            y: to.y,
+            duration: 130,
+            delay: k * 45,
+            onUpdate: () => {
+              if (!thread) return;
+              thread.clear();
+              thread.lineStyle(1.2, col.main, 0.7);
+              thread.lineBetween(hand.x, hand.y, n.x, n.y);
+            },
+            onComplete: () => {
+              this.fade(n, 300, { delay: 400 });
+              if (thread) this.fade(thread, 400, { delay: 500 });
+              if (k > 0) return;
+              const ring = this.gfx(FX - 1).setPosition(p.x, p.y);
+              ring.lineStyle(3, col.main, 0.9);
+              ring.strokeEllipse(0, 0, 30, 15);
+              ring.setScale(0.4);
+              this.scene.tweens.add({ targets: ring, scaleX: 1.5, scaleY: 1.5, duration: 340, ease: 'Cubic.easeOut' });
+              this.fade(ring, 360);
+              this.burst(to.x, to.y, 8, {
+                speed: { min: 30, max: 110 },
+                lifespan: 450,
+                scale: { start: 0.45, end: 0 },
+                tint: tints,
+              });
+            },
+          });
+        }
+      }
+      return;
+    }
+    // fim: a víbora (formada nos últimos 0,65 s) dá o bote no centro junto com o dano; ela puxa todos os fios
+    this.viperSwarm?.destroy();
+    this.viperSwarm = null;
+    const v = this.viper;
+    this.viper = null;
+    if (v) {
+      const sv = { s: 0 };
+      this.scene.tweens.add({
+        targets: sv,
+        s: 1,
+        duration: 150,
+        ease: 'Quad.easeIn',
+        onUpdate: () => v.draw(sv.s),
+        onComplete: () => this.fade(v.g, 500, { delay: 120 }),
+      });
+    }
+    // a teia: fios da mão até cada alvo, acesos e puxados (a curva estica)
+    const web = this.gfx(FX + 1).setBlendMode(Phaser.BlendModes.ADD);
+    const pts = ev.targets.filter((t) => t.hit !== false).map((t) => tileToScreen(t.x, t.y));
+    const pull = { k: 0 };
+    this.scene.tweens.add({
+      targets: pull,
+      k: 1,
+      duration: 260,
+      onUpdate: () => {
+        web.clear();
+        for (const p of pts) {
+          const sag = 26 * (1 - pull.k);
+          web.lineStyle(3, col.main, 0.5);
+          const mid = { x: (hand.x + p.x) / 2, y: (hand.y + p.y - 14) / 2 + sag };
+          web.strokePoints([hand, mid, { x: p.x, y: p.y - 14 }]);
+          web.lineStyle(1.2, col.core, 0.95);
+          web.strokePoints([hand, mid, { x: p.x, y: p.y - 14 }]);
+        }
+      },
+      onComplete: () => this.fade(web, 600, { delay: 150 }),
+    });
+    // bote: clarão, tremor, anel e nuvem de veneno em cada alvo
+    this.scene.time.delayedCall(150, () => {
+      this.scene.cameras.main.flash(240, 200, 255, 225);
+      shakeCamera(this.scene, 320, 0.009);
+      const r = this.iso(ev.radius);
+      const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+      ring.lineStyle(10, col.main, 1);
+      ring.strokeEllipse(0, 0, r.w, r.h);
+      ring.lineStyle(4, col.glow, 0.8);
+      ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+      ring.setScale(0.1);
+      this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+      this.fade(ring, 820);
+      for (const p of pts)
+        this.burst(p.x, p.y - 14, 16, {
+          speed: { min: 10, max: 50 },
+          lifespan: 1300,
+          scale: { start: 1.4, end: 0 },
+          alpha: { start: 0.55, end: 0 },
+          tint: [col.main, col.glow],
+        });
+      this.burst(c.x, c.y - 20, 36, {
+        speed: { min: 80, max: 260 },
+        lifespan: 900,
+        scale: { start: 0.7, end: 0 },
+        tint: tints,
+      });
+    });
+  }
+
+  // Geada (prévia aprovada: previews/ultimate-geada.html, opção B "Leque dos Mil Cristais")
+  /** Lâmina de cristal apontando para +x (origem na ponta de trás do brilho). */
+  private iceBlade(g: Phaser.GameObjects.Graphics, len: number, w: number, col: UltColors) {
+    const pts = [
+      { x: len * 0.4, y: 0 },
+      { x: -len * 0.2, y: -w },
+      { x: -len, y: 0 },
+      { x: -len * 0.2, y: w },
+    ];
+    g.fillStyle(col.glow, 0.35);
+    g.fillEllipse(-len * 0.3, 0, len * 1.6, w * 3.2);
+    g.fillStyle(col.main, 0.9);
+    g.fillPoints(pts, true);
+    g.fillStyle(col.core, 1);
+    g.fillPoints([pts[0], pts[1], { x: -len * 0.2, y: 0 }], true);
+    g.lineStyle(1.2, col.core, 0.95);
+    g.lineBetween(len * 0.4, 0, -len * 0.6, 0);
+  }
+  /** Bloco de gelo em volta de um monstro (congelado). */
+  private iceBlock(g: Phaser.GameObjects.Graphics, col: UltColors) {
+    const pts = [
+      { x: -22, y: 6 },
+      { x: -24, y: -30 },
+      { x: -9, y: -46 },
+      { x: 13, y: -44 },
+      { x: 24, y: -26 },
+      { x: 21, y: 6 },
+      { x: 0, y: 12 },
+    ];
+    g.fillStyle(col.glow, 0.25);
+    g.fillEllipse(0, -18, 64, 72);
+    g.fillStyle(col.main, 0.45);
+    g.fillPoints(pts, true);
+    g.lineStyle(2, col.core, 0.95);
+    g.strokePoints(pts, true);
+    g.lineStyle(1.5, col.core, 0.7);
+    g.lineBetween(-12, -36, -5, -4);
+    g.lineBetween(8, -40, 14, -22);
+  }
+  private ultGeada(ev: UltEvent, col: UltColors, freezeSecs: number) {
+    const c = tileToScreen(ev.x, ev.y);
+    const tints = [col.core, col.main, col.glow];
+    if (ev.phase === 'start') {
+      const R = this.iso(ev.radius);
+      const st = { k: 0, t: 0 };
+      // floco de neve no chão + redemoinho de neve em volta dela, redesenhados a cada quadro
+      const floor = this.gfx(FX - 1).setPosition(c.x, c.y);
+      const swirl = this.gfx(FX + 1)
+        .setPosition(c.x, c.y)
+        .setBlendMode(Phaser.BlendModes.ADD);
+      const fr = this.iso(2.2);
+      const draw = () => {
+        const k = st.k,
+          a0 = st.t * 0.0012;
+        floor.clear();
+        floor.lineStyle(2, col.core, 0.7 * k);
+        floor.strokeEllipse(0, 0, fr.w * k, fr.h * k);
+        for (let i = 0; i < 6; i++) {
+          const a = a0 + (i / 6) * Math.PI * 2,
+            cs = Math.cos(a),
+            sn = Math.sin(a),
+            ex = cs * fr.w * 0.48 * k,
+            ey = sn * fr.h * 0.48 * k;
+          floor.lineStyle(3, col.main, 0.85 * k);
+          floor.lineBetween(0, 0, ex, ey);
+          // galhos do floco
+          for (const f of [0.55, 0.78]) {
+            const bx = ex * f,
+              by = ey * f,
+              len = 0.16 * k;
+            for (const s of [-0.6, 0.6]) {
+              const b = a + s;
+              floor.lineBetween(bx, by, bx + Math.cos(b) * fr.w * len, by + Math.sin(b) * fr.h * len);
+            }
+          }
+        }
+        swirl.clear();
+        const t = st.t;
+        for (let i = 0; i < 56; i++) {
+          const a = t / 260 + i * 0.7,
+            r = 48 + ((i * 37) % 110),
+            y0 = -((i * 13) % 60);
+          swirl.fillStyle(i % 3 ? col.core : col.main, 0.65 * k);
+          swirl.fillCircle(Math.cos(a) * r * 1.3, Math.sin(a) * r * 0.5 + y0 - 10, 1.2 + (i % 3));
+        }
+        for (let i = 0; i < 4; i++) {
+          swirl.lineStyle(3, col.main, 0.4 * k);
+          swirl.beginPath();
+          const rx = 64 + i * 24,
+            ry = 18 + i * 8,
+            s0 = t / 200 + i;
+          for (let q = 0; q <= 12; q++) {
+            const a = s0 + (q / 12) * 2.2;
+            const px = Math.cos(a) * rx,
+              py = Math.sin(a) * ry - 10 - i * 12;
+            if (q) swirl.lineTo(px, py);
+            else swirl.moveTo(px, py);
+          }
+          swirl.strokePath();
+        }
+      };
+      this.scene.tweens.add({ targets: st, k: 1, duration: 350, ease: 'Back.easeOut' });
+      this.scene.tweens.add({
+        targets: st,
+        t: col.dur,
+        duration: col.dur,
+        onUpdate: draw,
+        onComplete: () => {
+          this.fade(floor, 300);
+          this.fade(swirl, 300);
+        },
+      });
+      // tela azulada (frio)
+      const cam = this.scene.cameras.main;
+      const tint = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x0a1e46, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: tint,
+        fillAlpha: 0.4,
+        duration: 400,
+        yoyo: true,
+        hold: col.dur - 600,
+        onComplete: () => tint.destroy(),
+      });
+      // ondas de lâminas de cristal em espiral, sem parar (uma a cada 0,25 s, 8 lâminas por onda)
+      const waves = Math.round(col.dur / 250);
+      this.scene.time.addEvent({
+        delay: 250,
+        repeat: waves - 1,
+        callback: () => {
+          const base = Math.random() * Math.PI * 2;
+          for (let k = 0; k < 8; k++) {
+            const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
+            this.iceBlade(g, 26, 5, col);
+            const sp = { r: 0.15, a: base + (k / 8) * Math.PI * 2 };
+            this.scene.tweens.add({
+              targets: sp,
+              r: 1,
+              a: sp.a + 1.1,
+              duration: 650,
+              ease: 'Sine.easeOut',
+              onUpdate: () => {
+                const x = Math.cos(sp.a) * R.w * 0.5 * sp.r,
+                  y = Math.sin(sp.a) * R.h * 0.5 * sp.r;
+                g.setPosition(c.x + x, c.y - 30 + y);
+                g.setRotation(Math.atan2(Math.sin(sp.a) * R.h, Math.cos(sp.a) * R.w) + Math.PI / 2 + 0.6);
+                g.setAlpha(Math.min(1, (1 - sp.r) * 3));
+              },
+              onComplete: () => g.destroy(),
+            });
+          }
+        },
+      });
+      // neve saindo do leque
+      this.burst(c.x, c.y - 60, 28, {
+        speed: { min: 60, max: 170 },
+        angle: { min: 200, max: 340 },
+        lifespan: 800,
+        scale: { start: 0.6, end: 0 },
+        tint: tints,
+      });
+      return;
+    }
+    const final = ev.phase === 'final';
+    for (const t of ev.targets) {
+      const p = tileToScreen(t.x, t.y);
+      // lâmina cravando no alvo e cristais brotando
+      const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
+      const ang = Math.atan2(p.y - c.y, p.x - c.x);
+      this.iceBlade(g, final ? 40 : 30, final ? 7 : 5, col);
+      g.setPosition(p.x - Math.cos(ang) * 40, p.y - 20 - Math.sin(ang) * 40).setRotation(ang);
+      this.scene.tweens.add({ targets: g, x: p.x, y: p.y - 20, duration: 90 });
+      this.fade(g, 260, { delay: 90 });
+      const cr = this.gfx(FX).setPosition(p.x, p.y);
+      for (let k = 0; k < 5; k++) {
+        const a = -Math.PI / 2 + (k - 2) * 0.45;
+        this.crystal(cr, Math.cos(a) * 6, 4, 16 + (k % 2) * 8, 4, a + Math.PI / 2);
+      }
+      cr.setScale(0.2, 0);
+      this.scene.tweens.add({ targets: cr, scaleX: 1, scaleY: 1, duration: 160, ease: 'Back.easeOut' });
+      this.fade(cr, 380, { delay: 220 });
+      const ring = this.gfx(FX - 1).setPosition(p.x, p.y);
+      ring.lineStyle(3, col.main, 0.9);
+      ring.strokeEllipse(0, 0, 30, 15);
+      ring.setScale(0.4);
+      this.scene.tweens.add({ targets: ring, scaleX: 1.6, scaleY: 1.6, duration: 360, ease: 'Cubic.easeOut' });
+      this.fade(ring, 380);
+      this.burst(p.x, p.y - 14, final ? 14 : 8, {
+        speed: { min: 30, max: 130 },
+        lifespan: 500,
+        scale: { start: 0.5, end: 0 },
+        tint: tints,
+      });
+      if (final && t.hit !== false && freezeSecs > 0) {
+        // congelado: bloco de gelo enquanto dura o atordoamento, depois estilhaça
+        const b = this.gfx(FX + 1).setPosition(p.x, p.y);
+        this.iceBlock(b, col);
+        b.setScale(0.3);
+        this.scene.tweens.add({ targets: b, scaleX: 1, scaleY: 1, duration: 180, ease: 'Back.easeOut' });
+        const hold = Math.max(300, freezeSecs * 1000);
+        this.scene.time.delayedCall(hold, () => {
+          b.destroy();
+          this.burst(p.x, p.y - 18, 18, {
+            speed: { min: 60, max: 200 },
+            angle: { min: 180, max: 360 },
+            gravityY: 400,
+            lifespan: 600,
+            scale: { start: 0.7, end: 0 },
+            tint: tints,
+          });
+        });
+      }
+    }
+    if (!final) {
+      shakeCamera(this.scene, 70, 0.0025);
+      return;
+    }
+    // estouro: clarão gelado, anel de geada do tamanho da área e estilhaços
+    this.scene.cameras.main.flash(260, 220, 240, 255);
+    shakeCamera(this.scene, 360, 0.01);
+    const r = this.iso(ev.radius);
+    const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+    ring.lineStyle(10, col.main, 1);
+    ring.strokeEllipse(0, 0, r.w, r.h);
+    ring.lineStyle(4, col.glow, 0.8);
+    ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+    ring.setScale(0.1);
+    this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+    this.fade(ring, 820);
+    this.burst(c.x, c.y - 30, 44, {
+      speed: { min: 120, max: 320 },
+      lifespan: 800,
+      scale: { start: 0.8, end: 0 },
+      tint: tints,
     });
   }
 }

@@ -1,8 +1,36 @@
 {
-  "proxima": [{ "texto": "Tempo de jogo no painel do Personagem: separado entre jogando com o auto desligado e com o auto ligado." },{ "texto": "Aura elemental: cada seita ganha uma aura do seu elemento que cresce a cada 100 de ataque elemental (até 600), em qualquer traje. Tormenta com faíscas e raios, Geada com flocos e cristais, Titã com brasas e chamas, Víbora com bolhas e veneno." },
-    { "texto": "Ultimate da Tormenta (nível 10): a Fúria da Tormenta enche com skills que acertam e chama raios por 3 s em volta. No celular, toque no arco em volta das skills; no PC, tecla R. Botões do celular reorganizados com espaçamento igual." }
-  ],
+  "proxima": [],
   "versoes": [
+    {
+      "versao": "0.8.0",
+      "data": "2026-11-22",
+      "loja": [
+        "Ultimates das 4 seitas (nível 10): Fúria da Tormenta, Leque dos Mil Cristais, Punhos do Gigante e Víbora de Mil Agulhas.",
+        "Enchem com skills que acertam; toque no arco (celular) ou tecla R (PC).",
+        "Aura elemental em todas as seitas, crescendo com o ataque elemental.",
+        "Tempo de jogo separado com o auto ligado e desligado."
+      ],
+      "itens": [
+        {
+          "texto": "Tempo de jogo no painel do Personagem: separado entre jogando com o auto desligado e com o auto ligado."
+        },
+        {
+          "texto": "Aura elemental: cada seita ganha uma aura do seu elemento que cresce a cada 100 de ataque elemental (até 600), em qualquer traje. Tormenta com faíscas e raios, Geada com flocos e cristais, Titã com brasas e chamas, Víbora com bolhas e veneno."
+        },
+        {
+          "texto": "Ultimate da Tormenta (nível 10): a Fúria da Tormenta enche com skills que acertam e chama raios por 3 s em volta. No celular, toque no arco em volta das skills; no PC, tecla R. Botões do celular reorganizados com espaçamento igual."
+        },
+        {
+          "texto": "Ultimate da Geada (nível 10): o Leque dos Mil Cristais solta ondas de lâminas de gelo em espiral por 3 s, deixa os monstros lentos e os congela no fim."
+        },
+        {
+          "texto": "Ultimate do Titã (nível 10): os Punhos do Gigante chamam um gigante de brasa que soca os monstros por 3 s, deixando-os atordoados, e esmaga o chão no fim."
+        },
+        {
+          "texto": "Ultimate da Víbora (nível 10): a Víbora de Mil Agulhas solta enxames de agulhas esmeralda que prendem fios nos monstros; no fim, uma víbora feita de agulhas dá o bote e envenena todos."
+        }
+      ]
+    },
     {
       "versao": "0.7.0",
       "data": "2026-11-22",

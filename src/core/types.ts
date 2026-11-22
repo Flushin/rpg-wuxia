@@ -176,16 +176,26 @@ export type GameEvent =
   /** ultimate: start (pose), strike (cada raio), final (estouro); targets = monstros atingidos */
   | {
       type: 'ultimate';
+      /** seita de quem soltou (ULTIMATES[sect]: efeito, cores e sons) */
+      sect: string;
       phase: 'start' | 'strike' | 'final';
       x: number;
       y: number;
       radius: number;
-      targets: { x: number; y: number }[];
+      /** hit: só no estouro (false = errou; o efeito não pega) */
+      targets: { x: number; y: number; hit?: boolean }[];
     }
   | { type: 'skillLevelUp'; skillId: string; level: number }
   | { type: 'skillUnlocked'; skillId: string }
   | { type: 'dash'; fromX: number; fromY: number; toX: number; toY: number }
-  | { type: 'buffApplied'; targetId: number; id: string; kind: BuffKind; duration: number }
+  | {
+      type: 'buffApplied';
+      targetId: number;
+      id: string;
+      kind: BuffKind;
+      duration: number;
+      /** só renovou um efeito que o alvo já tinha */ refresh?: boolean;
+    }
   /** broken: escudo esgotado pelo dano (não pelo tempo) */
   | { type: 'buffExpired'; targetId: number; id: string; kind: BuffKind; broken?: boolean }
   | { type: 'shieldAbsorb'; targetId: number; amount: number; x: number; y: number }

@@ -17,7 +17,7 @@ export { LEVELUP_POSE_S, XP_BANK_LEVELS };
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
-import { ultimateOf, ultSplit, type UltimateDef } from './ultimate';
+import { ultimateOf, ultSplit, type UltDebuff, type UltimateDef } from './ultimate';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
 import { findPath, insideAvoid, isWalkable, type Avoid } from './pathfinding';
@@ -485,7 +485,7 @@ export class World {
       old.value = value;
       old.remaining = old.duration = duration;
     } else e.buffs.push({ id, kind, value, remaining: duration, duration });
-    this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration });
+    this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration, refresh: !!old });
   }
   private tickBuffs(e: Entity, dt: number) {
     if (!e.buffs.length) return;
@@ -769,7 +769,7 @@ export class World {
     p.path = [];
     this.ultCast = { t: 0, hits: new Map(), x: p.x, y: p.y };
     this.lastCombat = this.time;
-    this.emit({ type: 'ultimate', phase: 'start', x: p.x, y: p.y, radius: u.radius, targets: [] });
+    this.emit({ type: 'ultimate', sect: this.classId, phase: 'start', x: p.x, y: p.y, radius: u.radius, targets: [] });
     return true;
   }
   private tickUltimate(dt: number) {
@@ -786,8 +786,16 @@ export class World {
         phase = (m.id * 0.618034) % 1;
       if (done >= u.strikes || c.t < every * (done + phase)) continue;
       c.hits.set(m.id, done + 1);
-      this.emit({ type: 'ultimate', phase: 'strike', x: c.x, y: c.y, radius: u.radius, targets: [{ x: m.x, y: m.y }] });
-      this.attack(p, m, u.strikeMult * k, true, false);
+      this.emit({
+        type: 'ultimate',
+        sect: this.classId,
+        phase: 'strike',
+        x: c.x,
+        y: c.y,
+        radius: u.radius,
+        targets: [{ x: m.x, y: m.y }],
+      });
+      this.ultHit(m, u.strikeMult * k, u.strikeDebuff, k);
       this.lastCombat = this.time;
     }
     if (c.t >= u.duration) {
@@ -796,6 +804,25 @@ export class World {
     }
     p.attackCd = Math.max(p.attackCd, 0.3);
   }
+  /** golpe da ultimate: conta das skills, sem roubo de vida; o efeito (lentidão, congelar...) só se acertar */
+  private ultHit(m: Entity, mult: number, debuff?: UltDebuff, split = 1): boolean {
+    const r = this.attack(this.player, m, mult, true, false);
+    if (!debuff || !r.hit || m.dead) return r.hit;
+    let value = debuff.value;
+    if (debuff.kind === 'poison') {
+      // veneno: value = fração do dano (como o "poison.percent" das skills), espalhada pela duração
+      const res = m.kind === 'monster' ? Math.min(0.9, MONSTERS[m.monsterId]?.poisonRes ?? 0) : 0;
+      value =
+        (expectedDamage(this.player, this.defender(m)) *
+          debuff.value *
+          split *
+          bal('dano.jogador', this.classId) *
+          (1 - res)) /
+        debuff.duration;
+    }
+    this.addBuff(m, `ult_${this.classId}`, debuff.kind, value, debuff.duration);
+    return r.hit;
+  }
   private ultInside(u: UltimateDef) {
     const c = this.ultCast!;
     return this.monsters.filter((m) => !m.dead && dist(m, c) <= u.radius);
@@ -803,19 +830,11 @@ export class World {
   /** estouro final em todos os monstros do raio; a carga não sobe com o dano da própria ultimate */
   private ultFinal(u: UltimateDef) {
     const c = this.ultCast!,
-      p = this.player,
       inside = this.ultInside(u),
-      k = ultSplit(u, inside.length),
-      mult = u.finalMult;
-    this.emit({
-      type: 'ultimate',
-      phase: 'final',
-      x: c.x,
-      y: c.y,
-      radius: u.radius,
-      targets: inside.map((m) => ({ x: m.x, y: m.y })),
-    });
-    for (const m of inside) if (!m.dead) this.attack(p, m, mult * k, true, false);
+      k = ultSplit(u, inside.length);
+    // golpeia antes de avisar o desenho: o alvo leva `hit` (errou = sem efeito, ex.: não congela)
+    const targets = inside.map((m) => ({ x: m.x, y: m.y, hit: this.ultHit(m, u.finalMult * k, u.finalDebuff, k) }));
+    this.emit({ type: 'ultimate', sect: this.classId, phase: 'final', x: c.x, y: c.y, radius: u.radius, targets });
     this.lastCombat = this.time;
   }
 

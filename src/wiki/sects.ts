@@ -96,19 +96,46 @@ export function sectPage(id: string): string | null {
 }
 
 // ---------- Ultimate (src/data/ultimates.json; regras em src/core/ultimate.ts) ----------
-type Ult = (typeof ultimatesJson)['lamina'];
-const ULTS = ultimatesJson as Record<string, Ult>;
+type Ult = (typeof ultimatesJson)['lamina'] & {
+  strikeDebuff?: { kind: string; value: number; duration: number };
+  finalDebuff?: { kind: string; value: number; duration: number };
+};
+const ULTS = ultimatesJson as unknown as Record<string, Ult>;
+const sec = (n: number) => String(n).replace('.', ',');
+const DEBUFF_TEXT: Record<string, (d: { value: number; duration: number }, el: string) => string> = {
+  slow: (d) => `fica ${pc(d.value)} mais lento por ${sec(d.duration)} s`,
+  stun: (d, el) => `fica ${el === 'ice' ? 'congelado (atordoado)' : 'atordoado'} por ${sec(d.duration)} s`,
+  poison: (d) => `fica envenenado e perde mais ${pc(d.value)} do dano ao longo de ${sec(d.duration)} s`,
+  defReduction: (d) => `perde ${pc(d.value)} da defesa por ${sec(d.duration)} s`,
+};
+const debuffText = (el: string, d?: { kind: string; value: number; duration: number }) =>
+  d ? (DEBUFF_TEXT[d.kind]?.(d, el) ?? d.kind) : '';
 export function ultPanel(id: string, panel = true): string {
   const u = ULTS[id];
   if (!u) return '';
-  const body = `<h3>⚡ ${esc(u.name)} <small class="muted">· Ultimate · nível ${u.unlock}</small></h3>
+  const c = CLASSES[id],
+    dmgType = c.damageType === 'spiritual' ? 'espiritual' : 'físico',
+    el = (ELEMENT_NAMES[c.element] ?? c.element).toLowerCase(),
+    onStrike = debuffText(c.element, u.strikeDebuff),
+    onFinal = debuffText(c.element, u.finalDebuff);
+  const effects =
+    onStrike || onFinal
+      ? `<li><b>Efeitos:</b> ${[
+          onStrike && `a cada golpe que acerta, o monstro ${onStrike}`,
+          onFinal && `no estouro, ${onFinal}`,
+        ]
+          .filter(Boolean)
+          .join('; ')}. Se o golpe errar, o efeito não pega.</li>`
+      : '';
+  const body = `<h3><span style="color:${u.color}">${esc(u.icon)}</span> ${esc(u.name)} <small class="muted">· Ultimate · nível ${u.unlock}</small></h3>
     <p>${esc(u.description)}</p>
     <ul><li><b>Carga:</b> a barra enche 1 ponto a cada skill que acerta pelo menos um monstro; com ${u.charge} pontos fica pronta.
       Usar skill no vazio e o dano da própria ultimate não carregam.</li>
     <li><b>Fora de combate:</b> depois de ${u.idleDelay} s sem lutar, a barra perde ${u.idleDrain} ponto por segundo.</li>
-    <li><b>Duração:</b> ${u.duration} s flutuando parado, com os braços para cima; os raios caem um de cada vez, intercalados entre os monstros: ${u.strikes} raios de ${pc(u.strikeMult)} do dano em todos os monstros a até ${u.radius} tiles e um estouro final de ${pc(u.finalMult)} (${pc(u.strikes * u.strikeMult + u.finalMult)} no total).</li>
+    <li><b>Duração:</b> ${u.duration} s flutuando parado, com os braços para cima; os golpes caem um de cada vez, intercalados entre os monstros: ${u.strikes} golpes de ${pc(u.strikeMult)} do dano em todos os monstros a até ${u.radius} tiles e um estouro final de ${pc(u.finalMult)} (${pc(u.strikes * u.strikeMult + u.finalMult)} no total).</li>
+    ${effects}
     <li><b>Muitos alvos:</b> até ${u.fullTargets} monstros levam o dano cheio; com mais, cada um leva ${u.fullTargets} ÷ (monstros no raio) do dano.</li>
-    <li><b>Dano:</b> a mesma conta das skills (ataque físico + ataque de trovão, contra defesa e resistência do alvo). Pode errar e dar crítico; não recupera vida. Não sobe de nível.</li>
+    <li><b>Dano:</b> a mesma conta das skills (ataque ${dmgType} + ataque de ${el}, contra defesa ${dmgType} e resistência a ${el} do alvo). Pode errar e dar crítico${c.lifeSteal ? '; não recupera vida' : ''}. Não sobe de nível.</li>
     <li><b>Só o jogador solta:</b> o Auto-combate nunca usa a ultimate. No celular, toque no arco em volta das skills; no PC, botão ao lado das skills ou tecla <b>R</b>.</li></ul>`;
   return panel ? `<section class="panel"><h2>Ultimate</h2>${body}</section>` : body;
 }
