@@ -242,15 +242,14 @@ export class InventoryPanel {
         ? ''
         : `<button data-act="lock" aria-pressed="${!!it.locked}">${it.locked ? L('🔓 Destrancar', '🔓 Unlock') : L('🔒 Trancar', '🔒 Lock')}</button>`;
       // trancado: sem Destruir (nem venda/desmonte no vendedor e ferreiro, nem venda do Auto)
-      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${lock}${it.locked ? `<small class="muted">${L('Trancado: não pode ser vendido, destruído nem desmontado.', 'Locked: cannot be sold, destroyed or salvaged.')}</small>` : it.rarity === 'epico' ? `<small class="muted">${L('Épico não pode ser destruído (desmonte no ferreiro).', 'Epics cannot be destroyed (salvage them at the blacksmith).')}</small>` : del}`;
+      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}<div class="inv-acts">${lock}${it.locked ? `<small class="muted">${L('Trancado: não pode ser vendido, destruído nem desmontado.', 'Locked: cannot be sold, destroyed or salvaged.')}</small>` : it.rarity === 'epico' ? `<small class="muted">${L('Épico não pode ser destruído (desmonte no ferreiro).', 'Epics cannot be destroyed (salvage them at the blacksmith).')}</small>` : del}</div>`;
     }
     // renderPanel mantém a moldura (.inv-card, que é quem rola; em telas largas rolam .inv-main e .inv-detail) e só troca
     // o que mudou, então a rolagem nunca é perdida (nem cortada no meio, no iPhone).
     renderPanel(
       byId('inv-panel'),
-      `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
-      <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
-      <h3>${L('Bolsa', 'Inventory')} (${count(this.tab)}/${BAG_TAB_SIZE}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}${filters}<div class="bag-grid">${bag}</div>
+      `<div class="card inv-card"><div class="inv-main"><div class="inv-head"><div class="inv-title"><h2>${L('Mochila', 'Bag')}</h2><span class="gold">${w.gold} ${L('ouro', 'gold')}</span></div>${closeX('data-act="close"')}</div>
+      <div class="inv-sub"><h3>${L('Bolsa', 'Inventory')} (${count(this.tab)}/${BAG_TAB_SIZE})</h3><button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></div>${tabs}${filters}<div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div><div class="inv-detail">${detail}</div></div>`,
     );
   }

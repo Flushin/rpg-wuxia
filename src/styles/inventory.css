@@ -566,3 +566,66 @@
   border-color: #d4a017;
   color: #ffd23f;
 }
+/* cabeçalho da mochila: título/ouro à esquerda, ✕ à direita (sem sobrepor o Organizar) */
+.inv-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.inv-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  min-width: 0;
+}
+.inv-title h2 {
+  margin: 0;
+}
+.inv-head .win-x {
+  position: static;
+  flex: 0 0 auto;
+  margin: 0;
+}
+.inv-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+.inv-sub h3 {
+  margin: 0;
+}
+.inv-sub .sort-btn {
+  float: none;
+}
+.inv-tab {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 6px;
+  min-width: 0;
+}
+.inv-filters {
+  margin-bottom: 10px;
+}
+.bag-grid {
+  margin: 0 auto;
+}
+/* ações do item: Trancar/Destruir lado a lado com espaço, mesma largura */
+.inv-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.inv-acts > button {
+  flex: 1 1 120px;
+  min-height: 44px;
+}
+.inv-acts > small {
+  flex-basis: 100%;
+}
