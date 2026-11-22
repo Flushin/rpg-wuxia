@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import data from '../data/audio.json';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { skillById } from '../core/skills';
+import { ultimateOf } from '../core/ultimate';
 import { PREF, getPref, setPref } from '../platform/prefs';
 
 export interface AudioSettings {
@@ -190,12 +191,15 @@ class AudioManager {
           else if (ev.ranged) this.sfx('spell', 300);
         }
         break;
-      case 'ultimate':
-        // ultimate da Tormenta: sons de raio que já existem (Passo do Raio) e o impacto de área no estouro
-        if (ev.phase === 'start') this.sfx('skill_up');
-        else if (ev.phase === 'strike') this.sfxOnce('skill_dash', 100);
-        else this.sfxOnce('aoe_impact', 200);
+      case 'ultimate': {
+        // sons da seita (ultimates.json "sounds"): pose, cada golpe e o estouro
+        const snd = ultimateOf(ev.sect)?.sounds;
+        if (!snd) break;
+        if (ev.phase === 'start') this.sfx(snd.start);
+        else if (ev.phase === 'strike') this.sfxOnce(snd.strike, 100);
+        else this.sfxOnce(snd.final, 200);
         break;
+      }
       case 'telegraph':
         // o pico do prato ao contrário (~0,85 s) cai junto com o golpe
         this.sfxOnce('aoe_warning', 200, Math.max(0, ev.delay - AOE_WARNING_PEAK));

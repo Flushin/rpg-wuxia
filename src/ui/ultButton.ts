@@ -35,7 +35,8 @@ export class UltButton {
     current = this;
     const u = world.ultimate();
     this.btn.className = 'ult-btn hidden';
-    this.btn.innerHTML = `<span class="ic">雷</span><span class="key">R</span><i class="ult-fill"></i><span class="lock"></span>`;
+    const icon = u?.icon ?? '';
+    this.btn.innerHTML = `<span class="ic">${icon}</span><span class="key">R</span><i class="ult-fill"></i><span class="lock"></span>`;
     this.btn.setAttribute('aria-label', u?.name ?? 'Ultimate');
     parent.appendChild(this.btn);
     onPress(this.btn, () => this.use(), false);
@@ -56,10 +57,21 @@ export class UltButton {
     this.labelPath.setAttribute('href', `#${pathId}`);
     this.labelPath.setAttribute('startOffset', '50%');
     this.labelPath.setAttribute('text-anchor', 'middle');
-    this.labelPath.textContent = u ? `雷 ${u.name.toUpperCase()}` : '';
+    this.labelPath.textContent = u ? `${icon} ${u.name.toUpperCase()}` : '';
     this.label.appendChild(this.labelPath);
     this.svg.append(this.border, this.track, this.fill, this.label);
     parent.appendChild(this.svg);
+    // cores da seita (ultimates.json) para o CSS do botão e do arco
+    if (u)
+      for (const el of [this.btn, this.svg])
+        for (const [k, v] of [
+          ['--ult', u.color],
+          ['--ult-glow', u.glow],
+          ['--ult-core', u.core],
+          ['--ult-dark', u.dark],
+          ['--ult-ink', u.ink],
+        ])
+          el.style.setProperty(k, v);
     // só a faixa do arco recebe o toque (o resto da caixa do SVG deixa passar para o jogo)
     onPress(this.track as unknown as HTMLElement, () => this.use(), false);
     if (showTip)
@@ -154,7 +166,7 @@ export class UltButton {
       ? ''
       : L(`Nv ${u.unlock}`, `Lv ${u.unlock}`);
     this.labelPath.textContent = unlocked
-      ? `雷 ${u.name.toUpperCase()}`
+      ? `${u.icon} ${u.name.toUpperCase()}`
       : `🔒 ${L(`NÍVEL ${u.unlock}`, `LEVEL ${u.unlock}`)}`;
   }
 }

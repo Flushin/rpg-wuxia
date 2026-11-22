@@ -176,11 +176,14 @@ export type GameEvent =
   /** ultimate: start (pose), strike (cada raio), final (estouro); targets = monstros atingidos */
   | {
       type: 'ultimate';
+      /** seita de quem soltou (ULTIMATES[sect]: efeito, cores e sons) */
+      sect: string;
       phase: 'start' | 'strike' | 'final';
       x: number;
       y: number;
       radius: number;
-      targets: { x: number; y: number }[];
+      /** hit: só no estouro (false = errou; o efeito não pega) */
+      targets: { x: number; y: number; hit?: boolean }[];
     }
   | { type: 'skillLevelUp'; skillId: string; level: number }
   | { type: 'skillUnlocked'; skillId: string }

@@ -4,6 +4,17 @@
     "name": "Fúria da Tormenta",
     "unlock": 10,
     "color": "#ffd23a",
+    "glow": "#9fe6ff",
+    "core": "#fff3b0",
+    "dark": "#b8860b",
+    "ink": "#3a2a00",
+    "icon": "雷",
+    "fx": "tormenta",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_dash",
+      "final": "aoe_impact"
+    },
     "description": "Ergue as lâminas para o céu e chama raios por 3 s em todos os monstros num raio de 7 tiles: 6 raios de 100% do dano e um estouro final de 300%. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico, e não recupera vida.",
     "charge": 25,
     "radius": 7,
@@ -11,6 +22,43 @@
     "strikes": 6,
     "strikeMult": 1,
     "finalMult": 3,
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
+  },
+  "pavilhao": {
+    "id": "leque_mil_cristais",
+    "name": "Leque dos Mil Cristais",
+    "unlock": 10,
+    "color": "#9fdcff",
+    "glow": "#b9a6ff",
+    "core": "#ffffff",
+    "dark": "#2a6fa8",
+    "ink": "#0b2440",
+    "icon": "霜",
+    "fx": "geada",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "cast_geada",
+      "final": "crit_geada"
+    },
+    "description": "Gira o leque e solta ondas de lâminas de cristal em espiral por 3 s em todos os monstros num raio de 8 tiles: 6 golpes de 80% do dano, cada um deixando o alvo 40% mais lento, e um estouro final de 300% que congela por 1,5 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 8,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.8,
+    "finalMult": 3,
+    "strikeDebuff": {
+      "kind": "slow",
+      "value": 0.4,
+      "duration": 1
+    },
+    "finalDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 1.5
+    },
     "fullTargets": 8,
     "idleDelay": 20,
     "idleDrain": 1

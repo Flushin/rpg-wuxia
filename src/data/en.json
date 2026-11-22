@@ -1000,6 +1000,9 @@
       },
       {
         "texto": "Tormenta ultimate (level 10): Storm's Fury charges with skills that hit and calls lightning for 3 s around you. On mobile, tap the arc around the skills; on PC, press R. Mobile buttons rearranged with even spacing."
+      },
+      {
+        "texto": "Geada ultimate (level 10): Thousand Crystal Fan sends spiraling waves of ice blades for 3 s, slows monsters and freezes them at the end."
       }
     ],
     "versoes": [
@@ -1213,6 +1216,10 @@
     "lamina": {
       "name": "Storm's Fury",
       "description": "Raises the blades to the sky and calls lightning for 3 s on every monster within 7 tiles: 6 bolts of 100% damage and a final burst of 300%. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit, and does not heal."
+    },
+    "pavilhao": {
+      "name": "Thousand Crystal Fan",
+      "description": "Spins the fan and sends spiraling waves of crystal blades for 3 s at every monster within 8 tiles: 6 hits of 80% damage, each slowing the target by 40%, and a final burst of 300% that freezes for 1.5 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
     }
   }
 }
