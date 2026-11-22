@@ -1,0 +1,18 @@
+{
+  "lamina": {
+    "id": "furia_tormenta",
+    "name": "Fúria da Tormenta",
+    "unlock": 10,
+    "color": "#ffd23a",
+    "description": "Ergue as lâminas para o céu e chama raios por 3 s em todos os monstros num raio de 7 tiles: 6 raios de 100% do dano e um estouro final de 300%. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico, e não recupera vida.",
+    "charge": 25,
+    "radius": 7,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 1,
+    "finalMult": 3,
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
+  }
+}

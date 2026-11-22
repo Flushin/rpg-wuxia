@@ -173,6 +173,15 @@ export type GameEvent =
       ranged: boolean;
     }
   | { type: 'skillFail'; skillId: string; reason: SkillFailReason }
+  /** ultimate: start (pose), strike (cada raio), final (estouro); targets = monstros atingidos */
+  | {
+      type: 'ultimate';
+      phase: 'start' | 'strike' | 'final';
+      x: number;
+      y: number;
+      radius: number;
+      targets: { x: number; y: number }[];
+    }
   | { type: 'skillLevelUp'; skillId: string; level: number }
   | { type: 'skillUnlocked'; skillId: string }
   | { type: 'dash'; fromX: number; fromY: number; toX: number; toY: number }

@@ -6,6 +6,7 @@ import { parseTiledMap, type GameMap } from '../src/core/map';
 import { SKILLS, skillScale, skillXpToNext } from '../src/core/skills';
 import { isWalkable } from '../src/core/pathfinding';
 import { World } from '../src/core/world';
+import { ULTIMATES } from '../src/core/ultimate';
 import type { Entity, GameEvent, SaveData } from '../src/core/types';
 
 let fails = 0;
@@ -512,6 +513,91 @@ console.log('\nSom do ataque de cada classe (audio.json "classAttack")');
     ok(has(a.hit) && has(a.crit), `${c.id}: acerto e crítico próprios`);
     if (c.attackRange > 3) ok(has(a.cast), `${c.id}: disparo próprio (ataca à distância)`);
   }
+}
+
+// ---------- ultimate da Tormenta (src/core/ultimate.ts) ----------
+{
+  console.log('ultimate (Tormenta)');
+  const u = ULTIMATES.lamina;
+  const place = (w: World, n: number, r: number) => {
+    freezeMonsters(w);
+    for (const m of w.monsters.slice(n)) Object.assign(m, { dead: true, respawnAt: 1e9 });
+    return w.monsters.slice(0, n).map((m, i) => {
+      const a = (i / n) * Math.PI * 2;
+      Object.assign(m, {
+        x: w.player.x + Math.cos(a) * r,
+        y: w.player.y + Math.sin(a) * r,
+        dead: false,
+        ai: 'idle',
+        aiTimer: 999,
+        buffs: [],
+      });
+      m.hp = m.derived.maxHp = 1e6;
+      m.derived.evasion = 0;
+      return m;
+    });
+  };
+  const w9 = mk('lamina', 9);
+  for (let i = 0; i < 30; i++) (w9 as any).chargeUltimate(); // eslint-disable-line
+  ok(w9.ultFill() === 0 && !w9.useUltimate(), 'antes do nível 10 a barra não enche');
+  const w = mk('lamina', 10);
+  for (let i = 0; i < u.charge - 1; i++) (w as any).chargeUltimate(); // eslint-disable-line
+  ok(!w.useUltimate(), `com ${u.charge - 1} cargas ainda não solta`);
+  (w as any).chargeUltimate(); // eslint-disable-line
+  ok(w.ultReady(), `${u.charge} skills que acertam enchem a barra`);
+  const near = place(w, 3, 4),
+    far = w.monsters[3];
+  Object.assign(far, { x: w.player.x + u.radius + 1.5, y: w.player.y, dead: false, ai: 'idle', aiTimer: 999 });
+  far.hp = far.derived.maxHp = 1e6;
+  w.player.hp = 10;
+  far.respawnAt = 0;
+  far.attackCd = 999;
+  drain(w);
+  ok(w.useUltimate(), 'barra cheia: solta');
+  w.useSkill(0);
+  run(w, u.duration + 0.2);
+  const evs = drain(w);
+  ok(!evs.some((e) => e.type === 'skillCast'), 'durante a ultimate não lança skill');
+  ok(w.ultCast === null && w.ultCharge === 0, 'termina em 3 s e esvazia a barra');
+  const strikes = evs.filter((e) => e.type === 'ultimate' && e.phase === 'strike').length;
+  ok(
+    strikes === u.strikes && evs.some((e) => e.type === 'ultimate' && e.phase === 'final'),
+    `${u.strikes} raios + estouro final`,
+  );
+  const one = dmgOf(evs, near[0].id) / (u.strikes * u.strikeMult + u.finalMult);
+  const hitsOf = (es: GameEvent[], id: number) =>
+    es.filter((e) => e.type === 'hit' && e.targetId === id).map((e) => (e as { amount: number }).amount);
+  ok(
+    near.every((m) => {
+      const h = hitsOf(evs, m.id);
+      return h.length === u.strikes + 1 && Math.abs(h[h.length - 1] / h[0] - u.finalMult / u.strikeMult) < 0.05;
+    }),
+    `cada monstro no raio leva ${u.strikes} raios + o estouro de ${u.finalMult}× (9× no total)`,
+  );
+  ok(dmgOf(evs, far.id) === 0, 'monstro fora do raio não leva dano');
+  ok(w.player.hp === 10, 'não recupera vida');
+  ok(w.ultCharge === 0, 'o dano da própria ultimate não carrega a barra');
+  // muitos alvos: dano dividido
+  const w2 = mk('lamina', 10);
+  const many = place(w2, 12, 3);
+  w2.ultCharge = u.charge;
+  drain(w2);
+  w2.useUltimate();
+  run(w2, u.duration + 0.2);
+  const e2 = drain(w2);
+  ok(
+    Math.abs(dmgOf(e2, many[0].id) / one - 9 * (u.fullTargets / 12)) < 0.3,
+    `12 monstros: cada um leva ${u.fullTargets}/12 do dano`,
+  );
+  // fora de combate esvazia
+  const w3 = mk('lamina', 10);
+  place(w3, 0, 0);
+  w3.ultCharge = u.charge;
+  w3.lastCombat = w3.time;
+  run(w3, u.idleDelay - 1);
+  const before = w3.ultCharge;
+  run(w3, 5);
+  ok(before === u.charge && w3.ultCharge < u.charge, `esvazia só depois de ${u.idleDelay} s sem combate`);
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
