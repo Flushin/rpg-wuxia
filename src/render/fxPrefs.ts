@@ -1,20 +1,22 @@
-// Preferências de efeitos (Configurações): números de dano, tremor de tela e vibração (só no app).
+// Preferências de efeitos (Configurações): números de dano, tremor de tela, aura elemental e vibração (só no app).
 // Gravadas no aparelho (src/platform/prefs.ts); padrão: tudo ligado.
 import type Phaser from 'phaser';
 import { haptics } from '../platform/haptics';
 import { PREF, getPref, setPref } from '../platform/prefs';
 
-type FxKey = 'damageNumbers' | 'shake' | 'vibrate';
-const KEY: Record<FxKey, typeof PREF.FX_DAMAGE | typeof PREF.FX_SHAKE | typeof PREF.FX_VIBRATE> = {
+type FxKey = 'damageNumbers' | 'shake' | 'vibrate' | 'aura';
+const KEY: Record<FxKey, (typeof PREF)[keyof typeof PREF]> = {
   damageNumbers: PREF.FX_DAMAGE,
   shake: PREF.FX_SHAKE,
   vibrate: PREF.FX_VIBRATE,
+  aura: PREF.FX_AURA,
 };
 
 export const fxPrefs = {
   damageNumbers: getPref(PREF.FX_DAMAGE) !== '0',
   shake: getPref(PREF.FX_SHAKE) !== '0',
   vibrate: getPref(PREF.FX_VIBRATE) !== '0',
+  aura: getPref(PREF.FX_AURA) !== '0',
   set(k: FxKey, on: boolean) {
     this[k] = on;
     setPref(KEY[k], on ? '1' : '0');

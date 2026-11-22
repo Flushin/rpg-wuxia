@@ -7,6 +7,7 @@ import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type SheetMeta } from './sprites';
 import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
+import { ElementAura } from './elementAura';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -46,6 +47,7 @@ export class EntityView {
   private labelY: number | null = null; // nome solto (fora do container), sempre por cima
   private mark?: Phaser.GameObjects.Text; // missão: "!" ou "?" sobre o NPC (marco 7)
   private markSig: string | null = null;
+  private aura?: ElementAura; // aura elemental do jogador (independe da skin)
 
   constructor(
     private scene: Phaser.Scene,
@@ -99,6 +101,7 @@ export class EntityView {
     this.labelY = labelY;
     label.setDepth(DEPTH.NAME);
     this.container = scene.add.container(0, 0, [this.ring, shadow, this.sprite, this.bar]);
+    if (e.kind === 'player') this.aura = new ElementAura(scene, this.container, shadow, this.sprite, this.top);
     this.sync(e, false);
     this.lastSx = this.container.x;
   }
@@ -118,6 +121,8 @@ export class EntityView {
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
     this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
     this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
+    if (this.aura && e.element)
+      this.aura.update(e.element, e.elemAtk[e.element], this.scene.game.loop.delta, this.container.visible && !e.dead);
     if (e.dead && this.sheet) {
       this.ring.clear();
       this.bar.clear();
@@ -349,6 +354,7 @@ export class EntityView {
 
   destroy() {
     this.flashTimer?.remove();
+    this.aura?.destroy();
     this.container.destroy();
     if (this.labelY !== null) this.label.destroy();
     this.mark?.destroy();
