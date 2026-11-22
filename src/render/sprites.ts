@@ -51,6 +51,8 @@ const npcSheets = Object.fromEntries(
 );
 /** npcId (mapa) -> folha. Os mestres usam o nome da seita no mapa. */
 const NPC_SHEET_BY_ID: Record<string, string> = {
+  joalheiro: 'npc_mercadora_jin', // provisório: sem sprite próprio até o Porto Noturno
+  ferreiro_mestre: 'npc_ferreira_lin',
   mestre_lamina: 'npc_mestre_tormenta',
   mestre_pavilhao: 'npc_mestra_geada',
   mestre_tita: 'npc_mestre_tita',

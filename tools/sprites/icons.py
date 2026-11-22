@@ -757,6 +757,20 @@ def i_essencia(im):
     fill(im, mask_ellipse((220, 200, 260, 240)), (255, 255, 255), outline=0, shade=False)
 
 
+def i_po_estrela(im):
+    # Pó de Estrela (Porto Noturno): monte de pó dourado com estrelas brilhando
+    m = mask_ellipse((110, 270, 402, 400))
+    part = new(); fill(part, m, (255, 244, 170), (190, 150, 60))
+    im.alpha_composite(glow(part, m, (255, 230, 120), 30, 1.4))
+    for cx, cy, r in ((256, 170, 70), (160, 230, 38), (360, 215, 44)):
+        pts = []
+        for k in range(8):
+            a = math.pi / 4 * k - math.pi / 2
+            rr = r if k % 2 == 0 else r * 0.28
+            pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+        fill(im, mask_poly(pts), (255, 255, 230), (230, 190, 80), outline=4)
+
+
 def i_pergaminho(im):
     fill(im, mask_poly([(130, 150), (382, 150), (382, 380), (130, 380)]), (246, 230, 180), (200, 170, 110))
     for y in (150, 380):
@@ -926,7 +940,7 @@ ITEMS = {
     'calca_la': i_calca_la, 'calca_escamas': i_calca_escamas,
     'botas_pico': i_botas_pico, 'botas_passo_celeste': i_botas_passo_celeste,
     'minerio_ferro': i_minerio, 'cristal_gelo': i_cristal, 'essencia_qi': i_essencia,
-    'pergaminho_retorno': i_pergaminho,
+    'pergaminho_retorno': i_pergaminho, 'po_estrela': i_po_estrela,
     'colar_bambu': i_colar_bambu, 'veste_bambu': i_veste_bambu,
     'espadas_folha_bambu': i_espadas_folha_bambu, 'leque_bambu_negro': i_leque_bambu_negro,
     'bastao_raiz_bambu': i_bastao_raiz_bambu, 'agulhas_espinho': i_agulhas_espinho,

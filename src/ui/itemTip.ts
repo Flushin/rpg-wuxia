@@ -3,6 +3,8 @@ import { CLASSES } from '../core/data';
 import {
   BASES,
   CONSUMABLES,
+  GEMS,
+  GEM_CFG,
   MATERIALS,
   POTIONS,
   RARITIES,
@@ -24,6 +26,29 @@ import type { ItemInstance, Slot } from '../core/types';
 import type { ItemOwner } from '../core/items';
 import type { World } from '../core/world';
 import { hasIcon, iconHtml } from './icons';
+
+/** Ícone da gema: losango na cor do tipo com o nível em romano; null = encaixe vazio (losango vazado). */
+export function gemIconHtml(id: string | null): string {
+  const g = id ? GEMS[id] : undefined;
+  return g
+    ? `<span class="gem" style="--gc:${g.color}"><b>${GEM_CFG.levelNames[g.level - 1]}</b></span>`
+    : '<span class="gem gem-empty"></span>';
+}
+/** Linhas dos encaixes na janela do item (vazio ou a gema com seus stats). */
+export function socketsTipHtml(it: ItemInstance): string {
+  if (!it.gems?.length) return '';
+  return it.gems
+    .map((id) => {
+      const g = id ? GEMS[id] : undefined;
+      const st = g
+        ? Object.entries(g.stats)
+            .map(([k, v]) => fmtStat(k, v))
+            .join(', ')
+        : '';
+      return `<div class="tip-gem">${gemIconHtml(id)} ${g ? `<span style="color:${g.color}">${g.name}</span> <small>${st}</small>` : `<small>${L('Encaixe vazio', 'Empty socket')}</small>`}</div>`;
+    })
+    .join('');
+}
 
 const GREEN = '#6fdc6f',
   RED = '#ff6b6b';
@@ -77,6 +102,15 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
       <small>${L('Usar outra do mesmo tipo reinicia o efeito.', 'Using another of the same type restarts the effect.')}</small>
       <div>${L('Quantidade', 'Quantity')}: ${it.qty ?? 1}</div><div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro (cada)`, `Sell: ${sellValue(it)} gold (each)`)}</div>`;
   }
+  const gem = GEMS[it.baseId];
+  if (gem) {
+    const st = Object.entries(gem.stats)
+      .map(([k, v]) => `<div>${fmtStat(k, v)}</div>`)
+      .join('');
+    return `<b style="color:${gem.color}">${gemIconHtml(it.baseId)} ${gem.name}</b>${st}
+      <small>${L('Gema: encaixe num equipamento com o Ferreiro-mestre. 3 iguais viram 1 do nível seguinte no Joalheiro.', 'Gem: set it into gear at the Master Smith. 3 alike become 1 of the next level at the Jeweler.')}</small>
+      <div>${L('Quantidade', 'Quantity')}: ${it.qty ?? 1}</div><div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro (cada)`, `Sell: ${sellValue(it)} gold (each)`)}</div>`;
+  }
   const st = MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId];
   if (st) {
     return `<b style="color:${st.color}">${st.name}</b><div>${st.desc}</div>
@@ -110,7 +144,7 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     <div><small style="color:${r.color}">${r.name}</small> <small>· ${SLOT_NAMES[b.slot]}</small></div>
     <div style="color:${lvlBad ? RED : 'inherit'}">${L(`Requer nível ${b.reqLevel}`, `Requires level ${b.reqLevel}`)}</div>
     ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
-    ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
+    ${lines}${bonus}${socketsTipHtml(it)}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
 /** Janela do Épico: sem nível próprio (stats da peça da faixa do personagem), bônus (da classe ou trocados), não vende. */
@@ -139,7 +173,7 @@ function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
     <div><small style="color:${r.color}">${r.name}</small> <small>· ${SLOT_NAMES[b.slot]}</small></div>
     <div>${L(`Acompanha seu nível (nv ${o.level})`, `Scales with your level (lv ${o.level})`)}</div>
     ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
-    ${lines}${bonus}${dur}<div class="tip-sell">${L('Não pode ser vendido', 'Cannot be sold')}</div>${compare ? compareHtml(w, it) : ''}`;
+    ${lines}${bonus}${socketsTipHtml(it)}${dur}<div class="tip-sell">${L('Não pode ser vendido', 'Cannot be sold')}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 /** Ícone do item; o Épico tem o seu próprio, fixo (não segue a peça da faixa). */
 const iconId = (it: ItemInstance) => (it.rarity === 'epico' ? epicIconId(it) : it.baseId);
@@ -159,10 +193,12 @@ export function cellHtml(it: ItemInstance | null, owner?: ItemOwner): string {
     pot = POTIONS[it.baseId],
     stack = !b,
     ico = iconId(it);
-  const label = iconHtml(
-    ico,
-    pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : b ? SLOT_ICON[b.slot] : CONSUMABLES[it.baseId] ? '📜' : '💎',
-  );
+  const label = GEMS[it.baseId]
+    ? gemIconHtml(it.baseId)
+    : iconHtml(
+        ico,
+        pot ? (pot.kind === 'hp' ? 'HP' : 'MP') : b ? SLOT_ICON[b.slot] : CONSUMABLES[it.baseId] ? '📜' : '💎',
+      );
   const col = itemColor(it);
   let extra = it.plus ? `<i class="plus">+${it.plus}</i>` : '';
   if (stack) extra = `<i class="qty">${it.qty ?? 1}</i>`;

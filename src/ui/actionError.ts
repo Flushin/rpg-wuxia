@@ -47,5 +47,17 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Cavalariço Ma', 'Talk to Stablemaster Ma');
     case 'mountOwned':
       return L('Você já tem esta montaria', 'You already own this mount');
+    case 'talkToJeweler':
+      return L('Fale com o Joalheiro', 'Talk to the Jeweler');
+    case 'talkToMasterSmith':
+      return L('Fale com o Ferreiro-mestre', 'Talk to the Master Smith');
+    case 'hasGems':
+      return L('Retire as gemas antes (Ferreiro-mestre)', 'Remove the gems first (Master Smith)');
+    case 'noSocket':
+      return L('Nenhum encaixe vazio', 'No empty socket');
+    case 'socketsMax':
+      return L('Todos os encaixes desta raridade já estão abertos', 'All sockets for this rarity are open');
+    case 'gemMaxLevel':
+      return L('A gema já está no nível máximo', 'The gem is already at max level');
   }
 }

@@ -32,6 +32,8 @@ export interface ItemInstance {
   plus?: number;
   /** trancado pelo jogador (cadeado): não pode ser vendido, destruído nem desmontado, nem pelo Auto */
   locked?: boolean;
+  /** encaixes abertos pelo Ferreiro-mestre (Porto Noturno): id da gema ou null (vazio); sem = nenhum aberto */
+  gems?: (string | null)[];
 }
 export interface GroundItem {
   id: number;
@@ -348,6 +350,12 @@ export type ActionError =
   | { code: 'talkToMonk' }
   | { code: 'nothingToReset' }
   | { code: 'talkToGovernor' }
+  | { code: 'talkToJeweler' }
+  | { code: 'talkToMasterSmith' }
+  | { code: 'hasGems' }
+  | { code: 'noSocket' }
+  | { code: 'socketsMax' }
+  | { code: 'gemMaxLevel' }
   | { code: 'skinOwned' }
   | { code: 'talkToStable' }
   | { code: 'mountOwned' };

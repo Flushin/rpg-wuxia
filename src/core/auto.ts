@@ -1,6 +1,6 @@
 import { MONSTERS } from './data';
 import { L } from './i18n';
-import { buyPrice, BASES, SLOTS } from './items';
+import { buyPrice, BASES, SLOTS, itemHasGems } from './items';
 import { findPath, isWalkable } from './pathfinding';
 import type {
   AutoBucket,
@@ -281,7 +281,10 @@ export class AutoCombat {
   // ---------- venda automática (mochila cheia) ----------
   sellable(it: ItemInstance): boolean {
     return (
-      !!BASES[it.baseId] && !it.locked && (it.rarity === 'comum' || (it.rarity === 'incomum' && this.cfg.sellIncomum))
+      !!BASES[it.baseId] &&
+      !it.locked &&
+      !itemHasGems(it) &&
+      (it.rarity === 'comum' || (it.rarity === 'incomum' && this.cfg.sellIncomum))
     );
   }
   /** Aba de equipamentos cheia e com algo que a regra vende: hora de ir ao vendedor da vila. */

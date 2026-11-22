@@ -34,6 +34,7 @@ import { renderPanel, resetScroll } from './panelRender';
 import { spinHtml } from './spinView';
 import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
+import { gemClick, jewelerHtml, masterSmithHtml } from './gemShop';
 import {
   matCount,
   rarityCost,
@@ -65,6 +66,7 @@ export class NpcWindow {
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
   private salvageAsk = 0; // confirmações de desmontar já dadas (Épico pede duas)
   private resetAsk = false; // realinhar meridianos aguardando confirmação
+  private gemSel = ''; // uid do item escolhido no Ferreiro-mestre
   private skinAsk = ''; // traje aguardando confirmação da compra
   private mountAsk = ''; // montaria aguardando confirmação da compra
   private qty = 1;
@@ -122,6 +124,18 @@ export class NpcWindow {
           ),
           '#9be7c4',
         );
+      return;
+    }
+    if (a === 'gemsel') {
+      audio.ui('ui_click');
+      this.gemSel = v;
+      this.showSide = true;
+      return;
+    }
+    if (a.startsWith('gem')) {
+      const err = gemClick(w, a, v, this.gemSel);
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else audio.ui('ui_click');
       return;
     }
     if (a === 'skinbuy') {
@@ -314,6 +328,7 @@ export class NpcWindow {
       this.resetAsk = false;
       this.skinAsk = '';
       this.mountAsk = '';
+      this.gemSel = '';
       this.pending = -1;
       this.sig = '';
       this.line = 0;
@@ -321,7 +336,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -336,7 +351,9 @@ export class NpcWindow {
       role === 'caminhos' ||
       role === 'meridianos' ||
       role === 'governador' ||
-      role === 'estabulo';
+      role === 'estabulo' ||
+      role === 'joalheiro' ||
+      role === 'ferreiro_mestre';
     let view: View,
       sub = '';
     if (role === 'ferreiro') {
@@ -349,7 +366,11 @@ export class NpcWindow {
     else if (role === 'meridianos') view = { list: this.talk(who) + this.meridians() };
     else if (role === 'governador') view = { list: this.talk(who) + this.skinShop() };
     else if (role === 'estabulo') view = { list: this.talk(who) + this.mountShop() };
-    else if (role.startsWith('mestre_')) {
+    else if (role === 'joalheiro') view = { list: this.talk(who) + jewelerHtml(w) };
+    else if (role === 'ferreiro_mestre') {
+      const g = masterSmithHtml(w, this.gemSel);
+      view = { list: this.talk(who) + g.list, side: g.side, wide: true };
+    } else if (role.startsWith('mestre_')) {
       const m = this.master(role.slice(7));
       view = { list: m.body };
       sub = m.sub;
