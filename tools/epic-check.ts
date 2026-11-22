@@ -1,6 +1,6 @@
 // Confere o equipamento Épico (raridade epico): chances de drop (0,5% / 1%, 0% no auto, invocados, monstro fraco e
 // offline), outras raridades intactas, +30% sobre o Raro da faixa, acompanha o nível, bônus por classe, forja até +10
-// (ouro ×2), sem venda nem desmonte, equipar sem trava de nível e saves antigos intactos.
+// (ouro ×2), troca de bônus (3× o Raro), desmonte, sem venda, equipar sem trava de nível e saves antigos intactos.
 // Uso: npm run check:epic
 import { readFileSync, readdirSync } from 'node:fs';
 import { CLASSES, MONSTERS } from '../src/core/data';
@@ -243,17 +243,38 @@ console.log('\n== forja, venda e desmonte ==');
     e.plus === MAX_PLUS && F.upgradeCost(e, w.owner()) === null && F.upgrade(w, e, true)?.code === 'cannotForge',
     'para em +10',
   );
+  ok(F.raiseRarity(w, e, true)?.code === 'cannotForge', 'sem subir raridade');
+  const ec = F.rerollCost(e, w.owner())!,
+    rc = F.rerollCost({ ...e, baseId: epicTierBase(e, 22), rarity: 'raro' })!;
   ok(
-    F.raiseRarity(w, e, true)?.code === 'cannotForge' && F.reroll(w, e, true)?.code === 'cannotForge',
-    'sem subir raridade nem trocar bônus',
+    ec.gold === 3 * rc.gold && Object.entries(rc.mats).every(([id, n]) => ec.mats[id] === 3 * n),
+    `trocar bônus: 3× o Raro da faixa (${ec.gold} ouro, ${JSON.stringify(ec.mats)})`,
   );
-  ok(F.salvage(w, 0, true)?.code === 'epicLocked' && w.bag[0] === e, 'não desmonta');
+  const goldBefore = w.gold;
+  ok(
+    F.reroll(w, e, true) === null && e.bonuses.length === 2 && w.gold === goldBefore - ec.gold,
+    `troca de bônus: ${e.bonuses.map((b) => b.stat).join(' + ')}`,
+  );
+  const vals = epicBonuses(w.owner(), e);
+  ok(
+    vals.length === 2 &&
+      vals.every((b) => b.value > 0) &&
+      new Set(vals.map((b) => b.stat)).size === 2 &&
+      !vals.some((b) => b.stat === 'elemAtk'),
+    `bônus trocados com força épica: ${vals.map((b) => `${b.stat} ${b.value}`).join(', ')}`,
+  );
+  const s = sanitizeItem(JSON.parse(JSON.stringify(e)))!;
+  ok(JSON.stringify(s.bonuses) === JSON.stringify(e.bonuses), 'bônus trocados sobrevivem ao save');
   (w as unknown as { npcRole: () => string }).npcRole = () => 'vendedor';
   const gold = w.gold;
   ok(
     w.sell(0)?.code === 'epicLocked' && w.sellRaw(0) === 0 && w.gold === gold && w.bag[0] === e,
     'não vende (nem pelo auto)',
   );
+  const y = F.salvageYield(e, w.owner()),
+    ess = w.potionCount('essencia_qi');
+  ok(F.salvage(w, 0, true) === null && w.bag[0] === null, `desmonta: ${JSON.stringify(y)}`);
+  ok(y.essencia_qi === 1 && w.potionCount('essencia_qi') === ess + 1, 'desmonte do Épico dá 1 Essência de Qi');
 }
 
 console.log('\n== ícones ==');

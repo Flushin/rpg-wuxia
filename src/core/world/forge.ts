@@ -11,7 +11,9 @@ import {
   RARITY_ORDER,
   epicTierBase,
   makeStack,
+  epicBonusStats,
   rollBonuses,
+  rollEpicBonusStats,
   type ItemOwner,
 } from '../items';
 import type { ActionError, ItemInstance, Rarity } from '../types';
@@ -35,6 +37,8 @@ export const FORGE = {
   rerollGold: { incomum: 100, raro: 200 } as Record<Rarity, number>,
   /** Épico: melhorar custa o ouro do Raro da faixa × isto (materiais e chance iguais). */
   epicGoldMul: 2,
+  /** Épico: trocar bônus custa materiais e ouro da troca do Raro da faixa × isto (no lugar de epicGoldMul). */
+  epicRerollMul: 3,
 };
 const ORE = 'minerio_ferro',
   CRYSTAL = 'cristal_gelo',
@@ -80,25 +84,29 @@ export function rarityCost(it: ItemInstance): ForgeCost | null {
 }
 
 /** Sorteia de novo todos os bônus de um item Incomum ou Raro (a quantidade continua a mesma). */
-export function rerollCost(it: ItemInstance): ForgeCost | null {
-  if (!BASES[it.baseId] || it.rarity === 'comum' || it.rarity === 'epico') return null; // Épico: bônus fixos da classe
+export function rerollCost(it: ItemInstance, owner?: ItemOwner): ForgeCost | null {
+  if (!BASES[it.baseId] || it.rarity === 'comum') return null;
+  if (it.rarity === 'epico') {
+    // 3× a troca do Raro da faixa do nível de quem usa (materiais e ouro; sem o ×2 de ouro da melhoria)
+    const k = FORGE.epicRerollMul,
+      g = Math.round(FORGE.rerollGold.raro * levelFactor(it, owner) * bal('forja.ouro') * k);
+    return { mats: { [ORE]: 10 * k, [rare(it, owner)]: rq(it, 2, owner) * k }, gold: g, chance: 1 };
+  }
   return it.rarity === 'incomum'
     ? { mats: { [ORE]: 6, [rare(it)]: rq(it, 1) }, gold: gold(FORGE.rerollGold.incomum, it), chance: 1 }
     : { mats: { [ORE]: 10, [rare(it)]: rq(it, 2) }, gold: gold(FORGE.rerollGold.raro, it), chance: 1 };
 }
 
-/** Materiais que desmontar o item devolve. */
-export function salvageYield(it: ItemInstance): Mats {
-  const b = BASES[it.baseId];
-  if (!b) return {};
-  const r = it.rarity;
+/** Materiais que desmontar o item devolve. Épico: como um Raro da faixa do nível de `owner`, + 1 Essência de Qi. */
+export function salvageYield(it: ItemInstance, owner?: ItemOwner): Mats {
+  if (!BASES[it.baseId]) return {};
+  const lv = forgeLevel(it, owner),
+    r = it.rarity,
+    hi = r === 'raro' || r === 'epico';
   return clean({
-    [ORE]:
-      1 + Math.floor(b.reqLevel / 5) + (r === 'incomum' ? 2 : r === 'raro' ? 3 : 0) + Math.floor((it.plus ?? 0) / 2),
-    [rare(it)]: rareQty(
-      b.reqLevel,
-      (b.reqLevel >= 10 ? 1 : 0) + (r === 'raro' ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0),
-    ),
+    [ORE]: 1 + Math.floor(lv / 5) + (r === 'incomum' ? 2 : hi ? 3 : 0) + Math.floor((it.plus ?? 0) / 2),
+    [rare(it, owner)]: rareQty(lv, (lv >= 10 ? 1 : 0) + (hi ? 1 : 0) + ((it.plus ?? 0) >= 6 ? 1 : 0)),
+    [ESSENCE]: r === 'epico' ? 1 : 0,
   });
 }
 
@@ -177,12 +185,27 @@ export function raiseRarity(w: World, it: ItemInstance, force = false): ActionEr
 }
 
 export function reroll(w: World, it: ItemInstance, force = false): ActionError | null {
-  const cost = rerollCost(it),
+  const cost = rerollCost(it, w.owner()),
     err = check(w, it, cost, force);
   if (err || !cost) return err;
   takeMats(w, cost.mats);
   w.gold -= cost.gold;
-  it.bonuses = rollBonuses(RARITIES[it.rarity].bonuses, it.ilvl, CLASSES[w.classId].element, w.rng);
+  if (it.rarity === 'epico') {
+    // mesma quantidade de antes; evita sair exatamente o mesmo par
+    const cur = epicBonusStats(w.owner(), it).slice().sort().join();
+    let next = rollEpicBonusStats(cur.split(',').length, w.rng);
+    for (
+      let i = 0;
+      i < 5 &&
+      next
+        .map((b) => b.stat)
+        .sort()
+        .join() === cur;
+      i++
+    )
+      next = rollEpicBonusStats(next.length, w.rng);
+    it.bonuses = next;
+  } else it.bonuses = rollBonuses(RARITIES[it.rarity].bonuses, it.ilvl, CLASSES[w.classId].element, w.rng);
   done(w, it, 'reroll', true);
   return null;
 }
@@ -192,8 +215,7 @@ export function salvage(w: World, bagIndex: number, force = false): ActionError 
   const it = w.bag[bagIndex];
   if (!force && w.npcRole() !== 'ferreiro') return { code: 'talkToBlacksmith' };
   if (!it || !BASES[it.baseId]) return { code: 'cannotForge' };
-  if (it.rarity === 'epico') return { code: 'epicLocked' };
-  const got = salvageYield(it);
+  const got = salvageYield(it, w.owner());
   w.bag[bagIndex] = null;
   const lost: Mats = {};
   for (const [id, n] of Object.entries(got)) if (!w.addItem(makeStack(id, n))) lost[id] = n;

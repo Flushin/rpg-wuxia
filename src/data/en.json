@@ -994,7 +994,7 @@
     }
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [{ "texto": "Epic items: you can now reroll their bonuses at the blacksmith (3× the Rare cost) and salvage duplicate Epics." }],
     "versoes": [
       {
         "loja": [

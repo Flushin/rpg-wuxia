@@ -22,12 +22,18 @@ Wiki: `#/mecanicas/epico`.
 - 2 bônus fixos: 1,3 × o máximo que um Raro sortearia no nível do personagem (`max × (1 + 0,2 × (nível − 1)) × 1,3`).
   - Tormenta, Titã e Víbora: Força + elemento da seita; Geada: Inteligência + Gelo. Motivo: elemento soma direto ao
     dano (só cai com resistência) e Força/Inteligência dão +2 de ataque; os dois escalam com as skills.
-  - Os bônus seguem a classe de quem usa (troca de classe nunca deixa o item errado).
+  - Os bônus seguem a classe de quem usa (troca de classe nunca deixa o item errado) enquanto não forem trocados.
 - Equipa em qualquer nível; a arma continua presa à seita.
 
 ## Forja e economia
 - Cai +0; melhora até +10 com os materiais e as chances do Raro da faixa e o ouro × 2 (`FORGE.epicGoldMul`).
-- Não sobe raridade, não troca bônus, não vende (nem pelo auto) e não desmonta (erro `epicLocked`).
+- Não sobe raridade e não vende, nem pelo auto (erro `epicLocked`).
+- Trocar bônus (Lucas, 22/11/2026): sorteia 2 atributos diferentes do pool (`bonusPool`), evitando repetir o par atual;
+  valor = mesma fórmula épica, pelo nível de quem usa. O item guarda só o `stat` do pool (`elemAtk` vira o elemento da
+  classe de quem usa) com `value: 0`; `bonuses` vazio = bônus da classe. Custo: 3× materiais e ouro da troca do Raro da
+  faixa (`FORGE.epicRerollMul`; sem o ×2 da melhoria).
+- Desmontar (Lucas, 22/11/2026): liberado para o épico repetido não travar a mochila. Rende como um Raro da faixa + 1
+  Essência de Qi. A janela do ferreiro pede confirmação duas vezes.
 - Conserto pelo nível do personagem.
 
 ## Nomes (um por slot; arma por seita)
@@ -40,5 +46,5 @@ Agulhas da Víbora Imperial (Víbora). Inglês em `src/data/en.json`.
   filtro) e brilho de drop maior.
 
 ## Saves
-- Nada novo é gravado: o item guarda `baseId`, `rarity: 'epico'`, `plus`, `durability` e `ilvl` (informativo).
+- O item guarda `baseId`, `rarity: 'epico'`, `plus`, `durability`, `ilvl` (informativo) e, se trocados, os bônus.
   Saves antigos carregam idênticos. Um save com Épico aberto numa versão antiga vira Comum (sem conserto).

@@ -61,7 +61,7 @@ export class NpcWindow {
   private tab: 'buy' | 'sell' = 'buy';
   private smithTab: 'repair' | 'forge' | 'salvage' = 'repair';
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
-  private salvageAsk = false; // desmontar aguardando confirmação
+  private salvageAsk = 0; // confirmações de desmontar já dadas (Épico pede duas)
   private resetAsk = false; // realinhar meridianos aguardando confirmação
   private skinAsk = ''; // traje aguardando confirmação da compra
   private qty = 1;
@@ -199,14 +199,14 @@ export class NpcWindow {
       audio.ui('ui_click');
       this.smithTab = v as 'repair' | 'forge' | 'salvage';
       this.forgeSel = '';
-      this.salvageAsk = false;
+      this.salvageAsk = 0;
       this.showSide = false;
       return;
     }
     if (a === 'fsel') {
       audio.ui('ui_click');
       this.forgeSel = v;
-      this.salvageAsk = false;
+      this.salvageAsk = 0;
       this.showSide = true;
       return;
     }
@@ -215,11 +215,11 @@ export class NpcWindow {
       if (!it) return;
       const before = it.plus ?? 0;
       if (v === 'salvage') {
-        if (!this.salvageAsk) {
-          this.salvageAsk = true;
+        if (this.salvageAsk < (it.rarity === 'epico' ? 2 : 1)) {
+          this.salvageAsk++;
           return;
         }
-        this.salvageAsk = false;
+        this.salvageAsk = 0;
         err = w.forgeSalvage(+this.forgeSel.split(':')[1]);
         if (!err) {
           audio.ui('salvage');
@@ -286,7 +286,7 @@ export class NpcWindow {
       this.tab = 'buy';
       this.smithTab = 'repair';
       this.forgeSel = '';
-      this.salvageAsk = false;
+      this.salvageAsk = 0;
       this.resetAsk = false;
       this.skinAsk = '';
       this.pending = -1;
@@ -580,7 +580,7 @@ export class NpcWindow {
     if (it) {
       const up = upgradeCost(it, w.owner()),
         ra = rarityCost(it),
-        re = rerollCost(it),
+        re = rerollCost(it, w.owner()),
         plus = it.plus ?? 0;
       // ações primeiro (é o que se usa várias vezes seguidas); a ficha completa do item vem logo abaixo
       detail = `${this.costRow(
@@ -613,10 +613,13 @@ export class NpcWindow {
           L('Trocar bônus', 'Reroll bonuses'),
           'reroll',
           re,
-          L('Sorteia de novo todos os bônus.', 'Rerolls all bonuses.'),
           it.rarity === 'epico'
-            ? L('Épico: bônus fixos da sua classe.', 'Epic: fixed bonuses for your class.')
-            : L('Só itens Incomuns ou Raros têm bônus.', 'Only Uncommon or Rare items have bonuses.'),
+            ? L(
+                'Sorteia 2 atributos novos (força épica, acompanha seu nível). Custa 3× a troca de um Raro.',
+                'Rolls 2 new attributes (epic strength, scales with your level). Costs 3× a Rare reroll.',
+              )
+            : L('Sorteia de novo todos os bônus.', 'Rerolls all bonuses.'),
+          L('Só itens Incomuns, Raros ou Épicos têm bônus.', 'Only Uncommon, Rare or Epic items have bonuses.'),
         )}
 <div class="tipbody ftip">${itemTipHtml(w, it, false)}</div>`;
     }
@@ -628,7 +631,7 @@ export class NpcWindow {
     const w = this.world;
     const pick: string[] = [];
     w.bag.forEach((it, i) => {
-      if (!it || !BASES[it.baseId] || it.rarity === 'epico') return; // Épico não se desmonta
+      if (!it || !BASES[it.baseId]) return;
       const ref = `bag:${i}`;
       pick.push(
         `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b></span></button>`,
@@ -646,9 +649,18 @@ export class NpcWindow {
     const it = this.forgeItem();
     let detail = `<p class="muted">${L('Escolha um item para desmontar.', 'Choose an item to salvage.')}</p>`;
     if (it && this.forgeSel.startsWith('bag:')) {
-      detail = `<div class="srow"><div class="si"><b>${L('Você recebe', 'You get')}</b><small>${this.matsHtml(salvageYield(it)).replace(/ <i>\([^)]*\)<\/i>/g, '')}</small>
-          <small class="muted">${L('O item é destruído.', 'The item is destroyed.')}</small></div>
-          <button class="${this.salvageAsk ? 'danger' : ''}" data-a="forge" data-v="salvage">${this.salvageAsk ? L('Confirmar?', 'Confirm?') : L('Desmontar', 'Salvage')}</button></div>
+      const epic = it.rarity === 'epico',
+        ask = this.salvageAsk,
+        btn = !ask
+          ? L('Desmontar', 'Salvage')
+          : epic && ask === 1
+            ? L('Desmontar um Épico?', 'Salvage an Epic?')
+            : epic
+              ? L('Tem certeza? Não volta', 'Are you sure? No undo')
+              : L('Confirmar?', 'Confirm?');
+      detail = `<div class="srow"><div class="si"><b>${L('Você recebe', 'You get')}</b><small>${this.matsHtml(salvageYield(it, w.owner())).replace(/ <i>\([^)]*\)<\/i>/g, '')}</small>
+          <small class="muted">${epic ? L('O Épico é destruído para sempre.', 'The Epic is destroyed forever.') : L('O item é destruído.', 'The item is destroyed.')}</small></div>
+          <button class="${ask ? 'danger' : ''}" data-a="forge" data-v="salvage">${btn}</button></div>
         <div class="tipbody ftip">${itemTipHtml(w, it, false)}</div>`;
     }
     return { top, list: `<div class="fpick">${pick.join('')}</div>`, side: detail, wide: true };
