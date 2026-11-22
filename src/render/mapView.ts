@@ -457,7 +457,14 @@ export function cullMap(objs: Phaser.GameObjects.GameObject[], cam: Phaser.Camer
     bottom = v.bottom + 320;
   for (const o of objs) {
     if (!(o instanceof Phaser.GameObjects.Image)) continue; // gráficos, partículas e textos ficam sempre
-    o.setVisible(o.x > left && o.x < right && o.y > top && o.y < bottom);
+    // fatias de casa têm origem no canto de cima (0,0): testa o retângulo inteiro, não só o pivô
+    if (o.originY === 0) {
+      const x0 = o.x - 32,
+        y0 = o.y - 32;
+      o.setVisible(
+        x0 < v.right + 32 && x0 + o.displayWidth + 64 > v.x && y0 < v.bottom + 32 && y0 + o.displayHeight + 64 > v.y,
+      );
+    } else o.setVisible(o.x > left && o.x < right && o.y > top && o.y < bottom);
   }
 }
 

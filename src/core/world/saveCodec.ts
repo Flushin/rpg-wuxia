@@ -42,6 +42,7 @@ export function serialize(w: World): SaveData {
     trialProgress: Object.keys(w.trialProgress).length ? { ...w.trialProgress } : undefined,
     skins: w.skinsOwned.length ? [...w.skinsOwned] : undefined,
     skin: w.skin ?? undefined,
+    playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
   };
 }
 
@@ -88,4 +89,6 @@ export function restore(w: World, s: SaveData, now: number) {
   w.quest = sanitizeQuest(s.quest);
   w.merchant = restoreMerchant(s.merchant);
   w.trialProgress = sanitizeTrialProgress(s.trialProgress);
+  const sec = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0);
+  w.playTime = { auto: sec(s.playTime?.auto), manual: sec(s.playTime?.manual) };
 }
