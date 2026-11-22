@@ -31,6 +31,7 @@ import { itemIndexPage, itemPage } from '../src/wiki/items';
 import { SHEETS, monsterIndexPage, monsterPage, statsAt } from '../src/wiki/monsters';
 import { NPCS, npcIndexPage, npcPage } from '../src/wiki/npcs';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from '../src/wiki/sects';
+import { ULTIMATES } from '../src/core/ultimate';
 import { mapIndexPage, mapPage, questIndexPage } from '../src/wiki/world';
 import * as M from '../src/wiki/mechanics';
 import { hitChance as cHit } from '../src/core/combat';
@@ -140,6 +141,11 @@ console.log('== dados iguais aos do jogo (com balanceamento) ==');
       .flat()
       .map((s) => [s.id, s.mana, s.cooldown, s.hits]);
   ok(same(sk(W.SKILLS), sk(C_SKILLS as never)), 'skills (mana, recarga, golpes)');
+  for (const [cid, u] of Object.entries(ULTIMATES))
+    ok(
+      (sectPage(cid) ?? '').includes(u.name) && skillIndexPage().includes(u.name),
+      `ultimate ${u.name} na página da seita e em Skills`,
+    );
 }
 
 console.log('== fórmulas copiadas ==');

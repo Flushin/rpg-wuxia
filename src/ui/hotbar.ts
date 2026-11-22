@@ -7,6 +7,8 @@ import { uiRect, uiW } from './uiScale';
 import { byId } from './dom';
 import { onPress } from './press';
 import { hudV2 } from './hudLayout';
+import { THUMB_COMPACT, THUMB_NORMAL, thumbLayout } from './thumbLayout';
+import { UltButton, ultTipHtml } from './ultButton';
 
 const SIZE = 56,
   R = 118,
@@ -24,6 +26,9 @@ export class Hotbar {
   private shown = -1;
   private pressTimer = 0;
   private longPressed = false;
+  private ult: UltButton;
+  /** dica aberta da ultimate (em vez de uma skill) */
+  private ultTip: Element | null = null;
 
   constructor(
     private world: World,
@@ -46,6 +51,14 @@ export class Hotbar {
         sig: '',
       });
       this.bind(b, i);
+    });
+    this.ult = new UltButton(world, this.el, onUse, (on, el) => {
+      this.ultTip = on ? el : null;
+      if (on) {
+        this.shown = -1;
+        this.tip.classList.remove('hidden');
+        this.renderTip();
+      } else this.hideTip();
     });
     window.addEventListener('resize', () => this.layout());
     this.layout();
@@ -90,8 +103,9 @@ export class Hotbar {
   }
 
   private layout() {
-    if (!isTouch) return;
+    if (!isTouch) return this.ult.layoutArc(null);
     if (hudV2()) return this.layoutV2();
+    this.clearV2();
     // celular deitado com pouca altura (ex.: Fold fechado): arco baixo e compacto, para não subir até os botões do topo
     const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
     const narrow = window.innerWidth < 380;
@@ -110,42 +124,77 @@ export class Hotbar {
       s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
       s.btn.style.bottom = `${cy + r * Math.sin(a) - size / 2}px`;
     });
+    // ultimate no layout clássico: botão redondo acima da última skill
+    this.ult.layoutArc(null);
+    this.ult.place(EDGE_GAP, cy + r + size, size);
   }
 
-  /** HUD novo do celular: as 4 skills num arco por cima do Atacar, todas à mesma distância dele, começando
-   *  um pouco acima da horizontal para deixar o canto de baixo livre para as poções (hud-mobile.css).
-   *  Centro do Atacar e tamanhos batem com o CSS: normal 96px em right 24/bottom 30; deitado baixo 78px em 14/12. */
+  /** HUD novo do celular (thumbLayout.ts): Atacar, as skills num anel em volta dele, poções e o arco da ultimate,
+   *  todos com o mesmo vão. Deitado com pouca altura ou em pé estreito usa os tamanhos compactos; em pé as poções ficam em coluna. */
   private layoutV2() {
-    const short = window.innerWidth > window.innerHeight && window.innerHeight <= 450;
-    const size = short ? 46 : SIZE,
-      r = short ? 96 : R,
-      cx = short ? 53 : 72,
-      cy = short ? 51 : 78;
-    const minStep = (2 * Math.asin(Math.min(1, (size + 6) / (2 * r))) * 180) / Math.PI;
-    const step = Math.max(31, minStep),
-      start = 168;
+    const land = window.innerWidth > window.innerHeight,
+      short = land && window.innerHeight <= 450,
+      // em pé e estreito (até ~420 px do HUD): compactos, senão as poções encostam no joystick
+      narrow = !land && uiW() < 420;
+    const t = thumbLayout(short || narrow ? THUMB_COMPACT : THUMB_NORMAL, this.slots.length, !land);
+    const k = t.k,
+      px = (n: number) => `${n.toFixed(1)}px`;
     this.slots.forEach((s, i) => {
-      const a = ((start - i * step) * Math.PI) / 180;
-      s.btn.style.right = `${cx - r * Math.cos(a) - size / 2}px`;
-      s.btn.style.bottom = `${cy + r * Math.sin(a) - size / 2}px`;
+      const p = t.skills[i];
+      Object.assign(s.btn.style, {
+        width: px(k.sk),
+        height: px(k.sk),
+        right: px(p.x - k.sk / 2),
+        bottom: px(p.y - k.sk / 2),
+      });
     });
+    Object.assign(byId('btn-attack').style, {
+      width: px(k.atk),
+      height: px(k.atk),
+      right: px(t.cx - k.atk / 2),
+      bottom: px(t.cy - k.atk / 2),
+    });
+    const bar = byId('potion-bar'),
+      p0 = t.pots[0];
+    Object.assign(bar.style, {
+      left: 'auto',
+      right: px(p0.x - k.pot / 2),
+      bottom: px(p0.y - k.pot / 2),
+      gap: px(k.gap),
+      flexDirection: land ? 'row' : 'column-reverse',
+    });
+    for (const b of bar.querySelectorAll<HTMLElement>('.pot'))
+      Object.assign(b.style, { width: px(k.pot), height: px(k.pot) });
+    this.ult.layoutArc(t);
+  }
+
+  /** Volta Atacar e poções para o CSS (layout clássico). */
+  private clearV2() {
+    const clear = (el: HTMLElement, keys: string[]) => keys.forEach((k) => el.style.removeProperty(k));
+    clear(byId('btn-attack'), ['width', 'height', 'right', 'bottom']);
+    const bar = byId('potion-bar');
+    clear(bar, ['left', 'right', 'bottom', 'gap', 'flex-direction']);
+    for (const b of bar.querySelectorAll<HTMLElement>('.pot')) clear(b, ['width', 'height']);
+    for (const s of this.slots) clear(s.btn, ['width', 'height']);
   }
 
   private showTip(i: number) {
     this.shown = i;
+    this.ultTip = null;
     this.tip.classList.remove('hidden');
     this.renderTip();
   }
   private hideTip() {
     this.shown = -1;
+    this.ultTip = null;
     this.tip.classList.add('hidden');
   }
 
   private renderTip() {
     const d = this.world.activeSkills()[this.shown];
-    if (!d) return this.hideTip();
-    this.tip.innerHTML = skillTipHtml(this.world, d);
-    const r = uiRect(this.slots[this.shown].btn),
+    if (!d && !this.ultTip) return this.hideTip();
+    this.tip.innerHTML = d ? skillTipHtml(this.world, d) : ultTipHtml(this.world);
+    const r = uiRect(d ? this.slots[this.shown].btn : (this.ultTip as HTMLElement)),
       w = 240;
     const x = Math.max(6, Math.min(uiW() - w - 6, r.left + r.width / 2 - w / 2));
     this.tip.style.left = `${x}px`;
@@ -176,7 +225,8 @@ export class Hotbar {
       s.cdt.textContent = !locked && cd > 0 ? (cd >= 10 ? String(Math.ceil(cd)) : cd.toFixed(1)) : '';
       s.sweep.style.background = frac > 0 ? `conic-gradient(rgba(0,0,0,.65) ${frac * 360}deg, transparent 0)` : '';
     });
-    if (this.shown >= 0) this.renderTip();
+    this.ult.update();
+    if (this.shown >= 0 || this.ultTip) this.renderTip();
   }
 }
 

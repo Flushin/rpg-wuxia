@@ -190,6 +190,12 @@ class AudioManager {
           else if (ev.ranged) this.sfx('spell', 300);
         }
         break;
+      case 'ultimate':
+        // ultimate da Tormenta: sons de raio que já existem (Passo do Raio) e o impacto de área no estouro
+        if (ev.phase === 'start') this.sfx('skill_up');
+        else if (ev.phase === 'strike') this.sfxOnce('skill_dash', 100);
+        else this.sfxOnce('aoe_impact', 200);
+        break;
       case 'telegraph':
         // o pico do prato ao contrário (~0,85 s) cai junto com o golpe
         this.sfxOnce('aoe_warning', 200, Math.max(0, ev.delay - AOE_WARNING_PEAK));

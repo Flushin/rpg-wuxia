@@ -335,6 +335,7 @@ ${critico()}
       <li>O <b>ataque elemental</b> (Fogo, Gelo, Trovão ou Veneno, conforme a seita) entra inteiro, sem defesa.</li>
       <li><b>Crítico:</b> multiplica o golpe pelo Dano crítico.</li>
       <li><b>Skills</b> causam uma porcentagem desse dano (ex.: 180%) e ficam 8% mais fortes a cada nível da skill. Ver <a href="#/skills">Skills</a>.</li>
+      <li><b>Ultimate</b> (por enquanto só Tormenta, a partir do nível 10): uma barra que enche com skills que acertam e, cheia, solta um golpe de área com a mesma conta das skills. Só o jogador solta; o Auto nunca usa. Ver <a href="#/seita/lamina">Tormenta</a>.</li>
       <li>Alguns monstros têm defesa física ou espiritual multiplicada: a página de cada <a href="#/monstros">monstro</a> diz qual tipo de dano funciona melhor.</li>
       <li><b>Escudos</b> absorvem o dano antes da vida. <b>Redução de defesa</b> diminui as duas defesas do alvo. <b>Lentidão</b> e <b>atordoamento</b> não mudam o dano.</li>
       <li><b>Aura elemental</b> (por enquanto só Tormenta): a cada 100 de Ataque de Trovão aparecem mais faíscas e raios em volta do personagem, até o máximo com 600 ou mais. É só visual, funciona com qualquer traje e pode ser desligada nas Configurações.</li>
