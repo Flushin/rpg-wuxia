@@ -14,6 +14,7 @@ import {
   epicTierBase,
   itemStats,
   makeEpic,
+  POTIONS,
   makePotion,
   rollRarity,
   sanitizeItem,
@@ -358,6 +359,36 @@ console.log('\n== save ==');
   ok(sanitizeItem({ ...b, rarity: 'xx' })?.rarity === 'comum', 'raridade desconhecida continua virando Comum');
   console.log('  save antigo serializado:', pick(s1).length, 'caracteres');
   if (process.argv.includes('--dump')) console.log(pick(s1));
+}
+
+console.log('\nbolsa cheia: drop no chão, Destruir libera espaço e o item é pego ao passar por cima');
+for (const [label, fill, drop] of [
+  ['épico', 'equip', () => makeEpic(Object.keys(BASES)[0], 10)],
+  ['poção', 'pot', () => ({ ...makePotion(Object.keys(POTIONS)[0]), qty: 1 })],
+] as [string, string, () => ItemInstance][]) {
+  const w = world('lamina', 10, 7);
+  w.bag = w.bag.map(() => null);
+  for (let i = 0; i < w.bag.length; i++) {
+    const it =
+      fill === 'equip' ? makeEpic(Object.keys(BASES)[0], 10) : { ...makePotion(Object.keys(POTIONS)[1]), qty: 99 };
+    if (w.freeSlots(fill as 'equip') > 0) w.bag[i] = it;
+  }
+  const it = drop(),
+    p = w.player;
+  w.collect(it, p.x + 3, p.y);
+  ok(w.ground.some((g) => g.item === it) && !w.bag.includes(it), `${label}: bolsa cheia, fica no chão`);
+  p.x += 3;
+  w.tickGround();
+  ok(
+    w.ground.some((g) => g.item === it),
+    `${label}: passando por cima com a bolsa cheia, continua no chão`,
+  );
+  ok(w.destroyItem(w.bag.findIndex((b) => !!b)), `${label}: Destruir remove um item`);
+  w.tickGround();
+  ok(
+    !w.ground.some((g) => g.item === it) && w.bag.some((b) => b?.uid === it.uid),
+    `${label}: depois de destruir, o item do chão entra na bolsa`,
+  );
 }
 
 console.log(fails ? `\n${fails} problema(s)` : '\nepic-check: tudo ok');
