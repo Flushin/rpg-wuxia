@@ -1003,6 +1003,9 @@
       },
       {
         "texto": "Geada ultimate (level 10): Thousand Crystal Fan sends spiraling waves of ice blades for 3 s, slows monsters and freezes them at the end."
+      },
+      {
+        "texto": "Titã ultimate (level 10): Giant's Fists summons an ember giant that punches monsters for 3 s, keeping them stunned, and smashes the ground at the end."
       }
     ],
     "versoes": [
@@ -1220,6 +1223,10 @@
     "pavilhao": {
       "name": "Thousand Crystal Fan",
       "description": "Spins the fan and sends spiraling waves of crystal blades for 3 s at every monster within 8 tiles: 6 hits of 80% damage, each slowing the target by 40%, and a final burst of 300% that freezes for 1.5 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
+    },
+    "tita": {
+      "name": "Giant's Fists",
+      "description": "An ember giant rises behind him and punches every monster within 6 tiles for 3 s: 6 punches of 90% damage, each stunning for 0.5 s, and a final smash of 300% that stuns for 2 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
     }
   }
 }

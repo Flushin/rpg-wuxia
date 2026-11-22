@@ -101,22 +101,23 @@ type Ult = (typeof ultimatesJson)['lamina'] & {
   finalDebuff?: { kind: string; value: number; duration: number };
 };
 const ULTS = ultimatesJson as unknown as Record<string, Ult>;
-const DEBUFF_TEXT: Record<string, (d: { value: number; duration: number }) => string> = {
-  slow: (d) => `fica ${pc(d.value)} mais lento por ${d.duration} s`,
-  stun: (d) => `fica congelado (atordoado) por ${d.duration} s`,
-  poison: (d) => `fica envenenado por ${d.duration} s`,
-  defReduction: (d) => `perde ${pc(d.value)} da defesa por ${d.duration} s`,
+const sec = (n: number) => String(n).replace('.', ',');
+const DEBUFF_TEXT: Record<string, (d: { value: number; duration: number }, el: string) => string> = {
+  slow: (d) => `fica ${pc(d.value)} mais lento por ${sec(d.duration)} s`,
+  stun: (d, el) => `fica ${el === 'ice' ? 'congelado (atordoado)' : 'atordoado'} por ${sec(d.duration)} s`,
+  poison: (d) => `fica envenenado por ${sec(d.duration)} s`,
+  defReduction: (d) => `perde ${pc(d.value)} da defesa por ${sec(d.duration)} s`,
 };
-const debuffText = (d?: { kind: string; value: number; duration: number }) =>
-  d ? (DEBUFF_TEXT[d.kind]?.(d) ?? d.kind) : '';
+const debuffText = (el: string, d?: { kind: string; value: number; duration: number }) =>
+  d ? (DEBUFF_TEXT[d.kind]?.(d, el) ?? d.kind) : '';
 export function ultPanel(id: string, panel = true): string {
   const u = ULTS[id];
   if (!u) return '';
   const c = CLASSES[id],
     dmgType = c.damageType === 'spiritual' ? 'espiritual' : 'físico',
     el = (ELEMENT_NAMES[c.element] ?? c.element).toLowerCase(),
-    onStrike = debuffText(u.strikeDebuff),
-    onFinal = debuffText(u.finalDebuff);
+    onStrike = debuffText(c.element, u.strikeDebuff),
+    onFinal = debuffText(c.element, u.finalDebuff);
   const effects =
     onStrike || onFinal
       ? `<li><b>Efeitos:</b> ${[

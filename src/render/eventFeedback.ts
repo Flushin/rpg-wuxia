@@ -110,7 +110,8 @@ export class EventFeedback {
           this.overPlayer(64, L('Escudo', 'Shield'), FLOAT_COLOR.SHIELD);
         else if (ev.kind === 'regen' && ev.targetId === this.world.player.id)
           this.overPlayer(64, L('Cura', 'Heal'), FLOAT_COLOR.HEAL);
-        else if (ev.kind === 'stun') {
+        else if (ev.kind === 'stun' && !ev.refresh) {
+          // renovar (ex.: cada soco da ultimate do Titã) não repete o texto
           const m = this.world.monsters.find((x) => x.id === ev.targetId);
           if (m) {
             const s = tileToScreen(m.x, m.y);

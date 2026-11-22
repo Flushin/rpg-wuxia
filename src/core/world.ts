@@ -483,7 +483,7 @@ export class World {
       old.value = value;
       old.remaining = old.duration = duration;
     } else e.buffs.push({ id, kind, value, remaining: duration, duration });
-    this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration });
+    this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration, refresh: !!old });
   }
   private tickBuffs(e: Entity, dt: number) {
     if (!e.buffs.length) return;

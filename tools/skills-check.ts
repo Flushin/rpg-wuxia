@@ -609,25 +609,36 @@ function ultCheck(sect: string) {
   ok(before === u.charge && w3.ultCharge < u.charge, `esvazia só depois de ${u.idleDelay} s sem combate`);
   return { w, near, far, evs };
 }
-ultCheck('lamina');
-{
-  const { w, near, far, evs } = ultCheck('pavilhao');
-  const u = ULTIMATES.pavilhao,
-    id = 'ult_pavilhao';
-  // lentidão em cada golpe que acerta; congelar (atordoar) no estouro
-  ok(
-    evs.some((e) => e.type === 'buffApplied' && e.kind === 'slow' && e.id === id) &&
-      !evs.some((e) => e.type === 'buffApplied' && e.kind === 'slow' && e.targetId === far.id),
-    `golpes deixam ${Math.round((u.strikeDebuff?.value ?? 0) * 100)}% mais lento (só no raio)`,
-  );
-  const stun = near.map((m) => m.buffs.find((b) => b.kind === 'stun' && b.id === id));
-  ok(
-    stun.every((b) => b && Math.abs(b.remaining - (u.finalDebuff?.duration ?? 0)) < 0.25),
-    `estouro congela por ${u.finalDebuff?.duration} s`,
-  );
-  ok(near.every((m) => w.isStunned(m)) && !w.isStunned(far), 'monstro fora do raio não congela');
-  ok(!ULTIMATES.lamina.strikeDebuff && !ULTIMATES.lamina.finalDebuff, 'Tormenta: só dano, sem efeito');
+// efeitos opcionais (strikeDebuff em cada golpe que acerta, finalDebuff no estouro): só no raio
+function ultDebuffCheck(sect: string) {
+  const { w, near, far, evs } = ultCheck(sect);
+  const u = ULTIMATES[sect],
+    id = `ult_${sect}`,
+    applied = (kind: string, t?: number) =>
+      evs.filter(
+        (e) => e.type === 'buffApplied' && e.kind === kind && e.id === id && (t === undefined || e.targetId === t),
+      );
+  if (u.strikeDebuff)
+    ok(
+      near.every((m) => applied(u.strikeDebuff!.kind, m.id).length >= u.strikes) &&
+        !applied(u.strikeDebuff.kind, far.id).length,
+      `cada golpe aplica ${u.strikeDebuff.kind} ${u.strikeDebuff.value || ''} por ${u.strikeDebuff.duration} s (só no raio)`,
+    );
+  if (u.finalDebuff) {
+    const d = u.finalDebuff;
+    ok(
+      near.every((m) =>
+        m.buffs.some((b) => b.kind === d.kind && b.id === id && Math.abs(b.remaining - d.duration) < 0.25),
+      ),
+      `estouro aplica ${d.kind} por ${d.duration} s`,
+    );
+    if (d.kind === 'stun') ok(near.every((m) => w.isStunned(m)) && !w.isStunned(far), 'fora do raio não atordoa');
+  }
 }
+ultCheck('lamina');
+ok(!ULTIMATES.lamina.strikeDebuff && !ULTIMATES.lamina.finalDebuff, 'Tormenta: só dano, sem efeito');
+ultDebuffCheck('pavilhao');
+ultDebuffCheck('tita');
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

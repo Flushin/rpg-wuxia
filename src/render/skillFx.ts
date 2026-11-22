@@ -3,6 +3,7 @@ import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import { skillById } from '../core/skills';
 import type { GameEvent } from '../core/types';
 import { ultimateOf } from '../core/ultimate';
+import { FIST_ORIGIN, GIANT_ORIGIN, GIANT_RES, ensureGiantTextures } from './ultGiant';
 import { DEPTH } from './depth';
 import { shakeCamera } from './fxPrefs';
 
@@ -729,6 +730,7 @@ export class SkillFx {
     if (!u) return;
     const col: UltColors = { main: hex(u.color), glow: hex(u.glow), core: hex(u.core), dur: u.duration * 1000 };
     if (u.fx === 'geada') this.ultGeada(ev, col, u.finalDebuff?.duration ?? 0);
+    else if (u.fx === 'tita') this.ultTita(ev, col);
     else this.ultTormenta(ev, col);
   }
 
@@ -862,6 +864,177 @@ export class SkillFx {
       lifespan: 800,
       scale: { start: 0.8, end: 0 },
       tint: [col.main, col.core, col.glow],
+    });
+  }
+
+  // Titã (prévia aprovada: previews/ultimate-tita.html, opção B "Punhos do Gigante")
+  /** gigante de brasa atrás do Titã durante a ultimate (troca de pose a cada soco) */
+  private giant: Phaser.GameObjects.Image | null = null;
+  private ultTita(ev: UltEvent, col: UltColors) {
+    ensureGiantTextures(this.scene);
+    const c = tileToScreen(ev.x, ev.y);
+    const K = 1.25 / GIANT_RES; // prévia → mundo (o personagem do jogo é 1,25× o da prévia)
+    const tints = [col.core, col.main, col.glow];
+    if (ev.phase === 'start') {
+      // brasa no chão e tela avermelhada
+      const r = this.iso(2.6);
+      const floor = this.gfx(FX - 1).setPosition(c.x, c.y);
+      floor.fillStyle(col.glow, 0.22);
+      floor.fillEllipse(0, 0, r.w, r.h);
+      floor.fillStyle(col.main, 0.25);
+      floor.fillEllipse(0, 0, r.w * 0.55, r.h * 0.55);
+      floor.setScale(0.2);
+      this.scene.tweens.add({ targets: floor, scaleX: 1, scaleY: 1, duration: 400, ease: 'Back.easeOut' });
+      this.fade(floor, 400, { delay: col.dur });
+      const cam = this.scene.cameras.main;
+      const tint = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x280800, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: tint,
+        fillAlpha: 0.4,
+        duration: 400,
+        yoyo: true,
+        hold: col.dur - 600,
+        onComplete: () => tint.destroy(),
+      });
+      // o gigante sobe atrás dele (profundidade logo abaixo da do personagem) e respira
+      this.giant?.destroy();
+      const g = this.scene.add
+        .image(c.x, c.y - 98 + 40, 'ult-giant-up')
+        .setOrigin(GIANT_ORIGIN.x, GIANT_ORIGIN.y)
+        .setScale(K)
+        .setAlpha(0)
+        .setDepth(ev.x + ev.y - 0.5);
+      this.giant = g;
+      // se a ultimate for interrompida (morte, troca de mapa) o estouro não vem: some sozinho
+      this.scene.time.delayedCall(col.dur + 1500, () => {
+        if (this.giant !== g) return;
+        this.giant = null;
+        this.fade(g, 400);
+      });
+      this.scene.tweens.add({ targets: g, alpha: 0.9, y: c.y - 98, duration: 400, ease: 'Cubic.easeOut' });
+      this.scene.tweens.add({
+        targets: g,
+        scaleX: K * 1.03,
+        scaleY: K * 1.03,
+        duration: 260,
+        yoyo: true,
+        repeat: Math.round(col.dur / 520),
+      });
+      // fagulhas subindo do gigante o tempo todo
+      this.scene.time.addEvent({
+        delay: 120,
+        repeat: Math.round(col.dur / 120) - 1,
+        callback: () =>
+          this.burst(c.x + (Math.random() - 0.5) * 220, c.y - 60 - Math.random() * 120, 3, {
+            speedY: { min: -90, max: -40 },
+            speedX: { min: -20, max: 20 },
+            lifespan: 700,
+            scale: { start: 0.45, end: 0 },
+            tint: tints,
+          }),
+      });
+      this.burst(c.x, c.y - 60, 30, {
+        speed: { min: 60, max: 180 },
+        angle: { min: 200, max: 340 },
+        lifespan: 800,
+        scale: { start: 0.6, end: 0 },
+        tint: tints,
+      });
+      return;
+    }
+    const final = ev.phase === 'final';
+    if (final) {
+      // esmagamento: as duas mãos caem no centro
+      for (const s of [-1, 1]) this.giantFist({ x: c.x + s * 50, y: c.y + 6 }, ev.x + ev.y + 1, K * 1.7, col, true);
+      this.scene.time.delayedCall(110, () => {
+        this.scene.cameras.main.flash(260, 255, 210, 150);
+        shakeCamera(this.scene, 420, 0.016);
+        const r = this.iso(ev.radius);
+        const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+        ring.lineStyle(12, col.main, 1);
+        ring.strokeEllipse(0, 0, r.w, r.h);
+        ring.lineStyle(5, col.glow, 0.85);
+        ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+        ring.setScale(0.1);
+        this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+        this.fade(ring, 820);
+        this.burst(c.x, c.y - 20, 50, {
+          speed: { min: 120, max: 340 },
+          angle: { min: 180, max: 360 },
+          gravityY: 300,
+          lifespan: 900,
+          scale: { start: 0.9, end: 0 },
+          tint: tints,
+        });
+      });
+      const g = this.giant;
+      this.giant = null;
+      if (g)
+        this.scene.tweens.add({
+          targets: g,
+          alpha: 0,
+          y: g.y - 30,
+          duration: 700,
+          delay: 250,
+          onComplete: () => g.destroy(),
+        });
+      return;
+    }
+    for (const t of ev.targets) {
+      const p = tileToScreen(t.x, t.y);
+      // o braço daquele lado desce enquanto o punho cai no monstro
+      const side = p.x < c.x ? 'l' : 'r';
+      if (this.giant) {
+        const g = this.giant;
+        g.setTexture(`ult-giant-${side}`);
+        this.scene.time.delayedCall(260, () => g.active && g === this.giant && g.setTexture('ult-giant-up'));
+      }
+      this.giantFist({ x: p.x, y: p.y + 4 }, t.x + t.y + 0.5, K * 0.75, col, false);
+    }
+  }
+  /** Punho de fogo caindo do alto até `at`, com impacto (anel, pedras e fagulhas). */
+  private giantFist(at: Pt, depth: number, scale: number, col: UltColors, big: boolean) {
+    const f = this.scene.add
+      .image(at.x, at.y - 170, 'ult-fist')
+      .setOrigin(FIST_ORIGIN.x, FIST_ORIGIN.y)
+      .setScale(scale)
+      .setDepth(depth)
+      .setBlendMode(Phaser.BlendModes.ADD);
+    this.scene.tweens.add({
+      targets: f,
+      y: at.y,
+      duration: 110,
+      ease: 'Quad.easeIn',
+      onComplete: () => {
+        this.fade(f, big ? 500 : 260, { delay: big ? 150 : 40 });
+        const ring = this.gfx(FX - 1).setPosition(at.x, at.y);
+        ring.lineStyle(big ? 6 : 4, col.main, 0.95);
+        ring.strokeEllipse(0, 0, 34, 17);
+        ring.setScale(0.4);
+        this.scene.tweens.add({ targets: ring, scaleX: 1.8, scaleY: 1.8, duration: 380, ease: 'Cubic.easeOut' });
+        this.fade(ring, 400);
+        // pedras e fagulhas
+        this.burst(at.x, at.y - 6, big ? 20 : 10, {
+          speed: { min: 60, max: 180 },
+          angle: { min: 200, max: 340 },
+          gravityY: 500,
+          lifespan: 600,
+          scale: { start: big ? 0.8 : 0.55, end: 0 },
+          tint: [0x5a3a2a, 0x7a4a2a, col.main],
+          blendMode: 'NORMAL',
+        });
+        this.burst(at.x, at.y - 10, big ? 16 : 9, {
+          speed: { min: 40, max: 150 },
+          lifespan: 450,
+          scale: { start: 0.5, end: 0 },
+          tint: [col.core, col.main, col.glow],
+        });
+        if (!big) shakeCamera(this.scene, 80, 0.004);
+      },
     });
   }
 

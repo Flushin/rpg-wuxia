@@ -62,5 +62,42 @@
     "fullTargets": 8,
     "idleDelay": 20,
     "idleDrain": 1
+  },
+  "tita": {
+    "id": "punhos_gigante",
+    "name": "Punhos do Gigante",
+    "unlock": 10,
+    "color": "#ff8a2a",
+    "glow": "#ff3a10",
+    "core": "#fff0b0",
+    "dark": "#b0400c",
+    "ink": "#3a1000",
+    "icon": "炎",
+    "fx": "tita",
+    "sounds": {
+      "start": "skill_up",
+      "strike": "skill_fistfire",
+      "final": "skill_quake"
+    },
+    "description": "Um gigante de brasa surge atrás dele e soca por 3 s todos os monstros num raio de 6 tiles: 6 socos de 90% do dano, cada um atordoando por 0,5 s, e um esmagamento final de 300% que atordoa por 2 s. Até 8 monstros levam o dano cheio; acima disso o dano é dividido entre eles. Pode errar e dar crítico.",
+    "charge": 25,
+    "radius": 6,
+    "duration": 3,
+    "strikes": 6,
+    "strikeMult": 0.9,
+    "finalMult": 3,
+    "strikeDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 0.5
+    },
+    "finalDebuff": {
+      "kind": "stun",
+      "value": 0,
+      "duration": 2
+    },
+    "fullTargets": 8,
+    "idleDelay": 20,
+    "idleDrain": 1
   }
 }
