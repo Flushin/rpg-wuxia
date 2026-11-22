@@ -1,6 +1,7 @@
 // Teste de sobreposição do HUD em vários tamanhos de tela (inclui Galaxy Z Fold fechado e aberto).
 // Uso: npm run build && npx vite preview --port 4173 &  →  node tools/layout-check.mjs [url]
 // Precisa do Playwright (npx playwright install chromium) ou de um Chrome instalado.
+import { semDicas } from './sem-dicas.mjs';
 let pw;
 try {
   pw = await import('playwright');
@@ -134,6 +135,7 @@ for (const sz0 of SIZES)
     console.log(
       `${ok ? 'OK   ' : 'FALHA'} ${sz.name} (feed ${res.feedLines} linhas, escala ${res.ui})${ok ? '' : ': ' + res.out.join('; ')}`,
     );
+    if (process.env.SHOTS) await semDicas(page);
     if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/${sz.w}x${sz.h}-${mode}.png` });
     await ctx.close();
   }

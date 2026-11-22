@@ -8,6 +8,7 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 - `npm test` (todos os `check:*`), `npm run check:layout`, `npm run maps`
 - **Antes de todo commit:** `npm run format` (Prettier) e `npm run format:check`; o CI roda `format:check` antes dos testes
   e falha por qualquer arquivo fora do estilo, até um que você não mexeu.
+- Screenshot de teste (Playwright): chame `semDicas(page)` de `tools/sem-dicas.mjs` antes, para a dica não cobrir a tela
 - `npm run balance` / `sim:balance` (simulações de balanceamento)
 - `npm run novidades:loja` (texto "O que há de novo" da Play Store)
 - APK só sob pedido: Actions → "APK Android" → Run workflow (release com novidades desde o último APK; `npm run novidades:apk`)

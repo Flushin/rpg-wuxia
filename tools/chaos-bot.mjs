@@ -15,6 +15,7 @@
 import { mkdirSync, writeFileSync, appendFileSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { semDicas } from './sem-dicas.mjs';
 
 let pw;
 try {
@@ -235,6 +236,7 @@ async function registrar(page, tipo, msg, extra = {}) {
 
   let estado = null;
   if (page && !page.isClosed()) {
+    await comTempo(semDicas(page), 3000).catch(() => {});
     await comTempo(page.screenshot({ path: join(pasta, 'tela.png') }), 8000).catch(() => {});
     estado = await comTempo(page.evaluate(fotografarEstado), 5000).catch(() => null);
   }
