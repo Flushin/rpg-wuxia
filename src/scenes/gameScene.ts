@@ -6,7 +6,7 @@ import type { Entity, GameEvent } from '../core/types';
 import type { OfflineReport, World } from '../core/world';
 import type { SaveData } from '../core/types';
 import { EntityView } from '../render/entityView';
-import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
+import { buildMapView, cullMap, fadeTreesNear, type MapView } from '../render/mapView';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
@@ -67,7 +67,7 @@ export class GameScene extends Phaser.Scene {
   private tips!: TipManager;
   private fx!: SkillFx;
   private feedback!: EventFeedback;
-  private mapObjs: Phaser.GameObjects.GameObject[] = [];
+  private mapView: MapView | null = null;
   private trees: Phaser.GameObjects.Image[] | null = null;
   private views = new Map<number, EntityView>();
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
@@ -288,10 +288,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private rebuildMap() {
-    this.mapObjs.forEach((o) => o.destroy());
+    this.mapView?.destroy();
     this.views.forEach((v) => v.destroy());
     this.views.clear();
-    this.mapObjs = buildMapView(this, this.world.map);
+    this.mapView = buildMapView(this, this.world.map);
     this.trees = null;
     const pv = this.viewFor(this.world.player);
     this.cameras.main.startFollow(pv.container, true, 0.12, 0.12);
@@ -454,9 +454,11 @@ export class GameScene extends Phaser.Scene {
         v.destroy();
         this.views.delete(id);
       }
-    cullMap(this.mapObjs, this.cameras.main, !this.trees);
+    if (this.mapView!.update(this.cameras.main)) this.trees = null;
+    const mapObjs = this.mapView!.all();
+    cullMap(mapObjs, this.cameras.main, !this.trees);
     if (!this.trees)
-      this.trees = this.mapObjs.filter((o) => o.name === 'tree' || o.name === 'building') as Phaser.GameObjects.Image[];
+      this.trees = mapObjs.filter((o) => o.name === 'tree' || o.name === 'building') as Phaser.GameObjects.Image[];
     {
       const who: { x: number; y: number; depth: number }[] = [];
       for (const e of [w.player, tgt]) {

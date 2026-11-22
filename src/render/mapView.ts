@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { tn } from '../core/i18n';
-import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
+import { TILE_H, TILE_W, screenToTile, tileToScreen } from '../core/iso';
 import type { GameMap, MapObject } from '../core/map';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
@@ -94,9 +94,24 @@ function hash(i: number, j: number, salt: number): number {
 }
 const pick = <T>(list: T[], r: number): T => list[Math.floor(r * list.length) % list.length];
 
-export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObjects.GameObject[] {
-  const out: Phaser.GameObjects.GameObject[] = [];
-  const water: Phaser.GameObjects.Image[] = [];
+/**
+ * Mapa desenhado em blocos (CHUNK×CHUNK tiles): só os blocos perto da câmera existem; ao andar, os que entram na
+ * área são criados e os que saem são apagados. Casas, enfeites, portais e círculo de teleporte (poucos) ficam sempre.
+ * Teste de 22/11/2026: mapa 96×96 com tudo criado perdia ~20% de FPS e dobrava a memória num celular fraco.
+ */
+export interface MapView {
+  /** objetos existentes agora (fixos + blocos carregados); a lista muda quando `update` devolve true */
+  all(): Phaser.GameObjects.GameObject[];
+  /** carrega/apaga blocos conforme a câmera; true se mudou algo */
+  update(cam: Phaser.Cameras.Scene2D.Camera): boolean;
+  destroy(): void;
+}
+const CHUNK = 8;
+
+export function buildMapView(scene: Phaser.Scene, map: GameMap): MapView {
+  const fixed: Phaser.GameObjects.GameObject[] = [];
+  let out: Phaser.GameObjects.GameObject[] = fixed;
+  const water = new Set<Phaser.GameObjects.Image>();
   const ground = (name: string, i: number, j: number, x: number, y: number) => {
     const frames = GROUND[name] ?? GROUND.grass; // tipo de piso sem arte: grama (não deixa buraco no mapa)
     return scene.add
@@ -106,22 +121,23 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
   };
   const snowy = MAPS_CONFIG[map.id]?.trees === 'snow',
     bamboo = MAPS_CONFIG[map.id]?.trees === 'bamboo';
-  for (let j = 0; j < map.height; j++)
-    for (let i = 0; i < map.width; i++) {
+  const tile = (i: number, j: number) => {
+    {
       const name = map.tiles[j * map.width + i],
         pos = tileToScreen(i + 0.5, j + 0.5);
       if (name === 'water' && snowy) {
         out.push(scene.add.image(pos.x, pos.y, 'pisos', ICE_FRAME).setScale(SPRITE_SCALE).setDepth(DEPTH.GROUND));
-        continue;
+        return;
       }
       if (name === 'water') {
         const w = scene.add.image(pos.x, pos.y, 'pisos', WATER_FRAMES[0]).setScale(SPRITE_SCALE).setDepth(DEPTH.GROUND);
         w.setData('phase', Math.floor(hash(i, j, 11) * WATER_FRAMES.length));
-        water.push(w);
+        water.add(w);
+        w.once(Phaser.GameObjects.Events.DESTROY, () => water.delete(w));
         out.push(w);
         const edge = shore(scene, map, i, j);
         if (edge) out.push(edge);
-        continue;
+        return;
       }
       if (name === 'pillar') {
         // montanha: pedra solta na encosta vira rocha nevada; os pilares do templo (junto às lajes) continuam colunas
@@ -137,7 +153,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
           .setDepth(i + j + 1);
         p.setName('tree');
         out.push(p);
-        continue;
+        return;
       }
       if (name === 'tree' || name === 'pine' || name === 'bamboo' || name === 'basalt') {
         out.push(ground(name === 'pine' ? 'snow' : name === 'basalt' ? 'ash' : 'grass', i, j, pos.x, pos.y));
@@ -205,7 +221,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         }
       }
     }
-  for (const o of map.objects) {
+  };
+  const obj = (o: MapObject) => {
     if (o.type === 'building') out.push(...building(scene, propsAtlas(o), String(o.props.sprite), o.x, o.y, o.w, o.h));
     else if (o.type === 'decor') {
       const p = tileToScreen(o.x, o.y);
@@ -216,8 +233,9 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         .setDepth(o.props.top ? DEPTH.GATE_TOP : Math.floor(o.x) + Math.floor(o.y) + 1);
       img.setName('tree'); // fica transparente se cobrir o jogador
       out.push(img);
-    } else if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
-  }
+    }
+  };
+  for (const o of map.objects) if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
   for (const o of map.objects) {
     if (o.type !== 'portal') continue;
     // portal na borda de cima/baixo fica de frente para o outro eixo: espelha o sprite
@@ -226,21 +244,90 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
     out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc));
   }
-  if (water.length) {
-    // água: cada tile troca de quadro com sua própria fase (sem todos piscarem juntos)
-    let k = 0;
-    const timer = scene.time.addEvent({
-      delay: WATER_MS,
-      loop: true,
-      callback: () => {
-        k++;
-        for (const w of water)
-          if (w.active) w.setFrame(WATER_FRAMES[(k + (w.getData('phase') as number)) % WATER_FRAMES.length]);
-      },
-    });
-    water[0].once(Phaser.GameObjects.Events.DESTROY, () => timer.remove());
+  // água: cada tile troca de quadro com sua própria fase (sem todos piscarem juntos)
+  let k = 0;
+  const timer = map.tiles.includes('water')
+    ? scene.time.addEvent({
+        delay: WATER_MS,
+        loop: true,
+        callback: () => {
+          k++;
+          for (const w of water) w.setFrame(WATER_FRAMES[(k + (w.getData('phase') as number)) % WATER_FRAMES.length]);
+        },
+      })
+    : null;
+
+  const cw = Math.ceil(map.width / CHUNK),
+    ch = Math.ceil(map.height / CHUNK);
+  const chunks = new Map<number, Phaser.GameObjects.GameObject[]>();
+  // casas e enfeites entram no bloco do seu centro
+  const objsIn = new Map<number, MapObject[]>();
+  for (const o of map.objects) {
+    if (o.type !== 'building' && o.type !== 'decor') continue;
+    const cx = Math.min(cw - 1, Math.max(0, Math.floor((o.x + o.w / 2) / CHUNK))),
+      cy = Math.min(ch - 1, Math.max(0, Math.floor((o.y + o.h / 2) / CHUNK)));
+    const key = cy * cw + cx;
+    if (!objsIn.has(key)) objsIn.set(key, []);
+    objsIn.get(key)!.push(o);
   }
-  return out;
+  const load = (cx: number, cy: number) => {
+    out = [];
+    for (const o of objsIn.get(cy * cw + cx) ?? []) obj(o);
+    for (let j = cy * CHUNK; j < Math.min(map.height, (cy + 1) * CHUNK); j++)
+      for (let i = cx * CHUNK; i < Math.min(map.width, (cx + 1) * CHUNK); i++) tile(i, j);
+    chunks.set(cy * cw + cx, out);
+  };
+  let list: Phaser.GameObjects.GameObject[] | null = null;
+  let last = { x: NaN, y: NaN, w: 0, h: 0 };
+  return {
+    all() {
+      if (!list) list = fixed.concat(...chunks.values());
+      return list;
+    },
+    update(cam) {
+      const v = cam.worldView;
+      if (Math.abs(v.x - last.x) < 24 && Math.abs(v.y - last.y) < 24 && v.width === last.w && v.height === last.h)
+        return false;
+      last = { x: v.x, y: v.y, w: v.width, h: v.height };
+      // retângulo da tela (com as mesmas margens do cullMap: árvores altas abaixo da tela aparecem) em tiles
+      const corners = [
+        screenToTile(v.x - 160, v.y - 80),
+        screenToTile(v.right + 160, v.y - 80),
+        screenToTile(v.x - 160, v.bottom + 320),
+        screenToTile(v.right + 160, v.bottom + 320),
+      ];
+      const x0 = Math.floor(Math.min(...corners.map((c) => c.x)) / CHUNK),
+        x1 = Math.floor(Math.max(...corners.map((c) => c.x)) / CHUNK),
+        y0 = Math.floor(Math.min(...corners.map((c) => c.y)) / CHUNK),
+        y1 = Math.floor(Math.max(...corners.map((c) => c.y)) / CHUNK);
+      let changed = false;
+      // apaga só o que ficou a mais de 1 bloco de distância (não fica criando/apagando na borda)
+      for (const [key, objs] of chunks) {
+        const cx = key % cw,
+          cy = Math.floor(key / cw);
+        if (cx < x0 - 1 || cx > x1 + 1 || cy < y0 - 1 || cy > y1 + 1) {
+          for (const o of objs) o.destroy();
+          chunks.delete(key);
+          changed = true;
+        }
+      }
+      for (let cy = Math.max(0, y0); cy <= Math.min(ch - 1, y1); cy++)
+        for (let cx = Math.max(0, x0); cx <= Math.min(cw - 1, x1); cx++)
+          if (!chunks.has(cy * cw + cx)) {
+            load(cx, cy);
+            changed = true;
+          }
+      if (changed) list = null;
+      return changed;
+    },
+    destroy() {
+      timer?.remove();
+      for (const objs of chunks.values()) for (const o of objs) o.destroy();
+      chunks.clear();
+      for (const o of fixed) o.destroy();
+      list = null;
+    },
+  };
 }
 
 /** Espuma clara nas bordas da água que encostam em terra. */
