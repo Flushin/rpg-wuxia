@@ -130,7 +130,8 @@
 #settings-panel,
 #auto-panel,
 #dungeon-panel,
-#trial-panel {
+#trial-panel,
+#trial-prompt {
   z-index: 5;
 }
 #offline-panel {

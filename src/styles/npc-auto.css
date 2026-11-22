@@ -666,6 +666,7 @@
   flex: none;
 }
 #trial-prompt .card {
+  pointer-events: auto;
   max-width: 340px;
   text-align: center;
 }
