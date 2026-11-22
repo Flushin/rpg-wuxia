@@ -994,7 +994,11 @@
     }
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [
+      {
+        "texto": "Max level 50: XP keeps coming after level 40, and each level from 41 to 50 grants 4 attribute points. Characters already at 40 start the level 41 bar from zero."
+      }
+    ],
     "versoes": [
       {
         "loja": [

@@ -30,7 +30,10 @@ const ok = (c: boolean, m: string) => {
 };
 
 console.log('== nível máximo e curva ==');
-ok(PROGRESSION.levelCap === 40 && PROGRESSION.xpToNext.length === 39, 'nível máximo 40, curva até o 40');
+ok(
+  PROGRESSION.levelCap >= 40 && PROGRESSION.xpToNext.length === PROGRESSION.levelCap - 1,
+  'nível máximo 40+, curva até o máximo',
+);
 
 console.log('\n== conjunto nv 35 ==');
 const SET = [
@@ -275,7 +278,7 @@ console.log('\n== missões 31–40 ==');
     'NPCs estão na Cidadela',
   );
   const xp = qs.reduce((a, q) => a + q.reward.xp, 0),
-    band = PROGRESSION.xpToNext.slice(30, 40).reduce((a, b) => a + b, 0);
+    band = PROGRESSION.xpToNext.slice(30, 39).reduce((a, b) => a + b, 0);
   ok(Math.abs(xp / band - 0.14) < 0.02, `XP das missões ~14% da faixa (${Math.round((100 * xp) / band)}%)`);
   ok(
     qs.filter((q) => q.reward.item).every((q) => q.reward.itemLevel === 35),
