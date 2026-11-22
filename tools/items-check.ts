@@ -586,6 +586,15 @@ console.log('\n== cadeado e recompra ==');
     w.buyBack(0) === null && w.gold === 0 && w.bag.some((b) => b?.uid === it.uid) && !w.buyback.length,
     'recompra devolve o item',
   );
+  const ep = { ...equipOf(w, 'colar_jade', 'raro'), rarity: 'epico' as const };
+  w.addItem(ep);
+  ok(!w.destroyItem(w.bag.indexOf(ep)) && w.bag.includes(ep), 'Épico não é destruído');
+  w.toggleLock(w.bag.indexOf(ep));
+  near(w, 'ferreiro');
+  ok(
+    w.forgeSalvage(w.bag.indexOf(ep))?.code === 'itemLocked' && w.bag.includes(ep),
+    'trancado não desmonta no ferreiro',
+  );
   ok(w.toggleLock(w.bag.findIndex((b) => b && b.qty)) === false, 'pilha (poção) não tranca');
 }
 

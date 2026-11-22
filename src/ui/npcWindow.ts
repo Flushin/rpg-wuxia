@@ -639,7 +639,7 @@ export class NpcWindow {
       if (!it || !BASES[it.baseId]) return;
       const ref = `bag:${i}`;
       pick.push(
-        `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${escapeHtml(itemName(it))}</b></span></button>`,
+        `<button class="fchip ${this.forgeSel === ref ? 'on' : ''}" data-a="fsel" data-v="${ref}" style="border-color:${itemColor(it)}">${icon(it)}<span><b style="color:${itemColor(it)}">${it.locked ? '🔒 ' : ''}${escapeHtml(itemName(it))}</b></span></button>`,
       );
     });
     const top = `<div class="npc-mats"><small class="muted">${L(
@@ -653,7 +653,9 @@ export class NpcWindow {
       };
     const it = this.forgeItem();
     let detail = `<p class="muted">${L('Escolha um item para desmontar.', 'Choose an item to salvage.')}</p>`;
-    if (it && this.forgeSel.startsWith('bag:')) {
+    if (it?.locked && this.forgeSel.startsWith('bag:'))
+      detail = `<p class="muted">${L('🔒 Item trancado: destranque na mochila para desmontar.', '🔒 Item locked: unlock it in your bag to salvage.')}</p>`;
+    else if (it && this.forgeSel.startsWith('bag:')) {
       const epic = it.rarity === 'epico',
         ask = this.salvageAsk,
         btn = !ask

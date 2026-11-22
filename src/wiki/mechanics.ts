@@ -420,6 +420,7 @@ function forja(): string {
         Na aba Vender há venda em lote dos equipamentos Comuns (ou Comuns + Incomuns), que deixa de fora os itens com + e os trancados.</li>
       <li><b>Recomprar:</b> os últimos ${BUYBACK_MAX} itens que você vendeu ao vendedor voltam pelo mesmo preço, na aba Recomprar, até fechar o jogo (vendas do Auto não entram).</li>
       <li><b>Cadeado:</b> na mochila, o botão Trancar protege um equipamento: trancado, ele não pode ser vendido (nem pelo Auto), destruído nem desmontado.</li>
+      <li><b>Destruir:</b> o botão Destruir da mochila apaga um item sem ganho; Épicos não podem ser destruídos (só desmontados no ferreiro).</li>
       <li>O <a href="#/npc/mercador">Mercador Ambulante</a> vende equipamentos Incomuns e Raros por <b>${n1(MERCHANT.priceMul)}×</b> o valor, renovando a cada ${MERCHANT.refreshMinutes} min,
         e sempre tem ${Object.keys(MERCHANT.materials).map(itemLink).join(', ')} e ${Object.keys(CONSUMABLES).map(itemLink).join(', ')}.</li></ul>
       <table class="tbl"><thead><tr><th>Raridade</th><th>Multiplicador</th><th>Venda (% do valor)</th><th>Mercador (% do valor)</th></tr></thead><tbody>${rarRows}</tbody></table>
