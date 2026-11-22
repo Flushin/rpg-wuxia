@@ -191,6 +191,8 @@ export class World {
   trialMenu = false;
   /** corrida do Trial em andamento (chefe e nível escolhidos); null fora do Trial */
   trialRun: { bossId: string; tier: number } | null = null;
+  /** chefe do Trial vencido: janela "próximo nível / sair" (torre de chefes); null sem pergunta pendente */
+  trialPrompt: { bossId: string; tier: number } | null = null;
   /** maior nível do Trial vencido de cada chefe (salvo) */
   trialProgress: TrialProgress = {};
 
@@ -970,6 +972,32 @@ export class World {
     return null;
   }
 
+  /** Torre do Trial: paga a entrada do nível seguinte (ou do mesmo, com repeat) e o chefe surge de novo na arena. */
+  trialNext(repeat = false): ActionError | null {
+    const p = this.trialPrompt,
+      tier = repeat ? (p?.tier ?? 0) : (p?.tier ?? 0) + 1;
+    if (!p || !this.trialRun || this.player.dead || !validTier(tier)) return null;
+    const cost = trialCost(tier);
+    if (this.gold < cost) return { code: 'noGold' };
+    this.gold -= cost;
+    this.bumpInv();
+    this.trialPrompt = null;
+    this.trialRun = { bossId: p.bossId, tier };
+    this.telegraphs = [];
+    this.arenas = [];
+    this.monsters = this.monsters.filter((m) => !m.dead);
+    this.spawnTrialBoss(p.bossId, tier);
+    this.emit({ type: 'trialEnter', bossId: p.bossId, tier, cost });
+    return null;
+  }
+
+  /** Sai do Trial pela janela do fim da luta (vai para o portal do Trial na vila). */
+  leaveTrial() {
+    if (!this.trialRun) return;
+    this.trialPrompt = null;
+    this.changeMap('cidade', 16, 27.5);
+  }
+
   /** Masmorra do mapa atual (null fora de uma). */
   /** Quem usa os itens (o Épico acompanha nível e classe do personagem). */
   owner(): ItemOwner {
@@ -1276,6 +1304,7 @@ export class World {
       if (this.trialRun) {
         const { bossId, tier } = this.trialRun;
         this.trialProgress[bossId] = Math.max(this.trialProgress[bossId] ?? 0, tier);
+        this.trialPrompt = { bossId, tier };
         this.emit({ type: 'trialCleared', bossId, tier });
       } else if (dungeon) this.emit({ type: 'dungeonCleared', dungeonId: dungeon });
     }
@@ -1531,6 +1560,7 @@ export class World {
     this.dungeonMenu = false;
     this.trialMenu = false;
     this.onMenuPortal = false;
+    this.trialPrompt = null;
     if (!MAPS_CONFIG[mapId]?.trial) this.trialRun = null; // saiu do Trial: a corrida acaba
     this.telegraphs = [];
     this.arenas = [];

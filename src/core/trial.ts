@@ -28,7 +28,9 @@ export const validTier = (tier: number) => Number.isInteger(tier) && tier >= 1 &
 /** Nível do chefe no nível N do Trial: 21 no nível 1 até 40 no nível 20. */
 export const trialBossLevel = (tier: number) => 20 + tier;
 /** Ouro cobrado para entrar no nível N: 1000 no nível 1, +200 por nível (2800 no 10, 4800 no 20). */
-export const trialCost = (tier: number) => 1000 + 200 * (tier - 1);
+/** Entrada: 1000 de ouro no nível 1, +12% a cada nível (arredondada a 10). */
+export const TRIAL_COST_GROWTH = 1.12;
+export const trialCost = (tier: number) => Math.round((1000 * TRIAL_COST_GROWTH ** (tier - 1)) / 10) * 10;
 /** Bônus de drop (equipamento e material): 12% no nível 1 e, a cada nível, +5% sobre o bônus anterior
  *  (12,60% no 2 … 18,62% no 10). Multiplicador da chance: 1 + bônus. */
 export const trialDropMul = (tier: number) => 1 + 0.12 * 1.05 ** (tier - 1);

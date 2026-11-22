@@ -8,7 +8,7 @@ Decidido com o Lucas em 19/11/2026. Código: `src/core/trial.ts`; números em `d
   Abade Caído, Rei dos Bandidos; chefe novo entra sozinho) e o nível do Trial.
 - **Níveis:** 10. Nível 1 = chefe nível 21 … nível 10 = chefe nível 30 (cada nível sobe o chefe em 1).
 - **Liberação:** vencer o nível N de um chefe libera o N+1 **daquele chefe** (progresso salvo em `trialProgress`).
-- **Custo:** 1000 de ouro no nível 1, +200 por nível (2800 no 10).
+- **Custo:** 1000 de ouro no nível 1, +12% por nível, arredondado a 10 (2770 no 10, 8610 no 20). Ao vencer, janela de torre: próximo nível, repetir ou sair.
 - **Drop:** bônus sobre o drop normal do chefe do Trial: 12% no nível 1 e, a cada nível, +5% sobre o anterior
   (12,60%, 13,23%, 13,89%, 14,59%, 15,32%, 16,08%, 16,89%, 17,73%, 18,62%). Vale para equipamento e material;
   o que passa de 100% vira chance de mais um.

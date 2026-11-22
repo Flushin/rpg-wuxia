@@ -265,11 +265,11 @@ export class EventFeedback {
         toast(
           L(
             ev.tier < TRIAL_TIERS
-              ? `Trial nível ${ev.tier} vencido! O nível ${ev.tier + 1} deste chefe está liberado. A saída é o portal da entrada.`
-              : `Trial nível ${ev.tier} vencido: o mais alto! A saída é o portal da entrada.`,
+              ? `Trial nível ${ev.tier} vencido! O nível ${ev.tier + 1} deste chefe está liberado.`
+              : `Trial nível ${ev.tier} vencido: o mais alto!`,
             ev.tier < TRIAL_TIERS
-              ? `Trial level ${ev.tier} cleared! Level ${ev.tier + 1} of this boss is unlocked. The exit is the portal at the entrance.`
-              : `Trial level ${ev.tier} cleared: the highest! The exit is the portal at the entrance.`,
+              ? `Trial level ${ev.tier} cleared! Level ${ev.tier + 1} of this boss is unlocked.`
+              : `Trial level ${ev.tier} cleared: the highest!`,
           ),
           '#ffd23f',
         );

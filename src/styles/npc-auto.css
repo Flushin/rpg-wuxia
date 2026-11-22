@@ -18,7 +18,8 @@
 }
 #npc-panel,
 #dungeon-panel,
-#trial-panel {
+#trial-panel,
+#trial-prompt {
   position: fixed;
   inset: 0 0 var(--fix-b, 0px) 0;
   display: flex;
@@ -663,4 +664,14 @@
 .dg-row .tr-tier button {
   width: 36px;
   flex: none;
+}
+#trial-prompt .card {
+  max-width: 340px;
+  text-align: center;
+}
+#trial-prompt .tp-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
 }
