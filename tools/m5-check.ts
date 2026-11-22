@@ -677,18 +677,21 @@ console.log('\n== versão do save e migrações (C8) ==');
   ok(!w20.levelUp() && w20.player.level === 20, 'XP abaixo do necessário não sobe');
   w20.gainXp(1);
   ok(w20.levelUp() && w20.player.level === 21 && w20.freePoints === 4, 'nível 21: +4 pontos livres');
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 40; i++) {
     w20.gainXp(1e9);
     w20.levelUpAll();
   }
   ok(
-    w20.player.level === 40 && w20.xp === 0 && w20.xpToNext() === null && w20.freePoints === 80,
-    `sobe até o 40 e para (pontos ${w20.freePoints})`,
+    w20.player.level === 50 && w20.xp === 0 && w20.xpToNext() === null && w20.freePoints === 120,
+    `sobe até o 50 e para (pontos ${w20.freePoints})`,
   );
   // 2 → 3 (nível máximo 30 → 40): quem estava no 30 fica no 30 com a barra do 31 em 0%
   const v2 = (level: number, xp: number) => ({ ...v1(level, xp), version: 2 });
   const at30 = migrateCharacter(v2(30, 250000));
-  ok(at30.level === 30 && at30.xp === 0 && at30.version === 3, 'save v2 no nível 30: continua no 30 com XP 0');
+  ok(
+    at30.level === 30 && at30.xp === 0 && at30.version === CHARACTER_SAVE_VERSION,
+    'save v2 no nível 30: continua no 30 com XP 0',
+  );
   ok(migrateCharacter(v2(27, 4321)).xp === 4321, 'save v2 abaixo do 30: XP mantida');
   ok(migrateCharacter({ ...v2(30, 500), version: 3 }).xp === 500, 'save v3 no 30 não é mexido de novo');
   const w30 = World.fromSave(maps, migrateCharacter(v2(30, 99999)), NOW_MIG, false);
@@ -698,6 +701,14 @@ console.log('\n== versão do save e migrações (C8) ==');
   );
   w30.gainXp(PROGRESSION.xpToNext[29]);
   ok(w30.levelUp() && w30.player.level === 31 && w30.freePoints === 4, 'nível 31: +4 pontos livres');
+  // 3 → 4 (nível máximo 40 → 50): quem estava no 40 fica no 40 com a barra do 41 em 0%
+  const v3 = (level: number, xp: number) => ({ ...v1(level, xp), version: 3 });
+  const at40 = migrateCharacter(v3(40, 900000));
+  ok(at40.level === 40 && at40.xp === 0 && at40.version === 4, 'save v3 no nível 40: continua no 40 com XP 0');
+  ok(migrateCharacter(v3(36, 4321)).xp === 4321, 'save v3 abaixo do 40: XP mantida');
+  const w40 = World.fromSave(maps, migrateCharacter(v3(40, 1)), NOW_MIG, false);
+  w40.gainXp(PROGRESSION.xpToNext[39]);
+  ok(w40.levelUp() && w40.player.level === 41 && w40.freePoints === 4, 'nível 41: +4 pontos livres');
 }
 
 console.log('\n== vários personagens: CRUD dos espaços ==');
@@ -813,10 +824,10 @@ console.log('\n== dicas e dados ==');
   ok(!!tips.bandidos && !!tips.terracota && !!tips.chefe, 'dicas bandidos, terracota e chefe existem');
   ok(/Quebra-Guarda/.test(JSON.stringify(tips.terracota)), 'dica da terracota recomenda o Quebra-Guarda (Tormenta)');
   ok(
-    PROGRESSION.levelCap === 40 &&
-      PROGRESSION.xpToNext.length === 39 &&
+    PROGRESSION.levelCap === 50 &&
+      PROGRESSION.xpToNext.length === 49 &&
       PROGRESSION.xpToNext.every((v, i, a) => i === 0 || v > a[i - 1]),
-    'curva de XP crescente até o nível 40',
+    'curva de XP crescente até o nível 50',
   );
   ok(
     freePointsAt(2) === 3 &&
