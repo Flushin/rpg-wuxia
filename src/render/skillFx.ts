@@ -3,6 +3,7 @@ import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import { skillById } from '../core/skills';
 import type { GameEvent } from '../core/types';
 import { DEPTH } from './depth';
+import { shakeCamera } from './fxPrefs';
 
 const FX: number = DEPTH.SKILL_FX;
 
@@ -31,6 +32,7 @@ export class SkillFx {
   onEvent(ev: GameEvent) {
     if (ev.type === 'dash') this.dash(ev.fromX, ev.fromY, ev.toX, ev.toY);
     else if (ev.type === 'skillCast') this.cast(ev);
+    else if (ev.type === 'ultimate') this.ultimate(ev);
   }
 
   // ---------- utilidades ----------
@@ -713,6 +715,137 @@ export class SkillFx {
       lifespan: 800,
       scale: { start: 0.5, end: 0 },
       tint: JADE,
+    });
+  }
+
+  // ---------- ultimate da Tormenta (prévia aprovada: previews/ultimate-tormenta-a.html) ----------
+  /** Raio da ultimate: halo azul-gelo, corpo amarelo e miolo branco, com galhos. */
+  private ultBolt(a: Pt, b: Pt, w: number, jag: number, segs = 10) {
+    const g = this.gfx(FX + 2).setBlendMode(Phaser.BlendModes.ADD);
+    const pts: Pt[] = [a];
+    for (let i = 1; i < segs; i++) {
+      const k = i / segs;
+      pts.push({
+        x: a.x + (b.x - a.x) * k + (Math.random() - 0.5) * 2 * jag,
+        y: a.y + (b.y - a.y) * k + (Math.random() - 0.5) * jag * 0.6,
+      });
+    }
+    pts.push(b);
+    g.lineStyle(w * 2.8, 0x9fe6ff, 0.3);
+    g.strokePoints(pts);
+    g.lineStyle(w * 1.3, 0xffd23a, 0.95);
+    g.strokePoints(pts);
+    g.lineStyle(w * 0.45, 0xfffdf2, 1);
+    g.strokePoints(pts);
+    for (let k = 0; k < 2; k++) {
+      const q = pts[1 + Math.floor(Math.random() * (pts.length - 2))];
+      g.lineStyle(Math.max(1, w * 0.3), 0xb4ebff, 0.85);
+      g.lineBetween(q.x, q.y, q.x + (Math.random() - 0.5) * 50, q.y + Math.random() * 30);
+    }
+    this.fade(g, 260);
+  }
+  private ultimate(ev: Extract<GameEvent, { type: 'ultimate' }>) {
+    const c = tileToScreen(ev.x, ev.y);
+    const sky = (p: Pt) => ({ x: p.x + (Math.random() - 0.5) * 60, y: p.y - 320 });
+    if (ev.phase === 'start') {
+      // círculo de runas amarelas no chão, girando durante os 3 s
+      const r = this.iso(2.2);
+      const g = this.gfx(FX - 1).setPosition(c.x, c.y);
+      const st = { a: 0, k: 0 };
+      const draw = () => {
+        g.clear();
+        g.lineStyle(3, 0xffd23a, 0.85 * st.k);
+        g.strokeEllipse(0, 0, r.w * st.k, r.h * st.k);
+        g.lineStyle(2, 0x9fe6ff, 0.6 * st.k);
+        g.strokeEllipse(0, 0, r.w * 0.74 * st.k, r.h * 0.74 * st.k);
+        for (let i = 0; i < 8; i++) {
+          const t = st.a + (i / 8) * Math.PI * 2,
+            cs = Math.cos(t),
+            sn = Math.sin(t);
+          g.lineStyle(3, 0xffd23a, 0.85 * st.k);
+          g.lineBetween(cs * r.w * 0.37 * st.k, sn * r.h * 0.37 * st.k, cs * r.w * 0.5 * st.k, sn * r.h * 0.5 * st.k);
+        }
+      };
+      this.scene.tweens.add({ targets: st, k: 1, duration: 400, ease: 'Back.easeOut' });
+      this.scene.tweens.add({
+        targets: st,
+        a: Math.PI * 3,
+        duration: 3000,
+        onUpdate: draw,
+        onComplete: () => this.fade(g, 300),
+      });
+      // tela escurece um pouco (céu de tempestade)
+      const cam = this.scene.cameras.main;
+      const dark = this.scene.add
+        .rectangle(0, 0, cam.width, cam.height, 0x050819, 0)
+        .setOrigin(0)
+        .setScrollFactor(0)
+        .setDepth(FX - 2);
+      this.scene.tweens.add({
+        targets: dark,
+        fillAlpha: 0.45,
+        duration: 400,
+        yoyo: true,
+        hold: 2400,
+        onComplete: () => dark.destroy(),
+      });
+      // faíscas subindo das mãos
+      this.burst(c.x, c.y - 70, 24, {
+        speed: { min: 60, max: 160 },
+        angle: { min: 230, max: 310 },
+        lifespan: 700,
+        scale: { start: 0.6, end: 0 },
+        tint: [0xffd23a, 0xffffff, 0x9fe6ff],
+      });
+      return;
+    }
+    const final = ev.phase === 'final';
+    for (const t of ev.targets) {
+      const p = tileToScreen(t.x, t.y);
+      this.ultBolt(sky(p), { x: p.x, y: p.y - 10 }, final ? 4 : 3, 24);
+      const ring = this.gfx(FX - 1).setPosition(p.x, p.y);
+      ring.lineStyle(3, 0xffd23a, 0.9);
+      ring.strokeEllipse(0, 0, 30, 15);
+      ring.setScale(0.4);
+      this.scene.tweens.add({ targets: ring, scaleX: 1.6, scaleY: 1.6, duration: 360, ease: 'Cubic.easeOut' });
+      this.fade(ring, 380);
+      this.burst(p.x, p.y - 12, final ? 14 : 8, {
+        speed: { min: 40, max: 150 },
+        lifespan: 450,
+        scale: { start: 0.5, end: 0 },
+        tint: [0xffd23a, 0xffffff, 0x9fe6ff],
+      });
+    }
+    // raios soltos no céu em volta, para encher a tela
+    for (let k = 0; k < 3; k++) {
+      const x = c.x + (Math.random() - 0.5) * 520,
+        y = c.y - 140 + (Math.random() - 0.5) * 200;
+      this.scene.time.delayedCall(k * 120, () =>
+        this.ultBolt({ x, y: y - 220 }, { x: x + (Math.random() - 0.5) * 60, y }, 1.6, 18, 6),
+      );
+    }
+    if (!final) {
+      shakeCamera(this.scene, 120, 0.004);
+      return;
+    }
+    // estouro final: raio gigante no personagem, clarão amarelado e anel do tamanho da área
+    this.ultBolt({ x: c.x, y: c.y - 420 }, { x: c.x, y: c.y - 40 }, 10, 30, 14);
+    this.scene.cameras.main.flash(260, 255, 244, 200);
+    shakeCamera(this.scene, 380, 0.012);
+    const r = this.iso(ev.radius);
+    const ring = this.gfx(FX - 1).setPosition(c.x, c.y);
+    ring.lineStyle(10, 0xffd23a, 1);
+    ring.strokeEllipse(0, 0, r.w, r.h);
+    ring.lineStyle(4, 0x9fe6ff, 0.8);
+    ring.strokeEllipse(0, 0, r.w * 1.04, r.h * 1.04);
+    ring.setScale(0.1);
+    this.scene.tweens.add({ targets: ring, scaleX: 1, scaleY: 1, duration: 520, ease: 'Cubic.easeOut' });
+    this.fade(ring, 820);
+    this.burst(c.x, c.y - 30, 40, {
+      speed: { min: 120, max: 320 },
+      lifespan: 800,
+      scale: { start: 0.8, end: 0 },
+      tint: [0xffd23a, 0xffffff, 0x9fe6ff],
     });
   }
 }

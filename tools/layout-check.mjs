@@ -87,6 +87,19 @@ for (const sz0 of SIZES)
           const b = el.getBoundingClientRect();
           if (b.width && b.height) boxes.push([id, b]);
         }
+        // arco da ultimate (HUD novo do celular): caixas ao longo da faixa
+        const track = document.querySelector('.ult-arc:not(.hidden) .ua-track');
+        if (track) {
+          const L = track.getTotalLength(),
+            m = track.getScreenCTM(),
+            half = (parseFloat(track.getAttribute('stroke-width')) / 2 + 2) * m.a;
+          for (let i = 0; i <= 16; i++) {
+            const q = track.getPointAtLength((L * i) / 16),
+              x = q.x * m.a + m.e,
+              y = q.y * m.d + m.f;
+            boxes.push([`ult-arc.${i}`, { left: x - half, right: x + half, top: y - half, bottom: y + half }]);
+          }
+        }
         const out = [],
           W = innerWidth,
           H = innerHeight;
@@ -96,8 +109,12 @@ for (const sz0 of SIZES)
           for (let j = i + 1; j < boxes.length; j++) {
             const [a, A] = boxes[i],
               [b, B] = boxes[j];
-            if (a.startsWith('hotbar') && b.startsWith('hotbar')) {
-              // botões redondos: compara círculos, não caixas
+            if (a.startsWith('ult-arc') && (b.startsWith('ult-arc') || b.startsWith('hotbar') || b === 'btn-attack'))
+              continue; // o arco abraça as skills com vão próprio (thumbLayout.ts)
+            if (b.startsWith('ult-arc') && (a.startsWith('hotbar') || a === 'btn-attack')) continue;
+            const round = (id) => id.startsWith('hotbar') || id === 'btn-attack';
+            if (round(a) && round(b)) {
+              // botões redondos (skills e Atacar): compara círculos, não caixas
               const d = Math.hypot(
                 (A.left + A.right - B.left - B.right) / 2,
                 (A.top + A.bottom - B.top - B.bottom) / 2,

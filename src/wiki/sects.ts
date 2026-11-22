@@ -1,4 +1,5 @@
 // Páginas de seitas (classes) e skills.
+import ultimatesJson from '../data/ultimates.json';
 import { computeDerived } from '../core/stats';
 import {
   BASES,
@@ -88,9 +89,28 @@ export function sectPage(id: string): string | null {
       ${c.recommended.map((r) => `<li><b>${STAT_LABELS[r.attr]}</b> — ${esc(r.reason)}</li>`).join('')}
       ${c.optional.map((r) => `<li><span class="muted">Opcional:</span> <b>${STAT_LABELS[r.attr]}</b> — ${esc(r.reason)}</li>`).join('')}</ul></section>
     <section class="panel"><h2>Skills</h2>${skillTable(SKILLS[id] ?? [])}</section>
+    ${ultPanel(id)}
     <section class="panel"><h2>Armas</h2><ul class="shop">${weapons
       .map((w) => `<li>${itemLink(w)} <span class="muted">nível ${BASES[w].reqLevel}</span></li>`)
       .join('')}</ul></section>`;
+}
+
+// ---------- Ultimate (src/data/ultimates.json; regras em src/core/ultimate.ts) ----------
+type Ult = (typeof ultimatesJson)['lamina'];
+const ULTS = ultimatesJson as Record<string, Ult>;
+export function ultPanel(id: string, panel = true): string {
+  const u = ULTS[id];
+  if (!u) return '';
+  const body = `<h3>⚡ ${esc(u.name)} <small class="muted">· Ultimate · nível ${u.unlock}</small></h3>
+    <p>${esc(u.description)}</p>
+    <ul><li><b>Carga:</b> a barra enche 1 ponto a cada skill que acerta pelo menos um monstro; com ${u.charge} pontos fica pronta.
+      Usar skill no vazio e o dano da própria ultimate não carregam.</li>
+    <li><b>Fora de combate:</b> depois de ${u.idleDelay} s sem lutar, a barra perde ${u.idleDrain} ponto por segundo.</li>
+    <li><b>Duração:</b> ${u.duration} s parado na pose, com os braços para cima; ${u.strikes} raios de ${pc(u.strikeMult)} do dano em todos os monstros a até ${u.radius} tiles e um estouro final de ${pc(u.finalMult)} (${pc(u.strikes * u.strikeMult + u.finalMult)} no total).</li>
+    <li><b>Muitos alvos:</b> até ${u.fullTargets} monstros levam o dano cheio; com mais, cada um leva ${u.fullTargets} ÷ (monstros no raio) do dano.</li>
+    <li><b>Dano:</b> a mesma conta das skills (ataque físico + ataque de trovão, contra defesa e resistência do alvo). Pode errar e dar crítico; não recupera vida. Não sobe de nível.</li>
+    <li><b>Só o jogador solta:</b> o Auto-combate nunca usa a ultimate. No celular, toque no arco em volta das skills; no PC, botão ao lado das skills ou tecla <b>R</b>.</li></ul>`;
+  return panel ? `<section class="panel"><h2>Ultimate</h2>${body}</section>` : body;
 }
 
 function skillTable(list: SkillDef[]): string {
@@ -111,7 +131,8 @@ export function skillIndexPage(): string {
     As ativas sobem de nível com o <b>uso</b>; as passivas sobem junto com o nível do personagem. Nível máximo ${SKILL_MAX_LEVEL}.</p>
     ${sects()
       .map(
-        (id) => `<h2 style="color:${CLASSES[id].color}">${esc(CLASSES[id].name)}</h2>${skillTable(SKILLS[id] ?? [])}`,
+        (id) =>
+          `<h2 style="color:${CLASSES[id].color}">${esc(CLASSES[id].name)}</h2>${skillTable(SKILLS[id] ?? [])}${ultPanel(id, false)}`,
       )
       .join('')}`;
 }

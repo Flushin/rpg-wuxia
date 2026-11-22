@@ -15,6 +15,7 @@
     "check:auto": "esbuild tools/auto-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/auto-check.mjs && node /tmp/auto-check.mjs",
     "check:skills": "esbuild tools/skills-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/skills-check.mjs && node /tmp/skills-check.mjs",
     "sim:balance": "esbuild tools/balance-sim.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/balance-sim.mjs && node /tmp/balance-sim.mjs",
+    "sim:ult": "esbuild tools/ult-sim.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/ult-sim.mjs && node /tmp/ult-sim.mjs",
     "balance": "esbuild tools/balance.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/balance.mjs && node /tmp/balance.mjs",
     "check:balance": "esbuild tools/balance-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/balance-check.mjs && node /tmp/balance-check.mjs",
     "check:i18n": "esbuild tools/i18n-check.ts --bundle --platform=node --format=esm --log-level=error --outfile=/tmp/i18n-check.mjs && node /tmp/i18n-check.mjs",

@@ -17,6 +17,7 @@ export { LEVELUP_POSE_S, XP_BANK_LEVELS };
 import { tn } from './i18n';
 import { distributeByRatio } from './distribute';
 import { expectedDamage, rollAttack, type AttackResult } from './combat';
+import { ultimateOf, ultSplit, type UltimateDef } from './ultimate';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
 import { findPath, insideAvoid, isWalkable, type Avoid } from './pathfinding';
@@ -139,6 +140,10 @@ export class World {
   freePoints = 0;
   /** segundos que ainda faltam da pose de subida de nível (não vai para o save) */
   levelUpPose = 0;
+  /** ultimate: carga atual (0..def.charge), soltura em andamento e último momento de combate (não vão para o save) */
+  ultCharge = 0;
+  ultCast: { t: number; done: number; x: number; y: number } | null = null;
+  lastCombat = -99;
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
@@ -563,7 +568,7 @@ export class World {
   useSkill(slot: number) {
     const p = this.player,
       def = this.activeSkills()[slot];
-    if (!def || p.dead || this.levelUpPose > 0) return;
+    if (!def || p.dead || this.levelUpPose > 0 || this.ultCast) return;
     if (!this.isUnlocked(def)) return this.fail(def, 'locked');
     const st = this.skills[def.id];
     if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
@@ -663,6 +668,7 @@ export class World {
       p.y = dest.y;
       p.path = [];
     }
+    let landed = false;
     for (const v of victims) {
       if (!def.hits?.length) {
         // sem golpe (Névoa Tóxica): os efeitos pegam em todos da área, sem rolar acerto
@@ -673,6 +679,7 @@ export class World {
       for (const pct of def.hits) {
         if (v.dead) break;
         const r = this.attack(p, v, pct * scale, true);
+        if (r.hit) landed = true;
         if (r.hit && !v.dead) this.applyOnHit(def, v, scale);
       }
     }
@@ -686,7 +693,8 @@ export class World {
         (p.derived.maxHp * def.heal.percent * scale) / def.heal.duration,
         def.heal.duration,
       );
-    if (victims.length || def.shield || def.heal) this.gainSkillXp(def, st); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
+    if (victims.length || def.shield || def.heal) this.gainSkillXp(def, st);
+    if (landed) this.chargeUltimate(); // sem acertar ninguém não ganha xp (evita treinar skill no vazio)
   }
 
   /** Efeitos de uma skill num alvo atingido: enfraquecer/lentidão, veneno e atordoar. */
@@ -719,6 +727,81 @@ export class World {
       this.emit({ type: 'skillLevelUp', skillId: def.id, level: st.level });
     }
     if (st.level >= SKILL_MAX_LEVEL) st.xp = 0;
+  }
+
+  // ---------- ultimate (src/core/ultimate.ts; só o jogador solta, o Auto nunca) ----------
+  ultimate(): UltimateDef | undefined {
+    return ultimateOf(this.classId);
+  }
+  ultUnlocked(): boolean {
+    const u = this.ultimate();
+    return !!u && this.player.level >= u.unlock;
+  }
+  /** 0..1 */
+  ultFill(): number {
+    const u = this.ultimate();
+    return u ? Math.min(1, this.ultCharge / u.charge) : 0;
+  }
+  ultReady(): boolean {
+    return this.ultUnlocked() && this.ultFill() >= 1;
+  }
+  private chargeUltimate() {
+    const u = this.ultimate();
+    if (!u || !this.ultUnlocked() || this.ultCast) return;
+    this.ultCharge = Math.min(u.charge, this.ultCharge + 1);
+  }
+  /** fora de combate por idleDelay s, a barra esvazia aos poucos */
+  private drainUltimate(dt: number) {
+    const u = this.ultimate();
+    if (!u || this.ultCast || this.ultCharge <= 0 || this.time - this.lastCombat < u.idleDelay) return;
+    this.ultCharge = Math.max(0, this.ultCharge - u.idleDrain * dt);
+  }
+  useUltimate(): boolean {
+    const p = this.player,
+      u = this.ultimate();
+    if (!u || p.dead || this.ultCast || this.levelUpPose > 0) return false;
+    if (!this.ultReady()) return false;
+    this.ultCharge = 0;
+    this.pendingSkill = null;
+    this.autoAttack = false;
+    p.path = [];
+    this.ultCast = { t: 0, done: 0, x: p.x, y: p.y };
+    this.lastCombat = this.time;
+    this.emit({ type: 'ultimate', phase: 'start', x: p.x, y: p.y, radius: u.radius, targets: [] });
+    return true;
+  }
+  private tickUltimate(dt: number) {
+    const c = this.ultCast!,
+      u = this.ultimate()!,
+      p = this.player;
+    c.t += dt;
+    const every = u.duration / u.strikes;
+    while (c.done < u.strikes && c.t >= every * (c.done + 0.5)) {
+      c.done++;
+      this.ultStrike(u, u.strikeMult, 'strike');
+    }
+    if (c.t >= u.duration) {
+      this.ultStrike(u, u.finalMult, 'final');
+      this.ultCast = null;
+    }
+    p.attackCd = Math.max(p.attackCd, 0.3);
+  }
+  /** um raio em todos os monstros do raio; a carga não sobe com o dano da própria ultimate */
+  private ultStrike(u: UltimateDef, mult: number, phase: 'strike' | 'final') {
+    const c = this.ultCast!,
+      p = this.player,
+      inside = this.monsters.filter((m) => !m.dead && dist(m, c) <= u.radius),
+      k = ultSplit(u, inside.length);
+    this.emit({
+      type: 'ultimate',
+      phase,
+      x: c.x,
+      y: c.y,
+      radius: u.radius,
+      targets: inside.map((m) => ({ x: m.x, y: m.y })),
+    });
+    for (const m of inside) if (!m.dead) this.attack(p, m, mult * k, true, false);
+    this.lastCombat = this.time;
   }
 
   private applyPassives() {
@@ -774,6 +857,7 @@ export class World {
 
   tick(dt: number) {
     this.time += dt;
+    this.drainUltimate(dt);
     this.gcd = Math.max(0, this.gcd - dt);
     for (const st of Object.values(this.skills)) st.cd = Math.max(0, st.cd - dt);
     this.tickBuffs(this.player, dt);
@@ -789,6 +873,8 @@ export class World {
     if (this.player.dead) {
       this.respawnTimer -= dt;
       if (this.respawnTimer <= 0) this.respawnPlayer();
+    } else if (this.ultCast) {
+      this.tickUltimate(dt); // ultimate: parado na pose, nem o auto nem o jogador agem
     } else if (this.levelUpPose > 0) {
       this.levelUpPose = Math.max(0, this.levelUpPose - dt); // pose de subida de nível: nem o auto nem o jogador agem
     } else {
@@ -1208,7 +1294,7 @@ export class World {
     return inventory.lowDurability(this);
   }
 
-  private attack(a: Entity, t: Entity, mult = 1, skill = false): AttackResult {
+  private attack(a: Entity, t: Entity, mult = 1, skill = false, leech = true): AttackResult {
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && a.kind === 'player' && this.hasBuff(t, 'poison')) {
       const bonus = this.passiveValue('poisonedBonus');
@@ -1245,7 +1331,7 @@ export class World {
         this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
       // roubo de vida da seita (Tormenta): parte do dano causado volta como vida;
       // conta só o dano que o alvo podia levar (excesso sobre a vida restante não cura)
-      const ls = a.kind === 'player' ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
+      const ls = a.kind === 'player' && leech ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
       const stolen = Math.min(dealt, hpBefore);
       if (ls > 0 && stolen > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + stolen * ls);
       // golpe que deixa lento (Espectro de gelo, marco 9)
@@ -1254,6 +1340,7 @@ export class World {
     } else {
       this.emit({ type: 'miss', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y });
     }
+    if (a.kind === 'player' || t.kind === 'player') this.lastCombat = this.time;
     if (t.kind === 'monster') {
       if (t.ai !== 'return') this.aggro(t);
       if (t.hp <= 0) this.killMonster(t);
@@ -1334,6 +1421,7 @@ export class World {
 
   /** Interno: usado pelos módulos de src/core/world/. */
   killPlayer() {
+    this.ultCast = null;
     const p = this.player;
     p.dead = true;
     p.hp = 0;
@@ -1564,6 +1652,7 @@ export class World {
 
   // ---------- mapa / entidades ----------
   changeMap(mapId: string, x?: number, y?: number) {
+    this.ultCast = null;
     this.mapId = mapId;
     this.map = this.maps[mapId];
     const sp = this.map.objects.find((o) => o.type === 'spawn');

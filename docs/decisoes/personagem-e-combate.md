@@ -84,3 +84,12 @@
 
 ## Dano dos chefes em % da vida (22/11/2026)
 Todo golpe de chefe soma uma parte da vida máxima do jogador, sem redução pela defesa (a parte normal segue reduzida pela defesa física/espiritual): 4% por golpe normal (chefe que bate a cada 2,4 s; proporcional ao intervalo) e 9% por 1× de mult nos golpes marcados no chão. Vale inteiro para chefe nv 20+ (todo o Trial), sobe em linha do nv 10 (0) ao 20; chefes iniciais não mudam. Constantes em `BOSS_PCT_HP` (`src/core/world/boss.ts`).
+
+## Ultimate (Tormenta primeiro)
+- Libera no nível 10. Barra enche 1 por skill que acerta ao menos um monstro (25 para encher; ~53 s de caça com Auto do nv 15+, `npm run sim:ult`). O dano da própria ultimate não carrega.
+- Esvazia devagar após ~20 s sem combate.
+- Só o jogador solta: o Auto nunca usa a ultimate.
+- Dano igual ao das skills: Força (ataque físico) + ataque de trovão do equipamento, menos defesa física e resistência a trovão do alvo. Pode errar (precisão × esquiva) e tem crítico (Agilidade). Não recupera vida (sem o roubo de 8%).
+- Wiki: página da skill e regra da barra entram no mesmo PR da implementação.
+- Tormenta, "Fúria da Tormenta": pose de subir de nível por 3 s, raio de 7 tiles em volta dela; 6 raios de 1× (a cada 0,5 s) + estouro final de 3× = 9× por monstro. Até 8 monstros com dano cheio; acima disso o dano total é dividido entre eles.
+- Visual: raios do céu (miolo branco, corpo amarelo, brilho azul-gelo), sem nuvem (`previews/ultimate-tormenta-a.html`). Celular: arco tocável por fora das skills (`previews/controles-celular.html`).

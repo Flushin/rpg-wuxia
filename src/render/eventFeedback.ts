@@ -138,6 +138,14 @@ export class EventFeedback {
       case 'dash':
         this.fx.onEvent(ev);
         return true;
+      case 'ultimate':
+        // pose de subir de nível (braços para cima) durante os 3 s, com brilho amarelo
+        if (ev.phase === 'start') {
+          this.views.get(this.world.player.id)?.levelUp(3000, 0xffd23a, 1.3, true, 3000);
+          vibrate();
+        }
+        this.fx.onEvent(ev);
+        return true;
       case 'skillFail': {
         const msg = {
           mana: L('Sem mana', 'No mana'),

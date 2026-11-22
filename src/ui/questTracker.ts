@@ -1,6 +1,7 @@
 import { L } from '../core/i18n';
 import { NPC_TEXT } from '../core/data';
 import type { World } from '../core/world';
+import { ultArcRects } from './ultButton';
 import { uiRect, uiScale, uiW } from './uiScale';
 import { byId, escapeHtml, viewportKey } from './dom';
 
@@ -65,16 +66,23 @@ export class QuestTracker {
     // logo abaixo do bloco do topo direito (que muda de altura conforme a tela)
     const r = uiRect(byId('top-right'));
     el.style.top = `${Math.round(r.bottom + 6)}px`;
-    // celular deitado baixo (Fold fechado): se encostar num botão de skill do arco, desvia para a esquerda dele
+    // celular deitado baixo (Fold fechado): se encostar num botão de skill ou no arco da ultimate, desvia para a esquerda
     if (el.classList.contains('hidden')) return;
     el.style.right = '';
     const t = uiRect(el);
     let right = 0;
-    for (const b of document.querySelectorAll('#hotbar .slot')) {
-      const s = uiRect(b);
-      if (s.left < t.right && s.right > t.left && s.top < t.bottom && s.bottom > t.top)
-        right = Math.max(right, uiW() - s.left + 6);
+    const boxes = [...document.querySelectorAll('#hotbar .slot')].map((b) => uiRect(b) as Rect).concat(ultArcRects());
+    const tw = t.right - t.left;
+    // o arco é curvo: depois de desviar de um pedaço, pode encostar no próximo; repete até ficar livre
+    for (let pass = 0; pass < 8; pass++) {
+      const R = right ? uiW() - right : t.right,
+        L = R - tw;
+      const hit = boxes.filter((s) => s.left < R && s.right > L && s.top < t.bottom && s.bottom > t.top);
+      if (!hit.length) break;
+      right = Math.max(right, ...hit.map((s) => uiW() - s.left + 6));
     }
     if (right) el.style.right = `${Math.round(right)}px`;
   }
 }
+
+type Rect = { left: number; right: number; top: number; bottom: number };

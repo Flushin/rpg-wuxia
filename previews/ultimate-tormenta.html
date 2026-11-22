@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ultimate da Tormenta</title>
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --panel: #141a2b;
+        --gold: #d4a017;
+        --txt: #e8e2cf;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        font-family: system-ui, sans-serif;
+        padding: 16px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 4px;
+        color: var(--gold);
+      }
+      p {
+        margin: 0 0 10px;
+        opacity: 0.8;
+        font-size: 14px;
+        max-width: 820px;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .card {
+        background: var(--panel);
+        border-radius: 12px;
+        padding: 12px;
+        width: min(100%, 460px);
+      }
+      canvas {
+        width: 100%;
+        aspect-ratio: 4/3;
+        border-radius: 8px;
+        display: block;
+        background: #1a2a1e;
+      }
+      .card button {
+        margin-top: 8px;
+        background: var(--gold);
+        color: #111;
+        border: 0;
+        border-radius: 8px;
+        padding: 9px 14px;
+        font-size: 15px;
+        font-weight: 700;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ultimate da Tormenta: prévias do efeito</h1>
+    <p>
+      Nas três prévias, a Tormenta faz a pose de braços para cima (a mesma de subir de nível) e o golpe dura 3 segundos,
+      acertando todos os monstros em volta, com um estouro final. Elas rodam sozinhas em sequência; aperte “Soltar de
+      novo” para ver outra vez.
+    </p>
+    <div class="grid" id="g"></div>
+    <script>
+      const V = [
+        [
+          'A · Tempestade Celeste',
+          'A tela escurece, uma nuvem negra gira sobre a Tormenta e raios caem do céu em cada monstro, sem parar, com clarões e tremor. No fim, um raio gigante cai nela e explode em anel.',
+        ],
+        [
+          'B · Domo do Trovão',
+          'Uma esfera elétrica cresce em volta dela e pulsa a cada meio segundo; de dentro saem raios em corrente que pulam de monstro em monstro. No fim, a esfera estoura para fora.',
+        ],
+        [
+          'C · Dragão do Trovão',
+          'Um dragão feito de raio sai das mãos dela e dá voltas em espiral cada vez mais largas, atravessando os monstros. No fim, ele sobe e mergulha no centro numa coluna de luz.',
+        ],
+      ];
+      const spr = new Image();
+      spr.src = 'tormenta_levelup_sul.png';
+      const W = 480,
+        H = 360,
+        CX = 240,
+        CY = 200,
+        DUR = 3000,
+        PRE = 450,
+        POST = 900;
+      function mobs() {
+        const m = [];
+        for (let i = 0; i < 9; i++) {
+          const a = (i / 9) * Math.PI * 2 + Math.random() * 0.4,
+            r = 80 + Math.random() * 80;
+          m.push({
+            x: CX + Math.cos(a) * r * 1.25,
+            y: CY + Math.sin(a) * r * 0.7,
+            hp: 1,
+            hit: 0,
+            c: ['#7a3b8a', '#3b7a4a', '#8a5a2b'][i % 3],
+          });
+        }
+        return m;
+      }
+      function bolt(ctx, x1, y1, x2, y2, w, col, seg = 10, jit = 18) {
+        ctx.save();
+        ctx.strokeStyle = col;
+        ctx.lineWidth = w;
+        ctx.shadowColor = '#9fd8ff';
+        ctx.shadowBlur = 18;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        for (let i = 1; i < seg; i++) {
+          const t = i / seg;
+          ctx.lineTo(
+            x1 + (x2 - x1) * t + (Math.random() - 0.5) * jit,
+            y1 + (y2 - y1) * t + (Math.random() - 0.5) * jit,
+          );
+        }
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.lineWidth = w * 0.35;
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+        ctx.restore();
+      }
+      function make(i) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<h2>${V[i][0]}</h2><p>${V[i][1]}</p><canvas width="${W}" height="${H}"></canvas><button>⚡ Soltar de novo</button>`;
+        g.appendChild(card);
+        const cv = card.querySelector('canvas'),
+          ctx = cv.getContext('2d');
+        let t0 = performance.now(),
+          M = mobs(),
+          nums = [],
+          parts = [],
+          last = 0;
+        card.querySelector('button').onclick = () => {
+          t0 = performance.now();
+          M = mobs();
+          nums = [];
+          parts = [];
+        };
+        const hit = (m, dmg, big) => {
+          m.hit = 1;
+          nums.push({ x: m.x + (Math.random() - 0.5) * 20, y: m.y - 30, v: dmg, t: 0, big });
+          for (let k = 0; k < 6; k++)
+            parts.push({ x: m.x, y: m.y - 10, vx: (Math.random() - 0.5) * 4, vy: -Math.random() * 4, t: 0 });
+        };
+        function frame(now) {
+          let t = Math.max(0, now - t0);
+          if (t > PRE + DUR + POST + 1200) {
+            t0 = now;
+            M = mobs();
+            nums = [];
+            parts = [];
+            t = 0;
+          }
+          const act = t > PRE && t < PRE + DUR,
+            p = (t - PRE) / DUR,
+            fin = t >= PRE + DUR && t < PRE + DUR + POST,
+            fp = (t - PRE - DUR) / POST;
+          ctx.save();
+          // tremor
+          const sh = act ? (i == 0 ? 4 : 2.5) : fin && fp < 0.4 ? 10 * (1 - fp / 0.4) : 0;
+          ctx.translate((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh);
+          // chão
+          ctx.fillStyle = '#24382a';
+          ctx.fillRect(-20, -20, W + 40, H + 40);
+          ctx.fillStyle = '#2c4432';
+          for (let y = 0; y < H; y += 40) for (let x = ((y / 40) % 2) * 40; x < W; x += 80) ctx.fillRect(x, y, 40, 40);
+          // escurecer
+          const dark = t < PRE ? (t / PRE) * 0.55 : act ? 0.55 : fin ? 0.55 * (1 - fp) : 0;
+          ctx.fillStyle = `rgba(5,8,25,${dark})`;
+          ctx.fillRect(-20, -20, W + 40, H + 40);
+          // carga: runas no chão
+          if (t < PRE + DUR) {
+            const k = Math.min(1, t / PRE);
+            ctx.save();
+            ctx.translate(CX, CY + 40);
+            ctx.scale(1, 0.45);
+            ctx.rotate(t / 600);
+            ctx.strokeStyle = `rgba(140,210,255,${0.8 * k})`;
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#6cf';
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(0, 0, 70 * k, 0, 7);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, 52 * k, 0, 7);
+            ctx.stroke();
+            for (let j = 0; j < 8; j++) {
+              ctx.rotate(Math.PI / 4);
+              ctx.beginPath();
+              ctx.moveTo(52 * k, 0);
+              ctx.lineTo(70 * k, 0);
+              ctx.stroke();
+            }
+            ctx.restore();
+          }
+          // monstros
+          M.forEach((m) => {
+            ctx.fillStyle = '#0005';
+            ctx.beginPath();
+            ctx.ellipse(m.x, m.y + 12, 16, 5, 0, 0, 7);
+            ctx.fill();
+            ctx.fillStyle = m.hit > 0 ? '#fff' : m.c;
+            ctx.beginPath();
+            ctx.ellipse(m.x, m.y - 4, 14, 16, 0, 0, 7);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(m.x - 6, m.y - 8, 3, 3);
+            ctx.fillRect(m.x + 3, m.y - 8, 3, 3);
+            m.hit = Math.max(0, m.hit - 0.12);
+          });
+          // efeitos por variante (camada de trás)
+          const tick = Math.floor(t / 90);
+          const newTick = tick !== last;
+          last = tick;
+          if (i == 1 && (act || fin)) {
+            const R = act ? Math.min(1, p * 4) * 150 : 150 + fp * 260,
+              a = act ? 1 : 1 - fp;
+            const pul = act ? Math.sin(((p * DUR) / 500) * Math.PI * 2) * 0.5 + 0.5 : 0;
+            ctx.save();
+            ctx.translate(CX, CY);
+            ctx.scale(1.25, 0.8);
+            const gr = ctx.createRadialGradient(0, 0, R * 0.2, 0, 0, R);
+            gr.addColorStop(0, `rgba(120,200,255,${0.05 * a})`);
+            gr.addColorStop(0.85, `rgba(120,200,255,${(0.18 + pul * 0.15) * a})`);
+            gr.addColorStop(1, `rgba(220,245,255,${0.7 * a})`);
+            ctx.fillStyle = gr;
+            ctx.beginPath();
+            ctx.arc(0, 0, R, 0, 7);
+            ctx.fill();
+            ctx.strokeStyle = `rgba(220,245,255,${a})`;
+            ctx.lineWidth = 3 + pul * 3;
+            ctx.shadowColor = '#8df';
+            ctx.shadowBlur = 25;
+            ctx.stroke();
+            ctx.restore();
+            if (act)
+              for (let k = 0; k < 4; k++) {
+                const an = Math.random() * 7;
+                bolt(
+                  ctx,
+                  CX,
+                  CY - 20,
+                  CX + Math.cos(an) * R * 1.25,
+                  CY + Math.sin(an) * R * 0.8,
+                  1.5,
+                  'rgba(170,225,255,.8)',
+                  6,
+                  14,
+                );
+              }
+          }
+          // personagem
+          const fi = Math.floor(t / 110) % 8,
+            fl = act && Math.random() < 0.25 ? 1 : 0;
+          if (spr.complete) {
+            ctx.save();
+            if (act || t < PRE) {
+              ctx.shadowColor = '#8df';
+              ctx.shadowBlur = 25;
+            }
+            ctx.drawImage(spr, fi * 120, 0, 120, 140, CX - 48, CY - 110, 96, 112);
+            ctx.restore();
+          }
+          if (act) {
+            // brilho nas mãos
+            const gl = ctx.createRadialGradient(CX, CY - 95, 0, CX, CY - 95, 30 + Math.random() * 10);
+            gl.addColorStop(0, 'rgba(255,255,255,.95)');
+            gl.addColorStop(0.3, 'rgba(150,220,255,.7)');
+            gl.addColorStop(1, 'rgba(150,220,255,0)');
+            ctx.fillStyle = gl;
+            ctx.beginPath();
+            ctx.arc(CX, CY - 95, 40, 0, 7);
+            ctx.fill();
+          }
+          // A: nuvem + raios do céu
+          if (i == 0 && (act || fin)) {
+            const a = act ? Math.min(1, p * 5) : 1 - fp;
+            for (let k = 0; k < 14; k++) {
+              const an = (k / 14) * 7 + t / 900;
+              ctx.fillStyle = `rgba(30,30,50,${0.85 * a})`;
+              ctx.beginPath();
+              ctx.ellipse(CX + Math.cos(an) * 120, 30 + Math.sin(an) * 22, 60, 26, 0, 0, 7);
+              ctx.fill();
+            }
+            ctx.fillStyle = `rgba(90,110,160,${0.5 * a})`;
+            ctx.beginPath();
+            ctx.ellipse(CX, 30, 90, 20, 0, 0, 7);
+            ctx.fill();
+            if (act && newTick) {
+              const m = M[Math.floor(Math.random() * M.length)];
+              bolt(ctx, m.x + (Math.random() - 0.5) * 60, 0, m.x, m.y, 5, '#bfe8ff', 12, 26);
+              hit(m, Math.floor(180 + Math.random() * 90));
+              ctx.fillStyle = 'rgba(200,230,255,.25)';
+              ctx.fillRect(0, 0, W, H);
+              parts.push({ ring: 1, x: m.x, y: m.y + 8, t: 0 });
+            }
+            if (act && Math.random() < 0.4) {
+              const x = Math.random() * W;
+              bolt(
+                ctx,
+                x,
+                0,
+                x + (Math.random() - 0.5) * 80,
+                60 + Math.random() * 60,
+                1.5,
+                'rgba(190,220,255,.7)',
+                6,
+                20,
+              );
+            }
+            if (fin && fp < 0.25) {
+              bolt(ctx, CX, 0, CX, CY - 40, 16, '#e6f6ff', 14, 30);
+              ctx.fillStyle = `rgba(255,255,255,${0.8 * (1 - fp / 0.25)})`;
+              ctx.fillRect(0, 0, W, H);
+            }
+          }
+          if (i == 1 && act && newTick && tick % 2 == 0) {
+            let a = M[Math.floor(Math.random() * M.length)];
+            bolt(ctx, CX, CY - 90, a.x, a.y, 3.5, '#bfe8ff');
+            hit(a, 140 + Math.floor(Math.random() * 60));
+            for (let c = 0; c < 3; c++) {
+              const b = M[Math.floor(Math.random() * M.length)];
+              if (b === a) continue;
+              bolt(ctx, a.x, a.y, b.x, b.y, 2.5, '#bfe8ff', 8, 16);
+              hit(b, 90 + Math.floor(Math.random() * 50));
+              a = b;
+            }
+          }
+          if (i == 1 && fin && fp < 0.15) {
+            ctx.fillStyle = `rgba(230,245,255,${0.7 * (1 - fp / 0.15)})`;
+            ctx.fillRect(0, 0, W, H);
+          }
+          // C: dragão em espiral
+          if (i == 2 && act) {
+            const pts = [];
+            for (let s = 0; s < 40; s++) {
+              const tt = p * DUR - s * 22;
+              if (tt < 0) break;
+              const pp = tt / DUR,
+                an = pp * Math.PI * 6,
+                r = 30 + pp * 150;
+              pts.push([
+                CX + Math.cos(an) * r * 1.25,
+                CY - 20 + Math.sin(an) * r * 0.7 - Math.sin(pp * Math.PI * 12) * 8,
+              ]);
+            }
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowColor = '#7cf';
+            ctx.shadowBlur = 30;
+            for (let s = pts.length - 1; s > 0; s--) {
+              ctx.strokeStyle = `rgba(${150 + s * 2},${220},255,${1 - s / 40})`;
+              ctx.lineWidth = 18 - s * 0.4;
+              ctx.beginPath();
+              ctx.moveTo(...pts[s]);
+              ctx.lineTo(...pts[s - 1]);
+              ctx.stroke();
+            }
+            if (pts[0]) {
+              const [hx, hy] = pts[0];
+              ctx.fillStyle = '#fff';
+              ctx.beginPath();
+              ctx.arc(hx, hy, 12, 0, 7);
+              ctx.fill();
+              ctx.fillStyle = '#ffd56a';
+              ctx.fillRect(hx - 6, hy - 5, 3, 3);
+              ctx.fillRect(hx + 3, hy - 5, 3, 3);
+              for (let k = 0; k < 2; k++)
+                bolt(ctx, hx, hy, hx + (Math.random() - 0.5) * 60, hy + (Math.random() - 0.5) * 60, 1.5, '#cff', 5, 10);
+              M.forEach((m) => {
+                if (Math.hypot(m.x - hx, m.y - hy) < 34 && m.hit < 0.2) hit(m, 220 + Math.floor(Math.random() * 80));
+              });
+            }
+            ctx.restore();
+            if (newTick && tick % 3 == 0)
+              M.forEach((m) => {
+                if (Math.random() < 0.2) {
+                  bolt(ctx, CX, CY - 90, m.x, m.y, 1.5, 'rgba(190,230,255,.6)', 6, 14);
+                }
+              });
+          }
+          if (i == 2 && fin) {
+            const a = 1 - fp;
+            ctx.fillStyle = `rgba(200,240,255,${0.6 * a})`;
+            ctx.fillRect(CX - 30 - fp * 40, 0, 60 + fp * 80, CY + 30);
+            if (fp < 0.2) {
+              ctx.fillStyle = `rgba(255,255,255,${0.8 * (1 - fp / 0.2)})`;
+              ctx.fillRect(0, 0, W, H);
+            }
+          }
+          // estouro final comum: anel + dano em todos
+          if (fin) {
+            if (!M.done) {
+              M.done = 1;
+              M.forEach((m) => hit(m, 600 + Math.floor(Math.random() * 200), 1));
+            }
+            ctx.save();
+            ctx.translate(CX, CY + 20);
+            ctx.scale(1.25, 0.6);
+            ctx.strokeStyle = `rgba(200,240,255,${1 - fp})`;
+            ctx.lineWidth = 14 * (1 - fp);
+            ctx.shadowColor = '#8df';
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.arc(0, 0, 40 + fp * 260, 0, 7);
+            ctx.stroke();
+            ctx.restore();
+          }
+          // partículas, anéis e números
+          parts = parts.filter((q) => (q.t += 1) < 30);
+          parts.forEach((q) => {
+            if (q.ring) {
+              ctx.strokeStyle = `rgba(190,230,255,${1 - q.t / 30})`;
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.ellipse(q.x, q.y, q.t * 2, q.t * 0.8, 0, 0, 7);
+              ctx.stroke();
+            } else {
+              q.x += q.vx;
+              q.y += q.vy;
+              q.vy += 0.2;
+              ctx.fillStyle = `rgba(220,245,255,${1 - q.t / 30})`;
+              ctx.fillRect(q.x, q.y, 3, 3);
+            }
+          });
+          nums = nums.filter((n) => (n.t += 1) < 50);
+          ctx.textAlign = 'center';
+          nums.forEach((n) => {
+            ctx.font = `bold ${n.big ? 26 : 17}px system-ui`;
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#000';
+            ctx.fillStyle = n.big ? '#ffd56a' : '#bfe8ff';
+            ctx.globalAlpha = 1 - n.t / 50;
+            const y = n.y - n.t * 0.8;
+            ctx.strokeText(n.v, n.x, y);
+            ctx.fillText(n.v, n.x, y);
+            ctx.globalAlpha = 1;
+          });
+          // texto da ultimate
+          if (t < PRE + 500) {
+            const a = t < PRE ? t / PRE : 1 - (t - PRE) / 500;
+            ctx.globalAlpha = a;
+            ctx.font = 'bold 30px serif';
+            ctx.fillStyle = '#ffd56a';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 5;
+            ctx.strokeText('雷 Fúria da Tormenta', CX, 70);
+            ctx.fillText('雷 Fúria da Tormenta', CX, 70);
+            ctx.globalAlpha = 1;
+          }
+          ctx.restore();
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+      [0, 1, 2].forEach(make);
+    </script>
+  </body>
+</html>

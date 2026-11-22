@@ -1,6 +1,7 @@
 // Confere src/data/en.json contra os dados em PT: sem chaves órfãs e com tradução para todo campo de texto.
 import en from '../src/data/en.json';
 import classes from '../src/data/classes.json';
+import ultimates from '../src/data/ultimates.json';
 import skills from '../src/data/skills.json';
 import items from '../src/data/items.json';
 import monsters from '../src/data/monsters.json';
@@ -65,8 +66,13 @@ const sections: [string, unknown][] = [
   ['quests', quests],
   ['novidades', novidades],
   ['skins', skins],
+  ['ultimates', ultimates],
 ];
 for (const [name, data] of sections) orphans(E[name], data, name);
+
+// ultimates: name, description
+for (const [id, u] of Object.entries(ultimates as J))
+  for (const f of ['name', 'description']) need(u[f], E.ultimates?.[id]?.[f], `ultimates.${id}.${f}`);
 
 // classes: name, description, rangeLabel, reasons
 for (const [id, c] of Object.entries(classes as J)) {
@@ -131,7 +137,21 @@ for (const f of readdirSync('public/maps').filter((x) => x.endsWith('.json'))) {
 for (const n of used) if (!E.names?.[n]) bad(`names: "${n}" (mapas) sem tradução EN`);
 for (const k of Object.keys(E.names ?? {})) if (!used.has(k)) bad(`names: chave órfã "${k}" (não aparece nos mapas)`);
 for (const k of Object.keys(E))
-  if (!['classes', 'skills', 'items', 'monsters', 'tips', 'npcs', 'quests', 'novidades', 'names', 'skins'].includes(k))
+  if (
+    ![
+      'classes',
+      'skills',
+      'items',
+      'monsters',
+      'tips',
+      'npcs',
+      'quests',
+      'novidades',
+      'names',
+      'skins',
+      'ultimates',
+    ].includes(k)
+  )
     bad(`seção desconhecida "${k}"`);
 
 console.log(fails ? `${fails} problema(s)` : 'i18n-check: tudo ok');

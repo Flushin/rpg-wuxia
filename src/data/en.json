@@ -994,7 +994,14 @@
     }
   },
   "novidades": {
-    "proxima": [{ "texto": "Thunder aura: Tormenta gets sparks and bolts around the body that grow every 100 Thunder Attack (up to 600), with any outfit." }],
+    "proxima": [
+      {
+        "texto": "Thunder aura: Tormenta gets sparks and bolts around the body that grow every 100 Thunder Attack (up to 600), with any outfit."
+      },
+      {
+        "texto": "Tormenta ultimate (level 10): Storm's Fury charges with skills that hit and calls lightning for 3 s around you. On mobile, tap the arc around the skills; on PC, press R. Mobile buttons rearranged with even spacing."
+      }
+    ],
     "versoes": [
       {
         "loja": [
@@ -1201,5 +1208,11 @@
         ]
       }
     ]
+  },
+  "ultimates": {
+    "lamina": {
+      "name": "Storm's Fury",
+      "description": "Raises the blades to the sky and calls lightning for 3 s on every monster within 7 tiles: 6 bolts of 100% damage and a final burst of 300%. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit, and does not heal."
+    }
   }
 }
