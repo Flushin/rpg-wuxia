@@ -68,7 +68,10 @@ ok(
   table.every((v, i) => trialDropPct(i + 1) === v),
   `bônus de drop 12% +5% composto: ${table.map((_, i) => trialDropPct(i + 1)).join(' ')}`,
 );
-ok(trialCost(1) === 1000 && trialCost(10) === 2800, 'entrada 1000 a 2800 de ouro');
+ok(
+  trialCost(1) === 1000 && trialCost(10) === 2770 && trialCost(20) === 8610,
+  'entrada 1000 → 2770 → 8610 de ouro (+12%/nível)',
+);
 for (const id of TRIAL_BOSSES) {
   const a = trialStats(MONSTERS[id], 21),
     b = trialStats(MONSTERS[id], 30);

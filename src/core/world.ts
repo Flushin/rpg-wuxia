@@ -972,12 +972,12 @@ export class World {
     return null;
   }
 
-  /** Torre do Trial: paga a entrada do nível seguinte e o chefe surge de novo na arena, sem sair do mapa. */
-  trialNext(): ActionError | null {
-    const p = this.trialPrompt;
-    if (!p || !this.trialRun || this.player.dead || !validTier(p.tier + 1)) return null;
-    const tier = p.tier + 1,
-      cost = trialCost(tier);
+  /** Torre do Trial: paga a entrada do nível seguinte (ou do mesmo, com repeat) e o chefe surge de novo na arena. */
+  trialNext(repeat = false): ActionError | null {
+    const p = this.trialPrompt,
+      tier = repeat ? (p?.tier ?? 0) : (p?.tier ?? 0) + 1;
+    if (!p || !this.trialRun || this.player.dead || !validTier(tier)) return null;
+    const cost = trialCost(tier);
     if (this.gold < cost) return { code: 'noGold' };
     this.gold -= cost;
     this.bumpInv();

@@ -1,5 +1,5 @@
 {
-  "proxima": [{ "texto": "Itens Épicos: agora dá para trocar os bônus no ferreiro (3× o custo do Raro) e desmontar o Épico repetido." }, { "texto": "Trial virou torre de chefes: ao vencer, escolha seguir para o próximo nível (paga a entrada na hora) ou sair, sem voltar à vila." }, { "texto": "Bolsa: novo botão Destruir (com confirmação) para liberar espaço longe da vila." }],
+  "proxima": [{ "texto": "Itens Épicos: agora dá para trocar os bônus no ferreiro (3× o custo do Raro) e desmontar o Épico repetido." }, { "texto": "Trial virou torre de chefes: ao vencer, escolha seguir para o próximo nível, repetir o mesmo (paga a entrada na hora) ou sair, sem voltar à vila." }, { "texto": "Trial: a entrada agora sobe 12% a cada nível (o ouro do chefe acompanha)." }, { "texto": "Bolsa: novo botão Destruir (com confirmação) para liberar espaço longe da vila." }],
   "versoes": [
     {
       "versao": "0.6.0",

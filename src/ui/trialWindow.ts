@@ -60,8 +60,8 @@ export class TrialWindow {
       const t = (e.target as HTMLElement).closest('[data-a]') as HTMLButtonElement | null;
       if (!t || t.disabled) return;
       audio.ui('ui_click');
-      if (t.dataset.a === 'next') {
-        const err = this.world.trialNext();
+      if (t.dataset.a === 'next' || t.dataset.a === 'repeat') {
+        const err = this.world.trialNext(t.dataset.a === 'repeat');
         if (err) this.toast(actionErrorText(err), '#ff8a80');
       } else if (t.dataset.a === 'leave') this.world.leaveTrial();
     });
@@ -85,24 +85,29 @@ export class TrialWindow {
     const last = p.tier >= TRIAL_TIERS,
       next = p.tier + 1,
       cost = last ? 0 : trialCost(next),
-      poor = w.gold < cost;
+      poor = w.gold < cost,
+      again = trialCost(p.tier);
     renderPanel(
       el,
       `<div class="card npc-card"><h2>${L(`Nível ${p.tier} vencido!`, `Level ${p.tier} cleared!`)}</h2>
       <p>${
         last
-          ? L('Você venceu o nível mais alto deste chefe.', 'You beat the highest level of this boss.')
+          ? L(
+              'Você venceu o nível mais alto deste chefe. Repetir ou sair?',
+              'You beat the highest level of this boss. Repeat or leave?',
+            )
           : L(
-              `Seguir para o nível ${next} (chefe nv ${trialBossLevel(next)}) por ${cost} ouro?`,
-              `Go on to level ${next} (boss lv ${trialBossLevel(next)}) for ${cost} gold?`,
+              `Seguir para o nível ${next} (chefe nv ${trialBossLevel(next)}) por ${cost} ouro, repetir este nível ou sair?`,
+              `Go on to level ${next} (boss lv ${trialBossLevel(next)}) for ${cost} gold, repeat this level or leave?`,
             )
       }</p>
       <small class="gold">${w.gold} ${L('ouro', 'gold')}</small>
       <div class="tp-btns">
         ${last ? '' : `<button class="primary" data-a="next" ${poor ? 'disabled' : ''}>${L(`Próximo nível (${cost})`, `Next level (${cost})`)}</button>`}
+        <button data-a="repeat" ${w.gold < again ? 'disabled' : ''}>${L(`Repetir nível (${again})`, `Repeat level (${again})`)}</button>
         <button data-a="leave">${L('Sair do Trial', 'Leave Trial')}</button>
       </div>
-      ${!last && poor ? `<small class="muted">${L('Ouro insuficiente', 'Not enough gold')}</small>` : ''}</div>`,
+      ${(!last && poor) || w.gold < again ? `<small class="muted">${L('Ouro insuficiente', 'Not enough gold')}</small>` : ''}</div>`,
     );
   }
 
