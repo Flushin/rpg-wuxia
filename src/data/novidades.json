@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{ "texto": "Itens Épicos: agora dá para trocar os bônus no ferreiro (3× o custo do Raro) e desmontar o Épico repetido." }],
   "versoes": [
     {
       "versao": "0.6.0",

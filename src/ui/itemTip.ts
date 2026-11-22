@@ -96,7 +96,7 @@ export function itemTipHtml(w: World, it: ItemInstance, compare = true): string 
     ${lines}${bonus}${dur}<div class="tip-sell">${L(`Venda: ${sellValue(it)} ouro`, `Sell: ${sellValue(it)} gold`)}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 
-/** Janela do Épico: sem nível próprio (stats da peça da faixa do personagem), bônus da classe de quem usa, não vende. */
+/** Janela do Épico: sem nível próprio (stats da peça da faixa do personagem), bônus (da classe ou trocados), não vende. */
 function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
   const b = BASES[it.baseId],
     r = RARITIES.epico,
@@ -107,10 +107,11 @@ function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
       ([k, v]) => `<div>${fmtStat(k, v)}${it.plus ? ` <small style="color:${GREEN}">(+${it.plus})</small>` : ''}</div>`,
     )
     .join('');
-  const bonus = epicBonuses(o)
+  const custom = it.bonuses.length > 0;
+  const bonus = epicBonuses(o, it)
     .map(
       (x) =>
-        `<div style="color:${r.color}">${fmtStat(x.stat, x.value)} <small>(${L('bônus da classe', 'class bonus')})</small></div>`,
+        `<div style="color:${r.color}">${fmtStat(x.stat, x.value)} <small>(${custom ? L('bônus', 'bonus') : L('bônus da classe', 'class bonus')})</small></div>`,
     )
     .join('');
   const max = maxDurability(it),
@@ -121,7 +122,7 @@ function epicTipHtml(w: World, it: ItemInstance, compare: boolean): string {
     <div><small style="color:${r.color}">${r.name}</small> <small>· ${SLOT_NAMES[b.slot]}</small></div>
     <div>${L(`Acompanha seu nível (nv ${o.level})`, `Scales with your level (lv ${o.level})`)}</div>
     ${b.sect ? `<div style="color:${sectBad ? RED : 'inherit'}">${L('Seita', 'Sect')}: ${CLASSES[b.sect]?.name ?? b.sect}</div>` : ''}
-    ${lines}${bonus}${dur}<div class="tip-sell">${L('Não pode ser vendido nem desmontado', 'Cannot be sold or salvaged')}</div>${compare ? compareHtml(w, it) : ''}`;
+    ${lines}${bonus}${dur}<div class="tip-sell">${L('Não pode ser vendido', 'Cannot be sold')}</div>${compare ? compareHtml(w, it) : ''}`;
 }
 /** Ícone do item; o Épico tem o seu próprio, fixo (não segue a peça da faixa). */
 const iconId = (it: ItemInstance) => (it.rarity === 'epico' ? epicIconId(it) : it.baseId);

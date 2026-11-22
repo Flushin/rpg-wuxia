@@ -182,7 +182,7 @@ function epicPage(id: string): string | null {
   const sub = `<b style="color:${col}">${esc(RARITIES.epico.name)}</b> · ${e.sect ? `Arma da seita ${esc(sectName(e.sect))}` : SLOT_NAMES[e.slot]}`;
   return `<a class="back" href="#/itens/equip">‹ Equipamentos</a>
     <div class="detail-head">${iconHtml(id, 'big')}<div><h1 style="color:${col}">${esc(e.name)}</h1><div class="sub">${sub}</div></div></div>
-    <section class="panel"><table class="tbl kv">${row('Nível', 'sem nível: acompanha o seu')}${row('Durabilidade', '100')}${row('Venda', 'não pode ser vendido nem desmontado')}</table></section>
+    <section class="panel"><table class="tbl kv">${row('Nível', 'sem nível: acompanha o seu')}${row('Durabilidade', '100')}${row('Venda', 'não pode ser vendido (desmonta no ferreiro)')}</table></section>
     <section class="panel"><h2>Atributos por faixa</h2><table class="tbl"><thead><tr><th>Seu nível</th><th>Peça usada e atributos (+0)</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="muted">Os atributos da peça da sua faixa ×${String(EPIC.mul).replace('.', ',')}. A forja (até +10) soma por cima, como no Raro, com o ouro em dobro.</p></section>
     <section class="panel"><h2>Bônus da classe</h2><div class="scroll"><table class="tbl"><thead><tr><th>Seita</th><th>Bônus</th>${lvs.map((lv) => `<th>Nível ${lv}</th>`).join('')}</tr></thead><tbody>${bon}</tbody></table></div>

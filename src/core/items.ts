@@ -191,6 +191,16 @@ export function rollRarity(rng: Rng): Rarity {
   return 'comum';
 }
 
+/** Troca de bônus do Épico: sorteia `count` atributos diferentes do pool (só o `stat`, valor 0: o valor sai de
+ *  epicBonuses pelo nível de quem usa; 'elemAtk' segue o elemento da classe). */
+export function rollEpicBonusStats(count: number, rng: Rng): Bonus[] {
+  const pool = J.bonusPool.map((d) => d.stat),
+    out: Bonus[] = [];
+  while (out.length < count && pool.length)
+    out.push({ stat: pool.splice(Math.min(pool.length - 1, Math.floor(rng.next() * pool.length)), 1)[0], value: 0 });
+  return out;
+}
+
 export function rollBonuses(
   count: number,
   ilvl: number,
@@ -232,7 +242,7 @@ export function makeEquipment(
   };
 }
 
-/** Épico recém-dropado: +0, durabilidade cheia, sem bônus guardados (vêm da classe de quem usa); ilvl é só o nível
+/** Épico recém-dropado: +0, durabilidade cheia, sem bônus guardados (vêm da classe de quem usa até trocar na forja); ilvl é só o nível
  *  do personagem no drop (informativo: stats e conserto usam o nível atual). */
 export function makeEpic(baseId: string, level: number): ItemInstance {
   return {
@@ -272,11 +282,15 @@ export function epicTierBase(it: ItemInstance, level: number): string {
   }
   return best || lowest || it.baseId;
 }
-/** Bônus fixos do Épico para a classe de quem usa: 1,3 × o máximo que um Raro sortearia no mesmo nível. */
-export function epicBonuses(owner: ItemOwner): Bonus[] {
+/** Atributos do pool que o Épico usa: os trocados na forja (guardados em `it.bonuses`, só o `stat` do pool, com
+ *  'elemAtk' no lugar do elemento) ou, sem troca, os fixos da classe de quem usa. */
+export const epicBonusStats = (owner: ItemOwner, it?: ItemInstance): string[] =>
+  it?.bonuses.length ? it.bonuses.map((b) => b.stat) : (J.epicBonuses[owner.classId] ?? []);
+/** Bônus do Épico: 1,3 × o máximo que um Raro sortearia no nível de quem usa (elemento da classe de quem usa). */
+export function epicBonuses(owner: ItemOwner, it?: ItemInstance): Bonus[] {
   const el = CLASSES[owner.classId]?.element ?? null,
     scale = 1 + 0.2 * (Math.max(1, owner.level) - 1);
-  return (J.epicBonuses[owner.classId] ?? []).flatMap((s) => {
+  return epicBonusStats(owner, it).flatMap((s) => {
     const d = J.bonusPool.find((p) => p.stat === s);
     if (!d) return [];
     const stat = s === 'elemAtk' ? `elem_${el ?? 'fire'}` : s,
@@ -299,7 +313,7 @@ export function itemStats(it: ItemInstance, owner?: ItemOwner, withBonuses = tru
       const x = upgraded(v, it.plus ?? 0) * EPIC_MUL;
       out[k] = (out[k] ?? 0) + (Math.abs(v) >= 1 ? Math.round(x) : Math.round(x * 1000) / 1000);
     }
-    if (withBonuses && owner) for (const bo of epicBonuses(owner)) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
+    if (withBonuses && owner) for (const bo of epicBonuses(owner, it)) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
     return out;
   }
   for (const [k, v] of Object.entries(b.stats)) out[k] = (out[k] ?? 0) + upgraded(v, it.plus ?? 0);

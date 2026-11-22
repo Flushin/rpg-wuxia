@@ -79,6 +79,7 @@ export const FORGE = {
   rarityGold: { incomum: 200, raro: 600 } as Record<string, number>,
   rerollGold: { incomum: 100, raro: 200 } as Record<string, number>,
   epicGoldMul: 2,
+  epicRerollMul: 3,
 };
 /** Bônus do Épico para a classe no nível (1,3 × máximo do Raro). */
 export function epicBonusesAt(classId: string, level: number) {
@@ -133,12 +134,14 @@ export const rerollCost = (reqLevel: number, rarity: string) =>
         mats: { minerio_ferro: 10, [rareMat(reqLevel)]: rq(reqLevel, 2) } as Mats,
         gold: fGold(FORGE.rerollGold.raro, reqLevel),
       };
-export const salvageYield = (reqLevel: number, rarity: string, plus: number): Mats =>
-  clean({
-    minerio_ferro:
-      1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : rarity === 'raro' ? 3 : 0) + Math.floor(plus / 2),
-    [rareMat(reqLevel)]: rq(reqLevel, (reqLevel >= 10 ? 1 : 0) + (rarity === 'raro' ? 1 : 0) + (plus >= 6 ? 1 : 0)),
+export const salvageYield = (reqLevel: number, rarity: string, plus: number): Mats => {
+  const hi = rarity === 'raro' || rarity === 'epico';
+  return clean({
+    minerio_ferro: 1 + Math.floor(reqLevel / 5) + (rarity === 'incomum' ? 2 : hi ? 3 : 0) + Math.floor(plus / 2),
+    [rareMat(reqLevel)]: rq(reqLevel, (reqLevel >= 10 ? 1 : 0) + (hi ? 1 : 0) + (plus >= 6 ? 1 : 0)),
+    essencia_qi: rarity === 'epico' ? 1 : 0,
   });
+};
 /** LOW_WEAR_FROM_LEVEL e LOW_WEAR_MUL em src/core/world/inventory.ts (nível 40): itens nv 35+ gastam metade. */
 export const LOW_WEAR_FROM_LEVEL = 35;
 export const LOW_WEAR_MUL = 0.5;
@@ -207,8 +210,8 @@ function epico(): string {
   return `<section class="panel"><h2>O que é</h2>
       <p>A raridade <b style="color:${col}">${esc(RARITIES.epico.name)}</b> (roxa) fica acima do Raro. O item <b>não tem nível</b>: acompanha o
       nível do personagem para sempre, então nunca fica velho. Ele usa a peça da sua faixa (a mesma que um Raro do seu nível teria; muda nos
-      níveis ${EQUIP_TIERS.filter((t) => t > 1).join(', ')}), com os atributos <b>×${n1(EPIC.mul)}</b>, e tem 2 bônus fixos feitos para a sua classe,
-      cada um ${n1(EPIC.mul)} × o máximo que um Raro do seu nível sortearia. Equipa em qualquer nível (a arma só na própria seita).</p></section>
+      níveis ${EQUIP_TIERS.filter((t) => t > 1).join(', ')}), com os atributos <b>×${n1(EPIC.mul)}</b>, e cai com 2 bônus feitos para a sua classe
+      (dá para trocá-los na forja), cada um ${n1(EPIC.mul)} × o máximo que um Raro do seu nível sortearia. Equipa em qualquer nível (a arma só na própria seita).</p></section>
     <section class="panel"><h2>Como cai</h2><ul>
       <li>Qualquer monstro: <b>${pc(EPIC.chanceMob)}</b> por abate. Chefes (mapa, masmorra e <a href="#/mecanicas/trial">Trial</a>): <b>${pc(EPIC.chanceBoss)}</b>.</li>
       <li>Só jogando: com o <a href="#/mecanicas/auto">Auto</a> ligado e no ganho offline não cai. Ajudantes invocados por chefes também não dão.</li>
@@ -219,7 +222,10 @@ function epico(): string {
     <section class="panel"><h2>Bônus por classe</h2><div class="scroll"><table class="tbl"><thead><tr><th>Seita</th><th>Bônus</th>${lvs.map((lv) => `<th>Nível ${lv}</th>`).join('')}</tr></thead><tbody>${bon}</tbody></table></div>
       <p class="muted">Elemento de cada seita: ${SECT.map((c) => `${esc(CLASSES[c].name)} ${ELEMENT_NAMES[CLASSES[c].element]}`).join(', ')}. Os bônus seguem a classe de quem está usando o item.</p></section>
     <section class="panel"><h2>Forja</h2><p>Cai +0 e melhora até +10 no ferreiro, com os materiais e as chances do Raro da sua faixa e <b>${FORGE.epicGoldMul}× o ouro</b>.
-      Não sobe de raridade, não troca bônus, <b>não pode ser vendido nem desmontado</b>. Conserto pelo seu nível. Ver <a href="#/mecanicas/forja">Forja</a>.</p></section>`;
+      Não sobe de raridade e <b>não pode ser vendido</b>. Conserto pelo seu nível. Ver <a href="#/mecanicas/forja">Forja</a>.</p>
+      <p><b>Trocar bônus:</b> sorteia 2 atributos diferentes do pool de bônus (podem sair outros que não os da classe), com a mesma força épica
+      e acompanhando o seu nível. Custa <b>${FORGE.epicRerollMul}×</b> os materiais e o ouro da troca de um Raro da sua faixa.</p>
+      <p><b>Desmontar:</b> rende como um Raro da sua faixa mais 1 ${itemLink('essencia_qi')}. O ferreiro pede confirmação duas vezes.</p></section>`;
 }
 
 /** Seção "Crítico" de Combate: de onde vem a chance de crítico e os dois tetos. */
@@ -379,7 +385,7 @@ function forja(): string {
   const goldHead = lvs.map((lv) => `<th>Ouro (item nv ${lv})</th>`).join('');
   const rr = (label: string, f: (lv: number) => { mats: Mats; gold: number }) =>
     `<tr><td>${label}</td><td>${mats(f(1).mats)}</td>${lvs.map((lv) => `<td>${f(lv).gold}</td>`).join('')}</tr>`;
-  const sal = (['comum', 'incomum', 'raro'] as const)
+  const sal = (['comum', 'incomum', 'raro', 'epico'] as const)
     .map(
       (r) =>
         `<tr><td style="color:${RARITIES[r].color}">${RARITIES[r].name}</td>${lvs.map((lv) => `<td>${mats(salvageYield(lv, r, 0))}</td>`).join('')}</tr>`,
@@ -396,7 +402,7 @@ function forja(): string {
       <p>Cada + soma <b>${pc(UPGRADE_STEP)}</b> aos atributos base do item (não aos bônus aleatórios). Materiais e ouro são cobrados antes;
       se <b>falhar</b>, o item fica como estava (não quebra nem perde +). Os materiais da tabela são os de itens até o nível 15; em itens de
       nível ${JADE_FROM_LEVEL} ou mais, o ${itemLink('jade_nevoa')} entra no lugar do ${itemLink('cristal_gelo')} (mesma quantidade; em itens de nível ${RARE_DOUBLE_FROM_LEVEL} ou mais, o <b>dobro</b>), aqui e em subir raridade, trocar bônus e desmontar.
-      O <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épico</a> usa a faixa do seu nível e custa <b>${FORGE.epicGoldMul}× o ouro</b>; não sobe raridade, não troca bônus nem é desmontado.</p>
+      O <a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Épico</a> usa a faixa do seu nível e custa <b>${FORGE.epicGoldMul}× o ouro</b> para melhorar e <b>${FORGE.epicRerollMul}×</b> materiais e ouro para trocar bônus; não sobe raridade. Desmontado, rende como um Raro + 1 ${itemLink('essencia_qi')}.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Melhoria</th><th>Chance</th><th>Materiais</th>${goldHead}</tr></thead><tbody>${up}</tbody></table></div></section>
     <section class="panel"><h2>Subir raridade e trocar bônus</h2>
       <p><b>Subir raridade</b> (Comum → Incomum → Raro) dá um bônus aleatório novo e mantém os que o item já tem. <b>Trocar bônus</b> sorteia de novo
