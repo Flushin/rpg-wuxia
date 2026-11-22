@@ -1438,6 +1438,14 @@ export class World {
   sellRaw(bagIndex: number, qty = 1): number {
     return shop.sellRaw(this, bagIndex, qty);
   }
+  // destrói o item (a pilha inteira) da mochila, sem ganho: libera espaço longe da vila
+  destroyItem(bagIndex: number): boolean {
+    const it = this.bag[bagIndex];
+    if (!it) return false;
+    this.removeFromBag(bagIndex, it.qty ?? 1);
+    this.bumpInv();
+    return true;
+  }
   sellValueNow(it: ItemInstance): number {
     return shop.sellValueNow(this, it);
   }

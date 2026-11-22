@@ -48,6 +48,7 @@ export class InventoryPanel {
   private sel: Sel | null = null;
   private last = { key: '', t: 0 };
   private tab: Tab = 'equip';
+  private confirmDel = ''; // item marcado para destruir (pede segundo toque)
   constructor(
     private world: World,
     private toast: (m: string, c?: string) => void,
@@ -116,6 +117,7 @@ export class InventoryPanel {
       now = performance.now();
     const dbl = key === this.last.key && now - this.last.t < 400;
     this.last = { key, t: now };
+    if (key !== this.confirmDel) this.confirmDel = '';
     this.sel = sel;
     this.sig = '';
     byId('item-tip').classList.add('hidden');
@@ -140,7 +142,17 @@ export class InventoryPanel {
       this.sel = null;
       return;
     }
+    if (a !== 'destroy' && a !== 'destroy-ok') this.confirmDel = '';
     if (!s) return;
+    if (a === 'destroy') {
+      this.confirmDel = selKey(s);
+      return;
+    }
+    if (a === 'destroy-ok') {
+      if (this.confirmDel === selKey(s) && w.destroyItem(s.i)) this.sel = null;
+      this.confirmDel = '';
+      return;
+    }
     let err: ActionError | null = null;
     if (a === 'equip') {
       const it = w.bag[s.i];
@@ -163,7 +175,7 @@ export class InventoryPanel {
   update() {
     if (!this.open) return;
     const w = this.world;
-    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}`;
+    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}|${this.confirmDel}`;
     if (sig === this.sig) return;
     // mudança vinda do jogo (auto pegando item, poção gasta…) enquanto o jogador rola a mochila: espera ele parar,
     // senão a lista é refeita no meio da rolagem. Ações do próprio jogador (sig vazio) redesenham na hora.
@@ -191,7 +203,11 @@ export class InventoryPanel {
         const err = w.canEquip(it);
         btn = `<button class="primary" data-act="equip" ${err ? 'disabled' : ''}>${L('Equipar', 'Equip')}</button>${err ? `<small class="muted">${actionErrorText(err)}</small>` : ''}`;
       }
-      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}`;
+      const del =
+        this.confirmDel === selKey(s)
+          ? `<button class="danger" data-act="destroy-ok">${L('Confirmar: destruir', 'Confirm: destroy')}</button><button data-act="cancel">${L('Cancelar', 'Cancel')}</button>`
+          : `<button class="danger" data-act="destroy">${L('Destruir', 'Destroy')}</button>`;
+      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${del}`;
     }
     // renderPanel mantém a moldura (.inv-card, que é quem rola; em telas largas rolam .inv-main e .inv-detail) e só troca
     // o que mudou, então a rolagem nunca é perdida (nem cortada no meio, no iPhone).
