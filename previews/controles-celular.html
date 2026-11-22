@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Controles do Celular</title>
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --panel: #141a2b;
+        --gold: #d4a017;
+        --jade: #3fc79a;
+        --red: #d8434a;
+        --txt: #e8e2cf;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        font-family: system-ui, sans-serif;
+        padding: 16px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 15px;
+        margin: 18px 0 6px;
+        color: var(--gold);
+      }
+      p {
+        margin: 0 0 10px;
+        opacity: 0.8;
+        font-size: 14px;
+        max-width: 900px;
+      }
+      .ctl {
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        padding: 8px 0;
+        z-index: 9;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .ctl span {
+        font-size: 13px;
+        opacity: 0.7;
+        margin: 0 4px 0 10px;
+      }
+      .ctl button {
+        background: var(--panel);
+        color: var(--txt);
+        border: 1px solid #d4a01766;
+        border-radius: 8px;
+        padding: 7px 11px;
+        font-size: 14px;
+      }
+      .ctl button.on {
+        background: var(--gold);
+        color: #111;
+      }
+      .row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .wrap {
+        flex: none;
+      }
+      .wrap .cap {
+        font-size: 12px;
+        opacity: 0.75;
+        margin-bottom: 4px;
+      }
+      .dev {
+        position: relative;
+        background: linear-gradient(160deg, #2a3a2e, #1b2433 60%, #2b2238);
+        border: 6px solid #000;
+        border-radius: 22px;
+        overflow: hidden;
+      }
+      .hud {
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform-origin: 0 0;
+      }
+      .b {
+        position: absolute;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+      }
+      .atk {
+        background: radial-gradient(#5a2a2a, #2a1414);
+        border: 3px solid var(--red);
+      }
+      .sk {
+        background: #1d2438;
+        border: 2px solid #8a93b8;
+      }
+      .pot {
+        background: #1d2438;
+        border: 2px solid #6a5a8a;
+      }
+      .joy {
+        border: 2px solid #ffffff30;
+        background: #ffffff08;
+      }
+      .bar {
+        position: absolute;
+        height: 10px;
+        border-radius: 5px;
+        background: #0006;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        border-radius: 5px;
+      }
+      .tb {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: #1d2438cc;
+        border: 1px solid #d4a01788;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+      }
+      svg.arc {
+        position: absolute;
+        overflow: visible;
+        pointer-events: none;
+      }
+      .arc path {
+        fill: none;
+        stroke-linecap: round;
+      }
+      .arc .brd {
+        stroke: #8a93b8;
+      }
+      .arc .trk {
+        stroke: #1d2438;
+        pointer-events: stroke;
+        cursor: pointer;
+      }
+      .arc .fil {
+        stroke: url(#jd);
+        stroke-dasharray: 100;
+        transition: stroke-dashoffset 0.5s;
+      }
+      .arc text {
+        fill: #e8e2cf;
+        opacity: 0.55;
+        letter-spacing: 2px;
+      }
+      .full .arc .brd {
+        stroke: var(--gold);
+        filter: drop-shadow(0 0 8px #ffd56a);
+      }
+      .full .arc .fil {
+        stroke: url(#gd);
+      }
+      .full .arc text {
+        fill: #2a1a00;
+        opacity: 1;
+        font-weight: 700;
+      }
+      .gap .g {
+        position: absolute;
+        background: #ff4fd8;
+        opacity: 0.9;
+        height: 2px;
+        transform-origin: 0 50%;
+      }
+      .spec {
+        font-size: 13px;
+        opacity: 0.85;
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+      .spec b {
+        color: var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0">
+      <defs>
+        <linearGradient id="jd" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#1f6b55" />
+          <stop offset="1" stop-color="#3fc79a" />
+        </linearGradient>
+        <linearGradient id="gd" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#b8860b" />
+          <stop offset=".5" stop-color="#ffd56a" />
+          <stop offset="1" stop-color="#b8860b" />
+        </linearGradient>
+      </defs>
+    </svg>
+    <h1>Controles do celular, com espaçamento padrão</h1>
+    <p>
+      A mesma ideia de hoje (Atacar no canto, 4 skills em arco, poções e a ultimate por fora), mas com uma regra só:
+      <b>o mesmo vão</b> entre o Atacar e as skills, entre uma skill e outra, entre as skills e o arco, e entre as
+      poções. As skills ficam todas à mesma distância do Atacar. O tamanho da interface (Pequena, Média e Grande) amplia
+      tudo junto, como no jogo, sem passar do tamanho máximo que cabe na tela.
+    </p>
+    <div class="ctl">
+      <span>Interface</span><button data-s="1" class="on">Pequena</button><button data-s="1.15">Média</button
+      ><button data-s="1.3">Grande</button> <span>Ultimate</span><button data-u=".35" class="on">35%</button
+      ><button data-u="1">Cheia ✦</button> <span>Vãos</span><button data-gap>mostrar</button>
+    </div>
+    <div id="out"></div>
+    <div class="spec" id="spec"></div>
+    <script>
+      // Tamanhos em px do HUD (antes da escala). "compacto" = deitado com pouca altura (Fold fechado, iPhone deitado).
+      const K = {
+        normal: { atk: 84, sk: 52, pot: 42, gap: 10, edge: 24, bot: 20 },
+        compacto: { atk: 72, sk: 46, pot: 38, gap: 8, edge: 24, bot: 10 },
+      };
+      const devs = [
+        { n: 'Em pé (360×780)', w: 360, h: 780, z: 0.5 },
+        { n: 'Deitado (800×360)', w: 800, h: 360, z: 0.5 },
+        { n: 'Fold fechado deitado (900×320)', w: 900, h: 320, z: 0.5 },
+        { n: 'Fold aberto em pé (720×880)', w: 720, h: 880, z: 0.4 },
+        { n: 'Fold aberto deitado (880×720)', w: 880, h: 720, z: 0.4 },
+      ];
+      let S = 1,
+        U = 0.35,
+        GAP = false;
+      const rad = (a) => (a * Math.PI) / 180;
+      function layout(k) {
+        // centro do Atacar (medido da borda direita e de baixo)
+        const ra = k.atk / 2,
+          rs = k.sk / 2,
+          G = k.gap;
+        const r = ra + G + rs; // anel das skills: vão G até o Atacar
+        const step = (2 * Math.asin((k.sk + G) / (2 * r)) * 180) / Math.PI; // vão G entre skills vizinhas
+        const span = 3 * step,
+          last = 180 + 8 - span; // 1ª skill um pouco abaixo da horizontal
+        const cx = Math.max(k.edge + ra, k.edge + rs + r * Math.cos(rad(last)));
+        const cy = k.bot + ra;
+        const sk = [0, 1, 2, 3].map((i) => {
+          const a = rad(188 - i * step);
+          return { x: cx - r * Math.cos(a), y: cy + r * Math.sin(a) };
+        });
+        // poções: abaixo da 1ª skill não cabe; ficam à esquerda dela, alinhadas embaixo, com vão G
+        const s0 = sk[0];
+        const px1 = s0.x + rs + G + k.pot / 2,
+          py = k.bot + k.pot / 2;
+        const pots = [
+          { x: px1, y: py },
+          { x: px1 + k.pot + G, y: py },
+        ];
+        // arco da ultimate: mesma grossura da skill, vão G por fora das skills
+        const ru = r + rs + G + rs;
+        return { cx, cy, ra, rs, r, sk, pots, ru, G, k, step };
+      }
+      function hud(d, L, W, H) {
+        const k = L.k,
+          toL = (x) => W - x,
+          toT = (y) => H - y;
+        let h = '';
+        // topo: barras e botões
+        h += `<div class="bar" style="left:12px;top:12px;width:150px"><i style="width:70%;background:#c0392b"></i></div><div class="bar" style="left:12px;top:26px;width:150px"><i style="width:55%;background:#2e86de"></i></div>`;
+        h += `<div class="tb" style="right:12px;top:12px">☰</div><div class="tb" style="right:64px;top:12px">🗺</div>`;
+        const jr = Math.min(60, H * 0.18);
+        h += `<div class="b joy" style="left:${40}px;top:${d.w > d.h ? H - k.bot - jr * 2 - 20 : H - (L.cy + L.ru + L.rs) - jr * 2 - 30}px;width:${jr * 2}px;height:${jr * 2}px"></div>`;
+        // ultimate
+        const sa = Math.asin(Math.min(1, Math.max(-1, (k.bot + k.pot + L.G + L.rs - L.cy) / L.ru))),
+          ea = Math.acos(Math.min(1, (L.cx - L.rs - k.edge) / L.ru));
+        const a0 = Math.PI - sa,
+          a1 = ea;
+        const P = (a) => [toL(L.cx - L.ru * Math.cos(a)), toT(L.cy + L.ru * Math.sin(a))];
+        const [x0, y0] = P(a0),
+          [x1, y1] = P(a1);
+        const D = `M${x0} ${y0} A${L.ru} ${L.ru} 0 0 1 ${x1} ${y1}`,
+          id = 'u' + Math.random().toString(36).slice(2);
+        h += `<svg class="arc" style="left:0;top:0" width="${W}" height="${H}"><path id="${id}" class="brd" stroke-width="${k.sk}" d="${D}"/><path class="trk" stroke-width="${k.sk - 4}" d="${D}"/><path class="fil" pathLength="100" stroke-width="${k.sk - 10}" d="${D}" style="stroke-dashoffset:${100 - U * 100}"/><text font-size="${k.sk * 0.22}" dy="${k.sk * 0.08}"><textPath href="#${id}" startOffset="50%" text-anchor="middle">終 ULTIMATE</textPath></text></svg>`;
+        const btn = (c, x, y, sz, t) =>
+          `<div class="b ${c}" style="left:${toL(x) - sz / 2}px;top:${toT(y) - sz / 2}px;width:${sz}px;height:${sz}px;font-size:${sz * 0.38}px">${t}</div>`;
+        h += btn('atk', L.cx, L.cy, k.atk, '⚔');
+        ['🔥', '❄', '⚡', '🌀'].forEach((t, i) => (h += btn('sk', L.sk[i].x, L.sk[i].y, k.sk, t)));
+        ['❤', '💧'].forEach((t, i) => (h += btn('pot', L.pots[i].x, L.pots[i].y, k.pot, t)));
+        if (GAP) {
+          const seg = (ax, ay, bx, by, ra, rb) => {
+            const dx = bx - ax,
+              dy = by - ay,
+              dd = Math.hypot(dx, dy),
+              ux = dx / dd,
+              uy = dy / dd;
+            const sx = ax + ux * ra,
+              sy = ay + uy * ra,
+              len = dd - ra - rb;
+            return `<div class="g" style="left:${toL(sx)}px;top:${toT(sy) - 1}px;width:${len}px;transform:rotate(${(Math.atan2(uy, -ux) * 180) / Math.PI}deg)"></div>`;
+          };
+          let g = '';
+          L.sk.forEach((s, i) => {
+            g += seg(L.cx, L.cy, s.x, s.y, L.ra, L.rs);
+            if (i) g += seg(L.sk[i - 1].x, L.sk[i - 1].y, s.x, s.y, L.rs, L.rs);
+            const ux = (s.x - L.cx) / L.r,
+              uy = (s.y - L.cy) / L.r;
+            g += seg(s.x, s.y, L.cx + ux * L.ru, L.cy + uy * L.ru, L.rs, L.rs);
+          });
+          g += seg(L.sk[0].x, L.sk[0].y, L.pots[0].x, L.pots[0].y, L.rs, k.pot / 2);
+          g += seg(L.pots[0].x, L.pots[0].y, L.pots[1].x, L.pots[1].y, k.pot / 2, k.pot / 2);
+          h += `<div class="gap">${g}</div>`;
+        }
+        return h;
+      }
+      function draw() {
+        document.body.classList.toggle('full', U >= 1);
+        out.innerHTML =
+          '<div class="row">' +
+          devs
+            .map((d) => {
+              const landscape = d.w > d.h,
+                max = Math.max(1, landscape ? d.h / 270 : d.w / 360),
+                s = Math.min(S, max);
+              const k = landscape && d.h <= 450 ? K.compacto : K.normal,
+                W = d.w / s,
+                H = d.h / s,
+                L = layout(k);
+              return `<div class="wrap"><div class="cap">${d.n} · escala ${s.toFixed(2)}${s < S ? ' (limitada: não cabe mais)' : ''}</div><div class="dev" style="width:${d.w * d.z + 12}px;height:${d.h * d.z + 12}px"><div class="hud" style="width:${W}px;height:${H}px;transform:scale(${s * d.z})">${hud(d, L, W, H)}</div></div></div>`;
+            })
+            .join('') +
+          '</div>';
+        const n = K.normal,
+          c = K.compacto;
+        spec.innerHTML = `<b>Padrão</b>: normal = Atacar ${n.atk}px, skill ${n.sk}px, poção ${n.pot}px, vão ${n.gap}px · compacto (deitado baixo) = Atacar ${c.atk}, skill ${c.sk}, poção ${c.pot}, vão ${c.gap}. Arco da ultimate com a grossura da skill. Nada a menos de ${n.edge}px da borda direita (gesto de voltar do Android). Pequena/Média/Grande = 1 / 1,15 / 1,3.`;
+        out.querySelectorAll('.trk').forEach(
+          (t) =>
+            (t.onclick = () => {
+              if (U < 1) return;
+              U = 0;
+              sel('u', null);
+              draw();
+            }),
+        );
+      }
+      function sel(attr, b) {
+        document.querySelectorAll(`[data-${attr}]`).forEach((x) => x.classList.toggle('on', x === b));
+      }
+      document.querySelectorAll('[data-s]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            S = +b.dataset.s;
+            sel('s', b);
+            draw();
+          }),
+      );
+      document.querySelectorAll('[data-u]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            U = +b.dataset.u;
+            sel('u', b);
+            draw();
+          }),
+      );
+      document.querySelector('[data-gap]').onclick = (e) => {
+        GAP = !GAP;
+        e.target.classList.toggle('on', GAP);
+        draw();
+      };
+      draw();
+    </script>
+  </body>
+</html>

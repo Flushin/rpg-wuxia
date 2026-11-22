@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Prévias Ultimate</title>
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --panel: #141a2b;
+        --gold: #d4a017;
+        --jade: #3fc79a;
+        --red: #d8434a;
+        --txt: #e8e2cf;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        font-family: system-ui, sans-serif;
+        padding: 16px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 17px;
+        margin: 28px 0 4px;
+        color: var(--gold);
+      }
+      p {
+        margin: 0 0 10px;
+        opacity: 0.8;
+        font-size: 14px;
+      }
+      .ctl {
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        padding: 8px 0;
+        z-index: 9;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .ctl button {
+        background: var(--panel);
+        color: var(--txt);
+        border: 1px solid #d4a01766;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      .ctl button.on {
+        background: var(--gold);
+        color: #111;
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .dev {
+        position: relative;
+        background: linear-gradient(160deg, #2a3a2e, #1b2433 60%, #2b2238);
+        border: 6px solid #000;
+        border-radius: 22px;
+        overflow: hidden;
+        flex: none;
+      }
+      .dev .cap {
+        position: absolute;
+        left: 8px;
+        top: 6px;
+        font-size: 11px;
+        opacity: 0.7;
+      }
+      .p {
+        width: 230px;
+        height: 470px;
+      }
+      .l {
+        width: 470px;
+        height: 230px;
+      }
+      .f {
+        width: 400px;
+        height: 360px;
+      }
+      .fold::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: #ffffff18;
+      }
+      /* cluster de controles (escala do celular) */
+      .cl {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: 190px;
+        height: 190px;
+      }
+      .l .cl,
+      .f .cl {
+        width: 170px;
+        height: 170px;
+      }
+      .atk {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: radial-gradient(#5a2a2a, #2a1414);
+        border: 3px solid var(--red);
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+      }
+      .sk {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #1d2438;
+        border: 2px solid #8a93b8;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+      }
+      .s1 {
+        right: 92px;
+        bottom: 6px;
+      }
+      .s2 {
+        right: 84px;
+        bottom: 54px;
+      }
+      .s3 {
+        right: 50px;
+        bottom: 88px;
+      }
+      .s4 {
+        right: 4px;
+        bottom: 96px;
+      }
+      /* estado */
+      body {
+        --pct: 0.4;
+      }
+      body.full {
+        --pct: 1;
+      }
+      /* A: faixa reta */
+      .ua {
+        position: absolute;
+        right: 2px;
+        bottom: 146px;
+        width: 150px;
+        height: 30px;
+        border-radius: 15px;
+        background: #0d1220;
+        border: 2px solid #d4a01788;
+        overflow: hidden;
+      }
+      .ua i {
+        position: absolute;
+        inset: 0;
+        width: calc(var(--pct) * 100%);
+        background: linear-gradient(90deg, #1f6b55, var(--jade));
+        transition: width 0.6s;
+      }
+      .ua b {
+        position: relative;
+        display: block;
+        text-align: center;
+        line-height: 26px;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px #000;
+      }
+      .full .ua {
+        border-color: var(--gold);
+        animation: glow 1.2s infinite alternate;
+      }
+      .full .ua i {
+        background: linear-gradient(90deg, #b8860b, #ffd56a, #b8860b);
+        background-size: 200%;
+        animation: shine 1.5s linear infinite;
+      }
+      /* B: arco */
+      .ub {
+        position: absolute;
+        right: -6px;
+        bottom: -6px;
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+      }
+      .ub .trk {
+        fill: none;
+        stroke: #0d1220;
+        stroke-width: 14;
+        stroke-linecap: round;
+      }
+      .ub .fil {
+        fill: none;
+        stroke: var(--jade);
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: calc(100 - var(--pct) * 100);
+        transition: stroke-dashoffset 0.6s;
+      }
+      .full .ub .fil {
+        stroke: #ffd56a;
+        filter: drop-shadow(0 0 6px #ffd56a);
+      }
+      .ub-btn {
+        position: absolute;
+        right: -4px;
+        bottom: 150px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #0d1220;
+        border: 2px solid #555;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        opacity: 0.5;
+      }
+      .full .ub-btn {
+        opacity: 1;
+        border-color: var(--gold);
+        animation: glow 1.2s infinite alternate;
+      }
+      /* C: lâmina */
+      .uc {
+        position: absolute;
+        right: 0;
+        bottom: 146px;
+        width: 160px;
+        height: 28px;
+      }
+      .uc svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .uc .bl {
+        fill: #0d1220;
+        stroke: #c9ccd8;
+        stroke-width: 1.5;
+      }
+      .uc .bf {
+        fill: url(#ink);
+      }
+      .uc rect.m {
+        transition: width 0.6s;
+      }
+      .full .uc svg {
+        filter: drop-shadow(0 0 6px #ffd56a);
+      }
+      .full .uc .bl {
+        stroke: var(--gold);
+      }
+      /* D: pergaminho segmentado */
+      .ud {
+        position: absolute;
+        right: 2px;
+        bottom: 146px;
+        width: 156px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 0 6px;
+        background: #e9d9a6;
+        border-radius: 4px;
+        border-left: 6px solid #7a4a1f;
+        border-right: 6px solid #7a4a1f;
+        box-shadow: 0 2px 4px #0008;
+      }
+      .ud span {
+        flex: 1;
+        height: 14px;
+        border-radius: 2px;
+        background: #0002;
+        border: 1px solid #5a3a1a66;
+      }
+      .ud span.on {
+        background: #8b1a1a;
+      }
+      .ud em {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-style: normal;
+        color: #5a1010;
+        font-size: 13px;
+        font-weight: 700;
+        opacity: 0;
+      }
+      .full .ud span {
+        background: #8b1a1a;
+      }
+      .full .ud em {
+        opacity: 1;
+        background: #e9d9a6cc;
+      }
+      .full .ud {
+        animation: glow 1.2s infinite alternate;
+      }
+      @keyframes glow {
+        from {
+          box-shadow: 0 0 4px #d4a01766;
+        }
+        to {
+          box-shadow: 0 0 16px #ffd56a;
+        }
+      }
+      @keyframes shine {
+        to {
+          background-position: -200% 0;
+        }
+      }
+      .f .cl {
+        right: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0">
+      <defs>
+        <linearGradient id="ink" x1="0" x2="1">
+          <stop offset="0" stop-color="#1f6b55" />
+          <stop offset="1" stop-color="#3fc79a" />
+        </linearGradient>
+      </defs>
+    </svg>
+    <h1>Ultimate no celular — prévias do botão</h1>
+    <p>
+      Sempre ancorada no cluster do polegar direito (Ataque + 4 skills), então funciona igual em pé, deitado e Fold
+      aberto. Troque o estado:
+    </p>
+    <div class="ctl">
+      <button class="on" data-p=".15">15%</button><button data-p=".4">40%</button><button data-p=".8">80%</button
+      ><button data-full>Cheia ✦</button>
+    </div>
+    <div id="out"></div>
+    <script>
+      const V = {
+        A: [
+          'A · Faixa de Jade',
+          'Barra reta e longa logo acima do arco de skills. Enche da esquerda pra direita; cheia vira ouro com brilho correndo. Toque na barra inteira = usar (alvo grande, fácil no polegar).',
+          `<div class="ua"><i></i><b>終 ULTIMATE</b></div>`,
+        ],
+        B: [
+          'B · Arco do Dragão',
+          'Um arco fino que contorna as 4 skills por fora e enche junto da curva; quando completa, acende o botão redondo na ponta. Ocupa menos tela, mas é menos “linha grande”.',
+          `<svg class="ub" viewBox="0 0 200 200"><path pathLength="100" class="trk" d="M10 188 A178 178 0 0 1 188 10"/><path pathLength="100" class="fil" d="M10 188 A178 178 0 0 1 188 10"/></svg><div class="ub-btn">龍</div>`,
+        ],
+        C: [
+          'C · Lâmina',
+          'A barra tem forma de espada (cabo à direita, ponta à esquerda); a “tinta” de jade sobe pela lâmina. Bem temático; cheia, a lâmina brilha.',
+          `<div class="uc"><svg viewBox="0 0 160 28"><path class="bl" d="M2 14 L22 4 H124 V24 H22 Z"/><clipPath id="cp{k}"><path d="M2 14 L22 4 H124 V24 H22 Z"/></clipPath><rect class="m bf" clip-path="url(#cp{k})" x="0" y="0" height="28" style="width:calc(var(--pct)*124px)"/><rect x="124" y="0" width="6" height="28" rx="2" fill="#d4a017"/><rect x="130" y="9" width="28" height="10" rx="4" fill="#5a3a1a"/></svg></div>`,
+        ],
+        D: [
+          'D · Pergaminho em 5 selos',
+          'Rolo de papel com 5 selos vermelhos: cada selo = um pedaço da carga (fácil de ler de relance). Cheio, aparece o nome da ultimate.',
+          `<div class="ud">{segs}<em>斬 · Ultimate</em></div>`,
+        ],
+      };
+      const devs = [
+        ['p', 'Em pé'],
+        ['l', 'Deitado'],
+        ['f fold', 'Fold aberto'],
+      ];
+      const base = `<div class="atk">⚔</div><div class="sk s1">🔥</div><div class="sk s2">❄</div><div class="sk s3">⚡</div><div class="sk s4">🌀</div>`;
+      function draw() {
+        const pct = parseFloat(getComputedStyle(document.body).getPropertyValue('--pct'));
+        let k = 0;
+        out.innerHTML = Object.values(V)
+          .map(
+            ([t, d, h]) =>
+              `<h2>${t}</h2><p>${d}</p><div class="row">${devs
+                .map(([c, n]) => {
+                  k++;
+                  const segs = [0, 1, 2, 3, 4]
+                    .map((i) => `<span class="${(i + 1) / 5 <= pct + 0.001 ? 'on' : ''}"></span>`)
+                    .join('');
+                  return `<div class="dev ${c}"><span class="cap">${n}</span><div class="cl">${base}${h.replace(/\{k\}/g, k).replace('{segs}', segs)}</div></div>`;
+                })
+                .join('')}</div>`,
+          )
+          .join('');
+      }
+      document.querySelectorAll('.ctl button').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('.ctl button').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+            if (b.dataset.full !== undefined) {
+              document.body.classList.add('full');
+              document.body.style.setProperty('--pct', 1);
+            } else {
+              document.body.classList.remove('full');
+              document.body.style.setProperty('--pct', b.dataset.p);
+            }
+            draw();
+          }),
+      );
+      document.body.style.setProperty('--pct', 0.15);
+      draw();
+    </script>
+  </body>
+</html>
