@@ -3,6 +3,7 @@ import { L } from '../core/i18n';
 import { TILE_H, TILE_W } from '../core/iso';
 import { LEVELUP_POSE_S } from '../core/data';
 import { audio } from './audio';
+import { shakeCamera } from './fxPrefs';
 import { DEPTH } from './depth';
 import { TEXT_RES } from './display';
 import type { EntityView } from './entityView';
@@ -139,7 +140,7 @@ export class LevelUpFx {
     this.scene.time.delayedCall(ms * 0.55, () => sparks.stop());
 
     // marco: tremor curto e fraco quando a coluna chega ao alto
-    if (k === LOOK.milestone) this.scene.time.delayedCall(ms * 0.2, () => this.scene.cameras.main.shake(260, 0.004));
+    if (k === LOOK.milestone) this.scene.time.delayedCall(ms * 0.2, () => shakeCamera(this.scene, 260, 0.004));
 
     // "Nível 20!" subindo dourado acima da cabeça (maior no marco)
     const label = this.scene.add

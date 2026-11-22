@@ -7,7 +7,7 @@ rastreador de missões, destruir com confirmação, reset de atributos, trajes.
 Itens que mudam regra de jogo (9, 10, 11, 15, 16) pedem consultar `docs/decisoes/` antes (podem chocar com o papel do Auto).
 Tudo que aparecer na wiki atualiza a wiki no mesmo PR.
 
-## Fase 1 · Barato e de impacto imediato
+## Fase 1 · Barato e de impacto imediato ✅ (feita em 2026-11-22)
 
 | # | Funcionalidade | Por quê / referência |
 | --- | --- | --- |

@@ -41,6 +41,7 @@ import {
   type ItemOwner,
   makePotion,
   maxDurability,
+  isStackId,
 } from './items';
 import { AutoCombat } from './auto';
 import { HOME_MAP, MAPS_CONFIG, TOWN_MAPS, homeTownOf, portalMinLevel } from './mapsConfig';
@@ -154,6 +155,10 @@ export class World {
   skinsOwned: string[] = [];
   skin: string | null = null;
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
+  /** vendidos nesta sessão que o vendedor recompra pelo mesmo preço (não vai para o save) */
+  buyback: { item: ItemInstance; price: number }[] = [];
+  /** uids de equipamentos pegos nesta sessão e ainda não vistos na mochila (ponto de "novo") */
+  newItems = new Set<string>();
   equipment: Record<Slot, ItemInstance | null> = {
     colar: null,
     tronco: null,
@@ -1483,8 +1488,20 @@ export class World {
   // destrói o item (a pilha inteira) da mochila, sem ganho: libera espaço longe da vila
   destroyItem(bagIndex: number): boolean {
     const it = this.bag[bagIndex];
-    if (!it) return false;
+    if (!it || it.locked) return false;
     this.removeFromBag(bagIndex, it.qty ?? 1);
+    this.bumpInv();
+    return true;
+  }
+  buyBack(idx: number): ActionError | null {
+    return shop.buyBack(this, idx);
+  }
+  /** Tranca/destranca um equipamento da mochila (cadeado). */
+  toggleLock(bagIndex: number): boolean {
+    const it = this.bag[bagIndex];
+    if (!it || isStackId(it.baseId)) return false;
+    if (it.locked) delete it.locked;
+    else it.locked = true;
     this.bumpInv();
     return true;
   }

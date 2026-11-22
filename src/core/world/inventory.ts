@@ -135,6 +135,7 @@ export function collect(w: World, item: ItemInstance, x: number, y: number) {
   // auto-combate com a aba de equipamentos cheia: o drop fica no chão e o auto vai vender na vila (core/auto.ts)
   const placed = addItem(w, item);
   if (placed) {
+    if (!isStackId(item.baseId)) w.newItems.add(item.uid);
     w.emit({
       type: 'itemPickup',
       baseId: item.baseId,

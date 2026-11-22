@@ -1,5 +1,6 @@
 // Mecânicas: combate e atributos, morte e durabilidade, forja e economia, auto-combate e ganho offline.
 // Tabelas e exemplos saem das fórmulas do jogo; as que são cópias (marcadas) são conferidas por tools/wiki-check.ts.
+import { BUYBACK_MAX } from '../core/world/shop';
 import { BOSS_PCT_HP } from '../core/world/boss';
 import { TELEPORT_COST } from '../core/teleport';
 import { bal } from '../core/balance';
@@ -415,7 +416,10 @@ function forja(): string {
     <section class="panel"><h2>Desmontar</h2><p>Transforma um equipamento em materiais. Itens com + devolvem um pouco mais (+1 minério a cada 2 +, +1 cristal ou jade a partir do +6).</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Raridade</th>${lvs.map((lv) => `<th>Item nv ${lv}</th>`).join('')}</tr></thead><tbody>${sal}</tbody></table></div></section>
     <section class="panel"><h2>Comprar e vender</h2><ul>
-      <li>O <a href="#/npc/vendedor">Vendedor de Poções</a> compra qualquer item por <b>${pc(SELL_RATIO)}</b> do valor de referência (vezes o multiplicador da raridade).</li>
+      <li>O <a href="#/npc/vendedor">Vendedor de Poções</a> compra qualquer item por <b>${pc(SELL_RATIO)}</b> do valor de referência (vezes o multiplicador da raridade).
+        Na aba Vender há venda em lote dos equipamentos Comuns (ou Comuns + Incomuns), que deixa de fora os itens com + e os trancados.</li>
+      <li><b>Recomprar:</b> os últimos ${BUYBACK_MAX} itens que você vendeu ao vendedor voltam pelo mesmo preço, na aba Recomprar, até fechar o jogo (vendas do Auto não entram).</li>
+      <li><b>Cadeado:</b> na mochila, o botão Trancar protege um equipamento: trancado, ele não pode ser vendido (nem pelo Auto), destruído nem desmontado.</li>
       <li>O <a href="#/npc/mercador">Mercador Ambulante</a> vende equipamentos Incomuns e Raros por <b>${n1(MERCHANT.priceMul)}×</b> o valor, renovando a cada ${MERCHANT.refreshMinutes} min,
         e sempre tem ${Object.keys(MERCHANT.materials).map(itemLink).join(', ')} e ${Object.keys(CONSUMABLES).map(itemLink).join(', ')}.</li></ul>
       <table class="tbl"><thead><tr><th>Raridade</th><th>Multiplicador</th><th>Venda (% do valor)</th><th>Mercador (% do valor)</th></tr></thead><tbody>${rarRows}</tbody></table>
@@ -434,7 +438,7 @@ function auto(): string {
       <li><b>Skills e poções:</b> você escolhe quais skills ele usa e com quanto de vida/mana toma poção (padrão: vida abaixo de 40%, mana abaixo de 30%).
         Escudos saem ao levar dano em combate (vida abaixo de 90%) ou com 2+ monstros atacando; curas, com a vida abaixo de 60%. O auto guarda mana para eles enquanto estão prontos.</li>
       <li><b>Sem poções:</b> volta à vila, compra a quantidade definida no menu (se tiver ouro) e retorna.</li>
-      <li><b>Mochila cheia:</b> quando a aba de equipamentos lota, volta à vila, vende no vendedor os equipamentos Comuns (opção para vender Incomuns também) e retorna. Raros nunca são vendidos: se só sobrarem eles, continua caçando e os drops que não couberem ficam no chão.</li>
+      <li><b>Mochila cheia:</b> quando a aba de equipamentos lota, volta à vila, vende no vendedor os equipamentos Comuns (opção para vender Incomuns também; itens trancados ficam) e retorna. Raros nunca são vendidos: se só sobrarem eles, continua caçando e os drops que não couberem ficam no chão.</li>
       <li><b>Morte:</b> volta da vila e continua, desde que nenhum item equipado esteja com durabilidade 0. Se estiver, para e espera você.</li>
       <li>Ligado na vila, vai sozinho para o melhor mapa de caça para o seu nível.</li>
       <li><b>Teleporte:</b> o auto só usa o <a href="#/npc/caminhos">Mestre dos Caminhos</a> quando o mapa de caça não tem caminho a pé (hoje todos têm).

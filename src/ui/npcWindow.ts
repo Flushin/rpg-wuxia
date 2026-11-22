@@ -1,5 +1,6 @@
 import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
+import { BUYBACK_MAX } from '../core/world/shop';
 import { L, tn } from '../core/i18n';
 import { CLASSES, NPC_TEXT, PROGRESSION, SKINS } from '../core/data';
 import { ATTR_KEYS } from '../core/types';
@@ -58,7 +59,7 @@ const icon = (it: ItemInstance, owner?: ItemOwner) =>
 // Janela dos NPCs (abre sozinha quando o personagem chega). Não bloqueia o jogo ao redor.
 export class NpcWindow {
   private sig = '';
-  private tab: 'buy' | 'sell' = 'buy';
+  private tab: 'buy' | 'sell' | 'back' = 'buy';
   private smithTab: 'repair' | 'forge' | 'salvage' = 'repair';
   private forgeSel = ''; // item escolhido na forja: "eq:<slot>" ou "bag:<índice>"
   private salvageAsk = 0; // confirmações de desmontar já dadas (Épico pede duas)
@@ -69,7 +70,7 @@ export class NpcWindow {
   private npcId = -1;
   private line = 0; // fala atual (NPCs de conversa)
   private sellFilter: SellFilter = 'all';
-  private sellJunkAsk = false; // "vender comuns" aguardando confirmação
+  private sellJunkAsk: false | 'comum' | 'incomum' = false; // venda em lote aguardando confirmação (até que raridade)
   private viewKey = ''; // muda de aba/NPC: a rolagem volta ao topo; senão é mantida entre redesenhos
   private showSide = false; // tela estreita: depois de escolher um item na forja, rola até o detalhe
   constructor(
@@ -156,7 +157,7 @@ export class NpcWindow {
     }
     if (a === 'tab') {
       audio.ui('ui_click');
-      this.tab = v as 'buy' | 'sell';
+      this.tab = v as 'buy' | 'sell' | 'back';
       this.pending = -1;
       this.sellJunkAsk = false;
       return;
@@ -169,14 +170,15 @@ export class NpcWindow {
       return;
     }
     if (a === 'selljunk') {
-      if (!this.sellJunkAsk) {
-        this.sellJunkAsk = true;
+      const upTo = v === 'incomum' ? 'incomum' : 'comum';
+      if (this.sellJunkAsk !== upTo) {
+        this.sellJunkAsk = upTo;
         return;
       }
       this.sellJunkAsk = false;
       let gold = 0,
         n = 0;
-      for (const i of this.junk()) {
+      for (const i of this.junk(upTo === 'incomum')) {
         const before = w.gold;
         err = w.sell(i, 1);
         if (err) break;
@@ -249,7 +251,10 @@ export class NpcWindow {
       err = w.merchantBuyGoods(v, this.qty);
       if (!err) audio.ui('coin');
     } else if (a === 'buy') err = w.buy(v, this.qty);
-    else if (a === 'sell' || a === 'sellall') {
+    else if (a === 'buyback') {
+      err = w.buyBack(+v);
+      if (!err) audio.ui('coin');
+    } else if (a === 'sell' || a === 'sellall') {
       const i = +v,
         it = w.bag[i];
       if (!it) return;
@@ -726,18 +731,45 @@ export class NpcWindow {
     };
   }
 
-  /** Equipamentos comuns da mochila (o "lixo" que o botão Vender comuns leva de uma vez). */
-  private junk(): number[] {
+  /** Equipamentos comuns (e, com `inc`, incomuns) da mochila que a venda em lote leva: sem +N e sem cadeado. */
+  private junk(inc = false): number[] {
     const out: number[] = [];
     this.world.bag.forEach((it, i) => {
-      if (it && BASES[it.baseId] && it.rarity === 'comum' && !it.plus) out.push(i);
+      if (
+        it &&
+        BASES[it.baseId] &&
+        !it.plus &&
+        !it.locked &&
+        (it.rarity === 'comum' || (inc && it.rarity === 'incomum'))
+      )
+        out.push(i);
     });
     return out;
   }
 
   private shop(): View {
     const w = this.world;
-    const tabs = `<div class="tabs"><button class="${this.tab === 'buy' ? 'on' : ''}" data-a="tab" data-v="buy">${L('Comprar', 'Buy')}</button><button class="${this.tab === 'sell' ? 'on' : ''}" data-a="tab" data-v="sell">${L('Vender', 'Sell')}</button></div>`;
+    const tabs = `<div class="tabs"><button class="${this.tab === 'buy' ? 'on' : ''}" data-a="tab" data-v="buy">${L('Comprar', 'Buy')}</button><button class="${this.tab === 'sell' ? 'on' : ''}" data-a="tab" data-v="sell">${L('Vender', 'Sell')}</button><button class="${this.tab === 'back' ? 'on' : ''}" data-a="tab" data-v="back">${L('Recomprar', 'Buy back')} <small>${w.buyback.length}</small></button></div>`;
+    if (this.tab === 'back') {
+      const rows = w.buyback
+        .map(
+          (
+            e,
+            i,
+          ) => `<div class="srow">${icon(e.item, w.owner())}<div class="si"><b style="color:${itemColor(e.item)}">${itemName(e.item)}${(e.item.qty ?? 1) > 1 ? ` x${e.item.qty}` : ''}</b>
+          <small><span class="tip-sell">${e.price} ${L('ouro', 'gold')}</span></small></div>
+          <button data-a="buyback" data-v="${i}" ${w.gold < e.price ? 'disabled' : ''}>${L('Recomprar', 'Buy back')}</button></div>`,
+        )
+        .join('');
+      return {
+        wide: true,
+        top: `<div class="npc-bar">${tabs}</div>`,
+        list: rows
+          ? `<div class="srows">${rows}</div>`
+          : `<p class="muted">${L('Nada vendido nesta sessão.', 'Nothing sold this session.')}</p>`,
+        foot: `<small class="muted">${L(`Os últimos ${BUYBACK_MAX} itens que você vendeu voltam pelo mesmo preço até fechar o jogo.`, `The last ${BUYBACK_MAX} items you sold come back at the same price until you close the game.`)}</small>`,
+      };
+    }
     if (this.tab === 'buy') {
       const rows = Object.keys(POTIONS)
         .map((id) => {
@@ -769,6 +801,11 @@ export class NpcWindow {
         : isStackId(it.baseId)
           ? `x${it.qty ?? 1} · `
           : '';
+      if (it.locked) {
+        rows.push(`<div class="srow">${icon(it, w.owner())}<div class="si"><b style="color:${itemColor(it)}">🔒 ${itemName(it)}</b>
+        <small>${info}<span class="muted">${L('Trancado', 'Locked')}</span></small></div></div>`);
+        return;
+      }
       if (it.rarity === 'epico') {
         // Épico não se vende: aparece na lista, sem preço nem botão
         rows.push(`<div class="srow">${icon(it, w.owner())}<div class="si"><b style="color:${itemColor(it)}">${itemName(it)}</b>
@@ -784,10 +821,20 @@ export class NpcWindow {
       `<button class="${this.sellFilter === k ? 'on' : ''}" data-a="sfilter" data-v="${k}">${label} <small>${count[k]}</small></button>`;
     const filters = `<div class="sfilters">${f('all', L('Tudo', 'All'))}${f('equip', L('Equip.', 'Gear'))}${f('pot', L('Consum.', 'Consum.'))}${f('mat', L('Materiais', 'Materials'))}</div>`;
     const junk = this.junk(),
-      junkGold = junk.reduce((a, i) => a + sellValue(w.bag[i]!), 0);
+      junkGold = junk.reduce((a, i) => a + sellValue(w.bag[i]!), 0),
+      junkInc = this.junk(true),
+      junkIncGold = junkInc.reduce((a, i) => a + sellValue(w.bag[i]!), 0);
+    const ask = this.sellJunkAsk;
+    const bComum = junk.length
+      ? `<button class="${ask === 'comum' ? 'danger' : ''}" data-a="selljunk" data-v="comum">${ask === 'comum' ? L(`Confirmar: vender ${junk.length} comuns?`, `Confirm: sell ${junk.length} common?`) : L(`Vender comuns (${junk.length} · ${junkGold} ouro)`, `Sell common (${junk.length} · ${junkGold} gold)`)}</button>`
+      : '';
+    const bInc =
+      junkInc.length > junk.length
+        ? `<button class="${ask === 'incomum' ? 'danger' : ''}" data-a="selljunk" data-v="incomum">${ask === 'incomum' ? L(`Confirmar: vender ${junkInc.length} comuns e incomuns?`, `Confirm: sell ${junkInc.length} common and uncommon?`) : L(`Comuns + incomuns (${junkInc.length} · ${junkIncGold} ouro)`, `Common + uncommon (${junkInc.length} · ${junkIncGold} gold)`)}</button>`
+        : '';
     const foot =
-      junk.length && (this.sellFilter === 'all' || this.sellFilter === 'equip')
-        ? `<button class="${this.sellJunkAsk ? 'danger' : ''}" data-a="selljunk">${this.sellJunkAsk ? L(`Confirmar: vender ${junk.length} comuns?`, `Confirm: sell ${junk.length} common?`) : L(`Vender equipamentos comuns (${junk.length} · ${junkGold} ouro)`, `Sell common gear (${junk.length} · ${junkGold} gold)`)}</button>`
+      (bComum || bInc) && (this.sellFilter === 'all' || this.sellFilter === 'equip')
+        ? `${bComum}${bInc}<small class="muted">${L('Itens trancados (🔒) e com +N ficam de fora.', 'Locked (🔒) and +N items are left out.')}</small>`
         : undefined;
     return {
       wide: true,

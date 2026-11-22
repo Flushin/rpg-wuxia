@@ -280,7 +280,9 @@ export class AutoCombat {
 
   // ---------- venda automática (mochila cheia) ----------
   sellable(it: ItemInstance): boolean {
-    return !!BASES[it.baseId] && (it.rarity === 'comum' || (it.rarity === 'incomum' && this.cfg.sellIncomum));
+    return (
+      !!BASES[it.baseId] && !it.locked && (it.rarity === 'comum' || (it.rarity === 'incomum' && this.cfg.sellIncomum))
+    );
   }
   /** Aba de equipamentos cheia e com algo que a regra vende: hora de ir ao vendedor da vila. */
   private needsSell() {

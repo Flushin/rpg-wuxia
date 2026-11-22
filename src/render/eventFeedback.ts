@@ -18,6 +18,7 @@ import { TEXT_RES } from './display';
 import type { EntityView } from './entityView';
 import type { SkillFx } from './skillFx';
 import { LevelUpFx } from './levelUpFx';
+import { fxPrefs, shakeCamera, vibrate } from './fxPrefs';
 
 // Cores dos textos que sobem do mapa
 const FLOAT_COLOR = {
@@ -65,19 +66,21 @@ export class EventFeedback {
       case 'hit': {
         const s = tileToScreen(ev.x, ev.y),
           toPlayer = ev.targetKind === 'player';
-        this.floatText(
-          s.x,
-          s.y - 40,
-          ev.crit ? `${ev.amount}!` : String(ev.amount),
-          ev.poison
-            ? FLOAT_COLOR.POISON
-            : toPlayer
-              ? FLOAT_COLOR.HURT
-              : ev.crit
-                ? FLOAT_COLOR.CRIT
-                : FLOAT_COLOR.DAMAGE,
-          ev.crit ? 22 : ev.poison ? 13 : 16,
-        );
+        if (ev.crit && !toPlayer) vibrate();
+        if (fxPrefs.damageNumbers)
+          this.floatText(
+            s.x,
+            s.y - 40,
+            ev.crit ? `${ev.amount}!` : String(ev.amount),
+            ev.poison
+              ? FLOAT_COLOR.POISON
+              : toPlayer
+                ? FLOAT_COLOR.HURT
+                : ev.crit
+                  ? FLOAT_COLOR.CRIT
+                  : FLOAT_COLOR.DAMAGE,
+            ev.crit ? 22 : ev.poison ? 13 : 16,
+          );
         this.views.get(ev.targetId)?.flash();
         return true;
       }
@@ -96,7 +99,8 @@ export class EventFeedback {
       case 'telegraphResolved':
         if (ev.hit) {
           const s = tileToScreen(ev.x, ev.y);
-          this.scene.cameras.main.shake(180, 0.006);
+          shakeCamera(this.scene, 180, 0.006);
+          vibrate();
           this.floatText(s.x, s.y - 20, L('Golpe em área!', 'Area strike!'), FLOAT_COLOR.WARNING, 15);
         }
         return true;
@@ -115,7 +119,7 @@ export class EventFeedback {
         return true;
       case 'shieldAbsorb': {
         const s = tileToScreen(ev.x, ev.y);
-        this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, FLOAT_COLOR.ABSORB, 14);
+        if (fxPrefs.damageNumbers) this.floatText(s.x, s.y - 40, `(${Math.round(ev.amount)})`, FLOAT_COLOR.ABSORB, 14);
         return true;
       }
     }
@@ -304,6 +308,7 @@ export class EventFeedback {
         // sem aviso no meio da tela: a animação já mostra "Nível N!" (tela limpa para prints/vídeos); os pontos
         // aparecem no selo do botão Atributos
         this.levelUpFx.request(ev.level, ev.pose);
+        vibrate();
         return true;
       case 'playerDeath':
         // nível 40: nos mapas além do portão leste, renasce na Cidadela de Jade (MapConfig.homeTown)
