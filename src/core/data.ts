@@ -3,6 +3,7 @@ import monstersJson from '../data/monsters.json';
 import progressionJson from '../data/progression.json';
 import npcsJson from '../data/npcs.json';
 import skinsJson from '../data/skins.json';
+import mountsJson from '../data/mounts.json';
 import { localize } from './i18n';
 import { balanceClasses, balanceMonsters, balanceProgression } from './balance';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap, ProjectileKind } from './types';
@@ -167,5 +168,17 @@ export interface SkinDef {
   price: number;
 }
 export const SKINS = localize('skins', skinsJson) as unknown as Record<string, SkinDef>;
+
+/** Montaria: mais velocidade fora de combate (speedBonus, × balance `montaria.velocidade`). Vendida no estábulo
+ * (Cavalariço Ma). Monta sozinha mountDelay s depois do último golpe dado ou recebido; desmonta ao entrar em combate.
+ * A folha de sprites tem o mesmo nome do id (tools/sprites/<id>.json). */
+export interface MountDef {
+  name: string;
+  desc: string;
+  price: number;
+  speedBonus: number;
+  mountDelay: number;
+}
+export const MOUNTS = localize('mounts', mountsJson) as unknown as Record<string, MountDef>;
 
 export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];

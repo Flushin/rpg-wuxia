@@ -43,5 +43,9 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Governador Bai', 'Talk to Governor Bai');
     case 'skinOwned':
       return L('Você já tem este traje', 'You already own this outfit');
+    case 'talkToStable':
+      return L('Fale com o Cavalariço Ma', 'Talk to Stablemaster Ma');
+    case 'mountOwned':
+      return L('Você já tem esta montaria', 'You already own this mount');
   }
 }

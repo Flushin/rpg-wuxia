@@ -14,6 +14,7 @@ import { QUESTS } from '../src/core/quests';
 import { TRIAL_BOSSES, TRIAL_TIERS, trialBossLevel, trialEquipReqLevel } from '../src/core/trial';
 import type { Entity } from '../src/core/types';
 import { World } from '../src/core/world';
+import { MOUNTS } from '../src/core/data';
 import type { SaveData } from '../src/core/types';
 import { Rng } from '../src/core/rng';
 import { stockLevel } from '../src/core/world/merchant';
@@ -304,6 +305,25 @@ console.log('\n== desgaste ==');
 console.log('\n== Trial 11–20 ==');
 ok(TRIAL_TIERS === 20 && trialBossLevel(20) === 40, 'níveis 1–20, chefe até o nível 40');
 ok(trialEquipReqLevel(14) === 25 && trialEquipReqLevel(15) === 35, 'nv 25 até o 14, nv 35 do 15 ao 20');
+
+console.log('\n== montaria (estábulo da Cidadela) ==');
+{
+  const w = mk(50, 'cidadela') as World & { time: number; lastCombat: number };
+  const st = w.npcs.find((n) => n.npcId === 'estabulo');
+  ok(!!st && w.npcRole(st) === 'estabulo', 'Cavalariço Ma no mapa da Cidadela');
+  ok(w.buyMount('cavalo')?.code === 'talkToStable', 'só compra falando com o estábulo');
+  w.openNpc = st!;
+  const g0 = w.gold;
+  ok(w.buyMount('cavalo') === null && w.gold === g0 - MOUNTS.cavalo.price, 'compra o cavalo pelo preço');
+  ok(w.buyMount('cavalo')?.code === 'mountOwned', 'não compra duas vezes');
+  w.time = 100;
+  w.lastCombat = 99;
+  ok(w.mountNow() === null, 'em combate (há 1 s): a pé');
+  w.lastCombat = 100 - MOUNTS.cavalo.mountDelay;
+  ok(w.mountNow() === 'cavalo', 'fora de combate: montado');
+  const w2 = World.fromSave(maps, { ...w.serialize(), lastSeen: NOW }, NOW, false);
+  ok(w2.mountsOwned.join() === 'cavalo', 'a montaria fica no save');
+}
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

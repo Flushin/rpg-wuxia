@@ -324,6 +324,8 @@ export interface SaveData {
   /** skins compradas (ids de skins.json) e a vestida (ausente = traje da seita) */
   skins?: string[];
   skin?: string;
+  /** montarias compradas (ids de mounts.json); a primeira é a usada */
+  mounts?: string[];
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
@@ -346,4 +348,6 @@ export type ActionError =
   | { code: 'talkToMonk' }
   | { code: 'nothingToReset' }
   | { code: 'talkToGovernor' }
-  | { code: 'skinOwned' };
+  | { code: 'skinOwned' }
+  | { code: 'talkToStable' }
+  | { code: 'mountOwned' };

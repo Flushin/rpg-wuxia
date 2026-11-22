@@ -55,6 +55,7 @@ export const KNOBS = {
   'venda.itens': { grupo: 'Economia', desc: 'ouro recebido ao vender itens' },
   'conserto.custo': { grupo: 'Economia', desc: 'custo de conserto' },
   'desgaste.equipamento': { grupo: 'Economia', desc: 'durabilidade perdida por golpe recebido e por morte' },
+  'montaria.velocidade': { grupo: 'Mundo', desc: 'bônus de velocidade da montaria fora de combate' },
   // Drops
   'drop.pocoes': { grupo: 'Drops', desc: 'chance de os monstros soltarem poções', scope: 'monstro' },
   'drop.equipamento': { grupo: 'Drops', desc: 'chance de os monstros soltarem equipamento', scope: 'monstro' },

@@ -53,6 +53,10 @@ const meridians = () =>
 const outfits = () =>
   `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem, só da sua seita e sem efeito no
   combate. Veja todos os trajes, preços e como funcionam na página <a href="#/trajes">Trajes</a>.</p>`;
+const stable = () =>
+  `${talkCitadel()}<p><b>Estábulo:</b> vende montarias. Fora de combate você monta sozinho alguns segundos depois da
+  última luta e anda mais rápido; ao entrar em combate desmonta na hora. Veja preços e velocidade em
+  <a href="#/mecanicas/montarias">Montarias</a>.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
 const sameAs = (id: string, name: string) => () =>
   `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;
@@ -154,13 +158,21 @@ function npcList(): NpcInfo[] {
         ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
         ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
         ['governador', 'Autoridade da Cidadela, trajes das seitas e missões', outfits],
+        ['estabulo', 'Estábulo (montarias)', stable],
         ['monge_pagode', 'Guardião do pagode, realinhar atributos e missões', meridians],
         ['guarda_jade', 'Guarda dos portões e missões', talkCitadel],
       ] as [string, string, () => string][]
     )
       .filter(([id]) => t[id])
       .map(
-        ([id, role, does]): NpcInfo => ({ id, name: t[id].name, role, sheet: 'npc_' + id, place: 'cidadela', does }),
+        ([id, role, does]): NpcInfo => ({
+          id,
+          name: t[id].name,
+          role,
+          sheet: id === 'estabulo' ? 'npc_mercador' : 'npc_' + id,
+          place: 'cidadela',
+          does,
+        }),
       ),
     ...['morador1', 'morador2', 'morador3', 'morador4']
       .filter((id) => t[id])

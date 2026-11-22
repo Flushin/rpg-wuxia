@@ -4,6 +4,7 @@ import geada from '../data/sprites/geada.json';
 import tita from '../data/sprites/tita.json';
 import vibora from '../data/sprites/vibora.json';
 import lobo from '../data/sprites/lobo.json';
+import cavalo from '../data/sprites/cavalo.json';
 import banditSword from '../data/sprites/bandido_espadachim.json';
 import banditArcher from '../data/sprites/bandido_arqueiro.json';
 import terracota from '../data/sprites/terracota.json';
@@ -54,6 +55,7 @@ const NPC_SHEET_BY_ID: Record<string, string> = {
   mestre_pavilhao: 'npc_mestra_geada',
   mestre_tita: 'npc_mestre_tita',
   mestre_vibora: 'npc_mestra_vibora',
+  estabulo: 'npc_mercador', // Cavalariço Ma usa o modelo do mercador
 };
 export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;
 
@@ -81,6 +83,7 @@ const SHEETS: Record<string, SheetMeta> = {
   tita: tita as SheetMeta,
   vibora: vibora as SheetMeta,
   lobo: lobo as SheetMeta,
+  cavalo: cavalo as SheetMeta,
   bandido_espadachim: banditSword as SheetMeta,
   bandido_arqueiro: banditArcher as SheetMeta,
   terracota: terracota as SheetMeta,
@@ -110,6 +113,7 @@ const BY_TEXTURE: Record<string, string> = {
   'player-tita': 'tita',
   'player-vibora': 'vibora',
   wolf: 'lobo',
+  'mount-cavalo': 'cavalo', // montarias: 'mount-' + id de mounts.json
   'bandit-sword': 'bandido_espadachim',
   'bandit-archer': 'bandido_arqueiro',
   terracotta: 'terracota',
@@ -181,7 +185,9 @@ export const PORTRAIT_DIRS: Record<string, PortraitDirs> = Object.fromEntries(
 
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(
-  Object.entries(NPC_SHEET_BY_ID).map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),
+  Object.entries(NPC_SHEET_BY_ID)
+    .filter(([id]) => id.startsWith('mestre_'))
+    .map(([id, sheet]) => [id.slice(7), `sprites/${sheet}_retrato.png`]),
 );
 
 export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | null => {
