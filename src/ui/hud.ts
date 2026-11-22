@@ -127,7 +127,11 @@ export class Hud {
     const t = byId('toast');
     t.classList.toggle('epic', kind === 'epic');
     const line = { msg, color };
-    this.toastLines = t.classList.contains('show') ? [...this.toastLines.slice(-1), line] : [line];
+    const shown = t.classList.contains('show');
+    // mesma mensagem já na tela (ex.: vários drops com a aba cheia): não repete a linha, só renova o tempo
+    if (shown && this.toastLines.some((l) => l.msg === msg))
+      this.toastLines = this.toastLines.filter((l) => l.msg !== msg);
+    this.toastLines = shown ? [...this.toastLines.slice(-1), line] : [line];
     t.innerHTML = this.toastLines
       .map(
         (l) =>
