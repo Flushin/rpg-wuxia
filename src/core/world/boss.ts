@@ -186,12 +186,39 @@ export function tickTelegraphs(w: World, dt: number) {
   }
 }
 
-// dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa
+/** Dano extra dos chefes em % da vida máxima de quem leva o golpe (não é reduzido pela defesa; a parte normal do golpe
+ *  continua reduzida pela defesa física/espiritual). Faz o chefe assustar mesmo com equipamento forte.
+ *  - basic: golpe normal de um chefe que bate a cada refInterval s (quem bate mais devagar tira mais por golpe)
+ *  - telegraph: golpe marcado no chão (círculo/linha), por 1× de mult (um círculo de 2× tira o dobro) */
+export const BOSS_PCT_HP = { basic: 0.04, refInterval: 2.4, telegraph: 0.09, fromLevel: 10, fullLevel: 30 };
+
+/** Quanto da % vale para um chefe deste nível: 0 até fromLevel, sobe em linha até 1 no fullLevel (chefes iniciais
+ *  não mudam; os de fim de jogo e o Trial levam tudo). */
+export const bossPctScale = (level: number) =>
+  Math.max(0, Math.min(1, (level - BOSS_PCT_HP.fromLevel) / (BOSS_PCT_HP.fullLevel - BOSS_PCT_HP.fromLevel)));
+
+/** Parte em % da vida do golpe normal de um chefe (0 para monstro comum ou alvo que não é o jogador). */
+export function bossBasicPctDamage(a: Entity, t: Entity): number {
+  if (a.kind !== 'monster' || t.kind !== 'player' || !MONSTERS[a.monsterId]?.boss) return 0;
+  const def = MONSTERS[a.monsterId]!;
+  return t.derived.maxHp * BOSS_PCT_HP.basic * (def.attackInterval / BOSS_PCT_HP.refInterval) * bossPctScale(a.level);
+}
+
+// dano que não erra (golpes marcados no chão): ataque do dono × mult, reduzido pela defesa; chefe soma % da vida
 export function directDamage(w: World, a: Entity, t: Entity, mult: number) {
   const physical = a.damageType === 'physical';
   const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
     df = physical ? t.derived.physDef : t.derived.spiritDef;
-  const amount = Math.max(1, Math.round(atk * mult * bal('dano.monstros', a.monsterId) * (1 - df / (df + 100))));
+  const pct =
+    t.kind === 'player' && MONSTERS[a.monsterId]?.boss
+      ? t.derived.maxHp * BOSS_PCT_HP.telegraph * mult * bossPctScale(a.level)
+      : 0;
+  const amount = Math.max(
+    1,
+    Math.round(
+      (atk * mult * (1 - df / (df + 100)) + pct) * bal('dano.monstros', a.monsterId) * (1 - w.damageTakenRed()),
+    ),
+  );
   const dealt = w.absorb(t, amount);
   t.hp -= dealt;
   if (dealt > 0)

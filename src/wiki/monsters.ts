@@ -1,4 +1,5 @@
 // Páginas de monstros: lista por mapa e página de cada monstro (atributos por nível, comportamento, drops, missões).
+import { BOSS_PCT_HP, bossPctScale } from '../core/world/boss';
 import { bal } from '../core/balance';
 import { computeDerived } from '../core/stats';
 import type { Attributes } from '../core/types';
@@ -133,7 +134,13 @@ function behavior(m: Monster): string[] {
 
 function bossMechanics(m: Monster, inDungeon: boolean): string {
   const b = m.boss!;
+  const pc = (v: number) => `${+(v * 100).toFixed(1)}%`;
   const li: string[] = [`Luta dentro de uma arena (raio ${b.arenaRadius}).`];
+  const k = bossPctScale(m.minLevel);
+  if (k > 0)
+    li.push(
+      `Golpes dele tiram também uma parte da sua <b>vida máxima</b>, que a defesa não reduz: ${pc(BOSS_PCT_HP.basic * (m.attackInterval / BOSS_PCT_HP.refInterval) * k)} por golpe normal e ${pc(BOSS_PCT_HP.telegraph * k)} por 1× de dano dos golpes marcados no chão. No Trial o valor segue o nível do chefe ali (total a partir do nível ${BOSS_PCT_HP.fullLevel}).`,
+    );
   if (b.aoe && b.line) {
     const l = b.line;
     li.push(

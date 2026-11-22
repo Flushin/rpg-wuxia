@@ -522,6 +522,10 @@ export class World {
     for (const b of e.buffs) if (b.kind === 'slow') m *= 1 - b.value;
     return m;
   }
+  /** redução de dano recebido do jogador (passivas) */
+  damageTakenRed(): number {
+    return this.passiveValue('damageTaken') || 0;
+  }
   private defender(t: Entity) {
     const red = t.buffs.filter((b) => b.kind === 'defReduction').reduce((a, b) => a + b.value, 0);
     if (!red) return t;
@@ -1173,9 +1177,11 @@ export class World {
     // balanceamento (src/data/balance.json): dano de quem ataca
     if (a.kind === 'player') mult *= bal('dano.jogador', this.classId);
     else if (a.kind === 'monster') mult *= bal('dano.monstros', a.monsterId);
+    // chefe: soma % da vida máxima do jogador ao golpe normal (src/core/world/boss.ts BOSS_PCT_HP)
+    if (r.hit && !skill) r.amount += Math.round(boss.bossBasicPctDamage(a, t) * (r.crit ? a.derived.critDamage : 1));
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (r.hit && t.kind === 'player') {
-      const red = this.passiveValue('damageTaken');
+      const red = this.damageTakenRed();
       if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
     }
     if (!skill)
