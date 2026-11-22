@@ -242,7 +242,7 @@ export class InventoryPanel {
         ? ''
         : `<button data-act="lock" aria-pressed="${!!it.locked}">${it.locked ? L('🔓 Destrancar', '🔓 Unlock') : L('🔒 Trancar', '🔒 Lock')}</button>`;
       // trancado: sem Destruir (nem venda/desmonte no vendedor e ferreiro, nem venda do Auto)
-      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${lock}${it.locked ? `<small class="muted">${L('Trancado: não pode ser vendido, destruído nem desmontado.', 'Locked: cannot be sold, destroyed or salvaged.')}</small>` : del}`;
+      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${lock}${it.locked ? `<small class="muted">${L('Trancado: não pode ser vendido, destruído nem desmontado.', 'Locked: cannot be sold, destroyed or salvaged.')}</small>` : it.rarity === 'epico' ? `<small class="muted">${L('Épico não pode ser destruído (desmonte no ferreiro).', 'Epics cannot be destroyed (salvage them at the blacksmith).')}</small>` : del}`;
     }
     // renderPanel mantém a moldura (.inv-card, que é quem rola; em telas largas rolam .inv-main e .inv-detail) e só troca
     // o que mudou, então a rolagem nunca é perdida (nem cortada no meio, no iPhone).

@@ -1488,7 +1488,7 @@ export class World {
   // destrói o item (a pilha inteira) da mochila, sem ganho: libera espaço longe da vila
   destroyItem(bagIndex: number): boolean {
     const it = this.bag[bagIndex];
-    if (!it || it.locked) return false;
+    if (!it || it.locked || it.rarity === 'epico') return false; // Épico não se destrói: só desmonta no ferreiro
     this.removeFromBag(bagIndex, it.qty ?? 1);
     this.bumpInv();
     return true;
