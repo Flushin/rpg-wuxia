@@ -337,6 +337,7 @@ ${critico()}
       <li><b>Skills</b> causam uma porcentagem desse dano (ex.: 180%) e ficam 8% mais fortes a cada nível da skill. Ver <a href="#/skills">Skills</a>.</li>
       <li>Alguns monstros têm defesa física ou espiritual multiplicada: a página de cada <a href="#/monstros">monstro</a> diz qual tipo de dano funciona melhor.</li>
       <li><b>Escudos</b> absorvem o dano antes da vida. <b>Redução de defesa</b> diminui as duas defesas do alvo. <b>Lentidão</b> e <b>atordoamento</b> não mudam o dano.</li>
+      <li><b>Aura elemental</b> (por enquanto só Tormenta): a cada 100 de Ataque de Trovão aparecem mais faíscas e raios em volta do personagem, até o máximo com 600 ou mais. É só visual, funciona com qualquer traje e pode ser desligada nas Configurações.</li>
       ${cls.lifeSteal ? `<li><b>Roubo de vida</b> (Tormenta): ${pc(cls.lifeSteal)} do dano causado volta como vida (só o dano que o alvo ainda podia levar; o excesso não cura).</li>` : ''}</ul>${ex}</section>
     <section class="panel"><h2>Níveis</h2><p>Nível máximo <b>${PROGRESSION.levelCap}</b>. A cada nível você ganha os atributos automáticos da sua <a href="#/seitas">seita</a>
       e <b>${freePointsText()}</b> para distribuir (o <a href="#/npc/monge_pagode">Monge do Pagode</a>, na Cidadela de Jade, devolve todos os pontos distribuídos por ${PROGRESSION.attrResetCost.toLocaleString('pt-BR')} de ouro). Quem já estava no nível 20 antes do nível máximo subir para 30 continua no 20, com a barra do 21 em 0%. XP vem de monstros e de <a href="#/missoes">missões</a>.</p>

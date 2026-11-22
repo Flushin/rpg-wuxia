@@ -30,6 +30,8 @@ export const PREF = {
   FX_SHAKE: 'rpg-fx-shake',
   /** vibração no app: '0' desligada (padrão ligada) */
   FX_VIBRATE: 'rpg-fx-vibrate',
+  /** aura elemental em volta do personagem: '0' desligada (padrão ligada) */
+  FX_AURA: 'rpg-fx-aura',
 } as const;
 export type PrefKey = (typeof PREF)[keyof typeof PREF];
 

@@ -1,5 +1,5 @@
 {
-  "proxima": [],
+  "proxima": [{ "texto": "Aura de trovão: a Tormenta ganha faíscas e raios em volta do corpo que crescem a cada 100 de Ataque de Trovão (até 600), em qualquer traje." }],
   "versoes": [
     {
       "versao": "0.7.0",

@@ -122,6 +122,9 @@ export class SettingsPanel {
       case 'opt-shake':
         fxPrefs.set('shake', el.checked);
         break;
+      case 'opt-aura':
+        fxPrefs.set('aura', el.checked);
+        break;
       case 'opt-vibrate':
         fxPrefs.set('vibrate', el.checked);
         break;
@@ -183,6 +186,7 @@ export class SettingsPanel {
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
       <label class="opt"><input type="checkbox" id="opt-dmg" ${fxPrefs.damageNumbers ? 'checked' : ''}/> ${L('Números de dano', 'Damage numbers')}</label>
       <label class="opt"><input type="checkbox" id="opt-shake" ${fxPrefs.shake ? 'checked' : ''}/> ${L('Tremor de tela', 'Screen shake')}</label>
+      <label class="opt"><input type="checkbox" id="opt-aura" ${fxPrefs.aura ? 'checked' : ''}/> ${L('Aura elemental em volta do personagem', 'Elemental aura around your character')}</label>
       ${isNative ? `<label class="opt"><input type="checkbox" id="opt-vibrate" ${fxPrefs.vibrate ? 'checked' : ''}/> ${L('Vibração (crítico, golpe do chefe, subir de nível)', 'Vibration (crit, boss strike, level up)')}</label>` : ''}
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
       <label class="opt"><input type="checkbox" id="opt-touchdbg" ${touchDebug.enabled ? 'checked' : ''}/> ${L('Diagnóstico de toque (mostra na tela cada toque e o que a skill fez)', 'Touch diagnostics (shows each touch and what the skill did)')}</label>
