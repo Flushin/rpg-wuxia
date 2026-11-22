@@ -695,12 +695,57 @@
           "The further you advance in your cultivation, the more roads this circle will reveal."
         ]
       },
-      "ferreira_lin": {"name": "Master Smith Lin", "lines": ["Welcome to the Citadel forge. Here steel is tempered in jade water: I repair, forge and salvage, like the village smith, but with a steadier hand.", "The Cloud Village blacksmith was my apprentice. Good lad. Still hammers too hard.", "Mist Jade does not forgive haste. Whoever forces the forge loses both the material and their patience."]},
-      "boticario_wen": {"name": "Apothecary Wen", "lines": ["Potions brewed with herbs from the Misty Peak. I also buy whatever you bring back from your hunts, even scrap.", "The village potions are good. These are the same, only the bottle is prettier. Don't tell the seller down there.", "Drink before you need it, not after. I have buried many brave cultivators who waited too long."]},
-      "mercadora_jin": {"name": "Merchant Jin", "lines": ["The caravans that pass the Citadel stop at my stall first. The stock changes every hour: choose well.", "The village traveling merchant? We are partners. He hauls the cart, I pick what is worth it.", "A return scroll is never a waste. From the top of the Peak, the village is a long walk away."]},
-      "governador": {"name": "Governor Bai", "lines": ["Welcome to the Jade Citadel. Few cultivators make it this far; those who do are always welcome in this hall.", "The Citadel tailors sew ceremonial garments for every sect. If you have the gold, I will have one made to your measure. Only in the colors of your own sect, of course.", "The Citadel was raised by the four sects together, back when they still trusted one another. The wall is what remains of that alliance.", "The empty lots beside the square will not stay empty for long. Masters from distant lands have already asked to open their houses here.", "Beyond the east gate the smoke is red again. When you reach level 31, come to me: the Citadel will need you."]},
-      "guarda_jade": {"name": "Jade Guard", "lines": ["The east gate is open again, but only for those who reached level 30. The south and west gates stay closed; for anywhere else, use the Master's roads on the golden circle.", "Jade armor? It is just the color of the silk. But don't tell anyone outside the wall.", "From the top of the towers, on a clear night, you can see the lanterns of Cloud Village far below."]},
-      "monge_pagode": {"name": "Pagoda Monk", "lines": ["Five floors, five gates of cultivation. Most disciples never pass the third.", "If your qi has flowed through the wrong meridians, I can untie the knots and return every point you have distributed. The meditation is long, and the offering to the pagoda is not small.", "You have reached the top of what the village could teach. From here on, the road is narrower and higher.", "They say the precious stones of the north hold ancient qi. One day, perhaps, your equipment will learn to carry them."]},
+      "ferreira_lin": {
+        "name": "Master Smith Lin",
+        "lines": [
+          "Welcome to the Citadel forge. Here steel is tempered in jade water: I repair, forge and salvage, like the village smith, but with a steadier hand.",
+          "The Cloud Village blacksmith was my apprentice. Good lad. Still hammers too hard.",
+          "Mist Jade does not forgive haste. Whoever forces the forge loses both the material and their patience."
+        ]
+      },
+      "boticario_wen": {
+        "name": "Apothecary Wen",
+        "lines": [
+          "Potions brewed with herbs from the Misty Peak. I also buy whatever you bring back from your hunts, even scrap.",
+          "The village potions are good. These are the same, only the bottle is prettier. Don't tell the seller down there.",
+          "Drink before you need it, not after. I have buried many brave cultivators who waited too long."
+        ]
+      },
+      "mercadora_jin": {
+        "name": "Merchant Jin",
+        "lines": [
+          "The caravans that pass the Citadel stop at my stall first. The stock changes every hour: choose well.",
+          "The village traveling merchant? We are partners. He hauls the cart, I pick what is worth it.",
+          "A return scroll is never a waste. From the top of the Peak, the village is a long walk away."
+        ]
+      },
+      "governador": {
+        "name": "Governor Bai",
+        "lines": [
+          "Welcome to the Jade Citadel. Few cultivators make it this far; those who do are always welcome in this hall.",
+          "The Citadel tailors sew ceremonial garments for every sect. If you have the gold, I will have one made to your measure. Only in the colors of your own sect, of course.",
+          "The Citadel was raised by the four sects together, back when they still trusted one another. The wall is what remains of that alliance.",
+          "The empty lots beside the square will not stay empty for long. Masters from distant lands have already asked to open their houses here.",
+          "Beyond the east gate the smoke is red again. When you reach level 31, come to me: the Citadel will need you."
+        ]
+      },
+      "guarda_jade": {
+        "name": "Jade Guard",
+        "lines": [
+          "The east gate is open again, but only for those who reached level 30. The south and west gates stay closed; for anywhere else, use the Master's roads on the golden circle.",
+          "Jade armor? It is just the color of the silk. But don't tell anyone outside the wall.",
+          "From the top of the towers, on a clear night, you can see the lanterns of Cloud Village far below."
+        ]
+      },
+      "monge_pagode": {
+        "name": "Pagoda Monk",
+        "lines": [
+          "Five floors, five gates of cultivation. Most disciples never pass the third.",
+          "If your qi has flowed through the wrong meridians, I can untie the knots and return every point you have distributed. The meditation is long, and the offering to the pagoda is not small.",
+          "You have reached the top of what the village could teach. From here on, the road is narrower and higher.",
+          "They say the precious stones of the north hold ancient qi. One day, perhaps, your equipment will learn to carry them."
+        ]
+      },
       "morador1": {
         "name": "Villager Mei",
         "lines": [
@@ -898,33 +943,205 @@
         "goal": "Defeat the Lord of the Mist",
         "done": "The mist has parted over the peak for the first time in a thousand years. From the village you can see the shrine shining in the sun. Wear this mantle: it is yours by right, master."
       },
-      {"name": "The East Gate", "offer": "Remember when I said I would need you? The red smoke is rising again beyond the east gate, closed since the war of the sects. I had it opened. Cross it and tell me what lies in the valley.", "goal": "Reach the Crimson Ash Valley", "done": "Ash and lava where rice fields used to be... and people walking through it. The valley has awakened. Rest; tomorrow the Citadel will need your blade."},
-      {"name": "Those Who Walk the Ash", "offer": "Since the gate opened, ash-covered figures prowl the wall at night. They strike with two blades and never say a word. Defeat 15 ash wanderers before they find a way up.", "goal": "Defeat ash wanderers", "done": "The nights are quiet again. One of them had a crimson seal sewn on its chest... Take it to the Pagoda Monk; he knows the old seals."},
-      {"name": "The Crimson Fire", "offer": "This seal belongs to the Celestial Palace, the court that floated above the clouds. The monks who kept its sacred fire came down to the valley and burn everything from afar. Defeat 15 crimson fire monks; their fire feeds the ash.", "goal": "Defeat crimson fire monks", "done": "The valley fire has weakened. Take this weapon, forged for those who will climb to the palace: up there, nothing less will do."},
-      {"name": "The Cold Moon", "offer": "In the palace ruins, the cold moon sorceresses guard the stairways. Their ice binds the feet of whoever climbs, and the celestial guards do the rest. Defeat 15 sorceresses and the way to the hall will be open.", "goal": "Defeat cold moon sorceresses", "done": "I felt the cold fade even from here at the pagoda. Now only the one sitting on the throne remains. Speak to the Governor when you are ready."},
-      {"name": "The Crimson Emperor", "offer": "The last lord of the Celestial Palace never died: they call him the Crimson Emperor. He is the one who sets the valley ablaze and sends the ash against our wall. Climb to the Throne Hall and finish what the four sects could not. Beware his line strike: near half health he calls the guards and the strike spreads into a fan.", "goal": "Defeat the Crimson Emperor", "done": "The throne is empty and the smoke has settled. The four sects will tell this story for a thousand years. Wear this palace tunic: the Citadel is your home, master."}
+      {
+        "name": "The East Gate",
+        "offer": "Remember when I said I would need you? The red smoke is rising again beyond the east gate, closed since the war of the sects. I had it opened. Cross it and tell me what lies in the valley.",
+        "goal": "Reach the Crimson Ash Valley",
+        "done": "Ash and lava where rice fields used to be... and people walking through it. The valley has awakened. Rest; tomorrow the Citadel will need your blade."
+      },
+      {
+        "name": "Those Who Walk the Ash",
+        "offer": "Since the gate opened, ash-covered figures prowl the wall at night. They strike with two blades and never say a word. Defeat 15 ash wanderers before they find a way up.",
+        "goal": "Defeat ash wanderers",
+        "done": "The nights are quiet again. One of them had a crimson seal sewn on its chest... Take it to the Pagoda Monk; he knows the old seals."
+      },
+      {
+        "name": "The Crimson Fire",
+        "offer": "This seal belongs to the Celestial Palace, the court that floated above the clouds. The monks who kept its sacred fire came down to the valley and burn everything from afar. Defeat 15 crimson fire monks; their fire feeds the ash.",
+        "goal": "Defeat crimson fire monks",
+        "done": "The valley fire has weakened. Take this weapon, forged for those who will climb to the palace: up there, nothing less will do."
+      },
+      {
+        "name": "The Cold Moon",
+        "offer": "In the palace ruins, the cold moon sorceresses guard the stairways. Their ice binds the feet of whoever climbs, and the celestial guards do the rest. Defeat 15 sorceresses and the way to the hall will be open.",
+        "goal": "Defeat cold moon sorceresses",
+        "done": "I felt the cold fade even from here at the pagoda. Now only the one sitting on the throne remains. Speak to the Governor when you are ready."
+      },
+      {
+        "name": "The Crimson Emperor",
+        "offer": "The last lord of the Celestial Palace never died: they call him the Crimson Emperor. He is the one who sets the valley ablaze and sends the ash against our wall. Climb to the Throne Hall and finish what the four sects could not. Beware his line strike: near half health he calls the guards and the strike spreads into a fan.",
+        "goal": "Defeat the Crimson Emperor",
+        "done": "The throne is empty and the smoke has settled. The four sects will tell this story for a thousand years. Wear this palace tunic: the Citadel is your home, master."
+      }
     ]
   },
   "skins": {
-    "tormenta_celeste": {"name": "Celestial Tempest", "desc": "Indigo tunic with golden buttons, dark steel bracers, a lacquered straw hat with ribbons and lightning-charged daggers."},
-    "geada_ameixa": {"name": "Snowy Plum", "desc": "Wine tunic with silver buttons, light steel bracers, a wide silver straw hat with plum ribbons and a fan that glows like ice."},
-    "vibora_lotus": {"name": "Venom Lotus", "desc": "Black tunic with golden buttons, a plum veil over the face, a purple straw hat with venom-green ribbons and needles that glow like poison."},
-    "tita_brasa": {"name": "Volcanic Ember", "desc": "Black iron armor with ember-red bands and a bronze belt, a dark straw hat with fire ribbons and a staff that glows like magma."}
+    "tormenta_celeste": {
+      "name": "Celestial Tempest",
+      "desc": "Indigo tunic with golden buttons, dark steel bracers, a lacquered straw hat with ribbons and lightning-charged daggers."
+    },
+    "geada_ameixa": {
+      "name": "Snowy Plum",
+      "desc": "Wine tunic with silver buttons, light steel bracers, a wide silver straw hat with plum ribbons and a fan that glows like ice."
+    },
+    "vibora_lotus": {
+      "name": "Venom Lotus",
+      "desc": "Black tunic with golden buttons, a plum veil over the face, a purple straw hat with venom-green ribbons and needles that glow like poison."
+    },
+    "tita_brasa": {
+      "name": "Volcanic Ember",
+      "desc": "Black iron armor with ember-red bands and a bronze belt, a dark straw hat with fire ribbons and a staff that glows like magma."
+    }
   },
   "novidades": {
-    "proxima": [{ "texto": "Max level 40: XP keeps coming after level 30, and each level from 31 to 40 grants 4 attribute points. Characters already at 30 start the level 31 bar from zero." }, { "texto": "Celestial Palace set (level 35): nine new pieces, with an attack-100 weapon for each sect. At the forge, level 35 items need twice the Mist Jade." }, { "texto": "Two new maps beyond the Jade Citadel east gate: Crimson Ash Valley (levels 30–35), with the Ash Wanderer and the Crimson Fire Monk, and the Celestial Palace Ruins (levels 35–40), with the Celestial Guard and the Cold Moon Sorceress. Dying or using a Return Scroll there takes you back to the Citadel." }, { "texto": "Crimson Emperor (level 40), a boss in the Throne Hall of the Celestial Palace Ruins, and five new quests from level 31 to 40 with Governor Bai, the Pagoda Monk and the Jade Guards. The Trial gained levels 11 to 20 (bosses up to level 40)." }, { "texto": "Pagoda Monk (Jade Citadel): for 200,000 gold, he realigns your meridians and returns every attribute point you distributed, so you can redistribute them as you like." }, { "texto": "Sect outfits: Governor Bai (Jade Citadel) sells new outfits for your character, only for your own sect and with no combat effect. The first is the Celestial Tempest, for the Tempest: an indigo tunic, a straw hat with ribbons and lightning daggers, for 50,000 gold. Before buying, spin the outfit 360° (drag or use the arrows) and view it full screen; the same works for your character in the Character window." }, { "texto": "New Frost outfit: Snowy Plum, with a wine tunic, silver bracers, a wide silver straw hat with ribbons and a fan that glows like ice, for 50,000 gold from Governor Bai.", "wiki": "npc/governador" }, { "texto": "New Viper outfit: Venom Lotus, with a black tunic, plum veil, purple straw hat with venom-green ribbons and needles that glow like poison, for 50,000 gold from Governor Bai.", "wiki": "npc/governador" }, { "texto": "New Titan outfit: Volcanic Ember, with black iron armor, ember-red bands, a dark straw hat with fire ribbons and a staff that glows like magma, for 50,000 gold from Governor Bai.", "wiki": "npc/governador" }
-  ],
+    "proxima": [],
     "versoes": [
-      {"loja": ["Jade Citadel (level 30): a walled city with a great hall, a pagoda, new shops and NPCs and its own music, via the Wayfarer Master.", "Epic equipment (purple): a rare drop that follows your level, 30% stronger than a Rare.", "New sounds: class attacks, skills, shields and boss fights.", "New music in the three dungeons and the Trial."], "itens": [{"texto": "Jade Citadel: a new walled city with a great hall, a five-story pagoda, jade-roofed houses and its own music. It has a forge, an apothecary and a market stall run by new characters (Master Smith Lin, Apothecary Wen and Merchant Jin), plus Governor Bai, the Pagoda Monk and the Jade Guards. At level 30, the Wayfarer Master takes you there for 200 gold. It has its own Wayfarer Master, who takes you to the hunting maps and back to the village for free."}, {"texto": "Epic equipment (purple): any piece can drop as Epic, with a 0.5% chance from any monster and 1% from bosses, only while you play (not on Auto or offline). It has no level: it follows yours and is 30% stronger than a Rare, with bonuses made for your class. Forge it up to +10 (double gold); it cannot be sold or salvaged."}, {"texto": "Each class now has its own attack sounds: sword cuts for the Tempest, a monk staff for the Titan, ice for the Frost and needles for the Viper, each with its own critical hit."}, {"texto": "Boss area strikes now have sound: a cymbal swells while the red circle is on the ground and an impact plays when the strike lands."}, {"texto": "Shields now have sound: a muffled impact when they absorb a hit and breaking glass when the damage depletes them."}, {"texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."}, {"texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."}, {"texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."}]},
-      {"itens": [{"texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."}]},
-      {"itens": [{"texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."}]},
-      {"itens": [{"texto": "Wayfarer Master: a new NPC in the village square, next to a golden circle. For 200 gold, the Master takes you straight to any hunting map your level has unlocked. Coming back is on foot or with a Return Scroll. On the world map, the Master's destinations have the ✦ mark."}]},
-      {"itens": [{"texto": "You choose when to level up: XP is stored (up to 3 ready levels) and your frame glows when a level is ready. Tap it (or press U) to level up, great for screenshots and videos; the animation is now 3× longer. With XP full, monsters stop giving XP and warn you on every kill."}]},
-      {"itens": [{"texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."}, {"texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."}]},
-      {"itens": [{"texto": "Cheaper repairs for shield users: a hit fully absorbed by a shield (Iron Skin, Mist Veil) no longer wears down your equipment."}]},
-      {"itens": [{"texto": "Max level is now 30: from 21 to 30 each level gives 4 free points. Characters at level 20 earn XP again."}, {"texto": "Level 20 and 25 equipment and the Mist Jade forging material. The Merchant sells jade and the Trial gives the new items."}, {"texto": "New maps: Shadow Bamboo Grove (level 20+) and Misty Peak (level 25+), with 4 monsters, the boss Lord of the Mist and 5 quests."}]},
-      {"itens": [{"texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."}]},
-      {"itens": [{"texto": "Battery saver on Auto: hunting without touching the screen for a while, the game enters rest mode (black screen with a summary of gains and much less processing), losing nothing from the hunt, material drops included. While Auto is on, the phone no longer turns the screen off by itself. One tap brings it back. Set it in ⚙ Settings (30 s, 1 min, 2 min or off)."}]},
+      {
+        "loja": [
+          "Max level 40, with the Celestial Palace set (level 35) and attack 100 weapons.",
+          "Two new maps beyond the Jade Citadel: Crimson Ash Valley (30–35) and Celestial Palace Ruins (35–40).",
+          "Crimson Emperor, a level 40 boss, five new quests and the Trial up to level 20.",
+          "Sect outfits from Governor Bai and the Pagoda Monk, who refunds your attribute points."
+        ],
+        "itens": [
+          {
+            "texto": "Max level 40: XP keeps coming after level 30, and each level from 31 to 40 grants 4 attribute points. Characters already at 30 start the level 31 bar from zero."
+          },
+          {
+            "texto": "Celestial Palace set (level 35): nine new pieces, with an attack-100 weapon for each sect. At the forge, level 35 items need twice the Mist Jade."
+          },
+          {
+            "texto": "Two new maps beyond the Jade Citadel east gate: Crimson Ash Valley (levels 30–35), with the Ash Wanderer and the Crimson Fire Monk, and the Celestial Palace Ruins (levels 35–40), with the Celestial Guard and the Cold Moon Sorceress. Dying or using a Return Scroll there takes you back to the Citadel."
+          },
+          {
+            "texto": "Crimson Emperor (level 40), a boss in the Throne Hall of the Celestial Palace Ruins, and five new quests from level 31 to 40 with Governor Bai, the Pagoda Monk and the Jade Guards. The Trial gained levels 11 to 20 (bosses up to level 40)."
+          },
+          {
+            "texto": "Pagoda Monk (Jade Citadel): for 200,000 gold, he realigns your meridians and returns every attribute point you distributed, so you can redistribute them as you like."
+          },
+          {
+            "texto": "Sect outfits: Governor Bai (Jade Citadel) sells new outfits for your character, only for your own sect and with no combat effect. The first is the Celestial Tempest, for the Tempest: an indigo tunic, a straw hat with ribbons and lightning daggers, for 50,000 gold. Before buying, spin the outfit 360° (drag or use the arrows) and view it full screen; the same works for your character in the Character window."
+          },
+          {
+            "texto": "New Frost outfit: Snowy Plum, with a wine tunic, silver bracers, a wide silver straw hat with ribbons and a fan that glows like ice, for 50,000 gold from Governor Bai.",
+            "wiki": "npc/governador"
+          },
+          {
+            "texto": "New Viper outfit: Venom Lotus, with a black tunic, plum veil, purple straw hat with venom-green ribbons and needles that glow like poison, for 50,000 gold from Governor Bai.",
+            "wiki": "npc/governador"
+          },
+          {
+            "texto": "New Titan outfit: Volcanic Ember, with black iron armor, ember-red bands, a dark straw hat with fire ribbons and a staff that glows like magma, for 50,000 gold from Governor Bai.",
+            "wiki": "npc/governador"
+          }
+        ]
+      },
+      {
+        "loja": [
+          "Jade Citadel (level 30): a walled city with a great hall, a pagoda, new shops and NPCs and its own music, via the Wayfarer Master.",
+          "Epic equipment (purple): a rare drop that follows your level, 30% stronger than a Rare.",
+          "New sounds: class attacks, skills, shields and boss fights.",
+          "New music in the three dungeons and the Trial."
+        ],
+        "itens": [
+          {
+            "texto": "Jade Citadel: a new walled city with a great hall, a five-story pagoda, jade-roofed houses and its own music. It has a forge, an apothecary and a market stall run by new characters (Master Smith Lin, Apothecary Wen and Merchant Jin), plus Governor Bai, the Pagoda Monk and the Jade Guards. At level 30, the Wayfarer Master takes you there for 200 gold. It has its own Wayfarer Master, who takes you to the hunting maps and back to the village for free."
+          },
+          {
+            "texto": "Epic equipment (purple): any piece can drop as Epic, with a 0.5% chance from any monster and 1% from bosses, only while you play (not on Auto or offline). It has no level: it follows yours and is 30% stronger than a Rare, with bonuses made for your class. Forge it up to +10 (double gold); it cannot be sold or salvaged."
+          },
+          {
+            "texto": "Each class now has its own attack sounds: sword cuts for the Tempest, a monk staff for the Titan, ice for the Frost and needles for the Viper, each with its own critical hit."
+          },
+          {
+            "texto": "Boss area strikes now have sound: a cymbal swells while the red circle is on the ground and an impact plays when the strike lands."
+          },
+          {
+            "texto": "Shields now have sound: a muffled impact when they absorb a hit and breaking glass when the damage depletes them."
+          },
+          {
+            "texto": "Skills now have their own sound: every strike, dash, ice spell, shield, quake, fire punch, needle and poison of the four classes has its own sound effect."
+          },
+          {
+            "texto": "Boss fights now have sound: a gong when you enter the arena, a roar when the boss becomes enraged, a war horn when it calls helpers and a fanfare on victory."
+          },
+          {
+            "texto": "New music in the three dungeons (Eternal Ice Gorge, Defiled Monastery and Bandit Lair) and in the Trial: each one has its own, faster soundtrack for the boss fights."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "New music: the Ruins, the Mountain and the Misty Peak now have their own soundtrack (before, the previous map's music kept playing)."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "On PC, a new golden gauntlet cursor: it gets a speech bubble over an NPC and turns into a sword over a monster. Default volume is now 20 for effects and 40 for music for new players."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "Wayfarer Master: a new NPC in the village square, next to a golden circle. For 200 gold, the Master takes you straight to any hunting map your level has unlocked. Coming back is on foot or with a Return Scroll. On the world map, the Master's destinations have the ✦ mark."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "You choose when to level up: XP is stored (up to 3 ready levels) and your frame glows when a level is ready. Tap it (or press U) to level up, great for screenshots and videos; the animation is now 3× longer. With XP full, monsters stop giving XP and warn you on every kill."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "World map: the map (M or tap the minimap) has a new World tab with every map and its levels. Tap a map to see the route step by step, portal by portal, from where you are; the next portal blinks gold on the minimap."
+          },
+          {
+            "texto": "Leveling up now feels special: your character raises their arms wrapped in golden light, with a light column, a ring on the ground and sparks. At levels 10, 20 and 30 the celebration is bigger. For a moment (0.65 s) they stand still in the pose."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "Cheaper repairs for shield users: a hit fully absorbed by a shield (Iron Skin, Mist Veil) no longer wears down your equipment."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "Max level is now 30: from 21 to 30 each level gives 4 free points. Characters at level 20 earn XP again."
+          },
+          {
+            "texto": "Level 20 and 25 equipment and the Mist Jade forging material. The Merchant sells jade and the Trial gives the new items."
+          },
+          {
+            "texto": "New maps: Shadow Bamboo Grove (level 20+) and Misty Peak (level 25+), with 4 monsters, the boss Lord of the Mist and 5 quests."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "Trial: a new portal at the south exit of the village (level 20). Pick any boss in the game and fight it on Trial levels 1 to 10 (boss level 21 to 30): each boss has a weak point (physical or spiritual damage), every win unlocks the next level of that boss, and the equipment and material drop chance rises from +12% to +18.62%."
+          }
+        ]
+      },
+      {
+        "itens": [
+          {
+            "texto": "Battery saver on Auto: hunting without touching the screen for a while, the game enters rest mode (black screen with a summary of gains and much less processing), losing nothing from the hunt, material drops included. While Auto is on, the phone no longer turns the screen off by itself. One tap brings it back. Set it in ⚙ Settings (30 s, 1 min, 2 min or off)."
+          }
+        ]
+      },
       {
         "itens": [
           {
