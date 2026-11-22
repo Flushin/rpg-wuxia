@@ -807,6 +807,13 @@
           "The potion seller buys anything you bring. Even that junk you found in the forest."
         ]
       },
+      "antiquario": {
+        "name": "Antiquarian Lao",
+        "lines": [
+          "Relics of forgotten dynasties, each with a power of its own. Only a level 50 hero can bear one.",
+          "The common and rare ones I sell. The legendary ones? Only by tearing them from the claws of great bosses."
+        ]
+      },
       "estabulo": {
         "name": "Stablemaster Ma",
         "lines": [
@@ -1056,6 +1063,9 @@
       {
         "texto": "Mounts: Stablemaster Ma, at the new stable in the Jade Citadel, sells a horse for 50,000 gold. Out of combat you mount by yourself and move 30% faster; when combat starts, you dismount at once.",
         "wiki": "npc/estabulo"
+      },
+      {
+        "texto": "Relics: a new equipment slot on your character, from level 50. Antiquarian Lao, in the Jade Citadel, sells common and rare relics with stats and a unique effect (life steal, attack speed, cooldown or health). Legendary ones only drop from bosses."
       }
     ],
     "versoes": [
@@ -1315,6 +1325,58 @@
     "cavalo": {
       "name": "Horse",
       "desc": "A bay horse from the Citadel stables. Carries you faster along the roads; you dismount when combat starts."
+    }
+  },
+  "relics": {
+    "slotName": "Relic",
+    "rarities": {
+      "comum": {
+        "name": "Common"
+      },
+      "rara": {
+        "name": "Rare"
+      },
+      "lendaria": {
+        "name": "Legendary"
+      }
+    },
+    "list": {
+      "casco_tartaruga": {
+        "name": "Black Tortoise Shell",
+        "desc": "A shard of shell from a northern guardian, cold as river stone."
+      },
+      "sino_bronze": {
+        "name": "Bronze Temple Bell",
+        "desc": "A small bell from a sunken temple. Its sound clears the mind."
+      },
+      "garra_tigre": {
+        "name": "White Tiger Claw",
+        "desc": "A polished claw on a silk cord. Strikes leave before thought."
+      },
+      "espelho_lua": {
+        "name": "Pale Moon Mirror",
+        "desc": "A bronze mirror that reflects the moon even by day."
+      },
+      "taca_sangue": {
+        "name": "General's Blood Cup",
+        "desc": "A red jade cup of a forgotten general. Whoever drinks from it does not fall."
+      },
+      "pena_grou": {
+        "name": "Immortal Crane Feather",
+        "desc": "A white feather that never touches the ground when it falls."
+      },
+      "coracao_dragao": {
+        "name": "Azure Dragon Heart",
+        "desc": "A living stone that beats like a heart. They say it comes from the depths of the Night Harbor sea."
+      },
+      "selo_jade": {
+        "name": "Imperial Jade Seal",
+        "desc": "The lost seal of the ancient dynasty. Its bearer carries the weight of an empire."
+      },
+      "perola_qilin": {
+        "name": "Qilin Pearl",
+        "desc": "The pearl a qilin carries in its mouth. It shines brighter near qi."
+      }
     }
   }
 }

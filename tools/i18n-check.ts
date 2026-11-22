@@ -11,6 +11,7 @@ import quests from '../src/data/quests.json';
 import novidades from '../src/data/novidades.json';
 import skins from '../src/data/skins.json';
 import mounts from '../src/data/mounts.json';
+import relics from '../src/data/relics.json';
 import { readFileSync, readdirSync } from 'node:fs';
 
 type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -108,6 +109,12 @@ for (const [id, k] of Object.entries(skins as J))
 // montarias: nome e descrição
 for (const [id, k] of Object.entries(mounts as J))
   for (const f of ['name', 'desc']) need(k[f], E.mounts?.[id]?.[f], `mounts.${id}.${f}`);
+// relíquias: nome e descrição de cada uma, nomes das raridades e do espaço
+for (const [id, k] of Object.entries((relics as J).list as J))
+  for (const f of ['name', 'desc']) need(k[f], E.relics?.list?.[id]?.[f], `relics.list.${id}.${f}`);
+for (const [id, k] of Object.entries((relics as J).rarities as J))
+  need(k.name, E.relics?.rarities?.[id]?.name, `relics.rarities.${id}`);
+need((relics as J).slotName, E.relics?.slotName, 'relics.slotName');
 // npcs (falas dos NPCs e mestres): todo texto
 need(npcs, E.npcs, 'npcs');
 // missões (marco 7): nome, oferta, objetivo e fala de entrega de cada etapa
@@ -155,6 +162,7 @@ for (const k of Object.keys(E))
       'names',
       'skins',
       'mounts',
+      'relics',
       'ultimates',
     ].includes(k)
   )

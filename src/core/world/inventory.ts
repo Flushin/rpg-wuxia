@@ -2,7 +2,7 @@
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
 import { DUNGEON_EQUIP_DROP_MUL, isDungeonMap } from '../dungeons';
 import { trialDropMul, trialEquipReqLevel, trialGold } from '../trial';
-import { CLASSES, type MonsterDef } from '../data';
+import { CLASSES, RELICS, type MonsterDef } from '../data';
 import { L } from '../i18n';
 import {
   BAG_TAB_SIZE,
@@ -66,6 +66,8 @@ export function gearStats(w: World): Record<string, number> {
     if (!it || isBroken(it)) continue;
     for (const [k, v] of Object.entries(itemStats(it, w.owner()))) out[k] = (out[k] ?? 0) + v;
   }
+  const r = w.relic ? RELICS[w.relic] : undefined; // relíquia equipada: atributos fixos, sem durabilidade
+  if (r) for (const [k, v] of Object.entries(r.stats)) out[k] = (out[k] ?? 0) + v;
   return out;
 }
 

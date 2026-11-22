@@ -2,7 +2,8 @@
 // equipamento), gastar pontos livres, "Distribuir recomendado", derivados e elementos. A mochila (I) é só a bolsa.
 // Não toca som de abrir/fechar nem decide quando abre: isso fica no Hud (togglePanel).
 import { L } from '../core/i18n';
-import { CLASSES } from '../core/data';
+import { CLASSES, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
+import { relicEffectText, relicPickHtml } from './relicShop';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
 import { attrBreakdown } from '../core/stats';
@@ -55,7 +56,7 @@ export class CharacterPanel {
   /** Assinatura do que foi desenhado; vazio força redesenhar no próximo update. */
   private sig = '';
   /** Slot equipado selecionado (detalhe + Desequipar). */
-  private sel: Slot | null = null;
+  private sel: Slot | 'reliquia' | null = null;
   private last = { slot: '', t: 0 };
 
   constructor(
@@ -65,11 +66,11 @@ export class CharacterPanel {
   ) {
     const el = byId('attrs-panel');
     el.addEventListener('contextmenu', (e) => e.preventDefault());
-    bindItemTip(world, el, (c) => world.equipment[c.dataset.eq as Slot]);
+    bindItemTip(world, el, (c) => (c.dataset.eq === 'reliquia' ? null : world.equipment[c.dataset.eq as Slot]));
     el.addEventListener('click', (e) => {
       if (e.target === el) return this.onClose();
       const t = (e.target as HTMLElement).closest(
-        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip]',
+        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip],[data-relic-eq]',
       ) as HTMLElement | null;
       if (!t) {
         // toque fora de um equipado (e fora do detalhe): desfaz a seleção e o detalhe some
@@ -79,7 +80,17 @@ export class CharacterPanel {
         }
         return;
       }
-      if (t.dataset.eq) {
+      if (t.dataset.relicEq !== undefined) {
+        // relíquia: equipar uma da coleção ou tirar a atual ('' = tirar)
+        audio.ui('ui_click');
+        const err = world.equipRelic(t.dataset.relicEq || null);
+        if (err) this.toast(actionErrorText(err), '#ff8a80');
+        this.sig = '';
+      } else if (t.dataset.eq === 'reliquia') {
+        this.sel = 'reliquia';
+        this.sig = '';
+        byId('item-tip').classList.add('hidden');
+      } else if (t.dataset.eq) {
         const slot = t.dataset.eq as Slot,
           now = performance.now();
         const dbl = slot === this.last.slot && now - this.last.t < 400;
@@ -113,7 +124,7 @@ export class CharacterPanel {
   }
 
   private unequip() {
-    if (!this.sel || !this.world.equipment[this.sel]) return;
+    if (!this.sel || this.sel === 'reliquia' || !this.world.equipment[this.sel]) return;
     const err = this.world.unequip(this.sel);
     this.sig = '';
     if (err) this.toast(actionErrorText(err), '#ff8a80');
@@ -134,6 +145,7 @@ export class CharacterPanel {
       p.level,
       w.invVersion,
       this.sel,
+      w.relic,
       Math.floor(w.playTime.auto / 60),
       Math.floor(w.playTime.manual / 60),
     ]);
@@ -184,7 +196,10 @@ export class CharacterPanel {
       [L('Dano crítico', 'Crit damage'), `${Math.round(d.critDamage * 100)}%`],
     ];
     // roubo de vida da seita (Tormenta): só aparece para quem tem
-    if (cls.lifeSteal) der.push([L('Roubo de vida', 'Life steal'), `${+(cls.lifeSteal * 100).toFixed(1)}%`]);
+    const ls = (cls.lifeSteal ?? 0) + w.relicEffect('lifeSteal');
+    if (ls) der.push([L('Roubo de vida', 'Life steal'), `${+(ls * 100).toFixed(1)}%`]);
+    const relicDef = w.relic ? RELICS[w.relic] : undefined;
+    if (relicDef && relicDef.effect.kind !== 'lifeSteal') der.push([L('Relíquia', 'Relic'), relicEffectText(relicDef)]);
     const fmtPlay = (s: number) => {
       const m = Math.floor(s / 60);
       return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min`;
@@ -199,22 +214,28 @@ export class CharacterPanel {
       (e) =>
         `<div class="at-el el-${e}"><span>${ELEMENT_LABELS[e]}</span><b class="${p.elemAtk[e] ? '' : 'zero'}">${p.elemAtk[e]}</b><b class="${p.elemRes[e] ? '' : 'zero'}">${p.elemRes[e]}</b></div>`,
     ).join('');
-    if (this.sel && !w.equipment[this.sel]) this.sel = null;
+    if (this.sel && this.sel !== 'reliquia' && !w.equipment[this.sel]) this.sel = null;
     const eqCell = (sl: Slot) => {
       const it = w.equipment[sl];
       return `<div class="eqs eqs-${sl}"><small>${SLOT_NAMES[sl]}</small><button class="cell ${this.sel === sl ? 'sel' : ''}" data-eq="${sl}" style="${cellStyle(it)}" aria-label="${SLOT_NAMES[sl]}" title="${SLOT_NAMES[sl]}">${it ? cellHtml(it, w.owner()) : `<span class="ic empty img">${slotIconHtml(sl, w.classId)}</span>`}</button></div>`;
     };
     const eq = `<div class="eq-col">${BODY_LEFT.map(eqCell).join('')}</div>${spinHtml(w.skin ?? w.classId, bodyFigure(w.skin ?? w.classId, cls.color ?? '#889'), 'body-spin')}<div class="eq-col">${BODY_RIGHT.map(eqCell).join('')}</div>`;
-    const selIt = this.sel ? w.equipment[this.sel] : null;
-    const detail = selIt
-      ? `<div class="tipbody">${itemTipHtml(w, selIt, false)}</div><button class="primary" data-unequip="1">${L('Desequipar', 'Unequip')}</button>`
-      : `<div class="muted">${isTouch ? L('Toque em um equipado para ver os detalhes. Duplo toque desequipa.', 'Tap an equipped item to see details. Double tap unequips.') : L('Clique em um equipado para ver os detalhes. Duplo clique desequipa.', 'Click an equipped item to see details. Double-click unequips.')}</div>`;
+    // relíquia (Porto Noturno, etapa 4): espaço próprio abaixo do corpo; o detalhe mostra a coleção para trocar
+    const rl = w.relic ? RELICS[w.relic] : undefined;
+    const relicCell = `<div class="eqs eqs-reliquia"><small>${RELIC_SLOT_NAME}</small><button class="cell ${this.sel === 'reliquia' ? 'sel' : ''}" data-eq="reliquia" style="${rl ? `border-color:${RELIC_RARITIES[rl.rarity].color}` : ''}" aria-label="${RELIC_SLOT_NAME}" title="${RELIC_SLOT_NAME}"><span class="ic ${rl ? '' : 'empty'} rl-cell">${rl ? rl.icon : '🏮'}</span></button></div>`;
+    const selIt = this.sel && this.sel !== 'reliquia' ? w.equipment[this.sel] : null;
+    const detail =
+      this.sel === 'reliquia'
+        ? relicPickHtml(w)
+        : selIt
+          ? `<div class="tipbody">${itemTipHtml(w, selIt, false)}</div><button class="primary" data-unequip="1">${L('Desequipar', 'Unequip')}</button>`
+          : `<div class="muted">${isTouch ? L('Toque em um equipado para ver os detalhes. Duplo toque desequipa.', 'Tap an equipped item to see details. Double tap unequips.') : L('Clique em um equipado para ver os detalhes. Duplo clique desequipa.', 'Click an equipped item to see details. Double-click unequips.')}</div>`;
     renderPanel(
       byId('attrs-panel'),
       `<div class="card at-card ch-card" style="--c:${cls.color}">${closeX('data-close="1"')}
       <h2>${L('Personagem', 'Character')}</h2>
       <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
-      <div class="ch-top"><div class="ch-left"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="inv-detail ch-detail">${detail}</div></div>
+      <div class="ch-top"><div class="ch-left"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="eq-relic">${relicCell}</div><div class="inv-detail ch-detail">${detail}</div></div>
       <div class="ch-der"><h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
       <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
       <h3 class="at-h">${L('Tempo de jogo', 'Play time')}</h3>

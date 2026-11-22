@@ -9,6 +9,10 @@
     {
       "texto": "Montarias: o Cavalariço Ma, no novo estábulo da Cidadela de Jade, vende um cavalo por 50.000 de ouro. Fora de combate você monta sozinho e anda 30% mais rápido; ao entrar em combate, desmonta na hora.",
       "wiki": "npc/estabulo"
+    },
+    {
+      "texto": "Relíquias: novo espaço de equipamento no personagem, a partir do nível 50. O Antiquário Lao, na Cidadela de Jade, vende relíquias comuns e raras com atributos e um efeito único (roubo de vida, velocidade de ataque, recarga ou vida). As lendárias só caem de chefes.",
+      "wiki": "mecanicas/reliquias"
     }
   ],
   "versoes": [

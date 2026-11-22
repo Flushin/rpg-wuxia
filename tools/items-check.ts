@@ -1,7 +1,7 @@
 // Verificação headless de itens, inventário, loot, poções, NPCs e save (não vai para o build do jogo).
 // Uso: npm run check:items
 import { readFileSync } from 'node:fs';
-import { CLASSES, MONSTERS } from '../src/core/data';
+import { CLASSES, MONSTERS, RELIC_DROP, RELICS } from '../src/core/data';
 import {
   BASES,
   POTIONS,
@@ -699,6 +699,49 @@ console.log('\n== save ==');
     w4.bag[0] === null && w4.bag[2]?.durability === 100 && w4.bag[2].rarity === 'comum' && !w4.equipment.arma,
     'save corrompido é saneado',
   );
+}
+// ---------- relíquias (Porto Noturno, etapa 4) ----------
+console.log('\n== relíquias ==');
+{
+  const w = mk('lamina', 50, 'cidadela');
+  const lao = w.npcs.find((n) => n.npcId === 'antiquario');
+  ok(!!lao && w.npcRole(lao) === 'antiquario', 'Antiquário Lao na Cidadela');
+  w.gold = 1_000_000;
+  ok(w.buyRelic('taca_sangue')?.code === 'talkToAntiquary', 'só compra falando com o antiquário');
+  w.openNpc = lao!;
+  ok(w.buyRelic('coracao_dragao')?.code === 'notEquippable', 'lendária não está à venda');
+  const g0 = w.gold;
+  ok(w.buyRelic('taca_sangue') === null && w.gold === g0 - RELICS.taca_sangue.price, 'compra pelo preço');
+  ok(w.buyRelic('taca_sangue')?.code === 'relicOwned', 'não compra duas vezes');
+  ok(w.equipRelic('selo_jade')?.code === 'relicNotOwned', 'não equipa a que não tem');
+  const atk0 = w.player.derived.physAtk,
+    hp0 = w.player.derived.maxHp;
+  ok(w.equipRelic('taca_sangue') === null && w.relic === 'taca_sangue', 'equipa a relíquia');
+  ok(w.player.derived.physAtk === atk0 + RELICS.taca_sangue.stats.physAtk, 'atributos somam no personagem');
+  ok(w.player.derived.maxHp > hp0, 'vida máxima sobe');
+  ok(w.relicEffect('lifeSteal') === RELICS.taca_sangue.effect.value, 'efeito único ativo');
+  const back = World.fromSave(maps, JSON.parse(JSON.stringify(w.serialize())));
+  ok(back.relic === 'taca_sangue' && back.relicsOwned.join() === 'taca_sangue', 'relíquia fica no save');
+  ok(back.player.derived.physAtk === w.player.derived.physAtk, 'atributos recalculados ao carregar');
+  const old = World.fromSave(maps, {
+    ...JSON.parse(JSON.stringify(w.serialize())),
+    relics: ['xx', 'taca_sangue'],
+    relic: 'selo_jade',
+  });
+  ok(old.relicsOwned.join() === 'taca_sangue' && old.relic === null, 'save saneado (id inválido e não possuída)');
+  ok(w.equipRelic(null) === null && w.player.derived.physAtk === atk0, 'desequipar volta ao normal');
+  const low = mk('lamina', 30, 'cidadela');
+  low.openNpc = low.npcs.find((n) => n.npcId === 'antiquario')!;
+  low.gold = 1_000_000;
+  ok(low.buyRelic('sino_bronze')?.code === 'needLevel', 'exige nível 50');
+  // drop de lendária: chance por chefe com o jogador no nível 50
+  const d = mk('lamina', 50, 'cidadela') as World & { rollRelicDrop: () => void; rng: { next: () => number } };
+  d.rng = { next: () => 0 };
+  d.rollRelicDrop();
+  ok(d.relicsOwned.length === 1 && RELICS[d.relicsOwned[0]].rarity === 'lendaria', 'chefe pode dar lendária');
+  d.rng = { next: () => RELIC_DROP.chance };
+  d.rollRelicDrop();
+  ok(d.relicsOwned.length === 1, 'sem sorte, nada cai');
 }
 function SLOTS_EMPTY(w: World) {
   return Object.values(w.equipment).every((e) => e === null);

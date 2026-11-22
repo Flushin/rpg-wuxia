@@ -1,0 +1,94 @@
+{
+  "_doc": "Relíquias (Porto Noturno, etapa 4; docs/decisoes/reliquias.md). 1 espaço no personagem; atributos fixos + 1 efeito único. Comum e rara: Antiquário Lao; lendária: só de chefes (drop.chance por chefe derrotado com o jogador no nível drop.minPlayerLevel+). Sem durabilidade, forja nem gemas.",
+  "slotName": "Relíquia",
+  "reqLevel": 50,
+  "rarities": {
+    "comum": { "name": "Comum", "color": "#ffffff" },
+    "rara": { "name": "Rara", "color": "#4aa3ff" },
+    "lendaria": { "name": "Lendária", "color": "#ff9f1c" }
+  },
+  "drop": { "chance": 0.03, "minPlayerLevel": 50 },
+  "list": {
+    "casco_tartaruga": {
+      "name": "Casco da Tartaruga Negra",
+      "desc": "Fragmento de casco de um guardião do norte, frio como pedra de rio.",
+      "icon": "🐢",
+      "rarity": "comum",
+      "price": 40000,
+      "stats": { "maxHp": 600, "physDef": 40, "spiritDef": 40 },
+      "effect": { "kind": "maxHpPct", "value": 0.05 }
+    },
+    "sino_bronze": {
+      "name": "Sino de Bronze do Templo",
+      "desc": "Pequeno sino de um templo afundado. O som clareia a mente.",
+      "icon": "🔔",
+      "rarity": "comum",
+      "price": 40000,
+      "stats": { "maxMana": 300, "spiritAtk": 40 },
+      "effect": { "kind": "cooldown", "value": 0.05 }
+    },
+    "garra_tigre": {
+      "name": "Garra do Tigre Branco",
+      "desc": "Garra polida presa num cordão de seda. Os golpes saem antes do pensamento.",
+      "icon": "🐯",
+      "rarity": "comum",
+      "price": 40000,
+      "stats": { "physAtk": 40, "hit": 20 },
+      "effect": { "kind": "attackSpeed", "value": 0.04 }
+    },
+    "espelho_lua": {
+      "name": "Espelho da Lua Pálida",
+      "desc": "Espelho de bronze que reflete a lua mesmo de dia.",
+      "icon": "🪞",
+      "rarity": "rara",
+      "price": 120000,
+      "stats": { "spiritAtk": 80, "critChance": 0.03 },
+      "effect": { "kind": "cooldown", "value": 0.1 }
+    },
+    "taca_sangue": {
+      "name": "Taça de Sangue do General",
+      "desc": "Taça de jade rubro de um general esquecido. Quem bebe dela não cai.",
+      "icon": "🏺",
+      "rarity": "rara",
+      "price": 120000,
+      "stats": { "physAtk": 80, "maxHp": 400 },
+      "effect": { "kind": "lifeSteal", "value": 0.03 }
+    },
+    "pena_grou": {
+      "name": "Pena do Grou Imortal",
+      "desc": "Pena branca que nunca toca o chão quando cai.",
+      "icon": "🪶",
+      "rarity": "rara",
+      "price": 120000,
+      "stats": { "hit": 30, "evasion": 40 },
+      "effect": { "kind": "attackSpeed", "value": 0.08 }
+    },
+    "coracao_dragao": {
+      "name": "Coração do Dragão Azul",
+      "desc": "Pedra viva que pulsa como um coração. Dizem que vem do fundo do mar do Porto Noturno.",
+      "icon": "🐉",
+      "rarity": "lendaria",
+      "price": 0,
+      "stats": { "physAtk": 120, "spiritAtk": 120, "maxHp": 800 },
+      "effect": { "kind": "lifeSteal", "value": 0.05 }
+    },
+    "selo_jade": {
+      "name": "Selo de Jade Imperial",
+      "desc": "O selo perdido da dinastia antiga. Seu portador carrega o peso de um império.",
+      "icon": "🟩",
+      "rarity": "lendaria",
+      "price": 0,
+      "stats": { "maxHp": 1200, "physDef": 100, "spiritDef": 100 },
+      "effect": { "kind": "maxHpPct", "value": 0.12 }
+    },
+    "perola_qilin": {
+      "name": "Pérola do Qilin",
+      "desc": "Pérola que o qilin carrega na boca. Brilha mais forte perto do qi.",
+      "icon": "🔮",
+      "rarity": "lendaria",
+      "price": 0,
+      "stats": { "spiritAtk": 120, "physAtk": 60, "critChance": 0.05 },
+      "effect": { "kind": "cooldown", "value": 0.15 }
+    }
+  }
+}

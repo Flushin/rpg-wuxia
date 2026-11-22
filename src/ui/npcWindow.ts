@@ -2,7 +2,7 @@ import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
 import { BUYBACK_MAX } from '../core/world/shop';
 import { L, tn } from '../core/i18n';
-import { CLASSES, NPC_TEXT, MOUNTS, PROGRESSION, SKINS } from '../core/data';
+import { CLASSES, NPC_TEXT, MOUNTS, RELICS, PROGRESSION, SKINS } from '../core/data';
 import { bal } from '../core/balance';
 import { ATTR_KEYS } from '../core/types';
 import { ATTR_LABELS } from './labels';
@@ -35,6 +35,7 @@ import { spinHtml } from './spinView';
 import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import { gemClick, jewelerHtml, masterSmithHtml } from './gemShop';
+import { antiquaryHtml } from './relicShop';
 import {
   matCount,
   rarityCost,
@@ -68,6 +69,7 @@ export class NpcWindow {
   private resetAsk = false; // realinhar meridianos aguardando confirmação
   private gemSel = ''; // uid do item escolhido no Ferreiro-mestre
   private skinAsk = ''; // traje aguardando confirmação da compra
+  private relicAsk = ''; // relíquia aguardando confirmação da compra (Antiquário Lao)
   private mountAsk = ''; // montaria aguardando confirmação da compra
   private qty = 1;
   private pending = -1; // venda aguardando confirmação (incomum/raro)
@@ -160,6 +162,23 @@ export class NpcWindow {
       const err = w.buyMount(v);
       if (err) this.toast(actionErrorText(err), '#ff8a80');
       else this.toast(L(`Montaria comprada: ${MOUNTS[v].name}`, `Mount bought: ${MOUNTS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'relicbuy') {
+      if (this.relicAsk !== v) {
+        audio.ui('ui_click');
+        this.relicAsk = v;
+        return;
+      }
+      this.relicAsk = '';
+      const err = w.buyRelic(v);
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else this.toast(L(`Relíquia comprada: ${RELICS[v].name}`, `Relic bought: ${RELICS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'reliccancel') {
+      audio.ui('ui_click');
+      this.relicAsk = '';
       return;
     }
     if (a === 'mountcancel') {
@@ -328,6 +347,7 @@ export class NpcWindow {
       this.resetAsk = false;
       this.skinAsk = '';
       this.mountAsk = '';
+      this.relicAsk = '';
       this.gemSel = '';
       this.pending = -1;
       this.sig = '';
@@ -336,7 +356,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}|${w.relicsOwned.length}|${this.relicAsk}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -352,6 +372,7 @@ export class NpcWindow {
       role === 'meridianos' ||
       role === 'governador' ||
       role === 'estabulo' ||
+      role === 'antiquario' ||
       role === 'joalheiro' ||
       role === 'ferreiro_mestre';
     let view: View,
@@ -366,6 +387,7 @@ export class NpcWindow {
     else if (role === 'meridianos') view = { list: this.talk(who) + this.meridians() };
     else if (role === 'governador') view = { list: this.talk(who) + this.skinShop() };
     else if (role === 'estabulo') view = { list: this.talk(who) + this.mountShop() };
+    else if (role === 'antiquario') view = { list: this.talk(who) + antiquaryHtml(w, this.relicAsk) };
     else if (role === 'joalheiro') view = { list: this.talk(who) + jewelerHtml(w) };
     else if (role === 'ferreiro_mestre') {
       const g = masterSmithHtml(w, this.gemSel);

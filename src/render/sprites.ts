@@ -57,6 +57,7 @@ const NPC_SHEET_BY_ID: Record<string, string> = {
   mestre_pavilhao: 'npc_mestra_geada',
   mestre_tita: 'npc_mestre_tita',
   mestre_vibora: 'npc_mestra_vibora',
+  antiquario: 'npc_monge_pagode', // provisório: Antiquário Lao usa o modelo do monge até o Porto Noturno
   estabulo: 'npc_mercador', // Cavalariço Ma usa o modelo do mercador
 };
 export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;

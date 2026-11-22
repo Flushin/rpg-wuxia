@@ -38,7 +38,16 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
-import { LEVELUP_POSE_S, MOUNTS, XP_BANK_LEVELS } from '../core/data';
+import {
+  LEVELUP_POSE_S,
+  MOUNTS,
+  RELIC_DROP,
+  RELIC_RARITIES,
+  RELIC_REQ_LEVEL,
+  RELICS,
+  XP_BANK_LEVELS,
+  relicEffectText,
+} from '../core/data';
 import {
   TRIAL_BOSSES,
   trialEquipReqLevel,
@@ -177,6 +186,7 @@ const TOPICS = [
   { id: 'epico', label: 'Equipamento Épico', icon: 'epico_colar' },
   { id: 'gemas', label: 'Gemas e encaixes', icon: 'po_estrela' },
   { id: 'montarias', label: 'Montarias', icon: 'pergaminho_retorno' },
+  { id: 'reliquias', label: 'Relíquias', icon: 'colar_jade' },
 ];
 
 export { EPIC };
@@ -187,7 +197,7 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -237,6 +247,28 @@ function gemas(): string {
       <p>Abrir (um de cada vez, na ordem):</p><ul>${open}</ul>
       <p><b>Colocar</b> uma gema num encaixe vazio é grátis. <b>Retirar</b> custa ${pc(GEM_CFG.removeCostPct)} do valor da gema, que volta inteira para a mochila.
       Item com gema <b>não pode ser vendido, destruído nem desmontado</b> (nem pelo Auto): retire as gemas antes.</p></section>`;
+}
+
+function reliquias(): string {
+  const rows = Object.values(RELICS)
+    .map((r) => {
+      const rar = RELIC_RARITIES[r.rarity];
+      const stats = Object.entries(r.stats)
+        .map(([k, v]) => `+${k === 'critChance' ? `${+(v * 100).toFixed(1)}%` : v} ${esc(STAT_LABELS[k] ?? k)}`)
+        .join(', ');
+      const where = r.rarity === 'lendaria' ? 'Drop de chefe' : `${r.price.toLocaleString('pt-BR')} ouro`;
+      return `<tr><td>${r.icon} <b style="color:${rar.color}">${esc(r.name)}</b></td><td>${esc(rar.name)}</td><td>${stats}</td><td>${esc(relicEffectText(r))}</td><td>${where}</td></tr>`;
+    })
+    .join('');
+  return `<section class="panel"><h2>Relíquias</h2>
+      <p>Um espaço de equipamento próprio, abaixo do corpo na janela do Personagem, liberado no <b>nível ${RELIC_REQ_LEVEL}</b>.
+      Cada relíquia dá atributos fixos e <b>um efeito único</b> (roubo de vida, velocidade de ataque, recarga das skills ou vida máxima em %).</p>
+      <ul><li><b>Comuns e raras:</b> vendidas pelo <a href="#/npc/antiquario">Antiquário Lao</a>, na Cidadela de Jade (provisório, até o Porto Noturno abrir).</li>
+      <li><b>Lendárias:</b> não estão à venda. Cada chefe derrotado (do mundo, de masmorra ou do Trial) com você no nível ${RELIC_DROP.minPlayerLevel} tem
+      ${Math.round(RELIC_DROP.chance * 100)}% de chance de dar uma lendária que você ainda não tem.</li>
+      <li>Compradas ou ganhas uma vez, ficam na sua coleção para sempre; troque a equipada quando quiser, sem custo.</li>
+      <li>Sem durabilidade, forja nem encaixe de gemas; não ocupam a mochila e não podem ser vendidas.</li></ul>
+      <table><tr><th>Relíquia</th><th>Raridade</th><th>Atributos</th><th>Efeito</th><th>Onde</th></tr>${rows}</table></section>`;
 }
 
 function montarias(): string {
