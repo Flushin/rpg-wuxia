@@ -147,7 +147,7 @@ export function collect(w: World, item: ItemInstance, x: number, y: number) {
   } else {
     const secs = item.rarity === 'epico' ? EPIC_GROUND_SECONDS : GROUND_SECONDS;
     w.ground.push({ id: w.nextGround++, x, y, item, expires: w.time + secs });
-    w.emit({ type: 'bagFull' });
+    w.emit({ type: 'bagFull', tab: bagTabOf(item.baseId) });
   }
 }
 

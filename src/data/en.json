@@ -577,7 +577,7 @@
     },
     "mochila_cheia": {
       "title": "Bag full",
-      "text": "Each bag tab (Equipment, Consumables and Materials) has 30 slots. The item stays on the ground for 60 seconds: free up space (sell items to the Potion Seller) and walk over it to pick it up."
+      "text": "Each bag tab (Equipment, Consumables and Materials) has 30 slots. The item stays on the ground for 60 seconds: free up space in the item's own tab (Destroy button in the bag, or sell to the Potion Seller) and walk over it to pick it up."
     },
     "primeiro_ouro": {
       "title": "Gold",

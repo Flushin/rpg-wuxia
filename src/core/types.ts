@@ -183,7 +183,7 @@ export type GameEvent =
   | { type: 'epicDrop'; name: string }
   | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
   | { type: 'goldPickup'; amount: number }
-  | { type: 'bagFull' }
+  | { type: 'bagFull'; tab?: 'equip' | 'pot' | 'mat' }
   | { type: 'groundGone'; id: number }
   | { type: 'equipChange' }
   | { type: 'potionUsed'; id: string; kind: PotionKind }
