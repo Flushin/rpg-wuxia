@@ -1,5 +1,6 @@
 // Mecânicas: combate e atributos, morte e durabilidade, forja e economia, auto-combate e ganho offline.
 // Tabelas e exemplos saem das fórmulas do jogo; as que são cópias (marcadas) são conferidas por tools/wiki-check.ts.
+import { BOSS_PCT_HP } from '../core/world/boss';
 import { TELEPORT_COST } from '../core/teleport';
 import { bal } from '../core/balance';
 import { CRIT_AGILITY_MAX, CRIT_TOTAL_MAX, computeDerived, emptyAttrs } from '../core/stats';
@@ -484,7 +485,7 @@ function trial(): string {
       <li>Depois da vitória, a saída é o portal da entrada (ao sul da arena).</li></ul></section>
     <section class="panel"><h2>Ponto fraco</h2><p>No Trial todos os chefes têm a <b>mesma vida e o mesmo dano por segundo</b> no mesmo nível. O que muda é o jeito de lutar e o ponto fraco:
       defesa alta contra um tipo de dano e baixa contra o outro. Tormenta, Titã e Víbora causam dano físico; Geada, espiritual.
-      Quem bate mais devagar bate mais forte (dano proporcional ao intervalo entre golpes).</p>
+      Quem bate mais devagar bate mais forte (dano proporcional ao intervalo entre golpes). Além disso, todo golpe de chefe tira <b>${Math.round(BOSS_PCT_HP.basic * 100)}% da sua vida máxima</b> por golpe normal (proporcional ao intervalo) e ${Math.round(BOSS_PCT_HP.telegraph * 100)}% por 1× de dano dos golpes marcados no chão, sem redução pela defesa (valores para chefe nível ${BOSS_PCT_HP.fullLevel}+; menos nos níveis abaixo). A defesa reduz só a outra parte do golpe.</p>
       <table class="tbl"><thead><tr><th>Chefe</th><th>Fraco contra</th><th>Golpe a cada</th><th>Passo</th><th>Mecânicas</th></tr></thead><tbody>${bosses}</tbody></table>
       <p class="muted">Ajudantes invocados vêm ${trialBossLevel(1) - trialSummonLevel(trialBossLevel(1))} níveis abaixo do chefe.</p></section>
     <section class="panel"><h2>Níveis</h2>

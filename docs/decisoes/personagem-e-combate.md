@@ -81,3 +81,6 @@
 - **Ouro:** cai dos monstros. O **vendedor de poções também compra qualquer item**.
 - **Poções:** recuperam **ao longo de 8 s** (estilo Dragon Oath); não acumulam (usar outra do mesmo tipo reinicia o efeito). **Pequena:** 30%. **Grande:** 60%, mais cara, cai de monstros nível 5+ (até os bandidos existirem, só na loja). Atalhos no PC (Q = HP, E = mana) e botões no celular.
 
+
+## Dano dos chefes em % da vida (22/11/2026)
+Todo golpe de chefe soma uma parte da vida máxima do jogador, sem redução pela defesa (a parte normal segue reduzida pela defesa física/espiritual): 4% por golpe normal (chefe que bate a cada 2,4 s; proporcional ao intervalo) e 9% por 1× de mult nos golpes marcados no chão. Vale inteiro para chefe nv 30+, sobe em linha do nv 10 (0) ao 30; chefes iniciais não mudam. Constantes em `BOSS_PCT_HP` (`src/core/world/boss.ts`).
