@@ -142,7 +142,7 @@ export class World {
   levelUpPose = 0;
   /** ultimate: carga atual (0..def.charge), soltura em andamento e último momento de combate (não vão para o save) */
   ultCharge = 0;
-  ultCast: { t: number; done: number; x: number; y: number } | null = null;
+  ultCast: { t: number; hits: Map<number, number>; x: number; y: number } | null = null;
   lastCombat = -99;
   ratioCursor = 0;
   seenTips: string[] = [];
@@ -765,7 +765,7 @@ export class World {
     this.pendingSkill = null;
     this.autoAttack = false;
     p.path = [];
-    this.ultCast = { t: 0, done: 0, x: p.x, y: p.y };
+    this.ultCast = { t: 0, hits: new Map(), x: p.x, y: p.y };
     this.lastCombat = this.time;
     this.emit({ type: 'ultimate', phase: 'start', x: p.x, y: p.y, radius: u.radius, targets: [] });
     return true;
@@ -775,26 +775,39 @@ export class World {
       u = this.ultimate()!,
       p = this.player;
     c.t += dt;
-    const every = u.duration / u.strikes;
-    while (c.done < u.strikes && c.t >= every * (c.done + 0.5)) {
-      c.done++;
-      this.ultStrike(u, u.strikeMult, 'strike');
+    // cada monstro leva seus raios num compasso próprio (fase pelo id): os raios caem intercalados, sem pausa
+    const every = u.duration / u.strikes,
+      inside = this.ultInside(u),
+      k = ultSplit(u, inside.length);
+    for (const m of inside) {
+      const done = c.hits.get(m.id) ?? 0,
+        phase = (m.id * 0.618034) % 1;
+      if (done >= u.strikes || c.t < every * (done + phase)) continue;
+      c.hits.set(m.id, done + 1);
+      this.emit({ type: 'ultimate', phase: 'strike', x: c.x, y: c.y, radius: u.radius, targets: [{ x: m.x, y: m.y }] });
+      this.attack(p, m, u.strikeMult * k, true, false);
+      this.lastCombat = this.time;
     }
     if (c.t >= u.duration) {
-      this.ultStrike(u, u.finalMult, 'final');
+      this.ultFinal(u);
       this.ultCast = null;
     }
     p.attackCd = Math.max(p.attackCd, 0.3);
   }
-  /** um raio em todos os monstros do raio; a carga não sobe com o dano da própria ultimate */
-  private ultStrike(u: UltimateDef, mult: number, phase: 'strike' | 'final') {
+  private ultInside(u: UltimateDef) {
+    const c = this.ultCast!;
+    return this.monsters.filter((m) => !m.dead && dist(m, c) <= u.radius);
+  }
+  /** estouro final em todos os monstros do raio; a carga não sobe com o dano da própria ultimate */
+  private ultFinal(u: UltimateDef) {
     const c = this.ultCast!,
       p = this.player,
-      inside = this.monsters.filter((m) => !m.dead && dist(m, c) <= u.radius),
-      k = ultSplit(u, inside.length);
+      inside = this.ultInside(u),
+      k = ultSplit(u, inside.length),
+      mult = u.finalMult;
     this.emit({
       type: 'ultimate',
-      phase,
+      phase: 'final',
       x: c.x,
       y: c.y,
       radius: u.radius,

@@ -267,6 +267,29 @@ export class EntityView {
     this.play('attack', true);
   }
 
+  /** Levita (ultimate): o corpo sobe `px`, flutua balançando e desce no fim de `ms`; a sombra fica no chão. */
+  levitate(ms: number, px = 26) {
+    const st = { h: 0 },
+      base = this.sprite.y;
+    const apply = () => {
+      const y = base - st.h - (st.h > 0 ? Math.sin(this.scene.time.now / 180) * 3 : 0);
+      this.sprite.y = y;
+      if (this.glowSp) this.glowSp.y = y;
+    };
+    this.scene.tweens.add({ targets: st, h: px, duration: 350, ease: 'Back.easeOut', onUpdate: apply });
+    this.scene.tweens.add({
+      targets: st,
+      h: 0,
+      delay: ms - 300,
+      duration: 300,
+      ease: 'Quad.easeIn',
+      onUpdate: apply,
+      onComplete: () => (this.sprite.y = base),
+    });
+    const bob = this.scene.time.addEvent({ delay: 16, repeat: Math.floor((ms - 650) / 16), callback: apply });
+    this.scene.time.delayedCall(ms, () => bob.remove());
+  }
+
   /** Subida de nível: pose de comemorar (olhando para o alto) e brilho no corpo. Só o jogador tem a pose;
    *  pose = false (níveis seguintes da fila): só o brilho. holdMs: a pose (último quadro) fica parada até este tempo. */
   levelUp(glowMs: number, color: number, intensity = 1, pose = true, holdMs = 0) {

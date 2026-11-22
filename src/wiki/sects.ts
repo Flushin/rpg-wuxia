@@ -106,7 +106,7 @@ export function ultPanel(id: string, panel = true): string {
     <ul><li><b>Carga:</b> a barra enche 1 ponto a cada skill que acerta pelo menos um monstro; com ${u.charge} pontos fica pronta.
       Usar skill no vazio e o dano da própria ultimate não carregam.</li>
     <li><b>Fora de combate:</b> depois de ${u.idleDelay} s sem lutar, a barra perde ${u.idleDrain} ponto por segundo.</li>
-    <li><b>Duração:</b> ${u.duration} s parado na pose, com os braços para cima; ${u.strikes} raios de ${pc(u.strikeMult)} do dano em todos os monstros a até ${u.radius} tiles e um estouro final de ${pc(u.finalMult)} (${pc(u.strikes * u.strikeMult + u.finalMult)} no total).</li>
+    <li><b>Duração:</b> ${u.duration} s flutuando parado, com os braços para cima; os raios caem um de cada vez, intercalados entre os monstros: ${u.strikes} raios de ${pc(u.strikeMult)} do dano em todos os monstros a até ${u.radius} tiles e um estouro final de ${pc(u.finalMult)} (${pc(u.strikes * u.strikeMult + u.finalMult)} no total).</li>
     <li><b>Muitos alvos:</b> até ${u.fullTargets} monstros levam o dano cheio; com mais, cada um leva ${u.fullTargets} ÷ (monstros no raio) do dano.</li>
     <li><b>Dano:</b> a mesma conta das skills (ataque físico + ataque de trovão, contra defesa e resistência do alvo). Pode errar e dar crítico; não recupera vida. Não sobe de nível.</li>
     <li><b>Só o jogador solta:</b> o Auto-combate nunca usa a ultimate. No celular, toque no arco em volta das skills; no PC, botão ao lado das skills ou tecla <b>R</b>.</li></ul>`;
