@@ -215,6 +215,7 @@ export function salvage(w: World, bagIndex: number, force = false): ActionError 
   const it = w.bag[bagIndex];
   if (!force && w.npcRole() !== 'ferreiro') return { code: 'talkToBlacksmith' };
   if (!it || !BASES[it.baseId]) return { code: 'cannotForge' };
+  if (it.locked) return { code: 'itemLocked' };
   const got = salvageYield(it, w.owner());
   w.bag[bagIndex] = null;
   const lost: Mats = {};

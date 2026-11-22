@@ -554,6 +554,41 @@ console.log('\n== vendedor: comprar e vender ==');
   );
 }
 
+console.log('\n== cadeado e recompra ==');
+{
+  const w = mk('pavilhao', 5, 'cidade');
+  w.bag = w.bag.map(() => null);
+  const it = equipOf(w, 'colar_jade', 'incomum');
+  w.addItem(it);
+  const i = w.bag.indexOf(it);
+  ok(w.toggleLock(i) && it.locked === true, 'tranca equipamento');
+  near(w, 'vendedor');
+  ok(w.sell(i)?.code === 'itemLocked' && w.bag[i] === it, 'trancado não vende');
+  ok(w.sellRaw(i) === 0 && w.bag[i] === it, 'trancado não vende pelo auto (sellRaw)');
+  ok(!w.auto.sellable(it), 'regra do auto ignora trancado');
+  ok(!w.destroyItem(i) && w.bag[i] === it, 'trancado não é destruído');
+  ok(w.forgeSalvage(i, true)?.code === 'itemLocked', 'trancado não é desmontado');
+  const back = World.fromSave(maps, JSON.parse(JSON.stringify(w.serialize())));
+  ok(
+    back.bag.some((b) => b?.uid === it.uid && b.locked),
+    'cadeado vai para o save',
+  );
+  w.toggleLock(i);
+  ok(!it.locked, 'destranca');
+  const g0 = w.gold;
+  ok(w.sell(i) === null && !w.bag[i] && w.gold > g0, 'destrancado vende');
+  const price = w.gold - g0;
+  ok(w.buyback.length === 1 && w.buyback[0].price === price, 'venda entra na recompra pelo mesmo preço');
+  w.gold = price - 1;
+  ok(w.buyBack(0)?.code === 'noGold' && w.buyback.length === 1, 'recompra sem ouro falha');
+  w.gold = price;
+  ok(
+    w.buyBack(0) === null && w.gold === 0 && w.bag.some((b) => b?.uid === it.uid) && !w.buyback.length,
+    'recompra devolve o item',
+  );
+  ok(w.toggleLock(w.bag.findIndex((b) => b && b.qty)) === false, 'pilha (poção) não tranca');
+}
+
 console.log('\n== save ==');
 {
   const w = mk('pavilhao', 5, 'cidade');

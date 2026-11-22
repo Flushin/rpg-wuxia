@@ -30,6 +30,8 @@ export interface ItemInstance {
   qty?: number;
   /** melhoria do ferreiro (+1 a +10, marco 9); sem = +0 */
   plus?: number;
+  /** trancado pelo jogador (cadeado): não pode ser vendido, destruído nem desmontado, nem pelo Auto */
+  locked?: boolean;
 }
 export interface GroundItem {
   id: number;
@@ -319,6 +321,7 @@ export type ActionError =
   | { code: 'soldOut' }
   | { code: 'trialLocked' }
   | { code: 'epicLocked' }
+  | { code: 'itemLocked' }
   | { code: 'talkToMonk' }
   | { code: 'nothingToReset' }
   | { code: 'talkToGovernor' }

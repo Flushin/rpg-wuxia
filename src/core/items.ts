@@ -382,6 +382,7 @@ export function sanitizeItem(raw: unknown): ItemInstance | null {
     ilvl: Math.max(b.reqLevel, Math.floor(Number(r.ilvl) || 1)),
     durability: dur,
     ...(Number(r.plus) >= 1 ? { plus: Math.min(MAX_PLUS, Math.floor(Number(r.plus))) } : {}),
+    ...(r.locked === true ? { locked: true } : {}),
   };
 }
 

@@ -30,6 +30,23 @@ const GREEN = '#6fdc6f',
 
 const effStats = (w: World, it: ItemInstance | null) => (it && !isBroken(it) ? itemStats(it, w.owner()) : {});
 
+/** Melhor que o equipado no mesmo slot: pode equipar, nada piora e algo melhora (o ▲ e o filtro "Melhores" da mochila). */
+export function isUpgrade(w: World, it: ItemInstance): boolean {
+  const b = baseOf(it);
+  if (!b || w.canEquip(it)) return false;
+  const cur = w.equipment[b.slot];
+  if (cur === it) return false;
+  const a = effStats(w, it),
+    c = effStats(w, cur);
+  let up = false;
+  for (const k of new Set([...Object.keys(a), ...Object.keys(c)])) {
+    const d = (a[k] ?? 0) - (c[k] ?? 0);
+    if (d < -1e-9) return false;
+    if (d > 1e-9) up = true;
+  }
+  return up;
+}
+
 export function compareHtml(w: World, it: ItemInstance): string {
   const b = baseOf(it);
   if (!b) return '';

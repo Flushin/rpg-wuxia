@@ -7,6 +7,8 @@ import { closeX } from './labels';
 import { audio } from '../render/audio';
 import { saveLootFilter, type Rewards } from './rewards';
 import { perf } from './perf';
+import { fxPrefs } from '../render/fxPrefs';
+import { isNative } from '../platform';
 import { restMode, REST_DELAYS } from './restMode';
 import { touchDebug } from './touchDebug';
 import { BugReport } from './bugReport';
@@ -114,6 +116,15 @@ export class SettingsPanel {
         if (this.rewards) this.rewards.filter = v;
         break;
       }
+      case 'opt-dmg':
+        fxPrefs.set('damageNumbers', el.checked);
+        break;
+      case 'opt-shake':
+        fxPrefs.set('shake', el.checked);
+        break;
+      case 'opt-vibrate':
+        fxPrefs.set('vibrate', el.checked);
+        break;
       case 'opt-fps':
         perf.setEnabled(el.checked);
         break;
@@ -170,6 +181,9 @@ export class SettingsPanel {
       ).join('')}</div></div>
       <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
       <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
+      <label class="opt"><input type="checkbox" id="opt-dmg" ${fxPrefs.damageNumbers ? 'checked' : ''}/> ${L('Números de dano', 'Damage numbers')}</label>
+      <label class="opt"><input type="checkbox" id="opt-shake" ${fxPrefs.shake ? 'checked' : ''}/> ${L('Tremor de tela', 'Screen shake')}</label>
+      ${isNative ? `<label class="opt"><input type="checkbox" id="opt-vibrate" ${fxPrefs.vibrate ? 'checked' : ''}/> ${L('Vibração (crítico, golpe do chefe, subir de nível)', 'Vibration (crit, boss strike, level up)')}</label>` : ''}
       <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
       <label class="opt"><input type="checkbox" id="opt-touchdbg" ${touchDebug.enabled ? 'checked' : ''}/> ${L('Diagnóstico de toque (mostra na tela cada toque e o que a skill fez)', 'Touch diagnostics (shows each touch and what the skill did)')}</label>
       <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>

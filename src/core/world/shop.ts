@@ -24,15 +24,39 @@ export function purchase(w: World, potionId: string, qty: number): ActionError |
 
 export function sell(w: World, bagIndex: number, qty = 1): ActionError | null {
   if (w.npcRole() !== 'vendedor') return { code: 'talkToSeller' };
-  if (w.bag[bagIndex]?.rarity === 'epico') return { code: 'epicLocked' };
-  sellRaw(w, bagIndex, qty);
+  const it = w.bag[bagIndex];
+  if (it?.rarity === 'epico') return { code: 'epicLocked' };
+  if (it?.locked) return { code: 'itemLocked' };
+  if (!it) return null;
+  const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
+    price = sellValue(it);
+  sellRaw(w, bagIndex, n);
+  // recompra (sessão): guarda a cópia vendida pelo mesmo preço; os mais novos primeiro
+  w.buyback.unshift({ item: { ...it, qty: it.qty ? n : undefined }, price: price * n });
+  if (w.buyback.length > BUYBACK_MAX) w.buyback.length = BUYBACK_MAX;
+  return null;
+}
+
+/** Quantos itens vendidos o vendedor guarda para recomprar (só nesta sessão; não vai para o save). */
+export const BUYBACK_MAX = 10;
+
+export function buyBack(w: World, idx: number): ActionError | null {
+  if (w.npcRole() !== 'vendedor') return { code: 'talkToSeller' };
+  const e = w.buyback[idx];
+  if (!e) return null;
+  if (w.gold < e.price) return { code: 'noGold' };
+  if (!w.canFit(e.item.baseId, e.item.qty ?? 1)) return { code: 'bagFull' };
+  w.gold -= e.price;
+  w.buyback.splice(idx, 1);
+  w.addItem({ ...e.item });
+  w.emit({ type: 'trade', kind: 'buy', gold: e.price });
   return null;
 }
 
 // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
 export function sellRaw(w: World, bagIndex: number, qty = 1): number {
   const it = w.bag[bagIndex];
-  if (!it || it.rarity === 'epico') return 0; // Épico não se vende (nem pelo auto)
+  if (!it || it.rarity === 'epico' || it.locked) return 0; // Épico e trancado não se vendem (nem pelo auto)
   const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
     gold = sellValue(it) * n;
   w.removeFromBag(bagIndex, n);

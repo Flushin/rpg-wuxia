@@ -24,6 +24,12 @@ export const PREF = {
   NEWS_SEEN: 'rpg-news-seen',
   /** modo descanso (economia de bateria no Auto): segundos sem tocar até entrar; '0' desligado */
   REST: 'rpg-rest',
+  /** números de dano flutuantes: '0' desligado (padrão ligado) */
+  FX_DAMAGE: 'rpg-fx-damage',
+  /** tremor de tela: '0' desligado (padrão ligado) */
+  FX_SHAKE: 'rpg-fx-shake',
+  /** vibração no app: '0' desligada (padrão ligada) */
+  FX_VIBRATE: 'rpg-fx-vibrate',
 } as const;
 export type PrefKey = (typeof PREF)[keyof typeof PREF];
 

@@ -33,6 +33,8 @@ export function actionErrorText(e: ActionError): string {
       return L('Vença o nível anterior deste chefe', 'Beat the previous level of this boss');
     case 'epicLocked':
       return L('Itens épicos não podem ser vendidos', 'Epic items cannot be sold');
+    case 'itemLocked':
+      return L('Item trancado: destranque na mochila', 'Item locked: unlock it in your bag');
     case 'talkToMonk':
       return L('Fale com o Monge do Pagode', 'Talk to the Pagoda Monk');
     case 'nothingToReset':

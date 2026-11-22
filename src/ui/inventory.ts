@@ -5,7 +5,7 @@ import { BAG_TAB_SIZE, BASES, type BagTab, CONSUMABLES, MATERIALS, POTIONS, bagT
 import type { ItemInstance, Slot } from '../core/types';
 import type { World } from '../core/world';
 import { closeX } from './labels';
-import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
+import { cellHtml, cellStyle, isUpgrade, itemTipHtml } from './itemTip';
 import { uiH, uiRect, uiW } from './uiScale';
 import { renderPanel } from './panelRender';
 import { byId } from './dom';
@@ -14,6 +14,8 @@ import { isTouch } from '../platform/input';
 type Sel = { kind: 'bag'; i: number };
 const selKey = (s: Sel | null) => (s ? `b${s.i}` : '');
 type Tab = BagTab;
+/** filtro da aba Equipamento: tudo, só os melhores que o equipado (▲) ou Incomum para cima */
+type Filter = 'all' | 'up' | 'rare';
 const tabOf = (it: ItemInstance): Tab => bagTabOf(it.baseId);
 const usable = (it: ItemInstance) => !!POTIONS[it.baseId] || !!CONSUMABLES[it.baseId];
 /** Dica do item ao passar o mouse sobre células [data-bag]/[data-eq] (mochila e Personagem). */
@@ -27,6 +29,7 @@ export function bindItemTip(world: World, el: HTMLElement, itemOf: (c: HTMLEleme
       tip.classList.add('hidden');
       return;
     }
+    if (c.dataset.bag !== undefined && world.newItems.delete(it.uid)) c.querySelector('.new-dot')?.remove();
     tip.innerHTML = itemTipHtml(world, it);
     tip.classList.remove('hidden');
     const r = uiRect(c),
@@ -48,6 +51,7 @@ export class InventoryPanel {
   private sel: Sel | null = null;
   private last = { key: '', t: 0 };
   private tab: Tab = 'equip';
+  private filter: Filter = 'all';
   private confirmDel = ''; // item marcado para destruir (pede segundo toque)
   constructor(
     private world: World,
@@ -119,6 +123,8 @@ export class InventoryPanel {
     this.last = { key, t: now };
     if (key !== this.confirmDel) this.confirmDel = '';
     this.sel = sel;
+    const picked = this.world.bag[sel.i];
+    if (picked) this.world.newItems.delete(picked.uid);
     this.sig = '';
     byId('item-tip').classList.add('hidden');
     if (dbl && this.selItem()) this.act(usable(this.selItem()!) ? 'use' : 'equip');
@@ -137,6 +143,11 @@ export class InventoryPanel {
       this.sel = null;
       return;
     }
+    if (a === 'f-all' || a === 'f-up' || a === 'f-rare') {
+      this.filter = a.slice(2) as Filter;
+      this.sel = null;
+      return;
+    }
     if (a === 'tab-equip' || a === 'tab-pot' || a === 'tab-mat') {
       this.tab = a.slice(4) as Tab;
       this.sel = null;
@@ -144,6 +155,10 @@ export class InventoryPanel {
     }
     if (a !== 'destroy' && a !== 'destroy-ok') this.confirmDel = '';
     if (!s) return;
+    if (a === 'lock') {
+      w.toggleLock(s.i);
+      return;
+    }
     if (a === 'destroy') {
       this.confirmDel = selKey(s);
       return;
@@ -175,19 +190,34 @@ export class InventoryPanel {
   update() {
     if (!this.open) return;
     const w = this.world;
-    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}|${this.confirmDel}`;
+    const sig = `${w.invVersion}|${selKey(this.sel)}|${w.player.level}|${this.tab}|${this.filter}|${this.confirmDel}`;
     if (sig === this.sig) return;
     // mudança vinda do jogo (auto pegando item, poção gasta…) enquanto o jogador rola a mochila: espera ele parar,
     // senão a lista é refeita no meio da rolagem. Ações do próprio jogador (sig vazio) redesenham na hora.
     if (this.sig !== '' && performance.now() < this.busyUntil) return;
     this.sig = sig;
     if (this.sel && !this.selItem()) this.sel = null;
+    const ups = new Set(w.bag.filter((x): x is ItemInstance => !!x && isUpgrade(w, x)).map((x) => x.uid));
+    const marks = (x: ItemInstance | null) =>
+      !x
+        ? ''
+        : `${x.locked ? '<i class="lock-mark">🔒</i>' : ''}${ups.has(x.uid) ? '<i class="up-mark">▲</i>' : ''}${w.newItems.has(x.uid) ? '<i class="new-dot"></i>' : ''}`;
     const bagCell = (i: number) =>
-      `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i], w.owner())}</button>`;
+      `<button class="cell ${this.sel && selKey(this.sel) === `b${i}` ? 'sel' : ''}" data-bag="${i}" style="${cellStyle(w.bag[i])}">${cellHtml(w.bag[i], w.owner())}${marks(w.bag[i])}</button>`;
     const idx = w.bag.map((_, i) => i);
-    const inTab = idx.filter((i) => w.bag[i] && tabOf(w.bag[i]!) === this.tab),
-      free = idx.filter((i) => !w.bag[i]).slice(0, w.freeSlots(this.tab));
+    const equipTab = this.tab === 'equip';
+    const pass = (x: ItemInstance) =>
+      !equipTab ||
+      this.filter === 'all' ||
+      (this.filter === 'up' ? ups.has(x.uid) : x.rarity === 'incomum' || x.rarity === 'raro' || x.rarity === 'epico');
+    const inTab = idx.filter((i) => w.bag[i] && tabOf(w.bag[i]!) === this.tab && pass(w.bag[i]!)),
+      free = equipTab && this.filter !== 'all' ? [] : idx.filter((i) => !w.bag[i]).slice(0, w.freeSlots(this.tab));
     const bag = [...inTab, ...free].map(bagCell).join('');
+    const fBtn = (f: Filter, label: string) =>
+      `<button class="${this.filter === f ? 'on' : ''}" data-act="f-${f}">${label}</button>`;
+    const filters = equipTab
+      ? `<div class="inv-filters">${fBtn('all', L('Tudo', 'All'))}${fBtn('up', L(`▲ Melhores (${ups.size})`, `▲ Upgrades (${ups.size})`))}${fBtn('rare', L('Incomum+', 'Uncommon+'))}</div>`
+      : '';
     const count = (t: Tab) => w.bag.filter((x) => x && tabOf(x) === t).length;
     const tabBtn = (t: Tab, label: string) =>
       `<button class="inv-tab ${this.tab === t ? 'on' : ''}" data-act="tab-${t}" role="tab" aria-selected="${this.tab === t}">${label} <small>${count(t)}</small></button>`;
@@ -207,7 +237,12 @@ export class InventoryPanel {
         this.confirmDel === selKey(s)
           ? `<button class="danger" data-act="destroy-ok">${L('Confirmar: destruir', 'Confirm: destroy')}</button><button data-act="cancel">${L('Cancelar', 'Cancel')}</button>`
           : `<button class="danger" data-act="destroy">${L('Destruir', 'Destroy')}</button>`;
-      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${del}`;
+      const stack = !BASES[it.baseId];
+      const lock = stack
+        ? ''
+        : `<button data-act="lock" aria-pressed="${!!it.locked}">${it.locked ? L('🔓 Destrancar', '🔓 Unlock') : L('🔒 Trancar', '🔒 Lock')}</button>`;
+      // trancado: sem Destruir (nem venda/desmonte no vendedor e ferreiro, nem venda do Auto)
+      detail = `<div class="tipbody">${itemTipHtml(w, it, true)}</div>${btn}${lock}${it.locked ? `<small class="muted">${L('Trancado: não pode ser vendido, destruído nem desmontado.', 'Locked: cannot be sold, destroyed or salvaged.')}</small>` : del}`;
     }
     // renderPanel mantém a moldura (.inv-card, que é quem rola; em telas largas rolam .inv-main e .inv-detail) e só troca
     // o que mudou, então a rolagem nunca é perdida (nem cortada no meio, no iPhone).
@@ -215,7 +250,7 @@ export class InventoryPanel {
       byId('inv-panel'),
       `<div class="card inv-card"><div class="inv-main">${closeX('data-act="close"')}
       <h2>${L('Mochila', 'Bag')} <span class="gold">${w.gold} ${L('ouro', 'gold')}</span></h2>
-      <h3>${L('Bolsa', 'Inventory')} (${count(this.tab)}/${BAG_TAB_SIZE}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}<div class="bag-grid">${bag}</div>
+      <h3>${L('Bolsa', 'Inventory')} (${count(this.tab)}/${BAG_TAB_SIZE}) <button class="sort-btn" data-act="sort">${L('Organizar', 'Sort')}</button></h3>${tabs}${filters}<div class="bag-grid">${bag}</div>
       <button class="close-btn" data-act="close">${L('Fechar', 'Close')}</button></div><div class="inv-detail">${detail}</div></div>`,
     );
   }

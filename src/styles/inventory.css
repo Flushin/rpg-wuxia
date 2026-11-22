@@ -520,3 +520,49 @@
 .spin-hint {
   color: #aab;
 }
+
+/* marcas na célula da mochila: trancado, melhor que o equipado e novo */
+.cell .lock-mark {
+  position: absolute;
+  left: 2px;
+  top: 1px;
+  font-style: normal;
+  font-size: 10px;
+  line-height: 1;
+  filter: drop-shadow(0 0 2px #000);
+}
+.cell .up-mark {
+  position: absolute;
+  right: 3px;
+  top: 1px;
+  font-style: normal;
+  font-size: 11px;
+  line-height: 1;
+  color: #6fdc6f;
+  text-shadow: 0 0 3px #000;
+}
+.cell .new-dot {
+  position: absolute;
+  right: 3px;
+  bottom: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffd23f;
+  box-shadow: 0 0 4px #ffd23f;
+}
+.inv-filters {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 6px;
+  flex-wrap: wrap;
+}
+.inv-filters button {
+  min-height: 30px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+.inv-filters button.on {
+  border-color: #d4a017;
+  color: #ffd23f;
+}
