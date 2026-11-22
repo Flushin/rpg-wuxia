@@ -983,9 +983,16 @@ export class World {
     this.bumpInv();
     this.trialPrompt = null;
     this.trialRun = { bossId: p.bossId, tier };
+    // arena zerada como numa entrada nova: chefe novo, sem ajudantes, marcas ou invocação da luta anterior
     this.telegraphs = [];
     this.arenas = [];
-    this.monsters = this.monsters.filter((m) => !m.dead);
+    this.monsters = [];
+    this.bossSummoned = false;
+    this.arenaSeen = false;
+    this.wasInArena = false;
+    this.targetId = null;
+    this.autoAttack = false;
+    this.pendingSkill = null;
     this.spawnTrialBoss(p.bossId, tier);
     this.emit({ type: 'trialEnter', bossId: p.bossId, tier, cost });
     return null;
