@@ -19,6 +19,7 @@ Personagens:
 
 Monstros:
 - Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
+- Cavalo (montaria): "Horse" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
 - Bandido Espadachim: "Knight" do KayKit Adventurers — Kay Lousberg, CC0. Sem elmo e escudos, couro marrom e pano cinza;
   o lenço no rosto é gerado pelo script.
 - Bandido Arqueiro: "Rogue" do KayKit Adventurers (com a besta) — Kay Lousberg, CC0. Recolorido; lenço e chapéu de palha

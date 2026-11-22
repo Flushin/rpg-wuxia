@@ -11,6 +11,7 @@ import { ElementAura } from './elementAura';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
+const RIDE_Y = 27; // montado: altura (px) da sela acima do chão
 
 const labelOf = (e: Entity) =>
   e.kind === 'monster'
@@ -48,6 +49,9 @@ export class EntityView {
   private mark?: Phaser.GameObjects.Text; // missão: "!" ou "?" sobre o NPC (marco 7)
   private markSig: string | null = null;
   private aura?: ElementAura; // aura elemental do jogador (independe da skin)
+  private mountSp?: Phaser.GameObjects.Sprite; // montaria embaixo do jogador (só fora de combate)
+  private mountKey: string | null = null;
+  private mountAnim = '';
 
   constructor(
     private scene: Phaser.Scene,
@@ -223,7 +227,7 @@ export class EntityView {
     if (moving) {
       if (!this.attacking || !e.attackWhileMoving) {
         this.attacking = false;
-        this.play('walk');
+        this.play(this.mountSp ? 'idle' : 'walk'); // montado, quem anda é a montaria
       }
       return;
     }
@@ -245,6 +249,49 @@ export class EntityView {
     sp.play(key);
     if (progress > 0) sp.anims.setProgress(progress);
     this.anim = anim;
+  }
+
+  /**
+   * Montaria (sheet de sheetFor('mount-' + id)) ou null = a pé. Montado, o cavaleiro sobe RIDE_Y px e fica na
+   * pose parada; a montaria anda/para na mesma direção. Folha não carregada: fica a pé.
+   */
+  setMount(key: string | null) {
+    if (key && !this.scene.textures.exists(sheetTexture(key))) key = null;
+    if (key === this.mountKey) {
+      if (key) this.animateMount();
+      return;
+    }
+    this.mountKey = key;
+    this.mountSp?.destroy();
+    this.mountSp = undefined;
+    this.mountAnim = '';
+    this.anim = '';
+    if (key) {
+      const meta = sheetFor('mount-' + key)?.meta;
+      if (!meta) return ((this.mountKey = null), undefined);
+      this.mountSp = this.scene.add
+        .sprite(0, 0, 'sp-' + key, 'idle_0_0')
+        .setOrigin(meta.anchor[0], meta.anchor[1])
+        .setScale(meta.scale);
+      this.container.addAt(this.mountSp, this.container.getIndex(this.sprite));
+      this.animateMount();
+    }
+    const dy = key ? -RIDE_Y : 0;
+    this.sprite.y = dy;
+    if (this.glowSp) this.glowSp.y = dy;
+  }
+
+  private animateMount() {
+    if (!this.mountSp || !this.mountKey) return;
+    const moving = this.scene.time.now - this.movedAt < MOVE_HOLD_MS;
+    const key = animKey(this.mountKey, moving ? 'walk' : 'idle', this.dir);
+    if (key !== this.mountAnim) {
+      const progress =
+        this.mountAnim && moving === this.mountAnim.startsWith('walk') ? this.mountSp.anims.getProgress() : 0;
+      this.mountSp.play(key);
+      if (progress > 0) this.mountSp.anims.setProgress(progress);
+      this.mountAnim = key;
+    }
   }
 
   /** Altura (px) do topo do personagem acima dos pés. */

@@ -60,6 +60,7 @@ arquivo de pacote foi usado; a configuração de cada folha fica em `tools/sprit
 | `public/sprites/terracota.*` | Monstro | `Knight.glb` | KayKit Adventurers | CC0 | Recolorido em barro alaranjado | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/general.*` | Chefe | `Knight.glb` | KayKit Adventurers | CC0 | Recolorido com detalhes dourados, elmo e capa; 1,5× | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/lobo.*` | Monstro | `Wolf.glb` | Quaternius Ultimate Animated Animals | CC0 | Renderizado | 2026-11-15 | Lucas/Claude | 🟡 (prova oficial) |
+| `public/sprites/cavalo.*` | Montaria | `Horse.glb` | Quaternius Ultimate Animated Animals | CC0 | Renderizado | 2026-11-22 | Lucas/Claude | 🟡 (prova oficial) |
 | `public/sprites/npc_mestre_tormenta.*` (+ retrato), `npc_morador1.*` | NPC | `Rogue.glb` | KayKit Adventurers | CC0 | Recolorido | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/npc_mestra_geada.*` (+ retrato), `npc_anciao.*`, `npc_vendedor.*`, `npc_morador2.*`, `npc_morador4.*` | NPC | `Mage.glb` | KayKit Adventurers | CC0 | Recolorido | 2026-11-16 | Lucas/Claude | 🟢 |
 | `public/sprites/npc_mestre_tita.*` (+ retrato), `npc_ferreiro.*`, `npc_morador3.*` | NPC | `Barbarian.glb` | KayKit Adventurers | CC0 | Recolorido | 2026-11-16 | Lucas/Claude | 🟢 |

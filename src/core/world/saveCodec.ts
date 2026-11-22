@@ -6,7 +6,7 @@ import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
 import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
-import { SKINS } from '../data';
+import { MOUNTS, SKINS } from '../data';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
@@ -42,6 +42,7 @@ export function serialize(w: World): SaveData {
     trialProgress: Object.keys(w.trialProgress).length ? { ...w.trialProgress } : undefined,
     skins: w.skinsOwned.length ? [...w.skinsOwned] : undefined,
     skin: w.skin ?? undefined,
+    mounts: w.mountsOwned.length ? [...w.mountsOwned] : undefined,
     playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
   };
 }
@@ -66,6 +67,9 @@ export function restore(w: World, s: SaveData, now: number) {
     (id, i, a) => typeof id === 'string' && SKINS[id]?.sect === w.classId && a.indexOf(id) === i,
   );
   w.skin = s.skin && w.skinsOwned.includes(s.skin) ? s.skin : null;
+  w.mountsOwned = (Array.isArray(s.mounts) ? s.mounts : []).filter(
+    (id, i, a) => typeof id === 'string' && !!MOUNTS[id] && a.indexOf(id) === i,
+  );
   (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
     w.bag[i] = sanitizeItem(raw);
   });

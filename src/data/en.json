@@ -807,6 +807,13 @@
           "The potion seller buys anything you bring. Even that junk you found in the forest."
         ]
       },
+      "estabulo": {
+        "name": "Stablemaster Ma",
+        "lines": [
+          "Fine horses, fed on mountain grass. Out of combat they run like the wind.",
+          "Once you own a horse, it follows you everywhere: you mount by yourself a few seconds after a fight ends."
+        ]
+      },
       "joalheiro": {
         "name": "Jeweler Yu",
         "lines": [
@@ -1045,6 +1052,10 @@
       },
       {
         "texto": "Max level 50: XP keeps coming after level 40, and each level from 41 to 50 grants 4 attribute points. Characters already at 40 start the level 41 bar from zero."
+      },
+      {
+        "texto": "Mounts: Stablemaster Ma, at the new stable in the Jade Citadel, sells a horse for 50,000 gold. Out of combat you mount by yourself and move 30% faster; when combat starts, you dismount at once.",
+        "wiki": "npc/estabulo"
       }
     ],
     "versoes": [
@@ -1298,6 +1309,12 @@
     "vibora": {
       "name": "Thousand-Needle Viper",
       "description": "A swarm of emerald needles circles her and pierces every monster within 7 tiles for 3 s, tying a thread to each: 6 streams of 80% damage and, at the end, the swarm becomes a viper that strikes for 250% while she pulls the threads, poisoning for another 200% damage over 6 s. Up to 8 monsters take full damage; beyond that the damage is split between them. Can miss and crit."
+    }
+  },
+  "mounts": {
+    "cavalo": {
+      "name": "Horse",
+      "desc": "A bay horse from the Citadel stables. Carries you faster along the roads; you dismount when combat starts."
     }
   }
 }

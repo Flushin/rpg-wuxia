@@ -10,6 +10,7 @@ import npcs from '../src/data/npcs.json';
 import quests from '../src/data/quests.json';
 import novidades from '../src/data/novidades.json';
 import skins from '../src/data/skins.json';
+import mounts from '../src/data/mounts.json';
 import { readFileSync, readdirSync } from 'node:fs';
 
 type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -66,6 +67,7 @@ const sections: [string, unknown][] = [
   ['quests', quests],
   ['novidades', novidades],
   ['skins', skins],
+  ['mounts', mounts],
   ['ultimates', ultimates],
 ];
 for (const [name, data] of sections) orphans(E[name], data, name);
@@ -103,6 +105,9 @@ for (const [id, t] of Object.entries(tips as J)) {
 // skins (trajes): nome e descrição
 for (const [id, k] of Object.entries(skins as J))
   for (const f of ['name', 'desc']) need(k[f], E.skins?.[id]?.[f], `skins.${id}.${f}`);
+// montarias: nome e descrição
+for (const [id, k] of Object.entries(mounts as J))
+  for (const f of ['name', 'desc']) need(k[f], E.mounts?.[id]?.[f], `mounts.${id}.${f}`);
 // npcs (falas dos NPCs e mestres): todo texto
 need(npcs, E.npcs, 'npcs');
 // missões (marco 7): nome, oferta, objetivo e fala de entrega de cada etapa
@@ -149,6 +154,7 @@ for (const k of Object.keys(E))
       'novidades',
       'names',
       'skins',
+      'mounts',
       'ultimates',
     ].includes(k)
   )

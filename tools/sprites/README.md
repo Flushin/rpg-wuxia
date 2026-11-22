@@ -38,6 +38,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_bambu.py` | Bosque de Bambu Sombrio (nível 30): moitas de bambu, brotos e folhas por script → `public/sprites/bambu.*` |
 | `montanha.json` | Objetos da montanha (`render_props.py`): pinheiros em 3 tons e rochas nevadas → `public/sprites/montanha.*` |
 | `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
+| `cavalo.json` | Montaria (Quaternius Horse): `idle` e `walk` (galope), 8 direções; no jogo fica sob o jogador fora de combate (`EntityView.setMount`) |
 | `npc_*.json` | NPCs da cidade (KayKit recolorido). `dir_list: [0]` = só de frente (NPC parado); moradores têm as 8 direções |
 | `fetch-assets.sh` | Baixa só os modelos usados (KayKit oficial; lobo e natureza de espelhos no GitHub fixados por commit) e confere com `models.sha256`. Aceita os pacotes oficiais em `QUATERNIUS_ANIMALS_DIR` / `KENNEY_NATURE_DIR` |
 | `models.sha256` | SHA-256 de cada modelo usado (prova de que é sempre o mesmo arquivo) |

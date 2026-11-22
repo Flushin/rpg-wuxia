@@ -8,6 +8,7 @@ import {
   NPC_TEXT,
   PROGRESSION,
   SKINS,
+  MOUNTS,
   freePointsAt,
   totalFreePoints,
   type MonsterDef,
@@ -161,6 +162,8 @@ export class World {
   /** skins compradas e a vestida (null = traje da seita); ver SKINS */
   skinsOwned: string[] = [];
   skin: string | null = null;
+  /** montarias compradas (MOUNTS); a primeira é a usada. Montado = fora de combate há mountDelay s (isMounted) */
+  mountsOwned: string[] = [];
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
   /** vendidos nesta sessão que o vendedor recompra pelo mesmo preço (não vai para o save) */
   buyback: { item: ItemInstance; price: number }[] = [];
@@ -449,6 +452,29 @@ export class World {
     this.emit({ type: 'skinChange' });
   }
 
+  /** Cavalariço Ma (estábulo): compra uma montaria. Ela é usada sozinha fora de combate. */
+  buyMount(id: string): ActionError | null {
+    if (this.npcRole() !== 'estabulo') return { code: 'talkToStable' };
+    const m = MOUNTS[id];
+    if (!m) return { code: 'notEquippable' };
+    if (this.mountsOwned.includes(id)) return { code: 'mountOwned' };
+    if (this.gold < m.price) return { code: 'noGold' };
+    this.gold -= m.price;
+    this.mountsOwned.push(id);
+    this.bumpInv();
+    this.emit({ type: 'trade', kind: 'buy', gold: m.price });
+    this.emit({ type: 'skinChange' }); // a cena carrega a folha da montaria e redesenha o jogador
+    return null;
+  }
+
+  /** montaria em uso agora (null = a pé): tem montaria, está vivo e fora de combate há mountDelay s */
+  mountNow(): string | null {
+    const id = this.mountsOwned[0];
+    const m = id ? MOUNTS[id] : undefined;
+    if (!m || this.player.hp <= 0 || this.time - this.lastCombat < m.mountDelay) return null;
+    return id;
+  }
+
   // ---------- skills ----------
   classSkills(): SkillDef[] {
     return SKILLS[this.classId] ?? [];
@@ -536,6 +562,10 @@ export class World {
   private speedMul(e: Entity) {
     let m = 1;
     for (const b of e.buffs) if (b.kind === 'slow') m *= 1 - b.value;
+    if (e === this.player) {
+      const mt = this.mountNow();
+      if (mt) m *= 1 + MOUNTS[mt].speedBonus * bal('montaria.velocidade');
+    }
     return m;
   }
   /** redução de dano recebido do jogador (passivas) */

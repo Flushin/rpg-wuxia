@@ -2,7 +2,8 @@ import { actionErrorText } from './actionError';
 import type { ActionError } from '../core/types';
 import { BUYBACK_MAX } from '../core/world/shop';
 import { L, tn } from '../core/i18n';
-import { CLASSES, NPC_TEXT, PROGRESSION, SKINS } from '../core/data';
+import { CLASSES, NPC_TEXT, MOUNTS, PROGRESSION, SKINS } from '../core/data';
+import { bal } from '../core/balance';
 import { ATTR_KEYS } from '../core/types';
 import { ATTR_LABELS } from './labels';
 import {
@@ -67,6 +68,7 @@ export class NpcWindow {
   private resetAsk = false; // realinhar meridianos aguardando confirmação
   private gemSel = ''; // uid do item escolhido no Ferreiro-mestre
   private skinAsk = ''; // traje aguardando confirmação da compra
+  private mountAsk = ''; // montaria aguardando confirmação da compra
   private qty = 1;
   private pending = -1; // venda aguardando confirmação (incomum/raro)
   private npcId = -1;
@@ -146,6 +148,23 @@ export class NpcWindow {
       const err = w.buySkin(v);
       if (err) this.toast(actionErrorText(err), '#ff8a80');
       else this.toast(L(`Traje vestido: ${SKINS[v].name}`, `Outfit equipped: ${SKINS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'mountbuy') {
+      if (this.mountAsk !== v) {
+        audio.ui('ui_click');
+        this.mountAsk = v;
+        return;
+      }
+      this.mountAsk = '';
+      const err = w.buyMount(v);
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else this.toast(L(`Montaria comprada: ${MOUNTS[v].name}`, `Mount bought: ${MOUNTS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'mountcancel') {
+      audio.ui('ui_click');
+      this.mountAsk = '';
       return;
     }
     if (a === 'skinwear') {
@@ -308,6 +327,7 @@ export class NpcWindow {
       this.salvageAsk = 0;
       this.resetAsk = false;
       this.skinAsk = '';
+      this.mountAsk = '';
       this.gemSel = '';
       this.pending = -1;
       this.sig = '';
@@ -316,7 +336,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');
@@ -331,6 +351,7 @@ export class NpcWindow {
       role === 'caminhos' ||
       role === 'meridianos' ||
       role === 'governador' ||
+      role === 'estabulo' ||
       role === 'joalheiro' ||
       role === 'ferreiro_mestre';
     let view: View,
@@ -344,6 +365,7 @@ export class NpcWindow {
     else if (role === 'caminhos') view = this.travel(who);
     else if (role === 'meridianos') view = { list: this.talk(who) + this.meridians() };
     else if (role === 'governador') view = { list: this.talk(who) + this.skinShop() };
+    else if (role === 'estabulo') view = { list: this.talk(who) + this.mountShop() };
     else if (role === 'joalheiro') view = { list: this.talk(who) + jewelerHtml(w) };
     else if (role === 'ferreiro_mestre') {
       const g = masterSmithHtml(w, this.gemSel);
@@ -501,6 +523,34 @@ export class NpcWindow {
       <small class="muted">${L(`Só mudam a aparência. Cada traje é de uma seita: aqui, apenas os da ${sect}.`, `Appearance only. Each outfit belongs to one sect: here, only ${sect} ones.`)}</small>
       ${row(null)}${mine.map(row).join('')}
       ${mine.length ? '' : `<p class="muted">${L('Ainda não há trajes para a sua seita.', 'No outfits for your sect yet.')}</p>`}`;
+  }
+
+  /** Cavalariço Ma (estábulo): montarias (MOUNTS); compra com confirmação. Montar é sozinho, fora de combate. */
+  private mountShop(): string {
+    const w = this.world;
+    const row = (id: string) => {
+      const m = MOUNTS[id],
+        owned = w.mountsOwned.includes(id),
+        price = m.price.toLocaleString('pt-BR'),
+        pct = Math.round(m.speedBonus * bal('montaria.velocidade') * 100);
+      let btn: string;
+      if (owned) btn = `<button disabled>${L('Já é sua', 'Owned')}</button>`;
+      else if (this.mountAsk === id)
+        btn = `<div class="mr-ask"><button class="danger" data-a="mountbuy" data-v="${id}">${L(`Confirmar (${price} ouro)`, `Confirm (${price} gold)`)}</button><button data-a="mountcancel">${L('Cancelar', 'Cancel')}</button></div>`;
+      else
+        btn = `<button class="primary" data-a="mountbuy" data-v="${id}" ${w.gold < m.price ? 'disabled' : ''}>${L(`Comprar (${price} ouro)`, `Buy (${price} gold)`)}</button>`;
+      const why =
+        !owned && w.gold < m.price
+          ? `<small class="muted">${L(`Faltam ${(m.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(m.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
+          : '';
+      return `<div class="dg-row sk-row"><div class="sk-body">
+        <b>${escapeHtml(m.name)}</b> <small class="muted">+${pct}% ${L('velocidade', 'speed')}</small>
+        <div class="dg-info">${escapeHtml(m.desc)}</div>
+        ${btn}${why}</div></div>`;
+    };
+    return `<h4>${L('Montarias', 'Mounts')}</h4>
+      <small class="muted">${L(`Você monta sozinho alguns segundos depois de sair de combate e desmonta ao entrar em um.`, `You mount by yourself a few seconds after leaving combat and dismount when combat starts.`)}</small>
+      ${Object.keys(MOUNTS).map(row).join('')}`;
   }
 
   /** Mestre dos Caminhos: destinos do teleporte (src/core/teleport.ts) agrupados por região, com o motivo do bloqueio. */

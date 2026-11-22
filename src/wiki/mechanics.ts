@@ -38,7 +38,7 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
-import { LEVELUP_POSE_S, XP_BANK_LEVELS } from '../core/data';
+import { LEVELUP_POSE_S, MOUNTS, XP_BANK_LEVELS } from '../core/data';
 import {
   TRIAL_BOSSES,
   trialEquipReqLevel,
@@ -176,6 +176,7 @@ const TOPICS = [
   { id: 'trial', label: 'Trial (desafio de chefes)', icon: 'essencia_qi' },
   { id: 'epico', label: 'Equipamento Épico', icon: 'epico_colar' },
   { id: 'gemas', label: 'Gemas e encaixes', icon: 'po_estrela' },
+  { id: 'montarias', label: 'Montarias', icon: 'pergaminho_retorno' },
 ];
 
 export { EPIC };
@@ -186,7 +187,7 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -236,6 +237,21 @@ function gemas(): string {
       <p>Abrir (um de cada vez, na ordem):</p><ul>${open}</ul>
       <p><b>Colocar</b> uma gema num encaixe vazio é grátis. <b>Retirar</b> custa ${pc(GEM_CFG.removeCostPct)} do valor da gema, que volta inteira para a mochila.
       Item com gema <b>não pode ser vendido, destruído nem desmontado</b> (nem pelo Auto): retire as gemas antes.</p></section>`;
+}
+
+function montarias(): string {
+  const rows = Object.values(MOUNTS)
+    .map(
+      (m) =>
+        `<tr><td><b>${esc(m.name)}</b></td><td>${m.price.toLocaleString('pt-BR')} ouro</td><td>+${Math.round(m.speedBonus * bal('montaria.velocidade') * 100)}%</td><td>${m.mountDelay} s</td></tr>`,
+    )
+    .join('');
+  return `<section class="panel"><h2>Montarias</h2>
+      <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo da Cidadela de Jade. Compradas uma vez, valem para sempre e em todos os mapas.</p>
+      <ul><li><b>Montar é sozinho:</b> depois de alguns segundos sem dar nem levar golpes, o personagem sobe na montaria.</li>
+      <li><b>Só fora de combate:</b> ao golpear ou ser golpeado, desmonta na hora e volta à velocidade normal.</li>
+      <li>A montaria só muda a velocidade de andar; não dá atributos nem muda o combate. O Auto também anda montado.</li></ul>
+      <table><tr><th>Montaria</th><th>Preço</th><th>Velocidade fora de combate</th><th>Monta após</th></tr>${rows}</table></section>`;
 }
 
 function epico(): string {

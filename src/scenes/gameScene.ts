@@ -437,6 +437,7 @@ export class GameScene extends Phaser.Scene {
     if (tgt && Math.hypot(tgt.x - w.player.x, tgt.y - w.player.y) <= w.player.attackRange + 1)
       this.viewFor(w.player).face(tgt.x, tgt.y, w.player.x, w.player.y);
     this.viewFor(w.player).sync(w.player, false);
+    this.viewFor(w.player).setMount(w.mountNow());
     for (const n of w.npcs) {
       live.add(n.id);
       const v = this.viewFor(n);

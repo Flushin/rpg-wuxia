@@ -8,13 +8,14 @@ Wanderers/Mistpeak: RPG wuxia de navegador (TypeScript, Vite, Capacitor/Android)
 - `npm test` (todos os `check:*`), `npm run check:layout`, `npm run maps`
 - **Antes de todo commit:** `npm run format` (Prettier) e `npm run format:check`; o CI roda `format:check` antes dos testes
   e falha por qualquer arquivo fora do estilo, até um que você não mexeu.
+- Screenshot de teste (Playwright): chame `semDicas(page)` de `tools/sem-dicas.mjs` antes, para a dica não cobrir a tela
 - `npm run balance` / `sim:balance` (simulações de balanceamento)
 - `npm run novidades:loja` (texto "O que há de novo" da Play Store)
 - APK só sob pedido: Actions → "APK Android" → Run workflow (release com novidades desde o último APK; `npm run novidades:apk`)
 
 ## Mapa rápido
 - `src/core/` lógica (combate, skills, itens, mapa, quests, save, masmorras em `dungeons.ts`, Trial em `trial.ts`, teleporte em `teleport.ts`, ultimate em `ultimate.ts` (+ `ultimates.json`), gemas/encaixes em `world/gems.ts` (+ `items.json` "gems", janelas em `ui/gemShop.ts`), rotas do mapa-múndi em `worldRoutes.ts`; `world/`)
-- `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en; trajes (skins) por seita em `skins.json` (Governador Bai)
+- `src/data/` JSON de itens, monstros, skills, classes, NPCs, quests, balance, en; trajes (skins) por seita em `skins.json` (Governador Bai); montarias em `mounts.json` (Cavalariço Ma, estábulo da Cidadela)
 - `src/scenes/`, `src/ui/`, `src/render/`, `src/platform/`, `src/styles/` telas, interface, desenho, Android, CSS
 - HUD novo do celular: posições de Atacar/skills/poções/arco da ultimate em `src/ui/thumbLayout.ts`
 - Janelas que se redesenham abertas usam `renderPanel()` de `src/ui/panelRender.ts` (mantém rolagem); nunca `innerHTML` direto
