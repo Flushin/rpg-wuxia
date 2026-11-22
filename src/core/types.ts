@@ -204,6 +204,7 @@ export type GameEvent =
   | { type: 'drop'; x: number; y: number; color: string; epic?: boolean }
   /** caiu um Épico (aviso no centro, som) */
   | { type: 'epicDrop'; name: string }
+  | { type: 'relicDrop'; name: string }
   | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
   | { type: 'goldPickup'; amount: number }
   | { type: 'bagFull'; tab?: 'equip' | 'pot' | 'mat' }
@@ -328,6 +329,9 @@ export interface SaveData {
   skin?: string;
   /** montarias compradas (ids de mounts.json); a primeira é a usada */
   mounts?: string[];
+  /** relíquias obtidas (ids de relics.json) e a equipada */
+  relics?: string[];
+  relic?: string;
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
@@ -358,4 +362,7 @@ export type ActionError =
   | { code: 'gemMaxLevel' }
   | { code: 'skinOwned' }
   | { code: 'talkToStable' }
-  | { code: 'mountOwned' };
+  | { code: 'mountOwned' }
+  | { code: 'talkToAntiquary' }
+  | { code: 'relicOwned' }
+  | { code: 'relicNotOwned' };

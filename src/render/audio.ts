@@ -220,6 +220,7 @@ class AudioManager {
         this.sfx('pickup', 200);
         break;
       case 'epicDrop':
+      case 'relicDrop':
         this.sfx('boss_defeated');
         break;
       case 'goldPickup':

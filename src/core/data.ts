@@ -4,7 +4,8 @@ import progressionJson from '../data/progression.json';
 import npcsJson from '../data/npcs.json';
 import skinsJson from '../data/skins.json';
 import mountsJson from '../data/mounts.json';
-import { localize } from './i18n';
+import relicsJson from '../data/relics.json';
+import { L, localize } from './i18n';
 import { balanceClasses, balanceMonsters, balanceProgression } from './balance';
 import type { AttrKey, Attributes, DamageType, Element, ElementMap, ProjectileKind } from './types';
 
@@ -180,5 +181,48 @@ export interface MountDef {
   mountDelay: number;
 }
 export const MOUNTS = localize('mounts', mountsJson) as unknown as Record<string, MountDef>;
+
+/** Relíquia (Porto Noturno, etapa 4): 1 espaço no personagem; atributos fixos (somam como equipamento) + 1 efeito.
+ * Comum/rara: Antiquário Lao; lendária: drop de chefe. Sem durabilidade, forja nem gemas. */
+export type RelicRarity = 'comum' | 'rara' | 'lendaria';
+export type RelicEffectKind = 'lifeSteal' | 'attackSpeed' | 'cooldown' | 'maxHpPct';
+export interface RelicDef {
+  name: string;
+  desc: string;
+  icon: string;
+  rarity: RelicRarity;
+  price: number;
+  stats: Record<string, number>;
+  effect: { kind: RelicEffectKind; value: number };
+}
+const RJ = localize('relics', relicsJson) as unknown as {
+  slotName: string;
+  reqLevel: number;
+  rarities: Record<RelicRarity, { name: string; color: string }>;
+  drop: { chance: number; minPlayerLevel: number };
+  list: Record<string, RelicDef>;
+};
+export const RELICS = RJ.list,
+  RELIC_RARITIES = RJ.rarities,
+  RELIC_DROP = RJ.drop,
+  RELIC_REQ_LEVEL = RJ.reqLevel,
+  RELIC_SLOT_NAME = RJ.slotName;
+
+const relicPct = (v: number) => `${+(v * 100).toFixed(1)}%`;
+
+/** Texto do efeito único da relíquia. */
+export function relicEffectText(r: RelicDef): string {
+  const v = relicPct(r.effect.value);
+  switch (r.effect.kind) {
+    case 'lifeSteal':
+      return L(`Roubo de vida +${v}`, `Life steal +${v}`);
+    case 'attackSpeed':
+      return L(`Velocidade de ataque +${v}`, `Attack speed +${v}`);
+    case 'cooldown':
+      return L(`Recarga das skills −${v}`, `Skill cooldowns −${v}`);
+    case 'maxHpPct':
+      return L(`Vida máxima +${v}`, `Max health +${v}`);
+  }
+}
 
 export const SECT_ORDER = ['lamina', 'pavilhao', 'tita', 'vibora'];

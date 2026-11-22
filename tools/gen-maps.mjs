@@ -1419,6 +1419,8 @@ function cidadela() {
   npc('Governador Bai', 'governador', 16, 7.5);
   // estábulo (montarias): Cavalariço Ma junto da praça oeste, ao sul do Mestre dos Caminhos
   npc('Cavalariço Ma', 'estabulo', 9.5, 19.5, { role: 'estabulo' });
+  // PROVISÓRIO (Porto Noturno, etapa 4): Antiquário Lao (relíquias) entre o Joalheiro e o Ferreiro-mestre
+  npc('Antiquário Lao', 'antiquario', 9.5, 15.5, { role: 'antiquario' });
   npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5, { role: 'meridianos' });
   for (const [x, y] of [
     [13.5, 28.4],

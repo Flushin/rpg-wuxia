@@ -9,6 +9,10 @@ import {
   PROGRESSION,
   SKINS,
   MOUNTS,
+  RELICS,
+  RELIC_DROP,
+  RELIC_REQ_LEVEL,
+  type RelicEffectKind,
   freePointsAt,
   totalFreePoints,
   type MonsterDef,
@@ -164,6 +168,9 @@ export class World {
   skin: string | null = null;
   /** montarias compradas (MOUNTS); a primeira é a usada. Montado = fora de combate há mountDelay s (isMounted) */
   mountsOwned: string[] = [];
+  /** relíquias obtidas (RELICS) e a equipada (null = espaço vazio); Porto Noturno, etapa 4 */
+  relicsOwned: string[] = [];
+  relic: string | null = null;
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
   /** vendidos nesta sessão que o vendedor recompra pelo mesmo preço (não vai para o save) */
   buyback: { item: ItemInstance; price: number }[] = [];
@@ -467,6 +474,54 @@ export class World {
     return null;
   }
 
+  /** Antiquário Lao: compra uma relíquia comum ou rara (lendária só cai de chefes). Fica na coleção. */
+  buyRelic(id: string): ActionError | null {
+    if (this.npcRole() !== 'antiquario') return { code: 'talkToAntiquary' };
+    const r = RELICS[id];
+    if (!r || r.rarity === 'lendaria') return { code: 'notEquippable' };
+    if (this.relicsOwned.includes(id)) return { code: 'relicOwned' };
+    if (this.player.level < RELIC_REQ_LEVEL) return { code: 'needLevel', level: RELIC_REQ_LEVEL };
+    if (this.gold < r.price) return { code: 'noGold' };
+    this.gold -= r.price;
+    this.relicsOwned.push(id);
+    this.bumpInv();
+    this.emit({ type: 'trade', kind: 'buy', gold: r.price });
+    return null;
+  }
+
+  /** Equipa uma relíquia da coleção (null = tira). Troca à vontade, em qualquer lugar. */
+  equipRelic(id: string | null): ActionError | null {
+    if (id !== null) {
+      if (!this.relicsOwned.includes(id)) return { code: 'relicNotOwned' };
+      if (this.player.level < RELIC_REQ_LEVEL) return { code: 'needLevel', level: RELIC_REQ_LEVEL };
+    }
+    if (this.relic === id) return null;
+    this.relic = id;
+    this.recalc(this.player, false);
+    this.bumpInv();
+    this.emit({ type: 'equipChange' });
+    return null;
+  }
+
+  /** Valor do efeito único da relíquia equipada (0 se não for desse tipo ou se não houver). */
+  relicEffect(kind: RelicEffectKind): number {
+    const r = this.relic ? RELICS[this.relic] : undefined;
+    return r && r.effect.kind === kind ? r.effect.value : 0;
+  }
+
+  /** Interno: chefe derrotado com o jogador no nível RELIC_DROP.minPlayerLevel+ pode dar uma lendária que falta. */
+  private rollRelicDrop() {
+    if (this.player.level < RELIC_DROP.minPlayerLevel || this.rng.next() >= RELIC_DROP.chance) return;
+    const missing = Object.keys(RELICS).filter(
+      (id) => RELICS[id].rarity === 'lendaria' && !this.relicsOwned.includes(id),
+    );
+    if (!missing.length) return;
+    const id = missing[Math.min(missing.length - 1, Math.floor(this.rng.next() * missing.length))];
+    this.relicsOwned.push(id);
+    this.bumpInv();
+    this.emit({ type: 'relicDrop', name: RELICS[id].name });
+  }
+
   /** montaria em uso agora (null = a pé): tem montaria, está vivo e fora de combate há mountDelay s */
   mountNow(): string | null {
     const id = this.mountsOwned[0];
@@ -682,7 +737,7 @@ export class World {
       }
     }
     p.mana -= def.mana ?? 0;
-    st.cd = def.cooldown ?? 0;
+    st.cd = (def.cooldown ?? 0) * (1 - this.relicEffect('cooldown'));
     this.gcd = GLOBAL_COOLDOWN;
     p.attackCd = Math.max(p.attackCd, 0.3);
     this.emit({
@@ -876,8 +931,9 @@ export class World {
       ...p.derived,
       critChance: Math.min(CRIT_TOTAL_MAX, p.derived.critChance + this.passiveValue('crit')),
     };
-    p.attackInterval = CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed'));
-    const hpBonus = this.passiveValue('maxHp'),
+    p.attackInterval =
+      CLASSES[this.classId].attackInterval / (1 + this.passiveValue('attackSpeed') + this.relicEffect('attackSpeed'));
+    const hpBonus = this.passiveValue('maxHp') + this.relicEffect('maxHpPct'),
       hpMul = (1 + hpBonus) * bal('vida.jogador', this.classId);
     if (hpMul !== 1) {
       p.derived = { ...p.derived, maxHp: Math.round(p.derived.maxHp * hpMul) };
@@ -1399,7 +1455,8 @@ export class World {
         this.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: r.crit });
       // roubo de vida da seita (Tormenta): parte do dano causado volta como vida;
       // conta só o dano que o alvo podia levar (excesso sobre a vida restante não cura)
-      const ls = a.kind === 'player' && leech ? (CLASSES[this.classId].lifeSteal ?? 0) : 0;
+      const ls =
+        a.kind === 'player' && leech ? (CLASSES[this.classId].lifeSteal ?? 0) + this.relicEffect('lifeSteal') : 0;
       const stolen = Math.min(dealt, hpBefore);
       if (ls > 0 && stolen > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + stolen * ls);
       // golpe que deixa lento (Espectro de gelo, marco 9)
@@ -1468,6 +1525,7 @@ export class World {
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
       this.emit({ type: 'bossDefeated', name: m.name, respawnAt: at });
+      this.rollRelicDrop();
       if (this.trialRun) {
         const { bossId, tier } = this.trialRun;
         this.trialProgress[bossId] = Math.max(this.trialProgress[bossId] ?? 0, tier);

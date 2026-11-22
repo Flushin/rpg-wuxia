@@ -29,7 +29,7 @@ const LISTAS = [
   'missoes',
   'mapas',
 ];
-const MECANICAS = ['combate', 'morte', 'forja', 'auto', 'trial', 'epico'];
+const MECANICAS = ['combate', 'morte', 'forja', 'auto', 'trial', 'epico', 'gemas', 'montarias', 'reliquias'];
 function paginaExiste(p: string): boolean {
   const [a, b, ...resto] = p.split('/');
   if (resto.length) return false;

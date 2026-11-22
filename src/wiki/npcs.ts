@@ -180,6 +180,7 @@ function npcList(): NpcInfo[] {
       [
         ['joalheiro', 'Gemas: vender e fundir', 'npc_mercadora_jin', jeweler],
         ['ferreiro_mestre', 'Encaixes: abrir, colocar e retirar gemas', 'npc_ferreira_lin', masterSmith],
+        ['antiquario', 'Relíquias (nível 50)', 'npc_monge_pagode', antiquary],
       ] as [string, string, string, () => string][]
     )
       .filter(([id]) => t[id])
@@ -259,6 +260,11 @@ function jeweler(): string {
   return `<p>Vende gemas de nível ${GEM_CFG.levelNames[0]} (${names}) por <b>${GEM_CFG.price} ouro</b> cada e funde ${GEM_CFG.fuse} gemas iguais em
     1 do nível seguinte. Por enquanto fica na <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Ver ${gemsLink}.</p>
     <h3>Sempre à venda</h3><ul class="shop">${shopRow('po_estrela', GEM_CFG.starDustPrice)}</ul>`;
+}
+function antiquary(): string {
+  return `<p>Vende relíquias comuns e raras para o novo espaço de relíquia do personagem (nível 50). As lendárias só caem de
+    chefes. Por enquanto fica na <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Veja todas em
+    <a href="#/mecanicas/reliquias">Relíquias</a>.</p>`;
 }
 function masterSmith(): string {
   const s = GEM_CFG.socketsByRarity;

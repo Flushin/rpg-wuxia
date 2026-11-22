@@ -6,7 +6,7 @@ import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
 import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
-import { MOUNTS, SKINS } from '../data';
+import { MOUNTS, RELICS, SKINS } from '../data';
 import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
@@ -43,6 +43,8 @@ export function serialize(w: World): SaveData {
     skins: w.skinsOwned.length ? [...w.skinsOwned] : undefined,
     skin: w.skin ?? undefined,
     mounts: w.mountsOwned.length ? [...w.mountsOwned] : undefined,
+    relics: w.relicsOwned.length ? [...w.relicsOwned] : undefined,
+    relic: w.relic ?? undefined,
     playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
   };
 }
@@ -70,6 +72,11 @@ export function restore(w: World, s: SaveData, now: number) {
   w.mountsOwned = (Array.isArray(s.mounts) ? s.mounts : []).filter(
     (id, i, a) => typeof id === 'string' && !!MOUNTS[id] && a.indexOf(id) === i,
   );
+  // relíquias (Porto Noturno, etapa 4): campos opcionais; saves antigos ficam com a coleção vazia
+  w.relicsOwned = (Array.isArray(s.relics) ? s.relics : []).filter(
+    (id, i, a) => typeof id === 'string' && !!RELICS[id] && a.indexOf(id) === i,
+  );
+  w.relic = typeof s.relic === 'string' && w.relicsOwned.includes(s.relic) ? s.relic : null;
   (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
     w.bag[i] = sanitizeItem(raw);
   });
