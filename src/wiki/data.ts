@@ -211,6 +211,10 @@ export const MERCHANT = I.merchant;
 export const BASES = I.bases;
 export const POTIONS = I.potions;
 export const MATERIALS = I.materials;
+/** Gemas e encaixes (items.json "gems"; mesma conta de GEMS em src/core/items.ts). */
+export const GEM_CFG = (itemsJson as unknown as { gems: import('../core/items').GemConfig }).gems;
+/** Valor da gema de nível lv (1..5). */
+export const gemValue = (lv: number) => GEM_CFG.price * GEM_CFG.levelValueMul ** (lv - 1);
 export const CONSUMABLES = I.consumables;
 export const MONSTERS = monstersJson as unknown as Record<string, Monster>;
 export const QUESTS = (questsJson as unknown as { chain: Quest[] }).chain;

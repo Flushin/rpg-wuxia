@@ -418,12 +418,41 @@
       "jade_nevoa": {
         "name": "Mist Jade",
         "desc": "Rare forging material for level 20+ items. Dropped by Shadow Bamboo Grove and Misty Peak monsters and by salvaging level 20+ items."
+      },
+      "po_estrela": {
+        "name": "Stardust",
+        "desc": "Rare Master Smith material: opening an item's 3rd socket takes 1. Sold by the Jeweler."
       }
     },
     "consumables": {
       "pergaminho_retorno": {
         "name": "Return Scroll",
         "desc": "Takes you back to Cloud Village at once (from the maps beyond the east gate, to the Jade Citadel)."
+      }
+    },
+    "gems": {
+      "types": {
+        "rubi": {
+          "name": "Ruby"
+        },
+        "ametista": {
+          "name": "Amethyst"
+        },
+        "jade": {
+          "name": "Jade"
+        },
+        "perola": {
+          "name": "Pearl"
+        },
+        "safira": {
+          "name": "Sapphire"
+        },
+        "onix": {
+          "name": "Onyx"
+        },
+        "topazio": {
+          "name": "Topaz"
+        }
       }
     }
   },
@@ -777,6 +806,22 @@
           "An adventurer with an empty belly fights poorly. Rest in the village, where the body mends itself.",
           "The potion seller buys anything you bring. Even that junk you found in the forest."
         ]
+      },
+      "joalheiro": {
+        "name": "Jeweler Yu",
+        "lines": [
+          "Gems of the Night Harbor, cut by lantern light. I sell first-cut stones; three alike I fuse into a single purer one.",
+          "Ruby sharpens the blade, Amethyst the spirit, Jade strengthens the body. Choose by your path.",
+          "The Master Smith opens the sockets; I only tend to the stones. Do not mix up the trades."
+        ]
+      },
+      "ferreiro_mestre": {
+        "name": "Master Smith Gang",
+        "lines": [
+          "Want sockets in your gear? I open them, set gems and take them out. Removing costs: the stone comes out whole, but the work is fine.",
+          "A common or uncommon item holds one socket; rare, two; epic, three. The third only opens with Stardust.",
+          "An item with gems cannot be sold or salvaged. Bring it here first and I will take the stones out."
+        ]
       }
     }
   },
@@ -995,6 +1040,9 @@
   },
   "novidades": {
     "proxima": [
+      {
+        "texto": "Gems and sockets: the Jeweler sells 7 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx and Topaz) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems. For now both are in the Jade Citadel."
+      },
       {
         "texto": "Max level 50: XP keeps coming after level 40, and each level from 41 to 50 grants 4 attribute points. Characters already at 40 start the level 41 bar from zero."
       }

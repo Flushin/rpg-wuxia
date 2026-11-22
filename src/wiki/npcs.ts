@@ -11,6 +11,7 @@ import {
   SELL_RATIO,
   esc,
   questsOfNpc,
+  GEM_CFG,
 } from './data';
 import { itemLink, questList } from './ui';
 import { mapName } from './maps';
@@ -162,6 +163,15 @@ function npcList(): NpcInfo[] {
       .map(
         ([id, role, does]): NpcInfo => ({ id, name: t[id].name, role, sheet: 'npc_' + id, place: 'cidadela', does }),
       ),
+    // Porto Noturno (etapa 2): na Cidadela até o mapa do Porto existir; folhas emprestadas (src/render/sprites.ts)
+    ...(
+      [
+        ['joalheiro', 'Gemas: vender e fundir', 'npc_mercadora_jin', jeweler],
+        ['ferreiro_mestre', 'Encaixes: abrir, colocar e retirar gemas', 'npc_ferreira_lin', masterSmith],
+      ] as [string, string, string, () => string][]
+    )
+      .filter(([id]) => t[id])
+      .map(([id, role, sheet, does]): NpcInfo => ({ id, name: t[id].name, role, sheet, place: 'cidadela', does })),
     ...['morador1', 'morador2', 'morador3', 'morador4']
       .filter((id) => t[id])
       .map((id): NpcInfo => ({ id, name: t[id].name, role: 'Morador da vila', sheet: 'npc_' + id, does: talkOnly })),
@@ -227,4 +237,20 @@ export function npcPage(id: string): string | null {
     <section class="panel"><h2>O que faz</h2>${n.does()}</section>
     ${qs.length ? `<section class="panel"><h2>Missões</h2>${n.sect ? '<p class="muted">Missões do “mestre” são passadas pelo mestre da <i>sua</i> seita.</p>' : ''}${questList(qs, id)}</section>` : ''}
     ${lines.length ? `<section class="panel"><h2>Falas</h2><ol class="lines">${lines.map((l) => `<li class="lore">“${esc(l)}”</li>`).join('')}</ol></section>` : ''}`;
+}
+
+const gemsLink = '<a href="#/mecanicas/gemas">Gemas e encaixes</a>';
+function jeweler(): string {
+  const names = Object.values(GEM_CFG.types)
+    .map((t) => esc(t.name))
+    .join(', ');
+  return `<p>Vende gemas de nível ${GEM_CFG.levelNames[0]} (${names}) por <b>${GEM_CFG.price} ouro</b> cada e funde ${GEM_CFG.fuse} gemas iguais em
+    1 do nível seguinte. Por enquanto fica na <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Ver ${gemsLink}.</p>
+    <h3>Sempre à venda</h3><ul class="shop">${shopRow('po_estrela', GEM_CFG.starDustPrice)}</ul>`;
+}
+function masterSmith(): string {
+  const s = GEM_CFG.socketsByRarity;
+  return `<p>Abre encaixes nos equipamentos (comum ${s.comum}, incomum ${s.incomum}, raro ${s.raro}, épico ${s.epico}), coloca e retira gemas.
+    Retirar devolve a gema e custa ${Math.round(GEM_CFG.removeCostPct * 100)}% do valor dela. Por enquanto fica na
+    <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Ver ${gemsLink}.</p>`;
 }

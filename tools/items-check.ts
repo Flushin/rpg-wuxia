@@ -11,6 +11,10 @@ import {
   makePotion,
   repairCost,
   sellValue,
+  GEMS,
+  GEM_CFG,
+  gemId,
+  makeStack,
 } from '../src/core/items';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
@@ -25,7 +29,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'cidadela'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const run = (w: World, s: number) => {
   for (let i = 0; i < s * 60; i++) w.tick(1 / 60);
@@ -596,6 +600,61 @@ console.log('\n== cadeado e recompra ==');
     'trancado não desmonta no ferreiro',
   );
   ok(w.toggleLock(w.bag.findIndex((b) => b && b.qty)) === false, 'pilha (poção) não tranca');
+}
+
+console.log('\n== gemas e encaixes ==');
+{
+  const w = mk('lamina', 50, 'cidadela');
+  const rubi = gemId('rubi', 1);
+  ok(Object.keys(GEMS).length === 35 && GEMS[gemId('rubi', 5)].stats.physAtk === 56, '7 tipos × 5 níveis');
+  ok(w.buyGem(rubi)?.code === 'talkToJeweler', 'comprar exige o Joalheiro');
+  near(w, 'joalheiro');
+  w.gold = 10_000;
+  ok(w.buyGem(rubi) === null && w.gold === 10_000 - GEM_CFG.price && w.potionCount(rubi) === 1, 'compra gema I');
+  w.addItem(makeStack(rubi, 2));
+  const g2 = gemId('rubi', 2);
+  ok(w.fuseGem(rubi) === null && w.potionCount(rubi) === 0 && w.potionCount(g2) === 1, 'funde 3 → 1 do nível II');
+  ok(w.fuseGem(g2)?.code === 'noMaterials', 'fundir exige 3 iguais');
+  const sword = equipOf(w, 'espadas_vento', 'raro');
+  w.addItem(sword);
+  ok(w.openSocket(sword)?.code === 'talkToMasterSmith', 'encaixe exige o Ferreiro-mestre');
+  near(w, 'ferreiro_mestre');
+  w.gold = 100_000;
+  ok(w.openSocket(sword) === null && w.gold === 98_000 && sword.gems?.length === 1, '1º encaixe: 2.000 ouro');
+  ok(w.openSocket(sword) === null && sword.gems?.length === 2, '2º encaixe');
+  ok(w.openSocket(sword)?.code === 'socketsMax', 'raro: máximo 2 encaixes');
+  const atk0 = itemStats(sword).physAtk ?? 0;
+  ok(w.insertGem(sword, g2) === null && sword.gems?.[0] === g2 && w.potionCount(g2) === 0, 'coloca gema');
+  ok((itemStats(sword).physAtk ?? 0) === atk0 + 18, 'gema soma nos stats do item');
+  ok(w.insertGem(sword, rubi)?.code === 'noMaterials', 'sem gema na mochila não coloca');
+  near(w, 'vendedor');
+  const idx = w.bag.indexOf(sword);
+  ok(w.sell(idx)?.code === 'hasGems' && w.bag.includes(sword), 'item com gema não se vende');
+  ok(!w.destroyItem(idx), 'item com gema não se destrói');
+  near(w, 'ferreiro_mestre');
+  const gold = w.gold;
+  ok(
+    w.removeGem(sword, 0) === null &&
+      sword.gems?.[0] === null &&
+      w.potionCount(g2) === 1 &&
+      w.gold === gold - Math.round(GEMS[g2].value * 0.2),
+    'retirar devolve a gema e custa 20% do valor',
+  );
+  w.insertGem(sword, g2, 1);
+  const back = World.fromSave(maps, JSON.parse(JSON.stringify(w.serialize())));
+  const sb = back.bag.find((b) => b?.uid === sword.uid);
+  ok(JSON.stringify(sb?.gems) === JSON.stringify([null, g2]), 'encaixes persistem no save');
+  const epic = { ...equipOf(w, 'colar_jade', 'raro'), rarity: 'epico' as const, gems: [rubi, 'xx', null, rubi, rubi] };
+  const bad = World.fromSave(maps, { ...JSON.parse(JSON.stringify(w.serialize())), bag: [epic] });
+  ok(
+    JSON.stringify(bad.bag[0]?.gems) === JSON.stringify([rubi, null, null]),
+    'save saneia: até 3 no épico, gema inválida vira vazio',
+  );
+  const old = World.fromSave(maps, {
+    ...JSON.parse(JSON.stringify(w.serialize())),
+    bag: [{ ...sword, gems: undefined }],
+  });
+  ok(old.bag[0] !== null && old.bag[0]?.gems === undefined, 'save antigo: item sem encaixes');
 }
 
 console.log('\n== save ==');

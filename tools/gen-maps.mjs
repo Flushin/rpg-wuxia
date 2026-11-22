@@ -1412,6 +1412,9 @@ function cidadela() {
   npc('Mestre Ferreiro Lin', 'ferreira_lin', 6.5, 13.5, { role: 'ferreiro' });
   npc('Boticário Wen', 'boticario_wen', 25.5, 13.5, { role: 'vendedor' });
   npc('Mercadora Jin', 'mercadora_jin', 25.6, 9.5, { role: 'mercador' });
+  // PROVISÓRIO (Porto Noturno, etapa 2): Joalheiro e Ferreiro-mestre ficam na Cidadela até o mapa do Porto existir
+  npc('Joalheiro Yu', 'joalheiro', 9.5, 13.5, { role: 'joalheiro' });
+  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 9.5, 17.5, { role: 'ferreiro_mestre' });
   // conversa: governador na escadaria do salão, monge diante do pagode, guardas junto dos portões
   npc('Governador Bai', 'governador', 16, 7.5);
   npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5, { role: 'meridianos' });

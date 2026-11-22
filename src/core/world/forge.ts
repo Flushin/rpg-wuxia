@@ -10,6 +10,7 @@ import {
   RARITIES,
   RARITY_ORDER,
   epicTierBase,
+  itemHasGems,
   makeStack,
   epicBonusStats,
   rollBonuses,
@@ -116,7 +117,7 @@ export function matCount(w: World, id: string): number {
 export function hasMats(w: World, m: Mats): boolean {
   return Object.entries(m).every(([id, n]) => matCount(w, id) >= n);
 }
-function takeMats(w: World, m: Mats) {
+export function takeMats(w: World, m: Mats) {
   for (const [id, n] of Object.entries(m)) {
     let left = n;
     for (let i = w.bag.length - 1; i >= 0 && left > 0; i--) {
@@ -216,6 +217,7 @@ export function salvage(w: World, bagIndex: number, force = false): ActionError 
   if (!force && w.npcRole() !== 'ferreiro') return { code: 'talkToBlacksmith' };
   if (!it || !BASES[it.baseId]) return { code: 'cannotForge' };
   if (it.locked) return { code: 'itemLocked' };
+  if (itemHasGems(it)) return { code: 'hasGems' };
   const got = salvageYield(it, w.owner());
   w.bag[bagIndex] = null;
   const lost: Mats = {};

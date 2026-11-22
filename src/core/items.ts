@@ -52,6 +52,33 @@ export interface MerchantDef {
   priceMul: number;
   materials: Record<string, number>;
 }
+export interface GemType {
+  name: string;
+  color: string;
+  /** stat -> valor por nível (índice 0 = nível I) */
+  stats: Record<string, number[]>;
+}
+export interface GemConfig {
+  price: number;
+  levelValueMul: number;
+  fuse: number;
+  fuseCostPct: number;
+  removeCostPct: number;
+  starDustPrice: number;
+  socketsByRarity: Record<Rarity, number>;
+  socketCost: { gold: number; mats: Record<string, number> }[];
+  levelNames: string[];
+  types: Record<string, GemType>;
+}
+/** Uma gema (pilha na aba de materiais): id gema_<tipo>_<nível>. */
+export interface GemDef {
+  name: string;
+  type: string;
+  level: number;
+  color: string;
+  value: number;
+  stats: Record<string, number>;
+}
 interface BonusDef {
   stat: string;
   min: number;
@@ -79,6 +106,7 @@ const J = localize('items', itemsJson) as unknown as {
   consumables: Record<string, ConsumableDef>;
   merchant: MerchantDef;
   upgradeStep: number;
+  gems: GemConfig;
 };
 balanceItems(J); // multiplicadores de src/data/balance.json
 export const SLOTS = J.slots,
@@ -96,6 +124,34 @@ export const RARITIES = J.rarities,
   MATERIALS = J.materials,
   CONSUMABLES = J.consumables,
   MERCHANT = J.merchant;
+/** Gemas e encaixes (Porto Noturno, etapa 2): config de items.json "gems" e uma entrada por tipo × nível. */
+export const GEM_CFG = J.gems;
+export const GEM_MAX_LEVEL = GEM_CFG.levelNames.length;
+export const gemId = (type: string, level: number) => `gema_${type}_${level}`;
+export const GEMS: Record<string, GemDef> = {};
+for (const [type, t] of Object.entries(GEM_CFG.types))
+  for (let lv = 1; lv <= GEM_MAX_LEVEL; lv++)
+    GEMS[gemId(type, lv)] = {
+      name: `${t.name} ${GEM_CFG.levelNames[lv - 1]}`,
+      type,
+      level: lv,
+      color: t.color,
+      value: GEM_CFG.price * GEM_CFG.levelValueMul ** (lv - 1),
+      stats: Object.fromEntries(Object.entries(t.stats).map(([k, v]) => [k, v[lv - 1]])),
+    };
+export const isGemId = (id: string) => id in GEMS;
+/** Encaixes máximos do item pela raridade (0 se não for equipamento). */
+export const maxSockets = (it: ItemInstance) => (BASES[it.baseId] ? (GEM_CFG.socketsByRarity[it.rarity] ?? 0) : 0);
+export const itemHasGems = (it: ItemInstance) => !!it.gems?.some(Boolean);
+/** Stats somados das gemas encaixadas. */
+export function gemStats(it: ItemInstance): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const g of it.gems ?? []) {
+    const d = g ? GEMS[g] : undefined;
+    if (d) for (const [k, v] of Object.entries(d.stats)) out[k] = Math.round(((out[k] ?? 0) + v) * 1000) / 1000;
+  }
+  return out;
+}
 /** Melhoria máxima (+10) e quanto cada nível soma aos stats da base (marco 9, craft). */
 export const MAX_PLUS = 10;
 export const UPGRADE_STEP = J.upgradeStep;
@@ -116,7 +172,7 @@ export const isPotionId = (id: string) => id in POTIONS;
 export const isMaterialId = (id: string) => id in MATERIALS;
 /** Empilha na mochila (até STACK_MAX): poções e materiais de forja. */
 export const isConsumableId = (id: string) => id in CONSUMABLES;
-export const isStackId = (id: string) => id in POTIONS || id in MATERIALS || id in CONSUMABLES;
+export const isStackId = (id: string) => id in POTIONS || id in MATERIALS || id in CONSUMABLES || id in GEMS;
 
 /** Abas da mochila: cada uma tem BAG_TAB_SIZE espaços próprios. */
 export type BagTab = 'equip' | 'pot' | 'mat';
@@ -124,7 +180,7 @@ export const BAG_TABS: BagTab[] = ['equip', 'pot', 'mat'];
 /** Total de espaços (todas as abas juntas, num array só). */
 export const BAG_SIZE = BAG_TAB_SIZE * BAG_TABS.length;
 export const bagTabOf = (baseId: string): BagTab =>
-  baseId in POTIONS || baseId in CONSUMABLES ? 'pot' : baseId in MATERIALS ? 'mat' : 'equip';
+  baseId in POTIONS || baseId in CONSUMABLES ? 'pot' : baseId in MATERIALS || baseId in GEMS ? 'mat' : 'equip';
 
 export const STAT_LABELS: Record<string, string> = {
   strength: L('Força', 'Strength'),
@@ -159,13 +215,15 @@ export const itemName = (it: ItemInstance) => {
   const eb = it.rarity === 'epico' ? BASES[it.baseId] : undefined;
   const n = eb
     ? epicName(eb.slot, eb.sect)
-    : ((BASES[it.baseId] ?? POTIONS[it.baseId] ?? MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId])?.name ?? it.baseId);
+    : ((BASES[it.baseId] ?? POTIONS[it.baseId] ?? MATERIALS[it.baseId] ?? CONSUMABLES[it.baseId] ?? GEMS[it.baseId])
+        ?.name ?? it.baseId);
   return it.plus ? `${n} +${it.plus}` : n;
 };
 export const itemColor = (it: ItemInstance) =>
   POTIONS[it.baseId]?.color ??
   MATERIALS[it.baseId]?.color ??
   CONSUMABLES[it.baseId]?.color ??
+  GEMS[it.baseId]?.color ??
   RARITIES[it.rarity].color;
 export const maxDurability = (it: ItemInstance) => BASES[it.baseId]?.durability ?? 0;
 export const isBroken = (it: ItemInstance) => !!BASES[it.baseId] && it.durability <= 0;
@@ -314,11 +372,16 @@ export function itemStats(it: ItemInstance, owner?: ItemOwner, withBonuses = tru
       out[k] = (out[k] ?? 0) + (Math.abs(v) >= 1 ? Math.round(x) : Math.round(x * 1000) / 1000);
     }
     if (withBonuses && owner) for (const bo of epicBonuses(owner, it)) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
+    if (withBonuses) addGems(out, it);
     return out;
   }
   for (const [k, v] of Object.entries(b.stats)) out[k] = (out[k] ?? 0) + upgraded(v, it.plus ?? 0);
   if (withBonuses) for (const bo of it.bonuses) out[bo.stat] = (out[bo.stat] ?? 0) + bo.value;
+  if (withBonuses) addGems(out, it);
   return out;
+}
+function addGems(out: Record<string, number>, it: ItemInstance) {
+  for (const [k, v] of Object.entries(gemStats(it))) out[k] = Math.round(((out[k] ?? 0) + v) * 1000) / 1000;
 }
 
 /** Stat da base com a melhoria: frações com 3 casas; inteiros arredondados, subindo pelo menos 1 a cada 3 níveis
@@ -336,6 +399,8 @@ export function sellValue(it: ItemInstance): number {
   if (p) return Math.max(1, Math.floor(p.price * J.sellRatio + 1e-9));
   const m = MATERIALS[it.baseId];
   if (m) return Math.max(1, Math.floor(m.value * J.sellRatio + 1e-9));
+  const g = GEMS[it.baseId];
+  if (g) return Math.max(1, Math.floor(g.value * J.sellRatio + 1e-9));
   const c = CONSUMABLES[it.baseId];
   if (c) return Math.max(1, Math.floor(c.price * J.sellRatio + 1e-9));
   const b = BASES[it.baseId];
@@ -383,7 +448,14 @@ export function sanitizeItem(raw: unknown): ItemInstance | null {
     durability: dur,
     ...(Number(r.plus) >= 1 ? { plus: Math.min(MAX_PLUS, Math.floor(Number(r.plus))) } : {}),
     ...(r.locked === true ? { locked: true } : {}),
+    ...sanitizeGems(r.gems, maxSockets({ baseId: r.baseId, rarity } as ItemInstance)),
   };
+}
+/** Encaixes do save: no máximo os da raridade; gema desconhecida vira encaixe vazio. */
+function sanitizeGems(raw: unknown, max: number): { gems?: (string | null)[] } {
+  if (!Array.isArray(raw) || !max) return {};
+  const gems = raw.slice(0, max).map((g) => (typeof g === 'string' && g in GEMS ? g : null));
+  return gems.length ? { gems } : {};
 }
 
 // ordem da mochila: equipamentos (ordem dos slots), depois poções; raridade (raro primeiro) e nível (maior primeiro)
@@ -415,7 +487,8 @@ export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[]
   }
   const potKeys = Object.keys(POTIONS),
     conKeys = Object.keys(CONSUMABLES),
-    matKeys = Object.keys(MATERIALS);
+    matKeys = Object.keys(MATERIALS),
+    gemKeys = Object.keys(GEMS);
   const rank = (it: ItemInstance) =>
     isPotionId(it.baseId)
       ? 100 + potKeys.indexOf(it.baseId)
@@ -423,7 +496,9 @@ export function sortedBag(bag: (ItemInstance | null)[]): (ItemInstance | null)[]
         ? 150 + conKeys.indexOf(it.baseId)
         : isMaterialId(it.baseId)
           ? 200 + matKeys.indexOf(it.baseId)
-          : SLOTS.indexOf(BASES[it.baseId].slot);
+          : isGemId(it.baseId)
+            ? 300 + gemKeys.indexOf(it.baseId)
+            : SLOTS.indexOf(BASES[it.baseId].slot);
   const all = [...items, ...stacks.values()].sort(
     (a, b) =>
       rank(a) - rank(b) ||

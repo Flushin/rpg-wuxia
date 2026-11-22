@@ -1,6 +1,16 @@
 // Loja e ferreiro: comprar, vender e consertar.
 // Funções chamadas pelo World (fachada em src/core/world.ts), que passa a si mesmo como `w`.
-import { BASES, POTIONS, SLOTS, buyPrice, makePotion, maxDurability, repairCost, sellValue } from '../items';
+import {
+  BASES,
+  POTIONS,
+  itemHasGems,
+  SLOTS,
+  buyPrice,
+  makePotion,
+  maxDurability,
+  repairCost,
+  sellValue,
+} from '../items';
 import { type ItemInstance } from '../types';
 import type { ActionError } from '../types';
 import type { World } from '../world';
@@ -27,6 +37,7 @@ export function sell(w: World, bagIndex: number, qty = 1): ActionError | null {
   const it = w.bag[bagIndex];
   if (it?.rarity === 'epico') return { code: 'epicLocked' };
   if (it?.locked) return { code: 'itemLocked' };
+  if (it && itemHasGems(it)) return { code: 'hasGems' };
   if (!it) return null;
   const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
     price = sellValue(it);
@@ -56,7 +67,7 @@ export function buyBack(w: World, idx: number): ActionError | null {
 // venda instantânea pelo preço do vendedor (auto-combate / ganho offline)
 export function sellRaw(w: World, bagIndex: number, qty = 1): number {
   const it = w.bag[bagIndex];
-  if (!it || it.rarity === 'epico' || it.locked) return 0; // Épico e trancado não se vendem (nem pelo auto)
+  if (!it || it.rarity === 'epico' || it.locked || itemHasGems(it)) return 0; // Épico e trancado não se vendem (nem pelo auto)
   const n = Math.max(1, Math.min(qty, it.qty ?? 1)),
     gold = sellValue(it) * n;
   w.removeFromBag(bagIndex, n);
