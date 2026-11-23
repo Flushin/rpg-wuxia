@@ -261,7 +261,7 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
 }
 
 /** Chefe do Trial (src/core/trial.ts): ouro do nível, 1 Raro garantido, 1 equipamento (nv 20 ou 25) e os materiais do
- *  chefe. A chance de equipamento e de material é multiplicada pelo bônus do nível (×1,12 a ×1,186); o que passa de
+ *  chefe. A chance de equipamento e de material é multiplicada pelo bônus do nível (×1,12 a ×1,237; o Épico fica fora, 1% em rollEpic); o que passa de
  *  100% vira chance de cair mais um. Os itens saem com o nível do chefe (bônus maiores). */
 function trialLoot(w: World, m: Entity, def: MonsterDef) {
   const tier = m.trial!.tier,
