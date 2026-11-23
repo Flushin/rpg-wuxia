@@ -600,6 +600,9 @@ if (trialArg) {
   const only = trialArg.split('=')[1],
     tiersArg = process.argv.find((a) => a.startsWith('--tiers='));
   const tiers = tiersArg ? tiersArg.split('=')[1].split(',').map(Number) : [1, 4, 7, 10];
+  // --plevel=N: personagem nível N (padrão 20); a partir do 35 usa equipamento nv 35
+  const pl = Number(process.argv.find((a) => a.startsWith('--plevel='))?.split('=')[1] ?? 20),
+    gearLv = pl >= 35 ? 35 : pl >= 25 ? 25 : 15;
   const N = Math.max(4, SEEDS);
   console.log('| Chefe | Seita | ' + tiers.map((t) => `Nv ${t} (nv15 inc / Trial)`).join(' | ') + ' |');
   console.log('|---|---|' + tiers.map(() => '---|').join(''));
@@ -610,8 +613,8 @@ if (trialArg) {
           const bs = Array.from({ length: N }, (_, i) => {
             const w =
               gear === 'base'
-                ? highWorld(classId, 20, i + 1, 15, 'incomum')
-                : highWorld(classId, 20, i + 1, 15, 'raro', trialBossLevel(tier) - 1);
+                ? highWorld(classId, pl, i + 1, gearLv, 'incomum')
+                : highWorld(classId, pl, i + 1, gearLv, 'raro', trialBossLevel(tier) - 1);
             w.trialRun = { bossId, tier };
             w.changeMap(TRIAL_MAP);
             return fightBoss(w, classId, gear === 'base' ? 'incomum' : 'raro', false);

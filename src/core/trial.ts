@@ -1,9 +1,10 @@
-// Trial: arena onde o jogador escolhe um dos chefes do jogo e um nível de 1 a 20 (chefe nível 21 a 40; os níveis
-// 11–20 entraram com o nível máximo 40, decidido pelo Lucas em 21/11/2026).
+// Trial: arena onde o jogador escolhe um dos chefes do jogo e um nível de 1 a 40 (chefe nível 21 a 60; os níveis
+// 21–40 entraram com o nível máximo 60, decidido pelo Lucas em 23/11/2026, junto com ouro abaixo da entrada e drop
+// em linha reta: farmar o Trial custa ouro).
 // Regras (aprovadas pelo Lucas em 19/11/2026): portal na saída sul da vila (menu); personagem nível 20+; entrada em
 // ouro que sobe a cada nível; vencer o nível N de um chefe libera o N+1 daquele chefe (progresso salvo); a chance de
-// drop de equipamento e material ganha +12% no nível 1 e esse bônus
-// cresce 5% a cada nível (12,60%, 13,23% … 18,62% no nível 10). Instância como as masmorras
+// drop de equipamento e material ganha +12% no nível 1 e +0,3 ponto a cada nível (23,7% no 40). O Épico
+// não entra no bônus: segue 1% por chefe (EPIC_CHANCE.boss). Instância como as masmorras
 // (Auto não funciona, nada renasce, morrer/sair/fechar o jogo encerra a corrida).
 //
 // Balanceamento (docs/balanceamento.md, seção "Trial"): no Trial todos os chefes têm a mesma vida e o mesmo dano por
@@ -12,7 +13,7 @@
 import { MONSTERS, type MonsterDef } from './data';
 
 export const TRIAL_MAP = 'trial';
-export const TRIAL_TIERS = 20;
+export const TRIAL_TIERS = 40;
 /** nível mínimo do personagem para entrar */
 export const TRIAL_MIN_LEVEL = 20;
 
@@ -25,16 +26,16 @@ export const TRIAL_BOSSES: string[] = Object.values(MONSTERS)
 export const isTrialBoss = (id: string) => TRIAL_BOSSES.includes(id);
 export const validTier = (tier: number) => Number.isInteger(tier) && tier >= 1 && tier <= TRIAL_TIERS;
 
-/** Nível do chefe no nível N do Trial: 21 no nível 1 até 40 no nível 20. */
+/** Nível do chefe no nível N do Trial: 21 no nível 1 até 60 no nível 40. */
 export const trialBossLevel = (tier: number) => 20 + tier;
-/** Ouro cobrado para entrar no nível N: 1000 no nível 1, +200 por nível (2800 no 10, 4800 no 20). */
-/** Entrada: 1000 de ouro no nível 1, +12% a cada nível (arredondada a 10). */
-export const TRIAL_COST_GROWTH = 1.12;
+/** Entrada: 1000 de ouro no nível 1, +10% a cada nível (arredondada a 10): 6120 no 20, 41140 no 40. */
+export const TRIAL_COST_GROWTH = 1.1;
 export const trialCost = (tier: number) => Math.round((1000 * TRIAL_COST_GROWTH ** (tier - 1)) / 10) * 10;
-/** Bônus de drop (equipamento e material): 12% no nível 1 e, a cada nível, +5% sobre o bônus anterior
- *  (12,60% no 2 … 18,62% no 10). Multiplicador da chance: 1 + bônus. */
-export const trialDropMul = (tier: number) => 1 + 0.12 * 1.05 ** (tier - 1);
-/** Bônus de drop em %, com 2 casas (12,00 … 18,62), para o menu e a wiki. */
+/** Bônus de drop (equipamento e material, nunca Épico): 12% no nível 1, +0,3 ponto por nível (17,7% no 20, 23,7% no
+ *  40). Multiplicador da chance: 1 + bônus. */
+export const TRIAL_DROP = { base: 0.12, perTier: 0.003 };
+export const trialDropMul = (tier: number) => 1 + TRIAL_DROP.base + TRIAL_DROP.perTier * (tier - 1);
+/** Bônus de drop em %, com 2 casas (12,00 … 23,70), para o menu e a wiki. */
 export const trialDropPct = (tier: number) => Math.round((trialDropMul(tier) - 1) * 10000) / 100;
 
 // ---------- força do chefe por nível ----------
@@ -69,7 +70,7 @@ export interface TrialStats {
   spiritDef: number;
 }
 
-/** Vida, ataque e defesas do chefe no nível (21–40) do Trial. */
+/** Vida, ataque e defesas do chefe no nível (21–60) do Trial. */
 export function trialStats(def: BossLike, level: number): TrialStats {
   const S = TRIAL_STATS,
     n = level - 21,
@@ -88,14 +89,15 @@ export function trialStats(def: BossLike, level: number): TrialStats {
 export const trialSummonLevel = (bossLevel: number) => bossLevel - 3;
 
 // ---------- recompensa ----------
-/** XP e ouro do chefe no nível N (o ouro cobre a entrada com um pouco de sobra). */
+/** XP e ouro do chefe no nível N. O ouro devolve só 40–60% da entrada: farmar o Trial gasta ouro. */
+export const TRIAL_GOLD_BACK: [number, number] = [0.4, 0.6];
 export const trialXp = (tier: number) => 9000 + 1000 * (tier - 1);
 export const trialGold = (tier: number): [number, number] => [
-  Math.round(trialCost(tier) * 1.0),
-  Math.round(trialCost(tier) * 1.3),
+  Math.round(trialCost(tier) * TRIAL_GOLD_BACK[0]),
+  Math.round(trialCost(tier) * TRIAL_GOLD_BACK[1]),
 ];
 /** Drop normal do chefe no Trial (antes do bônus): 1 Raro garantido, 1 equipamento de raridade sorteada e os materiais
- *  do chefe. Bases nv 20 nos níveis 1–5 do Trial, nv 25 nos 6–14 e nv 35 nos 15–20 (nível 40); os itens saem com o
+ *  do chefe. Bases nv 20 nos níveis 1–5 do Trial, nv 25 nos 6–14 e nv 35 nos 15–40 (a base mais alta do jogo); os itens saem com o
  *  nível do chefe (bônus mais altos). */
 export const trialEquipReqLevel = (tier: number) => (tier <= 5 ? 20 : tier <= 14 ? 25 : 35);
 

@@ -6,6 +6,7 @@ import { MONSTERS } from '../src/core/data';
 import { MAPS_CONFIG, MAP_IDS } from '../src/core/mapsConfig';
 import { parseTiledMap, type GameMap } from '../src/core/map';
 import {
+  trialGold,
   TRIAL_BOSSES,
   TRIAL_MAP,
   TRIAL_TIERS,
@@ -16,7 +17,7 @@ import {
   trialUnlocked,
   trialEquipReqLevel,
 } from '../src/core/trial';
-import { BASES } from '../src/core/items';
+import { BASES, EPIC_CHANCE, RARITIES } from '../src/core/items';
 import { World } from '../src/core/world';
 import type { Entity, GameEvent, SaveData } from '../src/core/types';
 
@@ -60,17 +61,24 @@ ok(
   `todos os chefes do jogo no Trial (${TRIAL_BOSSES.length})`,
 );
 ok(
-  trialBossLevel(1) === 21 && trialBossLevel(TRIAL_TIERS) === 40 && TRIAL_TIERS === 20,
-  'chefe nível 21 a 40 (níveis 1–20)',
-);
-const table = [12, 12.6, 13.23, 13.89, 14.59, 15.32, 16.08, 16.89, 17.73, 18.62];
-ok(
-  table.every((v, i) => trialDropPct(i + 1) === v),
-  `bônus de drop 12% +5% composto: ${table.map((_, i) => trialDropPct(i + 1)).join(' ')}`,
+  trialBossLevel(1) === 21 && trialBossLevel(TRIAL_TIERS) === 60 && TRIAL_TIERS === 40,
+  'chefe nível 21 a 60 (níveis 1–40)',
 );
 ok(
-  trialCost(1) === 1000 && trialCost(10) === 2770 && trialCost(20) === 8610,
-  'entrada 1000 → 2770 → 8610 de ouro (+12%/nível)',
+  trialDropPct(1) === 12 && trialDropPct(10) === 14.7 && trialDropPct(20) === 17.7 && trialDropPct(40) === 23.7,
+  'bônus de drop 12% +0,3 ponto/nível (23,7% no 40)',
+);
+ok(
+  trialCost(1) === 1000 && trialCost(10) === 2360 && trialCost(20) === 6120 && trialCost(40) === 41140,
+  'entrada 1000 → 2360 → 6120 → 41140 de ouro (+10%/nível)',
+);
+ok(
+  Array.from({ length: TRIAL_TIERS }, (_, i) => i + 1).every((t) => trialGold(t)[1] < trialCost(t)),
+  'ouro do chefe sempre abaixo da entrada (40–60%): farmar gasta ouro',
+);
+ok(
+  EPIC_CHANCE.boss === 0.01 && RARITIES.epico.weight === 0,
+  'Épico: 1% por chefe, fora do sorteio de raridade e do bônus',
 );
 for (const id of TRIAL_BOSSES) {
   const a = trialStats(MONSTERS[id], 21),
@@ -133,7 +141,7 @@ console.log('\n== entrada ==');
     trialEquipReqLevel(5) === 20 && trialEquipReqLevel(6) === 25 && trialEquipReqLevel(14) === 25,
     'níveis 6–14: bases nv 25',
   );
-  ok(trialEquipReqLevel(15) === 35 && trialEquipReqLevel(20) === 35, 'níveis 15–20: bases nv 35');
+  ok(trialEquipReqLevel(15) === 35 && trialEquipReqLevel(40) === 35, 'níveis 15–40: bases nv 35');
 
   console.log('\n== save e saída ==');
   const s = w.serialize();

@@ -303,8 +303,8 @@ console.log('\n== desgaste ==');
 }
 
 console.log('\n== Trial 11–20 ==');
-ok(TRIAL_TIERS === 20 && trialBossLevel(20) === 40, 'níveis 1–20, chefe até o nível 40');
-ok(trialEquipReqLevel(14) === 25 && trialEquipReqLevel(15) === 35, 'nv 25 até o 14, nv 35 do 15 ao 20');
+ok(TRIAL_TIERS === 40 && trialBossLevel(40) === 60, 'níveis 1–40, chefe até o nível 60');
+ok(trialEquipReqLevel(14) === 25 && trialEquipReqLevel(15) === 35, 'nv 25 até o 14, nv 35 do 15 ao 40');
 
 console.log('\n== montaria (estábulo do Porto Noturno) ==');
 {
