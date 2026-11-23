@@ -1708,6 +1708,15 @@ function porto() {
   decor('cestos', 55.4, 74.5, { block: 1 });
   decor('sacos_especiarias', 59.5, 75.6, { block: 1 });
   decor('jarros_cha', 55.4, 76.4, { block: 1 });
+  // barracas sem vendedor: lanternas e fogos de papel (oeste, i 14); seda e leques (leste, i 66)
+  decor('lanternas_papel', 16.5, 74.5, { block: 1, light: 1, soft: 1 });
+  decor('fogos', 13.4, 75.4, { block: 1 });
+  decor('fogos', 16.5, 75.6, { block: 1 });
+  decor('caixotes', 13.4, 74.4, { atlas: 'cidade', block: 1 });
+  decor('rolos_seda', 68.5, 74.5, { block: 1 });
+  decor('leques', 65.4, 75.4, { block: 1 });
+  decor('rolos_seda', 65.4, 74.4, { block: 1 });
+  decor('lanterna_chao', 68.6, 75.8, { block: 1, light: 1, soft: 1 });
   for (const x of [12, 30, 62, 80]) decor('estacas_cais', x + 1, 86.5, { light: 1 });
   const post = (x, y) => decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
   for (let x = 4; x < 92; x += 8) if (gr.get(x, 80) === PL) post(x, 80);

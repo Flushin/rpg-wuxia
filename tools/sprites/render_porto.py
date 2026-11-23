@@ -810,6 +810,74 @@ def big_brazier():
         a = k * math.pi / 2
         sphere(0.42 * math.cos(a), 0.42 * math.sin(a), 1.22, 0.06, JADE)
 
+# ---- barracas sem vendedor: lanternas e fogos de papel (oeste); seda e leques (leste) ----
+def paper_lantern_rack():
+    """Armação de bambu com lanternas de papel coloridas penduradas em duas fileiras (acesas)."""
+    BAM = (150, 130, 70)
+    for sx in (-1, 1):
+        cyl(sx * 0.42, 0, 0, 0.03, 1.5, BAM)
+    for z in (1.45, 0.95):
+        o = cyl(-0.45, 0, z, 0.02, 0.9, BAM)
+        o.rotation_euler = (0, 1.5708, 0)
+        o.location = (0, 0, z)
+    cols = [(230, 50, 40), (246, 170, 60), (240, 90, 140), (120, 200, 90), (90, 150, 240)]
+    for row, z in enumerate((1.45, 0.95)):
+        for k in range(4):
+            x = -0.3 + k * 0.2
+            cyl(x, 0, z - 0.1, 0.004, 0.1, INK)
+            lantern(x, 0, z - 0.2, 0.075, cols[(k + row * 2) % 5])
+            sphere(x, 0, z - 0.2, 0.05, cols[(k + row * 2) % 5], emit=2.5)
+
+
+def fireworks():
+    """Fogos de papel: tubos vermelhos com pavio em cesto, rojões em leque e uma caixa com o ideograma dourado."""
+    import math
+    cyl(-0.1, 0.1, 0, 0.22, 0.22, (176, 140, 80), r2=0.25)
+    for k in range(7):
+        a = k * 0.9
+        x, y = -0.1 + 0.12 * math.cos(a) * (k > 0), 0.1 + 0.12 * math.sin(a) * (k > 0)
+        cyl(x, y, 0.1, 0.045, 0.34 + 0.04 * (k % 3), (200, 36, 30))
+        cyl(x, y, 0.44 + 0.04 * (k % 3), 0.046, 0.03, rt.GOLD)
+    for k in range(5):  # rojões
+        o = cyl(0.25, -0.15, 0.0, 0.012, 0.75, (150, 110, 70))
+        o.rotation_euler = (0.25 * (k - 2) * 0.6, 0.2, 0)
+    box(0.0, -0.25, 0, 0.36, 0.24, 0.2, (180, 30, 28))
+    box(0.0, -0.375, 0.05, 0.12, 0.01, 0.12, rt.GOLD, emit=0.8)
+
+
+def silk_bolts():
+    """Prateleira de rolos de seda coloridos deitados, com uma peça desenrolada caindo na frente."""
+    for sx in (-1, 1):
+        box(sx * 0.4, 0, 0, 0.06, 0.34, 1.0, WOODW_D)
+    cols = [(180, 40, 60), (60, 120, 170), (230, 190, 80), (90, 150, 100), (150, 70, 160), (236, 226, 210)]
+    for k, z in enumerate((0.12, 0.46, 0.8)):
+        box(0, 0, z - 0.03, 0.82, 0.34, 0.03, WOODW)
+        for i in range(2):
+            o = cyl(0, -0.07 + i * 0.14, z + 0.07, 0.07, 0.72, cols[(k * 2 + i) % 6], rough=0.35)
+            o.rotation_euler = (0, 1.5708, 0)
+            o.location = (0, -0.07 + i * 0.14, z + 0.07)
+    box(0.1, -0.2, 0.15, 0.3, 0.01, 0.7, (180, 40, 60), rough=0.35)  # pano caindo
+    box(0, 0, 1.0, 0.9, 0.38, 0.05, WOODW_D)
+
+
+def fan_display():
+    """Leques de papel abertos num suporte em degraus e uma sombrinha aberta por cima."""
+    import math
+    box(0, 0.05, 0, 0.6, 0.4, 0.3, WOODW)
+    box(0, 0.12, 0.3, 0.6, 0.26, 0.15, WOODW)
+    cols = [(220, 60, 50), (240, 220, 180), (80, 130, 200)]
+    for k in range(3):
+        x = -0.2 + k * 0.2
+        z = 0.32 + (k == 1) * 0.15
+        for b in range(9):
+            a = -1.1 + b * 0.275
+            o = box(x + 0.12 * math.sin(a), -0.05 + (k == 1) * 0.07, z + 0.12 * math.cos(a), 0.05, 0.01, 0.24,
+                    cols[(k + b) % 3] if b % 2 else cols[k])
+            o.rotation_euler = (0, a, 0)
+    cyl(0.3, 0.2, 0, 0.012, 0.95, WOODW_D)
+    cyl(0.3, 0.2, 0.9, 0.38, 0.12, (60, 120, 160), r2=0.02, verts=16)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -856,6 +924,10 @@ SET = {
     'sino_porto': (harbor_bell, (1, 1), 1.9),
     'portal_trial': (trial_gate, (5, 3), 7.0),
     'braseiro_grande': (big_brazier, (1, 1), 1.7),
+    'lanternas_papel': (paper_lantern_rack, (1, 1), 1.6),
+    'fogos': (fireworks, (1, 1), 0.9),
+    'rolos_seda': (silk_bolts, (1, 1), 1.2),
+    'leques': (fan_display, (1, 1), 1.2),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),
