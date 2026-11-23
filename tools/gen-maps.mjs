@@ -1659,6 +1659,12 @@ function porto() {
   }
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
+  // Mestre do Cais junto do trapiche: mesa de registro de cargas atrás, sino do porto, âncora com cordas e carga
+  objs.push(area('mesa_registro', 'building', 30, 79, 2, 1, { sprite: 'mesa_registro', atlas: 'porto', block: 1 }));
+  decor('sino_porto', 28.5, 79.5, { block: 1 });
+  decor('ancora', 33.5, 80.5, { block: 1 });
+  decor('caixotes', 33.5, 79.5, { atlas: 'cidade', block: 1 });
+  decor('barril', 34.5, 80.4, { atlas: 'cidade', block: 1 });
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
   npc('Vendedora Hua', 'vendedor_porto1', 27, 74.7, { role: 'vendedor', face: 7 });
   npc('Vendedor Bo', 'vendedor_porto2', 37, 74.7, { role: 'vendedor', face: 7 });

@@ -642,6 +642,69 @@ def brazier():
     sphere(0, 0, 0.8, 0.09, (255, 170, 60), emit=5.0)
 
 
+# ---- Mestre do Cais: mesa de registro, âncora com cordas e sino do porto ----
+def harbor_desk():
+    """Mesa de registro do cais (2x1): livro de cargas aberto, balança de bronze, ábaco, carimbo e rolos de manifesto."""
+    box(0, 0, 0, 1.6, 0.6, 0.62, WOODW_D)
+    box(0, -0.31, 0.1, 1.5, 0.02, 0.42, WOODW)
+    box(0, 0, 0.62, 1.72, 0.7, 0.05, WOODW)
+    box(-0.4, 0, 0.67, 0.5, 0.36, 0.03, (120, 40, 36))  # livro
+    for sx in (-1, 1):
+        box(-0.4 + sx * 0.12, 0, 0.7, 0.22, 0.32, 0.015, PAPER)
+    for k in range(4):
+        box(-0.52 + (k % 2) * 0.24, -0.08 + (k // 2) * 0.12, 0.716, 0.16, 0.01, 0.002, INK)
+    # ábaco
+    box(0.18, 0.05, 0.67, 0.4, 0.22, 0.02, WOODW_D)
+    for r in range(4):
+        cyl(0.18, -0.05 + r * 0.065, 0.7, 0.006, 0.36, (160, 130, 80)).rotation_euler = (0, 1.5708, 0)
+        bpy.context.object.location = (0.18, -0.05 + r * 0.065, 0.7)
+        for b in range(5):
+            sphere(0.05 + b * 0.06 + (r % 2) * 0.03, -0.05 + r * 0.065, 0.7, 0.022, (150, 40, 36), sz=0.7)
+    # balança
+    cyl(0.62, 0.1, 0.67, 0.07, 0.03, rt.GOLD)
+    cyl(0.62, 0.1, 0.7, 0.015, 0.32, rt.GOLD)
+    box(0.62, 0.1, 1.02, 0.4, 0.02, 0.02, rt.GOLD)
+    for sx in (-1, 1):
+        cyl(0.62 + sx * 0.19, 0.1, 0.9, 0.08, 0.02, rt.GOLD, rough=0.3)
+        cyl(0.62 + sx * 0.19, 0.1, 0.92, 0.004, 0.1, rt.GOLD)
+    for k in range(3):  # manifestos enrolados
+        o = cyl(0.62, -0.22 + k * 0.0, 0.69 + k * 0.05, 0.03, 0.28, PAPER)
+        o.rotation_euler = (0, 1.5708, 0)
+        o.location = (0.62, -0.22, 0.7 + k * 0.05)
+    cyl(-0.78, 0.2, 0.67, 0.04, 0.08, (180, 40, 36))  # carimbo
+
+
+def anchor_ropes():
+    """Âncora de ferro encostada num rolo de corda grossa, com uma boia de madeira."""
+    import math
+    for k in range(4):  # rolo de corda
+        cyl(-0.12, 0.1, k * 0.06, 0.26 - k * 0.02, 0.06, (176, 150, 100), verts=16)
+    cyl(-0.12, 0.1, 0.24, 0.1, 0.02, (90, 74, 50))
+    o = cyl(0.18, -0.05, 0.05, 0.035, 0.85, IRON)  # haste
+    o.rotation_euler = (0.25, 0, 0)
+    o = bpy.ops.mesh.primitive_torus_add(major_radius=0.22, minor_radius=0.035, location=(0.18, -0.02, 0.18))
+    t = bpy.context.object
+    t.rotation_euler = (1.32, 0, 0)
+    t.data.materials.append(rt.mat(IRON))
+    box(0.18, 0.12, 0.88, 0.32, 0.05, 0.05, IRON)
+    o = bpy.ops.mesh.primitive_torus_add(major_radius=0.07, minor_radius=0.02, location=(0.18, 0.18, 1.0))
+    bpy.context.object.rotation_euler = (1.32, 0, 0)
+    bpy.context.object.data.materials.append(rt.mat(IRON))
+    cyl(0.32, -0.3, 0, 0.13, 0.22, (200, 60, 40), verts=12)  # boia
+    cyl(0.32, -0.3, 0.09, 0.135, 0.05, (236, 230, 216))
+
+
+def harbor_bell():
+    """Sino do porto: pórtico de madeira com telhadinho e sino de bronze pendurado."""
+    for sx in (-1, 1):
+        box(sx * 0.3, 0, 0, 0.1, 0.1, 1.5, WOODW_D)
+    box(0, 0, 1.45, 0.8, 0.12, 0.08, WOODW_D)
+    roof(0, 0, 0.42, 0.12, 1.53, 0.2, ROOF_R, over=0.1, lift=0.05, ridge=False)
+    cyl(0, 0, 1.3, 0.01, 0.16, IRON)
+    cyl(0, 0, 0.98, 0.17, 0.34, (176, 130, 60), r2=0.1, rough=0.3)
+    box(0, 0, 0, 0.8, 0.3, 0.06, rt.STONE_D)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -683,6 +746,9 @@ SET = {
     'bagagem_viagem': (travel_gear, (1, 1), 1.3),
     'estandarte': (banner, (1, 1), 2.4),
     'braseiro': (brazier, (1, 1), 1.0),
+    'mesa_registro': (harbor_desk, (2, 1), 1.2),
+    'ancora': (anchor_ropes, (1, 1), 1.2),
+    'sino_porto': (harbor_bell, (1, 1), 1.9),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),
