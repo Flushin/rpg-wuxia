@@ -1057,8 +1057,10 @@ export class World {
           // sem ponto: o tile alcançável mais perto do NPC (o "mais perto" cru podia ficar atrás de parede/objeto)
           const goal = spot ?? reachableNear(this.map, p, n) ?? n;
           p.path = this.findPathFor(p, goal);
-          if (!p.path.length && !spot && goal !== n && dist(p, n) <= dist(goal, n) + 0.75) {
-            this.npcGoal = null; // já está no ponto mais perto possível
+          // chegou ao ponto mais perto possível (NPC cercado: fica além do alcance normal)
+          if (!spot && goal !== n && dist(p, goal) <= 0.75) {
+            p.path = [];
+            this.npcGoal = null;
             this.openNpcWindow(n);
             return;
           }
