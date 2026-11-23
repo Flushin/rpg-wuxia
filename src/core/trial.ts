@@ -51,6 +51,11 @@ export const TRIAL_STATS = {
   defStrong: 300,
   defWeak: 110,
   defGrowth: 1.04,
+  /** acima do chefe nível 40 (Trial 21–40) o crescimento é menor, para todas as seitas vencerem o topo bem equipadas */
+  softFrom: 40,
+  hpGrowthHigh: 1.05,
+  atkGrowthHigh: 1.035,
+  defGrowthHigh: 1.02,
 };
 
 /** O ponto fraco do chefe: o tipo de dano contra o qual a defesa dele é menor (a mesma do jogo normal). */
@@ -73,13 +78,15 @@ export interface TrialStats {
 /** Vida, ataque e defesas do chefe no nível (21–60) do Trial. */
 export function trialStats(def: BossLike, level: number): TrialStats {
   const S = TRIAL_STATS,
-    n = level - 21,
-    strong = Math.round(S.defStrong * S.defGrowth ** n),
-    weak = Math.round(S.defWeak * S.defGrowth ** n),
+    n = Math.min(level, S.softFrom) - 21,
+    h = Math.max(0, level - S.softFrom),
+    defK = S.defGrowth ** n * S.defGrowthHigh ** h,
+    strong = Math.round(S.defStrong * defK),
+    weak = Math.round(S.defWeak * defK),
     physWeak = trialWeakness(def) === 'physical';
   return {
-    hp: Math.round(S.hp * S.hpGrowth ** n),
-    atk: Math.round(S.atk * S.atkGrowth ** n * (def.attackInterval / S.refInterval)),
+    hp: Math.round(S.hp * S.hpGrowth ** n * S.hpGrowthHigh ** h),
+    atk: Math.round(S.atk * S.atkGrowth ** n * S.atkGrowthHigh ** h * (def.attackInterval / S.refInterval)),
     physDef: physWeak ? weak : strong,
     spiritDef: physWeak ? strong : weak,
   };
