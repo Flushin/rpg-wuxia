@@ -1578,8 +1578,8 @@ function porto() {
   objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
   npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
-  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.5, 13, { role: 'ferreiro_mestre' });
-  npc('Joalheiro Yu', 'joalheiro', 77, 29, { role: 'joalheiro' });
+  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 74, 13, { role: 'ferreiro_mestre' });
+  npc('Joalheiro Yu', 'joalheiro', 74, 27, { role: 'joalheiro' });
   npc('Antiquário Lao', 'antiquario', 67, 60, { role: 'antiquario' });
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
@@ -1619,6 +1619,58 @@ function porto() {
     [56, 42],
     [47, 34],
     [47, 51],
+  ])
+    post(x, y);
+  // vielas: postes ao longo de todas; alguns apagados (esqueceram de acender: sem halo, sem 'light')
+  const unlit = (x, y) => decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1 });
+  for (const [x, y] of [
+    [6, 18],
+    [20, 18],
+    [24, 6],
+    [24, 13],
+    [24, 20],
+    [21, 27],
+    [56, 19],
+    [70, 19],
+    [84, 19],
+    [71, 6],
+    [71, 13],
+    [74, 13],
+    [71, 27],
+    [74, 34],
+    [11, 64],
+    [8, 71],
+    [61, 57],
+    [61, 64],
+    [64, 71],
+    [86, 50],
+    [86, 57],
+  ])
+    post(x, y);
+  for (const [x, y] of [
+    [41, 18],
+    [21, 20],
+    [21, 34],
+    [77, 22],
+    [74, 6],
+    [74, 20],
+    [8, 57],
+    [64, 50],
+    [61, 71],
+    [83, 57],
+  ])
+    unlit(x, y);
+  // um poste aceso junto de cada NPC, para ele ser visto no escuro
+  for (const [x, y] of [
+    [45, 39],
+    [73.5, 28.5],
+    [67.5, 60.5],
+    [27.5, 77.5],
+    [37.5, 77.5],
+    [57.5, 77.5],
+    [44, 5],
+    [51, 5],
+    [31, 26],
   ])
     post(x, y);
 
