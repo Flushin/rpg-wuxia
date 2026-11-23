@@ -45,6 +45,14 @@ def lantern_post():
     lantern(0.4, 0, 1.4, 0.13, LANT)
 
 
+def floor_lantern():
+    """Lanterninha de chão junto dos NPCs: suporte baixo de madeira com lanterna de papel âmbar."""
+    box(0, 0, 0, 0.26, 0.26, 0.05, WOODW_D)
+    cyl(0, 0, 0.05, 0.025, 0.42, WOODW_D)
+    box(0.08, 0, 0.45, 0.2, 0.03, 0.03, WOODW_D)
+    lantern(0.15, 0, 0.3, 0.09, AMBER)
+
+
 def stall_night(rgb):
     """Barraca do mercado noturno (2x2): balcão, mercadorias, toldo de pano e duas lanternas."""
     def f():
@@ -232,6 +240,75 @@ def old_jars():
     vase(-0.12, -0.25, 0, 0.15, 0.5, (60, 90, 150))
 
 
+# ---- joalheria (Joalheiro Yu): fachada, vitrine de joias e expositor de gemas ----
+SILK = (96, 52, 140)
+GEMS = [(230, 50, 70), (60, 120, 240), (60, 200, 120), (170, 80, 230), (250, 200, 60)]
+
+
+def jewel_front(a, b, wh):
+    """Cortinas de seda roxa na porta, janelas com joias brilhando e um losango de gema sobre a placa."""
+    for sx in (-1, 1):
+        box(sx * 0.42, -b - 0.05, 0.2, 0.22, 0.04, 0.95, SILK)
+        box(sx * 0.42, -b - 0.07, 1.1, 0.26, 0.04, 0.06, rt.GOLD)
+        for k in range(3):
+            sphere(sx * a * 0.6 - 0.14 + k * 0.14, -b - 0.06, 0.66, 0.04, GEMS[(k + (sx > 0) * 2) % 5], emit=2.5)
+    o = box(0, -b - 0.1, 0.2 + wh - 0.05, 0.22, 0.03, 0.22, (170, 80, 230), emit=2.0)
+    o.rotation_euler = (0, 0.785, 0)
+    for sx in (-1, 1):
+        cyl(sx * a * 0.85, -b - 0.3, 0.2 + wh - 0.05, 0.01, 0.12, rt.WOOD_D)
+        lantern(sx * a * 0.85, -b - 0.3, 0.2 + wh - 0.22, 0.11, (200, 110, 230))
+
+
+def jewel_shop():
+    porto_house(4, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((110, 70, 170)), jewel_front])
+
+
+def jewel_counter():
+    """Vitrine de joias (2x1): balcão de madeira escura com tampo de vidro, colares, anéis e gemas brilhando,
+    uma balança de joalheiro e uma lâmpada."""
+    box(0, 0, 0, 1.8, 0.62, 0.62, WOODW_D)
+    box(0, -0.32, 0.12, 1.6, 0.02, 0.38, WOODW)  # frente almofadada
+    box(0, 0, 0.62, 1.84, 0.66, 0.04, rt.GOLD, rough=0.3)
+    box(0, 0, 0.66, 1.7, 0.56, 0.02, (90, 30, 50))  # veludo
+    for k in range(8):
+        c = GEMS[k % 5]
+        sphere(-0.72 + k * 0.2, -0.08 + 0.14 * (k % 2), 0.71, 0.045, c, emit=3.0)
+    for k in range(3):  # anéis de ouro
+        o = cyl(-0.6 + k * 0.18, 0.18, 0.7, 0.05, 0.02, rt.GOLD, rough=0.25)
+    import math
+    for k in range(9):  # colar de pérolas em arco
+        t = math.pi * k / 8
+        sphere(0.35 + 0.22 * math.cos(t), 0.12 - 0.12 * math.sin(t), 0.7, 0.025, (240, 236, 225))
+    o = box(0, 0, 0.68, 1.7, 0.56, 0.22, (190, 220, 235), rough=0.05)  # vidro (material próprio, translúcido)
+    g = bpy.data.materials.new('vidro')
+    g.use_nodes = True
+    g.node_tree.nodes['Principled BSDF'].inputs['Alpha'].default_value = 0.18
+    g.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value = 0.05
+    o.data.materials[0] = g
+    # balança e lâmpada sobre o vidro
+    cyl(0.62, 0.1, 0.9, 0.02, 0.3, rt.GOLD)
+    box(0.62, 0.1, 1.2, 0.36, 0.02, 0.02, rt.GOLD)
+    for sx in (-1, 1):
+        cyl(0.62 + sx * 0.17, 0.1, 1.08, 0.06, 0.02, rt.GOLD)
+    cyl(-0.65, 0.12, 0.9, 0.08, 0.04, WOODW_D)
+    cyl(-0.65, 0.12, 0.94, 0.015, 0.3, WOODW_D)
+    lantern(-0.65, 0.12, 1.28, 0.1, (255, 220, 140))
+
+
+def gem_display():
+    """Expositor de gemas: pedestal de jade com um grande geodo de ametista brilhando."""
+    box(0, 0, 0, 0.5, 0.5, 0.12, rt.STONE_D)
+    cyl(0, 0, 0.12, 0.14, 0.45, (60, 140, 110), verts=8, rough=0.3)
+    box(0, 0, 0.57, 0.42, 0.42, 0.06, (40, 110, 86), rough=0.3)
+    sphere(0, 0, 0.78, 0.2, (90, 70, 80), sz=0.9)  # rocha
+    import random
+    rnd = random.Random(3)
+    for k in range(9):
+        o = cyl(rnd.uniform(-0.12, 0.12), rnd.uniform(-0.16, 0.0), 0.72, 0.035, rnd.uniform(0.18, 0.3),
+                (170, 80, 230), verts=6, emit=2.2, r2=0.005)
+        o.rotation_euler = (rnd.uniform(-0.5, 0.5), rnd.uniform(-0.5, 0.5), 0)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -239,7 +316,9 @@ SET = {
     'porto_casa_5x4': (lambda: porto_house(5, 4, wall_h=1.6), (5, 4), 3.9),
     'porto_estabulo': (stable, (6, 4), 3.6),
     'porto_forja': (lambda: porto_house(5, 4, extras=[rt.shop_sign((60, 60, 70)), rt.forge]), (5, 4), 3.6),
-    'porto_joalheria': (lambda: porto_house(4, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((110, 70, 170))]), (4, 4), 3.6),
+    'porto_joalheria': (jewel_shop, (4, 4), 3.6),
+    'vitrine_joias': (jewel_counter, (2, 1), 1.6),
+    'expositor_gemas': (gem_display, (1, 1), 1.2),
     'porto_casa_cha': (tea_house, (5, 4), 4.4),
     'porto_antiquario': (antique_shop, (4, 4), 3.6),
     'banca_reliquias': (relic_stall, (2, 1), 1.6),
@@ -249,6 +328,7 @@ SET = {
     'barraca_vermelha': (stall_night((170, 40, 36)), (2, 2), 2.4),
     'barraca_ambar': (stall_night((200, 130, 40)), (2, 2), 2.4),
     'lanterna_poste': (lantern_post, (1, 1), 2.2),
+    'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),
     'ponte_j': (bridge('j'), (2, 3), 1.0),

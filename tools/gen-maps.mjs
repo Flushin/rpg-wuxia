@@ -1565,6 +1565,16 @@ function porto() {
   for (let y = 29; y <= 35; y++) for (let x = 25; x <= 36; x++) reserve(x, y);
   building('porto_forja', 75, 8, 5, 4);
   building('porto_joalheria', 75, 24, 4, 4);
+  // frente da joalheria (porta em j 28): pátio de pedra até a viela, vitrine de joias com o Yu atrás,
+  // geodo de ametista na porta e lanternas de pedra
+  gr.rect(74, 28, 7, 3, PL);
+  gr.rect(74, 24, 1, 4, PL);
+  for (let y = 23; y <= 31; y++) for (let x = 73; x <= 81; x++) reserve(x, y);
+  objs.push(area('vitrine_joias', 'building', 76, 29, 2, 1, { sprite: 'vitrine_joias', atlas: 'porto', block: 1 }));
+  decor('expositor_gemas', 75.5, 28.5, { block: 1 });
+  decor('expositor_gemas', 79.5, 28.5, { block: 1 });
+  decor('lanterna_pedra', 74.5, 30.5, { atlas: 'cidade', block: 1, light: 1 });
+  decor('lanterna_pedra', 80.5, 30.5, { atlas: 'cidade', block: 1, light: 1 });
   building('porto_casa_cha', 11, 56, 5, 4);
   building('porto_antiquario', 65, 55, 4, 4);
   // frente do antiquário (porta em j 59): leões de pedra na porta, banca de relíquias, jarros antigos e lanternas de pedra
@@ -1589,7 +1599,7 @@ function porto() {
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
   npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 74, 13, { role: 'ferreiro_mestre' });
-  npc('Joalheiro Yu', 'joalheiro', 74, 27, { role: 'joalheiro' });
+  npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
   npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
@@ -1670,10 +1680,22 @@ function porto() {
     [83, 57],
   ])
     unlit(x, y);
+  // lanterninha de chão com luz suave junto de cada NPC (soft: halo fraco, clareia o NPC sem ofuscar)
+  for (const [x, y, block] of [
+    [45.4, 41.4, 1], // Mestre dos Caminhos
+    [46.3, 5.8, 0], // guardas do portão (sem bloquear a passagem)
+    [49.7, 5.8, 0],
+    [31.9, 81.2, 1], // Mestre do Cais
+    [27.9, 77.7, 1], // vendedores do cais
+    [37.9, 77.7, 1],
+    [57.9, 77.7, 1],
+    [67.9, 60.5, 1], // Antiquário Lao
+    [78.5, 28.5, 1], // Joalheiro Yu
+  ])
+    decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
   // um poste aceso junto de cada NPC, para ele ser visto no escuro
   for (const [x, y] of [
     [45, 39],
-    [73.5, 28.5],
     [27.5, 77.5],
     [37.5, 77.5],
     [57.5, 77.5],

@@ -480,9 +480,33 @@
     "y": 0.6263
    }
   },
-  "lanterna_poste": {
+  "vitrine_joias": {
    "frame": {
     "x": 764,
+    "y": 3703,
+    "w": 162,
+    "h": 176
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 162,
+    "h": 176
+   },
+   "sourceSize": {
+    "w": 162,
+    "h": 176
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8011
+   }
+  },
+  "lanterna_poste": {
+   "frame": {
+    "x": 928,
     "y": 3703,
     "w": 58,
     "h": 159
@@ -506,8 +530,8 @@
   },
   "banca_reliquias": {
    "frame": {
-    "x": 824,
-    "y": 3703,
+    "x": 0,
+    "y": 3908,
     "w": 159,
     "h": 131
    },
@@ -530,7 +554,7 @@
   },
   "leao_pedra": {
    "frame": {
-    "x": 0,
+    "x": 161,
     "y": 3908,
     "w": 74,
     "h": 108
@@ -552,9 +576,33 @@
     "y": 0.8426
    }
   },
+  "expositor_gemas": {
+   "frame": {
+    "x": 237,
+    "y": 3908,
+    "w": 66,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 96
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8438
+   }
+  },
   "jarros_antigos": {
    "frame": {
-    "x": 76,
+    "x": 305,
     "y": 3908,
     "w": 71,
     "h": 95
@@ -578,7 +626,7 @@
   },
   "estacas_cais": {
    "frame": {
-    "x": 149,
+    "x": 378,
     "y": 3908,
     "w": 64,
     "h": 85
@@ -599,13 +647,37 @@
     "x": 0.5,
     "y": 0.8353
    }
+  },
+  "lanterna_chao": {
+   "frame": {
+    "x": 444,
+    "y": 3908,
+    "w": 36,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 48
+   },
+   "pivot": {
+    "x": 0.4722,
+    "y": 0.8333
+   }
   }
  },
  "meta": {
   "image": "porto.png",
   "size": {
    "w": 1024,
-   "h": 4016
+   "h": 4039
   },
   "scale": "0.5"
  }

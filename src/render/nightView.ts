@@ -46,22 +46,30 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
     if (o.type !== 'decor') continue;
     if (o.props.light) {
       const p = tileToScreen(o.x, o.y),
-        tall = o.props.sprite === 'lanterna_poste';
-      const hx = p.x + (tall ? 10 : 6),
-        hy = p.y - (tall ? 46 : 14);
+        tall = o.props.sprite === 'lanterna_poste',
+        soft = !!o.props.soft; // lanterninha junto de NPC: clareia ele sem o brilho forte do poste
+      const hx = p.x + (tall ? 10 : soft ? 0 : 6),
+        hy = p.y - (tall ? 46 : soft ? 10 : 14);
       // poste ilumina o chão em volta (furo centrado no pé); lanterna baixa, um círculo menor
-      lights.push({ x: hx, y: tall ? p.y : hy, r: tall ? 1.25 : 0.7 });
+      lights.push({ x: hx, y: tall ? p.y : soft ? p.y - 24 : hy, r: tall ? 1.25 : soft ? 0.95 : 0.7 });
+      const a = soft ? 0.45 : 0.8;
       const h = scene.add
         .image(hx, hy, HALO)
-        .setScale(tall ? 1.5 : 1)
+        .setScale(tall ? 1.5 : soft ? 0.7 : 1)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setDepth(DEPTH.NIGHT_LIGHT)
-        .setAlpha(0.8);
+        .setAlpha(a);
       // tremor leve da chama, defasado por lanterna
-      scene.tweens.add({ targets: h, alpha: 0.6, yoyo: true, repeat: -1, duration: 900 + (k++ % 5) * 170 });
+      scene.tweens.add({ targets: h, alpha: a * 0.75, yoyo: true, repeat: -1, duration: 900 + (k++ % 5) * 170 });
       out.push(h);
     }
   }
+  // NPCs: clareira suave no corpo (com a lanterninha de chão ao lado), para não sumirem no escuro
+  for (const o of map.objects)
+    if (o.type === 'npc') {
+      const p = tileToScreen(o.x, o.y);
+      lights.push({ x: p.x, y: p.y - 26, r: 0.6 });
+    }
   const draw = () => {
     const v = cam.worldView,
       w = Math.ceil(v.width / Q) + 2,
