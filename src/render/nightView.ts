@@ -82,7 +82,7 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
       w = Math.ceil(v.width) + 4,
       hgt = Math.ceil(v.height) + 4;
     if (veil.width !== w || veil.height !== hgt) veil.resize(w, hgt);
-    veil.setPosition(v.x - 2, v.y - 2);
+    veil.setPosition(v.x - 2, v.y - 2).setVisible(true); // cullMap não pode esconder o véu
     veil.clear().fill(VEIL, VEIL_ALPHA);
     const pad = 256;
     for (const l of lights) {
