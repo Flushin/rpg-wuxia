@@ -121,6 +121,8 @@ export interface Entity {
   wander: number; // raio em tiles para andar pela cidade (0 = parado)
   /** NPC parado: direção (0..7, 0 = olhando para a câmera) em que fica virado; prop face do NPC no mapa */
   face?: number;
+  /** ponto onde o jogador para para conversar (prop spot do NPC no mapa; ex.: na frente do balcão da barraca) */
+  spot?: Point;
 }
 
 export type GameEvent =

@@ -1719,9 +1719,9 @@ function porto() {
   decor('caixotes', 33.5, 79.5, { atlas: 'cidade', block: 1 });
   decor('barril', 34.5, 80.4, { atlas: 'cidade', block: 1 });
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
-  npc('Vendedora Hua', 'vendedor_porto1', 27, 74.7, { role: 'vendedor', face: 7 });
-  npc('Vendedor Bo', 'vendedor_porto2', 37, 74.7, { role: 'vendedor', face: 7 });
-  npc('Vendedora Lan', 'vendedor_porto3', 57, 74.7, { role: 'vendedor', face: 7 });
+  npc('Vendedora Hua', 'vendedor_porto1', 27, 74.7, { role: 'vendedor', face: 7, spot: [27, 76.5] });
+  npc('Vendedor Bo', 'vendedor_porto2', 37, 74.7, { role: 'vendedor', face: 7, spot: [37, 76.5] });
+  npc('Vendedora Lan', 'vendedor_porto3', 57, 74.7, { role: 'vendedor', face: 7, spot: [57, 76.5] });
 
   // cais: barracas do mercado noturno, estacas nas pontas dos trapiches e postes de lanterna
   // barraca sobre a pedra do cais: objeto com block (sem tile de casa, que desenharia grama)

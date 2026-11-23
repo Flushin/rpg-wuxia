@@ -25,7 +25,7 @@ import { expectedDamage, rollAttack, type AttackResult } from './combat';
 import { ultimateOf, ultSplit, type UltDebuff, type UltimateDef } from './ultimate';
 import { screenToTile } from './iso';
 import type { GameMap } from './map';
-import { findPath, insideAvoid, isWalkable, type Avoid } from './pathfinding';
+import { findPath, insideAvoid, isWalkable, reachableNear, type Avoid } from './pathfinding';
 import {
   GLOBAL_COOLDOWN,
   SKILLS,
@@ -1043,7 +1043,9 @@ export class World {
       const n = this.npcs.find((e) => e.id === this.npcGoal);
       if (!n || moving) this.npcGoal = null;
       else {
-        if (dist(p, n) <= NPC_REACH) {
+        // NPC com ponto de conversa (barraca): só abre ao chegar nele, do lado do balcão
+        const spot = n.spot ?? null;
+        if (spot ? dist(p, spot) <= 0.75 : dist(p, n) <= NPC_REACH) {
           p.path = [];
           this.npcGoal = null;
           this.openNpcWindow(n);
@@ -1052,7 +1054,14 @@ export class World {
         p.repathCd -= dt;
         if (p.repathCd <= 0 || !p.path.length) {
           p.repathCd = 0.3;
-          p.path = this.findPathFor(p, n);
+          // sem ponto: o tile alcançável mais perto do NPC (o "mais perto" cru podia ficar atrás de parede/objeto)
+          const goal = spot ?? reachableNear(this.map, p, n) ?? n;
+          p.path = this.findPathFor(p, goal);
+          if (!p.path.length && !spot && goal !== n && dist(p, n) <= dist(goal, n) + 0.75) {
+            this.npcGoal = null; // já está no ponto mais perto possível
+            this.openNpcWindow(n);
+            return;
+          }
         }
         this.followPath(p, dt, 1);
         return;
@@ -1862,6 +1871,7 @@ export class World {
           npcRole: o.props.role ? String(o.props.role) : undefined,
           wander: Number(o.props.wander) || 0,
           face: o.props.face === undefined ? undefined : Number(o.props.face),
+          spot: Array.isArray(o.props.spot) ? { x: Number(o.props.spot[0]), y: Number(o.props.spot[1]) } : undefined,
         };
         n.home = { x: o.x, y: o.y };
         n.moveSpeed = NPC_WALK_SPEED;
