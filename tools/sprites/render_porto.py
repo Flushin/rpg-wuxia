@@ -485,6 +485,63 @@ def saddle_rack():
     sphere(-0.15, 0, 0.72, 0.06, (120, 70, 40))
 
 
+# ---- mercado do cais: mercadoria ao lado das barracas dos vendedores ----
+def potion_shelf():
+    """Estante de poções (Vendedora Hua): três prateleiras com frascos vermelhos, azuis e verdes."""
+    for sx in (-1, 1):
+        box(sx * 0.38, 0, 0, 0.06, 0.32, 1.2, WOODW_D)
+    for k in range(3):
+        z = 0.15 + k * 0.38
+        box(0, 0, z, 0.82, 0.32, 0.04, WOODW)
+        for i in range(4):
+            c = [(210, 50, 50), (60, 110, 220), (70, 180, 90), (220, 160, 50)][(i + k) % 4]
+            cyl(-0.27 + i * 0.18, 0, z + 0.04, 0.06, 0.16, c, rough=0.25, emit=0.6)
+            cyl(-0.27 + i * 0.18, 0, z + 0.2, 0.025, 0.05, (230, 220, 200))
+    box(0, 0, 1.2, 0.9, 0.36, 0.05, WOODW_D)
+
+
+def fish_rack():
+    """Varal de peixe seco (Vendedor Bo): armação de bambu com peixes pendurados."""
+    for sx in (-1, 1):
+        cyl(sx * 0.4, 0, 0, 0.03, 1.15, (150, 130, 70))
+    cyl(0, 0, 1.1, 0.025, 0.85, (150, 130, 70)).rotation_euler = (0, 1.5708, 0)
+    bpy.context.object.location = (0, 0, 1.1)
+    for i in range(5):
+        x = -0.3 + i * 0.15
+        cyl(x, 0, 0.98, 0.005, 0.12, (90, 70, 50))
+        sphere(x, 0, 0.82, 0.06, (170, 140, 100), sz=2.2)
+        cyl(x, 0, 0.6, 0.05, 0.08, (150, 120, 90), r2=0.0).rotation_euler = (3.1416, 0, 0)
+
+
+def tea_jars():
+    """Jarros de chá lacrados com etiqueta vermelha e um cesto de folhas."""
+    for x, y, r in [(-0.18, 0.12, 0.21), (0.2, 0.14, 0.17), (0.02, -0.2, 0.15)]:
+        vase(x, y, 0, r, r * 3.2, (90, 70, 60))
+        box(x, y - r * 0.85, r * 1.2, r * 0.6, 0.02, r * 0.8, (190, 40, 36))
+    cyl(0.28, -0.22, 0, 0.13, 0.14, (170, 140, 80), r2=0.16)
+    sphere(0.28, -0.22, 0.15, 0.12, (70, 120, 60), sz=0.5)
+
+
+def baskets():
+    """Cestos de vime com ervas, frutas e frascos (Vendedora Lan)."""
+    for (x, y), fill in zip([(-0.22, 0.14), (0.22, 0.1), (0.0, -0.22)], [(70, 140, 70), (220, 120, 50), (200, 60, 60)]):
+        cyl(x, y, 0, 0.21, 0.26, (176, 140, 80), r2=0.25)
+        for k in range(5):
+            sphere(x - 0.1 + k * 0.05, y + 0.04 * (k % 2), 0.28, 0.07, fill)
+    for k in range(3):
+        cyl(-0.08 + k * 0.08, -0.22, 0.3, 0.035, 0.14, (60, 110, 220), rough=0.25, emit=0.6)
+
+
+def spice_sacks():
+    """Sacos abertos de especiarias e ervas secas (vermelho, amarelo, verde) com uma concha."""
+    for (x, y), c in zip([(-0.2, 0.12), (0.2, 0.12), (0.0, -0.18)], [(190, 60, 30), (220, 170, 40), (90, 130, 60)]):
+        cyl(x, y, 0, 0.18, 0.34, (196, 176, 136), r2=0.2)
+        cyl(x, y, 0.34, 0.21, 0.04, (186, 166, 126))
+        sphere(x, y, 0.34, 0.16, c, sz=0.45)
+    o = cyl(0.05, -0.18, 0.4, 0.015, 0.3, WOODW)
+    o.rotation_euler = (0.7, 0.2, 0)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -516,6 +573,11 @@ SET = {
     'barraca_vermelha': (stall_night((170, 40, 36)), (2, 2), 2.4),
     'barraca_ambar': (stall_night((200, 130, 40)), (2, 2), 2.4),
     'lanterna_poste': (lantern_post, (1, 1), 2.2),
+    'estante_pocoes': (potion_shelf, (1, 1), 1.6),
+    'varal_peixe': (fish_rack, (1, 1), 1.5),
+    'jarros_cha': (tea_jars, (1, 1), 0.9),
+    'cestos': (baskets, (1, 1), 0.9),
+    'sacos_especiarias': (spice_sacks, (1, 1), 0.9),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),

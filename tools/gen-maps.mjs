@@ -1646,11 +1646,12 @@ function porto() {
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
-  npc('Vendedora Hua', 'vendedor_porto1', 27, 77, { role: 'vendedor' });
-  npc('Vendedor Bo', 'vendedor_porto2', 37, 77, { role: 'vendedor' });
-  npc('Vendedora Lan', 'vendedor_porto3', 57, 77, { role: 'vendedor' });
+  npc('Vendedora Hua', 'vendedor_porto1', 27, 74.7, { role: 'vendedor', face: 7 });
+  npc('Vendedor Bo', 'vendedor_porto2', 37, 74.7, { role: 'vendedor', face: 7 });
+  npc('Vendedora Lan', 'vendedor_porto3', 57, 74.7, { role: 'vendedor', face: 7 });
 
   // cais: barracas do mercado noturno, estacas nas pontas dos trapiches e postes de lanterna
+  // barraca sobre a pedra do cais: objeto com block (sem tile de casa, que desenharia grama)
   for (const [s2, i] of [
     ['barraca_vermelha', 26],
     ['barraca_ambar', 36],
@@ -1658,7 +1659,21 @@ function porto() {
     ['barraca_ambar', 66],
     ['barraca_vermelha', 14],
   ])
-    building(s2, i, 74, 2, 2);
+    objs.push(area(s2, 'building', i, 74, 2, 2, { sprite: s2, atlas: 'porto', block: 1 }));
+  // mercadoria ao lado das barracas dos vendedores (Hua: poções; Bo: peixe seco e chá; Lan: cestos e barril)
+  decor('estante_pocoes', 28.5, 74.5, { block: 1 });
+  decor('caixotes', 25.4, 75.4, { atlas: 'cidade', block: 1 });
+  decor('varal_peixe', 38.5, 74.5, { block: 1 });
+  decor('jarros_cha', 35.4, 75.4, { block: 1 });
+  decor('estante_pocoes', 58.5, 74.5, { block: 1 });
+  decor('barril', 54.4, 75.4, { atlas: 'cidade', block: 1 });
+  decor('sacos_especiarias', 25.4, 76.4, { block: 1 });
+  decor('cestos', 29.5, 75.6, { block: 1 });
+  decor('barril', 39.5, 75.5, { atlas: 'cidade', block: 1 });
+  decor('caixotes', 35.4, 74.4, { atlas: 'cidade', block: 1 });
+  decor('cestos', 55.4, 74.5, { block: 1 });
+  decor('sacos_especiarias', 59.5, 75.6, { block: 1 });
+  decor('jarros_cha', 55.4, 76.4, { block: 1 });
   for (const x of [12, 30, 62, 80]) decor('estacas_cais', x + 1, 86.5, { light: 1 });
   const post = (x, y) => decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
   for (let x = 4; x < 92; x += 8) if (gr.get(x, 80) === PL) post(x, 80);
@@ -1727,9 +1742,9 @@ function porto() {
     [46.3, 5.8, 0], // guardas do portão (sem bloquear a passagem)
     [49.7, 5.8, 0],
     [31.9, 81.2, 1], // Mestre do Cais
-    [27.9, 77.7, 1], // vendedores do cais
-    [37.9, 77.7, 1],
-    [57.9, 77.7, 1],
+    [28.6, 76.4, 1], // vendedores do cais (na frente da barraca, do lado)
+    [38.6, 76.4, 1],
+    [58.6, 76.4, 1],
     [67.9, 60.5, 1], // Antiquário Lao
     [78.5, 28.5, 1], // Joalheiro Yu
     [75.6, 14.4, 1], // Ferreiro-mestre Gang
@@ -1739,9 +1754,6 @@ function porto() {
   // um poste aceso junto de cada NPC, para ele ser visto no escuro
   for (const [x, y] of [
     [45, 39],
-    [27.5, 77.5],
-    [37.5, 77.5],
-    [57.5, 77.5],
     [44, 5],
     [51, 5],
   ])
