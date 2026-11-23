@@ -4,14 +4,13 @@ import type { GameMap } from '../core/map';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DEPTH } from './depth';
 
-// Noite do Porto Noturno (MapConfig.night): véu azul-escuro preso à câmera por cima do mundo e um halo quente
+// Noite do Porto Noturno (MapConfig.night): véu azul-escuro sobre a área visível, com furos de luz e um halo quente
 // (gradiente em ADD) em cada lanterna do mapa (enfeite com a propriedade light). Os halos são imagens: o cullMap
 // esconde os que estão longe da câmera. Barcos (enfeite com boat) balançam devagar, cada um no seu ritmo.
 
 const VEIL = 0x0b1633;
-const VEIL_ALPHA = 0.6;
+const VEIL_ALPHA = 0.62;
 const HALO = 'fx-halo';
-
 function haloTexture(scene: Phaser.Scene) {
   if (scene.textures.exists(HALO)) return;
   const size = 128,
@@ -32,20 +31,28 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
   haloTexture(scene);
   const out: Phaser.GameObjects.GameObject[] = [];
   const cam = scene.cameras.main;
-  // véu: bem maior que a tela (zoom da câmera e telas largas não deixam borda clara)
-  const veil = scene.add
-    .rectangle(cam.width / 2, cam.height / 2, cam.width * 4, cam.height * 4, VEIL, VEIL_ALPHA)
-    .setScrollFactor(0)
-    .setDepth(DEPTH.NIGHT_VEIL);
+  // véu: canvas em 1/4 da resolução (gradientes suaves não perdem nada), ampliado sobre a área visível e
+  // redesenhado a cada quadro com furos de luz (destination-out) nos postes e em volta do herói
+  const VKEY = 'fx-night-veil',
+    Q = 4;
+  if (scene.textures.exists(VKEY)) scene.textures.remove(VKEY);
+  const vt = scene.textures.createCanvas(VKEY, 8, 8)!;
+  const veil = scene.add.image(0, 0, VKEY).setOrigin(0, 0).setDepth(DEPTH.NIGHT_VEIL).setScale(Q);
   out.push(veil);
+  const veilCss = `rgba(11,22,51,${VEIL_ALPHA})`;
+  const lights: { x: number; y: number; r: number }[] = [];
   let k = 0;
   for (const o of map.objects) {
     if (o.type !== 'decor') continue;
     if (o.props.light) {
       const p = tileToScreen(o.x, o.y),
         tall = o.props.sprite === 'lanterna_poste';
+      const hx = p.x + (tall ? 10 : 6),
+        hy = p.y - (tall ? 46 : 14);
+      // poste ilumina o chão em volta (furo centrado no pé); lanterna baixa, um círculo menor
+      lights.push({ x: hx, y: tall ? p.y : hy, r: tall ? 1.25 : 0.7 });
       const h = scene.add
-        .image(p.x + (tall ? 10 : 6), p.y - (tall ? 46 : 14), HALO)
+        .image(hx, hy, HALO)
         .setScale(tall ? 1.5 : 1)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setDepth(DEPTH.NIGHT_LIGHT)
@@ -55,6 +62,46 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
       out.push(h);
     }
   }
+  const draw = () => {
+    const v = cam.worldView,
+      w = Math.ceil(v.width / Q) + 2,
+      hgt = Math.ceil(v.height / Q) + 2;
+    if (vt.width !== w || vt.height !== hgt) {
+      vt.setSize(w, hgt);
+      veil.setSizeToFrame();
+    }
+    veil.setPosition(v.x - Q, v.y - Q).setVisible(true); // cullMap não pode esconder o véu
+    const ctx = vt.getContext(),
+      ox = veil.x,
+      oy = veil.y;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, w, hgt);
+    ctx.fillStyle = veilCss;
+    ctx.fillRect(0, 0, w, hgt);
+    ctx.globalCompositeOperation = 'destination-out';
+    const hole = (x: number, y: number, r: number) => {
+      const cx = (x - ox) / Q,
+        cy = (y - oy) / Q,
+        rr = r / Q,
+        g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.45, 'rgba(0,0,0,0.85)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(cx - rr, cy - rr, rr * 2, rr * 2);
+    };
+    const pad = 320;
+    for (const l of lights) {
+      if (l.x < v.x - pad || l.x > v.right + pad || l.y < v.y - pad || l.y > v.bottom + pad) continue;
+      hole(l.x, l.y, 128 * l.r);
+    }
+    // luz própria do herói (a câmera o segue): personagem nunca some no escuro
+    hole(v.centerX, v.centerY - 20, 80);
+    vt.refresh();
+  };
+  scene.events.on(Phaser.Scenes.Events.POST_UPDATE, draw);
+  veil.once(Phaser.GameObjects.Events.DESTROY, () => scene.events.off(Phaser.Scenes.Events.POST_UPDATE, draw));
+  draw();
   return out;
 }
 
