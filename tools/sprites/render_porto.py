@@ -542,6 +542,77 @@ def spice_sacks():
     o.rotation_euler = (0.7, 0.2, 0)
 
 
+# ---- Mestre dos Caminhos (praça): marco de direções, mesa de mapas com bússola luopan e bagagem de viagem ----
+PAPER = (226, 208, 166)
+INK = (60, 44, 36)
+
+
+def waymarker():
+    """Marco dos caminhos: coluna de pedra com chapéu de telha e placas de madeira apontando para vários rumos."""
+    import math
+    box(0, 0, 0, 0.4, 0.4, 0.14, rt.STONE_D)
+    box(0, 0, 0.14, 0.24, 0.24, 1.3, rt.STONE)
+    box(0, 0, 1.44, 0.4, 0.4, 0.05, WOODW_D)
+    roof(0, 0, 0.2, 0.2, 1.49, 0.26, ROOF_R, over=0.12, lift=0.06, ridge=False)
+    sphere(0, 0, 1.78, 0.05, rt.GOLD, emit=0.5)
+    for k, (ang, z) in enumerate([(0.3, 1.2), (2.2, 1.02), (4.0, 0.84), (5.4, 0.66)]):
+        dx, dy = math.cos(ang), math.sin(ang)
+        o = box(dx * 0.33, dy * 0.33, z, 0.46, 0.03, 0.11, [WOODW, (150, 110, 70)][k % 2])
+        o.rotation_euler = (0, 0, ang)
+        o = box(dx * 0.33, dy * 0.33, z + 0.035, 0.32, 0.035, 0.035, (200, 50, 40))
+        o.rotation_euler = (0, 0, ang)
+    box(0, -0.125, 0.5, 0.12, 0.01, 0.5, (200, 50, 40))  # faixa vermelha com caracteres
+    for k in range(4):
+        box(0, -0.13, 0.58 + k * 0.11, 0.06, 0.01, 0.05, rt.GOLD, emit=0.4)
+
+
+def map_table():
+    """Mesa baixa de mapas (2x1): mapa aberto, bússola luopan dourada, rolos de mapa, pincel e lamparina."""
+    box(0, 0, 0.0, 1.6, 0.66, 0.06, WOODW_D)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            box(sx * 0.72, sy * 0.26, 0.06, 0.08, 0.08, 0.5, WOODW_D)
+    box(0, 0, 0.56, 1.7, 0.74, 0.06, WOODW)
+    box(-0.25, 0, 0.62, 0.9, 0.58, 0.01, PAPER)  # mapa
+    for sx in (-1, 1):
+        cyl(-0.25 + sx * 0.45, 0, 0.35, 0.035, 0.6, (150, 110, 70)).rotation_euler = (1.5708, 0, 0)
+    import random
+    rnd = random.Random(5)
+    for k in range(6):  # rios e estradas
+        o = box(-0.25 + rnd.uniform(-0.3, 0.3), rnd.uniform(-0.2, 0.2), 0.632, rnd.uniform(0.2, 0.4), 0.012, 0.003,
+                [(70, 110, 170), INK, (180, 50, 40)][k % 3])
+        o.rotation_euler = (0, 0, rnd.uniform(-1.2, 1.2))
+    for k in range(3):  # montanhas
+        cyl(-0.45 + k * 0.17, 0.12, 0.632, 0.045, 0.05, (90, 120, 80), verts=3, r2=0.0)
+    # luopan
+    cyl(0.5, 0.05, 0.62, 0.2, 0.05, (120, 60, 30))
+    cyl(0.5, 0.05, 0.67, 0.17, 0.012, rt.GOLD, rough=0.25, emit=0.6)
+    cyl(0.5, 0.05, 0.682, 0.08, 0.008, (180, 40, 36))
+    box(0.5, 0.05, 0.695, 0.22, 0.012, 0.008, (230, 230, 240), emit=0.8).rotation_euler = (0, 0, 0.6)
+    # rolos de mapa
+    for k in range(3):
+        o = cyl(0.3, -0.18 - k * 0.07, 0.49 + (k == 2) * 0.06, 0.035, 0.34, PAPER)
+        o.rotation_euler = (0, 1.5708, 0)
+    o = cyl(-0.62, -0.25, 0.52, 0.01, 0.22, INK)  # pincel
+    o.rotation_euler = (0, 1.5708, 0.3)
+    cyl(0.75, 0.25, 0.62, 0.05, 0.08, INK)  # tinteiro
+
+
+def travel_gear():
+    """Bagagem de viagem: baú de couro com cintas de bronze, trouxa de pano, cajado e sombrinha de papel."""
+    box(-0.05, 0.08, 0, 0.5, 0.32, 0.3, (110, 66, 40))
+    box(-0.05, 0.08, 0.3, 0.52, 0.34, 0.06, (90, 54, 34))
+    for sx in (-1, 1):
+        box(-0.05 + sx * 0.16, 0.08, 0, 0.04, 0.35, 0.37, rt.GOLD, rough=0.35)
+    sphere(0.22, -0.2, 0.12, 0.14, (60, 90, 140), sz=0.9)  # trouxa
+    sphere(0.22, -0.2, 0.25, 0.05, (60, 90, 140))
+    o = cyl(0.3, 0.22, 0, 0.02, 1.2, (150, 120, 70))  # cajado
+    o.rotation_euler = (0.15, -0.12, 0)
+    cyl(-0.3, -0.18, 0, 0.012, 0.8, WOODW_D).rotation_euler = (-0.2, 0.25, 0)
+    o = cyl(-0.35, -0.22, 0.6, 0.18, 0.12, (200, 60, 50), r2=0.0, verts=12)  # sombrinha fechada inclinada
+    o.rotation_euler = (-0.2, 0.25, 0)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -578,6 +649,9 @@ SET = {
     'jarros_cha': (tea_jars, (1, 1), 0.9),
     'cestos': (baskets, (1, 1), 0.9),
     'sacos_especiarias': (spice_sacks, (1, 1), 0.9),
+    'marco_caminhos': (waymarker, (1, 1), 2.0),
+    'mesa_mapas': (map_table, (2, 1), 1.1),
+    'bagagem_viagem': (travel_gear, (1, 1), 1.3),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),

@@ -1638,6 +1638,10 @@ function porto() {
   // praça: Mestre dos Caminhos no círculo dourado (oeste da praça)
   npc('Mestre dos Caminhos', 'caminhos', 44.5, 40.5);
   objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
+  // em volta dele: marco de direções atrás, mesa de mapas com bússola ao lado e bagagem de viajante
+  decor('marco_caminhos', 44.5, 38.4, { block: 1 });
+  objs.push(area('mesa_mapas', 'building', 46, 39, 2, 1, { sprite: 'mesa_mapas', atlas: 'porto', block: 1 }));
+  decor('bagagem_viagem', 42.9, 41.5, { block: 1 });
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
   npc('Cavalariço Ma', 'estabulo', 28.2, 27.2, { role: 'estabulo', face: 7 });
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
@@ -1738,7 +1742,7 @@ function porto() {
     unlit(x, y);
   // lanterninha de chão com luz suave junto de cada NPC (soft: halo fraco, clareia o NPC sem ofuscar)
   for (const [x, y, block] of [
-    [45.4, 41.4, 1], // Mestre dos Caminhos
+    [43.4, 38.6, 1], // Mestre dos Caminhos
     [46.3, 5.8, 0], // guardas do portão (sem bloquear a passagem)
     [49.7, 5.8, 0],
     [31.9, 81.2, 1], // Mestre do Cais
@@ -1753,7 +1757,6 @@ function porto() {
     decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
   // um poste aceso junto de cada NPC, para ele ser visto no escuro
   for (const [x, y] of [
-    [45, 39],
     [44, 5],
     [51, 5],
   ])
