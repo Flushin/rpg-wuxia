@@ -9,27 +9,8 @@ import { DEPTH } from './depth';
 // esconde os que estão longe da câmera. Barcos (enfeite com boat) balançam devagar, cada um no seu ritmo.
 
 const VEIL = 0x0b1633;
-const VEIL_ALPHA = 0.55;
+const VEIL_ALPHA = 0.62;
 const HALO = 'fx-halo';
-const HOLE = 'fx-light-hole';
-
-// Pincel do recorte de luz: o véu é apagado (ERASE) com esse gradiente em volta das lanternas e do herói,
-// então a área iluminada mostra as cores reais (não um filtro escuro por cima de tudo).
-function holeTexture(scene: Phaser.Scene) {
-  if (scene.textures.exists(HOLE)) return;
-  const size = 256,
-    tex = scene.textures.createCanvas(HOLE, size, size);
-  if (!tex) return;
-  const ctx = tex.getContext(),
-    g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  g.addColorStop(0, 'rgba(255,255,255,1)');
-  g.addColorStop(0.45, 'rgba(255,255,255,0.75)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, size, size);
-  tex.refresh();
-}
-
 function haloTexture(scene: Phaser.Scene) {
   if (scene.textures.exists(HALO)) return;
   const size = 128,
@@ -50,11 +31,15 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
   haloTexture(scene);
   const out: Phaser.GameObjects.GameObject[] = [];
   const cam = scene.cameras.main;
-  holeTexture(scene);
-  // véu: textura do tamanho da área visível, presa ao mundo e redesenhada a cada quadro com furos de luz
-  const veil = scene.add.renderTexture(0, 0, 8, 8).setOrigin(0, 0).setDepth(DEPTH.NIGHT_VEIL);
+  // véu: canvas em 1/4 da resolução (gradientes suaves não perdem nada), ampliado sobre a área visível e
+  // redesenhado a cada quadro com furos de luz (destination-out) nos postes e em volta do herói
+  const VKEY = 'fx-night-veil',
+    Q = 4;
+  if (scene.textures.exists(VKEY)) scene.textures.remove(VKEY);
+  const vt = scene.textures.createCanvas(VKEY, 8, 8)!;
+  const veil = scene.add.image(0, 0, VKEY).setOrigin(0, 0).setDepth(DEPTH.NIGHT_VEIL).setScale(Q);
   out.push(veil);
-  const brush = scene.make.image({ key: HOLE, add: false });
+  const veilCss = `rgba(11,22,51,${VEIL_ALPHA})`;
   const lights: { x: number; y: number; r: number }[] = [];
   let k = 0;
   for (const o of map.objects) {
@@ -65,7 +50,7 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
       const hx = p.x + (tall ? 10 : 6),
         hy = p.y - (tall ? 46 : 14);
       // poste ilumina o chão em volta (furo centrado no pé); lanterna baixa, um círculo menor
-      lights.push({ x: hx, y: tall ? p.y : hy, r: tall ? 1.6 : 0.9 });
+      lights.push({ x: hx, y: tall ? p.y : hy, r: tall ? 1.25 : 0.7 });
       const h = scene.add
         .image(hx, hy, HALO)
         .setScale(tall ? 1.5 : 1)
@@ -79,26 +64,43 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
   }
   const draw = () => {
     const v = cam.worldView,
-      w = Math.ceil(v.width) + 4,
-      hgt = Math.ceil(v.height) + 4;
-    if (veil.width !== w || veil.height !== hgt) veil.resize(w, hgt);
-    veil.setPosition(v.x - 2, v.y - 2).setVisible(true); // cullMap não pode esconder o véu
-    veil.clear().fill(VEIL, VEIL_ALPHA);
-    const pad = 256;
+      w = Math.ceil(v.width / Q) + 2,
+      hgt = Math.ceil(v.height / Q) + 2;
+    if (vt.width !== w || vt.height !== hgt) {
+      vt.setSize(w, hgt);
+      veil.setSizeToFrame();
+    }
+    veil.setPosition(v.x - Q, v.y - Q).setVisible(true); // cullMap não pode esconder o véu
+    const ctx = vt.getContext(),
+      ox = veil.x,
+      oy = veil.y;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, w, hgt);
+    ctx.fillStyle = veilCss;
+    ctx.fillRect(0, 0, w, hgt);
+    ctx.globalCompositeOperation = 'destination-out';
+    const hole = (x: number, y: number, r: number) => {
+      const cx = (x - ox) / Q,
+        cy = (y - oy) / Q,
+        rr = r / Q,
+        g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.45, 'rgba(0,0,0,0.85)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(cx - rr, cy - rr, rr * 2, rr * 2);
+    };
+    const pad = 320;
     for (const l of lights) {
       if (l.x < v.x - pad || l.x > v.right + pad || l.y < v.y - pad || l.y > v.bottom + pad) continue;
-      brush.setScale(l.r);
-      veil.erase(brush, l.x - veil.x, l.y - veil.y);
+      hole(l.x, l.y, 128 * l.r);
     }
     // luz própria do herói (a câmera o segue): personagem nunca some no escuro
-    brush.setScale(0.8);
-    veil.erase(brush, v.centerX - veil.x, v.centerY - 20 - veil.y);
+    hole(v.centerX, v.centerY - 20, 80);
+    vt.refresh();
   };
   scene.events.on(Phaser.Scenes.Events.POST_UPDATE, draw);
-  veil.once(Phaser.GameObjects.Events.DESTROY, () => {
-    scene.events.off(Phaser.Scenes.Events.POST_UPDATE, draw);
-    brush.destroy();
-  });
+  veil.once(Phaser.GameObjects.Events.DESTROY, () => scene.events.off(Phaser.Scenes.Events.POST_UPDATE, draw));
   draw();
   return out;
 }
