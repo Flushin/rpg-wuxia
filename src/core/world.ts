@@ -1861,6 +1861,7 @@ export class World {
           npcId: id,
           npcRole: o.props.role ? String(o.props.role) : undefined,
           wander: Number(o.props.wander) || 0,
+          face: o.props.face === undefined ? undefined : Number(o.props.face),
         };
         n.home = { x: o.x, y: o.y };
         n.moveSpeed = NPC_WALK_SPEED;

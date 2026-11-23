@@ -504,10 +504,82 @@
     "y": 0.9434
    }
   },
-  "estacas_cais": {
+  "banca_reliquias": {
    "frame": {
     "x": 824,
     "y": 3703,
+    "w": 159,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 159,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 159,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.4969,
+    "y": 0.7634
+   }
+  },
+  "leao_pedra": {
+   "frame": {
+    "x": 0,
+    "y": 3908,
+    "w": 74,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 74,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 74,
+    "h": 108
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8426
+   }
+  },
+  "jarros_antigos": {
+   "frame": {
+    "x": 76,
+    "y": 3908,
+    "w": 71,
+    "h": 95
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 71,
+    "h": 95
+   },
+   "sourceSize": {
+    "w": 71,
+    "h": 95
+   },
+   "pivot": {
+    "x": 0.5352,
+    "y": 0.8737
+   }
+  },
+  "estacas_cais": {
+   "frame": {
+    "x": 149,
+    "y": 3908,
     "w": 64,
     "h": 85
    },
@@ -533,7 +605,7 @@
   "image": "porto.png",
   "size": {
    "w": 1024,
-   "h": 3906
+   "h": 4016
   },
   "scale": "0.5"
  }

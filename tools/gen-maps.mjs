@@ -1567,6 +1567,16 @@ function porto() {
   building('porto_joalheria', 75, 24, 4, 4);
   building('porto_casa_cha', 11, 56, 5, 4);
   building('porto_antiquario', 65, 55, 4, 4);
+  // frente do antiquário (porta em j 59): leões de pedra na porta, banca de relíquias, jarros antigos e lanternas de pedra
+  gr.rect(64, 59, 8, 4, PL);
+  for (let y = 59; y <= 64; y++) for (let x = 63; x <= 72; x++) reserve(x, y);
+  decor('leao_pedra', 65.5, 59.5, { block: 1 });
+  decor('leao_pedra', 68.5, 59.5, { block: 1 });
+  // banca sobre o piso de pedra: objeto 'building' com block (não vira tile de casa, que desenha grama)
+  objs.push(area('banca_reliquias', 'building', 69, 60, 2, 1, { sprite: 'banca_reliquias', atlas: 'porto', block: 1 }));
+  decor('jarros_antigos', 64.5, 60.5, { block: 1 });
+  decor('lanterna_pedra', 64.5, 61.5, { atlas: 'cidade', block: 1, light: 1 });
+  decor('lanterna_pedra', 71.5, 61.5, { atlas: 'cidade', block: 1, light: 1 });
   building('porto_banco', 78, 50, 5, 4);
   // arena do banco: pátio de lajes com o portal do Trial no meio
   gr.rect(77, 60, 14, 12, PL);
@@ -1580,7 +1590,7 @@ function porto() {
   npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 74, 13, { role: 'ferreiro_mestre' });
   npc('Joalheiro Yu', 'joalheiro', 74, 27, { role: 'joalheiro' });
-  npc('Antiquário Lao', 'antiquario', 67, 60, { role: 'antiquario' });
+  npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
@@ -1664,7 +1674,6 @@ function porto() {
   for (const [x, y] of [
     [45, 39],
     [73.5, 28.5],
-    [67.5, 60.5],
     [27.5, 77.5],
     [37.5, 77.5],
     [57.5, 77.5],

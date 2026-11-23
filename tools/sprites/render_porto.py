@@ -137,6 +137,101 @@ def tea_house():
     rc.jade_house(5, 4, roof_rgb=ROOF_R, extras=[rt.shop_sign((52, 120, 80))])
 
 
+# ---- antiquário (Antiquário Lao): fachada, banca de relíquias, leões de pedra e jarros antigos ----
+BRONZE = (150, 112, 60)
+VERDIGRIS = (78, 140, 118)
+CELADON = (150, 190, 160)
+CLOTH = (36, 70, 72)
+
+
+def antique_front(a, b, wh):
+    """Toldo de pano verde-escuro sobre a porta, placas verticais vermelhas com letras douradas e lanternas âmbar."""
+    o = box(0, -b - 0.45, 0.2 + wh - 0.12, 1.5, 0.8, 0.04, CLOTH)
+    o.rotation_euler = (-0.2, 0, 0)
+    for sx in (-1, 1):
+        cyl(sx * 0.72, -b - 0.8, 0, 0.035, 0.2 + wh - 0.2, WOODW_D)
+        cyl(sx * 0.72, -b - 0.8, 0.2 + wh - 0.42, 0.008, 0.12, WOODW_D)
+        lantern(sx * 0.72, -b - 0.8, 0.2 + wh - 0.52, 0.1, AMBER)
+        box(sx * 0.5, -b - 0.04, 0.32, 0.18, 0.04, 0.9, rt.RED)
+        for k in range(3):
+            box(sx * 0.5, -b - 0.07, 0.48 + k * 0.26, 0.1, 0.02, 0.1, rt.GOLD)
+
+
+def antique_shop():
+    porto_house(4, 4, extras=[rt.shop_sign(rt.GOLD), antique_front])
+
+
+def ding(x, y, z, s=1.0):
+    """Caldeirão de bronze de três pés (ding), com pátina verde."""
+    import math
+    for k in range(3):
+        t = k * 2.094
+        cyl(x + 0.13 * s * math.cos(t), y + 0.13 * s * math.sin(t), z, 0.025 * s, 0.14 * s, BRONZE)
+    cyl(x, y, z + 0.12 * s, 0.17 * s, 0.18 * s, VERDIGRIS, verts=16, rough=0.4, r2=0.2 * s)
+    for sx in (-1, 1):
+        box(x + sx * 0.17 * s, y, z + 0.3 * s, 0.03 * s, 0.1 * s, 0.1 * s, BRONZE)
+
+
+def vase(x, y, z, r, h, rgb):
+    cyl(x, y, z, r * 0.6, h * 0.15, rgb, verts=16, rough=0.25, r2=r)
+    cyl(x, y, z + h * 0.15, r, h * 0.45, rgb, verts=16, rough=0.25, r2=r * 0.55)
+    cyl(x, y, z + h * 0.6, r * 0.3, h * 0.3, rgb, verts=16, rough=0.25, r2=r * 0.45)
+
+
+def relic_stall():
+    """Banca de relíquias (2x1): mesa baixa com pano azul, ding de bronze, disco de jade, pergaminhos,
+    vaso celadon, estatueta dourada e uma lanterna âmbar num poste curto."""
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cyl(sx * 0.75, sy * 0.25, 0, 0.04, 0.45, WOODW_D)
+    box(0, 0, 0.45, 1.75, 0.7, 0.06, WOODW)
+    box(0, -0.02, 0.51, 1.6, 0.66, 0.02, (40, 50, 110))
+    box(0, -0.36, 0.3, 1.6, 0.02, 0.22, (40, 50, 110))  # aba do pano
+    ding(-0.55, 0.05, 0.53)
+    cyl(-0.05, 0.1, 0.53, 0.16, 0.02, (110, 70, 40))  # suporte do disco
+    o = cyl(-0.05, 0.1, 0.62, 0.15, 0.04, (90, 190, 140), verts=20, rough=0.2)
+    o.rotation_euler = (1.4, 0, 0)
+    for k in range(2):  # pergaminhos
+        o = cyl(0, 0, 0, 0.05, 0.5, (226, 210, 170))
+        o.rotation_euler = (0, 1.5708, 0.2)
+        o.location = (0.12, -0.18 + k * 0.14, 0.58 + k * 0.02)
+    vase(0.45, 0.15, 0.53, 0.1, 0.36, CELADON)
+    cyl(0.72, -0.1, 0.53, 0.06, 0.05, rt.GOLD, rough=0.3)
+    cyl(0.72, -0.1, 0.58, 0.04, 0.12, rt.GOLD, rough=0.3)
+    sphere(0.72, -0.1, 0.74, 0.05, rt.GOLD)
+    cyl(0.85, 0.3, 0, 0.03, 1.15, WOODW_D)
+    box(0.75, 0.3, 1.13, 0.24, 0.03, 0.03, WOODW_D)
+    lantern(0.66, 0.3, 0.98, 0.1, AMBER)
+
+
+def stone_lion():
+    """Leão guardião de pedra (shishi) sentado num pedestal, olhando para a rua (-y)."""
+    S, SD = (176, 170, 160), rt.STONE_D
+    box(0, 0, 0, 0.56, 0.56, 0.32, SD)
+    box(0, 0, 0.32, 0.48, 0.48, 0.05, S)
+    sphere(0, 0.08, 0.55, 0.2, S, sz=1.1)  # corpo sentado
+    for sx in (-1, 1):
+        cyl(sx * 0.1, -0.1, 0.37, 0.05, 0.32, S)  # patas da frente
+        sphere(sx * 0.1, -0.13, 0.39, 0.06, S, sz=0.6)
+    for k in range(8):  # juba em cachos
+        import math
+        t = k * 0.785
+        sphere(0.17 * math.cos(t), -0.02 + 0.06 * math.sin(t), 0.86 + 0.15 * math.sin(t), 0.08, SD)
+    sphere(0, -0.08, 0.86, 0.14, S)  # cabeça
+    sphere(0, -0.2, 0.82, 0.07, S, sz=0.8)  # focinho
+    for sx in (-1, 1):
+        sphere(sx * 0.06, -0.2, 0.92, 0.025, (30, 30, 34))
+    box(0, -0.2, 0.75, 0.1, 0.03, 0.02, (120, 40, 36))  # boca
+    sphere(0.17, -0.12, 0.42, 0.07, SD)  # bola sob a pata
+
+
+def old_jars():
+    """Três jarros antigos (celadon, marrom e azul) de tamanhos diferentes."""
+    vase(-0.12, 0.15, 0, 0.27, 0.95, (120, 80, 50))
+    vase(0.22, 0.0, 0, 0.2, 0.7, CELADON)
+    vase(-0.12, -0.25, 0, 0.15, 0.5, (60, 90, 150))
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -146,7 +241,10 @@ SET = {
     'porto_forja': (lambda: porto_house(5, 4, extras=[rt.shop_sign((60, 60, 70)), rt.forge]), (5, 4), 3.6),
     'porto_joalheria': (lambda: porto_house(4, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((110, 70, 170))]), (4, 4), 3.6),
     'porto_casa_cha': (tea_house, (5, 4), 4.4),
-    'porto_antiquario': (lambda: porto_house(4, 4, extras=[rt.shop_sign((214, 172, 64))]), (4, 4), 3.6),
+    'porto_antiquario': (antique_shop, (4, 4), 3.6),
+    'banca_reliquias': (relic_stall, (2, 1), 1.6),
+    'leao_pedra': (stone_lion, (1, 1), 1.3),
+    'jarros_antigos': (old_jars, (1, 1), 1.0),
     'porto_banco': (lambda: rc.jade_house(5, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((214, 172, 64))]), (5, 4), 4.4),
     'barraca_vermelha': (stall_night((170, 40, 36)), (2, 2), 2.4),
     'barraca_ambar': (stall_night((200, 130, 40)), (2, 2), 2.4),

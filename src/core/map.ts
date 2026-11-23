@@ -55,12 +55,18 @@ export function parseTiledMap(id: string, json: any): GameMap {
         h: o.height / th,
         props: toProps(o.properties),
       });
-  // enfeites que bloqueiam (lanternas, estandartes, poço...) tiram o tile da caminhada
+  // enfeites que bloqueiam (lanternas, estandartes, poço...) tiram o tile da caminhada; um 'building' com block
+  // (banca sobre piso de pedra) tira a área inteira, sem trocar o piso por casa
   for (const o of objects)
-    if (o.type === 'decor' && o.props.block) {
-      const i = Math.floor(o.x),
-        j = Math.floor(o.y);
-      if (i >= 0 && j >= 0 && i < json.width && j < json.height) walkable[j * json.width + i] = false;
+    if ((o.type === 'decor' || o.type === 'building') && o.props.block) {
+      const w = o.type === 'building' ? Math.max(1, Math.round(o.w)) : 1,
+        h = o.type === 'building' ? Math.max(1, Math.round(o.h)) : 1;
+      for (let dj = 0; dj < h; dj++)
+        for (let di = 0; di < w; di++) {
+          const i = Math.floor(o.x) + di,
+            j = Math.floor(o.y) + dj;
+          if (i >= 0 && j >= 0 && i < json.width && j < json.height) walkable[j * json.width + i] = false;
+        }
     }
   const name = tn(String(toProps(json.properties).displayName ?? id));
   return { id, name, width: json.width, height: json.height, tiles, walkable, objects };

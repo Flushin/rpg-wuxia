@@ -119,6 +119,8 @@ export interface Entity {
   /** papel (loja) quando difere do personagem: prop role do NPC no mapa (ex.: ferreira_lin -> 'ferreiro') */
   npcRole?: string;
   wander: number; // raio em tiles para andar pela cidade (0 = parado)
+  /** NPC parado: direção (0..7, 0 = olhando para a câmera) em que fica virado; prop face do NPC no mapa */
+  face?: number;
 }
 
 export type GameEvent =
