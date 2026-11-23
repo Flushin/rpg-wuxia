@@ -376,9 +376,15 @@ function portal(
   out.push(g);
   const c = tileToScreen(x + w / 2, y + h / 2);
   // portão de ferro (gate: 'ferro'): o brilho e as faíscas só aparecem com a grade aberta (src/render/ironGate.ts)
+  // variante 'porta' (Cidadela): folhas de laca abrem para fora e a névoa de gelo acende no vão
   let onOpen: ((k: number) => void) | null = null;
-  if (o.props.gate === 'ferro')
-    out.push(...ironGate(scene, o, Number(o.props.gateX) + Number(o.props.gateY) + 1.8, (k) => onOpen?.(k)).objects);
+  const gated = o.props.gate === 'ferro' || o.props.gate === 'porta';
+  let mouth: { x: number; y: number } | null = null;
+  if (gated) {
+    const ig = ironGate(scene, o, Number(o.props.gateX) + Number(o.props.gateY) + 1.8, (k) => onOpen?.(k));
+    out.push(...ig.objects);
+    if (o.props.gate === 'porta') mouth = ig.mouth;
+  }
   const depth = Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1;
   if (!noGate) {
     const gate = scene.add
@@ -389,22 +395,24 @@ function portal(
     gate.setName('tree');
     out.push(gate);
   }
+  // no portão de portas, pontos de luz azuis e dourados flutuando no vão (prop `specks`: cores extras)
+  const specks = Array.isArray(o.props.specks) ? (o.props.specks as number[]) : [];
   const sparks = scene.add
-    .particles(c.x, c.y - 10, 'fx-dot', {
-      x: { min: -28, max: 28 },
-      y: { min: -6, max: 6 },
-      lifespan: 1400,
-      speedY: { min: -38, max: -16 },
-      speedX: { min: -4, max: 4 },
+    .particles(mouth ? mouth.x : c.x, mouth ? mouth.y : c.y - 10, 'fx-dot', {
+      x: mouth ? { min: -10, max: 10 } : { min: -28, max: 28 },
+      y: mouth ? { min: -22, max: 22 } : { min: -6, max: 6 },
+      lifespan: mouth ? 1800 : 1400,
+      speedY: mouth ? { min: -14, max: -4 } : { min: -38, max: -16 },
+      speedX: mouth ? { min: -8, max: 8 } : { min: -4, max: 4 },
       scale: { start: 0.5, end: 0 },
       alpha: { start: 0.9, end: 0 },
-      tint: [tintOf(glow, 0.55), glow, tintOf(glow, 0.85)],
-      frequency: 120,
+      tint: [tintOf(glow, 0.55), glow, tintOf(glow, 0.85), ...specks],
+      frequency: mouth ? 90 : 120,
       blendMode: 'ADD',
     })
-    .setDepth(depth + 0.5);
+    .setDepth(mouth ? Number(o.props.gateX) + Number(o.props.gateY) + 2 : depth + 0.5);
   out.push(sparks);
-  if (o.props.gate === 'ferro') {
+  if (gated) {
     pulse.pause();
     onOpen = (k) => {
       g.setAlpha(0.4 * k);

@@ -1334,12 +1334,38 @@ function cidadela() {
   }
   building('portao_muralha_j', 1, 14, 2, 4);
   building('portao_muralha_j', 29, 14, 2, 4);
+  // portais nos portões (padrão portão de ferro, variante 'porta', src/render/ironGate.ts): ao chegar perto as
+  // portas abrem para fora e a névoa branca/azul-gelo acende no vão, com pontos de luz azuis e dourados
+  const gelo = (gateAxis, gateX, gateY) => ({
+    gate: 'porta',
+    gateAxis,
+    gateX,
+    gateY,
+    noGate: 1,
+    glow: 0xbfe6ff,
+    specks: [0x4a90ff, 0xffd060],
+    labelY: 150,
+  });
   // nível 40: o portão leste leva ao Vale das Cinzas Rubras (portal junto do portão, na ponta da avenida)
   objs.push(
-    area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, { target: 'vale', targetX: 2.5, targetY: 16, minLevel: 30 }),
+    area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, {
+      target: 'vale',
+      targetX: 2.5,
+      targetY: 16,
+      minLevel: 30,
+      ...gelo('j', 30, 16),
+    }),
   );
   // nível 50: o portão sul leva ao Porto Noturno (portal na ponta sul da avenida, diante do portão)
-  objs.push(area('Porto Noturno', 'portal', 15, 28, 2, 1, { target: 'porto', targetX: 48, targetY: 6, minLevel: 50 }));
+  objs.push(
+    area('Porto Noturno', 'portal', 15, 28, 2, 1, {
+      target: 'porto',
+      targetX: 48,
+      targetY: 6,
+      minLevel: 50,
+      ...gelo('i', 16, 30),
+    }),
+  );
 
   // norte: salão principal no fim da avenida, pagode ao lado
   building('jade_salao', 13, 3, 6, 4);
