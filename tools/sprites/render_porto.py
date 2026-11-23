@@ -613,6 +613,35 @@ def travel_gear():
     o.rotation_euler = (-0.2, 0.25, 0)
 
 
+# ---- guardas do portão: estandarte da guarda e braseiro de ferro ----
+def banner():
+    """Estandarte da guarda: mastro com ponta de lança, flâmula vermelha com borda dourada e base de pedra."""
+    box(0, 0, 0, 0.36, 0.36, 0.16, rt.STONE_D)
+    cyl(0, 0, 0.16, 0.035, 2.0, WOODW_D)
+    cyl(0, 0, 2.16, 0.04, 0.16, STEEL, verts=6, r2=0.0, rough=0.3)
+    box(0.02, -0.17, 1.9, 0.03, 0.34, 0.04, WOODW_D)
+    box(0.02, -0.17, 1.12, 0.02, 0.32, 0.76, (176, 36, 32))
+    box(0.025, -0.17, 1.12, 0.022, 0.34, 0.05, rt.GOLD, rough=0.3)
+    for k in range(3):  # caracteres dourados
+        box(0.035, -0.17, 1.3 + k * 0.17, 0.01, 0.12, 0.1, rt.GOLD, emit=0.5)
+    box(0.02, -0.17, 1.02, 0.02, 0.1, 0.12, (176, 36, 32)).rotation_euler = (0.785, 0, 0)
+
+
+def brazier():
+    """Braseiro de ferro em tripé com brasas acesas (luz suave junto dos guardas)."""
+    import math
+    for k in range(3):
+        a = k * 2 * math.pi / 3
+        o = cyl(0.16 * math.cos(a), 0.16 * math.sin(a), 0, 0.022, 0.62, IRON)
+        o.rotation_euler = (-0.25 * math.sin(a), 0.25 * math.cos(a), 0)
+    cyl(0, 0, 0.56, 0.12, 0.18, IRON, r2=0.24, rough=0.4)
+    cyl(0, 0, 0.74, 0.25, 0.03, (50, 50, 54))
+    for k in range(7):
+        a = k * 0.9
+        sphere(0.12 * math.cos(a), 0.12 * math.sin(a), 0.76, 0.07, EMBER, emit=4.0)
+    sphere(0, 0, 0.8, 0.09, (255, 170, 60), emit=5.0)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -652,6 +681,8 @@ SET = {
     'marco_caminhos': (waymarker, (1, 1), 2.0),
     'mesa_mapas': (map_table, (2, 1), 1.1),
     'bagagem_viagem': (travel_gear, (1, 1), 1.3),
+    'estandarte': (banner, (1, 1), 2.4),
+    'braseiro': (brazier, (1, 1), 1.0),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),

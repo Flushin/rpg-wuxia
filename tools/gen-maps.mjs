@@ -1647,6 +1647,16 @@ function porto() {
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
   npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
   npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
+  // posto da guarda dos dois lados do portão: estandarte, braseiro aceso e suporte de lanças sobre a pedra
+  gr.rect(42, 3, 12, 4, PL);
+  for (const [x, sx] of [
+    [44, -1],
+    [51, 1],
+  ]) {
+    decor('estandarte', x + 0.4, 3.6, { block: 1 });
+    decor('braseiro', x + 0.5 + sx * 0.6, 5.9, { block: 1, light: 1, soft: 1 });
+    decor('suporte_armas', x + 0.5 + sx, 4.6, { block: 1 });
+  }
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
@@ -1743,8 +1753,6 @@ function porto() {
   // lanterninha de chão com luz suave junto de cada NPC (soft: halo fraco, clareia o NPC sem ofuscar)
   for (const [x, y, block] of [
     [43.4, 38.6, 1], // Mestre dos Caminhos
-    [46.3, 5.8, 0], // guardas do portão (sem bloquear a passagem)
-    [49.7, 5.8, 0],
     [31.9, 81.2, 1], // Mestre do Cais
     [28.6, 76.4, 1], // vendedores do cais (na frente da barraca, do lado)
     [38.6, 76.4, 1],
@@ -1755,12 +1763,6 @@ function porto() {
     [27.0, 27.6, 1], // Cavalariço Ma
   ])
     decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
-  // um poste aceso junto de cada NPC, para ele ser visto no escuro
-  for (const [x, y] of [
-    [44, 5],
-    [51, 5],
-  ])
-    post(x, y);
 
   // mar: juncos (barcos) parados e balançando
   for (const [s2, x, y] of [
