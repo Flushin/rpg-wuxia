@@ -61,8 +61,8 @@ const equipOf = (w: World, id: string, rarity: 'comum' | 'incomum' | 'raro' = 'c
   makeEquipment(id, rarity, CLASSES[w.classId].element, priv(w).rng);
 const near = (w: World, role: string) => {
   const n = w.npcs.find((e) => w.npcRole(e) === role)!;
-  w.player.x = n.x + 1;
-  w.player.y = n.y;
+  w.player.x = n.spot ? n.spot.x : n.x + 1;
+  w.player.y = n.spot ? n.spot.y : n.y;
   w.player.path = [];
   w.interactNpc(n.id);
   run(w, 0.1);
