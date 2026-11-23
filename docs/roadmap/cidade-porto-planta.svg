@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 828" width="768" height="828" font-family="sans-serif">
+<rect width="768" height="828" fill="#1b4f8a"/>
+<line x1="0" y1="0" x2="0" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="0" x2="768" y2="0" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="64" y1="0" x2="64" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="64" x2="768" y2="64" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="128" y1="0" x2="128" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="128" x2="768" y2="128" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="192" y1="0" x2="192" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="192" x2="768" y2="192" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="256" y1="0" x2="256" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="256" x2="768" y2="256" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="320" y1="0" x2="320" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="320" x2="768" y2="320" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="384" y1="0" x2="384" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="384" x2="768" y2="384" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="448" y1="0" x2="448" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="448" x2="768" y2="448" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="512" y1="0" x2="512" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="512" x2="768" y2="512" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="576" y1="0" x2="576" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="576" x2="768" y2="576" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="640" y1="0" x2="640" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="640" x2="768" y2="640" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="704" y1="0" x2="704" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="704" x2="768" y2="704" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="768" y1="0" x2="768" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<line x1="0" y1="768" x2="768" y2="768" stroke="#ffffff" stroke-opacity=".08"/>
+<rect x="8" y="8" width="752" height="640" rx="4" fill="none" stroke="#ffffff" stroke-width="3" />
+<rect x="0" y="656" width="768" height="112" rx="0" fill="#0d3566" stroke="#7fb6ff" stroke-width="1" />
+<path d="M80 704 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M98 704 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<path d="M208 728 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M226 728 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<path d="M352 696 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M370 696 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<path d="M496 736 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M514 736 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<path d="M624 704 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M642 704 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<path d="M704 744 l40 0 l-6 9 l-28 0 z" fill="#c98a4b" stroke="#fff"/><path d="M722 744 l0 -22 l14 18 z" fill="#f3e2c0" stroke="#fff"/>
+<text x="384" y="762.4" font-size="11" fill="#bfe0ff" text-anchor="middle" font-weight="bold">MAR — juncos chineses (barcos) visíveis do cais</text>
+<rect x="16" y="592" width="736" height="56" rx="2" fill="#5a7fa8" stroke="#dfefff" stroke-width="1.5" />
+<rect x="96" y="648" width="16" height="48" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<rect x="240" y="648" width="16" height="48" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<rect x="496" y="648" width="16" height="48" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<rect x="640" y="648" width="16" height="48" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<text x="384" y="628.0" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">CAIS DO PORTO — mercado noturno, barracas, lanternas</text>
+<rect x="360" y="8" width="48" height="584" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="1" />
+<rect x="16" y="328" width="736" height="32" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="1" />
+<text x="384" y="32" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">PORTÃO</text>
+<text x="384" y="44.8" font-size="8" fill="#ffffff" text-anchor="middle" font-weight="normal">(nível 50, mapa-múndi)</text>
+<circle cx="384" cy="344" r="64" fill="#3d77b8" stroke="#fff" stroke-width="2"/>
+<text x="384" y="336" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">PRAÇA CENTRAL</text>
+<rect x="160" y="360" width="24" height="232" rx="0" fill="#0d3566" stroke="#7fb6ff" stroke-width="1" />
+<rect x="152" y="416" width="40" height="12.0" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<rect x="152" y="496" width="40" height="12.0" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<rect x="152" y="560" width="40" height="12.0" rx="2" fill="#8a6a45" stroke="#dfefff" stroke-width="1.5" />
+<text x="172.0" y="392" font-size="8" fill="#bfe0ff" text-anchor="middle" font-weight="normal">canal</text>
+<rect x="24" y="24" width="320" height="288" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M24 24 l320 288" stroke="#fff" stroke-opacity=".12"/>
+<rect x="424" y="24" width="320" height="136" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M424 24 l320 136" stroke="#fff" stroke-opacity=".12"/>
+<rect x="424" y="176" width="320" height="136" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M424 176 l320 136" stroke="#fff" stroke-opacity=".12"/>
+<rect x="24" y="376" width="128" height="200" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M24 376 l128 200" stroke="#fff" stroke-opacity=".12"/>
+<rect x="200" y="376" width="144" height="200" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M200 376 l144 200" stroke="#fff" stroke-opacity=".12"/>
+<rect x="424" y="376" width="160" height="200" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M424 376 l160 200" stroke="#fff" stroke-opacity=".12"/>
+<rect x="600" y="376" width="144" height="200" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<path d="M600 376 l144 200" stroke="#fff" stroke-opacity=".12"/>
+<rect x="24" y="152" width="320" height="16" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="176" y="24" width="16" height="288" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="424" y="160" width="320" height="16" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="576" y="24" width="16" height="136" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="576" y="176" width="16" height="136" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="72" y="376" width="16" height="200" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="496" y="376" width="16" height="96" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="672" y="376" width="16" height="200" rx="0" fill="#4f86c2" stroke="#dfefff" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="0" y="768" width="768" height="60" fill="#123d6d"/>
+<text x="384" y="795.2" font-size="10" fill="#bfe0ff" text-anchor="middle" font-weight="normal">faixas claras = avenidas · tracejado = vielas/corredores · linha branca grossa = muralha</text>
+<text x="384" y="808" font-size="10" fill="#bfe0ff" text-anchor="middle" font-weight="normal">vila atual (32×32) caberia 9× aqui</text>
+<rect x="512" y="512" width="0.0" height="0" rx="2" fill="#2f6aa8" stroke="#dfefff" stroke-width="1.5" />
+<rect x="160" y="592" width="24" height="64" fill="#0d3566" stroke="#7fb6ff"/>
+<rect x="585.6" y="360" width="12.8" height="296" fill="#0d3566" stroke="#7fb6ff"/>
+<rect x="152" y="612.0" width="40" height="12.0" fill="#8a6a45" stroke="#fff"/>
+<rect x="576" y="612.0" width="32" height="12.0" fill="#8a6a45" stroke="#fff"/>
+<rect x="576" y="416" width="32" height="12.0" fill="#8a6a45" stroke="#fff"/>
+<rect x="576" y="512" width="32" height="12.0" fill="#8a6a45" stroke="#fff"/>
+<rect x="368" y="368" width="32" height="0.08" fill="none" stroke="none"/>
+<ellipse cx="272" cy="480" rx="40" ry="32" fill="#0d3566" stroke="#7fb6ff"/>
+<rect x="232" y="474.4" width="80" height="11.2" fill="#8a6a45" stroke="#fff"/>
+<rect x="24" y="320" width="8" height="0.08" fill="none" stroke="none"/>
+<rect x="16" y="360" width="9.6" height="0.08" fill="none" stroke="none"/>
+<rect x="745.6" y="176" width="12.8" height="480" fill="#0d3566" stroke="#7fb6ff"/>
+<rect x="592" y="162.4" width="153.6" height="11.2" fill="#0d3566" stroke="#7fb6ff"/>
+<text x="592" y="384" font-size="8" fill="#bfe0ff" text-anchor="middle">canal</text>
+<rect x="333.02" y="343.0" width="101.96" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="384" y="352" font-size="9" fill="#ffffff" text-anchor="middle" font-weight="normal">teleporte · quadro</text>
+<rect x="353.9" y="355.0" width="60.199999999999996" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="384" y="364.0" font-size="9" fill="#ffffff" text-anchor="middle" font-weight="normal">de missões</text>
+<rect x="152.16" y="152.0" width="63.67999999999999" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="184.0" y="164.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">ESTÁBULO</text>
+<rect x="83.43" y="171.8" width="201.14" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="184.0" y="180.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">NPC das montarias + cercado de treino</text>
+<rect x="538.24" y="76.0" width="91.52" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="584.0" y="88.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">FORJA-MESTRE</text>
+<rect x="483.43" y="95.8" width="201.14" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="584.0" y="104.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">ferreiro: abre socket, põe/tira gemas</text>
+<rect x="548.6800000000001" y="228.0" width="70.63999999999999" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="584.0" y="240.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">JOALHERIA</text>
+<rect x="514.75" y="247.8" width="138.5" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="584.0" y="256.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">NPC das gemas + fusão 3→1</text>
+<rect x="45.720000000000006" y="460.0" width="84.55999999999999" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="88.0" y="472.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">CASA DE CHÁ</text>
+<rect x="39.63" y="479.8" width="96.74" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="88.0" y="488.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">buffs temporários</text>
+<rect x="247.12" y="460.0" width="49.76" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="272.0" y="472.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">JARDIM</text>
+<rect x="215.8" y="479.8" width="112.39999999999999" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="272.0" y="488.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">lago e ponte (calmo)</text>
+<rect x="465.2" y="460.0" width="77.6" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="504.0" y="472.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">ANTIQUÁRIO</text>
+<rect x="455.63" y="479.8" width="96.74" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="504.0" y="488.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">NPC das relíquias</text>
+<rect x="622.76" y="460.0" width="98.47999999999999" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="672.0" y="472.0" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">BANCO / ARENA</text>
+<rect x="626.24" y="479.8" width="91.52" height="13" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="672.0" y="488.8" font-size="9" fill="#dfefff" text-anchor="middle" font-weight="normal">depósito · Trial</text>
+<rect x="129.44000000000003" y="768.8" width="509.11999999999995" height="16" rx="3" fill="#163f70" fill-opacity=".85"/>
+<text x="384" y="780.8" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">CIDADE DO PORTO NOTURNO — planta 96×96 (1 quadrado da grade = 8×8 tiles)</text>
+<rect x="736" y="324" width="24" height="40" fill="#8a6a45" stroke="#fff"/>
+</svg>

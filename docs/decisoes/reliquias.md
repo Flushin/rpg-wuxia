@@ -11,4 +11,4 @@ Decidido pelo Lucas em 22/11/2026. Dados em `src/data/relics.json`; regras em `s
   que ele ainda não tem (os chefes vão só até o nível 40, então a regra olha o nível do jogador).
 - Coleção, como as montarias: fica para sempre, troca sem custo; sem mochila, venda, durabilidade, forja nem gemas.
 - Save: campos opcionais `relics`/`relic`, saneados na leitura (sem versão nova).
-- Antiquário provisório na Cidadela (folha do Monge do Pagode) até o mapa do Porto Noturno existir.
+- Antiquário no bairro sul do Porto Noturno (etapa 5, `porto-noturno.md`), com sprite próprio.

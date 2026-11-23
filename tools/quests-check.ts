@@ -16,7 +16,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico', 'cidadela', 'vale', 'palacio'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico', 'cidadela', 'vale', 'palacio', 'porto'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 type Priv = { killMonster: (m: Entity) => void; questTalk: (id: string) => void; openNpcWindow: (n: Entity) => void };
 const priv = (w: World) => w as unknown as Priv;
@@ -38,7 +38,10 @@ const talkTo = (w: World, role: string) => {
 };
 
 console.log('== dados ==');
-ok(QUESTS.length === 24, '24 etapas na cadeia (8 até o nível 10 + 6 do marco 9 + 5 do nível 30 + 5 do nível 40)');
+ok(
+  QUESTS.length === 27,
+  '27 etapas na cadeia (8 até o nível 10 + 6 do marco 9 + 5 do nível 30 + 5 do nível 40 + 3 do Porto Noturno)',
+);
 ok(
   QUESTS.slice(8).every((q) => q.minLevel >= 10) && QUESTS[QUESTS.length - 1].objective.type === 'kill',
   'etapas do marco 9 a partir do nível 10, terminando num abate (o Abade)',
@@ -107,6 +110,12 @@ for (const classId of ['lamina', 'pavilhao']) {
     const o = q.objective;
     if (o.type === 'kill') for (let i = 0; i < o.count; i++) kill(w, o.monster);
     else if (o.type === 'reach') w.changeMap(o.map);
+    else {
+      // conversa: vai ao mapa do NPC (Porto Noturno: Mestre do Cais)
+      const at = Object.keys(maps).find((id) => maps[id].objects.some((x) => x.props.npc === o.npc));
+      if (at) w.changeMap(at);
+      talkTo(w, o.npc);
+    }
     ok(w.questView().phase === 'ready', `"${q.name}" cumprida`);
     // Os abates acima soltam itens por sorteio (às vezes uma arma Incomum nv 1): olhar só o que a entrega acrescentou.
     // Esses sorteios podem encher a aba de equipamentos, e com a mochila cheia a recompensa cai no chão: abre espaço antes.

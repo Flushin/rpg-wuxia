@@ -24,6 +24,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `render_props.py` | Objetos parados (árvores, pedras…) → atlas `public/sprites/floresta.*` com o ponto do chão (pivot) |
 | `render_town.py` | Cidade: casas wuxia, portão, lanternas, estandartes, incensário… gerados por script + cerejeiras → `public/sprites/cidade.*` |
 | `render_cidadela.py` | Cidadela de Jade: casas de dois andares com telhado de jade, salão, pagode, muralha (trechos, torres, portões), colunas e lanternas duplas, com as peças de `render_town.py` → `public/sprites/cidadela.*` (no mapa: prop `atlas: 'cidadela'`) |
+| `render_porto.py` | Porto Noturno (nível 50): casas de madeira escura, lojas dos bairros, barracas do mercado noturno, postes de lanterna, pontes, estacas do cais, cercas e juncos (barcos), com as peças de `render_town.py`/`render_cidadela.py` → `public/sprites/porto.*` (no mapa: prop `atlas: 'porto'`) |
 | `render_ruins.py` | Ruínas e portais: colunas de pedra, entulho, cacos, braseiros e a porta-lua do portal → `public/sprites/ruinas.*` |
 | `ground_tiles.py` | Pisos 2D (grama, caminho, lajotas da praça e das ruínas, 3 quadros de água, neve e lago congelado) → `public/sprites/pisos.png` |
 | `icons.py` | Ícones de itens e skills (2D, por script) → `public/sprites/icones.png` + `src/data/sprites/icones.json` |

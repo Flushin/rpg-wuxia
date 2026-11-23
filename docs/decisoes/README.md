@@ -18,6 +18,7 @@ Leia só o arquivo do tema que for mexer. Regra geral: mudanças que alteram a j
 | [nivel-50.md](nivel-50.md) | Nível máximo 50 (Porto Noturno): curva +22%, save v4, etapas |
 | [gemas.md](gemas.md) | Gemas e encaixes (Porto Noturno, etapa 2): Joalheiro, Ferreiro-mestre, valores |
 | [reliquias.md](reliquias.md) | Relíquias (Porto Noturno, etapa 4): espaço, efeitos, raridades, Antiquário Lao |
+| [porto-noturno.md](porto-noturno.md) | Cidade do Porto Noturno (etapa 5): mapa 96×96, bairros, noite, NPCs, missões, música |
 | [trial.md](trial.md) | Trial: chefes nível 21–30 à escolha, liberação por chefe, custo, bônus de drop, ponto fraco |
 | [teleporte.md](teleporte.md) | Teleporte do Mestre dos Caminhos: vila → mapas de caça, nível mínimo, 200 de ouro, só ida |
 | [epico.md](epico.md) | Equipamento Épico: drop 0,5%/1% só jogando, acompanha o nível, +30% sobre o Raro, bônus por classe, forja |

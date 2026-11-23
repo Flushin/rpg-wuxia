@@ -94,7 +94,7 @@ const minimap = (id: string, big = false) => `<canvas class="minimap${big ? ' bi
 
 export async function mapIndexPage(): Promise<string> {
   const maps = await loadMaps();
-  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. As cidades (a vila e a Cidadela de Jade) são seguras: lá a vida e a mana voltam sozinhas fora de combate.
+  return `<h1>Mapas</h1><p class="intro">As regiões do jogo, ligadas por portais. As cidades (a vila, a Cidadela de Jade e o Porto Noturno) são seguras: lá a vida e a mana voltam sozinhas fora de combate.
     No jogo, a aba <b>Mundo</b> do mapa (tecla M ou toque no minimapa) mostra todos os mapas; toque num deles para ver, passo a passo, por quais portais ir saindo de onde você está (o próximo portal pisca no minimapa).
     Na praça da vila, o <a href="#/npc/caminhos">${esc(npcName('caminhos'))}</a> leva você direto aos mapas marcados com ✦, por ${TELEPORT_COST} ouro; a <a href="#/mapa/cidadela">Cidadela de Jade</a> (nível 30) só se alcança assim.</p>
     <div class="grid map-grid">${maps
@@ -173,6 +173,7 @@ export async function mapPage(id: string): Promise<string | null> {
     qBoss = qs.filter(isBossQuest);
   return `<a class="back" href="#/mapas">‹ Mapas</a><h1>${esc(m.name)}</h1>
     <div class="sub">${town ? 'Cidade (segura)' : trial ? 'Trial (instância)' : dungeon ? 'Masmorra (instância)' : 'Área de caça'}${lv ? ` · monstros nível ${lv[0]}–${lv[1]}` : ''}${entry > 0 && entry < Infinity ? ` · entrada a partir do nível ${entry}` : ''}</div>
+    ${id === 'porto' ? HARBOR : ''}
     <section class="panel">${minimap(id, true)}
       <div class="legend"><span><i style="background:#f0d27a"></i>Saída</span><span><i style="background:#7fd4ff"></i>NPC</span><span><i style="background:#e04848"></i>Monstro</span></div></section>
     ${m.npcs.length ? `<section class="panel"><h2>NPCs</h2><ul>${m.npcs.map((n) => `<li><a href="#/npc/${n}">${esc(npcName(n))}</a></li>`).join('')}</ul></section>` : ''}
@@ -262,9 +263,19 @@ export async function fillMinimaps(root: ParentNode) {
 }
 
 /** Resumo do Trial na página do mapa; as regras completas ficam em Mecânicas › Trial. */
+/** Porto Noturno: bairros da planta (docs/decisoes/porto-noturno.md). */
+const HARBOR = `<section class="panel"><p>Cidade do nível 50, quatro vezes maior que as outras e <b>sempre de noite</b>: as lanternas
+  iluminam as ruas, e os juncos balançam no mar ao sul. Chega-se pelo portão sul da <a href="#/mapa/cidadela">Cidadela de Jade</a>
+  ou pelo Mestre dos Caminhos.</p><ul>
+  <li><b>Norte:</b> portão (volta à Cidadela) e a avenida até a praça central, com o círculo do Mestre dos Caminhos.</li>
+  <li><b>Noroeste:</b> estábulo do <a href="#/npc/estabulo">Cavalariço Ma</a>, com o cercado dos cavalos.</li>
+  <li><b>Nordeste:</b> forja-mestre do <a href="#/npc/ferreiro_mestre">Ferreiro-mestre Gang</a> e joalheria do <a href="#/npc/joalheiro">Joalheiro Yu</a>.</li>
+  <li><b>Sul:</b> casa de chá, jardim com lago e ponte, antiquário do <a href="#/npc/antiquario">Antiquário Lao</a> e o banco com a arena (portal do Trial).</li>
+  <li><b>Cais:</b> mercado noturno (poções), trapiches e o <a href="#/npc/mestre_cais">Mestre do Cais</a>. Três canais cortam a cidade até o mar; cruze pelas pontes.</li>
+  </ul></section>`;
 function trialPanel(): string {
   return `<section class="panel"><h2>Trial</h2><p class="lore">Uma arena de lajes e braseiros onde os chefes do jogo voltam mais fortes.</p><ul>
-      <li>Entrada pelo portal da saída sul da <a href="#/mapa/cidade">vila</a>, a partir do nível <b>${TRIAL_MIN_LEVEL}</b>: escolha o chefe e o nível (1 a ${TRIAL_TIERS}, chefe nível ${trialBossLevel(1)} a ${trialBossLevel(TRIAL_TIERS)}).</li>
+      <li>Entrada pelo portal da saída sul da <a href="#/mapa/cidade">vila</a> (ou da arena do <a href="#/mapa/porto">Porto Noturno</a>), a partir do nível <b>${TRIAL_MIN_LEVEL}</b>: escolha o chefe e o nível (1 a ${TRIAL_TIERS}, chefe nível ${trialBossLevel(1)} a ${trialBossLevel(TRIAL_TIERS)}).</li>
       <li>Chefes: ${TRIAL_BOSSES.map((b) => `<a href="#/monstro/${b}">${esc(MONSTERS[b]?.name ?? b)}</a>`).join(', ')}.</li>
       <li>Entrada de ${trialCost(1)} a ${trialCost(TRIAL_TIERS)} ouro; vencer um nível libera o seguinte daquele chefe.</li>
       <li>Regras, ponto fraco de cada chefe, tabela de níveis e drops: <a href="#/mecanicas/trial">Mecânicas › Trial</a>.</li>

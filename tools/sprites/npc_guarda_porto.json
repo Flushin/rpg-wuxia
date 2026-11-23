@@ -1,0 +1,92 @@
+{
+ "name": "npc_guarda_porto",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword_Offhand",
+  "2H_Sword",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "1,0": [
+    35,
+    30,
+    28
+   ],
+   "1,1": [
+    40,
+    48,
+    80
+   ],
+   "0,2": [
+    40,
+    48,
+    80
+   ],
+   "3,0": [
+    150,
+    36,
+    32
+   ],
+   "2,1": [
+    150,
+    36,
+    32
+   ],
+   "3,1": [
+    150,
+    36,
+    32
+   ],
+   "7,0": [
+    150,
+    36,
+    32
+   ],
+   "0,1": [
+    214,
+    172,
+    64
+   ],
+   "2,2": [
+    214,
+    172,
+    64
+   ],
+   "4,1": [
+    214,
+    172,
+    64
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

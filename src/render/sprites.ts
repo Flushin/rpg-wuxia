@@ -51,13 +51,14 @@ const npcSheets = Object.fromEntries(
 );
 /** npcId (mapa) -> folha. Os mestres usam o nome da seita no mapa. */
 const NPC_SHEET_BY_ID: Record<string, string> = {
-  joalheiro: 'npc_mercadora_jin', // provisório: sem sprite próprio até o Porto Noturno
-  ferreiro_mestre: 'npc_ferreira_lin',
   mestre_lamina: 'npc_mestre_tormenta',
   mestre_pavilhao: 'npc_mestra_geada',
   mestre_tita: 'npc_mestre_tita',
   mestre_vibora: 'npc_mestra_vibora',
-  antiquario: 'npc_monge_pagode', // provisório: Antiquário Lao usa o modelo do monge até o Porto Noturno
+  // Porto Noturno: as três barracas do mercado noturno usam o mesmo modelo
+  vendedor_porto1: 'npc_vendedora_porto',
+  vendedor_porto2: 'npc_vendedora_porto',
+  vendedor_porto3: 'npc_vendedora_porto',
   estabulo: 'npc_mercador', // Cavalariço Ma usa o modelo do mercador
 };
 export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;
@@ -206,6 +207,7 @@ export function preloadSprites(scene: Phaser.Scene) {
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-cidadela', 'sprites/cidadela.png', 'sprites/cidadela.json');
+  scene.load.atlas('props-porto', 'sprites/porto.png', 'sprites/porto.json');
   scene.load.atlas('props-ruinas', 'sprites/ruinas.png', 'sprites/ruinas.json');
   scene.load.atlas('props-montanha', 'sprites/montanha.png', 'sprites/montanha.json');
   scene.load.atlas('props-bambu', 'sprites/bambu.png', 'sprites/bambu.json');

@@ -1,0 +1,56 @@
+{
+ "name": "npc_joalheiro",
+ "model": ".cache/kaykit/Characters/gltf/Rogue_Hooded.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Crossbow",
+  "2H_Crossbow",
+  "Icosphere",
+  "Throwable",
+  "Knife",
+  "Knife_Offhand"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "rogue_texture",
+  "cells": {
+   "0,1": [
+    70,
+    60,
+    140
+   ],
+   "1,1": [
+    44,
+    38,
+    96
+   ],
+   "5,1": [
+    200,
+    206,
+    220
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

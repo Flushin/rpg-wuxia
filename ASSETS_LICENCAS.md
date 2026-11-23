@@ -91,6 +91,7 @@ arquivo de pacote foi usado; a configuração de cada folha fica em `tools/sprit
 | `public/audio/sfx/hit.*`, `crit.*`, `level_up.*`, `spell.*`, `monster_attack.*`, `monster_death.*`, `player_death.*` | Efeitos | **não registrado** (os arquivos têm `ARTIST=Kenney`) | Kenney (Impact Sounds ou RPG Audio) | CC0 | idem | 2026-11-15 | Lucas/Claude | 🟡 (descobrir o arquivo original e guardar a licença do pacote) |
 | `public/audio/music/cidade.*` | Música (loop, 22,5 s) | "Oriental" | Shadowfire452 (OpenGameArt) | CC0 | Convertido e cortado para loop | 2026-11-15 | Lucas/Claude | 🟢 (falta arquivar a página) |
 | `public/audio/music/floresta.*` | Música (1 min 43 s) | "Asian/Oriental 1" | Tozan (OpenGameArt) | CC0 | Convertido | 2026-11-15 | Lucas/Claude | 🟢 (falta arquivar a página) |
+| `public/audio/music/porto.*` | Música (1 min 9 s) | "Samurai Nights" | Majadroid / Maik Hoffmann (OpenGameArt) | **CC-BY 4.0** | Convertido, -20 LUFS; crédito na tela de créditos e em `public/audio/CREDITS.txt` | 2026-11-22 | Lucas/Claude | 🟢 (atribuição obrigatória feita) |
 
 ## Fontes
 

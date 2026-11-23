@@ -40,10 +40,16 @@ const MASTER_SHEETS: Record<string, string> = {
 const talkOnly = () =>
   '<p>Conversa com você e conta histórias e dicas sobre a vila e os arredores. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
 
-const PLACES: Record<string, string> = { cidade: 'Vila das Nuvens', cidadela: 'Cidadela de Jade' };
+const PLACES: Record<string, string> = {
+  cidade: 'Vila das Nuvens',
+  cidadela: 'Cidadela de Jade',
+  porto: 'Porto Noturno',
+};
 const placeName = (n: NpcInfo) => PLACES[n.place ?? 'cidade'];
 const talkCitadel = () =>
   '<p>Conversa com você e conta histórias sobre a <a href="#/mapa/cidadela">Cidadela de Jade</a> e o que vem pela frente. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
+const talkHarbor = () =>
+  '<p>Conversa com você e conta histórias sobre o <a href="#/mapa/porto">Porto Noturno</a>, os canais e os barcos do cais. Toque em <b>Continuar</b> para ouvir todas as falas.</p>';
 /** Monge do Pagode: realinhar meridianos (World.resetAttributes). */
 const meridians = () =>
   `${talkCitadel()}<p><b>Realinhar meridianos:</b> por <span class="price">${PROGRESSION.attrResetCost.toLocaleString('pt-BR')} ouro</span>, devolve todos os
@@ -55,12 +61,14 @@ const outfits = () =>
   `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem, só da sua seita e sem efeito no
   combate. Veja todos os trajes, preços e como funcionam na página <a href="#/trajes">Trajes</a>.</p>`;
 const stable = () =>
-  `${talkCitadel()}<p><b>Estábulo:</b> vende montarias. Fora de combate você monta sozinho alguns segundos depois da
+  `${talkHarbor()}<p><b>Estábulo</b> (bairro noroeste do Porto Noturno, ao lado do cercado): vende montarias. Fora de combate você monta sozinho alguns segundos depois da
   última luta e anda mais rápido; ao entrar em combate desmonta na hora. Veja preços e velocidade em
   <a href="#/mecanicas/montarias">Montarias</a>.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
-const sameAs = (id: string, name: string) => () =>
-  `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui na <a href="#/mapa/cidadela">Cidadela de Jade</a>.</p>`;
+const sameAs =
+  (id: string, name: string, place = 'cidadela') =>
+  () =>
+    `<p>Faz exatamente o mesmo que o <a href="#/npc/${id}">${esc(name)}</a> da vila, aqui ${place === 'porto' ? 'no' : 'na'} <a href="#/mapa/${place}">${PLACES[place]}</a>.</p>`;
 
 const shopRow = (id: string, price: number) => `<li>${itemLink(id)} <span class="price">${price} ouro</span></li>`;
 
@@ -138,9 +146,9 @@ function npcList(): NpcInfo[] {
             ...(regions.get(d.region.pt) ?? []),
             `<a href="#/mapa/${d.map}">${esc(mapName(d.map))}</a>${d.minLevel ? ` (nível ${d.minLevel}+)` : ''}${teleportCost(d) ? '' : ' (grátis)'}`,
           ]);
-        return `<p>Fica na praça da <a href="#/mapa/cidade">Vila das Nuvens</a> e da <a href="#/mapa/cidadela">Cidadela de Jade</a>, de pé sobre o círculo dourado. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você
+        return `<p>Fica na praça da <a href="#/mapa/cidade">Vila das Nuvens</a>, da <a href="#/mapa/cidadela">Cidadela de Jade</a> e do <a href="#/mapa/porto">Porto Noturno</a>, de pé sobre o círculo dourado. Por <b>${TELEPORT_COST} ouro</b> por viagem, leva você
          direto a um mapa de caça, sem passar pelos mapas do caminho. Cada destino abre no mesmo nível em que você chegaria a pé.</p>
-         <p>Também leva às cidades: a Cidadela de Jade (só se chega lá por ele) e, de lá, de volta à vila de graça.</p>
+         <p>Também leva às cidades: a Cidadela de Jade (nível 30), o Porto Noturno (nível 50; também a pé pelo portão sul da Cidadela) e, de volta à vila, de graça.</p>
          <p>Só leva de uma cidade para fora: para voltar de um mapa de caça, vá a pé ou use um ${itemLink('pergaminho_retorno')}.</p>
          <h3>Destinos</h3><ul>${[...regions].map(([r, ds]) => `<li><b>${esc(r)}:</b> ${ds.join(', ')}</li>`).join('')}</ul>`;
       },
@@ -159,7 +167,6 @@ function npcList(): NpcInfo[] {
         ['boticario_wen', 'Loja', sameAs('vendedor', 'Vendedor de Poções')],
         ['mercadora_jin', 'Equipamentos raros', sameAs('mercador', t.mercador?.name ?? 'Mercador Ambulante')],
         ['governador', 'Autoridade da Cidadela, trajes das seitas e missões', outfits],
-        ['estabulo', 'Estábulo (montarias)', stable],
         ['monge_pagode', 'Guardião do pagode, realinhar atributos e missões', meridians],
         ['guarda_jade', 'Guarda dos portões e missões', talkCitadel],
       ] as [string, string, () => string][]
@@ -170,21 +177,42 @@ function npcList(): NpcInfo[] {
           id,
           name: t[id].name,
           role,
-          sheet: id === 'estabulo' ? 'npc_mercador' : 'npc_' + id,
+          sheet: 'npc_' + id,
           place: 'cidadela',
           does,
         }),
       ),
-    // Porto Noturno (etapa 2): na Cidadela até o mapa do Porto existir; folhas emprestadas (src/render/sprites.ts)
+    // Porto Noturno (nível 50): NPCs dos bairros (folhas em src/render/sprites.ts)
     ...(
       [
-        ['joalheiro', 'Gemas: vender e fundir', 'npc_mercadora_jin', jeweler],
-        ['ferreiro_mestre', 'Encaixes: abrir, colocar e retirar gemas', 'npc_ferreira_lin', masterSmith],
-        ['antiquario', 'Relíquias (nível 50)', 'npc_monge_pagode', antiquary],
+        ['guarda_porto', 'Guarda do portão e missões', 'npc_guarda_porto', talkHarbor],
+        ['estabulo', 'Estábulo (montarias)', 'npc_mercador', stable],
+        ['ferreiro_mestre', 'Encaixes: abrir, colocar e retirar gemas', 'npc_ferreiro_mestre', masterSmith],
+        ['joalheiro', 'Gemas: vender e fundir', 'npc_joalheiro', jeweler],
+        ['antiquario', 'Relíquias (nível 50)', 'npc_antiquario', antiquary],
+        ['mestre_cais', 'Histórias do cais e missões', 'npc_mestre_cais', talkHarbor],
+        [
+          'vendedor_porto1',
+          'Barraca do mercado noturno',
+          'npc_vendedora_porto',
+          sameAs('vendedor', 'Vendedor de Poções', 'porto'),
+        ],
+        [
+          'vendedor_porto2',
+          'Barraca do mercado noturno',
+          'npc_vendedora_porto',
+          sameAs('vendedor', 'Vendedor de Poções', 'porto'),
+        ],
+        [
+          'vendedor_porto3',
+          'Barraca do mercado noturno',
+          'npc_vendedora_porto',
+          sameAs('vendedor', 'Vendedor de Poções', 'porto'),
+        ],
       ] as [string, string, string, () => string][]
     )
       .filter(([id]) => t[id])
-      .map(([id, role, sheet, does]): NpcInfo => ({ id, name: t[id].name, role, sheet, place: 'cidadela', does })),
+      .map(([id, role, sheet, does]): NpcInfo => ({ id, name: t[id].name, role, sheet, place: 'porto', does })),
     ...['morador1', 'morador2', 'morador3', 'morador4']
       .filter((id) => t[id])
       .map((id): NpcInfo => ({ id, name: t[id].name, role: 'Morador da vila', sheet: 'npc_' + id, does: talkOnly })),
@@ -232,11 +260,13 @@ export function npcIndexPage(): string {
     `<a class="card-link npc-card" href="#/npc/${n.id}">${spriteHtml(n.sheet)}<b>${esc(n.name)}</b><small>${esc(n.role)}</small></a>`;
   const masters = NPCS().filter((n) => n.sect),
     others = NPCS().filter((n) => !n.sect && !n.place),
-    citadel = NPCS().filter((n) => n.place === 'cidadela');
-  return `<h1>NPCs</h1><p class="intro">Quase todos ficam na <b>Vila das Nuvens</b>; os da <a href="#/mapa/cidadela">Cidadela de Jade</a> (nível 30) estão no fim da página, e o Mestre dos Caminhos fica nas duas cidades. Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
+    citadel = NPCS().filter((n) => n.place === 'cidadela'),
+    harbor = NPCS().filter((n) => n.place === 'porto');
+  return `<h1>NPCs</h1><p class="intro">Quase todos ficam na <b>Vila das Nuvens</b>; os da <a href="#/mapa/cidadela">Cidadela de Jade</a> (nível 30) e do <a href="#/mapa/porto">Porto Noturno</a> (nível 50) estão no fim da página, e o Mestre dos Caminhos fica nas três cidades. Toque em um NPC no jogo para o personagem andar até ele e abrir a conversa.</p>
     <h2>Mestres das seitas</h2><div class="grid npc-grid">${masters.map(card).join('')}</div>
     <h2>Moradores e lojas</h2><div class="grid npc-grid">${others.map(card).join('')}</div>
-    <h2>Cidadela de Jade</h2><div class="grid npc-grid">${citadel.map(card).join('')}</div>`;
+    <h2>Cidadela de Jade</h2><div class="grid npc-grid">${citadel.map(card).join('')}</div>
+    <h2>Porto Noturno</h2><div class="grid npc-grid">${harbor.map(card).join('')}</div>`;
 }
 
 export function npcPage(id: string): string | null {
@@ -246,7 +276,7 @@ export function npcPage(id: string): string | null {
   const qs = questsOfNpc(id);
   const pic = n.portrait ? `<img class="portrait" src="../sprites/${n.portrait}" alt="">` : spriteHtml(n.sheet, 'big');
   return `<a class="back" href="#/npcs">‹ NPCs</a>
-    <div class="detail-head">${pic}<div><h1>${esc(n.name)}</h1><div class="sub">${esc(n.role)} · ${n.id === 'caminhos' ? 'Vila das Nuvens e Cidadela de Jade' : placeName(n)}</div></div></div>
+    <div class="detail-head">${pic}<div><h1>${esc(n.name)}</h1><div class="sub">${esc(n.role)} · ${n.id === 'caminhos' ? 'Vila das Nuvens, Cidadela de Jade e Porto Noturno' : placeName(n)}</div></div></div>
     <section class="panel"><h2>O que faz</h2>${n.does()}</section>
     ${qs.length ? `<section class="panel"><h2>Missões</h2>${n.sect ? '<p class="muted">Missões do “mestre” são passadas pelo mestre da <i>sua</i> seita.</p>' : ''}${questList(qs, id)}</section>` : ''}
     ${lines.length ? `<section class="panel"><h2>Falas</h2><ol class="lines">${lines.map((l) => `<li class="lore">“${esc(l)}”</li>`).join('')}</ol></section>` : ''}`;
@@ -258,17 +288,17 @@ function jeweler(): string {
     .map((t) => esc(t.name))
     .join(', ');
   return `<p>Vende gemas de nível ${GEM_CFG.levelNames[0]} (${names}) por <b>${GEM_CFG.price} ouro</b> cada e funde ${GEM_CFG.fuse} gemas iguais em
-    1 do nível seguinte. Por enquanto fica na <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Ver ${gemsLink}.</p>
+    1 do nível seguinte. Fica na joalheria do bairro nordeste do <a href="#/mapa/porto">Porto Noturno</a>. Ver ${gemsLink}.</p>
     <h3>Sempre à venda</h3><ul class="shop">${shopRow('po_estrela', GEM_CFG.starDustPrice)}</ul>`;
 }
 function antiquary(): string {
   return `<p>Vende relíquias comuns e raras para o novo espaço de relíquia do personagem (nível 50). As lendárias só caem de
-    chefes. Por enquanto fica na <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Veja todas em
+    chefes. Fica no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>, entre o jardim e a arena. Veja todas em
     <a href="#/mecanicas/reliquias">Relíquias</a>.</p>`;
 }
 function masterSmith(): string {
   const s = GEM_CFG.socketsByRarity;
   return `<p>Abre encaixes nos equipamentos (comum ${s.comum}, incomum ${s.incomum}, raro ${s.raro}, épico ${s.epico}), coloca e retira gemas.
-    Retirar devolve a gema e custa ${Math.round(GEM_CFG.removeCostPct * 100)}% do valor dela. Por enquanto fica na
-    <a href="#/mapa/cidadela">Cidadela de Jade</a>, até o Porto Noturno abrir. Ver ${gemsLink}.</p>`;
+    Retirar devolve a gema e custa ${Math.round(GEM_CFG.removeCostPct * 100)}% do valor dela. Fica na forja-mestre do
+    bairro nordeste do <a href="#/mapa/porto">Porto Noturno</a>. Ver ${gemsLink}.</p>`;
 }

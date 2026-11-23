@@ -21,6 +21,8 @@ Música (CC0):
 - gruta (masmorra Desfiladeiro do Gelo Eterno): "Frozen Desert" — Dizzy Crow — https://opengameart.org/content/frozen-desert-112
 - mosteiro (masmorra Mosteiro Profanado): "Epic Endgame Cinematic" — cynicmusic — https://opengameart.org/content/epic-endgame-cinematic
 - covil (masmorra Covil dos Bandidos): "Battle Theme A" — cynicmusic — https://opengameart.org/content/battle-theme-a
+- porto (Porto Noturno, LICENÇA CC-BY 4.0, exige crédito): "Samurai Nights" (Samurai-Nights-Demo.mp3, volume igualado
+  a -20 LUFS) — Majadroid (Maik Hoffmann) — https://opengameart.org/content/samurai-nights — https://creativecommons.org/licenses/by/4.0/
 - trial: "Epic Boss Battle" (versão em loop) — Juhani Junkala (publicada por SubspaceAudio) — https://opengameart.org/content/boss-battle-music
   (trocadas em 20/11/2026; as duas com o mesmo volume, -20 LUFS)
 

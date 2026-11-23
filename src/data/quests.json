@@ -464,6 +464,61 @@
       "offer": "O último senhor do Palácio Celeste nunca morreu: chamam-no de Imperador Carmesim. É ele quem acende o vale e manda as cinzas contra a nossa muralha. Suba ao Salão do Trono e termine o que as quatro seitas não conseguiram. Cuidado com o golpe em linha: perto da metade, ele chama os guardas e o golpe se abre em leque.",
       "goal": "Derrote o Imperador Carmesim",
       "done": "O trono está vazio e a fumaça baixou. As quatro seitas vão contar esta história por mil anos. Vista esta túnica do palácio: a Cidadela é sua casa, mestre."
+    },
+    {
+      "id": "luzes_do_porto",
+      "giver": "governador",
+      "turnIn": "guarda_porto",
+      "minLevel": 50,
+      "objective": {
+        "type": "reach",
+        "map": "porto"
+      },
+      "reward": {
+        "xp": 400000,
+        "gold": 15000
+      },
+      "name": "As luzes do porto",
+      "offer": "Você chegou ao topo do caminho, mestre. Ao sul da Cidadela, depois do portão que mantínhamos fechado, fica o Porto Noturno: uma cidade onde as lanternas nunca se apagam. O portão sul agora se abre para você. Apresente-se ao guarda de lá.",
+      "goal": "Chegue ao Porto Noturno",
+      "done": "Então é você que o Governador mandou. Bem-vindo ao Porto Noturno. Pegue este ouro: aqui tudo custa mais caro, até a luz."
+    },
+    {
+      "id": "bairros_do_porto",
+      "giver": "guarda_porto",
+      "turnIn": "mestre_cais",
+      "minLevel": 50,
+      "objective": {
+        "type": "talk",
+        "npc": "mestre_cais"
+      },
+      "reward": {
+        "xp": 400000,
+        "gold": 20000
+      },
+      "name": "Os bairros do porto",
+      "offer": "Antes de qualquer coisa, conheça a cidade. Siga a avenida até a praça; o estábulo fica a noroeste, a forja-mestre e a joalheria a nordeste, o antiquário e a arena ao sul. No fim de tudo fica o cais. Procure o Mestre do Cais: ele sabe de tudo o que entra e sai daqui.",
+      "goal": "Fale com o Mestre do Cais",
+      "done": "O guarda mandou você dar a volta na cidade inteira só para chegar aqui? Típico. Ao menos agora você sabe onde fica cada coisa."
+    },
+    {
+      "id": "cais_ameacado",
+      "giver": "mestre_cais",
+      "turnIn": "mestre_cais",
+      "minLevel": 50,
+      "objective": {
+        "type": "kill",
+        "monster": "guarda_celeste",
+        "count": 20
+      },
+      "reward": {
+        "xp": 450000,
+        "gold": 40000
+      },
+      "name": "Carga do palácio",
+      "offer": "As caravanas que descem das ruínas do Palácio Celeste com seda e jade para os juncos estão sendo atacadas. Os guardas celestes ainda defendem o palácio como se o imperador estivesse vivo. Derrote 20 deles e as caravanas voltam a chegar ao cais.",
+      "goal": "Derrote guardas celestes",
+      "done": "As caravanas chegaram inteiras, e os juncos já estão carregados. O dono da carga mandou esta bolsa de ouro: no Porto, gratidão se paga em moedas."
     }
   ]
 }

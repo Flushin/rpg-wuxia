@@ -1,0 +1,64 @@
+{
+ "name": "npc_antiquario",
+ "model": ".cache/kaykit/Characters/gltf/Mage.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Wand",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "mage_texture",
+  "cells": {
+   "0,1": [
+    110,
+    78,
+    50
+   ],
+   "2,1": [
+    214,
+    172,
+    64
+   ],
+   "7,1": [
+    60,
+    44,
+    32
+   ],
+   "2,2": [
+    140,
+    100,
+    64
+   ],
+   "1,0": [
+    220,
+    220,
+    220
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

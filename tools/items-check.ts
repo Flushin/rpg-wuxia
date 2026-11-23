@@ -29,7 +29,7 @@ const ok = (c: boolean, m: string) => {
   } else console.log('  ok:', m);
 };
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'floresta', 'ruinas', 'cidadela'])
+for (const id of ['cidade', 'floresta', 'ruinas', 'cidadela', 'porto'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const run = (w: World, s: number) => {
   for (let i = 0; i < s * 60; i++) w.tick(1 / 60);
@@ -604,7 +604,7 @@ console.log('\n== cadeado e recompra ==');
 
 console.log('\n== gemas e encaixes ==');
 {
-  const w = mk('lamina', 50, 'cidadela');
+  const w = mk('lamina', 50, 'porto');
   const rubi = gemId('rubi', 1);
   ok(Object.keys(GEMS).length === 35 && GEMS[gemId('rubi', 5)].stats.physAtk === 56, '7 tipos × 5 níveis');
   ok(w.buyGem(rubi)?.code === 'talkToJeweler', 'comprar exige o Joalheiro');
@@ -703,9 +703,9 @@ console.log('\n== save ==');
 // ---------- relíquias (Porto Noturno, etapa 4) ----------
 console.log('\n== relíquias ==');
 {
-  const w = mk('lamina', 50, 'cidadela');
+  const w = mk('lamina', 50, 'porto');
   const lao = w.npcs.find((n) => n.npcId === 'antiquario');
-  ok(!!lao && w.npcRole(lao) === 'antiquario', 'Antiquário Lao na Cidadela');
+  ok(!!lao && w.npcRole(lao) === 'antiquario', 'Antiquário Lao no Porto Noturno');
   w.gold = 1_000_000;
   ok(w.buyRelic('taca_sangue')?.code === 'talkToAntiquary', 'só compra falando com o antiquário');
   w.openNpc = lao!;
@@ -730,12 +730,12 @@ console.log('\n== relíquias ==');
   });
   ok(old.relicsOwned.join() === 'taca_sangue' && old.relic === null, 'save saneado (id inválido e não possuída)');
   ok(w.equipRelic(null) === null && w.player.derived.physAtk === atk0, 'desequipar volta ao normal');
-  const low = mk('lamina', 30, 'cidadela');
+  const low = mk('lamina', 30, 'porto');
   low.openNpc = low.npcs.find((n) => n.npcId === 'antiquario')!;
   low.gold = 1_000_000;
   ok(low.buyRelic('sino_bronze')?.code === 'needLevel', 'exige nível 50');
   // drop de lendária: chance por chefe com o jogador no nível 50
-  const d = mk('lamina', 50, 'cidadela') as World & { rollRelicDrop: () => void; rng: { next: () => number } };
+  const d = mk('lamina', 50, 'porto') as World & { rollRelicDrop: () => void; rng: { next: () => number } };
   d.rng = { next: () => 0 };
   d.rollRelicDrop();
   ok(d.relicsOwned.length === 1 && RELICS[d.relicsOwned[0]].rarity === 'lendaria', 'chefe pode dar lendária');

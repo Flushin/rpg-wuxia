@@ -761,7 +761,7 @@
       "guarda_jade": {
         "name": "Jade Guard",
         "lines": [
-          "The east gate is open again, but only for those who reached level 30. The south and west gates stay closed; for anywhere else, use the Master's roads on the golden circle.",
+          "The east gate is open again, but only for those who reached level 30. The south gate leads to the Night Harbor, only from level 50; the west gate stays closed. For anywhere else, use the Master's roads on the golden circle.",
           "Jade armor? It is just the color of the silk. But don't tell anyone outside the wall.",
           "From the top of the towers, on a clear night, you can see the lanterns of Cloud Village far below."
         ]
@@ -817,7 +817,7 @@
       "estabulo": {
         "name": "Stablemaster Ma",
         "lines": [
-          "Fine horses, fed on mountain grass. Out of combat they run like the wind.",
+          "Fine horses, fed on mountain grass and brought by boat to the Harbor. Out of combat they run like the wind.",
           "Once you own a horse, it follows you everywhere: you mount by yourself a few seconds after a fight ends."
         ]
       },
@@ -835,6 +835,40 @@
           "Want sockets in your gear? I open them, set gems and take them out. Removing costs: the stone comes out whole, but the work is fine.",
           "A common or uncommon item holds one socket; rare, two; epic, three. The third only opens with Stardust.",
           "An item with gems cannot be sold or salvaged. Bring it here first and I will take the stones out."
+        ]
+      },
+      "guarda_porto": {
+        "name": "Gate Guard",
+        "lines": [
+          "Welcome to the Night Harbor. The sun never shows here: the lanterns rule. If you came from the Citadel, the gate behind you leads back.",
+          "We only let in those who reached level 50. The roads outside are too dangerous for anyone else.",
+          "Lost? The square is at the end of the avenue, with the Master of Roads on the golden circle. The quay and the market are down by the sea."
+        ]
+      },
+      "mestre_cais": {
+        "name": "Harbor Master",
+        "lines": [
+          "The junks come from lands that are not even on the Citadel's maps. Every sail brings goods, and sometimes trouble.",
+          "Three canals cut the city down to the sea. Cross on the bridges; whoever tries to swim ends up as a fisherman's tale.",
+          "One day these boats will carry heroes beyond the horizon. For now, they carry tea, silk and precious stones."
+        ]
+      },
+      "vendedor_porto1": {
+        "name": "Vendor Hua",
+        "lines": [
+          "Fresh potions, brewed by lantern light! Cheaper than at the Citadel? No. Closer to the sea? Absolutely."
+        ]
+      },
+      "vendedor_porto2": {
+        "name": "Vendor Bo",
+        "lines": [
+          "Dried fish, jasmine tea and potions for the road. The night market never closes."
+        ]
+      },
+      "vendedor_porto3": {
+        "name": "Vendor Lan",
+        "lines": [
+          "My grandmother sold on this very quay. Take a potion; the great bosses won't wait for you to get thirsty."
         ]
       }
     }
@@ -884,7 +918,8 @@
     "Serpente de Jade": "Jade Serpent",
     "Grou Espiritual": "Spirit Crane",
     "Guardião de Jade": "Jade Guardian",
-    "Senhor da Névoa": "Lord of the Mist"
+    "Senhor da Névoa": "Lord of the Mist",
+    "Porto Noturno": "Night Harbor"
   },
   "quests": {
     "chain": [
@@ -1031,6 +1066,24 @@
         "offer": "The last lord of the Celestial Palace never died: they call him the Crimson Emperor. He is the one who sets the valley ablaze and sends the ash against our wall. Climb to the Throne Hall and finish what the four sects could not. Beware his line strike: near half health he calls the guards and the strike spreads into a fan.",
         "goal": "Defeat the Crimson Emperor",
         "done": "The throne is empty and the smoke has settled. The four sects will tell this story for a thousand years. Wear this palace tunic: the Citadel is your home, master."
+      },
+      {
+        "name": "The harbor lights",
+        "offer": "You have reached the top of the road, master. South of the Citadel, past the gate we kept shut, lies the Night Harbor: a city where the lanterns never go out. The south gate now opens for you. Report to the guard there.",
+        "goal": "Reach the Night Harbor",
+        "done": "So you are the one the Governor sent. Welcome to the Night Harbor. Take this gold: everything costs more here, even the light."
+      },
+      {
+        "name": "The harbor districts",
+        "offer": "Before anything else, get to know the city. Follow the avenue to the square; the stable is to the northwest, the master forge and the jeweler to the northeast, the antique shop and the arena to the south. At the very end lies the quay. Look for the Harbor Master: he knows everything that comes and goes.",
+        "goal": "Talk to the Harbor Master",
+        "done": "The guard made you walk around the whole city just to get here? Typical. At least now you know where everything is."
+      },
+      {
+        "name": "Palace cargo",
+        "offer": "The caravans that come down from the Celestial Palace ruins with silk and jade for the junks are being attacked. The celestial guards still defend the palace as if the emperor were alive. Defeat 20 of them and the caravans will reach the quay again.",
+        "goal": "Defeat celestial guards",
+        "done": "The caravans arrived intact, and the junks are already loaded. The cargo's owner sent this purse of gold: in the Harbor, gratitude is paid in coins."
       }
     ]
   },
@@ -1055,17 +1108,20 @@
   "novidades": {
     "proxima": [
       {
-        "texto": "Gems and sockets: the Jeweler sells 7 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx and Topaz) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems. For now both are in the Jade Citadel."
+        "texto": "Gems and sockets: the Jeweler sells 7 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx and Topaz) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems. Both are in the northeast district of the Night Harbor."
       },
       {
         "texto": "Max level 50: XP keeps coming after level 40, and each level from 41 to 50 grants 4 attribute points. Characters already at 40 start the level 41 bar from zero."
       },
       {
-        "texto": "Mounts: Stablemaster Ma, at the new stable in the Jade Citadel, sells a horse for 50,000 gold. Out of combat you mount by yourself and move 30% faster; when combat starts, you dismount at once.",
+        "texto": "Mounts: Stablemaster Ma, at the Night Harbor stable, sells a horse for 50,000 gold. Out of combat you mount by yourself and move 30% faster; when combat starts, you dismount at once.",
         "wiki": "npc/estabulo"
       },
       {
-        "texto": "Relics: a new equipment slot on your character, from level 50. Antiquarian Lao, in the Jade Citadel, sells common and rare relics with stats and a unique effect (life steal, attack speed, cooldown or health). Legendary ones only drop from bosses."
+        "texto": "Relics: a new equipment slot on your character, from level 50. Antiquarian Lao, in the Night Harbor, sells common and rare relics with stats and a unique effect (life steal, attack speed, cooldown or health). Legendary ones only drop from bosses."
+      },
+      {
+        "texto": "Night Harbor: a new level 50 city, four times larger than the others and always at night, with lanterns, three canals with bridges, a night market on the quay and junks at sea. Enter through the south gate of the Jade Citadel or with the Master of Roads. It has the stable, the master forge, the jeweler, the antique shop, an arena with the Trial portal, three new quests and the music \"Samurai Nights\" by Majadroid."
       }
     ],
     "versoes": [
@@ -1324,7 +1380,7 @@
   "mounts": {
     "cavalo": {
       "name": "Horse",
-      "desc": "A bay horse from the Citadel stables. Carries you faster along the roads; you dismount when combat starts."
+      "desc": "A bay horse from the Night Harbor stables. Carries you faster along the roads; you dismount when combat starts."
     }
   },
   "relics": {

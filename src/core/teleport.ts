@@ -33,6 +33,7 @@ export const TELEPORT_DESTS: TeleportDest[] = [
   // ninguém fica preso lá: o Pergaminho de Retorno não funciona dentro de uma cidade)
   { map: 'cidade', region: CITIES, minLevel: 0, cost: 0 },
   { map: 'cidadela', region: CITIES, minLevel: 30 },
+  { map: 'porto', region: CITIES, minLevel: 50 },
   { map: 'floresta', region: EAST, minLevel: 0 },
   { map: 'ruinas', region: EAST, minLevel: 0 },
   { map: 'montanha', region: NORTH, minLevel: 10 },

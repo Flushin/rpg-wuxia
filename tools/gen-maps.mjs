@@ -2,9 +2,10 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import zlib from 'node:zlib';
 
-const W = 32,
-  H = 32,
-  TW = 64,
+// W e H mudam só durante a geração de um mapa maior (Porto Noturno, 96×96); os outros mapas são 32×32
+let W = 32,
+  H = 32;
+const TW = 64,
   TH = 32;
 const TILES = [
   { name: 'grass', walkable: true, color: [86, 140, 72] },
@@ -26,9 +27,11 @@ const TILES = [
   { name: 'lava', walkable: false, color: [200, 70, 30] },
   { name: 'marble', walkable: true, color: [220, 216, 206] },
   { name: 'cloud', walkable: false, color: [236, 240, 248] },
+  // nível 50 (Porto Noturno): tábuas do cais e das pontes, também no fim
+  { name: 'deck', walkable: true, color: [128, 92, 62] },
 ];
-const [G, P, WA, T, HS, PL, RU, PI, SN, PN, BB, AS, BS, LV, MB, CL] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+const [G, P, WA, T, HS, PL, RU, PI, SN, PN, BB, AS, BS, LV, MB, CL, DK] = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 ];
 const walkable = (id) => TILES[id - 1].walkable;
 
@@ -1335,6 +1338,8 @@ function cidadela() {
   objs.push(
     area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, { target: 'vale', targetX: 2.5, targetY: 16, minLevel: 30 }),
   );
+  // nível 50: o portão sul leva ao Porto Noturno (portal na ponta sul da avenida, diante do portão)
+  objs.push(area('Porto Noturno', 'portal', 15, 28, 2, 1, { target: 'porto', targetX: 48, targetY: 6, minLevel: 50 }));
 
   // norte: salão principal no fim da avenida, pagode ao lado
   building('jade_salao', 13, 3, 6, 4);
@@ -1412,15 +1417,7 @@ function cidadela() {
   npc('Mestre Ferreiro Lin', 'ferreira_lin', 6.5, 13.5, { role: 'ferreiro' });
   npc('Boticário Wen', 'boticario_wen', 25.5, 13.5, { role: 'vendedor' });
   npc('Mercadora Jin', 'mercadora_jin', 25.6, 9.5, { role: 'mercador' });
-  // PROVISÓRIO (Porto Noturno, etapa 2): Joalheiro e Ferreiro-mestre ficam na Cidadela até o mapa do Porto existir
-  npc('Joalheiro Yu', 'joalheiro', 9.5, 13.5, { role: 'joalheiro' });
-  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 9.5, 17.5, { role: 'ferreiro_mestre' });
-  // conversa: governador na escadaria do salão, monge diante do pagode, guardas junto dos portões
   npc('Governador Bai', 'governador', 16, 7.5);
-  // estábulo (montarias): Cavalariço Ma junto da praça oeste, ao sul do Mestre dos Caminhos
-  npc('Cavalariço Ma', 'estabulo', 9.5, 19.5, { role: 'estabulo' });
-  // PROVISÓRIO (Porto Noturno, etapa 4): Antiquário Lao (relíquias) entre o Joalheiro e o Ferreiro-mestre
-  npc('Antiquário Lao', 'antiquario', 9.5, 15.5, { role: 'antiquario' });
   npc('Monge do Pagode', 'monge_pagode', 22.5, 7.5, { role: 'meridianos' });
   for (const [x, y] of [
     [13.5, 28.4],
@@ -1456,6 +1453,236 @@ function cidadela() {
   return tiled('Cidadela de Jade', gr, objs);
 }
 
+// ---- porto ----
+// Porto Noturno (23/11/2026, nível 50): cidade 96×96 do fim do jogo, sempre de noite (véu escuro e halos das
+// lanternas, src/render/nightView.ts). Planta em docs/roadmap/cidade-porto-planta.svg (1 quadrado = 8×8 tiles):
+// portão no norte (portal para a Cidadela de Jade), avenidas em cruz, praça central com o Mestre dos Caminhos;
+// bairros: estábulo com cercado (noroeste), forja-mestre e joalheria (nordeste), casa de chá, jardim com lago,
+// antiquário e banco/arena com o portal do Trial (sul); três canais com pontes de madeira; cais com o mercado noturno
+// e quatro trapiches; mar ao sul com juncos (barcos) balançando. Casas e enfeites no atlas 'porto'
+// (tools/sprites/render_porto.py); muralha e torres do atlas 'cidadela'.
+const PORTO_W = 96;
+function porto() {
+  W = H = PORTO_W;
+  const rnd = rngFn(50);
+  const gr = makeGrid(G, G);
+  const objs = [];
+  const used = new Set();
+  const reserve = (i, j, pad = 0) => {
+    for (let y = j - pad; y <= j + pad; y++) for (let x = i - pad; x <= i + pad; x++) used.add(y * W + x);
+  };
+  const free = (i, j, w, h, pad = 1) => {
+    for (let y = j - pad; y < j + h + pad; y++)
+      for (let x = i - pad; x < i + w + pad; x++)
+        if (x < 0 || y < 0 || x >= W || y >= H || gr.get(x, y) !== G || used.has(y * W + x)) return false;
+    return true;
+  };
+  const building = (sprite, i, j, w, h, atlas = 'porto') => {
+    gr.rect(i, j, w, h, HS);
+    for (let y = j - 1; y <= j + h; y++) for (let x = i - 1; x <= i + w; x++) reserve(x, y);
+    objs.push(area(sprite, 'building', i, j, w, h, { sprite, atlas }));
+  };
+  const decor = (sprite, x, y, extra = {}) => {
+    reserve(Math.floor(x), Math.floor(y), 0);
+    objs.push(point(sprite, 'decor', x, y, { sprite, atlas: 'porto', ...extra }));
+  };
+  const npc = (name, id, x, y, extra = {}) => {
+    reserve(Math.floor(x), Math.floor(y), 1);
+    objs.push(point(name, 'npc', x, y, { npc: id, ...extra }));
+  };
+  // trecho de muralha de n tiles: peças de 11, 4 e 1 (atlas cidadela e porto)
+  const wallRun = (axis, a, b, fixed) => {
+    let k = a;
+    while (k <= b) {
+      const n = b - k + 1;
+      const len = n >= 11 ? 11 : n >= 4 ? 4 : 1;
+      const [i, j, w, h] = axis === 'i' ? [k, fixed, len, 1] : [fixed, k, 1, len];
+      building(`muralha_${axis}${len}`, i, j, w, h, len === 1 ? 'porto' : 'cidadela');
+      k += len;
+    }
+  };
+
+  // mar ao sul, cais de pedra e trapiches de tábuas
+  gr.rect(0, 82, W, H - 82, WA);
+  gr.rect(1, 74, W - 2, 8, PL);
+  for (const x of [12, 30, 62, 80]) gr.rect(x, 82, 2, 5, DK);
+  // avenidas em cruz e praça central
+  gr.rect(45, 3, 6, 71, PL);
+  gr.rect(2, 41, 92, 4, PL);
+  gr.disc(47.5, 42.5, 8, PL);
+  // vielas (terra batida)
+  gr.rect(3, 19, 40, 2, P);
+  gr.rect(22, 3, 2, 36, P);
+  gr.rect(53, 20, 38, 2, P);
+  gr.rect(72, 3, 2, 36, P);
+  gr.rect(9, 47, 2, 26, P);
+  gr.rect(62, 47, 2, 26, P);
+  gr.rect(84, 47, 2, 13, P);
+  // três canais até o mar, com pontes de tábuas (o tile 'deck' anda; o desenho da ponte fica por cima, achatado)
+  gr.rect(20, 45, 3, 37, WA);
+  gr.rect(73, 45, 2, 37, WA);
+  gr.rect(92, 22, 2, 60, WA);
+  const bridge = (x, y, w, h, sprite, cx, cy) => {
+    gr.rect(x, y, w, h, DK);
+    decor(sprite, cx, cy, { flat: 1 });
+  };
+  for (const y of [52, 63, 76]) bridge(20, y, 3, 2, 'ponte_i', 21.5, y + 1);
+  for (const y of [52, 64, 76]) bridge(73, y, 2, 2, 'ponte_i', 74, y + 1);
+  bridge(92, 41, 2, 4, 'ponte_i', 93, 42);
+  bridge(92, 76, 2, 2, 'ponte_i', 93, 77);
+  // jardim: lago com ponte comprida no meio
+  for (let j = 54; j <= 66; j++)
+    for (let i = 26; i <= 42; i++) if (((i - 34) / 7) ** 2 + ((j - 60) / 4.6) ** 2 <= 1) gr.set(i, j, WA);
+  gr.rect(26, 59, 17, 2, DK);
+  for (const x of [28.5, 31.5, 34.5, 37.5, 40.5]) decor('ponte_i', x, 60, { flat: 1 });
+
+  // muralha: norte com o portão no meio, oeste e leste até o cais; torres nos cantos
+  building('muralha_torre', 1, 1, 2, 2, 'cidadela');
+  building('muralha_torre', 93, 1, 2, 2, 'cidadela');
+  building('muralha_torre', 1, 72, 2, 2, 'cidadela');
+  building('muralha_torre', 93, 72, 2, 2, 'cidadela');
+  wallRun('i', 3, 45, 1);
+  building('portao_muralha_i', 46, 1, 4, 2, 'cidadela');
+  wallRun('i', 50, 92, 1);
+  wallRun('j', 3, 71, 1);
+  wallRun('j', 3, 21, 94);
+  wallRun('j', 22, 71, 94);
+  // portão: volta à Cidadela de Jade (portal livre; a ida, na Cidadela, pede nível 50)
+  objs.push(area('Cidadela de Jade', 'portal', 46, 3, 4, 1, { target: 'cidadela', targetX: 16, targetY: 26.5 }));
+  reserve(48, 4, 2);
+
+  // bairros: casas da planta
+  building('porto_estabulo', 25, 22, 6, 4);
+  for (const [s2, i, j] of [
+    ['cerca_i6', 25, 28],
+    ['cerca_i6', 31, 28],
+    ['cerca_i6', 25, 36],
+    ['cerca_i6', 31, 36],
+    ['cerca_j6', 24, 29],
+    ['cerca_j6', 37, 29],
+  ])
+    building(s2, i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6);
+  for (let y = 29; y <= 35; y++) for (let x = 25; x <= 36; x++) reserve(x, y);
+  building('porto_forja', 75, 8, 5, 4);
+  building('porto_joalheria', 75, 24, 4, 4);
+  building('porto_casa_cha', 11, 56, 5, 4);
+  building('porto_antiquario', 65, 55, 4, 4);
+  building('porto_banco', 78, 50, 5, 4);
+  // arena do banco: pátio de lajes com o portal do Trial no meio
+  gr.rect(77, 60, 14, 12, PL);
+  for (let y = 59; y <= 72; y++) for (let x = 76; x <= 91; x++) reserve(x, y);
+  objs.push(area('Trial', 'portal', 83, 65, 2, 2, { menu: 'trial', scale: 1.1 }));
+
+  // praça: Mestre dos Caminhos no círculo dourado (oeste da praça)
+  npc('Mestre dos Caminhos', 'caminhos', 44.5, 40.5);
+  objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
+  // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
+  npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
+  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.5, 13, { role: 'ferreiro_mestre' });
+  npc('Joalheiro Yu', 'joalheiro', 77, 29, { role: 'joalheiro' });
+  npc('Antiquário Lao', 'antiquario', 67, 60, { role: 'antiquario' });
+  npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
+  npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
+  npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
+  npc('Vendedora Hua', 'vendedor_porto1', 27, 77, { role: 'vendedor' });
+  npc('Vendedor Bo', 'vendedor_porto2', 37, 77, { role: 'vendedor' });
+  npc('Vendedora Lan', 'vendedor_porto3', 57, 77, { role: 'vendedor' });
+
+  // cais: barracas do mercado noturno, estacas nas pontas dos trapiches e postes de lanterna
+  for (const [s2, i] of [
+    ['barraca_vermelha', 26],
+    ['barraca_ambar', 36],
+    ['barraca_vermelha', 56],
+    ['barraca_ambar', 66],
+    ['barraca_vermelha', 14],
+  ])
+    building(s2, i, 74, 2, 2);
+  for (const x of [12, 30, 62, 80]) decor('estacas_cais', x + 1, 86.5, { light: 1 });
+  const post = (x, y) => decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
+  for (let x = 4; x < 92; x += 8) if (gr.get(x, 80) === PL) post(x, 80);
+  for (let y = 7; y < 72; y += 8) {
+    if (Math.abs(y - 42) < 9) continue;
+    post(44, y);
+    post(51, y);
+  }
+  for (let x = 6; x < 92; x += 10) {
+    if (Math.abs(x - 47) < 9 || gr.get(x, 40) !== G) continue;
+    post(x, 40);
+    post(x, 45);
+  }
+  for (const [x, y] of [
+    [76, 60],
+    [90, 60],
+    [76, 71],
+    [90, 71],
+    [39, 42],
+    [56, 42],
+    [47, 34],
+    [47, 51],
+  ])
+    post(x, y);
+
+  // mar: juncos (barcos) parados e balançando
+  for (const [s2, x, y] of [
+    ['junco_a', 8, 89],
+    ['junco_b', 24, 91.5],
+    ['junco_a', 45, 88],
+    ['junco_b', 66, 92],
+    ['junco_a', 85, 89.5],
+    ['junco_b', 91, 93.5],
+  ])
+    objs.push(point(s2, 'decor', x, y, { sprite: s2, atlas: 'porto', boat: 1 }));
+
+  // casas comuns enchendo os quarteirões (sem encostar em rua, praça nem nas casas da planta)
+  const HOUSES = [
+    ['porto_casa_4x3', 4, 3],
+    ['porto_casa_3x4', 3, 4],
+    ['porto_casa_3x3', 3, 3],
+    ['porto_casa_5x4', 5, 4],
+  ];
+  let houses = 0;
+  for (let j = 3; j < 73; j++)
+    for (let i = 3; i < 92; i++) {
+      if (rnd() > 0.5) continue;
+      const [sp, w, h] = HOUSES[Math.floor(rnd() * HOUSES.length)];
+      if (!free(i, j, w, h, 1)) continue;
+      // jardim: só árvores
+      if (i + w > 24 && i < 44 && j + h > 46 && j < 73) continue;
+      building(sp, i, j, w, h);
+      houses++;
+    }
+  // árvores (cerejeiras e carvalhos) nas sobras de grama longe das ruas
+  let trees = 0;
+  for (let j = 3; j < 73; j++)
+    for (let i = 2; i < 93; i++) {
+      if (gr.get(i, j) !== G || used.has(j * W + i) || rnd() > 0.22) continue;
+      let nearRoad = false;
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) if (gr.get(i + dx, j + dy) !== G) nearRoad = true;
+      if (nearRoad) continue;
+      gr.set(i, j, T);
+      trees++;
+    }
+  const seen = sealUnreachable(gr, 48, 6, HS);
+  for (const [x, y, what] of [
+    [48, 42, 'praça'],
+    [28, 27, 'estábulo'],
+    [77, 13, 'forja'],
+    [77, 29, 'joalheria'],
+    [13, 61, 'casa de chá'],
+    [67, 60, 'antiquário'],
+    [83, 64, 'arena'],
+    [31, 80, 'cais'],
+    [31, 85, 'trapiche'],
+  ])
+    if (!seen.has(y * W + x)) throw new Error(`porto: ${what} inalcançável (${x},${y})`);
+  objs.unshift(point('player', 'spawn', 48.5, 6.5));
+  console.log(`porto: ${seen.size} tiles andáveis, ${houses} casas, ${trees} árvores, ${objs.length} objetos`);
+  const map = tiled('Porto Noturno', gr, objs);
+  W = H = 32;
+  return map;
+}
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
@@ -1470,5 +1697,6 @@ writeFileSync('public/maps/pico.json', JSON.stringify(pico()));
 writeFileSync('public/maps/cidadela.json', JSON.stringify(cidadela()));
 writeFileSync('public/maps/vale.json', JSON.stringify(vale()));
 writeFileSync('public/maps/palacio.json', JSON.stringify(palacio()));
+writeFileSync('public/maps/porto.json', JSON.stringify(porto()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

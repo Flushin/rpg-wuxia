@@ -1,0 +1,73 @@
+{
+ "name": "npc_ferreiro_mestre",
+ "model": ".cache/kaykit/Characters/gltf/Knight.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "1H_Sword_Offhand",
+  "2H_Sword",
+  "Badge_Shield",
+  "Icosphere",
+  "Rectangle_Shield",
+  "Round_Shield",
+  "Spike_Shield",
+  "Knight_Helmet"
+ ],
+ "samples": 24,
+ "texture": {
+  "image": "knight_texture",
+  "cells": {
+   "1,0": [
+    35,
+    30,
+    28
+   ],
+   "0,1": [
+    120,
+    36,
+    30
+   ],
+   "2,2": [
+    120,
+    36,
+    30
+   ],
+   "4,1": [
+    214,
+    172,
+    64
+   ],
+   "1,1": [
+    60,
+    52,
+    48
+   ],
+   "0,2": [
+    60,
+    52,
+    48
+   ]
+  }
+ },
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
+ "px_per_unit": 24,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "portrait": "idle",
+ "dir_list": [
+  0
+ ]
+}

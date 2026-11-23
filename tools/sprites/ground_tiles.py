@@ -98,6 +98,21 @@ def ice(seed):
     out = np.zeros((H, W, 4), np.uint8)
     out[..., :3] = np.clip(col, 0, 255); out[..., 3] = diamond_mask() * 255
     return Image.fromarray(out)
+def planks(base, seed, n=4):
+    """Tábuas de madeira (cais e pontes do Porto Noturno): n tábuas por tile ao longo de i, com frestas escuras."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:H, 0:W]
+    X = (x + 0.5) / W * 2 - 1; Y = (y + 0.5) / H * 2 - 1
+    j = (Y - X + 1) / 2 * n
+    fj = np.floor(np.clip(j, 0, n - 1e-6)).astype(int)
+    jit = rng.normal(0, 0.07, n)[fj]
+    grain = rng.normal(0, 0.05, (H, W))
+    col = np.array(base, np.float32)[None, None, :] * (1 + jit[..., None] + grain[..., None])
+    col[np.minimum(j % 1, 1 - j % 1) < 0.06] = (52, 36, 26)
+    img = np.zeros((H, W, 4), np.uint8)
+    img[..., :3] = np.clip(col, 0, 255)
+    img[..., 3] = diamond_mask() * 255
+    return Image.fromarray(img)
 out = sys.argv[1]
 tiles = {
   'grass1': tile((96, 150, 72), 0.16, 1),
@@ -123,6 +138,9 @@ tiles = {
   'marble1': flagstone((222, 218, 208), 55, grout=(170, 160, 140)),
   'marble2': flagstone((214, 212, 204), 56, grout=(168, 156, 136)),
   'cloud':  tile((150, 172, 212), 0.12, 57, [((246, 248, 255), 0.45), ((196, 212, 240), 0.35)]),
+  # Porto Noturno: tábuas do cais e das pontes, no fim
+  'deck1':  planks((132, 96, 64), 61),
+  'deck2':  planks((124, 90, 60), 62),
 }
 sheet = Image.new('RGBA', (W * len(tiles), H))
 for i, im in enumerate(tiles.values()): sheet.paste(im, (i * W, 0))
