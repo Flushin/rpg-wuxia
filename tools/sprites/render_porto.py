@@ -705,6 +705,111 @@ def harbor_bell():
     box(0, 0, 0, 0.8, 0.3, 0.06, rt.STONE_D)
 
 
+# ---- portal do Trial (arena do banco): pórtico cerimonial imponente com vórtice ----
+JADE = (50, 150, 116)
+LACQ = (150, 30, 28)
+BLOOD = (200, 30, 20)
+CRIMSON = (255, 70, 30)
+
+
+def _ring(x, y, z, R, r, rgb, emit=0.0, sz=1.0):
+    bpy.ops.mesh.primitive_torus_add(major_radius=R, minor_radius=r, location=(x, y, z), major_segments=48)
+    o = bpy.context.object
+    o.rotation_euler = (1.5708, 0, 0)
+    o.scale = (1, sz, 1)
+    o.data.materials.append(rt.mat(rgb, 0.3, emit))
+    return o
+
+
+def trial_gate():
+    """Pórtico do Trial (4x2): plataforma de três degraus, colunas de laca com dragões de jade enrolados, duas vigas
+    com placa dourada, telhado duplo de beirais levantados e um vórtice violeta com anéis de runas no vão."""
+    import math
+    # plataforma em degraus
+    for k, (w, d) in enumerate([(4.0, 2.0), (3.7, 1.7), (3.4, 1.4)]):
+        box(0, 0, k * 0.1, w, d, 0.1, [rt.STONE_D, rt.STONE, (150, 146, 140)][k])
+    for sx in (-1, 1):
+        x = sx * 1.4
+        box(x, 0, 0.3, 0.62, 0.62, 0.32, rt.STONE_D)  # pedestal
+        box(x, 0, 0.62, 0.5, 0.5, 0.08, rt.GOLD, rough=0.35)
+        cyl(x, 0, 0.7, 0.2, 3.3, LACQ, rough=0.4)
+        for z in (0.75, 2.2, 3.85):
+            cyl(x, 0, z, 0.22, 0.07, rt.GOLD, rough=0.3)
+        for k in range(46):  # dragão de jade enrolado na coluna
+            t = k / 45
+            a = t * 3 * 2 * math.pi * sx
+            sphere(x + 0.24 * math.cos(a), 0.24 * math.sin(a), 0.85 + t * 2.9, 0.075 - 0.03 * t, JADE, emit=0.15)
+        sphere(x + 0.24 * math.cos(3 * 2 * math.pi * sx), 0.24 * math.sin(0), 3.82, 0.1, JADE)
+        # lanterna pendurada para fora
+        cyl(x + sx * 0.55, -0.05, 3.05, 0.008, 0.45, WOODW_D)
+        lantern(x + sx * 0.55, -0.05, 2.85, 0.16, LANT)
+    # vigas e placa
+    box(0, 0, 3.55, 3.7, 0.36, 0.22, LACQ, rough=0.4)
+    box(0, 0, 3.95, 4.1, 0.42, 0.24, WOODW_D)
+    for z in (3.55, 3.77):
+        box(0, -0.19, z, 3.6, 0.02, 0.025, rt.GOLD, rough=0.3)
+    box(0, -0.23, 3.36, 1.0, 0.06, 0.78, rt.GOLD, rough=0.3)
+    box(0, -0.27, 3.42, 0.86, 0.03, 0.66, (40, 30, 28))
+    for k in range(2):  # dois ideogramas dourados brilhando
+        for b in range(3):
+            box(-0.18 + k * 0.36, -0.29, 3.5 + b * 0.17, 0.2, 0.01, 0.04, (255, 210, 100), emit=3.0)
+        box(-0.18 + k * 0.36, -0.29, 3.5, 0.04, 0.01, 0.42, (255, 210, 100), emit=3.0)
+    # telhado duplo
+    roof(0, 0, 1.95, 0.32, 4.19, 0.42, ROOF_T, over=0.42, lift=0.32)
+    box(0, 0, 4.55, 1.4, 0.3, 0.3, LACQ)
+    roof(0, 0, 0.75, 0.2, 4.85, 0.36, ROOF_T, over=0.34, lift=0.28)
+    for sx in (-1, 1):
+        sphere(sx * 0.55, 0, 5.28, 0.09, rt.GOLD, emit=0.8)
+    sphere(0, 0, 5.32, 0.13, (255, 200, 90), emit=3.0)
+    # vórtice no vão: abismo escuro no centro, espiral de fogo vermelho-sangue e anéis de runas douradas
+    zc = 1.95
+    o = cyl(0, 0.06, zc, 1.1, 0.04, (40, 6, 6), emit=0.6, verts=48)
+    o.rotation_euler = (1.5708, 0, 0)
+    o.location = (0, 0.06, zc)
+    o.scale = (1, 1.2, 1)
+    for arm in range(5):  # braços finos da espiral, brasa no centro escurecendo em sangue na borda
+        for k in range(36):
+            t = k / 35
+            a = t * 1.7 * math.pi + arm * 2 * math.pi / 5
+            r = 0.18 + t * 0.9
+            c = (int(255 - 90 * t), int(120 - 105 * t), int(40 - 30 * t))
+            sphere(r * math.cos(a), 0.0, zc + 1.2 * r * math.sin(a), 0.018 + 0.03 * t, c, emit=5.0 - 3 * t)
+    o = cyl(0, 0.02, zc, 0.5, 0.03, (120, 10, 10), emit=1.5, verts=32)  # olho do abismo
+    o.rotation_euler = (1.5708, 0, 0)
+    o.location = (0, 0.02, zc)
+    o.scale = (1, 1.2, 1)
+    sphere(0, 0.03, zc, 0.12, (10, 0, 0))
+    _ring(0, -0.02, zc, 1.15, 0.06, rt.GOLD, emit=1.2, sz=1.2)
+    _ring(0, -0.04, zc, 1.05, 0.03, CRIMSON, emit=6.0, sz=1.2)
+    for k in range(12):  # runas em volta
+        a = k * math.pi / 6
+        box(1.15 * math.cos(a), -0.08, zc + 1.38 * math.sin(a) - 0.05, 0.1, 0.02, 0.1, (255, 200, 120), emit=4.0)
+    # aumenta tudo 25% (pórtico maior que as casas em volta)
+    for ob in bpy.context.scene.objects:
+        if ob.type == 'MESH':
+            ob.location = [v * 1.25 for v in ob.location]
+            ob.scale = [v * 1.25 for v in ob.scale]
+
+
+def big_brazier():
+    """Braseiro grande de bronze sobre pedestal de pedra (cantos da arena do Trial); as chamas são partículas no jogo."""
+    import math
+    box(0, 0, 0, 0.7, 0.7, 0.2, rt.STONE_D)
+    box(0, 0, 0.2, 0.5, 0.5, 0.5, rt.STONE)
+    box(0, 0, 0.7, 0.62, 0.62, 0.08, rt.STONE_D)
+    for k in range(4):
+        a = k * math.pi / 2 + math.pi / 4
+        o = cyl(0.2 * math.cos(a), 0.2 * math.sin(a), 0.78, 0.04, 0.4, (120, 84, 40), rough=0.35)
+    cyl(0, 0, 1.08, 0.18, 0.22, (140, 96, 44), r2=0.38, rough=0.35)
+    cyl(0, 0, 1.3, 0.4, 0.05, rt.GOLD, rough=0.3)
+    for k in range(10):
+        a = k * 0.63
+        sphere(0.22 * math.cos(a), 0.22 * math.sin(a), 1.3, 0.09, EMBER, emit=5.0)
+    sphere(0, 0, 1.36, 0.16, (255, 190, 80), emit=6.0)
+    for k in range(4):  # cabeças de dragão nas alças
+        a = k * math.pi / 2
+        sphere(0.42 * math.cos(a), 0.42 * math.sin(a), 1.22, 0.06, JADE)
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -749,6 +854,8 @@ SET = {
     'mesa_registro': (harbor_desk, (2, 1), 1.2),
     'ancora': (anchor_ropes, (1, 1), 1.2),
     'sino_porto': (harbor_bell, (1, 1), 1.9),
+    'portal_trial': (trial_gate, (5, 3), 7.0),
+    'braseiro_grande': (big_brazier, (1, 1), 1.7),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),

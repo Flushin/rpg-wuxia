@@ -64,6 +64,29 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
       out.push(h);
     }
   }
+  // núcleo do vórtice do Trial (portal com noGate): luz vermelho-sangue grande, pulsando como um coração
+  for (const o of map.objects)
+    if (o.type === 'portal' && o.props.noGate) {
+      const p = tileToScreen(o.x + o.w / 2, o.y + o.h / 2);
+      lights.push({ x: p.x, y: p.y - 40, r: 2.2 });
+      const h = scene.add
+        .image(p.x, p.y - 66, HALO)
+        .setScale(2.6)
+        .setTint(0xff3018)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(DEPTH.NIGHT_LIGHT)
+        .setAlpha(0.9);
+      scene.tweens.add({
+        targets: h,
+        alpha: 0.55,
+        scale: 2.2,
+        yoyo: true,
+        repeat: -1,
+        duration: 1300,
+        ease: 'Sine.InOut',
+      });
+      out.push(h);
+    }
   // NPCs: clareira suave no corpo (com a lanterninha de chão ao lado), para não sumirem no escuro
   for (const o of map.objects)
     if (o.type === 'npc') {

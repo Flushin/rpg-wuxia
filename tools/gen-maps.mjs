@@ -1633,7 +1633,21 @@ function porto() {
   // arena do banco: pátio de lajes com o portal do Trial no meio
   gr.rect(77, 60, 14, 12, PL);
   for (let y = 59; y <= 72; y++) for (let x = 76; x <= 91; x++) reserve(x, y);
-  objs.push(area('Trial', 'portal', 83, 65, 2, 2, { menu: 'trial', scale: 1.1 }));
+  // pórtico cerimonial do Trial (sprite próprio, no lugar do arco das ruínas) com braseiros, leões e estandartes
+  objs.push(area('portal_trial', 'building', 82, 64, 5, 3, { sprite: 'portal_trial', atlas: 'porto' }));
+  objs.push(area('Trial', 'portal', 83, 65, 3, 2, { menu: 'trial', scale: 1.1, noGate: 1 }));
+  for (const sx of [-1, 1]) {
+    decor('leao_pedra', 84.5 + sx * 2, 68.4, { block: 1 });
+    decor('estandarte', 84.5 + sx * 3.6, 66, { block: 1 });
+  }
+  // braseiros grandes com chamas vivas (partículas, prop fire) nos quatro cantos do piso de lajes
+  for (const [x, y] of [
+    [77.5, 60.5],
+    [90.5, 60.5],
+    [77.5, 71.5],
+    [90.5, 71.5],
+  ])
+    decor('braseiro_grande', x, y, { block: 1, light: 1, soft: 1, fire: 58 });
 
   // praça: Mestre dos Caminhos no círculo dourado (oeste da praça)
   npc('Mestre dos Caminhos', 'caminhos', 44.5, 40.5);

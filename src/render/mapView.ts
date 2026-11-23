@@ -241,6 +241,23 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (!o.props.flat) img.setName('tree'); // fica transparente se cobrir o jogador
       if (o.props.boat) boats.push(img);
       out.push(img);
+      // `fire`: chamas vivas saindo do topo (braseiros grandes da arena do Trial); o número é a altura em px
+      if (o.props.fire)
+        out.push(
+          scene.add
+            .particles(p.x, p.y - Number(o.props.fire), 'fx-dot', {
+              x: { min: -12, max: 12 },
+              lifespan: { min: 500, max: 900 },
+              speedY: { min: -80, max: -40 },
+              speedX: { min: -10, max: 10 },
+              scale: { start: 1.4, end: 0.1 },
+              alpha: { start: 1, end: 0 },
+              tint: [0xffe080, 0xff9020, 0xff4010],
+              frequency: 28,
+              blendMode: 'ADD',
+            })
+            .setDepth(img.depth + 0.5),
+        );
     } else if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
   }
   for (const o of map.objects) {
@@ -249,7 +266,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
     // `scale` no mapa força o tamanho do sprite (ex.: Trial, na borda de baixo, some se ficar pequeno)
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
-    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc));
+    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc, !!o.props.noGate));
   }
   if (boats.length) bobBoats(scene, boats);
   out.push(...buildNight(scene, map));
@@ -338,25 +355,30 @@ function portal(
   name: string,
   flip = false,
   scale = 1,
+  noGate = false,
 ): Phaser.GameObjects.GameObject[] {
   const out: Phaser.GameObjects.GameObject[] = [];
   const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
   for (let j = Math.floor(y); j < y + h; j++)
     for (let i = Math.floor(x); i < x + w; i++) {
       const pts = [tileToScreen(i, j), tileToScreen(i + 1, j), tileToScreen(i + 1, j + 1), tileToScreen(i, j + 1)];
-      g.fillStyle(0xa060ff, 0.28);
+      g.fillStyle(noGate ? 0xff3018 : 0xa060ff, 0.28);
       g.fillPoints(pts, true);
     }
   scene.tweens.add({ targets: g, alpha: 0.45, yoyo: true, repeat: -1, duration: 1100 });
   out.push(g);
   const c = tileToScreen(x + w / 2, y + h / 2);
-  const gate = scene.add
-    .image(c.x, c.y, 'props-ruinas', 'portal')
-    .setScale(SPRITE_SCALE * scale)
-    .setFlipX(flip)
-    .setDepth(Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1);
-  gate.setName('tree');
-  out.push(gate);
+  // `noGate`: o arco é desenhado à parte (pórtico do Trial no Porto, objeto 'building' próprio)
+  const depth = Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1;
+  if (!noGate) {
+    const gate = scene.add
+      .image(c.x, c.y, 'props-ruinas', 'portal')
+      .setScale(SPRITE_SCALE * scale)
+      .setFlipX(flip)
+      .setDepth(depth);
+    gate.setName('tree');
+    out.push(gate);
+  }
   const sparks = scene.add
     .particles(c.x, c.y - 10, 'fx-dot', {
       x: { min: -28, max: 28 },
@@ -366,14 +388,15 @@ function portal(
       speedX: { min: -4, max: 4 },
       scale: { start: 0.5, end: 0 },
       alpha: { start: 0.9, end: 0 },
-      tint: [0xd8b8ff, 0xa070ff, 0xffffff],
+      // pórtico do Trial: brasas vermelho-sangue (portal de chefe); arcos das ruínas: faíscas violeta
+      tint: noGate ? [0xffc080, 0xff3010, 0xffe0a0] : [0xd8b8ff, 0xa070ff, 0xffffff],
       frequency: 120,
       blendMode: 'ADD',
     })
-    .setDepth(gate.depth + 0.5);
+    .setDepth(depth + 0.5);
   out.push(sparks);
   const label = scene.add
-    .text(c.x, c.y - 92 * scale, name, {
+    .text(c.x, c.y - (noGate ? 175 : 92) * scale, name, {
       fontSize: '13px',
       color: '#e8d0ff',
       stroke: '#000',
