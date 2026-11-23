@@ -1,26 +1,43 @@
 {
-  "proxima": [
-{"texto": "Trial até o nível 40 (chefes até o nível 60). O ouro do chefe agora devolve só 40–60% da entrada, e o bônus de drop sobe +0,3 ponto por nível (12% a 23,7%); o Épico continua 1%."},
-    {
-      "texto": "Gemas e encaixes: o Joalheiro vende 11 gemas (Rubi, Ametista, Jade, Pérola, Safira, Ônix, Topázio e uma de ataque para cada elemento: Cornalina, Água-marinha, Citrino e Malaquita) e funde 3 iguais numa do nível seguinte, até o V. O Ferreiro-mestre abre até 3 encaixes por item, conforme a raridade, e coloca ou retira as gemas (sem repetir o mesmo tipo no item). Os dois ficam no bairro nordeste do Porto Noturno."
-    },
-    {
-      "texto": "Nível máximo 50: a XP continua depois do nível 40 e cada nível do 41 ao 50 dá 4 pontos de atributo. Quem já estava no 40 começa a barra do 41 do zero."
-    },
-    {
-      "texto": "Montarias: o Cavalariço Ma, no estábulo do Porto Noturno, vende um cavalo por 50.000 de ouro. Fora de combate você monta sozinho e anda 30% mais rápido; ao entrar em combate, desmonta na hora.",
-      "wiki": "npc/estabulo"
-    },
-    {
-      "texto": "Relíquias: novo espaço de equipamento no personagem, a partir do nível 50. O Antiquário Lao, no Porto Noturno, vende relíquias comuns e raras com atributos e um efeito único (roubo de vida, velocidade de ataque, recarga ou vida). As lendárias só caem de chefes.",
-      "wiki": "mecanicas/reliquias"
-    },
-    {
-      "texto": "Porto Noturno: nova cidade do nível 50, quatro vezes maior que as outras e sempre de noite, com lanternas, três canais com pontes, mercado noturno no cais e juncos no mar. Entra-se pelo portão sul da Cidadela de Jade ou pelo Mestre dos Caminhos. Tem o estábulo, a forja-mestre, a joalheria, o antiquário, uma arena com o portal do Trial, três missões novas e a música \"Samurai Nights\", de Majadroid.",
-      "wiki": "mapa/porto"
-    }
-  ],
+  "proxima": [],
   "versoes": [
+    {
+      "versao": "0.9.0",
+      "data": "2026-11-23",
+      "loja": [
+        "Porto Noturno: nova cidade do nível 50, sempre de noite, com mercado no cais e portal do Trial.",
+        "Nível máximo 50 e Trial até o nível 40.",
+        "Gemas e encaixes (Joalheiro e Ferreiro-mestre).",
+        "Montarias: cavalo com 30% de velocidade.",
+        "Relíquias: novo espaço de equipamento no nível 50."
+      ],
+      "itens": [
+        {
+          "texto": "Trial até o nível 40 (chefes até o nível 60). O ouro do chefe agora devolve só 40–60% da entrada, e o bônus de drop sobe +0,3 ponto por nível (12% a 23,7%); o Épico continua 1%."
+        },
+        {
+          "texto": "Gemas e encaixes: o Joalheiro vende 11 gemas (Rubi, Ametista, Jade, Pérola, Safira, Ônix, Topázio e uma de ataque para cada elemento: Cornalina, Água-marinha, Citrino e Malaquita) e funde 3 iguais numa do nível seguinte, até o V. O Ferreiro-mestre abre até 3 encaixes por item, conforme a raridade, e coloca ou retira as gemas (sem repetir o mesmo tipo no item). Os dois ficam no bairro nordeste do Porto Noturno."
+        },
+        {
+          "texto": "Nível máximo 50: a XP continua depois do nível 40 e cada nível do 41 ao 50 dá 4 pontos de atributo. Quem já estava no 40 começa a barra do 41 do zero."
+        },
+        {
+          "texto": "Montarias: o Cavalariço Ma, no estábulo do Porto Noturno, vende um cavalo por 50.000 de ouro. Fora de combate você monta sozinho e anda 30% mais rápido; ao entrar em combate, desmonta na hora.",
+          "wiki": "npc/estabulo"
+        },
+        {
+          "texto": "Relíquias: novo espaço de equipamento no personagem, a partir do nível 50. O Antiquário Lao, no Porto Noturno, vende relíquias comuns e raras com atributos e um efeito único (roubo de vida, velocidade de ataque, recarga ou vida). As lendárias só caem de chefes.",
+          "wiki": "mecanicas/reliquias"
+        },
+        {
+          "texto": "Porto Noturno: nova cidade do nível 50, quatro vezes maior que as outras e sempre de noite, com lanternas, três canais com pontes, mercado noturno no cais e juncos no mar. Entra-se pelo portão sul da Cidadela de Jade ou pelo Mestre dos Caminhos. Tem o estábulo, a forja-mestre, a joalheria, o antiquário, uma arena com o portal do Trial, três missões novas e a música \"Samurai Nights\", de Majadroid.",
+          "wiki": "mapa/porto"
+        },
+        {
+          "texto": "Porto Noturno mais vivo: o Antiquário, a Joalheria, a Forja, o Estábulo e as barracas do cais ganharam pátios e cenário próprios (relíquias, vitrine de joias, fornalha acesa, cavalos no cercado), e os NPCs agora têm uma lanterninha ao lado e ficam visíveis à noite."
+        }
+      ]
+    },
     {
       "versao": "0.8.0",
       "data": "2026-11-22",

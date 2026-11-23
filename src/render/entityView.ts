@@ -80,7 +80,7 @@ export class EntityView {
       });
       this.sprite = sp;
       this.top = m.top * this.sc;
-      this.dir = e.kind === 'monster' ? Phaser.Math.Between(0, 7) : 0;
+      this.dir = e.kind === 'monster' ? Phaser.Math.Between(0, 7) : (e.face ?? 0);
     } else {
       this.sprite = scene.add
         .image(0, 2, PLACEHOLDER)

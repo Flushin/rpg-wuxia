@@ -1,9 +1,33 @@
 {
  "frames": {
-  "porto_casa_cha": {
+  "portal_trial": {
    "frame": {
     "x": 0,
     "y": 0,
+    "w": 511,
+    "h": 687
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 511,
+    "h": 687
+   },
+   "sourceSize": {
+    "w": 511,
+    "h": 687
+   },
+   "pivot": {
+    "x": 0.499,
+    "y": 0.8428
+   }
+  },
+  "porto_casa_cha": {
+   "frame": {
+    "x": 0,
+    "y": 689,
     "w": 575,
     "h": 454
    },
@@ -27,7 +51,7 @@
   "porto_banco": {
    "frame": {
     "x": 0,
-    "y": 456,
+    "y": 1145,
     "w": 575,
     "h": 454
    },
@@ -48,10 +72,34 @@
     "y": 0.7225
    }
   },
+  "portao_porto": {
+   "frame": {
+    "x": 577,
+    "y": 1145,
+    "w": 376,
+    "h": 444
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 376,
+    "h": 444
+   },
+   "sourceSize": {
+    "w": 376,
+    "h": 444
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8108
+   }
+  },
   "porto_estabulo": {
    "frame": {
     "x": 0,
-    "y": 912,
+    "y": 1601,
     "w": 628,
     "h": 419
    },
@@ -75,7 +123,7 @@
   "porto_casa_5x4": {
    "frame": {
     "x": 0,
-    "y": 1333,
+    "y": 2022,
     "w": 566,
     "h": 411
    },
@@ -99,7 +147,7 @@
   "porto_forja": {
    "frame": {
     "x": 0,
-    "y": 1746,
+    "y": 2435,
     "w": 565,
     "h": 404
    },
@@ -123,7 +171,7 @@
   "porto_joalheria": {
    "frame": {
     "x": 0,
-    "y": 2152,
+    "y": 2841,
     "w": 502,
     "h": 362
    },
@@ -147,7 +195,7 @@
   "porto_antiquario": {
    "frame": {
     "x": 504,
-    "y": 2152,
+    "y": 2841,
     "w": 502,
     "h": 362
    },
@@ -171,7 +219,7 @@
   "junco_a": {
    "frame": {
     "x": 0,
-    "y": 2516,
+    "y": 3205,
     "w": 361,
     "h": 344
    },
@@ -195,7 +243,7 @@
   "porto_casa_3x4": {
    "frame": {
     "x": 363,
-    "y": 2516,
+    "y": 3205,
     "w": 438,
     "h": 335
    },
@@ -219,7 +267,7 @@
   "porto_casa_4x3": {
    "frame": {
     "x": 0,
-    "y": 2862,
+    "y": 3551,
     "w": 438,
     "h": 333
    },
@@ -243,7 +291,7 @@
   "porto_casa_3x3": {
    "frame": {
     "x": 440,
-    "y": 2862,
+    "y": 3551,
     "w": 375,
     "h": 305
    },
@@ -267,7 +315,7 @@
   "junco_b": {
    "frame": {
     "x": 0,
-    "y": 3197,
+    "y": 3886,
     "w": 288,
     "h": 275
    },
@@ -291,7 +339,7 @@
   "cerca_i6": {
    "frame": {
     "x": 290,
-    "y": 3197,
+    "y": 3886,
     "w": 400,
     "h": 227
    },
@@ -315,7 +363,7 @@
   "cerca_j6": {
    "frame": {
     "x": 0,
-    "y": 3474,
+    "y": 4163,
     "w": 399,
     "h": 227
    },
@@ -339,7 +387,7 @@
   "barraca_vermelha": {
    "frame": {
     "x": 401,
-    "y": 3474,
+    "y": 4163,
     "w": 212,
     "h": 217
    },
@@ -363,7 +411,7 @@
   "barraca_ambar": {
    "frame": {
     "x": 615,
-    "y": 3474,
+    "y": 4163,
     "w": 212,
     "h": 217
    },
@@ -387,7 +435,7 @@
   "muralha_j1": {
    "frame": {
     "x": 829,
-    "y": 3474,
+    "y": 4163,
     "w": 126,
     "h": 204
    },
@@ -411,7 +459,7 @@
   "muralha_i1": {
    "frame": {
     "x": 0,
-    "y": 3703,
+    "y": 4392,
     "w": 126,
     "h": 203
    },
@@ -432,10 +480,34 @@
     "y": 0.867
    }
   },
-  "ponte_i": {
+  "estandarte": {
    "frame": {
     "x": 128,
-    "y": 3703,
+    "y": 4392,
+    "w": 48,
+    "h": 199
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 199
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 199
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9447
+   }
+  },
+  "ponte_i": {
+   "frame": {
+    "x": 178,
+    "y": 4392,
     "w": 316,
     "h": 190
    },
@@ -458,8 +530,8 @@
   },
   "ponte_j": {
    "frame": {
-    "x": 446,
-    "y": 3703,
+    "x": 496,
+    "y": 4392,
     "w": 316,
     "h": 190
    },
@@ -480,10 +552,106 @@
     "y": 0.6263
    }
   },
+  "nevoa_ferro_i": {
+   "frame": {
+    "x": 814,
+    "y": 4392,
+    "w": 184,
+    "h": 179
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 184,
+    "h": 179
+   },
+   "sourceSize": {
+    "w": 184,
+    "h": 179
+   },
+   "pivot": {
+    "x": 0.5435,
+    "y": 0.9106
+   }
+  },
+  "vitrine_joias": {
+   "frame": {
+    "x": 0,
+    "y": 4597,
+    "w": 162,
+    "h": 176
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 162,
+    "h": 176
+   },
+   "sourceSize": {
+    "w": 162,
+    "h": 176
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8011
+   }
+  },
+  "sino_porto": {
+   "frame": {
+    "x": 164,
+    "y": 4597,
+    "w": 103,
+    "h": 166
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 103,
+    "h": 166
+   },
+   "sourceSize": {
+    "w": 103,
+    "h": 166
+   },
+   "pivot": {
+    "x": 0.4951,
+    "y": 0.9036
+   }
+  },
+  "marco_caminhos": {
+   "frame": {
+    "x": 269,
+    "y": 4597,
+    "w": 98,
+    "h": 161
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 98,
+    "h": 161
+   },
+   "sourceSize": {
+    "w": 98,
+    "h": 161
+   },
+   "pivot": {
+    "x": 0.5306,
+    "y": 0.9255
+   }
+  },
   "lanterna_poste": {
    "frame": {
-    "x": 764,
-    "y": 3703,
+    "x": 369,
+    "y": 4597,
     "w": 58,
     "h": 159
    },
@@ -504,10 +672,538 @@
     "y": 0.9434
    }
   },
+  "fornalha": {
+   "frame": {
+    "x": 429,
+    "y": 4597,
+    "w": 114,
+    "h": 154
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 114,
+    "h": 154
+   },
+   "sourceSize": {
+    "w": 114,
+    "h": 154
+   },
+   "pivot": {
+    "x": 0.5088,
+    "y": 0.8442
+   }
+  },
+  "cavalo_a": {
+   "frame": {
+    "x": 545,
+    "y": 4597,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "cavalo_b": {
+   "frame": {
+    "x": 693,
+    "y": 4597,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "cavalo_c": {
+   "frame": {
+    "x": 841,
+    "y": 4597,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "lanternas_papel": {
+   "frame": {
+    "x": 0,
+    "y": 4775,
+    "w": 62,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 62,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 62,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.906
+   }
+  },
+  "braseiro_grande": {
+   "frame": {
+    "x": 64,
+    "y": 4775,
+    "w": 92,
+    "h": 147
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 92,
+    "h": 147
+   },
+   "sourceSize": {
+    "w": 92,
+    "h": 147
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8571
+   }
+  },
+  "grade_ferro_i": {
+   "frame": {
+    "x": 158,
+    "y": 4775,
+    "w": 100,
+    "h": 143
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 143
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 143
+   },
+   "pivot": {
+    "x": 1.12,
+    "y": 0.8531
+   }
+  },
+  "estante_pocoes": {
+   "frame": {
+    "x": 260,
+    "y": 4775,
+    "w": 82,
+    "h": 137
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 137
+   },
+   "sourceSize": {
+    "w": 82,
+    "h": 137
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8759
+   }
+  },
+  "banca_reliquias": {
+   "frame": {
+    "x": 344,
+    "y": 4775,
+    "w": 159,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 159,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 159,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.4969,
+    "y": 0.7634
+   }
+  },
+  "mesa_registro": {
+   "frame": {
+    "x": 505,
+    "y": 4775,
+    "w": 156,
+    "h": 123
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 156,
+    "h": 123
+   },
+   "sourceSize": {
+    "w": 156,
+    "h": 123
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7398
+   }
+  },
+  "rolos_seda": {
+   "frame": {
+    "x": 663,
+    "y": 4775,
+    "w": 84,
+    "h": 122
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 84,
+    "h": 122
+   },
+   "sourceSize": {
+    "w": 84,
+    "h": 122
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8525
+   }
+  },
+  "suporte_armas": {
+   "frame": {
+    "x": 749,
+    "y": 4775,
+    "w": 54,
+    "h": 121
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 54,
+    "h": 121
+   },
+   "sourceSize": {
+    "w": 54,
+    "h": 121
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9008
+   }
+  },
+  "varal_peixe": {
+   "frame": {
+    "x": 805,
+    "y": 4775,
+    "w": 60,
+    "h": 121
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 60,
+    "h": 121
+   },
+   "sourceSize": {
+    "w": 60,
+    "h": 121
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8843
+   }
+  },
+  "mesa_mapas": {
+   "frame": {
+    "x": 0,
+    "y": 4926,
+    "w": 158,
+    "h": 119
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 158,
+    "h": 119
+   },
+   "sourceSize": {
+    "w": 158,
+    "h": 119
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7227
+   }
+  },
+  "ancora": {
+   "frame": {
+    "x": 160,
+    "y": 4926,
+    "w": 58,
+    "h": 114
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 58,
+    "h": 114
+   },
+   "sourceSize": {
+    "w": 58,
+    "h": 114
+   },
+   "pivot": {
+    "x": 0.4483,
+    "y": 0.7895
+   }
+  },
+  "palanque": {
+   "frame": {
+    "x": 220,
+    "y": 4926,
+    "w": 106,
+    "h": 110
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 106,
+    "h": 110
+   },
+   "sourceSize": {
+    "w": 106,
+    "h": 110
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7909
+   }
+  },
+  "bagagem_viagem": {
+   "frame": {
+    "x": 328,
+    "y": 4926,
+    "w": 100,
+    "h": 110
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 110
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 110
+   },
+   "pivot": {
+    "x": 0.54,
+    "y": 0.8636
+   }
+  },
+  "leao_pedra": {
+   "frame": {
+    "x": 430,
+    "y": 4926,
+    "w": 74,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 74,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 74,
+    "h": 108
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8426
+   }
+  },
+  "leques": {
+   "frame": {
+    "x": 506,
+    "y": 4926,
+    "w": 98,
+    "h": 99
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 98,
+    "h": 99
+   },
+   "sourceSize": {
+    "w": 98,
+    "h": 99
+   },
+   "pivot": {
+    "x": 0.3163,
+    "y": 0.8687
+   }
+  },
+  "expositor_gemas": {
+   "frame": {
+    "x": 606,
+    "y": 4926,
+    "w": 66,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 96
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8438
+   }
+  },
+  "cocho": {
+   "frame": {
+    "x": 674,
+    "y": 4926,
+    "w": 136,
+    "h": 95
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 136,
+    "h": 95
+   },
+   "sourceSize": {
+    "w": 136,
+    "h": 95
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6842
+   }
+  },
+  "jarros_antigos": {
+   "frame": {
+    "x": 812,
+    "y": 4926,
+    "w": 71,
+    "h": 95
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 71,
+    "h": 95
+   },
+   "sourceSize": {
+    "w": 71,
+    "h": 95
+   },
+   "pivot": {
+    "x": 0.5352,
+    "y": 0.8737
+   }
+  },
   "estacas_cais": {
    "frame": {
-    "x": 824,
-    "y": 3703,
+    "x": 885,
+    "y": 4926,
     "w": 64,
     "h": 85
    },
@@ -527,13 +1223,277 @@
     "x": 0.5,
     "y": 0.8353
    }
+  },
+  "jarros_cha": {
+   "frame": {
+    "x": 951,
+    "y": 4926,
+    "w": 64,
+    "h": 82
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 82
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 82
+   },
+   "pivot": {
+    "x": 0.4062,
+    "y": 0.7561
+   }
+  },
+  "feno": {
+   "frame": {
+    "x": 0,
+    "y": 5047,
+    "w": 75,
+    "h": 80
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 75,
+    "h": 80
+   },
+   "sourceSize": {
+    "w": 75,
+    "h": 80
+   },
+   "pivot": {
+    "x": 0.4933,
+    "y": 0.8
+   }
+  },
+  "braseiro": {
+   "frame": {
+    "x": 77,
+    "y": 5047,
+    "w": 47,
+    "h": 78
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 47,
+    "h": 78
+   },
+   "sourceSize": {
+    "w": 47,
+    "h": 78
+   },
+   "pivot": {
+    "x": 0.5106,
+    "y": 0.9487
+   }
+  },
+  "sela": {
+   "frame": {
+    "x": 126,
+    "y": 5047,
+    "w": 56,
+    "h": 77
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 77
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 77
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8961
+   }
+  },
+  "tina_tempera": {
+   "frame": {
+    "x": 184,
+    "y": 5047,
+    "w": 56,
+    "h": 75
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 75
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 75
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8267
+   }
+  },
+  "fogos": {
+   "frame": {
+    "x": 242,
+    "y": 5047,
+    "w": 59,
+    "h": 73
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 59,
+    "h": 73
+   },
+   "sourceSize": {
+    "w": 59,
+    "h": 73
+   },
+   "pivot": {
+    "x": 0.6102,
+    "y": 0.7808
+   }
+  },
+  "bigorna": {
+   "frame": {
+    "x": 303,
+    "y": 5047,
+    "w": 45,
+    "h": 70
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 45,
+    "h": 70
+   },
+   "sourceSize": {
+    "w": 45,
+    "h": 70
+   },
+   "pivot": {
+    "x": 0.4889,
+    "y": 0.8571
+   }
+  },
+  "sacos_especiarias": {
+   "frame": {
+    "x": 350,
+    "y": 5047,
+    "w": 71,
+    "h": 62
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 71,
+    "h": 62
+   },
+   "sourceSize": {
+    "w": 71,
+    "h": 62
+   },
+   "pivot": {
+    "x": 0.4366,
+    "y": 0.7903
+   }
+  },
+  "cestos": {
+   "frame": {
+    "x": 423,
+    "y": 5047,
+    "w": 80,
+    "h": 58
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 80,
+    "h": 58
+   },
+   "sourceSize": {
+    "w": 80,
+    "h": 58
+   },
+   "pivot": {
+    "x": 0.4625,
+    "y": 0.7414
+   }
+  },
+  "sacos_racao": {
+   "frame": {
+    "x": 505,
+    "y": 5047,
+    "w": 62,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 62,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 62,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.4355,
+    "y": 0.8333
+   }
+  },
+  "lanterna_chao": {
+   "frame": {
+    "x": 569,
+    "y": 5047,
+    "w": 36,
+    "h": 48
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 48
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 48
+   },
+   "pivot": {
+    "x": 0.4722,
+    "y": 0.8333
+   }
   }
  },
  "meta": {
   "image": "porto.png",
   "size": {
    "w": 1024,
-   "h": 3906
+   "h": 5127
   },
   "scale": "0.5"
  }

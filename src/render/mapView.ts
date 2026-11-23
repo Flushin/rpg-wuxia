@@ -2,9 +2,11 @@ import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import type { GameMap, MapObject } from '../core/map';
+import { ironGate } from './ironGate';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { bobBoats, buildNight } from './nightView';
+import { animKey, sheetFor, sheetTexture } from './sprites';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
@@ -213,6 +215,23 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     if (o.type === 'building') out.push(...building(scene, propsAtlas(o), String(o.props.sprite), o.x, o.y, o.w, o.h));
     else if (o.type === 'decor') {
       const p = tileToScreen(o.x, o.y);
+      // bicho parado animado no lugar (cavalos do estábulo): folha de personagem com a animação idle; sem a folha
+      // carregada, cai no desenho fixo do atlas
+      const sh = o.props.sheet ? sheetFor(String(o.props.sheet)) : null;
+      if (sh && scene.textures.exists(sheetTexture(sh.key))) {
+        const dir = Number(o.props.dir) || 0,
+          key = animKey(sh.key, 'idle', dir);
+        const sp = scene.add
+          .sprite(p.x, p.y, sheetTexture(sh.key), `idle_${dir}_0`)
+          .setOrigin(sh.meta.anchor[0], sh.meta.anchor[1])
+          .setScale(sh.meta.scale * (Number(o.props.scale) || 1))
+          .setDepth(Math.floor(o.x) + Math.floor(o.y) + 1);
+        if (o.props.tint) sp.setTint(Number(o.props.tint));
+        if (scene.anims.exists(key)) sp.play({ key, startFrame: Math.floor(o.x * 7 + o.y * 3) % 4 });
+        sp.setName('tree');
+        out.push(sp);
+        continue;
+      }
       const img = scene.add
         .image(p.x, p.y, propsAtlas(o), String(o.props.sprite))
         .setScale(SPRITE_SCALE)
@@ -223,6 +242,23 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (!o.props.flat) img.setName('tree'); // fica transparente se cobrir o jogador
       if (o.props.boat) boats.push(img);
       out.push(img);
+      // `fire`: chamas vivas saindo do topo (braseiros grandes da arena do Trial); o número é a altura em px
+      if (o.props.fire)
+        out.push(
+          scene.add
+            .particles(p.x, p.y - Number(o.props.fire), 'fx-dot', {
+              x: { min: -12, max: 12 },
+              lifespan: { min: 500, max: 900 },
+              speedY: { min: -80, max: -40 },
+              speedX: { min: -10, max: 10 },
+              scale: { start: 1.4, end: 0.1 },
+              alpha: { start: 1, end: 0 },
+              tint: [0xffe080, 0xff9020, 0xff4010],
+              frequency: 28,
+              blendMode: 'ADD',
+            })
+            .setDepth(img.depth + 0.5),
+        );
     } else if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
   }
   for (const o of map.objects) {
@@ -231,7 +267,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
     // `scale` no mapa força o tamanho do sprite (ex.: Trial, na borda de baixo, some se ficar pequeno)
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
-    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc));
+    out.push(...portal(scene, o, tn(o.name), ns, sc));
   }
   if (boats.length) bobBoats(scene, boats);
   out.push(...buildNight(scene, map));
@@ -313,49 +349,80 @@ function teleCircle(scene: Phaser.Scene, x: number, y: number, w: number, h: num
 
 function portal(
   scene: Phaser.Scene,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
+  o: MapObject,
   name: string,
   flip = false,
   scale = 1,
 ): Phaser.GameObjects.GameObject[] {
+  const { x, y, w, h } = o;
+  // `noGate`: o arco é desenhado à parte (objeto 'building' próprio: pórtico do Trial, portão de ferro do Porto);
+  // `glow`: cor do brilho do chão e das faíscas; `labelY`: altura do nome em px (padrão 92, acima do arco)
+  const noGate = !!o.props.noGate,
+    glow = typeof o.props.glow === 'number' ? o.props.glow : 0xa060ff,
+    labelY = typeof o.props.labelY === 'number' ? o.props.labelY : 92;
+  const tintOf = (c: number, k: number) => {
+    const ch = (sh: number) => Math.round(((c >> sh) & 255) + (255 - ((c >> sh) & 255)) * k);
+    return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+  };
   const out: Phaser.GameObjects.GameObject[] = [];
   const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
   for (let j = Math.floor(y); j < y + h; j++)
     for (let i = Math.floor(x); i < x + w; i++) {
       const pts = [tileToScreen(i, j), tileToScreen(i + 1, j), tileToScreen(i + 1, j + 1), tileToScreen(i, j + 1)];
-      g.fillStyle(0xa060ff, 0.28);
+      g.fillStyle(glow, 0.28);
       g.fillPoints(pts, true);
     }
-  scene.tweens.add({ targets: g, alpha: 0.45, yoyo: true, repeat: -1, duration: 1100 });
+  const pulse = scene.tweens.add({ targets: g, alpha: 0.45, yoyo: true, repeat: -1, duration: 1100 });
   out.push(g);
   const c = tileToScreen(x + w / 2, y + h / 2);
-  const gate = scene.add
-    .image(c.x, c.y, 'props-ruinas', 'portal')
-    .setScale(SPRITE_SCALE * scale)
-    .setFlipX(flip)
-    .setDepth(Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1);
-  gate.setName('tree');
-  out.push(gate);
+  // portão de ferro (gate: 'ferro'): o brilho e as faíscas só aparecem com a grade aberta (src/render/ironGate.ts)
+  // variante 'porta' (Cidadela): folhas de laca abrem para fora e a névoa de gelo acende no vão
+  let onOpen: ((k: number) => void) | null = null;
+  const gated = o.props.gate === 'ferro' || o.props.gate === 'porta';
+  let mouth: { x: number; y: number } | null = null;
+  if (gated) {
+    const ig = ironGate(scene, o, Number(o.props.gateX) + Number(o.props.gateY) + 1.8, (k) => onOpen?.(k));
+    out.push(...ig.objects);
+    if (o.props.gate === 'porta') mouth = ig.mouth;
+  }
+  const depth = Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1;
+  if (!noGate) {
+    const gate = scene.add
+      .image(c.x, c.y, 'props-ruinas', 'portal')
+      .setScale(SPRITE_SCALE * scale)
+      .setFlipX(flip)
+      .setDepth(depth);
+    gate.setName('tree');
+    out.push(gate);
+  }
+  // no portão de portas, pontos de luz azuis e dourados flutuando no vão (prop `specks`: cores extras)
+  const specks = Array.isArray(o.props.specks) ? (o.props.specks as number[]) : [];
   const sparks = scene.add
-    .particles(c.x, c.y - 10, 'fx-dot', {
-      x: { min: -28, max: 28 },
-      y: { min: -6, max: 6 },
-      lifespan: 1400,
-      speedY: { min: -38, max: -16 },
-      speedX: { min: -4, max: 4 },
+    .particles(mouth ? mouth.x : c.x, mouth ? mouth.y : c.y - 10, 'fx-dot', {
+      x: mouth ? { min: -10, max: 10 } : { min: -28, max: 28 },
+      y: mouth ? { min: -22, max: 22 } : { min: -6, max: 6 },
+      lifespan: mouth ? 1800 : 1400,
+      speedY: mouth ? { min: -14, max: -4 } : { min: -38, max: -16 },
+      speedX: mouth ? { min: -8, max: 8 } : { min: -4, max: 4 },
       scale: { start: 0.5, end: 0 },
       alpha: { start: 0.9, end: 0 },
-      tint: [0xd8b8ff, 0xa070ff, 0xffffff],
-      frequency: 120,
+      tint: [tintOf(glow, 0.55), glow, tintOf(glow, 0.85), ...specks],
+      frequency: mouth ? 90 : 120,
       blendMode: 'ADD',
     })
-    .setDepth(gate.depth + 0.5);
+    .setDepth(mouth ? Number(o.props.gateX) + Number(o.props.gateY) + 2 : depth + 0.5);
   out.push(sparks);
+  if (gated) {
+    pulse.pause();
+    onOpen = (k) => {
+      g.setAlpha(0.4 * k);
+      if (k > 0.5 && !sparks.emitting) sparks.start();
+      else if (k <= 0.5 && sparks.emitting) sparks.stop();
+    };
+    onOpen(0);
+  }
   const label = scene.add
-    .text(c.x, c.y - 92 * scale, name, {
+    .text(c.x, c.y - (noGate && !o.props.labelY ? 175 : labelY) * scale, name, {
       fontSize: '13px',
       color: '#e8d0ff',
       stroke: '#000',

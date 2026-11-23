@@ -68,6 +68,7 @@
  "out_json": "../../src/data/sprites",
  "portrait": "idle",
  "dir_list": [
-  0
+  0,
+  7
  ]
 }

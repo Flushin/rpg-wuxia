@@ -238,9 +238,28 @@ def tower():
     lantern(0.3, -0.42, H + 0.38, 0.09, (230, 60, 40))
 
 
-def gatehouse(axis):
+GATE_OPEN = (22, 44, 64, 82)  # graus das folhas nos quadros portao_muralha_*_1..4 (portal que abre ao chegar perto)
+
+
+def _holdout():
+    """Material que recorta (deixa transparente) o que estiver na frente: portas abertas na frente da névoa."""
+    m = bpy.data.materials.new('holdout')
+    m.use_nodes = True
+    nt = m.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new('ShaderNodeOutputMaterial')
+    h = nt.nodes.new('ShaderNodeHoldout')
+    nt.links.new(h.outputs[0], out.inputs[0])
+    return m
+
+
+def gatehouse(axis, opened=0.0, mist=False):
     """Portão da muralha (4x2 ou 2x4): base de pedra com portas de laca vermelha e tachas douradas (nas duas
-    faces) e um pavilhão de dois telhados de jade em cima."""
+    faces) e um pavilhão de dois telhados de jade em cima. `opened` (graus): as folhas da face visível (-y no
+    eixo i, +x no j) giram para fora nas dobradiças. `mist`: só a névoa do teleporte no vão (branco e azul-gelo,
+    com pontos azuis e dourados), com as portas abertas recortando o que fica atrás delas (src/render/ironGate.ts)."""
+    if mist:
+        return gate_mist(axis)
     def B(x, y, z, sx, sy, sz, rgb):
         return box(x, y, z, sx, sy, sz, rgb) if axis == 'i' else box(y, x, z, sy, sx, sz, rgb)
     def S(x, y, z, r, rgb):
@@ -248,12 +267,16 @@ def gatehouse(axis):
     def C(x, y, z, r, h, rgb):
         return cyl(x, y, z, r, h, rgb) if axis == 'i' else cyl(y, x, z, r, h, rgb)
     H = 2.0
+    vis = -1 if axis == 'i' else 1
     B(0, 0, 0, 3.92, 1.92, 0.35, BRICK_D)
     B(0, 0, 0.35, 3.8, 1.8, H - 0.35, BRICK)
     B(0, 0, H, 3.92, 1.92, 0.08, BRICK_D)
     for s in (-1, 1):
         B(0, s * 0.91, 0.3, 1.5, 0.06, 1.35, (60, 56, 56))  # vão
         for k in (-1, 1):
+            if opened and s == vis:
+                door_leaf(axis, k, s, opened)
+                continue
             B(k * 0.35, s * 0.94, 0.3, 0.66, 0.06, 1.28, RED)
             for r in range(4):
                 for c in range(3):
@@ -289,6 +312,51 @@ def gatehouse(axis):
             lantern(k * 0.9, -b - 0.34, z - 0.26, 0.1, (230, 60, 40))
         else:
             lantern(b + 0.34, k * 0.9, z - 0.26, 0.1, (230, 60, 40))
+
+
+def _leaf_xy(axis, k, s, ang, u, n=0.0):
+    """Ponto da folha k (-1 esquerda, 1 direita) aberta `ang` graus: u = distância da dobradiça, n = para fora
+    da face. Devolve (x, y) já no eixo do portão."""
+    a = math.radians(ang)
+    dx, dy = -k * math.cos(a), s * math.sin(a)
+    nx, ny = -s * k * -dy, -s * k * dx  # normal da face da folha (para fora quando fechada)
+    x, y = k * 0.68 + dx * u + nx * n, s * 0.94 + dy * u + ny * n
+    return (x, y, math.atan2(dy, dx)) if axis == 'i' else (y, x, math.atan2(dx, dy))
+
+
+def door_leaf(axis, k, s, ang, mat_over=None):
+    x, y, rot = _leaf_xy(axis, k, s, ang, 0.33)
+    o = box(x, y, 0.3, 0.66, 0.06, 1.28, RED, rot=rot)
+    if mat_over:
+        o.data.materials[0] = mat_over
+        return
+    for r in range(4):
+        for c in range(3):
+            sx, sy, _ = _leaf_xy(axis, k, s, ang, 0.13 + c * 0.2, 0.04)
+            sphere(sx, sy, 0.5 + r * 0.26, 0.025, GOLD)
+    # argola de bronze perto da junção das folhas
+    sx, sy, _ = _leaf_xy(axis, k, s, ang, 0.56, 0.05)
+    sphere(sx, sy, 0.95, 0.05, GOLD)
+
+
+def gate_mist(axis):
+    """Névoa do portal no vão (mesma pegada e centro do portão): camadas brilhando do azul-gelo (borda) ao branco
+    (centro), com pontos de luz azuis e dourados; as portas abertas na frente viram recorte (holdout)."""
+    s = -1 if axis == 'i' else 1
+    def B(x, y, z, sx, sy, sz, rgb, emit):
+        return box(x, y, z, sx, sy, sz, rgb, emit=emit) if axis == 'i' else box(y, x, z, sy, sx, sz, rgb, emit=emit)
+    def S(x, y, z, r, rgb, emit):
+        return sphere(x, y, z, r, rgb, emit=emit) if axis == 'i' else sphere(y, x, z, r, rgb, emit=emit)
+    for k, (w, h, rgb, e) in enumerate([(1.46, 1.32, (40, 110, 220), 0.9), (1.16, 1.08, (90, 170, 240), 1.0),
+                                        (0.8, 0.82, (170, 215, 250), 1.2), (0.4, 0.5, (240, 248, 255), 1.6)]):
+        B(0, s * (0.95 + k * 0.006), 0.3 + (1.32 - h) / 2 - k * 0.03, w, 0.01, h, rgb, e)
+    cols = [(110, 170, 255), (255, 214, 100), (190, 230, 255)]
+    for k in range(18):
+        S(-0.62 + (k * 53 % 100) / 80, s * 0.99, 0.4 + (k * 37 % 100) / 90, 0.022 + (k % 3) * 0.008,
+          cols[k % 3], 2.6)
+    ho = _holdout()
+    for k in (-1, 1):
+        door_leaf(axis, k, s, GATE_OPEN[-1], mat_over=ho)
 
 
 def huabiao():
@@ -350,6 +418,10 @@ SET = {
     'muralha_torre': (tower, (2, 2), 4.0),
     'portao_muralha_i': (lambda: gatehouse('i'), (4, 2), 4.6),
     'portao_muralha_j': (lambda: gatehouse('j'), (2, 4), 4.6),
+    **{f'portao_muralha_{ax}_{n + 1}': ((lambda ax=ax, a=a: gatehouse(ax, a)), (4, 2) if ax == 'i' else (2, 4), 4.6)
+       for ax in 'ij' for n, a in enumerate(GATE_OPEN)},
+    'nevoa_gelo_i': (lambda: gatehouse('i', mist=True), (4, 2), 4.6),
+    'nevoa_gelo_j': (lambda: gatehouse('j', mist=True), (2, 4), 4.6),
     'huabiao': (huabiao, (1, 1), 3.0),
     'lanterna_dupla': (double_lantern, (1, 1), 2.2),
 }

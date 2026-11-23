@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { ironGateOf } from './ironGate';
 import { tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
 import { MAPS_CONFIG } from '../core/mapsConfig';
@@ -40,28 +41,63 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
   const veil = scene.add.image(0, 0, VKEY).setOrigin(0, 0).setDepth(DEPTH.NIGHT_VEIL).setScale(Q);
   out.push(veil);
   const veilCss = `rgba(11,22,51,${VEIL_ALPHA})`;
-  const lights: { x: number; y: number; r: number }[] = [];
+  const lights: { x: number; y: number; r: number; k?: () => number }[] = [];
   let k = 0;
   for (const o of map.objects) {
     if (o.type !== 'decor') continue;
     if (o.props.light) {
       const p = tileToScreen(o.x, o.y),
-        tall = o.props.sprite === 'lanterna_poste';
-      const hx = p.x + (tall ? 10 : 6),
-        hy = p.y - (tall ? 46 : 14);
+        tall = o.props.sprite === 'lanterna_poste',
+        soft = !!o.props.soft; // lanterninha junto de NPC: clareia ele sem o brilho forte do poste
+      const hx = p.x + (tall ? 10 : soft ? 0 : 6),
+        hy = p.y - (tall ? 46 : soft ? 10 : 14);
       // poste ilumina o chão em volta (furo centrado no pé); lanterna baixa, um círculo menor
-      lights.push({ x: hx, y: tall ? p.y : hy, r: tall ? 1.25 : 0.7 });
+      lights.push({ x: hx, y: tall ? p.y : soft ? p.y - 24 : hy, r: tall ? 1.25 : soft ? 0.95 : 0.7 });
+      const a = soft ? 0.45 : 0.8;
       const h = scene.add
         .image(hx, hy, HALO)
-        .setScale(tall ? 1.5 : 1)
+        .setScale(tall ? 1.5 : soft ? 0.7 : 1)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setDepth(DEPTH.NIGHT_LIGHT)
-        .setAlpha(0.8);
+        .setAlpha(a);
       // tremor leve da chama, defasado por lanterna
-      scene.tweens.add({ targets: h, alpha: 0.6, yoyo: true, repeat: -1, duration: 900 + (k++ % 5) * 170 });
+      scene.tweens.add({ targets: h, alpha: a * 0.75, yoyo: true, repeat: -1, duration: 900 + (k++ % 5) * 170 });
       out.push(h);
     }
   }
+  // portal com arco próprio (noGate) e cor `glow`: luz grande pulsando como um coração na altura `glowY` (px)
+  // (núcleo vermelho-sangue do Trial; névoa de jade no portão de ferro do Porto)
+  for (const o of map.objects)
+    if (o.type === 'portal' && o.props.noGate && typeof o.props.glow === 'number') {
+      const p = tileToScreen(o.x + o.w / 2, o.y + o.h / 2),
+        gy = Number(o.props.glowY) || 40;
+      // portão de ferro: a luz acompanha a abertura da grade
+      const k = o.props.gate === 'ferro' ? () => ironGateOf(o)?.open() ?? 0 : undefined;
+      lights.push({ x: p.x, y: p.y - Math.min(gy, 40), r: 2.2, k });
+      const h = scene.add
+        .image(p.x, p.y - gy, HALO)
+        .setScale(2.6)
+        .setTint(o.props.glow)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(DEPTH.NIGHT_LIGHT)
+        .setAlpha(0.9);
+      scene.tweens.add({
+        targets: h,
+        alpha: 0.55,
+        scale: 2.2,
+        yoyo: true,
+        repeat: -1,
+        duration: 1300,
+        ease: 'Sine.InOut',
+      });
+      out.push(h);
+    }
+  // NPCs: clareira suave no corpo (com a lanterninha de chão ao lado), para não sumirem no escuro
+  for (const o of map.objects)
+    if (o.type === 'npc') {
+      const p = tileToScreen(o.x, o.y);
+      lights.push({ x: p.x, y: p.y - 26, r: 0.6 });
+    }
   const draw = () => {
     const v = cam.worldView,
       w = Math.ceil(v.width / Q) + 2,
@@ -93,7 +129,8 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
     const pad = 320;
     for (const l of lights) {
       if (l.x < v.x - pad || l.x > v.right + pad || l.y < v.y - pad || l.y > v.bottom + pad) continue;
-      hole(l.x, l.y, 128 * l.r);
+      const f = l.k ? l.k() : 1;
+      if (f > 0.02) hole(l.x, l.y, 128 * l.r * f);
     }
     // luz própria do herói (a câmera o segue): personagem nunca some no escuro
     hole(v.centerX, v.centerY - 20, 80);

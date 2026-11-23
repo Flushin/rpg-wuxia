@@ -1334,12 +1334,38 @@ function cidadela() {
   }
   building('portao_muralha_j', 1, 14, 2, 4);
   building('portao_muralha_j', 29, 14, 2, 4);
+  // portais nos portões (padrão portão de ferro, variante 'porta', src/render/ironGate.ts): ao chegar perto as
+  // portas abrem para fora e a névoa branca/azul-gelo acende no vão, com pontos de luz azuis e dourados
+  const gelo = (gateAxis, gateX, gateY) => ({
+    gate: 'porta',
+    gateAxis,
+    gateX,
+    gateY,
+    noGate: 1,
+    glow: 0xbfe6ff,
+    specks: [0x4a90ff, 0xffd060],
+    labelY: 150,
+  });
   // nível 40: o portão leste leva ao Vale das Cinzas Rubras (portal junto do portão, na ponta da avenida)
   objs.push(
-    area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, { target: 'vale', targetX: 2.5, targetY: 16, minLevel: 30 }),
+    area('Vale das Cinzas Rubras', 'portal', 27, 15, 1, 2, {
+      target: 'vale',
+      targetX: 2.5,
+      targetY: 16,
+      minLevel: 30,
+      ...gelo('j', 30, 16),
+    }),
   );
   // nível 50: o portão sul leva ao Porto Noturno (portal na ponta sul da avenida, diante do portão)
-  objs.push(area('Porto Noturno', 'portal', 15, 28, 2, 1, { target: 'porto', targetX: 48, targetY: 6, minLevel: 50 }));
+  objs.push(
+    area('Porto Noturno', 'portal', 15, 28, 2, 1, {
+      target: 'porto',
+      targetX: 48,
+      targetY: 6,
+      minLevel: 50,
+      ...gelo('i', 16, 30),
+    }),
+  );
 
   // norte: salão principal no fim da avenida, pagode ao lado
   building('jade_salao', 13, 3, 6, 4);
@@ -1542,17 +1568,31 @@ function porto() {
   building('muralha_torre', 1, 72, 2, 2, 'cidadela');
   building('muralha_torre', 93, 72, 2, 2, 'cidadela');
   wallRun('i', 3, 45, 1);
-  building('portao_muralha_i', 46, 1, 4, 2, 'cidadela');
+  building('portao_porto', 46, 1, 4, 2);
   wallRun('i', 50, 92, 1);
   wallRun('j', 3, 71, 1);
   wallRun('j', 3, 21, 94);
   wallRun('j', 22, 71, 94);
   // portão: volta à Cidadela de Jade (portal livre; a ida, na Cidadela, pede nível 50)
-  objs.push(area('Cidadela de Jade', 'portal', 46, 3, 4, 1, { target: 'cidadela', targetX: 16, targetY: 26.5 }));
+  objs.push(
+    area('Cidadela de Jade', 'portal', 46, 3, 4, 1, {
+      target: 'cidadela',
+      targetX: 16,
+      targetY: 26.5,
+      noGate: 1,
+      gate: 'ferro', // grade de ferro que abre ao chegar perto (src/render/ironGate.ts)
+      gateX: 48,
+      gateY: 2,
+      glow: 0x40e0a8,
+      glowY: 30,
+      labelY: 140,
+    }),
+  );
   reserve(48, 4, 2);
 
   // bairros: casas da planta
   building('porto_estabulo', 25, 22, 6, 4);
+  // cerca sobre a terra: objeto com block (não vira tile de casa, que desenharia uma faixa de grama)
   for (const [s2, i, j] of [
     ['cerca_i6', 25, 28],
     ['cerca_i6', 31, 28],
@@ -1561,34 +1601,130 @@ function porto() {
     ['cerca_j6', 24, 29],
     ['cerca_j6', 37, 29],
   ])
-    building(s2, i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6);
+    objs.push(
+      area(s2, 'building', i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6, {
+        sprite: s2,
+        atlas: 'porto',
+        block: 1,
+      }),
+    );
   for (let y = 29; y <= 35; y++) for (let x = 25; x <= 36; x++) reserve(x, y);
+  // estábulo: terreiro de terra entre a porta (j 26) e o cercado, chão de terra no cercado, cavalos, cocho, feno,
+  // sela e postes acesos nos cantos da cerca
+  gr.rect(24, 26, 14, 2, P);
+  gr.rect(24, 28, 14, 9, P);
+  for (let y = 21; y <= 37; y++) for (let x = 23; x <= 38; x++) reserve(x, y);
+  decor('cavalo_a', 29.5, 31.5, { block: 1, sheet: 'mount-cavalo', dir: 7 });
+  decor('cavalo_b', 33.5, 33.5, { block: 1, sheet: 'mount-cavalo', dir: 3, tint: 0x8a6650 });
+  decor('lanterna_chao', 31.5, 32.5, { block: 1, light: 1, soft: 1 });
+  decor('lanterna_chao', 27.5, 33.5, { block: 1, light: 1, soft: 1 });
+  objs.push(area('cocho', 'building', 26, 29, 2, 1, { sprite: 'cocho', atlas: 'porto', block: 1 }));
+  decor('feno', 35.5, 29.5, { block: 1 });
+  decor('feno', 31.5, 26.5, { block: 1 });
+  decor('sela', 24.5, 26.5, { block: 1 });
+  // ao lado do Ma: palanque com um cavalo amarrado, sacos de ração e barril
+  objs.push(area('palanque', 'building', 33, 25, 2, 1, { sprite: 'palanque', atlas: 'porto', block: 1 }));
+  decor('cavalo_c', 34.2, 26.7, { block: 1, sheet: 'mount-cavalo', dir: 6, tint: 0xd8d0c8 });
+  decor('sacos_racao', 29.6, 26.5, { block: 1 });
+  decor('barril', 25.6, 26.4, { atlas: 'cidade', block: 1 });
+  for (const [x, y] of [
+    [24, 28],
+    [37, 28],
+    [24, 36],
+    [37, 36],
+  ])
+    decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
   building('porto_forja', 75, 8, 5, 4);
+  // pátio da forja (porta em j 12): fornalha acesa, bigorna, suporte de armas, tina de têmpera, barris e caixotes
+  gr.rect(74, 12, 8, 3, PL);
+  gr.rect(74, 8, 1, 4, PL);
+  for (let y = 7; y <= 17; y++) for (let x = 73; x <= 82; x++) reserve(x, y);
+  decor('fornalha', 79.5, 12.6, { block: 1, light: 1 });
+  decor('bigorna', 76.4, 13.5, { block: 1 });
+  decor('suporte_armas', 74.5, 12.5, { block: 1 });
+  decor('tina_tempera', 78.6, 14.2, { block: 1 });
+  decor('barril', 81.5, 12.5, { atlas: 'cidade', block: 1 });
+  decor('caixotes', 81.5, 13.6, { atlas: 'cidade', block: 1 });
   building('porto_joalheria', 75, 24, 4, 4);
+  // frente da joalheria (porta em j 28): pátio de pedra até a viela, vitrine de joias com o Yu atrás,
+  // geodo de ametista na porta e lanternas de pedra
+  gr.rect(74, 28, 7, 3, PL);
+  gr.rect(74, 24, 1, 4, PL);
+  for (let y = 23; y <= 31; y++) for (let x = 73; x <= 81; x++) reserve(x, y);
+  objs.push(area('vitrine_joias', 'building', 76, 29, 2, 1, { sprite: 'vitrine_joias', atlas: 'porto', block: 1 }));
+  decor('expositor_gemas', 75.5, 28.5, { block: 1 });
+  decor('expositor_gemas', 79.5, 28.5, { block: 1 });
+  decor('lanterna_pedra', 74.5, 30.5, { atlas: 'cidade', block: 1, light: 1 });
+  decor('lanterna_pedra', 80.5, 30.5, { atlas: 'cidade', block: 1, light: 1 });
   building('porto_casa_cha', 11, 56, 5, 4);
   building('porto_antiquario', 65, 55, 4, 4);
+  // frente do antiquário (porta em j 59): leões de pedra na porta, banca de relíquias, jarros antigos e lanternas de pedra
+  gr.rect(64, 59, 8, 4, PL);
+  for (let y = 59; y <= 64; y++) for (let x = 63; x <= 72; x++) reserve(x, y);
+  decor('leao_pedra', 65.5, 59.5, { block: 1 });
+  decor('leao_pedra', 68.5, 59.5, { block: 1 });
+  // banca sobre o piso de pedra: objeto 'building' com block (não vira tile de casa, que desenha grama)
+  objs.push(area('banca_reliquias', 'building', 69, 60, 2, 1, { sprite: 'banca_reliquias', atlas: 'porto', block: 1 }));
+  decor('jarros_antigos', 64.5, 60.5, { block: 1 });
+  decor('lanterna_pedra', 64.5, 61.5, { atlas: 'cidade', block: 1, light: 1 });
+  decor('lanterna_pedra', 71.5, 61.5, { atlas: 'cidade', block: 1, light: 1 });
   building('porto_banco', 78, 50, 5, 4);
   // arena do banco: pátio de lajes com o portal do Trial no meio
   gr.rect(77, 60, 14, 12, PL);
   for (let y = 59; y <= 72; y++) for (let x = 76; x <= 91; x++) reserve(x, y);
-  objs.push(area('Trial', 'portal', 83, 65, 2, 2, { menu: 'trial', scale: 1.1 }));
+  // pórtico cerimonial do Trial (sprite próprio, no lugar do arco das ruínas) com braseiros, leões e estandartes
+  objs.push(area('portal_trial', 'building', 82, 64, 5, 3, { sprite: 'portal_trial', atlas: 'porto' }));
+  objs.push(area('Trial', 'portal', 83, 65, 3, 2, { menu: 'trial', scale: 1.1, noGate: 1, glow: 0xff3018, glowY: 66 }));
+  for (const sx of [-1, 1]) {
+    decor('leao_pedra', 84.5 + sx * 2, 68.4, { block: 1 });
+    decor('estandarte', 84.5 + sx * 3.6, 66, { block: 1 });
+  }
+  // braseiros grandes com chamas vivas (partículas, prop fire) nos quatro cantos do piso de lajes
+  for (const [x, y] of [
+    [77.5, 60.5],
+    [90.5, 60.5],
+    [77.5, 71.5],
+    [90.5, 71.5],
+  ])
+    decor('braseiro_grande', x, y, { block: 1, light: 1, soft: 1, fire: 58 });
 
   // praça: Mestre dos Caminhos no círculo dourado (oeste da praça)
   npc('Mestre dos Caminhos', 'caminhos', 44.5, 40.5);
   objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
+  // em volta dele: marco de direções atrás, mesa de mapas com bússola ao lado e bagagem de viajante
+  decor('marco_caminhos', 44.5, 38.4, { block: 1 });
+  objs.push(area('mesa_mapas', 'building', 46, 39, 2, 1, { sprite: 'mesa_mapas', atlas: 'porto', block: 1 }));
+  decor('bagagem_viagem', 42.9, 41.5, { block: 1 });
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
-  npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
-  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 74, 13, { role: 'ferreiro_mestre' });
-  npc('Joalheiro Yu', 'joalheiro', 74, 27, { role: 'joalheiro' });
-  npc('Antiquário Lao', 'antiquario', 67, 60, { role: 'antiquario' });
+  npc('Cavalariço Ma', 'estabulo', 28.2, 27.2, { role: 'estabulo', face: 7 });
+  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
+  npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
+  npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
+  // posto da guarda dos dois lados do portão: estandarte, braseiro aceso e suporte de lanças sobre a pedra
+  gr.rect(42, 3, 12, 4, PL);
+  for (const [x, sx] of [
+    [44, -1],
+    [51, 1],
+  ]) {
+    decor('estandarte', x + 0.4, 3.6, { block: 1 });
+    decor('braseiro', x + 0.5 + sx * 0.6, 5.9, { block: 1, light: 1, soft: 1 });
+    decor('suporte_armas', x + 0.5 + sx, 4.6, { block: 1 });
+  }
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
   npc('Guarda do Portão', 'guarda_porto', 50.5, 5);
+  // Mestre do Cais junto do trapiche: mesa de registro de cargas atrás, sino do porto, âncora com cordas e carga
+  objs.push(area('mesa_registro', 'building', 30, 79, 2, 1, { sprite: 'mesa_registro', atlas: 'porto', block: 1 }));
+  decor('sino_porto', 28.5, 79.5, { block: 1 });
+  decor('ancora', 33.5, 80.5, { block: 1 });
+  decor('caixotes', 33.5, 79.5, { atlas: 'cidade', block: 1 });
+  decor('barril', 34.5, 80.4, { atlas: 'cidade', block: 1 });
   npc('Mestre do Cais', 'mestre_cais', 31, 80.5);
-  npc('Vendedora Hua', 'vendedor_porto1', 27, 77, { role: 'vendedor' });
-  npc('Vendedor Bo', 'vendedor_porto2', 37, 77, { role: 'vendedor' });
-  npc('Vendedora Lan', 'vendedor_porto3', 57, 77, { role: 'vendedor' });
+  npc('Vendedora Hua', 'vendedor_porto1', 27, 74.7, { role: 'vendedor', face: 7 });
+  npc('Vendedor Bo', 'vendedor_porto2', 37, 74.7, { role: 'vendedor', face: 7 });
+  npc('Vendedora Lan', 'vendedor_porto3', 57, 74.7, { role: 'vendedor', face: 7 });
 
   // cais: barracas do mercado noturno, estacas nas pontas dos trapiches e postes de lanterna
+  // barraca sobre a pedra do cais: objeto com block (sem tile de casa, que desenharia grama)
   for (const [s2, i] of [
     ['barraca_vermelha', 26],
     ['barraca_ambar', 36],
@@ -1596,7 +1732,30 @@ function porto() {
     ['barraca_ambar', 66],
     ['barraca_vermelha', 14],
   ])
-    building(s2, i, 74, 2, 2);
+    objs.push(area(s2, 'building', i, 74, 2, 2, { sprite: s2, atlas: 'porto', block: 1 }));
+  // mercadoria ao lado das barracas dos vendedores (Hua: poções; Bo: peixe seco e chá; Lan: cestos e barril)
+  decor('estante_pocoes', 28.5, 74.5, { block: 1 });
+  decor('caixotes', 25.4, 75.4, { atlas: 'cidade', block: 1 });
+  decor('varal_peixe', 38.5, 74.5, { block: 1 });
+  decor('jarros_cha', 35.4, 75.4, { block: 1 });
+  decor('estante_pocoes', 58.5, 74.5, { block: 1 });
+  decor('barril', 54.4, 75.4, { atlas: 'cidade', block: 1 });
+  decor('sacos_especiarias', 25.4, 76.4, { block: 1 });
+  decor('cestos', 29.5, 75.6, { block: 1 });
+  decor('barril', 39.5, 75.5, { atlas: 'cidade', block: 1 });
+  decor('caixotes', 35.4, 74.4, { atlas: 'cidade', block: 1 });
+  decor('cestos', 55.4, 74.5, { block: 1 });
+  decor('sacos_especiarias', 59.5, 75.6, { block: 1 });
+  decor('jarros_cha', 55.4, 76.4, { block: 1 });
+  // barracas sem vendedor: lanternas e fogos de papel (oeste, i 14); seda e leques (leste, i 66)
+  decor('lanternas_papel', 16.5, 74.5, { block: 1, light: 1, soft: 1 });
+  decor('fogos', 13.4, 75.4, { block: 1 });
+  decor('fogos', 16.5, 75.6, { block: 1 });
+  decor('caixotes', 13.4, 74.4, { atlas: 'cidade', block: 1 });
+  decor('rolos_seda', 68.5, 74.5, { block: 1 });
+  decor('leques', 65.4, 75.4, { block: 1 });
+  decor('rolos_seda', 65.4, 74.4, { block: 1 });
+  decor('lanterna_chao', 68.6, 75.8, { block: 1, light: 1, soft: 1 });
   for (const x of [12, 30, 62, 80]) decor('estacas_cais', x + 1, 86.5, { light: 1 });
   const post = (x, y) => decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
   for (let x = 4; x < 92; x += 8) if (gr.get(x, 80) === PL) post(x, 80);
@@ -1635,7 +1794,6 @@ function porto() {
     [84, 19],
     [71, 6],
     [71, 13],
-    [74, 13],
     [71, 27],
     [74, 34],
     [11, 64],
@@ -1660,19 +1818,19 @@ function porto() {
     [83, 57],
   ])
     unlit(x, y);
-  // um poste aceso junto de cada NPC, para ele ser visto no escuro
-  for (const [x, y] of [
-    [45, 39],
-    [73.5, 28.5],
-    [67.5, 60.5],
-    [27.5, 77.5],
-    [37.5, 77.5],
-    [57.5, 77.5],
-    [44, 5],
-    [51, 5],
-    [31, 26],
+  // lanterninha de chão com luz suave junto de cada NPC (soft: halo fraco, clareia o NPC sem ofuscar)
+  for (const [x, y, block] of [
+    [43.4, 38.6, 1], // Mestre dos Caminhos
+    [31.9, 81.2, 1], // Mestre do Cais
+    [28.6, 76.4, 1], // vendedores do cais (na frente da barraca, do lado)
+    [38.6, 76.4, 1],
+    [58.6, 76.4, 1],
+    [67.9, 60.5, 1], // Antiquário Lao
+    [78.5, 28.5, 1], // Joalheiro Yu
+    [75.6, 14.4, 1], // Ferreiro-mestre Gang
+    [27.0, 27.6, 1], // Cavalariço Ma
   ])
-    post(x, y);
+    decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
 
   // mar: juncos (barcos) parados e balançando
   for (const [s2, x, y] of [
