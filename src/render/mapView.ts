@@ -4,6 +4,7 @@ import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import type { GameMap, MapObject } from '../core/map';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
+import { bobBoats, buildNight } from './nightView';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
@@ -22,6 +23,8 @@ const GROUND: Record<string, number[]> = {
   lava: [19],
   marble: [20, 21],
   cloud: [22],
+  // nível 50 (Porto Noturno): tábuas do cais e das pontes
+  deck: [23, 24],
 };
 const ICE_FRAME = 15; // água na montanha: lago congelado (parado)
 // Montanha Nevada (atlas props-montanha): pinheiros (mais escuros, com geada e com neve) e pedras nevadas
@@ -205,6 +208,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
         }
       }
     }
+  const boats: Phaser.GameObjects.Image[] = [];
   for (const o of map.objects) {
     if (o.type === 'building') out.push(...building(scene, propsAtlas(o), String(o.props.sprite), o.x, o.y, o.w, o.h));
     else if (o.type === 'decor') {
@@ -212,9 +216,12 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       const img = scene.add
         .image(p.x, p.y, propsAtlas(o), String(o.props.sprite))
         .setScale(SPRITE_SCALE)
-        // parte de cima do portão: sempre por cima de quem passa embaixo
-        .setDepth(o.props.top ? DEPTH.GATE_TOP : Math.floor(o.x) + Math.floor(o.y) + 1);
-      img.setName('tree'); // fica transparente se cobrir o jogador
+        // parte de cima do portão: sempre por cima de quem passa embaixo; ponte (flat): rente ao chão, debaixo de todos
+        .setDepth(
+          o.props.top ? DEPTH.GATE_TOP : o.props.flat ? DEPTH.SHORE + 1 : Math.floor(o.x) + Math.floor(o.y) + 1,
+        );
+      if (!o.props.flat) img.setName('tree'); // fica transparente se cobrir o jogador
+      if (o.props.boat) boats.push(img);
       out.push(img);
     } else if (o.type === 'teleCircle') out.push(...teleCircle(scene, o.x, o.y, o.w, o.h));
   }
@@ -226,6 +233,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
     out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc));
   }
+  if (boats.length) bobBoats(scene, boats);
+  out.push(...buildNight(scene, map));
   if (water.length) {
     // água: cada tile troca de quadro com sua própria fase (sem todos piscarem juntos)
     let k = 0;

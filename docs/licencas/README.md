@@ -100,6 +100,7 @@ Licença conferida no campo "License(s)" da página do OpenGameArt. Texto legal:
 | `mosteiro` | `https://opengameart.org/content/epic-endgame-cinematic` (ChoirChordsBassMaster.wav) | cynicmusic | CC0 |
 | `covil` | `https://opengameart.org/content/battle-theme-a` (battleThemeA.mp3) | cynicmusic | CC0 |
 | `trial` | `https://opengameart.org/content/boss-battle-music` (Juhani Junkala - Epic Boss Battle [Seamlessly Looping].wav) | Juhani Junkala (SubspaceAudio) | CC0 |
+| `porto` | `https://opengameart.org/content/samurai-nights` (samurai-nights-by-majadroid.zip → Samurai-Nights-Demo.mp3, verificada em 22/11/2026; -20 LUFS; autor em `majadroid-samurai-nights-INFO.txt`) | Majadroid (Maik Hoffmann) | **CC-BY 4.0** (crédito obrigatório: tela de créditos e `public/audio/CREDITS.txt`) |
 
 ### Ações, itens, forja e missões (verificados em 20/11/2026)
 

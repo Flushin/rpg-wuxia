@@ -31,6 +31,8 @@ export interface MapConfig {
   /** Cidade de apoio: morrer ou usar o Pergaminho de Retorno aqui leva a esta cidade (sem ela, à vila). Nível 40:
    *  Cidadela de Jade nos mapas além do portão leste (decidido pelo Lucas em 21/11/2026). */
   homeTown?: string;
+  /** Noite (Porto Noturno): véu azul-escuro sobre o mapa e halos quentes nas lanternas (src/render/nightView.ts). */
+  night?: boolean;
   /** Posição no mapa-múndi (janela do mapa, aba Mundo): coluna e linha de uma grade; mapa sem ela não aparece. */
   world?: { col: number; row: number };
 }
@@ -39,6 +41,16 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
   cidade: { town: true, world: { col: 1, row: 2 }, music: 'music_cidade', trees: 'city', grassDecor: 0.035 },
   // Cidadela de Jade (21/11/2026): cidade do meio do jogo, só pelo teleporte do Mestre dos Caminhos (nível 30)
   cidadela: { town: true, world: { col: 2, row: 3 }, music: 'music_cidadela', trees: 'city', grassDecor: 0.03 },
+  // Porto Noturno (23/11/2026): cidade 96×96 do nível 50, pelo portão sul da Cidadela (minLevel 50) ou pelo teleporte;
+  // sempre de noite (véu escuro + halos das lanternas, src/render/nightView.ts)
+  porto: {
+    town: true,
+    world: { col: 2, row: 4 },
+    music: 'music_porto',
+    trees: 'city',
+    grassDecor: 0.02,
+    night: true,
+  },
   floresta: {
     music: 'music_floresta',
     trees: 'forest',

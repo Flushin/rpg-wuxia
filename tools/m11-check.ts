@@ -122,7 +122,7 @@ ok(
 );
 
 const maps: Record<string, GameMap> = {};
-for (const id of ['cidade', 'cidadela', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico', 'vale', 'palacio'])
+for (const id of ['cidade', 'cidadela', 'floresta', 'ruinas', 'montanha', 'bambu', 'pico', 'vale', 'palacio', 'porto'])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const NOW = 1_800_000_000_000;
 const mk = (level: number, mapId: string, classId = 'lamina'): World => {
@@ -264,7 +264,7 @@ console.log('\n== Imperador Carmesim ==');
 
 console.log('\n== missões 31–40 ==');
 {
-  const qs = QUESTS.slice(19);
+  const qs = QUESTS.slice(19, 24); // depois vêm as 3 do Porto Noturno (nível 50)
   ok(
     qs.map((q) => q.id).join() === 'portao_leste,andarilhos_cinzas,fogo_rubro,lua_fria,imperador_carmesim',
     'cinco etapas novas, em ordem',
@@ -306,11 +306,11 @@ console.log('\n== Trial 11–20 ==');
 ok(TRIAL_TIERS === 20 && trialBossLevel(20) === 40, 'níveis 1–20, chefe até o nível 40');
 ok(trialEquipReqLevel(14) === 25 && trialEquipReqLevel(15) === 35, 'nv 25 até o 14, nv 35 do 15 ao 20');
 
-console.log('\n== montaria (estábulo da Cidadela) ==');
+console.log('\n== montaria (estábulo do Porto Noturno) ==');
 {
-  const w = mk(50, 'cidadela') as World & { time: number; lastCombat: number };
+  const w = mk(50, 'porto') as World & { time: number; lastCombat: number };
   const st = w.npcs.find((n) => n.npcId === 'estabulo');
-  ok(!!st && w.npcRole(st) === 'estabulo', 'Cavalariço Ma no mapa da Cidadela');
+  ok(!!st && w.npcRole(st) === 'estabulo', 'Cavalariço Ma no mapa do Porto Noturno');
   ok(w.buyMount('cavalo')?.code === 'talkToStable', 'só compra falando com o estábulo');
   w.openNpc = st!;
   const g0 = w.gold;

@@ -9,6 +9,10 @@ export const DEPTH = {
   PORTAL_FLOOR: -90000,
   /** área de aviso dos golpes do chefe (telegraph), por cima do chão e por baixo de todos */
   TELEGRAPH: -80000,
+  /** véu da noite (Porto Noturno): por cima do mundo, abaixo dos halos, nomes e efeitos */
+  NIGHT_VEIL: 99000,
+  /** halos das lanternas, por cima do véu */
+  NIGHT_LIGHT: 99001,
   /** topo do portão da cidade: por cima de quem passa embaixo */
   GATE_TOP: 99990,
   /** nomes acima das cabeças (casas, árvores e o portão não cortam) */

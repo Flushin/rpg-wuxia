@@ -10,6 +10,7 @@ SPRITE_CFG=montanha.json $PY render_props.py
 SPRITE_CFG=vale.json $PY render_props.py
 $PY render_town.py
 $PY render_cidadela.py
+$PY render_porto.py
 $PY render_ruins.py
 $PY render_bambu.py
 $PY icons.py

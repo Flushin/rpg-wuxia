@@ -1,7 +1,7 @@
 {
   "cavalo": {
     "name": "Cavalo",
-    "desc": "Cavalo baio dos estábulos da Cidadela. Leva você mais rápido pelas estradas; desmonta ao entrar em combate.",
+    "desc": "Cavalo baio dos estábulos do Porto Noturno. Leva você mais rápido pelas estradas; desmonta ao entrar em combate.",
     "price": 50000,
     "speedBonus": 0.3,
     "mountDelay": 3

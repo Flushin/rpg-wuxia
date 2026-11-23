@@ -14,5 +14,5 @@ lógica em `src/core/world/gems.ts`; janelas em `src/ui/gemShop.ts`.
 - Visual: losango CSS na cor da gema com o nível em romano; encaixe vazio = losango tracejado.
 - Save: campo opcional `gems` no item (id ou null por encaixe). Sem versão nova: saves antigos não têm o campo (= sem encaixes)
   e a leitura saneia (máximo da raridade, gema desconhecida vira vazio).
-- **Provisório:** os dois NPCs ficam na Cidadela (sprites emprestados da Mercadora Jin e do Ferreiro Lin) até o mapa do Porto;
+- Os dois NPCs ficam no bairro nordeste do Porto Noturno (etapa 5, `porto-noturno.md`), com sprites próprios;
   o Pó de Estrela passa a cair de monstros nv 45+ quando eles existirem.

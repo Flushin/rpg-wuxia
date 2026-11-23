@@ -24,6 +24,7 @@ interface Credit {
 }
 
 const CC0 = L('CC0 (domínio público)', 'CC0 (public domain)');
+const CCBY4 = 'CC-BY 4.0 (creativecommons.org/licenses/by/4.0)';
 
 const ART: Credit[] = [
   {
@@ -143,6 +144,14 @@ const SOUND: Credit[] = [
     what: L('Música do Trial: "Epic Boss Battle"', 'Trial music: "Epic Boss Battle"'),
     who: 'Juhani Junkala (SubspaceAudio, OpenGameArt.org)',
     license: CC0,
+  },
+  {
+    what: L(
+      'Música do Porto Noturno: "Samurai Nights" (volume igualado)',
+      'Night Harbor music: "Samurai Nights" (volume matched)',
+    ),
+    who: 'Majadroid — Maik Hoffmann (majadroid.com, OpenGameArt.org)',
+    license: CCBY4,
   },
 ];
 

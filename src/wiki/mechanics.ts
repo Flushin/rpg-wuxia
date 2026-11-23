@@ -263,7 +263,7 @@ function reliquias(): string {
   return `<section class="panel"><h2>Relíquias</h2>
       <p>Um espaço de equipamento próprio, abaixo do corpo na janela do Personagem, liberado no <b>nível ${RELIC_REQ_LEVEL}</b>.
       Cada relíquia dá atributos fixos e <b>um efeito único</b> (roubo de vida, velocidade de ataque, recarga das skills ou vida máxima em %).</p>
-      <ul><li><b>Comuns e raras:</b> vendidas pelo <a href="#/npc/antiquario">Antiquário Lao</a>, na Cidadela de Jade (provisório, até o Porto Noturno abrir).</li>
+      <ul><li><b>Comuns e raras:</b> vendidas pelo <a href="#/npc/antiquario">Antiquário Lao</a>, no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>.</li>
       <li><b>Lendárias:</b> não estão à venda. Cada chefe derrotado (do mundo, de masmorra ou do Trial) com você no nível ${RELIC_DROP.minPlayerLevel} tem
       ${Math.round(RELIC_DROP.chance * 100)}% de chance de dar uma lendária que você ainda não tem.</li>
       <li>Compradas ou ganhas uma vez, ficam na sua coleção para sempre; troque a equipada quando quiser, sem custo.</li>
@@ -279,7 +279,7 @@ function montarias(): string {
     )
     .join('');
   return `<section class="panel"><h2>Montarias</h2>
-      <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo da Cidadela de Jade. Compradas uma vez, valem para sempre e em todos os mapas.</p>
+      <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo do <a href="#/mapa/porto">Porto Noturno</a> (nível 50). Compradas uma vez, valem para sempre e em todos os mapas.</p>
       <ul><li><b>Montar é sozinho:</b> depois de alguns segundos sem dar nem levar golpes, o personagem sobe na montaria.</li>
       <li><b>Só fora de combate:</b> ao golpear ou ser golpeado, desmonta na hora e volta à velocidade normal.</li>
       <li>A montaria só muda a velocidade de andar; não dá atributos nem muda o combate. O Auto também anda montado.</li></ul>
