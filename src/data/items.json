@@ -1167,7 +1167,11 @@
             35
           ]
         }
-      }
+      },
+      "cornalina": { "name": "Cornalina", "color": "#ff6a2a", "stats": { "elem_fire": [6, 13, 21, 30, 40] } },
+      "agua_marinha": { "name": "Água-marinha", "color": "#7fe0ff", "stats": { "elem_ice": [6, 13, 21, 30, 40] } },
+      "citrino": { "name": "Citrino", "color": "#ffe24a", "stats": { "elem_thunder": [6, 13, 21, 30, 40] } },
+      "malaquita": { "name": "Malaquita", "color": "#4fbf5a", "stats": { "elem_poison": [6, 13, 21, 30, 40] } }
     }
   }
 }

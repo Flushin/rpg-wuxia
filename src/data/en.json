@@ -452,7 +452,11 @@
         },
         "topazio": {
           "name": "Topaz"
-        }
+        },
+        "cornalina": { "name": "Carnelian" },
+        "agua_marinha": { "name": "Aquamarine" },
+        "citrino": { "name": "Citrine" },
+        "malaquita": { "name": "Malachite" }
       }
     }
   },
@@ -1108,7 +1112,7 @@
   "novidades": {
     "proxima": [
       {
-        "texto": "Gems and sockets: the Jeweler sells 7 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx and Topaz) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems. Both are in the northeast district of the Night Harbor."
+        "texto": "Gems and sockets: the Jeweler sells 11 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx, Topaz and one attack gem per element: Carnelian, Aquamarine, Citrine and Malachite) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems (no repeated type on the same item). Both are in the northeast district of the Night Harbor."
       },
       {
         "texto": "Max level 50: XP keeps coming after level 40, and each level from 41 to 50 grants 4 attribute points. Characters already at 40 start the level 41 bar from zero."

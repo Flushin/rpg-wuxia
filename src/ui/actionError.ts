@@ -59,6 +59,8 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Ferreiro-mestre', 'Talk to the Master Smith');
     case 'hasGems':
       return L('Retire as gemas antes (Ferreiro-mestre)', 'Remove the gems first (Master Smith)');
+    case 'gemDuplicate':
+      return L('Este item já tem uma gema desse tipo', 'This item already has a gem of this type');
     case 'noSocket':
       return L('Nenhum encaixe vazio', 'No empty socket');
     case 'socketsMax':
