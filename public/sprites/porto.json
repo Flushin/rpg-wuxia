@@ -528,9 +528,33 @@
     "y": 0.9434
    }
   },
-  "banca_reliquias": {
+  "fornalha": {
    "frame": {
     "x": 0,
+    "y": 3908,
+    "w": 114,
+    "h": 154
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 114,
+    "h": 154
+   },
+   "sourceSize": {
+    "w": 114,
+    "h": 154
+   },
+   "pivot": {
+    "x": 0.5088,
+    "y": 0.8442
+   }
+  },
+  "banca_reliquias": {
+   "frame": {
+    "x": 116,
     "y": 3908,
     "w": 159,
     "h": 131
@@ -552,9 +576,33 @@
     "y": 0.7634
    }
   },
+  "suporte_armas": {
+   "frame": {
+    "x": 277,
+    "y": 3908,
+    "w": 54,
+    "h": 121
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 54,
+    "h": 121
+   },
+   "sourceSize": {
+    "w": 54,
+    "h": 121
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9008
+   }
+  },
   "leao_pedra": {
    "frame": {
-    "x": 161,
+    "x": 333,
     "y": 3908,
     "w": 74,
     "h": 108
@@ -578,7 +626,7 @@
   },
   "expositor_gemas": {
    "frame": {
-    "x": 237,
+    "x": 409,
     "y": 3908,
     "w": 66,
     "h": 96
@@ -602,7 +650,7 @@
   },
   "jarros_antigos": {
    "frame": {
-    "x": 305,
+    "x": 477,
     "y": 3908,
     "w": 71,
     "h": 95
@@ -626,7 +674,7 @@
   },
   "estacas_cais": {
    "frame": {
-    "x": 378,
+    "x": 550,
     "y": 3908,
     "w": 64,
     "h": 85
@@ -648,9 +696,57 @@
     "y": 0.8353
    }
   },
+  "tina_tempera": {
+   "frame": {
+    "x": 616,
+    "y": 3908,
+    "w": 56,
+    "h": 75
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 75
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 75
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8267
+   }
+  },
+  "bigorna": {
+   "frame": {
+    "x": 674,
+    "y": 3908,
+    "w": 45,
+    "h": 70
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 45,
+    "h": 70
+   },
+   "sourceSize": {
+    "w": 45,
+    "h": 70
+   },
+   "pivot": {
+    "x": 0.4889,
+    "y": 0.8571
+   }
+  },
   "lanterna_chao": {
    "frame": {
-    "x": 444,
+    "x": 721,
     "y": 3908,
     "w": 36,
     "h": 48
@@ -677,7 +773,7 @@
   "image": "porto.png",
   "size": {
    "w": 1024,
-   "h": 4039
+   "h": 4062
   },
   "scale": "0.5"
  }

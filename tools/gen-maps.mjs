@@ -1564,6 +1564,16 @@ function porto() {
     building(s2, i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6);
   for (let y = 29; y <= 35; y++) for (let x = 25; x <= 36; x++) reserve(x, y);
   building('porto_forja', 75, 8, 5, 4);
+  // pátio da forja (porta em j 12): fornalha acesa, bigorna, suporte de armas, tina de têmpera, barris e caixotes
+  gr.rect(74, 12, 8, 3, PL);
+  gr.rect(74, 8, 1, 4, PL);
+  for (let y = 7; y <= 17; y++) for (let x = 73; x <= 82; x++) reserve(x, y);
+  decor('fornalha', 79.5, 12.6, { block: 1, light: 1 });
+  decor('bigorna', 76.4, 13.5, { block: 1 });
+  decor('suporte_armas', 74.5, 12.5, { block: 1 });
+  decor('tina_tempera', 78.6, 14.2, { block: 1 });
+  decor('barril', 81.5, 12.5, { atlas: 'cidade', block: 1 });
+  decor('caixotes', 81.5, 13.6, { atlas: 'cidade', block: 1 });
   building('porto_joalheria', 75, 24, 4, 4);
   // frente da joalheria (porta em j 28): pátio de pedra até a viela, vitrine de joias com o Yu atrás,
   // geodo de ametista na porta e lanternas de pedra
@@ -1598,7 +1608,7 @@ function porto() {
   objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
   npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
-  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 74, 13, { role: 'ferreiro_mestre' });
+  npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
   npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
   npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
   npc('Guarda do Portão', 'guarda_porto', 45.5, 5);
@@ -1655,7 +1665,6 @@ function porto() {
     [84, 19],
     [71, 6],
     [71, 13],
-    [74, 13],
     [71, 27],
     [74, 34],
     [11, 64],
@@ -1691,6 +1700,7 @@ function porto() {
     [57.9, 77.7, 1],
     [67.9, 60.5, 1], // Antiquário Lao
     [78.5, 28.5, 1], // Joalheiro Yu
+    [75.6, 14.4, 1], // Ferreiro-mestre Gang
   ])
     decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
   // um poste aceso junto de cada NPC, para ele ser visto no escuro

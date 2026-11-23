@@ -309,13 +309,91 @@ def gem_display():
         o.rotation_euler = (rnd.uniform(-0.5, 0.5), rnd.uniform(-0.5, 0.5), 0)
 
 
+# ---- forja (Ferreiro-mestre Gang): fachada, fornalha, bigorna, suporte de armas e tina de têmpera ----
+IRON = (70, 72, 78)
+STEEL = (170, 176, 186)
+EMBER = (255, 110, 30)
+
+
+def forge_front(a, b, wh):
+    """Ferramentas penduradas na parede (tenazes e martelos), janela da fornalha brilhando e toldo de lona escura."""
+    o = box(0, -b - 0.4, 0.2 + wh - 0.1, 1.6, 0.7, 0.04, (60, 56, 52))
+    o.rotation_euler = (-0.18, 0, 0)
+    for sx in (-1, 1):
+        cyl(sx * 0.75, -b - 0.72, 0, 0.035, 0.2 + wh - 0.2, WOODW_D)
+    for k in range(3):  # martelos e tenazes na parede da direita
+        x = a * 0.35 + k * 0.22
+        box(x, -b - 0.05, 0.55, 0.04, 0.03, 0.4, WOODW)
+        box(x, -b - 0.06, 0.92, 0.14 if k % 2 == 0 else 0.06, 0.05, 0.08, IRON, rough=0.4)
+    box(-a * 0.6, -b - 0.03, 0.5, 0.5, 0.03, 0.35, EMBER, emit=3.0)  # boca da fornalha (janela)
+    box(-a * 0.6, -b - 0.05, 0.85, 0.6, 0.05, 0.06, rt.STONE_D)
+
+
+def forge_shop():
+    def chimney(a, b, wh):
+        box(-a * 0.5, b * 0.3, 0.2, 0.42, 0.42, wh + 1.25, rt.STONE_D)
+    porto_house(5, 4, extras=[rt.shop_sign((60, 60, 70)), chimney, forge_front])
+
+
+def hearth():
+    """Fornalha de pedra com brasas acesas, fole de couro e chaminé curta."""
+    box(0, 0, 0, 0.8, 0.8, 0.5, rt.STONE_D)
+    box(0, 0, 0.5, 0.86, 0.86, 0.06, rt.STONE)
+    box(0, 0, 0.56, 0.6, 0.6, 0.04, (50, 30, 26))  # cinzas
+    for k in range(12):
+        sphere(-0.22 + (k % 6) * 0.09, -0.12 + (k // 6) * 0.16 + 0.04 * (k % 2), 0.6, 0.06,
+               (220, 70, 20) if k % 3 else (255, 150, 40), emit=1.4 if k % 3 else 2.2)
+    box(0.15, 0.3, 0.56, 0.3, 0.2, 0.9, rt.STONE_D)  # chaminé
+    box(-0.55, 0.0, 0.25, 0.28, 0.4, 0.14, (120, 80, 50))  # fole
+    cyl(-0.4, 0.0, 0.3, 0.03, 0.2, WOODW_D)
+
+
+def anvil():
+    """Bigorna de ferro num toco, com martelo e uma lâmina em brasa."""
+    cyl(0, 0, 0, 0.24, 0.38, WOODW, verts=12)
+    box(0, 0, 0.38, 0.24, 0.2, 0.12, IRON, rough=0.35)
+    box(0, 0, 0.5, 0.46, 0.22, 0.1, IRON, rough=0.35)
+    cyl(0.28, 0, 0.53, 0.07, 0.04, IRON, rough=0.35, r2=0.01).rotation_euler = (0, 1.5708, 0)
+    box(-0.05, -0.02, 0.61, 0.34, 0.05, 0.02, (255, 140, 50), emit=3.0)  # lâmina em brasa
+    box(0.12, 0.08, 0.63, 0.24, 0.03, 0.03, WOODW)  # cabo do martelo
+    box(0.02, 0.08, 0.63, 0.06, 0.08, 0.06, IRON)
+
+
+def weapon_rack():
+    """Suporte de madeira com espadas, lança e um machado."""
+    for sx in (-1, 1):
+        cyl(sx * 0.32, 0, 0, 0.035, 1.0, WOODW_D)
+    box(0, 0, 0.95, 0.75, 0.06, 0.05, WOODW_D)
+    box(0, 0, 0.3, 0.75, 0.06, 0.05, WOODW_D)
+    for k in range(3):  # espadas
+        x = -0.2 + k * 0.14
+        box(x, -0.04, 0.32, 0.04, 0.02, 0.6, STEEL, rough=0.25)
+        box(x, -0.04, 0.92, 0.12, 0.03, 0.03, rt.GOLD)
+        box(x, -0.04, 0.95, 0.03, 0.03, 0.12, WOODW)
+    cyl(0.24, -0.04, 0.05, 0.015, 1.25, WOODW)  # lança
+    cyl(0.24, -0.04, 1.3, 0.04, 0.14, STEEL, verts=6, r2=0.0)
+
+
+def quench_tub():
+    """Tina de têmpera: barril cortado com água e vapor."""
+    cyl(0, 0, 0, 0.3, 0.36, WOODW, verts=14)
+    for z in (0.06, 0.28):
+        cyl(0, 0, z, 0.305, 0.04, IRON, verts=14)
+    cyl(0, 0, 0.3, 0.26, 0.04, (60, 100, 130), verts=14, rough=0.1)
+    box(0.05, 0.05, 0.34, 0.03, 0.03, 0.45, IRON).rotation_euler = (0.3, 0.2, 0)  # tenaz
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
     'porto_casa_3x3': (lambda: porto_house(3, 3, roof_rgb=ROOF_T), (3, 3), 3.6),
     'porto_casa_5x4': (lambda: porto_house(5, 4, wall_h=1.6), (5, 4), 3.9),
     'porto_estabulo': (stable, (6, 4), 3.6),
-    'porto_forja': (lambda: porto_house(5, 4, extras=[rt.shop_sign((60, 60, 70)), rt.forge]), (5, 4), 3.6),
+    'porto_forja': (forge_shop, (5, 4), 3.6),
+    'fornalha': (hearth, (1, 1), 1.6),
+    'bigorna': (anvil, (1, 1), 1.0),
+    'suporte_armas': (weapon_rack, (1, 1), 1.6),
+    'tina_tempera': (quench_tub, (1, 1), 1.0),
     'porto_joalheria': (jewel_shop, (4, 4), 3.6),
     'vitrine_joias': (jewel_counter, (2, 1), 1.6),
     'expositor_gemas': (gem_display, (1, 1), 1.2),
