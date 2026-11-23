@@ -5,6 +5,7 @@ import type { GameMap, MapObject } from '../core/map';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { bobBoats, buildNight } from './nightView';
+import { animKey, sheetFor, sheetTexture } from './sprites';
 
 // Marco 6: piso, árvores, cidade, ruínas, água e portais renderizados (public/sprites).
 // Folha 'pisos' (128x64, mostrada em 0,5): 0-2 grama, 3 caminho, 4-5 lajotas da praça, 6-8 lajotas das ruínas,
@@ -213,6 +214,23 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     if (o.type === 'building') out.push(...building(scene, propsAtlas(o), String(o.props.sprite), o.x, o.y, o.w, o.h));
     else if (o.type === 'decor') {
       const p = tileToScreen(o.x, o.y);
+      // bicho parado animado no lugar (cavalos do estábulo): folha de personagem com a animação idle; sem a folha
+      // carregada, cai no desenho fixo do atlas
+      const sh = o.props.sheet ? sheetFor(String(o.props.sheet)) : null;
+      if (sh && scene.textures.exists(sheetTexture(sh.key))) {
+        const dir = Number(o.props.dir) || 0,
+          key = animKey(sh.key, 'idle', dir);
+        const sp = scene.add
+          .sprite(p.x, p.y, sheetTexture(sh.key), `idle_${dir}_0`)
+          .setOrigin(sh.meta.anchor[0], sh.meta.anchor[1])
+          .setScale(sh.meta.scale * (Number(o.props.scale) || 1))
+          .setDepth(Math.floor(o.x) + Math.floor(o.y) + 1);
+        if (o.props.tint) sp.setTint(Number(o.props.tint));
+        if (scene.anims.exists(key)) sp.play({ key, startFrame: Math.floor(o.x * 7 + o.y * 3) % 4 });
+        sp.setName('tree');
+        out.push(sp);
+        continue;
+      }
       const img = scene.add
         .image(p.x, p.y, propsAtlas(o), String(o.props.sprite))
         .setScale(SPRITE_SCALE)

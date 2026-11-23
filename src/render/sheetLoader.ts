@@ -17,6 +17,7 @@ function sheetsOf(map: GameMap, player: string): Set<string> {
   add(player);
   for (const o of map.objects) {
     if (o.type === 'npc') add('npc-' + String(o.props.npc ?? ''));
+    if (o.type === 'decor' && o.props.sheet) add(String(o.props.sheet)); // bichos animados do cenário (cavalos)
     if (o.type !== 'monsterSpawn') continue;
     const def = MONSTERS[String(o.props.monster)];
     if (!def) continue;

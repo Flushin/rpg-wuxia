@@ -552,9 +552,81 @@
     "y": 0.8442
    }
   },
-  "banca_reliquias": {
+  "cavalo_a": {
    "frame": {
     "x": 116,
+    "y": 3908,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "cavalo_b": {
+   "frame": {
+    "x": 264,
+    "y": 3908,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "cavalo_c": {
+   "frame": {
+    "x": 412,
+    "y": 3908,
+    "w": 146,
+    "h": 149
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 149
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 149
+   },
+   "pivot": {
+    "x": 0.5959,
+    "y": 0.8389
+   }
+  },
+  "banca_reliquias": {
+   "frame": {
+    "x": 560,
     "y": 3908,
     "w": 159,
     "h": 131
@@ -578,7 +650,7 @@
   },
   "suporte_armas": {
    "frame": {
-    "x": 277,
+    "x": 721,
     "y": 3908,
     "w": 54,
     "h": 121
@@ -600,9 +672,33 @@
     "y": 0.9008
    }
   },
+  "palanque": {
+   "frame": {
+    "x": 777,
+    "y": 3908,
+    "w": 106,
+    "h": 110
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 106,
+    "h": 110
+   },
+   "sourceSize": {
+    "w": 106,
+    "h": 110
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7909
+   }
+  },
   "leao_pedra": {
    "frame": {
-    "x": 333,
+    "x": 885,
     "y": 3908,
     "w": 74,
     "h": 108
@@ -626,8 +722,8 @@
   },
   "expositor_gemas": {
    "frame": {
-    "x": 409,
-    "y": 3908,
+    "x": 0,
+    "y": 4064,
     "w": 66,
     "h": 96
    },
@@ -648,10 +744,34 @@
     "y": 0.8438
    }
   },
+  "cocho": {
+   "frame": {
+    "x": 68,
+    "y": 4064,
+    "w": 136,
+    "h": 95
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 136,
+    "h": 95
+   },
+   "sourceSize": {
+    "w": 136,
+    "h": 95
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6842
+   }
+  },
   "jarros_antigos": {
    "frame": {
-    "x": 477,
-    "y": 3908,
+    "x": 206,
+    "y": 4064,
     "w": 71,
     "h": 95
    },
@@ -674,8 +794,8 @@
   },
   "estacas_cais": {
    "frame": {
-    "x": 550,
-    "y": 3908,
+    "x": 279,
+    "y": 4064,
     "w": 64,
     "h": 85
    },
@@ -696,10 +816,58 @@
     "y": 0.8353
    }
   },
+  "feno": {
+   "frame": {
+    "x": 345,
+    "y": 4064,
+    "w": 75,
+    "h": 80
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 75,
+    "h": 80
+   },
+   "sourceSize": {
+    "w": 75,
+    "h": 80
+   },
+   "pivot": {
+    "x": 0.4933,
+    "y": 0.8
+   }
+  },
+  "sela": {
+   "frame": {
+    "x": 422,
+    "y": 4064,
+    "w": 56,
+    "h": 77
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 56,
+    "h": 77
+   },
+   "sourceSize": {
+    "w": 56,
+    "h": 77
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8961
+   }
+  },
   "tina_tempera": {
    "frame": {
-    "x": 616,
-    "y": 3908,
+    "x": 480,
+    "y": 4064,
     "w": 56,
     "h": 75
    },
@@ -722,8 +890,8 @@
   },
   "bigorna": {
    "frame": {
-    "x": 674,
-    "y": 3908,
+    "x": 538,
+    "y": 4064,
     "w": 45,
     "h": 70
    },
@@ -744,10 +912,34 @@
     "y": 0.8571
    }
   },
+  "sacos_racao": {
+   "frame": {
+    "x": 585,
+    "y": 4064,
+    "w": 62,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 62,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 62,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.4355,
+    "y": 0.8333
+   }
+  },
   "lanterna_chao": {
    "frame": {
-    "x": 721,
-    "y": 3908,
+    "x": 649,
+    "y": 4064,
     "w": 36,
     "h": 48
    },
@@ -773,7 +965,7 @@
   "image": "porto.png",
   "size": {
    "w": 1024,
-   "h": 4062
+   "h": 4160
   },
   "scale": "0.5"
  }

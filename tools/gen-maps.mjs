@@ -1553,6 +1553,7 @@ function porto() {
 
   // bairros: casas da planta
   building('porto_estabulo', 25, 22, 6, 4);
+  // cerca sobre a terra: objeto com block (não vira tile de casa, que desenharia uma faixa de grama)
   for (const [s2, i, j] of [
     ['cerca_i6', 25, 28],
     ['cerca_i6', 31, 28],
@@ -1561,8 +1562,39 @@ function porto() {
     ['cerca_j6', 24, 29],
     ['cerca_j6', 37, 29],
   ])
-    building(s2, i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6);
+    objs.push(
+      area(s2, 'building', i, j, s2.endsWith('i6') ? 6 : 1, s2.endsWith('i6') ? 1 : 6, {
+        sprite: s2,
+        atlas: 'porto',
+        block: 1,
+      }),
+    );
   for (let y = 29; y <= 35; y++) for (let x = 25; x <= 36; x++) reserve(x, y);
+  // estábulo: terreiro de terra entre a porta (j 26) e o cercado, chão de terra no cercado, cavalos, cocho, feno,
+  // sela e postes acesos nos cantos da cerca
+  gr.rect(24, 26, 14, 2, P);
+  gr.rect(24, 28, 14, 9, P);
+  for (let y = 21; y <= 37; y++) for (let x = 23; x <= 38; x++) reserve(x, y);
+  decor('cavalo_a', 29.5, 31.5, { block: 1, sheet: 'mount-cavalo', dir: 7 });
+  decor('cavalo_b', 33.5, 33.5, { block: 1, sheet: 'mount-cavalo', dir: 3, tint: 0x8a6650 });
+  decor('lanterna_chao', 31.5, 32.5, { block: 1, light: 1, soft: 1 });
+  decor('lanterna_chao', 27.5, 33.5, { block: 1, light: 1, soft: 1 });
+  objs.push(area('cocho', 'building', 26, 29, 2, 1, { sprite: 'cocho', atlas: 'porto', block: 1 }));
+  decor('feno', 35.5, 29.5, { block: 1 });
+  decor('feno', 31.5, 26.5, { block: 1 });
+  decor('sela', 24.5, 26.5, { block: 1 });
+  // ao lado do Ma: palanque com um cavalo amarrado, sacos de ração e barril
+  objs.push(area('palanque', 'building', 33, 25, 2, 1, { sprite: 'palanque', atlas: 'porto', block: 1 }));
+  decor('cavalo_c', 34.2, 26.7, { block: 1, sheet: 'mount-cavalo', dir: 6, tint: 0xd8d0c8 });
+  decor('sacos_racao', 29.6, 26.5, { block: 1 });
+  decor('barril', 25.6, 26.4, { atlas: 'cidade', block: 1 });
+  for (const [x, y] of [
+    [24, 28],
+    [37, 28],
+    [24, 36],
+    [37, 36],
+  ])
+    decor('lanterna_poste', x + 0.5, y + 0.5, { block: 1, light: 1 });
   building('porto_forja', 75, 8, 5, 4);
   // pátio da forja (porta em j 12): fornalha acesa, bigorna, suporte de armas, tina de têmpera, barris e caixotes
   gr.rect(74, 12, 8, 3, PL);
@@ -1607,7 +1639,7 @@ function porto() {
   npc('Mestre dos Caminhos', 'caminhos', 44.5, 40.5);
   objs.push(area('Círculo de Teleporte', 'teleCircle', 43.75, 39.75, 1.5, 1.5));
   // NPCs movidos da Cidadela (etapas 2 a 4) e os novos do Porto
-  npc('Cavalariço Ma', 'estabulo', 28, 27, { role: 'estabulo' });
+  npc('Cavalariço Ma', 'estabulo', 28.2, 27.2, { role: 'estabulo', face: 7 });
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
   npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
   npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
@@ -1701,6 +1733,7 @@ function porto() {
     [67.9, 60.5, 1], // Antiquário Lao
     [78.5, 28.5, 1], // Joalheiro Yu
     [75.6, 14.4, 1], // Ferreiro-mestre Gang
+    [27.0, 27.6, 1], // Cavalariço Ma
   ])
     decor('lanterna_chao', x, y, { light: 1, soft: 1, ...(block ? { block: 1 } : {}) });
   // um poste aceso junto de cada NPC, para ele ser visto no escuro
@@ -1711,7 +1744,6 @@ function porto() {
     [57.5, 77.5],
     [44, 5],
     [51, 5],
-    [31, 26],
   ])
     post(x, y);
 

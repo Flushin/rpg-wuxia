@@ -453,10 +453,18 @@
         "topazio": {
           "name": "Topaz"
         },
-        "cornalina": { "name": "Carnelian" },
-        "agua_marinha": { "name": "Aquamarine" },
-        "citrino": { "name": "Citrine" },
-        "malaquita": { "name": "Malachite" }
+        "cornalina": {
+          "name": "Carnelian"
+        },
+        "agua_marinha": {
+          "name": "Aquamarine"
+        },
+        "citrino": {
+          "name": "Citrine"
+        },
+        "malaquita": {
+          "name": "Malachite"
+        }
       }
     }
   },
@@ -1111,7 +1119,9 @@
   },
   "novidades": {
     "proxima": [
-{"texto": "Trial up to level 40 (bosses up to level 60). The boss now returns only 40–60% of the entry gold, and the drop bonus grows +0.3 point per level (12% to 23.7%); Epic stays at 1%."},
+      {
+        "texto": "Trial up to level 40 (bosses up to level 60). The boss now returns only 40–60% of the entry gold, and the drop bonus grows +0.3 point per level (12% to 23.7%); Epic stays at 1%."
+      },
       {
         "texto": "Gems and sockets: the Jeweler sells 11 gems (Ruby, Amethyst, Jade, Pearl, Sapphire, Onyx, Topaz and one attack gem per element: Carnelian, Aquamarine, Citrine and Malachite) and fuses 3 alike into one of the next level, up to V. The Master Smith opens up to 3 sockets per item, by rarity, and sets or removes gems (no repeated type on the same item). Both are in the northeast district of the Night Harbor."
       },
@@ -1127,6 +1137,9 @@
       },
       {
         "texto": "Night Harbor: a new level 50 city, four times larger than the others and always at night, with lanterns, three canals with bridges, a night market on the quay and junks at sea. Enter through the south gate of the Jade Citadel or with the Master of Roads. It has the stable, the master forge, the jeweler, the antique shop, an arena with the Trial portal, three new quests and the music \"Samurai Nights\" by Majadroid."
+      },
+      {
+        "texto": "A livelier Night Port: the Antiquarian, Jeweler, Forge and Stable got their own courtyards and scenery (relics, a jewel showcase, a lit hearth, horses in the corral), and NPCs now have a small lantern beside them and stay visible at night."
       }
     ],
     "versoes": [

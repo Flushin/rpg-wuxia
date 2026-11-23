@@ -135,8 +135,18 @@ def fence(n, axis):
     return f
 
 
+def stable_wall(a, b, wh):
+    """Tábua na parede com ferraduras e rédeas penduradas, ao lado da porta."""
+    box(-a * 0.55, -b - 0.04, 0.55, 0.9, 0.03, 0.55, WOODW_D)
+    for k in range(4):
+        o = cyl(-a * 0.55 - 0.3 + k * 0.2, -b - 0.07, 0.9, 0.07, 0.02, (120, 124, 130), verts=10, rough=0.4)
+        o.rotation_euler = (1.5708, 0, 0)
+    for k in range(2):
+        box(-a * 0.55 - 0.15 + k * 0.3, -b - 0.07, 0.6, 0.03, 0.02, 0.28, (90, 50, 30))
+
+
 def stable():
-    porto_house(6, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((150, 110, 60))])
+    porto_house(6, 4, roof_rgb=ROOF_T, extras=[rt.shop_sign((150, 110, 60)), stable_wall])
     for k in range(3):
         box(-1.8 + k * 1.2, -2.25, 0, 0.5, 0.3, 0.35, (200, 170, 90))  # fardos de feno
 
@@ -383,12 +393,112 @@ def quench_tub():
     box(0.05, 0.05, 0.34, 0.03, 0.03, 0.45, IRON).rotation_euler = (0.3, 0.2, 0)  # tenaz
 
 
+# ---- estábulo (Cavalariço Ma): cavalos no cercado, cocho, feno e sela ----
+HAY = (206, 172, 92)
+
+
+def horse(rot, tint=None):
+    """Cavalo parado (modelo do cavalo das montarias, pose do primeiro quadro do Idle), virado rot radianos."""
+    def f():
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.gltf(filepath=os.path.join(HERE, '.cache/quaternius/Horse.glb'))
+        new = [o for o in bpy.data.objects if o not in before]
+        for o in new:
+            if o.name.startswith('Icosphere'):
+                o.hide_render = True
+        roots = [o for o in new if o.parent is None]
+        arm = next((o for o in new if o.type == 'ARMATURE'), None)
+        if arm is not None:
+            if arm.animation_data is None:
+                arm.animation_data_create()
+            act = bpy.data.actions.get('AnimalArmature|Idle')
+            if act:
+                arm.animation_data.action = act
+                if hasattr(arm.animation_data, 'action_slot') and act.slots:
+                    arm.animation_data.action_slot = act.slots[0]
+                bpy.context.scene.frame_set(int(act.frame_range[0]))
+        for r in roots:
+            r.scale = (0.38, 0.38, 0.38)
+            r.rotation_euler = (0, 0, rot)
+        if tint:
+            for o in new:
+                if o.type == 'MESH':
+                    for m in o.data.materials:
+                        if m and m.use_nodes:
+                            b = next((n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+                            if b and m.name.startswith('Main'):
+                                k = {'Main': 1.0, 'Main_Dark': 0.7, 'Main_Light': 1.35}.get(m.name, 1.0)
+                                c = tuple(min(255, int(v * k)) for v in tint)
+                                for l in list(b.inputs['Base Color'].links):
+                                    m.node_tree.links.remove(l)
+                                b.inputs['Base Color'].default_value = (*rsp.srgb(c)[:3], 1)
+    return f
+
+
+def trough():
+    """Cocho (2x1): caixa de madeira comprida com água de um lado e feno do outro."""
+    for sx in (-1, 1):
+        box(sx * 0.75, 0, 0, 0.08, 0.4, 0.4, WOODW_D)
+    box(0, 0, 0.1, 1.6, 0.46, 0.06, WOODW)
+    for sy in (-1, 1):
+        box(0, sy * 0.22, 0.1, 1.6, 0.05, 0.32, WOODW)
+    box(-0.4, 0, 0.3, 0.75, 0.38, 0.04, (60, 100, 130), rough=0.1)
+    box(0.4, 0, 0.3, 0.75, 0.38, 0.1, HAY)
+
+
+def hay_pile():
+    """Fardos de feno empilhados com um forcado encostado."""
+    box(0, 0, 0, 0.7, 0.42, 0.32, HAY)
+    box(0.05, 0.02, 0.32, 0.6, 0.38, 0.3, (196, 162, 84), rot=0.25)
+    for z in (0.1, 0.22):
+        box(0, -0.215, z, 0.7, 0.01, 0.025, (150, 110, 60))
+    o = cyl(0.42, -0.1, 0, 0.018, 1.0, WOODW)
+    o.rotation_euler = (0.25, -0.15, 0)
+
+
+def hitching_rail():
+    """Palanque de amarrar (2x1) com rédea pendurada e um balde."""
+    for sx in (-1, 1):
+        cyl(sx * 0.7, 0, 0, 0.05, 0.75, WOODW_D)
+    box(0, 0, 0.7, 1.55, 0.08, 0.08, WOODW)
+    box(-0.2, 0, 0.45, 0.03, 0.03, 0.28, (90, 50, 30))
+    cyl(0.4, -0.2, 0, 0.13, 0.22, WOODW, verts=12, r2=0.15)
+    cyl(0.4, -0.2, 0.18, 0.12, 0.03, HAY)
+
+
+def feed_sacks():
+    """Sacos de ração de aveia, um aberto com uma concha."""
+    for k, (x, y) in enumerate([(-0.15, 0.1), (0.15, 0.12), (0.0, -0.15)]):
+        sphere(x, y, 0.2, 0.18, (196, 176, 136), sz=1.3)
+    cyl(0.0, -0.15, 0.4, 0.1, 0.03, HAY)
+    o = cyl(0.12, -0.2, 0.35, 0.015, 0.3, WOODW)
+    o.rotation_euler = (0.6, 0.3, 0)
+
+
+def saddle_rack():
+    """Cavalete com sela de couro e manta vermelha."""
+    for sx in (-1, 1):
+        cyl(sx * 0.22, 0, 0, 0.03, 0.55, WOODW_D)
+    box(0, 0, 0.55, 0.55, 0.12, 0.06, WOODW_D)
+    box(0, 0, 0.6, 0.45, 0.4, 0.03, (170, 40, 36))
+    sphere(0, 0, 0.66, 0.2, (120, 70, 40), sz=0.45)
+    sphere(-0.15, 0, 0.72, 0.06, (120, 70, 40))
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
     'porto_casa_3x3': (lambda: porto_house(3, 3, roof_rgb=ROOF_T), (3, 3), 3.6),
     'porto_casa_5x4': (lambda: porto_house(5, 4, wall_h=1.6), (5, 4), 3.9),
     'porto_estabulo': (stable, (6, 4), 3.6),
+    'cavalo_a': (horse(-0.6), (2, 2), 2.2),
+    'cavalo_b': (horse(2.3, (70, 50, 40)), (2, 2), 2.2),
+    'cocho': (trough, (2, 1), 0.9),
+    'feno': (hay_pile, (1, 1), 1.1),
+    'sela': (saddle_rack, (1, 1), 1.0),
+    'palanque': (hitching_rail, (2, 1), 1.0),
+    'sacos_racao': (feed_sacks, (1, 1), 0.8),
+    'cavalo_c': (horse(2.4, (150, 150, 150)), (2, 2), 2.2),
     'porto_forja': (forge_shop, (5, 4), 3.6),
     'fornalha': (hearth, (1, 1), 1.6),
     'bigorna': (anvil, (1, 1), 1.0),
