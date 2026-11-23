@@ -878,6 +878,78 @@ def fan_display():
     cyl(0.3, 0.2, 0.9, 0.38, 0.12, (60, 120, 160), r2=0.02, verts=16)
 
 
+# ---- portão norte do Porto (volta à Cidadela de Jade): padrão portão de ferro ----
+def iron_gatehouse():
+    """Portão da muralha do Porto (4x2): base de pedra, arco com moldura de ferro e vão escuro (a grade e a névoa do
+    teleporte são os sprites grade_ferro_i e nevoa_ferro_i), placa com ideogramas de jade e pavilhão de madeira
+    escura com telhado vermelho e lanternas."""
+    H = 2.1
+    box(0, 0, 0, 3.92, 1.92, 0.35, rc.BRICK_D)
+    for sx in (-1, 1):  # dois blocos de pedra dos lados do vão
+        box(sx * 1.3, 0, 0.35, 1.2, 1.8, H - 0.35, rc.BRICK)
+    box(0, 0, 1.62, 1.42, 1.8, H - 1.62, rc.BRICK)  # verga sobre o vão
+    box(0, 0, H, 3.92, 1.92, 0.08, rc.BRICK_D)
+    for s in (-1, 1):
+        box(0, s * 0.92, 1.56, 1.5, 0.06, 0.08, IRON)  # moldura de ferro do arco
+        for sx in (-1, 1):
+            box(sx * 0.72, s * 0.92, 0.35, 0.08, 0.06, 1.25, IRON)
+    # vão escuro (a grade de ferro e a névoa do teleporte são sprites à parte: grade_ferro_i, nevoa_ferro_i)
+    box(0, 0, 0.35, 1.38, 1.6, 1.22, (22, 22, 26))
+    # placa de ferro com ideogramas de jade sobre o arco
+    box(0, -0.97, 1.66, 0.9, 0.04, 0.3, IRON)
+    for k in range(3):
+        box(-0.25 + k * 0.25, -0.995, 1.72, 0.14, 0.01, 0.18, (90, 230, 170), emit=2.5)
+    # ameias
+    for k in range(14):
+        t = -1.82 + k * 0.28
+        for s in (-1, 1):
+            box(t, s * 0.84, H + 0.08, 0.16, 0.12, 0.24, rc.BRICK)
+    # pavilhão de madeira escura com telhado vermelho do Porto
+    a, b = 1.3, 0.48
+    for k in range(5):
+        x = -a + k * a / 2
+        for s in (-1, 1):
+            cyl(x, s * b, H + 0.08, 0.06, 0.8, WOODW_D)
+    box(0, 0, H + 0.08, 2 * a - 0.2, 2 * b - 0.2, 0.8, WOODW)
+    box(0, 0, H + 0.76, 2 * a + 0.04, 2 * b + 0.04, 0.12, WOODW_D)
+    z = H + 0.88
+    roof(0, 0, a, b, z - 0.02, 0.26, ROOF_R, over=0.36, lift=0.2, ridge=False)
+    box(0, 0, z, 2 * a * 0.7, 2 * b * 0.7, 0.42, WOODW)
+    roof(0, 0, a * 0.7, b * 0.7, z + 0.4, 0.55, ROOF_R, over=0.34, lift=0.26)
+    for k in (-1, 1):
+        cyl(k * 0.9, -b - 0.34, z - 0.12, 0.01, 0.12, WOODW_D)
+        lantern(k * 0.9, -b - 0.34, z - 0.26, 0.1, LANT)
+        cyl(k * 1.0, -1.0, 1.36, 0.01, 0.2, IRON)  # lanternas de ferro nas laterais do arco
+        lantern(k * 1.0, -1.0, 1.25, 0.09, AMBER)
+
+
+
+# ---- padrão "portão de ferro" (teleporte que abre ao chegar perto; src/render/ironGate.ts) ----
+# Sprites com a mesma pegada (4x2) e o mesmo centro do portão da muralha, para ficarem alinhados no jogo.
+# Vão do arco na face da frente (-y = tile j+): x de -0.72 a 0.72, z de 0.35 a 1.57 (as constantes em ironGate.ts).
+def iron_grate():
+    """Grade levadiça de ferro fechada: barras grossas com pontas, travessas, rebites dourados e moldura."""
+    y = -0.97
+    for k in range(7):
+        x = -0.6 + k * 0.2
+        box(x, y, 0.4, 0.07, 0.07, 1.17, (44, 46, 52), rough=0.4)
+        cyl(x, y, 0.3, 0.05, 0.12, (60, 62, 70), verts=4, r2=0.0).rotation_euler = (3.1416, 0, 0)
+    for z in (0.62, 0.98, 1.34):
+        box(0, y - 0.02, z, 1.42, 0.06, 0.07, (60, 62, 70), rough=0.35)
+        for k in range(7):
+            sphere(-0.6 + k * 0.2, y - 0.06, z + 0.035, 0.025, rt.GOLD)
+    box(0, y, 1.5, 1.44, 0.08, 0.07, (60, 62, 70))
+
+
+def gate_mist():
+    """Névoa de jade do teleporte, dentro do vão: planos brilhando do fundo (claro) para a frente e faíscas."""
+    for k, y in enumerate([0.6, 0.1, -0.4, -0.85]):
+        box(0, y, 0.35, 1.36, 0.02, 1.2, [(120, 255, 200), (60, 200, 150), (30, 140, 104), (80, 230, 180)][k],
+            emit=[3.0, 1.8, 1.0, 0.8][k])
+    for k in range(12):
+        sphere(-0.55 + k * 0.1, -0.88, 0.45 + (k * 37 % 10) * 0.1, 0.03, (210, 255, 235), emit=6.0)
+
+
 SET = {
     'porto_casa_4x3': (lambda: porto_house(4, 3), (4, 3), 3.6),
     'porto_casa_3x4': (lambda: porto_house(3, 4, door='x', roof_rgb=ROOF_T), (3, 4), 3.6),
@@ -928,6 +1000,9 @@ SET = {
     'fogos': (fireworks, (1, 1), 0.9),
     'rolos_seda': (silk_bolts, (1, 1), 1.2),
     'leques': (fan_display, (1, 1), 1.2),
+    'portao_porto': (iron_gatehouse, (4, 2), 4.8),
+    'grade_ferro_i': (iron_grate, (4, 2), 1.7),
+    'nevoa_ferro_i': (gate_mist, (4, 2), 1.7),
     'lanterna_chao': (floor_lantern, (1, 1), 0.8),
     'estacas_cais': (pier_posts, (1, 1), 1.2),
     'ponte_i': (bridge('i'), (3, 2), 1.0),

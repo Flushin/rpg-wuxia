@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import type { GameMap, MapObject } from '../core/map';
+import { ironGate } from './ironGate';
 import { DEPTH } from './depth';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { bobBoats, buildNight } from './nightView';
@@ -266,7 +267,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
     // `scale` no mapa força o tamanho do sprite (ex.: Trial, na borda de baixo, some se ficar pequeno)
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
-    out.push(...portal(scene, o.x, o.y, o.w, o.h, tn(o.name), ns, sc, !!o.props.noGate));
+    out.push(...portal(scene, o, tn(o.name), ns, sc));
   }
   if (boats.length) bobBoats(scene, boats);
   out.push(...buildNight(scene, map));
@@ -348,27 +349,36 @@ function teleCircle(scene: Phaser.Scene, x: number, y: number, w: number, h: num
 
 function portal(
   scene: Phaser.Scene,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
+  o: MapObject,
   name: string,
   flip = false,
   scale = 1,
-  noGate = false,
 ): Phaser.GameObjects.GameObject[] {
+  const { x, y, w, h } = o;
+  // `noGate`: o arco é desenhado à parte (objeto 'building' próprio: pórtico do Trial, portão de ferro do Porto);
+  // `glow`: cor do brilho do chão e das faíscas; `labelY`: altura do nome em px (padrão 92, acima do arco)
+  const noGate = !!o.props.noGate,
+    glow = typeof o.props.glow === 'number' ? o.props.glow : 0xa060ff,
+    labelY = typeof o.props.labelY === 'number' ? o.props.labelY : 92;
+  const tintOf = (c: number, k: number) => {
+    const ch = (sh: number) => Math.round(((c >> sh) & 255) + (255 - ((c >> sh) & 255)) * k);
+    return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+  };
   const out: Phaser.GameObjects.GameObject[] = [];
   const g = scene.add.graphics().setDepth(DEPTH.PORTAL_FLOOR);
   for (let j = Math.floor(y); j < y + h; j++)
     for (let i = Math.floor(x); i < x + w; i++) {
       const pts = [tileToScreen(i, j), tileToScreen(i + 1, j), tileToScreen(i + 1, j + 1), tileToScreen(i, j + 1)];
-      g.fillStyle(noGate ? 0xff3018 : 0xa060ff, 0.28);
+      g.fillStyle(glow, 0.28);
       g.fillPoints(pts, true);
     }
-  scene.tweens.add({ targets: g, alpha: 0.45, yoyo: true, repeat: -1, duration: 1100 });
+  const pulse = scene.tweens.add({ targets: g, alpha: 0.45, yoyo: true, repeat: -1, duration: 1100 });
   out.push(g);
   const c = tileToScreen(x + w / 2, y + h / 2);
-  // `noGate`: o arco é desenhado à parte (pórtico do Trial no Porto, objeto 'building' próprio)
+  // portão de ferro (gate: 'ferro'): o brilho e as faíscas só aparecem com a grade aberta (src/render/ironGate.ts)
+  let onOpen: ((k: number) => void) | null = null;
+  if (o.props.gate === 'ferro')
+    out.push(...ironGate(scene, o, Number(o.props.gateX) + Number(o.props.gateY) + 1.8, (k) => onOpen?.(k)).objects);
   const depth = Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1;
   if (!noGate) {
     const gate = scene.add
@@ -388,15 +398,23 @@ function portal(
       speedX: { min: -4, max: 4 },
       scale: { start: 0.5, end: 0 },
       alpha: { start: 0.9, end: 0 },
-      // pórtico do Trial: brasas vermelho-sangue (portal de chefe); arcos das ruínas: faíscas violeta
-      tint: noGate ? [0xffc080, 0xff3010, 0xffe0a0] : [0xd8b8ff, 0xa070ff, 0xffffff],
+      tint: [tintOf(glow, 0.55), glow, tintOf(glow, 0.85)],
       frequency: 120,
       blendMode: 'ADD',
     })
     .setDepth(depth + 0.5);
   out.push(sparks);
+  if (o.props.gate === 'ferro') {
+    pulse.pause();
+    onOpen = (k) => {
+      g.setAlpha(0.4 * k);
+      if (k > 0.5 && !sparks.emitting) sparks.start();
+      else if (k <= 0.5 && sparks.emitting) sparks.stop();
+    };
+    onOpen(0);
+  }
   const label = scene.add
-    .text(c.x, c.y - (noGate ? 175 : 92) * scale, name, {
+    .text(c.x, c.y - (noGate && !o.props.labelY ? 175 : labelY) * scale, name, {
       fontSize: '13px',
       color: '#e8d0ff',
       stroke: '#000',

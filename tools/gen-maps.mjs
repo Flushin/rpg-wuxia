@@ -1542,13 +1542,26 @@ function porto() {
   building('muralha_torre', 1, 72, 2, 2, 'cidadela');
   building('muralha_torre', 93, 72, 2, 2, 'cidadela');
   wallRun('i', 3, 45, 1);
-  building('portao_muralha_i', 46, 1, 4, 2, 'cidadela');
+  building('portao_porto', 46, 1, 4, 2);
   wallRun('i', 50, 92, 1);
   wallRun('j', 3, 71, 1);
   wallRun('j', 3, 21, 94);
   wallRun('j', 22, 71, 94);
   // portão: volta à Cidadela de Jade (portal livre; a ida, na Cidadela, pede nível 50)
-  objs.push(area('Cidadela de Jade', 'portal', 46, 3, 4, 1, { target: 'cidadela', targetX: 16, targetY: 26.5 }));
+  objs.push(
+    area('Cidadela de Jade', 'portal', 46, 3, 4, 1, {
+      target: 'cidadela',
+      targetX: 16,
+      targetY: 26.5,
+      noGate: 1,
+      gate: 'ferro', // grade de ferro que abre ao chegar perto (src/render/ironGate.ts)
+      gateX: 48,
+      gateY: 2,
+      glow: 0x40e0a8,
+      glowY: 30,
+      labelY: 140,
+    }),
+  );
   reserve(48, 4, 2);
 
   // bairros: casas da planta
@@ -1635,7 +1648,7 @@ function porto() {
   for (let y = 59; y <= 72; y++) for (let x = 76; x <= 91; x++) reserve(x, y);
   // pórtico cerimonial do Trial (sprite próprio, no lugar do arco das ruínas) com braseiros, leões e estandartes
   objs.push(area('portal_trial', 'building', 82, 64, 5, 3, { sprite: 'portal_trial', atlas: 'porto' }));
-  objs.push(area('Trial', 'portal', 83, 65, 3, 2, { menu: 'trial', scale: 1.1, noGate: 1 }));
+  objs.push(area('Trial', 'portal', 83, 65, 3, 2, { menu: 'trial', scale: 1.1, noGate: 1, glow: 0xff3018, glowY: 66 }));
   for (const sx of [-1, 1]) {
     decor('leao_pedra', 84.5 + sx * 2, 68.4, { block: 1 });
     decor('estandarte', 84.5 + sx * 3.6, 66, { block: 1 });

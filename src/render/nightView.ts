@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { ironGateOf } from './ironGate';
 import { tileToScreen } from '../core/iso';
 import type { GameMap } from '../core/map';
 import { MAPS_CONFIG } from '../core/mapsConfig';
@@ -40,7 +41,7 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
   const veil = scene.add.image(0, 0, VKEY).setOrigin(0, 0).setDepth(DEPTH.NIGHT_VEIL).setScale(Q);
   out.push(veil);
   const veilCss = `rgba(11,22,51,${VEIL_ALPHA})`;
-  const lights: { x: number; y: number; r: number }[] = [];
+  const lights: { x: number; y: number; r: number; k?: () => number }[] = [];
   let k = 0;
   for (const o of map.objects) {
     if (o.type !== 'decor') continue;
@@ -64,15 +65,19 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
       out.push(h);
     }
   }
-  // núcleo do vórtice do Trial (portal com noGate): luz vermelho-sangue grande, pulsando como um coração
+  // portal com arco próprio (noGate) e cor `glow`: luz grande pulsando como um coração na altura `glowY` (px)
+  // (núcleo vermelho-sangue do Trial; névoa de jade no portão de ferro do Porto)
   for (const o of map.objects)
-    if (o.type === 'portal' && o.props.noGate) {
-      const p = tileToScreen(o.x + o.w / 2, o.y + o.h / 2);
-      lights.push({ x: p.x, y: p.y - 40, r: 2.2 });
+    if (o.type === 'portal' && o.props.noGate && typeof o.props.glow === 'number') {
+      const p = tileToScreen(o.x + o.w / 2, o.y + o.h / 2),
+        gy = Number(o.props.glowY) || 40;
+      // portão de ferro: a luz acompanha a abertura da grade
+      const k = o.props.gate === 'ferro' ? () => ironGateOf(o)?.open() ?? 0 : undefined;
+      lights.push({ x: p.x, y: p.y - Math.min(gy, 40), r: 2.2, k });
       const h = scene.add
-        .image(p.x, p.y - 66, HALO)
+        .image(p.x, p.y - gy, HALO)
         .setScale(2.6)
-        .setTint(0xff3018)
+        .setTint(o.props.glow)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setDepth(DEPTH.NIGHT_LIGHT)
         .setAlpha(0.9);
@@ -124,7 +129,8 @@ export function buildNight(scene: Phaser.Scene, map: GameMap): Phaser.GameObject
     const pad = 320;
     for (const l of lights) {
       if (l.x < v.x - pad || l.x > v.right + pad || l.y < v.y - pad || l.y > v.bottom + pad) continue;
-      hole(l.x, l.y, 128 * l.r);
+      const f = l.k ? l.k() : 1;
+      if (f > 0.02) hole(l.x, l.y, 128 * l.r * f);
     }
     // luz própria do herói (a câmera o segue): personagem nunca some no escuro
     hole(v.centerX, v.centerY - 20, 80);
