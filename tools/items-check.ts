@@ -613,7 +613,16 @@ console.log('\n== gemas e encaixes ==');
     '11 tipos × 5 níveis (4 elementais)',
   );
   ok(w.buyGem(rubi)?.code === 'talkToJeweler', 'comprar exige o Joalheiro');
-  near(w, 'joalheiro');
+  {
+    // Joalheiro cercado de objetos: clicar de longe anda até o ponto alcançável e abre a janela
+    const j = w.npcs.find((e) => w.npcRole(e) === 'joalheiro')!;
+    w.player.x = 72.5;
+    w.player.y = 32.5;
+    w.player.path = [];
+    w.interactNpc(j.id);
+    run(w, 8);
+    ok(w.openNpc === j, 'clicar de longe no Joalheiro cercado abre a janela');
+  }
   w.gold = 10_000;
   ok(w.buyGem(rubi) === null && w.gold === 10_000 - GEM_CFG.price && w.potionCount(rubi) === 1, 'compra gema I');
   w.addItem(makeStack(rubi, 2));
