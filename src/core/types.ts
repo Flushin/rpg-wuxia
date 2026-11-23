@@ -358,6 +358,7 @@ export type ActionError =
   | { code: 'talkToMasterSmith' }
   | { code: 'hasGems' }
   | { code: 'noSocket' }
+  | { code: 'gemDuplicate' }
   | { code: 'socketsMax' }
   | { code: 'gemMaxLevel' }
   | { code: 'skinOwned' }

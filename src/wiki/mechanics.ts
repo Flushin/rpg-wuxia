@@ -239,13 +239,13 @@ function gemas(): string {
       que soma atributos ao item. As gemas são vendidas pelo <a href="#/npc/joalheiro">Joalheiro</a> e vão de nível ${lvs[0]} a ${lvs[lvs.length - 1]}.
       Ficam na aba de materiais da mochila e empilham. Item quebrado (durabilidade 0) perde também o efeito das gemas.</p></section>
     <section class="panel"><h2>Gemas</h2><div class="scroll"><table class="tbl"><thead><tr><th>Gema</th><th>Atributo</th>${lvs.map((l) => `<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="muted">Ônix soma o valor nas duas defesas; Topázio, na precisão e na esquiva.</p></section>
+      <p class="muted">Ônix soma o valor nas duas defesas; Topázio, na precisão e na esquiva. Cornalina, Água-marinha, Citrino e Malaquita somam ataque de Fogo, Gelo, Trovão e Veneno (o dano elemental só sai no elemento da sua seita).</p></section>
     <section class="panel"><h2>Comprar e fundir</h2><p>O Joalheiro só vende gemas de nível ${lvs[0]}. <b>${GEM_CFG.fuse} gemas iguais</b> viram 1 do nível
       seguinte, pagando ${pc(GEM_CFG.fuseCostPct)} do valor da gema nova. Ele também vende ${itemLink('po_estrela')} por ${fmtG(GEM_CFG.starDustPrice)} ouro.</p>
       <div class="scroll"><table class="tbl"><thead><tr><th>Nível</th><th>Valor</th><th>Como conseguir</th><th>Retirar (ouro)</th><th>Venda</th></tr></thead><tbody>${price}</tbody></table></div></section>
     <section class="panel"><h2>Encaixes</h2><p>Máximo por raridade:</p><table class="tbl"><tbody><tr>${sock}</tr></tbody></table>
       <p>Abrir (um de cada vez, na ordem):</p><ul>${open}</ul>
-      <p><b>Colocar</b> uma gema num encaixe vazio é grátis. <b>Retirar</b> custa ${pc(GEM_CFG.removeCostPct)} do valor da gema, que volta inteira para a mochila.
+      <p><b>Colocar</b> uma gema num encaixe vazio é grátis. <b><b>Não dá para repetir</b> o mesmo tipo de gema no mesmo item (nem em níveis diferentes). <b>Retirar</b> custa ${pc(GEM_CFG.removeCostPct)} do valor da gema, que volta inteira para a mochila.
       Item com gema <b>não pode ser vendido, destruído nem desmontado</b> (nem pelo Auto): retire as gemas antes.</p></section>`;
 }
 

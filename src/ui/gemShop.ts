@@ -17,7 +17,7 @@ import {
 import type { ActionError, ItemInstance } from '../core/types';
 import type { World } from '../core/world';
 import { matCount } from '../core/world/forge';
-import { fuseCost, jewelerGoods, removeCost, socketCost } from '../core/world/gems';
+import { fuseCost, hasGemType, jewelerGoods, removeCost, socketCost } from '../core/world/gems';
 import { escapeHtml } from './dom';
 import { cellHtml, cellStyle, gemIconHtml, itemTipHtml } from './itemTip';
 
@@ -91,7 +91,7 @@ export function masterSmithHtml(w: World, sel: string): { list: string; side: st
   if (!it) return { list, side: `<p class="muted">${L('Escolha um item.', 'Choose an item.')}</p>` };
   const max = maxSockets(it),
     gems = it.gems ?? [];
-  const owned = Object.keys(GEMS).filter((id) => matCount(w, id) > 0);
+  const owned = Object.keys(GEMS).filter((id) => matCount(w, id) > 0 && !hasGemType(it, GEMS[id].type));
   const rows = gems
     .map((id, i) => {
       if (id)
@@ -105,7 +105,7 @@ export function masterSmithHtml(w: World, sel: string): { list: string; side: st
                 `<button class="gem-pick" data-a="gemput" data-v="${g}|${i}" title="${escapeHtml(GEMS[g].name)}: ${gemStatsTxt(g)}">${gemIconHtml(g)}<small>×${matCount(w, g)}</small></button>`,
             )
             .join('')
-        : `<small class="muted">${L('Sem gemas na mochila (compre no Joalheiro).', 'No gems in your bag (buy from the Jeweler).')}</small>`;
+        : `<small class="muted">${L('Sem gemas que caibam aqui (o item não repete tipo; compre no Joalheiro).', 'No gems that fit here (no repeated type per item; buy from the Jeweler).')}</small>`;
       return `<div class="srow gem-slot"><div class="si">${gemIconHtml(null)}<b>${L(`Encaixe ${i + 1} vazio`, `Empty socket ${i + 1}`)}</b><div class="gem-picks">${pick}</div></div></div>`;
     })
     .join('');

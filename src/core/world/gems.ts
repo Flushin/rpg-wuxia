@@ -26,6 +26,9 @@ export function socketCost(it: ItemInstance): { gold: number; mats: Record<strin
   return GEM_CFG.socketCost[n] ?? null;
 }
 
+/** O item já tem uma gema desse tipo (qualquer nível)? Gemas repetidas no mesmo item são bloqueadas. */
+export const hasGemType = (it: ItemInstance, type: string) => !!it.gems?.some((g) => g && GEMS[g]?.type === type);
+
 const owned = (w: World, it: ItemInstance) => w.bag.includes(it) || Object.values(w.equipment).includes(it);
 function changed(w: World, it: ItemInstance) {
   if (Object.values(w.equipment).includes(it)) w.recalc(w.player, false);
@@ -86,6 +89,7 @@ export function insertGem(w: World, it: ItemInstance, id: string, slot = -1): Ac
   const gems = it.gems ?? [];
   const i = slot >= 0 ? (gems[slot] === null ? slot : -1) : gems.indexOf(null);
   if (i < 0) return { code: 'noSocket' };
+  if (hasGemType(it, GEMS[id].type)) return { code: 'gemDuplicate' };
   if (matCount(w, id) < 1) return { code: 'noMaterials' };
   takeMats(w, { [id]: 1 });
   gems[i] = id;

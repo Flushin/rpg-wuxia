@@ -606,7 +606,12 @@ console.log('\n== gemas e encaixes ==');
 {
   const w = mk('lamina', 50, 'porto');
   const rubi = gemId('rubi', 1);
-  ok(Object.keys(GEMS).length === 35 && GEMS[gemId('rubi', 5)].stats.physAtk === 56, '7 tipos × 5 níveis');
+  ok(
+    Object.keys(GEMS).length === 55 &&
+      GEMS[gemId('rubi', 5)].stats.physAtk === 56 &&
+      GEMS[gemId('cornalina', 5)].stats.elem_fire === 40,
+    '11 tipos × 5 níveis (4 elementais)',
+  );
   ok(w.buyGem(rubi)?.code === 'talkToJeweler', 'comprar exige o Joalheiro');
   near(w, 'joalheiro');
   w.gold = 10_000;
@@ -626,7 +631,8 @@ console.log('\n== gemas e encaixes ==');
   const atk0 = itemStats(sword).physAtk ?? 0;
   ok(w.insertGem(sword, g2) === null && sword.gems?.[0] === g2 && w.potionCount(g2) === 0, 'coloca gema');
   ok((itemStats(sword).physAtk ?? 0) === atk0 + 18, 'gema soma nos stats do item');
-  ok(w.insertGem(sword, rubi)?.code === 'noMaterials', 'sem gema na mochila não coloca');
+  ok(w.insertGem(sword, gemId('jade', 1))?.code === 'noMaterials', 'sem gema na mochila não coloca');
+  ok(w.insertGem(sword, rubi)?.code === 'gemDuplicate', 'não repete o tipo de gema no mesmo item (outro nível)');
   near(w, 'vendedor');
   const idx = w.bag.indexOf(sword);
   ok(w.sell(idx)?.code === 'hasGems' && w.bag.includes(sword), 'item com gema não se vende');
