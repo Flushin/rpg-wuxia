@@ -151,6 +151,9 @@ export class World {
   ultCharge = 0;
   ultCast: { t: number; hits: Map<number, number>; x: number; y: number } | null = null;
   lastCombat = -99;
+  /** montado pelo botão (🐎 / tecla H); entrar em combate desmonta e só volta pelo botão */
+  riding = false;
+  private ridingSince = 0;
   ratioCursor = 0;
   seenTips: string[] = [];
   tipsEnabled = true;
@@ -522,12 +525,27 @@ export class World {
     this.emit({ type: 'relicDrop', name: RELICS[id].name });
   }
 
-  /** montaria em uso agora (null = a pé): tem montaria, está vivo e fora de combate há mountDelay s */
+  /** montaria em uso agora (null = a pé): montou pelo botão, tem montaria e está vivo */
   mountNow(): string | null {
     const id = this.mountsOwned[0];
-    const m = id ? MOUNTS[id] : undefined;
-    if (!m || this.player.hp <= 0 || this.time - this.lastCombat < m.mountDelay) return null;
+    if (!this.riding || !id || !MOUNTS[id] || this.player.hp <= 0) return null;
     return id;
+  }
+
+  /** Botão de montar/desmontar. Montar exige estar fora de combate há mountDelay s. */
+  toggleMount(): ActionError | null {
+    const id = this.mountsOwned[0];
+    const m = id ? MOUNTS[id] : undefined;
+    if (!m) return { code: 'noMount' };
+    if (this.riding) {
+      this.riding = false;
+      return null;
+    }
+    if (this.player.hp <= 0) return { code: 'noMount' };
+    if (this.time - this.lastCombat < m.mountDelay) return { code: 'mountCombat' };
+    this.riding = true;
+    this.ridingSince = this.time;
+    return null;
   }
 
   // ---------- skills ----------
@@ -979,6 +997,7 @@ export class World {
 
   tick(dt: number) {
     this.time += dt;
+    if (this.riding && (this.lastCombat > this.ridingSince || this.player.hp <= 0)) this.riding = false; // combate desmonta
     if (this.auto.state === 'on') this.playTime.auto += dt;
     else this.playTime.manual += dt;
     this.drainUltimate(dt);

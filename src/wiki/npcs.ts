@@ -61,8 +61,7 @@ const outfits = () =>
   `${talkCitadel()}<p><b>Trajes das seitas:</b> vende roupas novas para o seu personagem, só da sua seita e sem efeito no
   combate. Veja todos os trajes, preços e como funcionam na página <a href="#/trajes">Trajes</a>.</p>`;
 const stable = () =>
-  `${talkHarbor()}<p><b>Estábulo</b> (bairro noroeste do Porto Noturno, ao lado do cercado): vende montarias. Fora de combate você monta sozinho alguns segundos depois da
-  última luta e anda mais rápido; ao entrar em combate desmonta na hora. Veja preços e velocidade em
+  `${talkHarbor()}<p><b>Estábulo</b> (bairro noroeste do Porto Noturno, ao lado do cercado): vende montarias. Fora de combate você monta pelo botão do cavalo, ao lado do Auto, e anda mais rápido; ao entrar em combate desmonta na hora. Veja preços e velocidade em
   <a href="#/mecanicas/montarias">Montarias</a>.</p>`;
 /** Loja da Cidadela: o mesmo serviço da loja da vila (prop role no mapa). */
 const sameAs =

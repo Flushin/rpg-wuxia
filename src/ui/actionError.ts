@@ -51,6 +51,13 @@ export function actionErrorText(e: ActionError): string {
       return L('Você já tem esta relíquia', 'You already own this relic');
     case 'relicNotOwned':
       return L('Você não tem esta relíquia', 'You do not own this relic');
+    case 'noMount':
+      return L(
+        'Você não tem montaria (Cavalariço Ma, no Porto Noturno)',
+        'You have no mount (Stableman Ma, Night Harbor)',
+      );
+    case 'mountCombat':
+      return L('Saia do combate para montar', 'Leave combat to mount');
     case 'mountOwned':
       return L('Você já tem esta montaria', 'You already own this mount');
     case 'talkToJeweler':

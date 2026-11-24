@@ -1,5 +1,7 @@
 {
-  "proxima": [],
+  "proxima": [
+    { "texto": "Montaria: botão do cavalo ao lado do Auto (tecla H no computador) para montar e desmontar; a montaria não sobe mais sozinha. Montado, a aura fica no personagem e não no cavalo." }
+  ],
   "versoes": [
     {
       "versao": "0.9.0",

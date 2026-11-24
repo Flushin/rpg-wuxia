@@ -368,6 +368,8 @@ export type ActionError =
   | { code: 'skinOwned' }
   | { code: 'talkToStable' }
   | { code: 'mountOwned' }
+  | { code: 'noMount' }
+  | { code: 'mountCombat' }
   | { code: 'talkToAntiquary' }
   | { code: 'relicOwned' }
   | { code: 'relicNotOwned' };

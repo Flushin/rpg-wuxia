@@ -463,6 +463,12 @@ export class ElementAura {
     draw(this.s, tier, dt, this.back.clear(), this.front.clear(), k, cy);
   }
 
+  /** Montado: a aura sobe junto com o cavaleiro (y negativo = para cima). */
+  setLift(y: number) {
+    this.back.y = y;
+    this.front.y = y;
+  }
+
   destroy() {
     this.back.destroy();
     this.front.destroy();

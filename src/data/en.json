@@ -830,7 +830,7 @@
         "name": "Stablemaster Ma",
         "lines": [
           "Fine horses, fed on mountain grass and brought by boat to the Harbor. Out of combat they run like the wind.",
-          "Once you own a horse, it follows you everywhere: you mount by yourself a few seconds after a fight ends."
+          "Once you own a horse, it follows you everywhere: just tap the horse button next to Auto to mount out of combat."
         ]
       },
       "joalheiro": {
@@ -1118,7 +1118,9 @@
     }
   },
   "novidades": {
-    "proxima": [],
+    "proxima": [
+      { "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse." }
+    ],
     "versoes": [
       {
         "loja": [

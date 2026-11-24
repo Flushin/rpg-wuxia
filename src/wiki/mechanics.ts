@@ -280,8 +280,8 @@ function montarias(): string {
     .join('');
   return `<section class="panel"><h2>Montarias</h2>
       <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo do <a href="#/mapa/porto">Porto Noturno</a> (nível 50). Compradas uma vez, valem para sempre e em todos os mapas.</p>
-      <ul><li><b>Montar é sozinho:</b> depois de alguns segundos sem dar nem levar golpes, o personagem sobe na montaria.</li>
-      <li><b>Só fora de combate:</b> ao golpear ou ser golpeado, desmonta na hora e volta à velocidade normal.</li>
+      <ul><li><b>Montar pelo botão:</b> o botão do cavalo, ao lado do Auto (tecla H no computador), sobe e desce da montaria. Para montar, é preciso estar alguns segundos sem dar nem levar golpes.</li>
+      <li><b>Só fora de combate:</b> ao golpear ou ser golpeado, desmonta na hora e volta à velocidade normal; para montar de novo, toque no botão.</li>
       <li>A montaria só muda a velocidade de andar; não dá atributos nem muda o combate. O Auto também anda montado.</li></ul>
       <table><tr><th>Montaria</th><th>Preço</th><th>Velocidade fora de combate</th><th>Monta após</th></tr>${rows}</table></section>`;
 }
