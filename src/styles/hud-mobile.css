@@ -46,6 +46,7 @@ body.hud-v2 #hud #btn-auto {
   min-width: 72px;
   font-size: 13px;
 }
+body.hud-v2 #hud #btn-mount,
 body.hud-v2 #hud #btn-auto-cfg,
 body.hud-v2 #hud #top-right > #btn-menu,
 body.hud-v2 #hud #top-right > #dur-warn {
@@ -241,6 +242,7 @@ body.hud-v2 #hud #tip-card {
     min-height: 40px;
     height: 40px;
   }
+  body.hud-v2 #hud #btn-mount,
   body.hud-v2 #hud #btn-auto-cfg,
   body.hud-v2 #hud #top-right > #btn-menu,
   body.hud-v2 #hud #top-right > #dur-warn {
@@ -307,6 +309,7 @@ body.hud-v2 #hud #tip-card {
     min-height: 42px;
     height: 42px;
   }
+  body.hud-v2 #hud #btn-mount,
   body.hud-v2 #hud #btn-auto-cfg,
   body.hud-v2 #hud #top-right > #btn-menu,
   body.hud-v2 #hud #top-right > #dur-warn {

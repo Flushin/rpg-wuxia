@@ -279,6 +279,7 @@ export class EntityView {
     const dy = key ? -RIDE_Y : 0;
     this.sprite.y = dy;
     if (this.glowSp) this.glowSp.y = dy;
+    this.aura?.setLift(dy);
   }
 
   private animateMount() {

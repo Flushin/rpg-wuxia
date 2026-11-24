@@ -39,6 +39,7 @@
     min-width: 72px;
     font-size: 13px;
   }
+  #btn-mount,
   #btn-auto-cfg,
   #btn-settings {
     width: 40px;

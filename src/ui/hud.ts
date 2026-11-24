@@ -1,3 +1,4 @@
+import { actionErrorText } from './actionError';
 import { L } from '../core/i18n';
 import { PROGRESSION } from '../core/data';
 import type { World } from '../core/world';
@@ -35,6 +36,7 @@ export class Hud {
   private goldSig = -1;
   private autoPanel: AutoPanel;
   private autoSig = '';
+  private mountSig = '';
   private minimap: Minimap;
   readonly rewards = new Rewards();
   private questTracker = new QuestTracker();
@@ -58,15 +60,23 @@ export class Hud {
     this.trial = new TrialWindow(world, (m, c) => this.toast(m, c));
     this.potions = new PotionBar(world);
     this.autoPanel = new AutoPanel(world);
-    for (const id of ['btn-auto', 'btn-auto-cfg'])
+    for (const id of ['btn-mount', 'btn-auto', 'btn-auto-cfg'])
       byId(id).addEventListener('focus', (e) => (e.target as HTMLElement).blur());
     byId('btn-auto').addEventListener('click', () => {
       audio.ui('ui_click');
       world.auto.toggle();
     });
     byId('btn-auto-cfg').addEventListener('click', () => this.autoPanel.set(!this.autoPanel.open));
+    byId('btn-mount').addEventListener('click', () => this.toggleMount());
     byId('dur-warn').addEventListener('click', () => this.togglePanel(true));
     byId('hud').classList.remove('hidden');
+  }
+
+  /** Montar/desmontar (botão 🐎 ao lado do Auto, tecla H). */
+  toggleMount() {
+    audio.ui('ui_click');
+    const err = this.world.toggleMount();
+    if (err) this.toast(actionErrorText(err), '#ff8a80');
   }
 
   togglePanel(open?: boolean) {
@@ -213,6 +223,16 @@ export class Hud {
     this.trial.update();
     this.potions.update();
     byId('dur-warn').classList.toggle('hidden', !w.lowDurability());
+    const ms = `${w.mountsOwned.length > 0}|${w.riding}`;
+    if (ms !== this.mountSig) {
+      this.mountSig = ms;
+      const b = byId('btn-mount');
+      b.classList.toggle('hidden', !w.mountsOwned.length);
+      b.classList.toggle('on', w.riding);
+      const t = w.riding ? L('Desmontar', 'Dismount') : L('Montar', 'Mount');
+      b.setAttribute('aria-label', t);
+      b.title = isTouch ? t : `${t} (H)`;
+    }
     const as = w.auto.state,
       sig = `${as}|${isTouch}`;
     if (sig !== this.autoSig) {

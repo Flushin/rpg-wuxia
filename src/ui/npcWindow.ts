@@ -547,7 +547,7 @@ export class NpcWindow {
       ${mine.length ? '' : `<p class="muted">${L('Ainda não há trajes para a sua seita.', 'No outfits for your sect yet.')}</p>`}`;
   }
 
-  /** Cavalariço Ma (estábulo): montarias (MOUNTS); compra com confirmação. Montar é sozinho, fora de combate. */
+  /** Cavalariço Ma (estábulo): montarias (MOUNTS); compra com confirmação. Monta pelo botão 🐎 (hud.ts), fora de combate. */
   private mountShop(): string {
     const w = this.world;
     const row = (id: string) => {
