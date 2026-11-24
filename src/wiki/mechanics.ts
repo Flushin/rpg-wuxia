@@ -318,9 +318,24 @@ function epico(): string {
     <section class="panel"><h2>Como cai</h2><ul>
       <li>Qualquer monstro: <b>${pc(EPIC.chanceMob)}</b> por abate. Chefes (mapa, masmorra e <a href="#/mecanicas/trial">Trial</a>): <b>${pc(EPIC.chanceBoss)}</b>.</li>
       <li>Só jogando: com o <a href="#/mecanicas/auto">Auto</a> ligado e no ganho offline não cai. Ajudantes invocados por chefes também não dão.</li>
-      <li>O monstro precisa ter nível igual ou maior que o seu menos ${EPIC.maxLevelsBelow}.</li>
+      <li>O monstro precisa ter <b>nível igual ou maior que o seu menos ${EPIC.maxLevelsBelow}</b> (sem limite para cima). Veja a tabela abaixo.</li>
       <li>A peça é sorteada entre todas as que você usa (armas só da sua seita). Sem garantia: é raro de propósito.</li>
       <li>Mochila cheia: ele fica no chão por ${EPIC.groundSeconds / 60} minutos (os outros itens, ${GROUND_SECONDS} s). Sair do mapa limpa o chão.</li></ul></section>
+    <section class="panel"><h2>Que monstro dá Épico no meu nível?</h2>
+      <p>Conta: <b>nível mínimo do monstro = seu nível − ${EPIC.maxLevelsBelow}</b>. Monstro mais fraco que isso nunca dá Épico, nem chefe.
+      No <a href="#/mecanicas/trial">Trial</a> o chefe tem nível ${trialBossLevel(0)} + o andar, então vale do andar mostrado em diante.</p>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Seu nível</th><th>Monstro de nível</th><th>Trial a partir do andar</th></tr></thead><tbody>${[
+        5, 10, 15, 20, 25, 30, 35, 40, 45, 50,
+      ]
+        .map((lv) => {
+          const min = Math.max(1, lv - EPIC.maxLevelsBelow),
+            tier = Math.max(1, min - trialBossLevel(0));
+          return `<tr><td>${lv}</td><td>${min} ou mais</td><td>${tier <= TRIAL_TIERS ? tier : '—'}</td></tr>`;
+        })
+        .join('')}</tbody></table></div>
+      <p class="muted">Níveis entre as linhas: faça a conta (ex.: nível 47 → monstros de ${47 - EPIC.maxLevelsBelow}+). O nível de cada monstro aparece
+      sobre ele no jogo; no nível 50, só os de nível 40 do Palácio Celeste (e o Imperador Carmesim) e o Trial do andar
+      ${50 - EPIC.maxLevelsBelow - trialBossLevel(0)} em diante contam.</p></section>
     <section class="panel"><h2>Nomes</h2><table class="tbl"><tbody>${names}</tbody></table></section>
     <section class="panel"><h2>Bônus por classe</h2><div class="scroll"><table class="tbl"><thead><tr><th>Seita</th><th>Bônus</th>${lvs.map((lv) => `<th>Nível ${lv}</th>`).join('')}</tr></thead><tbody>${bon}</tbody></table></div>
       <p class="muted">Elemento de cada seita: ${SECT.map((c) => `${esc(CLASSES[c].name)} ${ELEMENT_NAMES[CLASSES[c].element]}`).join(', ')}. Os bônus seguem a classe de quem está usando o item.</p></section>
