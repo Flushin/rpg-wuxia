@@ -1,10 +1,11 @@
+import { baguaPortal } from './baguaPortal';
 import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
 import type { GameMap, MapObject } from '../core/map';
 import { ironGate } from './ironGate';
 import { DEPTH } from './depth';
-import { MAPS_CONFIG } from '../core/mapsConfig';
+import { MAPS_CONFIG, TOWN_MAPS } from '../core/mapsConfig';
 import { bobBoats, buildNight } from './nightView';
 import { animKey, sheetFor, sheetTexture } from './sprites';
 
@@ -267,7 +268,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
     const ns = Math.min(o.y, map.height - o.y - o.h) < Math.min(o.x, map.width - o.x - o.w);
     // `scale` no mapa força o tamanho do sprite (ex.: Trial, na borda de baixo, some se ficar pequeno)
     const sc = typeof o.props.scale === 'number' ? o.props.scale : Math.min(1, o.h / 3.2);
-    out.push(...portal(scene, o, tn(o.name), ns, sc));
+    out.push(...portal(scene, o, tn(o.name), ns, sc, !TOWN_MAPS.has(map.id)));
   }
   if (boats.length) bobBoats(scene, boats);
   out.push(...buildNight(scene, map));
@@ -353,8 +354,18 @@ function portal(
   name: string,
   flip = false,
   scale = 1,
+  hunt = false,
 ): Phaser.GameObjects.GameObject[] {
   const { x, y, w, h } = o;
+  // mapas de caça: portal Bagua (disco no chão; src/render/baguaPortal.ts)
+  if (hunt && !o.props.gate && !o.props.noGate) {
+    const c = tileToScreen(x + w / 2, y + h / 2);
+    const label = scene.add
+      .text(c.x, c.y - 70, name, { fontSize: '13px', color: '#ffe6a8', stroke: '#000', strokeThickness: 3 })
+      .setOrigin(0.5)
+      .setDepth(DEPTH.DROP_FX);
+    return [...baguaPortal(scene, c.x, c.y, Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1), label];
+  }
   // `noGate`: o arco é desenhado à parte (objeto 'building' próprio: pórtico do Trial, portão de ferro do Porto);
   // `glow`: cor do brilho do chão e das faíscas; `labelY`: altura do nome em px (padrão 92, acima do arco)
   const noGate = !!o.props.noGate,
