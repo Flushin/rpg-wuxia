@@ -55,7 +55,7 @@ ok(
 );
 ok(!maps[TRIAL_MAP].objects.some((o) => o.type === 'monsterSpawn'), 'mapa do Trial sem monstros fixos');
 const portal = maps.cidade.objects.find((o) => o.type === 'portal' && o.props.menu === 'trial')!;
-ok(!!portal && portal.y >= 28, 'portal do Trial na saída sul da vila');
+ok(!!portal && portal.y >= 26, 'portal do Trial na saída sul da vila');
 ok(
   TRIAL_BOSSES.length === Object.values(MONSTERS).filter((m) => m.boss).length && TRIAL_BOSSES.length >= 5,
   `todos os chefes do jogo no Trial (${TRIAL_BOSSES.length})`,

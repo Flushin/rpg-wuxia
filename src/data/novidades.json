@@ -1,7 +1,8 @@
 {
   "proxima": [
     { "texto": "Montaria: botão do cavalo ao lado do Auto (tecla H no computador) para montar e desmontar; a montaria não sobe mais sozinha. Montado, a aura fica no personagem e não no cavalo." },
-    { "texto": "Portais novos nos mapas de caça: um círculo de Bagua no chão com a runa 門 dourada; quando você chega perto, ele gira mais rápido e sobe uma coluna de luz." }
+    { "texto": "Portais novos nos mapas de caça: um círculo de Bagua no chão com a runa 門 dourada; quando você chega perto, ele gira mais rápido e sobe uma coluna de luz." },
+    { "texto": "Portais novos na Vila: um lótus de jade com a cor e o símbolo de cada destino (Floresta, Montanha, Masmorras e Trial); quando você chega perto, as pétalas abrem e sobe um jato de luz." }
   ],
   "versoes": [
     {

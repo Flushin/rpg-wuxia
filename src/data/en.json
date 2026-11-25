@@ -1120,7 +1120,8 @@
   "novidades": {
     "proxima": [
       { "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse." },
-      { "texto": "New portals on hunting maps: a Bagua circle on the ground with a golden 門 rune; when you get close it spins faster and a column of light rises." }
+      { "texto": "New portals on hunting maps: a Bagua circle on the ground with a golden 門 rune; when you get close it spins faster and a column of light rises." },
+      { "texto": "New portals in the Village: a jade lotus with the color and symbol of each destination (Forest, Mountain, Dungeons and Trial); when you get close, the petals open and a jet of light rises." }
     ],
     "versoes": [
       {

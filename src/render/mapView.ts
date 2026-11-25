@@ -1,4 +1,5 @@
 import { baguaPortal } from './baguaPortal';
+import { lotusPortal } from './lotusPortal';
 import Phaser from 'phaser';
 import { tn } from '../core/i18n';
 import { TILE_H, TILE_W, tileToScreen } from '../core/iso';
@@ -357,6 +358,16 @@ function portal(
   hunt = false,
 ): Phaser.GameObjects.GameObject[] {
   const { x, y, w, h } = o;
+  // Vila: lótus de jade com cor e símbolo do destino (src/render/lotusPortal.ts)
+  if (typeof o.props.lotus === 'string') {
+    const c = tileToScreen(x + w / 2, y + h / 2);
+    const label = scene.add
+      .text(c.x, c.y - 70, name, { fontSize: '13px', color: '#ffe6a8', stroke: '#000', strokeThickness: 3 })
+      .setOrigin(0.5)
+      .setDepth(DEPTH.DROP_FX);
+    const d = Math.floor(x + w / 2) + Math.floor(y + h / 2) + 1;
+    return [...lotusPortal(scene, c.x, c.y, d, o.props.lotus), label];
+  }
   // mapas de caça: portal Bagua (disco no chão; src/render/baguaPortal.ts)
   if (hunt && !o.props.gate && !o.props.noGate) {
     const c = tileToScreen(x + w / 2, y + h / 2);
