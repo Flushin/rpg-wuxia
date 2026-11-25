@@ -1,4 +1,5 @@
 // Confere src/data/en.json contra os dados em PT: sem chaves órfãs e com tradução para todo campo de texto.
+import arenaJson from '../src/data/arena.json';
 import en from '../src/data/en.json';
 import classes from '../src/data/classes.json';
 import ultimates from '../src/data/ultimates.json';
@@ -70,6 +71,7 @@ const sections: [string, unknown][] = [
   ['skins', skins],
   ['mounts', mounts],
   ['ultimates', ultimates],
+  ['arenaTitles', arenaJson.titles],
 ];
 for (const [name, data] of sections) orphans(E[name], data, name);
 
@@ -164,6 +166,7 @@ for (const k of Object.keys(E))
       'mounts',
       'relics',
       'ultimates',
+      'arenaTitles',
     ].includes(k)
   )
     bad(`seção desconhecida "${k}"`);

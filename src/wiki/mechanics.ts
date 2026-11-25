@@ -1,5 +1,18 @@
 // Mecânicas: combate e atributos, morte e durabilidade, forja e economia, auto-combate e ganho offline.
 // Tabelas e exemplos saem das fórmulas do jogo; as que são cópias (marcadas) são conferidas por tools/wiki-check.ts.
+import {
+  ARENA_COINS,
+  ARENA_COUNTDOWN,
+  ARENA_DAMAGE,
+  ARENA_DELTA_MAX,
+  ARENA_DELTA_MIN,
+  ARENA_POWER_MAX,
+  ARENA_POWER_MIN,
+  ARENA_RANKS,
+  ARENA_START,
+  ARENA_TIME_LIMIT,
+  ARENA_TITLES,
+} from '../core/arena';
 import { BUYBACK_MAX } from '../core/world/shop';
 import { BOSS_PCT_HP } from '../core/world/boss';
 import { TELEPORT_COST } from '../core/teleport';
@@ -192,6 +205,7 @@ const TOPICS = [
   { id: 'montarias', label: 'Montarias', icon: 'pergaminho_retorno' },
   { id: 'reliquias', label: 'Relíquias', icon: 'colar_jade' },
   { id: 'equipe', label: 'Equipe (bots)', icon: 'skill_corte_duplo' },
+  { id: 'arena', label: 'Arena', icon: 'skill_corte_duplo' },
   { id: 'efeitos', label: 'Buffs e debuffs', icon: 'skill_corte_duplo' },
 ];
 
@@ -203,7 +217,7 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, efeitos }[
+  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, arena, efeitos }[
     t.id as 'combate'
   ]();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
@@ -653,6 +667,37 @@ function equipe(): string {
       <li>Ele volta com ${Math.round(REVIVE_HP * 100)}% da vida.</li>
       <li>Cada bot pode ser revivido <b>1 vez por luta</b>; a contagem zera quando nenhum monstro está em combate.</li>
     </ul></section>`;
+}
+
+/** Arena do Porto Noturno: regras em src/core/arena.ts e src/core/world/arena.ts. */
+function arena(): string {
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
+  const ranks = ARENA_RANKS.map((r) => `<b style="color:${r.color}">${r.name}</b> (${r.min}+)`).join(', ');
+  const titles = Object.values(ARENA_TITLES)
+    .map(
+      (t) =>
+        `<tr><td><b style="color:${t.color}">«${t.name}»</b></td><td>${t.price}</td><td>${t.minPoints ? `${t.minPoints}` : '—'}</td></tr>`,
+    )
+    .join('');
+  return `<p class="intro">No <a href="#/mapa/porto">Porto Noturno</a>, o Mestre da Arena Tie (ao lado do portal do Trial) manda você lutar 1 contra 1 com um lutador de outra seita. É a preparação para o PvP.</p>
+    <section class="panel"><h2>A luta</h2><ul>
+      <li>O adversário é um bot de outra seita, com a mesma inteligência dos <a href="#/mecanicas/equipe">bots da masmorra em equipe</a>.</li>
+      <li><b>O seu poder nunca muda.</b> O bot recebe de ${pct(ARENA_POWER_MIN)} a ${pct(ARENA_POWER_MAX)} do seu poder (vida e dano dele acompanham os seus; defesas iguais às suas), conforme os seus pontos.</li>
+      <li>Os dois começam com vida e mana cheias. Há ${ARENA_COUNTDOWN} s de contagem, em que ninguém anda nem ataca.</li>
+      <li>Na arena todo dano, dos dois lados, vale ${pct(ARENA_DAMAGE)} do normal, para a luta não acabar no primeiro golpe.</li>
+      <li>Depois de ${ARENA_TIME_LIMIT} s de luta, vence quem tiver mais vida (em %).</li>
+      <li>Perder não é morrer: sem penalidade, você volta ao Porto com a vida cheia.</li>
+    </ul></section>
+    <section class="panel"><h2>Pontos e ranking</h2><ul>
+      <li>Todos começam com ${ARENA_START} pontos. Vitória dá de +${ARENA_DELTA_MIN} a +${ARENA_DELTA_MAX} e derrota tira de ${ARENA_DELTA_MIN} a ${ARENA_DELTA_MAX} (estilo ELO): vencer um bot mais forte vale mais.</li>
+      <li>Quanto mais pontos, mais forte o bot. Por isso cada jogador para perto de 50% de vitórias.</li>
+      <li>Faixas: ${ranks}.</li>
+      <li>Sem limite de lutas.</li>
+    </ul></section>
+    <section class="panel"><h2>Moeda e títulos</h2>
+      <p>Cada luta dá moedas da arena: ${ARENA_COINS.win} na vitória e ${ARENA_COINS.loss} na derrota. Elas compram títulos, que aparecem acima do seu nome. São só visuais e não dão poder.</p>
+      <table><tr><th>Título</th><th>Moedas</th><th>Pontos mínimos</th></tr>${titles}</table>
+    </section>`;
 }
 
 /** Buffs e debuffs: ícones de src/data/buffs.json (os mesmos do jogo); fontes tiradas de skills, ultimates e monstros. */

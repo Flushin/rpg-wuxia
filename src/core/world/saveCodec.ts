@@ -11,6 +11,7 @@ import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
 import { sanitizeTrialProgress } from '../trial';
+import { ARENA_TITLES, newArenaState } from '../arena';
 
 export function serialize(w: World): SaveData {
   return {
@@ -45,6 +46,7 @@ export function serialize(w: World): SaveData {
     mounts: w.mountsOwned.length ? [...w.mountsOwned] : undefined,
     relics: w.relicsOwned.length ? [...w.relicsOwned] : undefined,
     relic: w.relic ?? undefined,
+    arena: { ...w.arena, titles: [...w.arena.titles], title: w.arena.title ?? undefined },
     playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
   };
 }
@@ -77,6 +79,22 @@ export function restore(w: World, s: SaveData, now: number) {
     (id, i, a) => typeof id === 'string' && !!RELICS[id] && a.indexOf(id) === i,
   );
   w.relic = typeof s.relic === 'string' && w.relicsOwned.includes(s.relic) ? s.relic : null;
+  // arena: campo opcional; save antigo começa com 1000 pontos e sem títulos
+  const a = s.arena,
+    num = (v: unknown, d: number) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : d);
+  const base = newArenaState();
+  const titles = (Array.isArray(a?.titles) ? a.titles : []).filter(
+    (id, i, l) => typeof id === 'string' && !!ARENA_TITLES[id] && l.indexOf(id) === i,
+  );
+  w.arena = {
+    points: num(a?.points, base.points),
+    coins: num(a?.coins, 0),
+    wins: num(a?.wins, 0),
+    losses: num(a?.losses, 0),
+    titles,
+    title: typeof a?.title === 'string' && titles.includes(a.title) ? a.title : null,
+  };
+  w.player.title = w.arena.title ? ARENA_TITLES[w.arena.title].name : undefined;
   (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
     w.bag[i] = sanitizeItem(raw);
   });

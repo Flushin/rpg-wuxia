@@ -47,6 +47,14 @@ export function actionErrorText(e: ActionError): string {
       return L('Fale com o Cavalariço Ma', 'Talk to Stablemaster Ma');
     case 'talkToAntiquary':
       return L('Fale com o Antiquário Lao', 'Talk to Antiquarian Lao');
+    case 'talkToArena':
+      return L('Fale com o Mestre da Arena', 'Talk to the Arena Master');
+    case 'titleOwned':
+      return L('Você já tem este título', 'You already own this title');
+    case 'arenaPoints':
+      return L(`Requer ${e.points} pontos de arena`, `Requires ${e.points} arena points`);
+    case 'arenaCoins':
+      return L('Moedas de arena insuficientes', 'Not enough arena coins');
     case 'relicOwned':
       return L('Você já tem esta relíquia', 'You already own this relic');
     case 'relicNotOwned':

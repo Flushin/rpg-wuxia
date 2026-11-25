@@ -304,7 +304,7 @@ export class GameScene extends Phaser.Scene {
   private textureFor(e: Entity): string {
     if (e.kind === 'player') return playerTexture(this.world.classId, this.world.skin);
     if (e.kind === 'monster') return MONSTERS[e.monsterId].sprite;
-    if (e.kind === 'bot') return playerTexture(this.world.party.find((b) => b.e === e)?.classId ?? 'lamina', null);
+    if (e.kind === 'bot') return playerTexture(this.world.botOf(e)?.classId ?? 'lamina', null);
     return 'npc-' + (e.npcId ?? '');
   }
 
