@@ -36,7 +36,7 @@ const DEBUG_KEY = 'vpDebug';
 export function initViewportDebug() {
   let toques = 0,
     t0 = 0;
-  document.addEventListener('click', (e) => {
+  document.addEventListener('pointerup', (e) => {
     if (!(e.target as Element | null)?.closest?.('#ver-label')) return;
     const agora = Date.now();
     if (agora - t0 > 3000) toques = 0;
