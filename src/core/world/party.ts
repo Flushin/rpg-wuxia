@@ -6,8 +6,9 @@ import { expectedDamage } from '../combat';
 import { MONSTERS } from '../data';
 import { dungeonById } from '../dungeons';
 import { GLOBAL_COOLDOWN, skillScale, type SkillDef } from '../skills';
-import type { Entity } from '../types';
+import type { Entity, Point } from '../types';
 import { findPath, isWalkable } from '../pathfinding';
+import { inTelegraph, safeSpot } from './boss';
 import type { World } from '../world';
 
 /** Tamanho do grupo de bots (o jogador + 3). */
@@ -19,8 +20,26 @@ export const REVIVE_HP = 0.5;
 export const REVIVE_REACH = 1.8;
 /** Mana dos bots: 1% da máxima por segundo (o jogador só regenera com passiva; sem isso o bot zera cedo). */
 export const BOT_MANA_REGEN = 0.01;
+/** Golpe marcado do chefe: chance de o bot perceber a marca e sair dela (decidida uma vez por marca). */
+export const BOT_DODGE = 0.7;
 
-/** Cria o grupo de bots para a masmorra (classes sorteadas, nível do meio da faixa até o do jogador). */
+/** Marcas que cada bot já avaliou (id da marca -> lugar seguro para onde corre, ou null se não percebeu). */
+const dodgeSeen = new WeakMap<Bot, Map<number, Point | null>>();
+
+/** Bot dentro de uma marca que percebeu: lugar seguro para onde correr (escolhido uma vez por marca; null = fica). */
+function dodgeSpot(w: World, b: Bot): Point | null {
+  if (!w.telegraphs.length) return null;
+  let seen = dodgeSeen.get(b);
+  if (!seen) dodgeSeen.set(b, (seen = new Map()));
+  for (const t of w.telegraphs) {
+    if (!inTelegraph(t, b.e, 0.3)) continue;
+    if (!seen.has(t.id)) seen.set(t.id, w.rng.next() < BOT_DODGE ? safeSpot(w, b.e) : null);
+    const q = seen.get(t.id);
+    if (q) return q;
+  }
+  return null;
+}
+
 export function makeParty(w: World, dungeonId: string): Bot[] {
   const d = dungeonById(dungeonId);
   if (!d) return [];
@@ -62,6 +81,12 @@ export function tickParty(w: World, dt: number) {
     if (e.dead || w.player.dead) continue;
     e.mana = Math.min(e.derived.maxMana, e.mana + e.derived.maxMana * BOT_MANA_REGEN * dt);
     if (w.isStunned(e)) continue;
+    const away = dodgeSpot(w, b);
+    if (away) {
+      e.path = [away];
+      w.followPath(e, dt, 1);
+      continue;
+    }
     const a = botThink(b, { leader: w.player, leaderTargetId: w.targetId, enemies, allies });
     if (a.kind === 'potion') {
       if (botDrink(b, a.potion)) w.emit({ type: 'botPotion', botId: e.id, kind: a.potion });

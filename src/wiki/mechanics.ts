@@ -643,7 +643,8 @@ function equipe(): string {
       <li>Os monstros perseguem quem bateu neles primeiro, você ou um bot.</li>
     </ul></section>
     <section class="panel"><h2>Dificuldade e recompensa</h2><ul>
-      <li>Vida dos monstros: comuns ×${x(bal('equipe.vida_comuns'))} e chefe ×${x(bal('equipe.vida_chefe'))}. Ataque e defesa são os do modo solo. Valores provisórios.</li>
+      <li>Vida dos monstros: comuns ×${x(bal('equipe.vida_comuns'))} e chefe ×${x(bal('equipe.vida_chefe'))}. Ataque e defesa são os do modo solo.</li>
+      <li>Golpes marcados no chão do chefe também acertam os bots; eles costumam sair da marca, mas às vezes não percebem.</li>
       <li>XP, ouro e drops são os mesmos do modo solo, e tudo vai para você.</li>
       <li>A corrida só falha se <b>você</b> morrer; bots caídos não encerram.</li>
     </ul></section>

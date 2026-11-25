@@ -197,6 +197,34 @@ console.log('\n== reviver ==');
   ok(revivable(w) === b, 'luta acabou: pode reviver de novo');
 }
 
+console.log('\n== golpe marcado do chefe ==');
+{
+  const w = fresh();
+  w.enterDungeon('gruta', true);
+  const boss = w.monsters.find((x) => !!MONSTERS[x.monsterId]?.boss)!;
+  const b = w.party[0];
+  const hp0 = b.e.hp;
+  const t = { id: 999, x: b.e.x, y: b.e.y, radius: 2, delay: 0.01, remaining: 0.01, ownerId: boss.id, mult: 1 };
+  boss.ai = 'chase';
+  w.telegraphs.push(t);
+  w.tickTelegraphs(0.02);
+  ok(b.e.hp < hp0, 'golpe marcado acerta o bot dentro da marca');
+  let moved = 0;
+  for (let seed = 0; seed < 20; seed++) {
+    const v = fresh();
+    v.enterDungeon('gruta', true);
+    const bb = v.party[0],
+      bo = v.monsters.find((x) => !!MONSTERS[x.monsterId]?.boss)!,
+      x0 = bb.e.x,
+      y0 = bb.e.y;
+    for (const m of v.monsters) m.dead = m !== bo;
+    v.telegraphs.push({ id: 1, x: x0, y: y0, radius: 1.5, delay: 9, remaining: 9, ownerId: bo.id, mult: 1 });
+    run(v, 1.5);
+    if (Math.hypot(bb.e.x - x0, bb.e.y - y0) > 1.5) moved++;
+  }
+  ok(moved >= 8 && moved < 20, `bots desviam às vezes (${moved}/20 saíram da marca)`);
+}
+
 console.log('\n== fim da corrida ==');
 {
   const w = fresh();
