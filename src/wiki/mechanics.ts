@@ -3,7 +3,7 @@
 import {
   ARENA_COINS,
   ARENA_COUNTDOWN,
-  ARENA_DAMAGE,
+  ARENA_TTK,
   ARENA_DELTA_MAX,
   ARENA_DELTA_MIN,
   ARENA_POWER_MAX,
@@ -684,7 +684,7 @@ function arena(): string {
       <li>O adversário é um bot de outra seita, com a mesma inteligência dos <a href="#/mecanicas/equipe">bots da masmorra em equipe</a>.</li>
       <li><b>O seu poder nunca muda.</b> O bot recebe de ${pct(ARENA_POWER_MIN)} a ${pct(ARENA_POWER_MAX)} do seu poder (vida e dano dele acompanham os seus; defesas iguais às suas), conforme os seus pontos.</li>
       <li>Os dois começam com vida e mana cheias. Há ${ARENA_COUNTDOWN} s de contagem, em que ninguém anda nem ataca.</li>
-      <li>Na arena todo dano, dos dois lados, vale ${pct(ARENA_DAMAGE)} do normal, para a luta não acabar no primeiro golpe.</li>
+      <li>Na arena todo dano, dos dois lados, é reduzido pela mesma conta: seu golpe normal levaria cerca de ${ARENA_TTK} s para tirar a sua própria vida. Assim a luta não acaba no primeiro golpe, com qualquer equipamento.</li>
       <li>Depois de ${ARENA_TIME_LIMIT} s de luta, vence quem tiver mais vida (em %).</li>
       <li>Perder não é morrer: sem penalidade, você volta ao Porto com a vida cheia.</li>
     </ul></section>

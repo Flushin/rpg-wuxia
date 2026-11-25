@@ -26,9 +26,12 @@ export const ARENA_DELTA_MAX = 30;
 export const ARENA_COINS = { win: 30, loss: 10 };
 /** Luta longa demais: acaba e vence quem tiver mais vida (em %). */
 export const ARENA_TIME_LIMIT = 120;
-/** Todo dano na arena (dos dois lados) é multiplicado por isto: no nível 50 uma skill tira quase a vida inteira e a
- *  luta acabaria em 2 s, decidida por quem bate primeiro. Vale igual para os dois: o poder relativo não muda. */
-export const ARENA_DAMAGE = 0.25;
+/** Todo dano na arena (dos dois lados) é multiplicado por um fator calculado na entrada: o golpe normal do jogador
+ *  levaria ARENA_TTK segundos para tirar a vida dele mesmo. Assim a duração não depende do equipamento (com muito
+ *  crítico e elemento uma skill matava no primeiro golpe). Vale igual para os dois: o poder relativo não muda. */
+export const ARENA_TTK = 40;
+export const arenaDamageMul = (player: Entity, bot: Entity) =>
+  Math.min(1, player.derived.maxHp / (basicDps(player, bot) * ARENA_TTK));
 /** Contagem antes da luta começar (s); ninguém anda nem ataca. */
 export const ARENA_COUNTDOWN = 3;
 
@@ -102,12 +105,14 @@ export function scaleArenaBot(b: Bot, player: Entity, power: number, playerClass
   e.elemRes = { ...player.elemRes };
   d.maxHp = Math.round(pd.maxHp * k);
   e.hp = d.maxHp;
-  const want = basicDps(player, e) * k;
-  // dano ~ ataque × (1 - defesa): escala ataque e elemento juntos; repete para acertar o piso de 1 de dano
-  for (let i = 0; i < 4; i++) {
-    const m = want / basicDps(e, player);
-    d.physAtk *= m;
-    d.spiritAtk *= m;
-    for (const el of Object.keys(e.elemAtk) as (keyof typeof e.elemAtk)[]) e.elemAtk[el] *= m;
-  }
+  // ataque: copia o perfil ofensivo do jogador (ataque, elemento, crítico) para o tipo de dano/elemento do bot,
+  // vezes k. Antes o bot só igualava o DPS do golpe normal pelo ataque e, contra jogador de muito elemento e
+  // crítico, ficava com ataque 10× maior: as skills (que escalam por ataque) matavam no primeiro golpe.
+  const atk = player.damageType === 'physical' ? pd.physAtk : pd.spiritAtk,
+    elem = player.element ? player.elemAtk[player.element] : 0;
+  d.physAtk = d.spiritAtk = atk * k;
+  for (const el of Object.keys(e.elemAtk) as (keyof typeof e.elemAtk)[]) e.elemAtk[el] = 0;
+  if (e.element) e.elemAtk[e.element] = elem * k;
+  d.critChance = pd.critChance;
+  d.critDamage = pd.critDamage;
 }
