@@ -425,3 +425,56 @@ button.primary {
   color: #f3e6c4;
   font-size: 14px;
 }
+.buff-row {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.buff-row.hidden {
+  display: none;
+}
+.buff-row .buff {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid var(--c, #888);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--c, #888) 45%, transparent) calc(var(--left, 1) * 100%),
+    rgba(0, 0, 0, 0.55) 0
+  );
+  overflow: hidden;
+}
+.buff-row .buff.neg {
+  box-shadow: 0 0 0 1px rgba(200, 40, 40, 0.8);
+}
+.buff-row .buff.pos {
+  box-shadow: 0 0 0 1px rgba(60, 180, 70, 0.8);
+}
+.buff-row .buff.ending {
+  animation: buff-blink 0.5s steps(2) infinite;
+}
+.buff-row .buff small {
+  position: absolute;
+  right: 1px;
+  bottom: 0;
+  font-size: 9px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+}
+.buff-row .buff.more {
+  font-size: 10px;
+  border-color: #888;
+}
+@keyframes buff-blink {
+  50% {
+    opacity: 0.45;
+  }
+}

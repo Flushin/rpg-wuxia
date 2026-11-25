@@ -12,6 +12,7 @@ import { TrialWindow } from './trialWindow';
 import { AutoPanel, showOfflineReport } from './autoPanel';
 import { Minimap } from './minimap';
 import { isTouch } from '../platform/input';
+import { BuffRow } from './buffRow';
 import type { OfflineReport } from '../core/world';
 import { PotionBar } from './potions';
 import { Rewards } from './rewards';
@@ -37,6 +38,7 @@ export class Hud {
   private autoPanel: AutoPanel;
   private autoSig = '';
   private mountSig = '';
+  private tBuffs?: BuffRow;
   private minimap: Minimap;
   readonly rewards = new Rewards();
   private questTracker = new QuestTracker();
@@ -213,6 +215,7 @@ export class Hud {
       setText(byId('t-level'), L(`Nv ${t.level}`, `Lv ${t.level}`));
       setStyle(byId('t-hp'), 'width', pct(t.hp, t.derived.maxHp));
       setText(byId('t-hp-t'), `${Math.max(0, Math.ceil(t.hp))} / ${t.derived.maxHp}`);
+      (this.tBuffs ??= new BuffRow(byId('t-buffs'))).update(t.buffs, 'debuff');
     }
     this.attrs.update();
     this.hotbar.update();
