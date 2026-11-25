@@ -7,7 +7,7 @@ import { EPIC, EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from
 import { loadMaps, type WikiMap } from './maps';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
-import { TRIAL_TIERS, isTrialBoss, trialBossLevel, trialWeakness } from '../core/trial';
+import { TRIAL_TIERS, isTrialBoss, trialBossLevel, trialWeakness, trialXp } from '../core/trial';
 import { spriteHtml } from './npcs';
 import { chance, itemLink, questList, spoiler } from './ui';
 
@@ -171,7 +171,7 @@ function bossMechanics(m: Monster, inDungeon: boolean): string {
   );
   if (isTrialBoss(m.id))
     li.push(
-      `No <a href="#/mecanicas/trial">Trial</a> volta nos níveis ${trialBossLevel(1)} a ${trialBossLevel(TRIAL_TIERS)}, com as mesmas mecânicas. Ponto fraco: dano <b>${trialWeakness(m) === 'physical' ? 'físico' : 'espiritual'}</b>.`,
+      `No <a href="#/mecanicas/trial">Trial</a> volta nos níveis ${trialBossLevel(1)} a ${trialBossLevel(TRIAL_TIERS)}, com as mesmas mecânicas e dá ${trialXp(1).toLocaleString('pt-BR')} a ${trialXp(TRIAL_TIERS).toLocaleString('pt-BR')} de XP (não a da tabela acima). Ponto fraco: dano <b>${trialWeakness(m) === 'physical' ? 'físico' : 'espiritual'}</b>.`,
     );
   return `<ul>${li.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 }
