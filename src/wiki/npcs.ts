@@ -189,6 +189,7 @@ function npcList(): NpcInfo[] {
         ['ferreiro_mestre', 'Encaixes: abrir, colocar e retirar gemas', 'npc_ferreiro_mestre', masterSmith],
         ['joalheiro', 'Gemas: vender e fundir', 'npc_joalheiro', jeweler],
         ['antiquario', 'Relíquias (nível 50)', 'npc_antiquario', antiquary],
+        ['mestre_arena', 'Arena: lutas contra bots e títulos', 'npc_mestre_cais', arenaMaster],
         ['mestre_cais', 'Histórias do cais e missões', 'npc_mestre_cais', talkHarbor],
         [
           'vendedor_porto1',
@@ -294,6 +295,11 @@ function antiquary(): string {
   return `<p>Vende relíquias comuns e raras para o novo espaço de relíquia do personagem (nível 50). As lendárias só caem de
     chefes. Fica no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>, entre o jardim e a arena. Veja todas em
     <a href="#/mecanicas/reliquias">Relíquias</a>.</p>`;
+}
+function arenaMaster(): string {
+  return `<p>Manda você para o círculo da arena contra um lutador de outra seita e vende títulos com a moeda da arena.
+    Fica no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>, ao lado do portal do Trial. Veja as regras em
+    <a href="#/mecanicas/arena">Arena</a>.</p>`;
 }
 function masterSmith(): string {
   const s = GEM_CFG.socketsByRarity;

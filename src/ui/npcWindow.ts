@@ -36,6 +36,8 @@ import { byId, escapeHtml } from './dom';
 import { cellHtml, cellStyle, itemTipHtml } from './itemTip';
 import { gemClick, jewelerHtml, masterSmithHtml } from './gemShop';
 import { antiquaryHtml } from './relicShop';
+import { arenaHtml } from './arenaShop';
+import { ARENA_TITLES } from '../core/arena';
 import {
   matCount,
   rarityCost,
@@ -162,6 +164,24 @@ export class NpcWindow {
       const err = w.buyMount(v);
       if (err) this.toast(actionErrorText(err), '#ff8a80');
       else this.toast(L(`Montaria comprada: ${MOUNTS[v].name}`, `Mount bought: ${MOUNTS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'arenafight') {
+      const err = w.enterArena();
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else audio.ui('ui_click');
+      return;
+    }
+    if (a === 'titlebuy') {
+      const err = w.buyArenaTitle(v);
+      if (err) this.toast(actionErrorText(err), '#ff8a80');
+      else
+        this.toast(L(`Título comprado: ${ARENA_TITLES[v].name}`, `Title bought: ${ARENA_TITLES[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'titlewear') {
+      audio.ui('ui_click');
+      w.wearArenaTitle(v || null);
       return;
     }
     if (a === 'relicbuy') {
@@ -388,6 +408,7 @@ export class NpcWindow {
     else if (role === 'governador') view = { list: this.talk(who) + this.skinShop() };
     else if (role === 'estabulo') view = { list: this.talk(who) + this.mountShop() };
     else if (role === 'antiquario') view = { list: this.talk(who) + antiquaryHtml(w, this.relicAsk) };
+    else if (role === 'arena') view = { list: this.talk(who) + arenaHtml(w) };
     else if (role === 'joalheiro') view = { list: this.talk(who) + jewelerHtml(w) };
     else if (role === 'ferreiro_mestre') {
       const g = masterSmithHtml(w, this.gemSel);

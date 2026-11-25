@@ -223,7 +223,7 @@ export function directDamage(w: World, a: Entity, t: Entity, mult: number) {
     Math.round(
       (atk * mult * (1 - df / (df + 100)) + pct) *
         bal('dano.monstros', a.monsterId) *
-        (1 - (t.kind === 'bot' ? (w.party.find((b) => b.e === t)?.damageTaken ?? 0) : w.damageTakenRed())),
+        (1 - (t.kind === 'bot' ? (w.botOf(t)?.damageTaken ?? 0) : w.damageTakenRed())),
     ),
   );
   const dealt = w.absorb(t, amount);

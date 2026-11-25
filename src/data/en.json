@@ -819,6 +819,14 @@
           "The potion seller buys anything you bring. Even that junk you found in the forest."
         ]
       },
+      "mestre_arena": {
+        "name": "Arena Master Tie",
+        "lines": [
+          "In the arena circle nobody truly dies, but pride bleeds. Fighters from every sect are waiting for you.",
+          "The more you win, the stronger the one I call to fight you. Your points show how far you have come.",
+          "Arena coins buy titles that all of the Port will read above your name."
+        ]
+      },
       "antiquario": {
         "name": "Antiquarian Lao",
         "lines": [
@@ -1119,6 +1127,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Arena in the Night Port: talk to Arena Master Tie, next to the Trial portal, to fight 1 on 1 against a fighter from another sect. Your power never changes; your opponent gets stronger with your ranking points (Bronze to Legend). Losing has no penalty. Every fight gives arena coins, which buy titles shown above your name." },
     { "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight." },
       { "texto": "Buff and debuff icons: the target frame and boss bar show slow, poison, stun, freeze and broken armor, with time left; under your HP you see shield, regeneration and effects on you. A new wiki page explains each icon." },
       { "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse." },
@@ -1416,6 +1425,14 @@
       "name": "Horse",
       "desc": "A bay horse from the Night Harbor stables. Carries you faster along the roads; you dismount when combat starts."
     }
+  },
+  "arenaTitles": {
+    "duelista": { "name": "Duelist" },
+    "lamina_do_porto": { "name": "Blade of the Port" },
+    "punho_de_ferro": { "name": "Iron Fist" },
+    "lanterna_rubra": { "name": "Crimson Lantern" },
+    "senhor_da_arena": { "name": "Lord of the Arena" },
+    "lenda_do_porto": { "name": "Legend of the Night Port" }
   },
   "relics": {
     "slotName": "Relic",

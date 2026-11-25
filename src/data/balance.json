@@ -4,6 +4,18 @@
     "Não edite à mão: use npm run balance (lista tudo) e npm run balance -- <chave> +10% (veja docs/balanceamento.md).",
     "Chave com id vale só para aquele monstro/skill/seita/poção/missão/nível (ex.: xp.monstros.lobo) e multiplica a global."
   ],
-  "multiplicadores": { "equipe.vida_comuns": 3.5, "equipe.vida_chefe": 4.5 },
-  "historico": []
+  "multiplicadores": {
+    "equipe.vida_comuns": 3.5,
+    "equipe.vida_chefe": 4.5,
+    "arena.poder_bot.lamina": 0.85,
+    "arena.poder_bot.pavilhao": 1.2,
+    "arena.poder_bot.tita": 1.6,
+    "arena.poder_bot.vibora": 1.05
+  },
+  "historico": [
+    {"data":"2026-11-25","chave":"arena.poder_bot.lamina","de":1,"para":0.85},
+    {"data":"2026-11-25","chave":"arena.poder_bot.pavilhao","de":1,"para":1.2},
+    {"data":"2026-11-25","chave":"arena.poder_bot.tita","de":1,"para":1.6},
+    {"data":"2026-11-25","chave":"arena.poder_bot.vibora","de":1,"para":1.05}
+  ]
 }

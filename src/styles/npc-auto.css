@@ -757,3 +757,14 @@
   border-color: #e8b84a;
   box-shadow: 0 0 8px rgba(232, 184, 74, 0.55);
 }
+
+/* Mestre da Arena (src/ui/arenaShop.ts) */
+.ar-stats {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.ar-stats button {
+  justify-self: start;
+  margin-top: 4px;
+}

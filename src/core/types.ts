@@ -108,6 +108,10 @@ export interface Entity {
   summoned: boolean;
   /** monstro: id de quem ele persegue (jogador ou bot da masmorra em equipe); sem = o mais próximo */
   foeId?: number;
+  /** título mostrado acima do nome (arena) */
+  title?: string;
+  /** bot inimigo da arena (nome e vida em vermelho) */
+  arenaFoe?: boolean;
   /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */
   enraged?: boolean;
   /** chefe com golpe em linha (boss.line): quantos golpes marcados já deu, para alternar círculo e linha */
@@ -160,6 +164,8 @@ export type GameEvent =
   | { type: 'botPotion'; botId: number; kind: 'hp' | 'mp' }
   | { type: 'botDeath'; botId: number; name: string }
   | { type: 'botRevive'; botId: number; name: string }
+  | { type: 'arenaStart'; botId: number; classId: string; power: number }
+  | { type: 'arenaResult'; win: boolean; delta: number; points: number; coins: number }
   /** entrou numa masmorra (já pagou a entrada) */
   | { type: 'dungeonEnter'; dungeonId: string; cost: number; team?: boolean }
   | { type: 'teleport'; map: string; cost: number }
@@ -342,6 +348,8 @@ export interface SaveData {
   /** relíquias obtidas (ids de relics.json) e a equipada */
   relics?: string[];
   relic?: string;
+  /** arena do Porto Noturno (src/core/arena.ts): pontos, moeda, vitórias/derrotas, títulos comprados e o usado */
+  arena?: { points: number; coins: number; wins: number; losses: number; titles: string[]; title?: string };
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
 }
 
@@ -378,4 +386,8 @@ export type ActionError =
   | { code: 'mountCombat' }
   | { code: 'talkToAntiquary' }
   | { code: 'relicOwned' }
+  | { code: 'talkToArena' }
+  | { code: 'titleOwned' }
+  | { code: 'arenaPoints'; points: number }
+  | { code: 'arenaCoins' }
   | { code: 'relicNotOwned' };

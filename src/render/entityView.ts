@@ -18,7 +18,9 @@ const labelOf = (e: Entity) =>
     ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`)
     : e.kind === 'npc'
       ? tn(e.name)
-      : e.name;
+      : e.title
+        ? `«${e.title}»\n${e.name}` // título da arena acima do nome
+        : e.name;
 
 export class EntityView {
   container: Phaser.GameObjects.Container;
@@ -94,11 +96,26 @@ export class EntityView {
     this.ring = scene.add.graphics();
     this.bar = scene.add.graphics();
     const color =
-      e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : e.kind === 'bot' ? '#8ad0ff' : '#f0d070';
+      e.kind === 'player'
+        ? '#9fe8a0'
+        : e.kind === 'monster'
+          ? '#ff9a8a'
+          : e.kind === 'bot'
+            ? e.arenaFoe
+              ? '#ff9a8a'
+              : '#8ad0ff'
+            : '#f0d070';
     const text = labelOf(e);
     const labelY = this.sheet ? -this.top - 4 : e.kind === 'monster' ? -36 * this.sc : -52;
     const label = scene.add
-      .text(0, labelY, text, { fontSize: '12px', color, stroke: '#000', strokeThickness: 3, resolution: DPR * 2 })
+      .text(0, labelY, text, {
+        fontSize: '12px',
+        color,
+        align: 'center',
+        stroke: '#000',
+        strokeThickness: 3,
+        resolution: DPR * 2,
+      })
       .setOrigin(0.5, 1);
     label.setName('label');
     this.label = label;
@@ -180,12 +197,12 @@ export class EntityView {
       this.bar.strokeCircle(0, -20, 30);
     }
     if (e.kind === 'bot') {
-      // aliado da masmorra em equipe: barra de vida verde sempre à mostra
+      // aliado da masmorra em equipe: barra de vida verde sempre à mostra (inimigo da arena: vermelha)
       const w = 36,
         top = this.sheet ? -this.top - 10 : -48;
       this.bar.fillStyle(0x000000, 0.75);
       this.bar.fillRect(-w / 2 - 1, top - 1, w + 2, 5);
-      this.bar.fillStyle(0x4cc46a, 1);
+      this.bar.fillStyle(e.arenaFoe ? 0xe0503c : 0x4cc46a, 1);
       this.bar.fillRect(-w / 2, top, w * Math.max(0, e.hp / e.derived.maxHp), 3);
     }
     if (selected && e.kind === 'monster') {

@@ -42,6 +42,11 @@ export const KNOBS = {
     grupo: 'Combate',
     desc: 'masmorra em equipe (bots): vida do chefe (valor = multiplicador; 3.5 = 3,5× a vida)',
   },
+  'arena.poder_bot': {
+    grupo: 'Combate',
+    desc: 'arena: poder do bot por seita do JOGADOR (+ = bot mais forte; acerta o ponto de 50% de vitórias de cada seita)',
+    scope: 'seita',
+  },
   roubo_vida: { grupo: 'Combate', desc: 'roubo de vida da seita (Tormenta)', scope: 'seita' },
   'cura.pocoes': { grupo: 'Combate', desc: 'quanto as poções recuperam', scope: 'pocao' },
   // Progressão

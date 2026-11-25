@@ -1719,6 +1719,7 @@ function porto() {
   npc('Ferreiro-mestre Gang', 'ferreiro_mestre', 77.6, 13.1, { role: 'ferreiro_mestre', face: 7 });
   npc('Joalheiro Yu', 'joalheiro', 77, 28.4, { role: 'joalheiro', face: 7 });
   npc('Antiquário Lao', 'antiquario', 67, 59.7, { role: 'antiquario', face: 7 });
+  npc('Mestre da Arena Tie', 'mestre_arena', 80, 68, { role: 'arena', face: 7 }); // arena (src/core/world/arena.ts)
   // posto da guarda dos dois lados do portão: estandarte, braseiro aceso e suporte de lanças sobre a pedra
   gr.rect(42, 3, 12, 4, PL);
   for (const [x, sx] of [

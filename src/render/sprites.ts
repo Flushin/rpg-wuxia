@@ -60,6 +60,7 @@ const NPC_SHEET_BY_ID: Record<string, string> = {
   vendedor_porto2: 'npc_vendedora_porto',
   vendedor_porto3: 'npc_vendedora_porto',
   estabulo: 'npc_mercador', // Cavalariço Ma usa o modelo do mercador
+  mestre_arena: 'npc_mestre_cais', // Mestre da Arena Tie usa o modelo do Mestre do Cais
 };
 export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' + npcId;
 

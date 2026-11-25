@@ -9,6 +9,7 @@ import { GLOBAL_COOLDOWN, skillScale, type SkillDef } from '../skills';
 import type { Entity, Point } from '../types';
 import { findPath, isWalkable } from '../pathfinding';
 import { inTelegraph, safeSpot } from './boss';
+import { arenaBotOf, finishArena } from './arena';
 import type { World } from '../world';
 
 /** Tamanho do grupo de bots (o jogador + 3). */
@@ -115,13 +116,13 @@ export function tickParty(w: World, dt: number) {
 
 /** Skill do bot no mundo: mesmos efeitos da skill do jogador (golpes, área, avanço, enfraquecer, veneno, atordoar,
  *  escudo e cura), no nível de skill do bot. */
-export function castBotSkill(w: World, b: Bot, def: SkillDef, t: Entity | null) {
+export function castBotSkill(w: World, b: Bot, def: SkillDef, t: Entity | null, foes: Entity[] = w.monsters) {
   const e = b.e,
     scale = skillScale(b.skillLevel);
   if (def.target === 'target' && !def.area && !t) return;
   const around = def.area === 'self' ? e : def.area === 'target' ? (t ?? e) : null;
   let victims: Entity[] = t ? [t] : [];
-  if (around) victims = w.monsters.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
+  if (around) victims = foes.filter((m) => !m.dead && dist(m, around) <= (def.radius ?? 0));
   if (def.dash && t) {
     const d = dist(e, t);
     if (d > 1) {
@@ -152,7 +153,7 @@ export function castBotSkill(w: World, b: Bot, def: SkillDef, t: Entity | null) 
   for (const v of victims) {
     if (!def.hits?.length) {
       applyOnHit(w, e, def, v, scale);
-      if (!v.dead && v.ai !== 'return') w.aggroBy(v, e);
+      if (!v.dead && v.kind === 'monster' && v.ai !== 'return') w.aggroBy(v, e);
       continue;
     }
     for (const pct of def.hits) {
@@ -179,6 +180,10 @@ function applyOnHit(w: World, e: Entity, def: SkillDef, v: Entity, scale: number
 
 /** Bot caiu: fica no chão até ser revivido (ou até o fim da corrida). */
 export function killBot(w: World, e: Entity) {
+  if (arenaBotOf(w, e)) {
+    finishArena(w, true); // bot da arena caiu: vitória do jogador
+    return;
+  }
   e.dead = true;
   e.hp = 0;
   e.path = [];

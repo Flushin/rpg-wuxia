@@ -80,6 +80,8 @@ import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import * as party from './world/party';
+import * as arenaW from './world/arena';
+import { ARENA_COUNTDOWN, ARENA_DAMAGE, newArenaState, type ArenaState } from './arena';
 import type { Bot } from './bots';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
@@ -216,6 +218,9 @@ export class World {
   dungeonMenu = false;
   /** masmorra em equipe: bots aliados (src/core/world/party.ts); vazio fora do modo equipe */
   party: Bot[] = [];
+  /** arena do Porto Noturno: progresso salvo e a luta em andamento (src/core/world/arena.ts) */
+  arena: ArenaState = newArenaState();
+  arenaFight: arenaW.ArenaFight | null = null;
   /** corrida atual é em equipe (monstros com mais vida: balance.json equipe.*) */
   teamRun = false;
   /** jogador segurando o botão de reviver; tempo segurado; bots já revividos nesta luta */
@@ -626,7 +631,7 @@ export class World {
   }
   /** Um tique de veneno: dano direto (sem acerto/erro nem defesa; já foi calculado ao aplicar). */
   private poisonTick(e: Entity, amount: number) {
-    const dealt = Math.max(1, Math.round(amount));
+    const dealt = Math.max(1, Math.round(amount * (this.arenaFight ? ARENA_DAMAGE : 1)));
     e.hp -= dealt;
     this.emit({
       type: 'hit',
@@ -687,7 +692,7 @@ export class World {
   useSkill(slot: number) {
     const p = this.player,
       def = this.activeSkills()[slot];
-    if (!def || p.dead || this.levelUpPose > 0 || this.ultCast) return;
+    if (!def || p.dead || this.levelUpPose > 0 || this.ultCast || this.arenaLocked()) return;
     if (!this.isUnlocked(def)) return this.fail(def, 'locked');
     const st = this.skills[def.id];
     if (st.cd > 0 || this.gcd > 0) return this.fail(def, 'cooldown');
@@ -878,7 +883,7 @@ export class World {
   useUltimate(): boolean {
     const p = this.player,
       u = this.ultimate();
-    if (!u || p.dead || this.ultCast || this.levelUpPose > 0) return false;
+    if (!u || p.dead || this.ultCast || this.levelUpPose > 0 || this.arenaLocked()) return false;
     if (!this.ultReady()) return false;
     this.ultCharge = 0;
     this.pendingSkill = null;
@@ -1046,7 +1051,8 @@ export class World {
       this.wasInArena = inArena;
     }
     party.tickParty(this, dt);
-    for (const m of this.monsters) this.tickMonster(m, dt);
+    arenaW.tickArena(this, dt);
+    for (const m of this.monsters) if (m.kind === 'monster') this.tickMonster(m, dt); // o bot da arena anda sozinho
     for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
     this.tickTelegraphs(dt);
   }
@@ -1055,6 +1061,10 @@ export class World {
     const p = this.player,
       d = p.derived;
     p.attackCd = Math.max(0, p.attackCd - dt);
+    if (this.arenaLocked()) {
+      p.path = []; // contagem da arena (ou luta acabada): ninguém anda nem ataca
+      return;
+    }
     // HP e mana só regeneram na cidade
     if (TOWN_MAPS.has(this.mapId) && this.time - this.lastDamaged > 5) {
       p.hp = Math.min(d.maxHp, p.hp + d.maxHp * TOWN_REGEN * dt);
@@ -1487,9 +1497,10 @@ export class World {
     else if (a.kind === 'monster') mult *= bal('dano.monstros', a.monsterId);
     // chefe: soma % da vida máxima do jogador ao golpe normal (src/core/world/boss.ts BOSS_PCT_HP)
     if (r.hit && !skill) r.amount += Math.round(boss.bossBasicPctDamage(a, t) * (r.crit ? a.derived.critDamage : 1));
+    if (this.arenaFight) mult *= ARENA_DAMAGE; // arena: dano reduzido dos dois lados (src/core/arena.ts)
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (r.hit && t.kind === 'bot') {
-      const red = this.party.find((b) => b.e === t)?.damageTaken ?? 0;
+      const red = this.botOf(t)?.damageTaken ?? 0;
       if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
     }
     if (r.hit && t.kind === 'player') {
@@ -1521,7 +1532,7 @@ export class World {
         a.kind === 'player' && leech
           ? (CLASSES[this.classId].lifeSteal ?? 0) + this.relicEffect('lifeSteal')
           : a.kind === 'bot' && leech
-            ? (this.party.find((b) => b.e === a)?.lifeSteal ?? 0)
+            ? (this.botOf(a)?.lifeSteal ?? 0)
             : 0;
       const stolen = Math.min(dealt, hpBefore);
       if (ls > 0 && stolen > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + stolen * ls);
@@ -1614,7 +1625,34 @@ export class World {
   }
 
   /** Interno: usado pelos módulos de src/core/world/. */
+  /** Arena: contagem antes da luta ou resultado na tela; o jogador fica parado. */
+  arenaLocked(): boolean {
+    const f = this.arenaFight;
+    return !!f && (f.over || f.t < ARENA_COUNTDOWN);
+  }
+
+  /** Interno: bot aliado (masmorra em equipe) ou o inimigo da arena dono desta entidade. */
+  botOf(e: Entity): Bot | null {
+    return this.party.find((b) => b.e === e) ?? (this.arenaFight?.bot.e === e ? this.arenaFight.bot : null);
+  }
+
+  // ---------- arena do Porto Noturno: src/core/world/arena.ts ----------
+  enterArena(): ActionError | null {
+    return arenaW.enterArena(this);
+  }
+  buyArenaTitle(id: string): ActionError | null {
+    return arenaW.buyArenaTitle(this, id);
+  }
+  wearArenaTitle(id: string | null) {
+    arenaW.wearArenaTitle(this, id);
+  }
+
   killPlayer() {
+    if (this.arenaFight) {
+      // na arena ninguém morre: a luta acaba em derrota, sem penalidade (src/core/world/arena.ts)
+      arenaW.finishArena(this, false);
+      return;
+    }
     this.ultCast = null;
     const p = this.player;
     p.dead = true;

@@ -6,7 +6,8 @@ import { L } from '../core/i18n';
 import { tileToScreen } from '../core/iso';
 import type { Entity, GameEvent } from '../core/types';
 import type { World } from '../core/world';
-import { MONSTERS } from '../core/data';
+import { CLASSES, MONSTERS } from '../core/data';
+import { ARENA_COUNTDOWN } from '../core/arena';
 import { homeTownOf } from '../core/mapsConfig';
 import { RARITIES } from '../core/items';
 import { TRIAL_TIERS } from '../core/trial';
@@ -66,7 +67,7 @@ export class EventFeedback {
     switch (ev.type) {
       case 'hit': {
         const s = tileToScreen(ev.x, ev.y),
-          toPlayer = ev.targetKind === 'player' || ev.targetKind === 'bot';
+          toPlayer = ev.targetKind === 'player' || (ev.targetKind === 'bot' && !this.world.arenaFight);
         if (ev.crit && !toPlayer) vibrate();
         if (fxPrefs.damageNumbers)
           this.floatText(
@@ -299,6 +300,29 @@ export class EventFeedback {
             `Trial level ${ev.tier}: −${ev.cost} gold. Auto doesn't work here.`,
           ),
           '#c08cff',
+        );
+        return true;
+      case 'arenaStart':
+        toast(
+          L(
+            `Arena: ${CLASSES[ev.classId]?.name ?? ''} com ${Math.round(ev.power * 100)}% do seu poder. Luta em ${ARENA_COUNTDOWN} s!`,
+            `Arena: ${CLASSES[ev.classId]?.name ?? ''} at ${Math.round(ev.power * 100)}% of your power. Fight in ${ARENA_COUNTDOWN} s!`,
+          ),
+          '#8ad0ff',
+        );
+        return true;
+      case 'arenaResult':
+        toast(
+          ev.win
+            ? L(
+                `Vitória! +${ev.delta} pontos (${ev.points}), +${ev.coins} moedas da arena`,
+                `Victory! +${ev.delta} points (${ev.points}), +${ev.coins} arena coins`,
+              )
+            : L(
+                `Derrota: ${ev.delta} pontos (${ev.points}), +${ev.coins} moedas da arena`,
+                `Defeat: ${ev.delta} points (${ev.points}), +${ev.coins} arena coins`,
+              ),
+          ev.win ? '#ffd23f' : '#ff8a80',
         );
         return true;
       case 'trialCleared':
