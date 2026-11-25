@@ -7,10 +7,10 @@
   "multiplicadores": {
     "equipe.vida_comuns": 3.5,
     "equipe.vida_chefe": 4.5,
-    "arena.poder_bot.lamina": 0.88,
-    "arena.poder_bot.pavilhao": 0.82,
-    "arena.poder_bot.tita": 1.3,
-    "arena.poder_bot.vibora": 1
+    "arena.poder_bot.lamina": 0.9,
+    "arena.poder_bot.pavilhao": 1.15,
+    "arena.poder_bot.tita": 1.5,
+    "arena.poder_bot.vibora": 1.35
   },
   "historico": [
     {"data":"2026-11-25","chave":"arena.poder_bot.lamina","de":1,"para":0.85},
@@ -20,6 +20,10 @@
     {"data":"2026-11-25","chave":"arena.poder_bot.lamina","de":0.85,"para":0.88},
     {"data":"2026-11-25","chave":"arena.poder_bot.pavilhao","de":1.2,"para":0.82},
     {"data":"2026-11-25","chave":"arena.poder_bot.tita","de":1.6,"para":1.3},
-    {"data":"2026-11-25","chave":"arena.poder_bot.vibora","de":1.05,"para":1}
+    {"data":"2026-11-25","chave":"arena.poder_bot.vibora","de":1.05,"para":1},
+    {"data":"2026-11-25","chave":"arena.poder_bot.lamina","de":0.88,"para":0.9},
+    {"data":"2026-11-25","chave":"arena.poder_bot.pavilhao","de":0.82,"para":1.15},
+    {"data":"2026-11-25","chave":"arena.poder_bot.tita","de":1.3,"para":1.5},
+    {"data":"2026-11-25","chave":"arena.poder_bot.vibora","de":1,"para":1.35}
   ]
 }

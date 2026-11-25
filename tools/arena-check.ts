@@ -91,8 +91,6 @@ function fight(w: World): boolean | null {
     if (!f || f.over) continue;
     const p = w.player,
       b = f.bot.e;
-    if (p.hp < p.derived.maxHp * 0.45 && w.potionCd.hp <= 0 && !w.potionFx.hp) w.usePotion('hp');
-    if (p.mana < p.derived.maxMana * 0.25 && w.potionCd.mp <= 0 && !w.potionFx.mp) w.usePotion('mp');
     if (w.targetId !== b.id) {
       w.setTarget(b.id);
       w.attackNearest();
@@ -134,6 +132,7 @@ console.log('\n== luta ==');
   const f = w.arenaFight!,
     b = f.bot.e;
   ok(f.bot.classId !== 'lamina' && w.monsters.includes(b), `bot de outra seita (${f.bot.classId}) no círculo`);
+  ok(!w.usePotion('hp') && f.bot.potions.hp === 0 && f.bot.potions.mp === 0, 'ninguém usa poção na arena');
   ok(w.player.derived.physAtk === atk0 && w.player.derived.maxHp === hp0, 'o poder do jogador não muda');
   ok(
     Math.abs(b.derived.maxHp / w.player.derived.maxHp - Math.sqrt(f.power * bal('arena.poder_bot', 'lamina'))) < 0.02 &&
@@ -179,6 +178,28 @@ console.log('\n== luta ==');
   w2.changeMap('porto');
   w2.tick(1 / 30);
   ok(w2.arena.losses === 1 && !w2.arenaFight, 'sair no meio da luta conta como derrota');
+}
+
+for (const [me, foe, what] of [
+  ['tita', 'pavilhao', 'bot de longe faz kite (recua e anda de lado)'],
+  ['pavilhao', 'tita', 'bot de perto dá fugidas com as skills em recarga'],
+]) {
+  const w = player(me, 50, 9);
+  w.openNpcWindow(mestre(w));
+  enterArena(w, { classId: foe, power: 1 });
+  const b = w.arenaFight!.bot.e;
+  let away = 0;
+  for (let i = 0; i < 30 * 30 && w.arenaFight && !w.arenaFight.over; i++) {
+    const d0 = Math.hypot(b.x - w.player.x, b.y - w.player.y);
+    w.tick(1 / 30);
+    w.events.length = 0;
+    if (w.arenaFight!.move.left > 0 && Math.hypot(b.x - w.player.x, b.y - w.player.y) >= d0 - 0.01) away++;
+    if (w.targetId !== b.id) {
+      w.setTarget(b.id);
+      w.attackNearest();
+    }
+  }
+  ok(away > 30, `${what} (${away} quadros)`);
 }
 
 console.log('\n== títulos e save ==');

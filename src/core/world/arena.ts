@@ -12,8 +12,18 @@ import {
   arenaDamageMul,
   scaleArenaBot,
 } from '../arena';
-import { botActives, botDrink, botThink, dist, makeBot, pickBotClasses, tickBot, type Bot } from '../bots';
-import { findPath } from '../pathfinding';
+import {
+  botActives,
+  botDrink,
+  botThink,
+  type BotAction,
+  dist,
+  makeBot,
+  pickBotClasses,
+  tickBot,
+  type Bot,
+} from '../bots';
+import { findPath, isWalkable } from '../pathfinding';
 import { TRIAL_MAP } from '../trial';
 import type { ActionError } from '../types';
 import type { World } from '../world';
@@ -33,6 +43,8 @@ export interface ArenaFight {
   t: number;
   over: boolean;
   endAt: number;
+  /** manobra do bot (kite/recuo): destino e segundos restantes; espera até a próxima */
+  move: { x: number; y: number; left: number; wait: number };
   /** multiplicador de todo dano na luta (arenaDamageMul) */
   dmg: number;
 }
@@ -54,12 +66,22 @@ export function enterArena(w: World, test?: { classId?: string; power?: number }
   p.mana = p.derived.maxMana;
   p.buffs = [];
   scaleArenaBot(bot, p, power, w.classId);
+  bot.potions = { hp: 0, mp: 0 }; // arena: sem poções dos dois lados
   bot.e.arenaFoe = true;
   bot.e.x = ARENA_SPOTS.bot.x;
   bot.e.y = ARENA_SPOTS.bot.y;
   bot.e.ai = 'chase';
   w.monsters.push(bot.e);
-  w.arenaFight = { bot, rating, power, t: 0, over: false, endAt: 0, dmg: arenaDamageMul(p, bot.e) };
+  w.arenaFight = {
+    bot,
+    rating,
+    power,
+    t: 0,
+    over: false,
+    endAt: 0,
+    move: { x: 0, y: 0, left: 0, wait: 2 },
+    dmg: arenaDamageMul(p, bot.e),
+  };
   w.emit({ type: 'arenaStart', botId: bot.e.id, classId: cls, power });
   return null;
 }
@@ -95,7 +117,7 @@ export function tickArena(w: World, dt: number) {
   if (e.dead || p.dead || f.t < ARENA_COUNTDOWN) return;
   e.mana = Math.min(e.derived.maxMana, e.mana + e.derived.maxMana * BOT_MANA_REGEN * dt);
   if (w.isStunned(e)) return;
-  const a = botThink(b, { leader: null, leaderTargetId: p.id, enemies: [p], allies: [e] });
+  const a = maneuver(w, f, botThink(b, { leader: null, leaderTargetId: p.id, enemies: [p], allies: [e] }), dt);
   if (a.kind === 'potion') {
     if (botDrink(b, a.potion)) w.emit({ type: 'botPotion', botId: e.id, kind: a.potion });
   } else if (a.kind === 'move') {
@@ -116,6 +138,69 @@ export function tickArena(w: World, dt: number) {
     const def = botActives(b).find((s) => s.id === a.skillId);
     if (def) castBotSkill(w, b, def, p, [p]);
   }
+}
+
+/** Centro e raio do círculo de luta (o bot não foge para fora dele). */
+const ARENA_CENTER = { x: 16, y: 9 },
+  ARENA_RADIUS = 6;
+
+/** Deixa a luta mexida: quem bate de longe faz kite (recua se o jogador chega perto e anda de lado de vez em quando);
+ *  quem bate de perto, com todas as skills em recarga, dá uma fugida curta. Skills prontas sempre vêm antes. */
+function maneuver(w: World, f: ArenaFight, a: BotAction, dt: number): BotAction {
+  const b = f.bot,
+    e = b.e,
+    p = w.player,
+    m = f.move;
+  if (a.kind === 'skill') return a;
+  m.wait -= dt;
+  if (m.left > 0) {
+    m.left -= dt;
+    if (dist(e, m) > 0.4) return { kind: 'move', x: m.x, y: m.y };
+    m.left = 0;
+  }
+  const ranged = e.attackRange > 3,
+    d = dist(e, p) || 0.01,
+    ux = (e.x - p.x) / d,
+    uy = (e.y - p.y) / d,
+    side = w.rng.next() < 0.5 ? 1 : -1;
+  let goal: { x: number; y: number } | null = null,
+    time = 0;
+  if (ranged && d < e.attackRange * 0.45) {
+    // jogador colado: recua para ~70% do alcance, um pouco de lado
+    const r = e.attackRange * 0.7;
+    goal = { x: p.x + (ux - uy * side * 0.5) * r, y: p.y + (uy + ux * side * 0.5) * r };
+    time = 1.5;
+  } else if (m.wait <= 0) {
+    const allCd = botActives(b)
+      .filter((s) => !s.shield && !s.heal)
+      .every((s) => (b.cds[s.id] ?? 0) > 0.5 || e.mana < (s.mana ?? 0));
+    if (ranged) {
+      // anda de lado em volta do jogador, na mesma distância
+      goal = { x: e.x - uy * side * 2.5, y: e.y + ux * side * 2.5 };
+      time = 1;
+    } else if (allCd) {
+      // corpo a corpo sem skill: foge um pouco na diagonal
+      goal = { x: e.x + (ux - uy * side) * 2.5, y: e.y + (uy + ux * side) * 2.5 };
+      time = 1;
+    }
+  }
+  if (!goal) return a;
+  // dentro do círculo e em chão andável
+  const cx = goal.x - ARENA_CENTER.x,
+    cy = goal.y - ARENA_CENTER.y,
+    cd = Math.hypot(cx, cy);
+  if (cd > ARENA_RADIUS)
+    goal = { x: ARENA_CENTER.x + (cx / cd) * ARENA_RADIUS, y: ARENA_CENTER.y + (cy / cd) * ARENA_RADIUS };
+  if (!isWalkable(w.map, goal.x, goal.y)) {
+    m.wait = 0.5;
+    return a;
+  }
+  m.x = goal.x;
+  m.y = goal.y;
+  m.left = time;
+  m.wait = time + (ranged ? 2.5 : 3) + w.rng.next() * 1.5;
+  e.path = [];
+  return { kind: 'move', x: m.x, y: m.y };
 }
 
 /** Fim da luta: pontos (ELO), moeda, placar; o jogador fica de pé e volta ao Porto depois de ARENA_END_DELAY s. */

@@ -22,12 +22,16 @@ Preparação para o PvP online: por enquanto o jogador luta contra um bot.
   ataque e elemento = raiz(poder) × os do jogador (o ataque e o elemento do jogador vão para o tipo de dano e o elemento
   do bot). Antes o bot só igualava o DPS do golpe normal mexendo no ataque: contra jogador de muito crítico e elemento
   (teste do Lucas, nível 50 épico +10) o ataque dele ficava ~10× maior e as skills matavam no primeiro golpe.
-  Calibragem por seita do jogador em `balance.json` (`arena.poder_bot.<seita>`: Tormenta 0,88, Geada 0,82, Titã 1,3,
-  Víbora 1), medida na simulação para que 100% seja luta equilibrada. Resultado: ~95% de vitórias com o bot a 80%,
-  ~58% a 100% e ~11% a 130%. Luta média: ~30 s (Geada, Víbora), ~47 s (Tormenta), ~62 s (Titã).
+  Calibragem por seita do jogador em `balance.json` (`arena.poder_bot.<seita>`: Tormenta 0,9, Geada 1,15, Titã 1,5,
+  Víbora 1,35), medida na simulação para que 100% seja luta equilibrada. Resultado: ~83% de vitórias com o bot a 80%,
+  ~52% a 100% e ~7% a 130%. Luta média: ~30 s (Geada, Víbora), ~44 s (Tormenta), ~50 s (Titã).
 - Todo dano na arena, dos dois lados, é multiplicado por um fator calculado na entrada (`arenaDamageMul`): o golpe
-  normal do jogador levaria `ARENA_TTK` (40) s para tirar a vida dele mesmo (máximo 1). Antes era 25% fixo, e com
+  normal do jogador levaria `ARENA_TTK` (60) s para tirar a vida dele mesmo (máximo 1). Antes era 25% fixo, e com
   equipamento forte uma skill ainda matava em 1–2 golpes.
+- Sem poções na arena, para os dois (pedido do Lucas: a luta parada com poção era chata).
+- O bot se mexe (`maneuver` em `world/arena.ts`): quem bate de longe faz kite (recua para ~70% do alcance quando o
+  jogador chega a menos de 45% dele e anda de lado a cada ~3–4 s); quem bate de perto, com as skills de dano em
+  recarga, foge ~2,5 casas na diagonal a cada ~4 s. Skill pronta vem sempre antes; o bot não sai do círculo.
 - Contagem de 3 s em que ninguém anda nem ataca; limite de 120 s (vence quem tem mais vida em %).
 - Perder não é morrer: sem penalidade, o jogador volta com vida e mana cheias. Sair do mapa no meio da luta conta como
   derrota.

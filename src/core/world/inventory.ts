@@ -337,6 +337,11 @@ export function afterEquip(w: World) {
 export function usePotion(w: World, kind: PotionKind, baseId?: string): boolean {
   const p = w.player;
   if (p.dead) return false;
+  if (w.arenaFight) {
+    // arena: ninguém usa poção (src/core/arena.ts)
+    w.emit({ type: 'potionFail', kind, reason: 'arena' });
+    return false;
+  }
   if (w.potionCd[kind] > 0) {
     w.emit({ type: 'potionFail', kind, reason: 'cooldown' });
     return false;

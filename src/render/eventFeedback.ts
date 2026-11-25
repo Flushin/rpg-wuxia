@@ -247,6 +247,7 @@ export class EventFeedback {
         const msg = {
           none: L('Sem poção', 'No potion'),
           cooldown: L('Recarregando', 'On cooldown'),
+          arena: L('Sem poções na arena', 'No potions in the arena'),
           full: ev.kind === 'hp' ? L('Vida cheia', 'Health full') : L('Mana cheia', 'Mana full'),
         }[ev.reason];
         this.overPlayer(64, msg, FLOAT_COLOR.INFO);
