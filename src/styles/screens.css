@@ -130,7 +130,7 @@ button.link {
   text-align: right;
   font-size: 10px;
   color: #667;
-  pointer-events: none;
+  pointer-events: auto;
 }
 /* Novidades (Édito da Seita) */
 .news-list {
