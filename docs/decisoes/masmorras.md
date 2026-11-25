@@ -25,4 +25,19 @@ Decidido com o Lucas em 19/11/2026.
 - **Sem portal na arena:** a saída fica só na entrada; um portal atrás da arena fazia quem desviava dos golpes sair sem querer.
 - Balanceamento do chefe: `docs/balanceamento.md` (seção "Masmorra").
 
+## Masmorra em equipe (bots) — decidido 25/11/2026, a implementar
+
+- Na porta da masmorra, menu: **Sozinho** (como hoje) ou **Equipe (bots)**.
+- Equipe = jogador + 3 bots de classes **sorteadas**, diferentes da do jogador (e entre si, quando houver classes).
+  O jogador escolhe só o modo; os bots agem sozinhos, sem comandos.
+- Bots: nível = meio da faixa da masmorra, limitado ao nível do jogador; equipamento incomum com no máximo 1 peça rara;
+  sem upgrade, gemas ou relíquias. Usam as skills da classe e só poções **pequenas** de HP e de mana; não usam ultimate.
+- Bot morto: o jogador pode reviver segurando perto dele por ~3 s (sem atacar); volta com 50% da vida;
+  1 vez por bot por sala/luta de chefe.
+- A run só falha se o jogador morrer.
+- Monstros e chefe: só a **vida** aumenta (ataque e defesa iguais). Multiplicador separado para comuns e chefe,
+  definido por simulação (`npm run balance`): tempo para matar em equipe parecido com o do solo.
+- Recompensa: igual ao modo solo.
+- A IA dos bots é a mesma base usada na arena ([arena.md](arena.md)).
+
 Ideias para depois: mais masmorras no menu (outras faixas de nível, ex.: uma de nível 5+), recorde de tempo por masmorra, baú no fim em vez do drop do chefe.
