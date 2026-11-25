@@ -38,6 +38,8 @@ import {
   type AttrKey,
 } from './data';
 import { statsAt } from './monsters';
+import ultimatesJson from '../data/ultimates.json';
+import { BUFF_INFO, FREEZE_SOURCES, type BuffIconKey } from '../ui/buffRow';
 import {
   LEVELUP_POSE_S,
   MOUNTS,
@@ -187,6 +189,7 @@ const TOPICS = [
   { id: 'gemas', label: 'Gemas e encaixes', icon: 'po_estrela' },
   { id: 'montarias', label: 'Montarias', icon: 'pergaminho_retorno' },
   { id: 'reliquias', label: 'Relíquias', icon: 'colar_jade' },
+  { id: 'efeitos', label: 'Buffs e debuffs', icon: 'skill_corte_duplo' },
 ];
 
 export { EPIC };
@@ -197,7 +200,7 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, efeitos }[t.id as 'combate']();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -620,3 +623,56 @@ function trial(): string {
       <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
       <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1, +0,3 ponto por nível: 12,30%, 12,60% … ${pct2(trialDropPct(TRIAL_TIERS))}% no ${TRIAL_TIERS}). O <b>Épico</b> não entra no bônus: continua 1% por chefe. O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
 }
+
+/** Buffs e debuffs: ícones de src/data/buffs.json (os mesmos do jogo); fontes tiradas de skills, ultimates e monstros. */
+function efeitos(): string {
+  const src: Record<string, string[]> = {};
+  const add = (k: BuffIconKey, html: string) => (src[k] ??= []).push(html);
+  const pct = (v: number) => `${Math.round(v * 100)}%`;
+  for (const list of Object.values(SKILLS))
+    for (const k of list) {
+      const a = `<a href="#/skill/${k.id}">${esc(k.name)}</a>`;
+      if (k.debuff) add(k.debuff.kind as BuffIconKey, `${a} (${pct(k.debuff.value)}, ${k.debuff.duration} s)`);
+      if (k.poison) add('poison', `${a} (${pct(k.poison.percent)} do dano em ${k.poison.duration} s)`);
+      if (k.stun) add(FREEZE_SOURCES.has(k.id) ? 'freeze' : 'stun', `${a} (${k.stun} s)`);
+      if (k.shield) add('shield', `${a} (${pct(k.shield.percent)} da vida, ${k.shield.duration} s)`);
+      if (k.heal) add('regen', `${a} (${pct(k.heal.percent)} da vida em ${k.heal.duration} s)`);
+    }
+  type UD = { kind: string; value: number; duration: number };
+  for (const [cls, u] of Object.entries(ultimatesJson) as [
+    string,
+    { name: string; strikeDebuff?: UD; finalDebuff?: UD },
+  ][])
+    for (const d of [u.strikeDebuff, u.finalDebuff]) {
+      if (!d) continue;
+      const k = (d.kind === 'stun' && FREEZE_SOURCES.has(`ult_${cls}`) ? 'freeze' : d.kind) as BuffIconKey;
+      add(k, `<a href="#/seita/${cls}">${esc(u.name)}</a> (ultimate, ${d.duration} s)`);
+    }
+  for (const m of Object.values(MONSTERS)) {
+    const oh = (m as { onHit?: { slow: number; duration: number } }).onHit;
+    if (oh) add('slow', `<a href="#/monstro/${m.id}">${esc(m.name)}</a> (golpe, ${pct(oh.slow)}, ${oh.duration} s)`);
+  }
+  const rows = (Object.keys(BUFF_INFO) as BuffIconKey[])
+    .map((k) => {
+      const i = BUFF_INFO[k];
+      return `<tr><td><span class="buff-ico" style="border-color:${i.color}">${i.icon}</span></td><td><b>${esc(i.pt)}</b><br><small>${i.debuff ? 'Debuff' : 'Buff'}</small></td><td>${esc(DESC[k])}</td><td>${(src[k] ?? ['—']).join('<br>')}</td></tr>`;
+    })
+    .join('');
+  return `<section class="panel"><h2>Onde aparecem</h2>
+      <p>Os efeitos ativos aparecem como ícones: sob a vida do <b>alvo</b> e do <b>chefe</b> (só debuffs) e sob a sua vida e mana (buffs e debuffs).
+      A cor de fundo do ícone esvazia conforme o tempo passa; nos últimos 3 s aparece a contagem e o ícone pisca.
+      Passe o mouse (ou segure no celular) para ver o nome, o valor e o tempo.</p>
+      <p>A mesma skill aplicada de novo <b>renova</b> o tempo e o valor (não acumula). Skills diferentes com o mesmo efeito valem ao mesmo tempo.</p></section>
+    <section class="panel"><h2>Efeitos</h2><table class="tbl"><thead><tr><th></th><th>Efeito</th><th>O que faz</th><th>De onde vem</th></tr></thead><tbody>${rows}</tbody></table></section>`;
+}
+const DESC: Record<BuffIconKey, string> = {
+  slow: 'Reduz a velocidade de movimento pela porcentagem indicada (não muda a velocidade de ataque).',
+  poison:
+    'Causa dano por segundo durante a duração; resistência a veneno do monstro reduz o dano. A passiva da Víbora aumenta o dano contra alvos envenenados.',
+  stun: 'O monstro não anda nem ataca.',
+  freeze: 'Igual ao atordoamento, mas vindo de gelo: o monstro fica parado sem agir.',
+  defReduction:
+    'Reduz a defesa do alvo pela porcentagem indicada (efeitos diferentes somam), então ele leva mais dano.',
+  shield: 'Absorve dano até acabar os pontos ou o tempo.',
+  regen: 'Recupera vida a cada segundo durante a duração.',
+};

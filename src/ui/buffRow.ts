@@ -10,10 +10,13 @@ interface BuffInfo {
   en: string;
   fx: { pt: string; en: string };
 }
+export type BuffIconKey = IconKey;
 type IconKey = BuffKind | 'freeze';
 const DATA = buffsJson as unknown as Record<IconKey, BuffInfo> & { freezeSources: string[] };
-export const BUFF_INFO = DATA as unknown as Record<IconKey, BuffInfo>;
-const FREEZE = new Set(DATA.freezeSources);
+const { freezeSources: _f, ...INFO } = DATA;
+export const BUFF_INFO = INFO as unknown as Record<IconKey, BuffInfo>;
+export const FREEZE_SOURCES = new Set(DATA.freezeSources);
+const FREEZE = FREEZE_SOURCES;
 const MAX = 6;
 
 /** Ícone a usar: atordoar vindo de gelo aparece como "Congelado". */

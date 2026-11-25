@@ -17,6 +17,7 @@ import { parseTiledMap, type GameMap } from '../src/core/map';
 import { MAP_IDS } from '../src/core/mapsConfig';
 import { QUESTS as C_QUESTS } from '../src/core/quests';
 import { Rng } from '../src/core/rng';
+import type { BuffKind } from '../src/core/types';
 import {
   SKILLS as C_SKILLS,
   SKILL_MAX_LEVEL as C_MAX,
@@ -27,6 +28,8 @@ import { World } from '../src/core/world';
 import { offerPrice } from '../src/core/world/merchant';
 import atlas from '../src/data/sprites/icones.json';
 import * as W from '../src/wiki/data';
+import { BUFF_INFO } from '../src/ui/buffRow';
+import { mechanicsPage } from '../src/wiki/mechanics';
 import { itemIndexPage, itemPage } from '../src/wiki/items';
 import { SHEETS, monsterIndexPage, monsterPage, statsAt } from '../src/wiki/monsters';
 import { NPCS, npcIndexPage, npcPage } from '../src/wiki/npcs';
@@ -300,11 +303,20 @@ console.log('== páginas ==');
   look('monstros', await monsterIndexPage());
   for (const id of Object.keys(W.MONSTERS)) look('monstro/' + id, await monsterPage(id));
   look('mecanicas', M.mechanicsPage());
-  for (const t of ['combate', 'morte', 'forja', 'auto', 'trial', 'epico']) look('mecanicas/' + t, M.mechanicsPage(t));
+  for (const t of ['combate', 'morte', 'forja', 'auto', 'trial', 'epico', 'efeitos'])
+    look('mecanicas/' + t, M.mechanicsPage(t));
   look('missoes', await questIndexPage());
   look('mapas', await mapIndexPage());
   for (const id of MAP_IDS) look('mapa/' + id, await mapPage(id));
   ok(!bad.length, `todas as páginas renderizam sem "undefined"/"NaN" ${bad.join(', ')}`);
+}
+
+{
+  // Buffs e debuffs: todo BuffKind do jogo tem ícone/texto e aparece na página
+  const kinds: string[] = ['defReduction', 'slow', 'shield', 'poison', 'stun', 'regen'] satisfies BuffKind[];
+  const page = mechanicsPage('efeitos');
+  const miss = kinds.filter((k) => !(k in BUFF_INFO) || !page.includes(BUFF_INFO[k as BuffKind].pt));
+  ok(!miss.length, `buffs/debuffs com ícone e entrada na wiki ${miss.join(', ')}`);
 }
 
 if (fails) {
