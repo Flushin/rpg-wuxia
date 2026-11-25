@@ -9,6 +9,8 @@ import { uiRect } from './uiScale';
 let current: UltButton | null = null;
 /** Caixas (px do HUD) ao longo da faixa do arco, para quem precisa desviar dele (rastreador da missão). */
 export const ultArcRects = () => current?.rects() ?? [];
+(window as unknown as { __ultFits?: (t: string, r: boolean) => boolean | null }).__ultFits = (t, r) =>
+  current ? current.fitsLabel(t, r) : null; // usado por tools/layout-check.mjs
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -25,6 +27,8 @@ export class UltButton {
   private pts: { x: number; y: number }[] = [];
   private half = 0;
   private size = 1;
+  private baseFont = 0;
+  private labelText = '';
 
   constructor(
     private world: World,
@@ -116,8 +120,39 @@ export class UltButton {
     this.border.setAttribute('stroke-width', String(w));
     this.track.setAttribute('stroke-width', String(w - 4));
     this.fill.setAttribute('stroke-width', String(w - 12));
-    this.label.setAttribute('font-size', (w * 0.24).toFixed(1));
+    this.baseFont = w * 0.24;
     this.label.setAttribute('dy', (w * 0.085).toFixed(1));
+    this.fitLabel();
+  }
+
+  /** Diminui a fonte do texto do arco até caber no comprimento da faixa (nomes longos, EN, telas pequenas). */
+  private fitLabel() {
+    if (!this.baseFont) return;
+    let fs = this.baseFont;
+    this.label.setAttribute('font-size', fs.toFixed(1));
+    try {
+      const avail = this.border.getTotalLength() - this.half * 1.2; // desconta as pontas arredondadas
+      for (let i = 0; i < 4; i++) {
+        const len = this.labelPath.getComputedTextLength();
+        if (!len || len <= avail) break;
+        fs = Math.max(this.baseFont * 0.5, fs * (avail / len) * 0.97);
+        this.label.setAttribute('font-size', fs.toFixed(1));
+        this.label.style.letterSpacing = `${(2 * fs) / this.baseFont}px`;
+      }
+      if (fs === this.baseFont) this.label.style.letterSpacing = '';
+    } catch {
+      /* sem layout (SVG oculto): mantém a fonte base */
+    }
+  }
+
+  /** Para tools/layout-check.mjs: põe um texto no arco, ajusta e diz se coube (true) ou não. */
+  fitsLabel(txt: string, ready: boolean): boolean {
+    this.labelPath.textContent = txt;
+    this.svg.classList.toggle('ready', ready);
+    this.fitLabel();
+    const ok = this.labelPath.getComputedTextLength() <= this.border.getTotalLength() - this.half * 1.2 + 0.5;
+    this.sig = this.labelText = ''; // o próximo update() restaura o texto real
+    return ok;
   }
 
   rects(): { left: number; right: number; top: number; bottom: number }[] {
@@ -165,9 +200,13 @@ export class UltButton {
     (this.btn.querySelector('.lock') as HTMLElement).textContent = unlocked
       ? ''
       : L(`Nv ${u.unlock}`, `Lv ${u.unlock}`);
-    this.labelPath.textContent = unlocked
-      ? `${u.icon} ${u.name.toUpperCase()}`
-      : `🔒 ${L(`NÍVEL ${u.unlock}`, `LEVEL ${u.unlock}`)}`;
+    const txt = unlocked ? `${u.icon} ${u.name.toUpperCase()}` : `🔒 ${L(`NÍVEL ${u.unlock}`, `LEVEL ${u.unlock}`)}`;
+    if (txt !== this.labelText || ready !== this.svg.classList.contains('fit-ready')) {
+      this.labelText = txt;
+      this.labelPath.textContent = txt;
+      this.svg.classList.toggle('fit-ready', ready); // negrito do "pronto" alarga o texto: remede
+      this.fitLabel();
+    }
   }
 }
 
