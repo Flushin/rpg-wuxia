@@ -29,7 +29,7 @@ export const ARENA_TIME_LIMIT = 120;
 /** Todo dano na arena (dos dois lados) é multiplicado por um fator calculado na entrada: o golpe normal do jogador
  *  levaria ARENA_TTK segundos para tirar a vida dele mesmo. Assim a duração não depende do equipamento (com muito
  *  crítico e elemento uma skill matava no primeiro golpe). Vale igual para os dois: o poder relativo não muda. */
-export const ARENA_TTK = 40;
+export const ARENA_TTK = 60;
 export const arenaDamageMul = (player: Entity, bot: Entity) =>
   Math.min(1, player.derived.maxHp / (basicDps(player, bot) * ARENA_TTK));
 /** Contagem antes da luta começar (s); ninguém anda nem ataca. */

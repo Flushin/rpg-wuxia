@@ -227,7 +227,7 @@ export type GameEvent =
   | { type: 'groundGone'; id: number }
   | { type: 'equipChange' }
   | { type: 'potionUsed'; id: string; kind: PotionKind }
-  | { type: 'potionFail'; kind: PotionKind; reason: 'none' | 'cooldown' | 'full' }
+  | { type: 'potionFail'; kind: PotionKind; reason: 'none' | 'cooldown' | 'full' | 'arena' }
   | { type: 'npcOpen'; npcId: string; entityId: number }
   | { type: 'npcClose' }
   | { type: 'skinChange' }

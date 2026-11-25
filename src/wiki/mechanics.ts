@@ -684,6 +684,8 @@ function arena(): string {
       <li>O adversário é um bot de outra seita, com a mesma inteligência dos <a href="#/mecanicas/equipe">bots da masmorra em equipe</a>.</li>
       <li><b>O seu poder nunca muda.</b> O bot recebe de ${pct(ARENA_POWER_MIN)} a ${pct(ARENA_POWER_MAX)} do seu poder (vida e dano dele acompanham os seus; defesas iguais às suas), conforme os seus pontos.</li>
       <li>Os dois começam com vida e mana cheias. Há ${ARENA_COUNTDOWN} s de contagem, em que ninguém anda nem ataca.</li>
+      <li><b>Sem poções:</b> nem você nem o bot podem tomar poção na arena.</li>
+      <li>O bot se mexe: quem ataca de longe faz kite (recua quando você chega perto e anda de lado); quem ataca de perto dá uma fugida curta quando as skills dele estão em recarga.</li>
       <li>Na arena todo dano, dos dois lados, é reduzido pela mesma conta: seu golpe normal levaria cerca de ${ARENA_TTK} s para tirar a sua própria vida. Assim a luta não acaba no primeiro golpe, com qualquer equipamento.</li>
       <li>Depois de ${ARENA_TIME_LIMIT} s de luta, vence quem tiver mais vida (em %).</li>
       <li>Perder não é morrer: sem penalidade, você volta ao Porto com a vida cheia.</li>
