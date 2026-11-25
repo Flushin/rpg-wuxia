@@ -478,3 +478,9 @@ button.primary {
     opacity: 0.45;
   }
 }
+#boss-bar .buff-row {
+  justify-content: center;
+}
+#player-frame .buff-row {
+  margin: 3px 0;
+}

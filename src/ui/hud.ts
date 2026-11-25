@@ -39,6 +39,8 @@ export class Hud {
   private autoSig = '';
   private mountSig = '';
   private tBuffs?: BuffRow;
+  private bossBuffs?: BuffRow;
+  private pBuffs?: BuffRow;
   private minimap: Minimap;
   readonly rewards = new Rewards();
   private questTracker = new QuestTracker();
@@ -167,6 +169,7 @@ export class Hud {
     setText(byId('p-level'), L(`Nv ${p.level}`, `Lv ${p.level}`));
     setStyle(byId('p-hp'), 'width', pct(p.hp, d.maxHp));
     setText(byId('p-hp-t'), `${Math.ceil(p.hp)} / ${d.maxHp}`);
+    (this.pBuffs ??= new BuffRow(byId('p-buffs'))).update(p.buffs);
     setStyle(byId('p-mp'), 'width', pct(p.mana, d.maxMana));
     setText(byId('p-mp-t'), `${Math.floor(p.mana)} / ${d.maxMana}`);
     // XP guardada: com nível pronto o quadro do jogador vira botão (subir de nível quando quiser)
@@ -206,6 +209,7 @@ export class Hud {
       setText(byId('boss-name'), L(`Nv ${boss.level} ${boss.name}`, `Lv ${boss.level} ${boss.name}`));
       setStyle(byId('boss-hp'), 'width', pct(boss.hp, boss.derived.maxHp));
       setText(byId('boss-hp-t'), `${Math.max(0, Math.ceil(boss.hp))} / ${boss.derived.maxHp}`);
+      (this.bossBuffs ??= new BuffRow(byId('boss-buffs'))).update(boss.buffs, 'debuff');
     }
     const t = w.getTarget(),
       tf = byId('target-frame');
