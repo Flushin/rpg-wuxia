@@ -1,0 +1,10 @@
+{
+  "slow": { "debuff": true, "icon": "🐌", "color": "#6fb7e8", "pt": "Lentidão", "en": "Slow", "fx": { "pt": "−{pct}% velocidade", "en": "−{pct}% speed" } },
+  "poison": { "debuff": true, "icon": "☠", "color": "#6cc04a", "pt": "Veneno", "en": "Poison", "fx": { "pt": "{dps} de dano/s", "en": "{dps} damage/s" } },
+  "stun": { "debuff": true, "icon": "💫", "color": "#ffd23f", "pt": "Atordoado", "en": "Stunned", "fx": { "pt": "Não age", "en": "Can't act" } },
+  "freeze": { "debuff": true, "icon": "❄", "color": "#9fe4ff", "pt": "Congelado", "en": "Frozen", "fx": { "pt": "Não age", "en": "Can't act" } },
+  "defReduction": { "debuff": true, "icon": "🛡", "color": "#e06a4a", "pt": "Defesa quebrada", "en": "Armor broken", "fx": { "pt": "−{pct}% defesa", "en": "−{pct}% defense" } },
+  "shield": { "debuff": false, "icon": "🔰", "color": "#8fd0ff", "pt": "Escudo", "en": "Shield", "fx": { "pt": "Absorve {val}", "en": "Absorbs {val}" } },
+  "regen": { "debuff": false, "icon": "✚", "color": "#7be07b", "pt": "Regeneração", "en": "Regeneration", "fx": { "pt": "+{dps} vida/s", "en": "+{dps} HP/s" } },
+  "freezeSources": ["lotus_congelante", "ult_pavilhao"]
+}
