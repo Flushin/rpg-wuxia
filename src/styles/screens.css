@@ -131,6 +131,8 @@ button.link {
   font-size: 10px;
   color: #667;
   pointer-events: auto;
+  cursor: pointer;
+  padding: 6px 0;
 }
 /* Novidades (Édito da Seita) */
 .news-list {
