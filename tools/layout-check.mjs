@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 // Teste de sobreposição do HUD em vários tamanhos de tela (inclui Galaxy Z Fold fechado e aberto).
 // Uso: npm run build && npx vite preview --port 4173 &  →  node tools/layout-check.mjs [url]
 // Precisa do Playwright (npx playwright install chromium) ou de um Chrome instalado.
@@ -31,6 +32,15 @@ const IDS = [
   'hotbar',
 ];
 
+const ULT_DATA = JSON.parse(readFileSync(new globalThis.URL('../src/data/ultimates.json', import.meta.url), 'utf8'));
+const EN = JSON.parse(readFileSync(new globalThis.URL('../src/data/en.json', import.meta.url), 'utf8'));
+const ULT_NAMES = Object.values(ULT_DATA)
+  .filter((u) => u && u.name)
+  .flatMap((u) =>
+    [u.name, EN.strings?.[u.name] ?? EN[u.name]].filter(Boolean).map((n) => `${u.icon ?? ''} ${n.toUpperCase()}`),
+  )
+  .concat(['🔒 NÍVEL 30', '🔒 LEVEL 30']);
+
 const browser = await pw.chromium
   .launch({ executablePath: process.env.CHROME ?? undefined })
   .catch(() => pw.chromium.launch({ executablePath: '/usr/bin/google-chrome' }));
@@ -59,7 +69,7 @@ for (const sz0 of SIZES)
     await page.waitForSelector('#hud:not(.hidden)');
     await page.waitForTimeout(800);
     const res = await page.evaluate(
-      ({ ids, lines }) => {
+      ({ ids, lines, ultNames }) => {
         const $ = (id) => document.getElementById(id);
         for (const id of ['tip-card']) $(id).classList.add('hidden');
         const tf = $('target-frame');
@@ -126,9 +136,14 @@ for (const sz0 of SIZES)
             if (A.left < B.right - 1 && B.left < A.right - 1 && A.top < B.bottom - 1 && B.top < A.bottom - 1)
               out.push(`${a} × ${b}`);
           }
+        // texto do arco da ultimate: todos os nomes (PT/EN, normal e "pronto" em negrito) cabem na faixa
+        if (document.querySelector('.ult-arc:not(.hidden)') && window.__ultFits)
+          for (const t of ultNames)
+            for (const r of [false, true])
+              if (!window.__ultFits(t, r)) out.push(`ult-arc texto cortado: ${t}${r ? ' (pronto)' : ''}`);
         return { out, feedLines: n, compact, ui };
       },
-      { ids: IDS, lines: sz.feed },
+      { ids: IDS, lines: sz.feed, ultNames: ULT_NAMES },
     );
     const ok = !res.out.length;
     if (!ok) fails++;
