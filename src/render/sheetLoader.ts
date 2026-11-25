@@ -31,6 +31,10 @@ function sheetsOf(map: GameMap, player: string): Set<string> {
 /** Folhas que o mapa atual do mundo usa (mais os monstros vivos que não vêm do mapa: o chefe do Trial). */
 export function sheetsForMap(world: World): Set<string> {
   const keys = sheetsOf(world.map, playerTexture(world.classId, world.skin));
+  for (const b of world.party) {
+    const sh = sheetFor(playerTexture(b.classId, null)); // bots da masmorra em equipe: traje da seita
+    if (sh) keys.add(sh.key);
+  }
   const mount = world.mountsOwned[0] && sheetFor('mount-' + world.mountsOwned[0]);
   if (mount) keys.add(mount.key);
   for (const m of world.monsters) {

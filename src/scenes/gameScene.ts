@@ -1,3 +1,4 @@
+import { foeOf } from '../core/world/party';
 import { touchDebug } from '../ui/touchDebug';
 import Phaser from 'phaser';
 import { L } from '../core/i18n';
@@ -303,6 +304,7 @@ export class GameScene extends Phaser.Scene {
   private textureFor(e: Entity): string {
     if (e.kind === 'player') return playerTexture(this.world.classId, this.world.skin);
     if (e.kind === 'monster') return MONSTERS[e.monsterId].sprite;
+    if (e.kind === 'bot') return playerTexture(this.world.party.find((b) => b.e === e)?.classId ?? 'lamina', null);
     return 'npc-' + (e.npcId ?? '');
   }
 
@@ -444,10 +446,17 @@ export class GameScene extends Phaser.Scene {
       v.sync(n, false);
       v.setMark(w.questMark(n.npcId ?? ''));
     }
+    for (const b of w.party) {
+      live.add(b.e.id);
+      this.viewFor(b.e).sync(b.e, false); // o golpe já vira o bot para o alvo (EntityView.attack)
+    }
     for (const m of w.monsters) {
       live.add(m.id);
       const v = this.viewFor(m);
-      if (m.ai === 'chase' && !w.player.dead) v.face(w.player.x, w.player.y, m.x, m.y);
+      if (m.ai === 'chase' && !w.player.dead) {
+        const f = foeOf(w, m); // jogador ou o bot que ele persegue (masmorra em equipe)
+        v.face(f.x, f.y, m.x, m.y);
+      }
       v.sync(m, m.id === w.targetId);
     }
     for (const [id, v] of this.views)

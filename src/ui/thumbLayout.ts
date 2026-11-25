@@ -21,6 +21,8 @@ export interface ThumbLayout {
   r: number;
   skills: { x: number; y: number }[];
   pots: { x: number; y: number }[];
+  /** botão de reviver aliado (masmorra em equipe): à esquerda das poções, do tamanho de uma skill */
+  revive: { x: number; y: number };
   /** arco da ultimate: raio do centro da faixa e ângulos (graus, 180 = esquerda, 90 = em cima) */
   ult: { r: number; from: number; to: number };
 }
@@ -66,5 +68,6 @@ export function thumbLayout(k: ThumbSizes, n: number, column: boolean): ThumbLay
   const potTop = Math.max(...pots.map((p) => p.y)) + rp;
   const from = 180 - deg(Math.asin(Math.min(1, Math.max(-1, (potTop + G + rs - cy) / ur)))),
     to = deg(Math.acos(Math.min(1, (cx - rs - k.edge) / ur)));
-  return { k, cx, cy, r, skills, pots, ult: { r: ur, from: Math.min(from, 186), to } };
+  const revive = { x: Math.max(...pots.map((p) => p.x)) + rp + G + rs, y: pyBase - rp + rs };
+  return { k, cx, cy, r, skills, pots, revive, ult: { r: ur, from: Math.min(from, 186), to } };
 }

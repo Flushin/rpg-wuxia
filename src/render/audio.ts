@@ -183,6 +183,7 @@ class AudioManager {
         this.sfx('skill_up');
         break;
       case 'skillCast':
+        if (ev.casterId !== playerId) break; // skills dos bots aliados ficam sem som (4 personagens viraria barulho)
         this.lastRanged = ev.ranged;
         {
           const fx = skillById(ev.skillId)?.fx;

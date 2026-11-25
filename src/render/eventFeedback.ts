@@ -66,7 +66,7 @@ export class EventFeedback {
     switch (ev.type) {
       case 'hit': {
         const s = tileToScreen(ev.x, ev.y),
-          toPlayer = ev.targetKind === 'player';
+          toPlayer = ev.targetKind === 'player' || ev.targetKind === 'bot';
         if (ev.crit && !toPlayer) vibrate();
         if (fxPrefs.damageNumbers)
           this.floatText(
@@ -85,6 +85,25 @@ export class EventFeedback {
         this.views.get(ev.targetId)?.flash();
         return true;
       }
+      case 'botDeath':
+      case 'botRevive': {
+        const b = this.entityById(ev.botId);
+        if (b) {
+          const s = tileToScreen(b.x, b.y);
+          this.floatText(
+            s.x,
+            s.y - 60,
+            ev.type === 'botDeath'
+              ? L(`${ev.name} caiu`, `${ev.name} is down`)
+              : L(`${ev.name} voltou!`, `${ev.name} is back!`),
+            ev.type === 'botDeath' ? FLOAT_COLOR.HURT : FLOAT_COLOR.SHIELD,
+            14,
+          );
+        }
+        return true;
+      }
+      case 'botPotion':
+        return true;
       case 'miss': {
         const s = tileToScreen(ev.x, ev.y);
         this.floatText(s.x, s.y - 40, L('Errou', 'Miss'), FLOAT_COLOR.MISS, 13);
@@ -343,7 +362,11 @@ export class EventFeedback {
 
   private entityById(id: number): Entity | undefined {
     const w = this.world;
-    return id === w.player.id ? w.player : (w.monsters.find((m) => m.id === id) ?? w.npcs.find((n) => n.id === id));
+    return id === w.player.id
+      ? w.player
+      : (w.monsters.find((m) => m.id === id) ??
+          w.party.find((b) => b.e.id === id)?.e ??
+          w.npcs.find((n) => n.id === id));
   }
 
   /** Animação de golpe virada para o alvo (sprites do marco 6). */

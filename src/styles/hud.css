@@ -484,3 +484,73 @@ button.primary {
 #player-frame .buff-row {
   margin: 3px 0;
 }
+
+/* Masmorra em equipe (src/ui/partyHud.ts): vida dos bots no quadro do jogador e botão de reviver */
+#party-frames {
+  margin-top: 4px;
+  border-top: 1px solid #445;
+  padding-top: 3px;
+}
+#party-frames .pm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #8ad0ff;
+  line-height: 12px;
+}
+#party-frames .pm b {
+  width: 58px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: normal;
+}
+#party-frames .pm .bar {
+  flex: 1;
+  height: 6px;
+  margin: 1px 0;
+}
+#party-frames .pm.down {
+  color: #a88;
+}
+#party-frames .pm.down .bar {
+  opacity: 0.4;
+}
+#btn-revive {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid #8ad0ff;
+  background: rgba(20, 40, 60, 0.85);
+  color: #dff2ff;
+  font-size: 26px;
+  overflow: hidden;
+  touch-action: none;
+  z-index: 3;
+}
+#btn-revive .fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: rgba(76, 196, 106, 0.55);
+}
+#btn-revive .lb {
+  position: relative;
+}
+#btn-revive .hk {
+  position: absolute;
+  right: 6px;
+  bottom: 2px;
+  font-size: 10px;
+  color: #9ab;
+}
+#btn-revive.touch .hk {
+  display: none;
+}

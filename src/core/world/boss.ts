@@ -7,6 +7,7 @@ import { type Entity, type Point, type Telegraph } from '../types';
 import type { World } from '../world';
 import { dist } from './geometry';
 import { trialSummonLevel } from '../trial';
+import { killBot } from './party';
 
 // ---------- chefe ----------
 export function tickBossExtras(w: World, m: Entity, def: MonsterDef, dt: number) {
@@ -179,10 +180,14 @@ export function tickTelegraphs(w: World, dt: number) {
     if (t.remaining > 0) continue;
     w.telegraphs = w.telegraphs.filter((x) => x !== t);
     const owner = w.monsters.find((e) => e.id === t.ownerId);
-    const hit = !!owner && !owner.dead && !p.dead && inTelegraph(t, p),
+    const live = !!owner && !owner.dead && !p.dead;
+    const hit = live && inTelegraph(t, p),
       c = telegraphCenter(t);
     w.emit({ type: 'telegraphResolved', id: t.id, x: c.x, y: c.y, radius: t.radius, hit });
     if (hit && owner) directDamage(w, owner, p, t.mult);
+    // masmorra em equipe: o golpe marcado pega também os bots dentro da área (eles tentam desviar: party.ts)
+    if (live && owner)
+      for (const b of w.party) if (!b.e.dead && inTelegraph(t, b.e)) directDamage(w, owner, b.e, t.mult);
   }
 }
 
@@ -210,19 +215,25 @@ export function directDamage(w: World, a: Entity, t: Entity, mult: number) {
   const atk = physical ? a.derived.physAtk : a.derived.spiritAtk,
     df = physical ? t.derived.physDef : t.derived.spiritDef;
   const pct =
-    t.kind === 'player' && MONSTERS[a.monsterId]?.boss
+    (t.kind === 'player' || t.kind === 'bot') && MONSTERS[a.monsterId]?.boss
       ? t.derived.maxHp * BOSS_PCT_HP.telegraph * mult * bossPctScale(a.level)
       : 0;
   const amount = Math.max(
     1,
     Math.round(
-      (atk * mult * (1 - df / (df + 100)) + pct) * bal('dano.monstros', a.monsterId) * (1 - w.damageTakenRed()),
+      (atk * mult * (1 - df / (df + 100)) + pct) *
+        bal('dano.monstros', a.monsterId) *
+        (1 - (t.kind === 'bot' ? (w.party.find((b) => b.e === t)?.damageTaken ?? 0) : w.damageTakenRed())),
     ),
   );
   const dealt = w.absorb(t, amount);
   t.hp -= dealt;
   if (dealt > 0)
     w.emit({ type: 'hit', targetId: t.id, targetKind: t.kind, x: t.x, y: t.y, amount: dealt, crit: false });
+  if (t.kind === 'bot') {
+    if (t.hp <= 0) killBot(w, t);
+    return;
+  }
   w.lastDamaged = w.time;
   if (dealt > 0) w.wearGear(); // golpe todo absorvido pelo escudo não desgasta
   if (t.hp <= 0) w.killPlayer();

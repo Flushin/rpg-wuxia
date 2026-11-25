@@ -1,3 +1,4 @@
+import { PartyHud } from './partyHud';
 import { actionErrorText } from './actionError';
 import { L } from '../core/i18n';
 import { PROGRESSION } from '../core/data';
@@ -34,6 +35,7 @@ export class Hud {
   private dungeon: DungeonWindow;
   private trial: TrialWindow;
   private potions: PotionBar;
+  private party: PartyHud;
   private goldSig = -1;
   private autoPanel: AutoPanel;
   private autoSig = '';
@@ -63,6 +65,7 @@ export class Hud {
     this.dungeon = new DungeonWindow(world, (m, c) => this.toast(m, c));
     this.trial = new TrialWindow(world, (m, c) => this.toast(m, c));
     this.potions = new PotionBar(world);
+    this.party = new PartyHud(world);
     this.autoPanel = new AutoPanel(world);
     for (const id of ['btn-mount', 'btn-auto', 'btn-auto-cfg'])
       byId(id).addEventListener('focus', (e) => (e.target as HTMLElement).blur());
@@ -229,6 +232,7 @@ export class Hud {
     this.dungeon.update();
     this.trial.update();
     this.potions.update();
+    this.party.update();
     byId('dur-warn').classList.toggle('hidden', !w.lowDurability());
     const ms = `${w.mountsOwned.length > 0}|${w.riding}`;
     if (ms !== this.mountSig) {

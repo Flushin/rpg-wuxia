@@ -11,7 +11,10 @@ import { parseTiledMap, type GameMap } from '../src/core/map';
 import { Rng } from '../src/core/rng';
 import { TRIAL_BOSSES, TRIAL_MAP, trialBossLevel } from '../src/core/trial';
 import { World } from '../src/core/world';
+import { DUNGEONS } from '../src/core/dungeons';
 import { inTelegraph, safeSpot } from '../src/core/world/boss';
+import { makeParty } from '../src/core/world/party';
+import { bal } from '../src/core/balance';
 import type { GameEvent, ItemInstance, Rarity, SaveData } from '../src/core/types';
 
 const maps: Record<string, GameMap> = {};
@@ -561,12 +564,70 @@ function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
 // --masmorra=mosteiro (Patriarca Profanado): níveis 16/18/20 com equipamento nv 15.
 // --masmorra=covil (Rei dos Bandidos): nível 20 com equipamento nv 15.
 // Os monstros comuns da masmorra já foram derrotados.
+// --equipe: entra com os 3 bots aliados (masmorra em equipe, vida extra de balance.json "equipe.*").
+// --comuns: em vez do chefe, limpa os monstros comuns da masmorra (tempo para matar todos).
+const EQUIPE = process.argv.includes('--equipe'),
+  COMUNS = process.argv.includes('--comuns');
+/** Limpa os monstros comuns da masmorra (o chefe fica de fora): vai ao mais perto, usa skills e poções. */
+function fightCommons(w: World, classId: string, rarity: Rarity): BossRun {
+  w.addItem(makePotion('pocao_hp_g', 8));
+  w.addItem(makePotion('pocao_mp_g', 4));
+  const boss = w.monsters.find((m) => !!MONSTERS[m.monsterId].boss)!;
+  boss.dead = true;
+  boss.respawnAt = Infinity;
+  const alive = () => w.monsters.filter((m) => !m.dead && !MONSTERS[m.monsterId].boss);
+  const total = alive().reduce((a, m) => a + m.derived.maxHp, 0);
+  let potions = 0,
+    deaths = 0;
+  for (let i = 0; i < 1800 / DT; i++) {
+    w.tick(DT);
+    for (const ev of w.events.splice(0)) {
+      if (ev.type === 'playerDeath') deaths++;
+      if (ev.type === 'potionUsed') potions++;
+    }
+    const left = alive();
+    if (deaths || !left.length) break;
+    const p = w.player;
+    if (p.hp < p.derived.maxHp * 0.55 && w.potionCd.hp <= 0 && !w.potionFx.hp) w.usePotion('hp');
+    if (p.mana < p.derived.maxMana * 0.25 && w.potionCd.mp <= 0 && !w.potionFx.mp) w.usePotion('mp');
+    const t = w.getTarget();
+    if (!t || t.dead) {
+      const n = left.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+      w.setTarget(n.id);
+      w.attackNearest();
+    }
+    for (let slot = w.activeSkills().length - 1; slot >= 0; slot--) {
+      const d = w.activeSkills()[slot];
+      const tt = w.getTarget();
+      if (
+        !tt ||
+        Math.hypot(tt.x - p.x, tt.y - p.y) > Math.max(p.attackRange, typeof d.range === 'number' ? d.range : 0) + 0.5
+      )
+        break;
+      if (!w.isUnlocked(d) || w.skills[d.id].cd > 0 || w.gcd > 0 || p.mana < (d.mana ?? 0) || d.shield) continue;
+      w.useSkill(slot);
+      break;
+    }
+  }
+  const left = alive().reduce((a, m) => a + Math.max(0, m.hp), 0);
+  return {
+    classId,
+    tier: rarity,
+    win: !alive().length,
+    seconds: w.time,
+    potions,
+    deaths,
+    hpLeftPct: Math.round((100 * left) / total),
+  };
+}
 const masmorraArg = process.argv.find((a) => a.startsWith('--masmorra'));
 if (masmorraArg) {
   const dungeonMap = masmorraArg.split('=')[1] || 'gruta';
   const [levels, gearLevel] =
     dungeonMap === 'covil' ? [[20], 15] : dungeonMap === 'mosteiro' ? [[16, 18, 20], 15] : [[11, 13, 15], 10];
-  console.log(`masmorra ${dungeonMap}: equipamento nv ${gearLevel}`);
+  console.log(
+    `masmorra ${dungeonMap}: equipamento nv ${gearLevel}; ${EQUIPE ? `EQUIPE (vida comuns ×${bal('equipe.vida_comuns')}, chefe ×${bal('equipe.vida_chefe')})` : 'solo'}; ${COMUNS ? 'monstros comuns (masmorra inteira menos o chefe)' : 'chefe'}`,
+  );
   console.log('| Seita | Nível | Equipamento | Vitórias | Tempo médio (s) | Poções | Vida restante se perdeu |');
   console.log('|---|---|---|---|---|---|---|');
   for (const classId of Object.keys(CLASSES))
@@ -574,7 +635,12 @@ if (masmorraArg) {
       for (const tier of ['incomum', 'raro'] as Rarity[]) {
         const bs = Array.from({ length: Math.max(5, SEEDS * 2) }, (_, i) => {
           const w = highWorld(classId, level, i + 1, gearLevel, tier);
+          if (EQUIPE) {
+            w.teamRun = true;
+            w.party = makeParty(w, DUNGEONS.find((d) => d.map === dungeonMap)!.id);
+          }
           w.changeMap(dungeonMap);
+          if (COMUNS) return fightCommons(w, classId, tier);
           for (const m of w.monsters)
             if (!MONSTERS[m.monsterId].boss) {
               m.dead = true;

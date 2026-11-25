@@ -38,6 +38,14 @@ Decidido com o Lucas em 19/11/2026.
 - Monstros e chefe: só a **vida** aumenta (ataque e defesa iguais). Multiplicador separado para comuns e chefe,
   definido por simulação (`npm run balance`): tempo para matar em equipe parecido com o do solo.
 - Recompensa: igual ao modo solo.
-- A IA dos bots é a mesma base usada na arena ([arena.md](arena.md)).
+- A IA dos bots é a mesma base usada na arena ([arena.md](arena.md)). **Base feita** em `src/core/bots.ts` (montagem, IA, luta simulada; `npm run check:bots`); nível das skills ativas = nível/4 (1–15). Integrado no jogo em `src/core/world/party.ts`
+  (`npm run check:party`): menu com Sozinho/Equipe; bots só lutam com monstros já em combate (ou o alvo do jogador),
+  não puxam sozinhos; monstro persegue quem bateu primeiro; bots regeneram 1% da mana/s; "luta" para o reviver =
+  enquanto algum monstro está em combate (acabou, a contagem zera); reviver: ✚ no HUD (celular: `thumbLayout.ts`
+  `revive`) ou tecla F, até 1,8 tile; vida dos bots no quadro do jogador. Vida extra em `balance.json`:
+  `equipe.vida_comuns` 3.5 e `equipe.vida_chefe` 4.5 (simulação no World real, `npm run sim:balance -- --masmorra=<mapa>
+  [--comuns] --equipe`: com esses valores o tempo médio em equipe empata com o solo nas 3 masmorras; escolhido pelo Lucas
+  em 25/11/2026, sabendo que no Mosteiro Titã e Tormenta vencem menos em equipe, porque o chefe bate só no jogador).
+  Golpes marcados do chefe pegam os bots também; cada bot percebe a marca com 70% de chance e sai dela.
 
 Ideias para depois: mais masmorras no menu (outras faixas de nível, ex.: uma de nível 5+), recorde de tempo por masmorra, baú no fim em vez do drop do chefe.

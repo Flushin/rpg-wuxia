@@ -34,6 +34,14 @@ export const KNOBS = {
   'dano.skills': { grupo: 'Combate', desc: 'porcentagem de dano das skills (golpes e veneno)', scope: 'skill' },
   'vida.jogador': { grupo: 'Combate', desc: 'vida máxima do jogador', scope: 'seita' },
   'vida.monstros': { grupo: 'Combate', desc: 'vida máxima dos monstros', scope: 'monstro' },
+  'equipe.vida_comuns': {
+    grupo: 'Combate',
+    desc: 'masmorra em equipe (bots): vida dos monstros comuns (valor = multiplicador; 2.5 = 2,5× a vida)',
+  },
+  'equipe.vida_chefe': {
+    grupo: 'Combate',
+    desc: 'masmorra em equipe (bots): vida do chefe (valor = multiplicador; 3.5 = 3,5× a vida)',
+  },
   roubo_vida: { grupo: 'Combate', desc: 'roubo de vida da seita (Tormenta)', scope: 'seita' },
   'cura.pocoes': { grupo: 'Combate', desc: 'quanto as poções recuperam', scope: 'pocao' },
   // Progressão
