@@ -7,9 +7,19 @@ const standalone = () =>
   (navigator as Navigator & { standalone?: boolean }).standalone === true ||
   matchMedia('(display-mode: standalone)').matches;
 
+// iOS 26.1+: o app instalado nem desenha a faixa abaixo de innerHeight (fica preta, bug do WebKit).
+// Esticar até a tela inteira só escondia o rodapé do HUD (Atacar cortado) lá dentro; então fica na
+// altura informada e sem a margem do home (que já está dentro da faixa preta). Medido no iPhone 16, 26.1.
+// O Safari 26 congela o "OS 18_6" no UA; a versão real vem em "Version/26.x" (quando há). Usa a maior.
+const versao = (re: RegExp) => {
+  const m = re.exec(navigator.userAgent);
+  return m ? +m[1] * 100 + +m[2] : 0;
+};
+const iosCortaRodape = isIPhone && Math.max(versao(/OS (\d+)_(\d+)/), versao(/Version\/(\d+)\.(\d+)/)) >= 2601;
+
 export function appHeight(): number {
   const h = window.innerHeight;
-  if (!isIPhone || !standalone()) return h;
+  if (!isIPhone || !standalone() || iosCortaRodape) return h;
   // no iPhone o app instalado sempre ocupa a tela inteira; screen.* vem sempre "em pé"
   const a = screen.width,
     b = screen.height,
@@ -18,6 +28,7 @@ export function appHeight(): number {
 }
 
 function apply() {
+  document.documentElement.classList.toggle('ios-corta-rodape', iosCortaRodape && standalone());
   document.documentElement.style.setProperty('--app-h', `${appHeight()}px`);
 }
 
@@ -68,7 +79,7 @@ export function initViewportDebug() {
   const box = document.createElement('div');
   box.style.cssText =
     'position:fixed;left:50%;top:40%;transform:translateX(-50%);z-index:99999;pointer-events:none;' +
-    'background:rgba(0,0,0,.85);color:#0f0;font:12px/1.4 monospace;padding:8px;white-space:pre;border-radius:6px';
+    'background:rgba(0,0,0,.85);color:#0f0;font:12px/1.4 monospace;padding:8px;white-space:pre-wrap;max-width:90vw;border-radius:6px';
   const probe = document.createElement('div');
   probe.style.cssText =
     'position:fixed;visibility:hidden;pointer-events:none;top:0;height:100lvh;' +
@@ -78,7 +89,8 @@ export function initViewportDebug() {
     const cs = getComputedStyle(probe);
     const vv = window.visualViewport;
     box.textContent = [
-      `UA iPhone: ${isIPhone}  standalone: ${standalone()}`,
+      navigator.userAgent.replace(/^.*?\(/, '('),
+      `UA iPhone: ${isIPhone}  standalone: ${standalone()}  corta: ${iosCortaRodape}`,
       `innerW x innerH: ${innerWidth} x ${innerHeight}`,
       `screen: ${screen.width} x ${screen.height}`,
       `visualViewport: ${vv ? `${Math.round(vv.width)} x ${Math.round(vv.height)} off ${Math.round(vv.offsetTop)}` : '-'}`,
