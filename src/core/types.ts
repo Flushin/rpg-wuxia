@@ -106,6 +106,8 @@ export interface Entity {
   buffs: Buff[];
   group: number; // 0 = sem grupo; monstros do mesmo grupo entram em combate juntos
   summoned: boolean;
+  /** monstro: id de quem ele persegue (jogador ou bot da masmorra em equipe); sem = o mais próximo */
+  foeId?: number;
   /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */
   enraged?: boolean;
   /** chefe com golpe em linha (boss.line): quantos golpes marcados já deu, para alternar círculo e linha */
@@ -154,8 +156,12 @@ export type GameEvent =
   | { type: 'portalLocked'; name: string; minLevel: number }
   /** pisou no Portal das Masmorras: a interface abre o menu de escolha (World.dungeonMenu) */
   | { type: 'dungeonMenu' }
+  /** masmorra em equipe: bot bebeu poção, caiu, foi revivido */
+  | { type: 'botPotion'; botId: number; kind: 'hp' | 'mp' }
+  | { type: 'botDeath'; botId: number; name: string }
+  | { type: 'botRevive'; botId: number; name: string }
   /** entrou numa masmorra (já pagou a entrada) */
-  | { type: 'dungeonEnter'; dungeonId: string; cost: number }
+  | { type: 'dungeonEnter'; dungeonId: string; cost: number; team?: boolean }
   | { type: 'teleport'; map: string; cost: number }
   /** chefe da masmorra derrotado */
   | { type: 'dungeonCleared'; dungeonId: string }

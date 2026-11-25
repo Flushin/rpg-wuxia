@@ -21,7 +21,7 @@ export class DungeonWindow {
         audio.ui('ui_close');
         this.world.dungeonMenu = false;
       } else if (t.dataset.a === 'enter') {
-        const err = this.world.enterDungeon(t.dataset.v ?? '');
+        const err = this.world.enterDungeon(t.dataset.v ?? '', t.dataset.team === '1');
         if (err) this.toast(actionErrorText(err), '#ff8a80');
         else audio.ui('ui_click');
       }
@@ -57,7 +57,10 @@ export class DungeonWindow {
         <div class="dg-name"><b>${escapeHtml(name)}</b> <small class="tag">${L(`Nv ${d.levels[0]}–${d.levels[1]}`, `Lv ${d.levels[0]}–${d.levels[1]}`)}</small></div>
         <p class="lore">${escapeHtml(L(d.desc.pt, d.desc.en))}</p>
         <div class="dg-info">${L(`Entrada: nível ${d.minLevel}+ · ${d.cost} ouro`, `Entry: level ${d.minLevel}+ · ${d.cost} gold`)}</div>
-        <button class="primary" data-a="enter" data-v="${d.id}" ${why ? 'disabled' : ''}>${L(`Entrar (${d.cost} ouro)`, `Enter (${d.cost} gold)`)}</button>
+        <div class="dg-modes">
+          <button class="primary" data-a="enter" data-v="${d.id}" ${why ? 'disabled' : ''}>${L(`Sozinho (${d.cost} ouro)`, `Solo (${d.cost} gold)`)}</button>
+          <button class="primary" data-a="enter" data-team="1" data-v="${d.id}" ${why ? 'disabled' : ''}>${L(`Equipe (bots) (${d.cost} ouro)`, `Team (bots) (${d.cost} gold)`)}</button>
+        </div>
         ${why ? `<small class="muted">${why}</small>` : ''}
       </div>`;
     }).join('');
@@ -66,8 +69,8 @@ export class DungeonWindow {
       `<div class="card npc-card"><div class="npc-top"><div class="npc-head"><h2>${escapeHtml(tn('Portal das Masmorras'))}</h2><span class="gold">${w.gold} ${L('ouro', 'gold')}</span><button class="x" data-a="close" aria-label="${L('Fechar', 'Close')}">✕</button></div></div>
       <div class="npc-cols"><div class="npc-list">${rows}</div></div>
       <div class="npc-foot"><small class="muted">${L(
-        `Nas masmorras os monstros não renascem e têm +${bonus}% de chance de equipamento. O Auto não funciona lá dentro. Morrer ou sair encerra a corrida.`,
-        `In dungeons monsters don't respawn and have +${bonus}% equipment drop chance. Auto doesn't work inside. Dying or leaving ends the run.`,
+        `Nas masmorras os monstros não renascem e têm +${bonus}% de chance de equipamento. O Auto não funciona lá dentro. Morrer ou sair encerra a corrida. Equipe: você entra com 3 bots de outras seitas; os monstros têm mais vida e a recompensa é a mesma.`,
+        `In dungeons monsters don't respawn and have +${bonus}% equipment drop chance. Auto doesn't work inside. Dying or leaving ends the run. Team: you enter with 3 bots from other sects; monsters have more HP and the rewards are the same.`,
       )}</small></div></div>`,
     );
   }

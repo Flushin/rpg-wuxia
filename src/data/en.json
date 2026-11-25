@@ -1119,6 +1119,7 @@
   },
   "novidades": {
     "proxima": [
+    { "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight." },
       { "texto": "Buff and debuff icons: the target frame and boss bar show slow, poison, stun, freeze and broken armor, with time left; under your HP you see shield, regeneration and effects on you. A new wiki page explains each icon." },
       { "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse." },
       { "texto": "New portals on hunting maps: a Bagua circle on the ground with a golden 門 rune; when you get close it spins faster and a column of light rises." },

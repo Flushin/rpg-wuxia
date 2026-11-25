@@ -614,6 +614,10 @@
 .dg-row button {
   width: 100%;
 }
+.dg-modes {
+  display: flex;
+  gap: 6px;
+}
 /* Governador Bai: trajes (skins) da seita (src/ui/npcWindow.ts) */
 .sk-row {
   display: flex;

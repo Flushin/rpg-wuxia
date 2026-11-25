@@ -79,6 +79,8 @@ import * as gems from './world/gems';
 import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
+import * as party from './world/party';
+import type { Bot } from './bots';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
 import { bal } from './balance';
@@ -212,6 +214,14 @@ export class World {
   autoAttack = false;
   /** menu das masmorras aberto (o jogador pisou no Portal das Masmorras); fecha ao sair de cima do portal */
   dungeonMenu = false;
+  /** masmorra em equipe: bots aliados (src/core/world/party.ts); vazio fora do modo equipe */
+  party: Bot[] = [];
+  /** corrida atual é em equipe (monstros com mais vida: balance.json equipe.*) */
+  teamRun = false;
+  /** jogador segurando o botão de reviver; tempo segurado; bots já revividos nesta luta */
+  reviving = false;
+  reviveT = 0;
+  revivedInFight = new Set<number>();
   /** menu do Trial aberto (o jogador pisou no portal sul da vila); fecha ao sair de cima do portal */
   trialMenu = false;
   /** corrida do Trial em andamento (chefe e nível escolhidos); null fora do Trial */
@@ -588,7 +598,8 @@ export class World {
     } else e.buffs.push({ id, kind, value, remaining: duration, duration });
     this.emit({ type: 'buffApplied', targetId: e.id, id, kind, duration, refresh: !!old });
   }
-  private tickBuffs(e: Entity, dt: number) {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  tickBuffs(e: Entity, dt: number) {
     if (!e.buffs.length) return;
     for (const b of e.buffs) {
       b.remaining -= dt;
@@ -628,6 +639,7 @@ export class World {
       poison: true,
     });
     if (e.kind === 'monster' && e.hp <= 0) this.killMonster(e);
+    else if (e.kind === 'bot' && e.hp <= 0) party.killBot(this, e);
   }
   isStunned(e: Entity) {
     return e.buffs.some((b) => b.kind === 'stun');
@@ -1033,6 +1045,7 @@ export class World {
         this.emit({ type: 'bossArenaEnter' });
       this.wasInArena = inArena;
     }
+    party.tickParty(this, dt);
     for (const m of this.monsters) this.tickMonster(m, dt);
     for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
     this.tickTelegraphs(dt);
@@ -1056,6 +1069,11 @@ export class World {
     }
     const mi = this.moveInput,
       moving = !!(mi.x || mi.y);
+    if (this.reviving && !moving && party.revivable(this)) {
+      // reviver um bot (masmorra em equipe): parado, sem atacar, até completar (src/core/world/party.ts)
+      p.path = [];
+      return;
+    }
     if (this.pendingSkill !== null && this.tickPending(dt, t, moving || (p.attackWhileMoving && p.path.length > 0)))
       return;
     if (this.npcGoal !== null) {
@@ -1172,7 +1190,8 @@ export class World {
   }
 
   /** Menu das masmorras: paga a entrada e entra numa instância nova (monstros todos vivos). */
-  enterDungeon(id: string): ActionError | null {
+  /** Entra na masmorra; `team` = modo equipe, com 3 bots aliados (src/core/world/party.ts). */
+  enterDungeon(id: string, team = false): ActionError | null {
     const d = dungeonById(id);
     if (!d || !this.maps[d.map] || this.player.dead) return null;
     if (this.player.level < d.minLevel) return { code: 'needLevel', level: d.minLevel };
@@ -1181,8 +1200,10 @@ export class World {
     this.bumpInv();
     this.dungeonMenu = false;
     this.auto.disable(); // o Auto não funciona na masmorra
+    this.teamRun = team;
+    this.party = team ? party.makeParty(this, d.id) : [];
     this.changeMap(d.map);
-    this.emit({ type: 'dungeonEnter', dungeonId: d.id, cost: d.cost });
+    this.emit({ type: 'dungeonEnter', dungeonId: d.id, cost: d.cost, team });
     return null;
   }
 
@@ -1261,7 +1282,7 @@ export class World {
 
   private tickMonster(m: Entity, dt: number) {
     const def = MONSTERS[m.monsterId],
-      p = this.player;
+      p = party.foeOf(this, m); // jogador ou, na masmorra em equipe, o bot que ele persegue
     if (m.dead) {
       if (this.time >= m.respawnAt) this.respawn(m, def);
       return;
@@ -1272,14 +1293,14 @@ export class World {
     const boss = def.boss;
     if (boss) this.tickBossExtras(m, def, dt);
     else if (def.slam) this.tickSlam(m, def, dt);
-    const fromHome = p.dead ? Infinity : dist(p, m.home);
+    const fromHome = this.player.dead ? Infinity : dist(this.player, m.home);
     const wake = !boss || fromHome <= boss.arenaRadius; // chefe só acorda com o jogador na arena
     // chefe em combate só desiste com o jogador bem fora da arena (folga + alguns segundos): desviar de um golpe
     // marcado perto dos braseiros não reseta mais a luta
     let gaveUp = false;
     if (boss && m.ai === 'chase') {
       this.bossAwayT = fromHome > boss.arenaRadius + BOSS_LEASH_SLACK ? this.bossAwayT + dt : 0;
-      gaveUp = p.dead || this.bossAwayT >= BOSS_LEASH_GRACE;
+      gaveUp = this.player.dead || this.bossAwayT >= BOSS_LEASH_GRACE;
     }
     if (m.ai === 'idle') {
       if (pd < def.aggroRange && wake) {
@@ -1356,6 +1377,12 @@ export class World {
         if (boss) this.resetBoss(m);
       }
     }
+  }
+
+  /** Interno: monstro atingido por `by` (o primeiro a bater vira quem ele persegue). */
+  aggroBy(m: Entity, by: Entity) {
+    if (m.ai !== 'chase' || m.foeId === undefined) m.foeId = by.id;
+    this.aggro(m);
   }
 
   private aggro(m: Entity) {
@@ -1448,7 +1475,8 @@ export class World {
     return inventory.lowDurability(this);
   }
 
-  private attack(a: Entity, t: Entity, mult = 1, skill = false, leech = true): AttackResult {
+  /** Interno: usado pelos módulos de src/core/world/. */
+  attack(a: Entity, t: Entity, mult = 1, skill = false, leech = true): AttackResult {
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && a.kind === 'player' && this.hasBuff(t, 'poison')) {
       const bonus = this.passiveValue('poisonedBonus');
@@ -1460,6 +1488,10 @@ export class World {
     // chefe: soma % da vida máxima do jogador ao golpe normal (src/core/world/boss.ts BOSS_PCT_HP)
     if (r.hit && !skill) r.amount += Math.round(boss.bossBasicPctDamage(a, t) * (r.crit ? a.derived.critDamage : 1));
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
+    if (r.hit && t.kind === 'bot') {
+      const red = this.party.find((b) => b.e === t)?.damageTaken ?? 0;
+      if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
+    }
     if (r.hit && t.kind === 'player') {
       const red = this.damageTakenRed();
       if (red) r.amount = Math.max(1, Math.round(r.amount * (1 - red)));
@@ -1476,7 +1508,7 @@ export class World {
     const proj = a.kind === 'monster' ? MONSTERS[a.monsterId]?.projectile : undefined;
     if (proj) this.emit({ type: 'projectile', fromX: a.x, fromY: a.y, toX: t.x, toY: t.y, kind: proj });
     if (r.hit) {
-      const dealt = t.kind === 'player' ? this.absorb(t, r.amount) : r.amount;
+      const dealt = t.kind === 'player' || t.kind === 'bot' ? this.absorb(t, r.amount) : r.amount;
       // desgaste: só golpe que passa do escudo (o escudo protege o equipamento; decidido pelo Lucas em 19/11/2026)
       if (t.kind === 'player' && a.kind === 'monster' && dealt > 0) this.wearGear();
       const hpBefore = Math.max(0, t.hp);
@@ -1486,7 +1518,11 @@ export class World {
       // roubo de vida da seita (Tormenta): parte do dano causado volta como vida;
       // conta só o dano que o alvo podia levar (excesso sobre a vida restante não cura)
       const ls =
-        a.kind === 'player' && leech ? (CLASSES[this.classId].lifeSteal ?? 0) + this.relicEffect('lifeSteal') : 0;
+        a.kind === 'player' && leech
+          ? (CLASSES[this.classId].lifeSteal ?? 0) + this.relicEffect('lifeSteal')
+          : a.kind === 'bot' && leech
+            ? (this.party.find((b) => b.e === a)?.lifeSteal ?? 0)
+            : 0;
       const stolen = Math.min(dealt, hpBefore);
       if (ls > 0 && stolen > 0 && !a.dead) a.hp = Math.min(a.derived.maxHp, a.hp + stolen * ls);
       // golpe que deixa lento (Espectro de gelo, marco 9)
@@ -1497,8 +1533,10 @@ export class World {
     }
     if (a.kind === 'player' || t.kind === 'player') this.lastCombat = this.time;
     if (t.kind === 'monster') {
-      if (t.ai !== 'return') this.aggro(t);
+      if (t.ai !== 'return') this.aggroBy(t, a);
       if (t.hp <= 0) this.killMonster(t);
+    } else if (t.kind === 'bot') {
+      if (t.hp <= 0) party.killBot(this, t);
     } else {
       this.lastDamaged = this.time;
       if (t.hp <= 0) this.killPlayer();
@@ -1826,6 +1864,14 @@ export class World {
   // ---------- mapa / entidades ----------
   changeMap(mapId: string, x?: number, y?: number) {
     this.ultCast = null;
+    if (!isDungeonMap(mapId)) {
+      // saiu da masmorra (ou morreu): a corrida em equipe acaba
+      this.party = [];
+      this.teamRun = false;
+    }
+    this.reviving = false;
+    this.reviveT = 0;
+    this.revivedInFight.clear();
     this.mapId = mapId;
     this.map = this.maps[mapId];
     const sp = this.map.objects.find((o) => o.type === 'spawn');
@@ -1901,6 +1947,7 @@ export class World {
       }
     });
     if (this.trialRun && MAPS_CONFIG[mapId]?.trial) this.spawnTrialBoss(this.trialRun.bossId, this.trialRun.tier);
+    if (this.party.length) party.placeParty(this);
     this.emit({ type: 'mapChange', mapId });
     this.questReach(mapId);
   }
@@ -1968,6 +2015,9 @@ export class World {
     for (const k of ATTR_KEYS) e.attrs[k] = Math.round(def.baseAttributes[k] + def.perLevel[k] * (level - 1));
     e.derived = computeDerived(e.attrs);
     e.derived.maxHp = Math.max(1, Math.round(e.derived.maxHp * bal('vida.monstros', def.id)));
+    // masmorra em equipe: só a vida aumenta (ataque e defesa iguais); valores em balance.json equipe.*
+    if (this.teamRun && isDungeonMap(this.mapId))
+      e.derived.maxHp = Math.round(e.derived.maxHp * bal(def.boss ? 'equipe.vida_chefe' : 'equipe.vida_comuns'));
     if (def.defMul) {
       e.derived.physDef *= def.defMul.phys;
       e.derived.spiritDef *= def.defMul.spirit;

@@ -4,6 +4,8 @@ import { BUYBACK_MAX } from '../core/world/shop';
 import { BOSS_PCT_HP } from '../core/world/boss';
 import { TELEPORT_COST } from '../core/teleport';
 import { bal } from '../core/balance';
+import { PARTY_BOTS, REVIVE_HP, REVIVE_REACH, REVIVE_SECONDS, BOT_MANA_REGEN } from '../core/world/party';
+import { BOT_POTION_COUNT, BOT_HP_POTION_AT } from '../core/bots';
 import { CRIT_AGILITY_MAX, CRIT_TOTAL_MAX, computeDerived, emptyAttrs } from '../core/stats';
 import { SKILL_MAX_LEVEL, skillScale } from '../core/skills';
 import {
@@ -189,6 +191,7 @@ const TOPICS = [
   { id: 'gemas', label: 'Gemas e encaixes', icon: 'po_estrela' },
   { id: 'montarias', label: 'Montarias', icon: 'pergaminho_retorno' },
   { id: 'reliquias', label: 'Relíquias', icon: 'colar_jade' },
+  { id: 'equipe', label: 'Equipe (bots)', icon: 'skill_corte_duplo' },
   { id: 'efeitos', label: 'Buffs e debuffs', icon: 'skill_corte_duplo' },
 ];
 
@@ -200,7 +203,9 @@ export function mechanicsPage(topic?: string): string {
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, efeitos }[t.id as 'combate']();
+  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, efeitos }[
+    t.id as 'combate'
+  ]();
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -622,6 +627,31 @@ function trial(): string {
       <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial, de nível ${trialEquipReqLevel(6)} nos níveis 6–14 e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 15–${TRIAL_TIERS} (a base mais alta do jogo; da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}): mais fortes que os mesmos itens caídos no mundo.</li>
       <li>Os materiais de forja do chefe (os mesmos do mundo).</li>
       <li><b>Bônus de drop:</b> a chance de equipamento e de material é multiplicada por 1 + o bônus do nível (12% no nível 1, +0,3 ponto por nível: 12,30%, 12,60% … ${pct2(trialDropPct(TRIAL_TIERS))}% no ${TRIAL_TIERS}). O <b>Épico</b> não entra no bônus: continua 1% por chefe. O que passa de 100% vira chance de cair <b>mais um</b>: no nível 1, 12% de chance de um segundo equipamento sorteado e de um lote extra de cada material.</li></ul></section>`;
+}
+
+/** Masmorra em equipe: regras em src/core/world/party.ts e src/core/bots.ts; vida em balance.json. */
+function equipe(): string {
+  const x = (v: number) => String(v).replace('.', ',');
+  return `<p class="intro">No Portal das Masmorras, cada masmorra tem dois botões: <b>Sozinho</b> e <b>Equipe (bots)</b>, com o mesmo custo de entrada.</p>
+    <section class="panel"><h2>Os bots aliados</h2><ul>
+      <li>Você entra com <b>${PARTY_BOTS} bots</b> de seitas sorteadas, diferentes da sua e diferentes entre si.</li>
+      <li><b>Nível:</b> o meio da faixa da masmorra, sem passar do seu nível.</li>
+      <li><b>Equipamento:</b> Incomum, com no máximo 1 peça Rara, sem melhoria (+0), sem gemas e sem relíquia.</li>
+      <li><b>Skills:</b> as da seita, com nível igual ao nível do bot ÷ 4 (mínimo 1). Não usam ultimate.</li>
+      <li><b>Poções:</b> só as pequenas (${BOT_POTION_COUNT.hp} de vida e ${BOT_POTION_COUNT.mp} de mana); bebem com a vida abaixo de ${Math.round(BOT_HP_POTION_AT * 100)}% ou com a mana baixa. Regeneram ${Math.round(BOT_MANA_REGEN * 100)}% da mana por segundo.</li>
+      <li><b>Comportamento:</b> seguem você, ajudam no seu alvo e só lutam com monstros que já estão em combate (não puxam monstro sozinhos).</li>
+      <li>Os monstros perseguem quem bateu neles primeiro, você ou um bot.</li>
+    </ul></section>
+    <section class="panel"><h2>Dificuldade e recompensa</h2><ul>
+      <li>Vida dos monstros: comuns ×${x(bal('equipe.vida_comuns'))} e chefe ×${x(bal('equipe.vida_chefe'))}. Ataque e defesa são os do modo solo. Valores provisórios.</li>
+      <li>XP, ouro e drops são os mesmos do modo solo, e tudo vai para você.</li>
+      <li>A corrida só falha se <b>você</b> morrer; bots caídos não encerram.</li>
+    </ul></section>
+    <section class="panel"><h2>Reviver</h2><ul>
+      <li>Um bot caído fica no chão. Segure o botão ✚ (ou a tecla F) parado a até ${x(REVIVE_REACH)} tile dele, sem atacar, por ${REVIVE_SECONDS} s.</li>
+      <li>Ele volta com ${Math.round(REVIVE_HP * 100)}% da vida.</li>
+      <li>Cada bot pode ser revivido <b>1 vez por luta</b>; a contagem zera quando nenhum monstro está em combate.</li>
+    </ul></section>`;
 }
 
 /** Buffs e debuffs: ícones de src/data/buffs.json (os mesmos do jogo); fontes tiradas de skills, ultimates e monstros. */

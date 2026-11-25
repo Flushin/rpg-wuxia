@@ -165,6 +165,14 @@ export class Hotbar {
     });
     for (const b of bar.querySelectorAll<HTMLElement>('.pot'))
       Object.assign(b.style, { width: px(k.pot), height: px(k.pot) });
+    Object.assign(byId('btn-revive').style, {
+      left: 'auto',
+      transform: 'none',
+      width: px(k.sk),
+      height: px(k.sk),
+      right: px(t.revive.x - k.sk / 2),
+      bottom: px(t.revive.y - k.sk / 2),
+    });
     this.ult.layoutArc(t);
   }
 
@@ -172,6 +180,7 @@ export class Hotbar {
   private clearV2() {
     const clear = (el: HTMLElement, keys: string[]) => keys.forEach((k) => el.style.removeProperty(k));
     clear(byId('btn-attack'), ['width', 'height', 'right', 'bottom']);
+    clear(byId('btn-revive'), ['left', 'transform', 'width', 'height', 'right', 'bottom']);
     const bar = byId('potion-bar');
     clear(bar, ['left', 'right', 'bottom', 'gap', 'flex-direction']);
     for (const b of bar.querySelectorAll<HTMLElement>('.pot')) clear(b, ['width', 'height']);

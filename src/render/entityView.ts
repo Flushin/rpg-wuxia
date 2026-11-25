@@ -93,7 +93,8 @@ export class EntityView {
     shadow.setScale(this.sc);
     this.ring = scene.add.graphics();
     this.bar = scene.add.graphics();
-    const color = e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : '#f0d070';
+    const color =
+      e.kind === 'player' ? '#9fe8a0' : e.kind === 'monster' ? '#ff9a8a' : e.kind === 'bot' ? '#8ad0ff' : '#f0d070';
     const text = labelOf(e);
     const labelY = this.sheet ? -this.top - 4 : e.kind === 'monster' ? -36 * this.sc : -52;
     const label = scene.add
@@ -177,6 +178,15 @@ export class EntityView {
       this.bar.fillStyle(0xaad0ff, 0.22);
       this.bar.fillCircle(0, -20, 30);
       this.bar.strokeCircle(0, -20, 30);
+    }
+    if (e.kind === 'bot') {
+      // aliado da masmorra em equipe: barra de vida verde sempre à mostra
+      const w = 36,
+        top = this.sheet ? -this.top - 10 : -48;
+      this.bar.fillStyle(0x000000, 0.75);
+      this.bar.fillRect(-w / 2 - 1, top - 1, w + 2, 5);
+      this.bar.fillStyle(0x4cc46a, 1);
+      this.bar.fillRect(-w / 2, top, w * Math.max(0, e.hp / e.derived.maxHp), 3);
     }
     if (selected && e.kind === 'monster') {
       this.ring.lineStyle(2, 0xff5050, 1);

@@ -289,6 +289,7 @@ function dungeonPanel(d: (typeof DUNGEONS)[number]): string {
       <li>Entrada pelo <b>Portal das Masmorras</b>, na saída oeste da <a href="#/mapa/cidade">vila</a>: a partir do nível <b>${d.minLevel}</b>, custa <b>${d.cost}</b> ouro por entrada.</li>
       <li>Cada entrada é uma corrida nova: todos os monstros vivos, e eles <b>não renascem</b>. O chefe fica no fim e dá um item garantido.</li>
       <li>Os monstros daqui têm <b>+${bonus}%</b> de chance de deixar equipamento (sobre a chance normal deles).</li>
+      <li><b>Masmorra em equipe (bots):</b> o botão <b>Equipe (bots)</b> leva 3 bots aliados, com a vida dos monstros aumentada e a opção de reviver os bots caídos; recompensa igual à do modo solo. Regras: <a href="#/mecanicas/equipe">Mecânicas › Equipe (bots)</a>.</li>
       <li>O <a href="#/mecanicas/auto">Auto</a> não funciona aqui, e a masmorra não rende ganho offline.</li>
       <li>Morrer, sair por um portal ou fechar o jogo encerra a corrida: você volta para a vila e precisa pagar de novo para entrar.</li>
     </ul></section>`;
