@@ -1,34 +1,17 @@
-// Altura real da tela. No iPhone com o jogo instalado na tela inicial (barra de status transparente),
-// o iOS informa a janela com a altura da barra de status a menos: tudo que usa 100% / inset: 0 / innerHeight
-// terminava antes do fim da tela e sobrava uma faixa preta embaixo. Aqui a altura certa vai para --app-h,
-// e --fix-b (usado no bottom das telas fixas) estica cada uma até o fim real da tela.
+// Altura da janela em --app-h (o canvas e o HUD leem daqui; --fix-b estica as telas fixas até ela).
+// Antes o iPhone instalado usava a barra de status transparente e esticávamos até a tela inteira, mas
+// no iOS 26.1 o app instalado não desenha nada abaixo de innerHeight (faixa preta + HUD cortado).
+// Com a barra de status opaca (index.html, "black") a janela começa abaixo do relógio e vai até o fim.
 const isIPhone = /iPhone|iPod/.test(navigator.userAgent);
 const standalone = () =>
   (navigator as Navigator & { standalone?: boolean }).standalone === true ||
   matchMedia('(display-mode: standalone)').matches;
 
-// iOS 26.1+: o app instalado nem desenha a faixa abaixo de innerHeight (fica preta, bug do WebKit).
-// Esticar até a tela inteira só escondia o rodapé do HUD (Atacar cortado) lá dentro; então fica na
-// altura informada e sem a margem do home (que já está dentro da faixa preta). Medido no iPhone 16, 26.1.
-// O Safari 26 congela o "OS 18_6" no UA; a versão real vem em "Version/26.x" (quando há). Usa a maior.
-const versao = (re: RegExp) => {
-  const m = re.exec(navigator.userAgent);
-  return m ? +m[1] * 100 + +m[2] : 0;
-};
-const iosCortaRodape = isIPhone && Math.max(versao(/OS (\d+)_(\d+)/), versao(/Version\/(\d+)\.(\d+)/)) >= 2601;
-
 export function appHeight(): number {
-  const h = window.innerHeight;
-  if (!isIPhone || !standalone() || iosCortaRodape) return h;
-  // no iPhone o app instalado sempre ocupa a tela inteira; screen.* vem sempre "em pé"
-  const a = screen.width,
-    b = screen.height,
-    full = innerWidth > h ? Math.min(a, b) : Math.max(a, b);
-  return Math.max(h, full);
+  return window.innerHeight;
 }
 
 function apply() {
-  document.documentElement.classList.toggle('ios-corta-rodape', iosCortaRodape && standalone());
   document.documentElement.style.setProperty('--app-h', `${appHeight()}px`);
 }
 
@@ -90,7 +73,7 @@ export function initViewportDebug() {
     const vv = window.visualViewport;
     box.textContent = [
       navigator.userAgent.replace(/^.*?\(/, '('),
-      `UA iPhone: ${isIPhone}  standalone: ${standalone()}  corta: ${iosCortaRodape}`,
+      `UA iPhone: ${isIPhone}  standalone: ${standalone()}`,
       `innerW x innerH: ${innerWidth} x ${innerHeight}`,
       `screen: ${screen.width} x ${screen.height}`,
       `visualViewport: ${vv ? `${Math.round(vv.width)} x ${Math.round(vv.height)} off ${Math.round(vv.offsetTop)}` : '-'}`,

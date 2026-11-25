@@ -8,14 +8,9 @@
 :root {
   --sa-top: env(safe-area-inset-top);
   --sa-right: env(safe-area-inset-right);
-  --sab: env(safe-area-inset-bottom);
-  --sa-bottom: var(--sab);
+  --sa-bottom: env(safe-area-inset-bottom);
   --sa-left: env(safe-area-inset-left);
   --fix-b: calc(100% - var(--app-h, 100%));
-}
-/* iOS 26.1+ instalado: a barra do home fica na faixa preta que o iOS não desenha (ui/viewport.ts) */
-:root.ios-corta-rodape {
-  --sab: 0px;
 }
 html,
 body {
