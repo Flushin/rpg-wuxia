@@ -590,7 +590,7 @@ function trial(): string {
     .map((t) => {
       const st = trialStats(MONSTERS.rei_bandidos, trialBossLevel(t)),
         [g0, g1] = trialGold(t);
-      return `<tr><td>${t}</td><td>${trialBossLevel(t)}</td><td>${trialCost(t)}</td><td>+${pct2(trialDropPct(t))}%</td><td>${st.hp}</td><td>${Math.max(st.physDef, st.spiritDef)} / ${Math.min(st.physDef, st.spiritDef)}</td><td>${g0}–${g1}</td></tr>`;
+      return `<tr><td>${t}</td><td>${trialBossLevel(t)}</td><td>${trialCost(t)}</td><td>+${pct2(trialDropPct(t))}%</td><td>${st.hp}</td><td>${Math.max(st.physDef, st.spiritDef)} / ${Math.min(st.physDef, st.spiritDef)}</td><td>${g0}–${g1}</td><td>${trialXp(t).toLocaleString('pt-BR')}</td></tr>`;
     })
     .join('');
   const bosses = TRIAL_BOSSES.map((id) => {
@@ -613,10 +613,10 @@ function trial(): string {
       defesa alta contra um tipo de dano e baixa contra o outro. Tormenta, Titã e Víbora causam dano físico; Geada, espiritual.
       Quem bate mais devagar bate mais forte (dano proporcional ao intervalo entre golpes). Além disso, todo golpe de chefe tira <b>${Math.round(BOSS_PCT_HP.basic * 100)}% da sua vida máxima</b> por golpe normal (proporcional ao intervalo) e ${Math.round(BOSS_PCT_HP.telegraph * 100)}% por 1× de dano dos golpes marcados no chão, sem redução pela defesa (valores para chefe nível ${BOSS_PCT_HP.fullLevel}+; menos nos níveis abaixo). A defesa reduz só a outra parte do golpe.</p>
       <table class="tbl"><thead><tr><th>Chefe</th><th>Fraco contra</th><th>Golpe a cada</th><th>Passo</th><th>Mecânicas</th></tr></thead><tbody>${bosses}</tbody></table>
-      <p class="muted">Ajudantes invocados vêm ${trialBossLevel(1) - trialSummonLevel(trialBossLevel(1))} níveis abaixo do chefe.</p></section>
+      <p class="muted">Ajudantes invocados vêm ${trialBossLevel(1) - trialSummonLevel(trialBossLevel(1))} níveis abaixo do chefe e dão a XP normal deles nesse nível.</p></section>
     <section class="panel"><h2>Níveis</h2>
       ${formula(`vida = ${S.hp} × ${n1(S.hpGrowth)}<sup>(nível do chefe − 21)</sup> · ataque = ${S.atk} × ${String(S.atkGrowth).replace('.', ',')}<sup>(nível − 21)</sup> × intervalo / ${n1(S.refInterval)} · defesa forte ${S.defStrong}, fraca ${S.defWeak}, × ${String(S.defGrowth).replace('.', ',')}<sup>(nível − 21)</sup>`)}
-      <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th></tr></thead><tbody>${tiers}</tbody></table></section>
+      <table class="tbl"><thead><tr><th>Nível</th><th>Chefe</th><th>Entrada</th><th>Bônus de drop</th><th>Vida</th><th>Defesa forte / fraca</th><th>Ouro</th><th>XP</th></tr></thead><tbody>${tiers}</tbody></table></section>
     <section class="panel"><h2>Recompensa</h2><ul>
       <li>Ouro da tabela acima e ${trialXp(1)} de XP no nível 1 (+${trialXp(2) - trialXp(1)} por nível).</li>
       <li>1 equipamento <b>Raro</b> garantido e 1 equipamento de raridade sorteada, os dois de nível ${trialEquipReqLevel(1)} nos níveis 1–5 do Trial, de nível ${trialEquipReqLevel(6)} nos níveis 6–14 e de nível ${trialEquipReqLevel(TRIAL_TIERS)} nos níveis 15–${TRIAL_TIERS} (a base mais alta do jogo; da sua seita, se for arma), com os bônus do <b>nível do chefe</b> (${trialBossLevel(1)}–${trialBossLevel(TRIAL_TIERS)}): mais fortes que os mesmos itens caídos no mundo.</li>
