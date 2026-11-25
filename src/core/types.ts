@@ -76,7 +76,7 @@ export type AiState = 'idle' | 'wander' | 'chase' | 'return';
 
 export interface Entity {
   id: number;
-  kind: 'player' | 'monster' | 'npc';
+  kind: 'player' | 'monster' | 'npc' | 'bot';
   name: string;
   level: number;
   x: number;

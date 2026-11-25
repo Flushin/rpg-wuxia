@@ -38,6 +38,6 @@ Decidido com o Lucas em 19/11/2026.
 - Monstros e chefe: só a **vida** aumenta (ataque e defesa iguais). Multiplicador separado para comuns e chefe,
   definido por simulação (`npm run balance`): tempo para matar em equipe parecido com o do solo.
 - Recompensa: igual ao modo solo.
-- A IA dos bots é a mesma base usada na arena ([arena.md](arena.md)).
+- A IA dos bots é a mesma base usada na arena ([arena.md](arena.md)). **Base feita** em `src/core/bots.ts` (montagem, IA, luta simulada; `npm run check:bots`); nível das skills ativas = nível/4 (1–15). Falta: integrar no World, desenho, menu.
 
 Ideias para depois: mais masmorras no menu (outras faixas de nível, ex.: uma de nível 5+), recorde de tempo por masmorra, baú no fim em vez do drop do chefe.
