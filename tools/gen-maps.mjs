@@ -347,6 +347,19 @@ function cidade() {
 
   // árvores (cerejeiras e carvalhos) só na grama livre, longe das casas, estradas e da praça
   reserve(16, 17, 1);
+  // lótus dos portais (src/render/lotusPortal.ts): sem árvore na frente
+  for (const [pi, pj] of [
+    [29, 16],
+    [16, 2],
+    [2, 16],
+    [16, 28],
+  ])
+    reserve(pi, pj, 3);
+  // tira as árvores da borda na frente dos lótus da Floresta (leste) e do Trial (sul)
+  for (let k = 13; k <= 19; k++) {
+    if (gr.get(31, k) === T) gr.set(31, k, G);
+    if (gr.get(k, 31) === T) gr.set(k, 31, G);
+  }
   let n = 0;
   for (let tries = 0; tries < 2000 && n < 30; tries++) {
     const x = 1 + Math.floor(rnd() * 30),
@@ -363,13 +376,19 @@ function cidade() {
   sealUnreachable(gr, 16, 17);
   objs.unshift(
     point('player', 'spawn', 16.5, 17.5),
-    area('Floresta', 'portal', 29, 14, 2, 4, { target: 'floresta', targetX: 5.5, targetY: 16.5 }),
+    area('Floresta', 'portal', 28, 15, 2, 2, { target: 'floresta', targetX: 5.5, targetY: 16.5, lotus: 'floresta' }),
     // saída norte (marco 9): só abre no nível 10 (minLevel)
-    area('Montanha Nevada', 'portal', 15, 1, 2, 2, { target: 'montanha', targetX: 16, targetY: 27.5, minLevel: 10 }),
+    area('Montanha Nevada', 'portal', 15, 1, 2, 2, {
+      target: 'montanha',
+      targetX: 16,
+      targetY: 27.5,
+      minLevel: 10,
+      lotus: 'montanha',
+    }),
     // saída oeste: portal das masmorras (abre o menu de escolha; src/core/dungeons.ts)
-    area('Portal das Masmorras', 'portal', 1, 14, 2, 4, { menu: 'masmorras' }),
+    area('Portal das Masmorras', 'portal', 1, 14, 2, 4, { menu: 'masmorras', lotus: 'masmorras' }),
     // saída sul: portal do Trial (menu de chefe e nível; src/core/trial.ts)
-    area('Trial', 'portal', 15, 29, 2, 2, { menu: 'trial', scale: 1.1 }),
+    area('Trial', 'portal', 15, 27, 2, 2, { menu: 'trial', scale: 1.1, lotus: 'trial' }),
   );
   return tiled('Vila das Nuvens', gr, objs);
 }
@@ -1103,7 +1122,7 @@ function trial() {
   if (!seen.has(TRIAL_ARENA.y * W + TRIAL_ARENA.x)) throw new Error('trial: arena inalcançável');
   const objs = [
     point('player', 'spawn', 16, 27.5),
-    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 27.5 }),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 16, targetY: 25.5 }),
   ];
   for (const [i, j] of [
     [13, 21],
