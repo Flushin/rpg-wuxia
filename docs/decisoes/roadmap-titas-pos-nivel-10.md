@@ -37,7 +37,7 @@ com o simulador (6 execuções por seita): até o nível 10 — Tormenta ~61 min
   5. Sangue de Serpente · Serpent Blood (nv 9, passiva): +15% de dano em alvos envenenados
 - **Mecânicas novas:** veneno (tiques de 1 s, calculado ao aplicar com o dano médio do golpe contra o alvo, sem
   acerto/erro; número verde), atordoar (o monstro não anda nem ataca), cura ao longo do tempo e passivas de redução
-  de dano, HP máximo e bônus contra envenenado. Auto-combate usa a cura com a vida abaixo de 60% em combate.
+  de dano, HP máximo e bônus contra envenenado. Auto-combate usa a cura com a vida abaixo de 75% em combate.
 - Os mestres Gang e Du passam a dar 3 dicas, como os outros; as duas seitas saem do "Em breve" na criação.
 
 ### Pós-nível-10 (marco 9, 18/11/2026)
