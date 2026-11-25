@@ -10,7 +10,7 @@ import { credits } from './ui/credits';
 import { atualizarPontoNovidades, novidades } from './ui/novidades';
 import { openPrivacyPolicy } from './ui/privacy';
 import { initUiScale } from './ui/uiScale';
-import { initViewport } from './ui/viewport';
+import { initViewport, initViewportDebug } from './ui/viewport';
 import { initNoBrowserZoom } from './ui/noBrowserZoom';
 import { initScrollbars } from './ui/scrollbars';
 import { registerServiceWorker } from './platform';
@@ -19,6 +19,7 @@ import { initNativeApp } from './platform/native';
 
 captureErrors();
 initViewport();
+initViewportDebug();
 initNativeApp();
 initUiScale();
 initNoBrowserZoom();
