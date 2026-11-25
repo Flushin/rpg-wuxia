@@ -16,6 +16,7 @@ import {
   ARENA_TITLES,
   arenaDelta,
   arenaPower,
+  ARENA_COUNTDOWN,
   basicDps,
 } from '../src/core/arena';
 import { ARENA_RETURN, enterArena } from '../src/core/world/arena';
@@ -75,13 +76,17 @@ function player(classId: string, level: number, seed: number): World {
 const mestre = (w: World) => w.npcs.find((n) => n.npcId === 'mestre_arena')!;
 
 /** Luta com uma política simples de jogador (alvo, skills, poções), como a simulação dos chefes. */
+const fightTimes: number[] = [];
 function fight(w: World): boolean | null {
   const DT = 1 / 30;
   for (let i = 0; i < 200 / DT; i++) {
     w.tick(DT);
     const evs = w.events.splice(0);
     const r = evs.find((e) => e.type === 'arenaResult');
-    if (r && r.type === 'arenaResult') return r.win;
+    if (r && r.type === 'arenaResult') {
+      fightTimes.push(i * DT - ARENA_COUNTDOWN);
+      return r.win;
+    }
     const f = w.arenaFight;
     if (!f || f.over) continue;
     const p = w.player,
@@ -132,9 +137,10 @@ console.log('\n== luta ==');
   ok(w.player.derived.physAtk === atk0 && w.player.derived.maxHp === hp0, 'o poder do jogador não muda');
   ok(
     Math.abs(b.derived.maxHp / w.player.derived.maxHp - Math.sqrt(f.power * bal('arena.poder_bot', 'lamina'))) < 0.02 &&
-      Math.abs(basicDps(b, w.player) / basicDps(w.player, b) - Math.sqrt(f.power * bal('arena.poder_bot', 'lamina'))) <
-        0.05,
-    `bot com ${Math.round(f.power * 100)}% do poder (vida e dano × raiz)`,
+      Math.abs(b.derived.spiritAtk / w.player.derived.physAtk - Math.sqrt(f.power * bal('arena.poder_bot', 'lamina'))) <
+        0.02 &&
+      b.derived.critChance === w.player.derived.critChance,
+    `bot com ${Math.round(f.power * 100)}% do poder (vida e ataque × raiz, mesmo crítico)`,
   );
   const evs: string[] = [];
   let win: boolean | null = null;
@@ -225,7 +231,8 @@ console.log('\n== simulação (vitórias por poder do bot) ==');
       total[pw] = [(total[pw]?.[0] ?? 0) + wins, (total[pw]?.[1] ?? 0) + n];
       row.push(`${Math.round(pw * 100)}%: ${wins}/${n}`);
     }
-    console.log(`  ${CLASSES[cls].name}: ${row.join('  ')}`);
+    const avg = fightTimes.splice(0).reduce((a, b) => a + b, 0) / (powers.length * (SECT_ORDER.length - 1) * seeds);
+    console.log(`  ${CLASSES[cls].name}: ${row.join('  ')}  (luta média ${Math.round(avg)} s)`);
   }
   const rate = (pw: number) => total[pw][0] / total[pw][1];
   ok(

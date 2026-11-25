@@ -18,13 +18,16 @@ Preparação para o PvP online: por enquanto o jogador luta contra um bot.
   títulos em `src/data/arena.json`; `npm run check:arena` (com `--sim`, a tabela completa).
 - NPC: **Mestre da Arena Tie** (`mestre_arena`, papel `arena`) no Porto (80, 68), ao lado do portal do Trial. A luta é no
   círculo do mapa do Trial, sem chefe; depois o jogador volta ao lado do NPC.
-- "Poder" = vida × dano do golpe normal (com crítico). O bot copia as defesas, a esquiva, o acerto e as resistências do
-  jogador; vida e dano = raiz(poder) × os do jogador. Calibragem por seita do jogador em `balance.json`
-  (`arena.poder_bot.<seita>`: Tormenta 0,85, Geada 1,2, Titã 1,6, Víbora 1,05), medida na simulação para que 100% seja
-  luta equilibrada. Resultado: ~85% de vitórias com o bot a 80%, ~58% a 100% e ~12% a 130%, então o ponto de 50% fica
-  dentro da faixa.
-- Todo dano na arena vale 25% (`ARENA_DAMAGE`), igual para os dois lados. Sem isso, no nível 50 uma skill tira quase a
-  vida inteira e a luta acaba em 1–2 s.
+- "Poder" = vida × ataque. O bot copia as defesas, a esquiva, o acerto, as resistências e o crítico do jogador; vida,
+  ataque e elemento = raiz(poder) × os do jogador (o ataque e o elemento do jogador vão para o tipo de dano e o elemento
+  do bot). Antes o bot só igualava o DPS do golpe normal mexendo no ataque: contra jogador de muito crítico e elemento
+  (teste do Lucas, nível 50 épico +10) o ataque dele ficava ~10× maior e as skills matavam no primeiro golpe.
+  Calibragem por seita do jogador em `balance.json` (`arena.poder_bot.<seita>`: Tormenta 0,88, Geada 0,82, Titã 1,3,
+  Víbora 1), medida na simulação para que 100% seja luta equilibrada. Resultado: ~95% de vitórias com o bot a 80%,
+  ~58% a 100% e ~11% a 130%. Luta média: ~30 s (Geada, Víbora), ~47 s (Tormenta), ~62 s (Titã).
+- Todo dano na arena, dos dois lados, é multiplicado por um fator calculado na entrada (`arenaDamageMul`): o golpe
+  normal do jogador levaria `ARENA_TTK` (40) s para tirar a vida dele mesmo (máximo 1). Antes era 25% fixo, e com
+  equipamento forte uma skill ainda matava em 1–2 golpes.
 - Contagem de 3 s em que ninguém anda nem ataca; limite de 120 s (vence quem tem mais vida em %).
 - Perder não é morrer: sem penalidade, o jogador volta com vida e mana cheias. Sair do mapa no meio da luta conta como
   derrota.

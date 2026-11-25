@@ -81,7 +81,7 @@ import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import * as party from './world/party';
 import * as arenaW from './world/arena';
-import { ARENA_COUNTDOWN, ARENA_DAMAGE, newArenaState, type ArenaState } from './arena';
+import { ARENA_COUNTDOWN, newArenaState, type ArenaState } from './arena';
 import type { Bot } from './bots';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
@@ -631,7 +631,7 @@ export class World {
   }
   /** Um tique de veneno: dano direto (sem acerto/erro nem defesa; já foi calculado ao aplicar). */
   private poisonTick(e: Entity, amount: number) {
-    const dealt = Math.max(1, Math.round(amount * (this.arenaFight ? ARENA_DAMAGE : 1)));
+    const dealt = Math.max(1, Math.round(amount * (this.arenaFight?.dmg ?? 1)));
     e.hp -= dealt;
     this.emit({
       type: 'hit',
@@ -1497,7 +1497,7 @@ export class World {
     else if (a.kind === 'monster') mult *= bal('dano.monstros', a.monsterId);
     // chefe: soma % da vida máxima do jogador ao golpe normal (src/core/world/boss.ts BOSS_PCT_HP)
     if (r.hit && !skill) r.amount += Math.round(boss.bossBasicPctDamage(a, t) * (r.crit ? a.derived.critDamage : 1));
-    if (this.arenaFight) mult *= ARENA_DAMAGE; // arena: dano reduzido dos dois lados (src/core/arena.ts)
+    if (this.arenaFight) mult *= this.arenaFight.dmg; // arena: dano reduzido dos dois lados (src/core/arena.ts)
     if (r.hit && mult !== 1) r.amount = Math.max(1, Math.round(r.amount * mult));
     if (r.hit && t.kind === 'bot') {
       const red = this.botOf(t)?.damageTaken ?? 0;

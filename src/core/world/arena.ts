@@ -9,6 +9,7 @@ import {
   ARENA_TITLES,
   arenaDelta,
   arenaPower,
+  arenaDamageMul,
   scaleArenaBot,
 } from '../arena';
 import { botActives, botDrink, botThink, dist, makeBot, pickBotClasses, tickBot, type Bot } from '../bots';
@@ -32,6 +33,8 @@ export interface ArenaFight {
   t: number;
   over: boolean;
   endAt: number;
+  /** multiplicador de todo dano na luta (arenaDamageMul) */
+  dmg: number;
 }
 
 /** Entra na luta (falando com o Mestre da Arena). */
@@ -56,7 +59,7 @@ export function enterArena(w: World, test?: { classId?: string; power?: number }
   bot.e.y = ARENA_SPOTS.bot.y;
   bot.e.ai = 'chase';
   w.monsters.push(bot.e);
-  w.arenaFight = { bot, rating, power, t: 0, over: false, endAt: 0 };
+  w.arenaFight = { bot, rating, power, t: 0, over: false, endAt: 0, dmg: arenaDamageMul(p, bot.e) };
   w.emit({ type: 'arenaStart', botId: bot.e.id, classId: cls, power });
   return null;
 }
