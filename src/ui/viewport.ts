@@ -1,20 +1,14 @@
-// Altura real da tela. No iPhone com o jogo instalado na tela inicial (barra de status transparente),
-// o iOS informa a janela com a altura da barra de status a menos: tudo que usa 100% / inset: 0 / innerHeight
-// terminava antes do fim da tela e sobrava uma faixa preta embaixo. Aqui a altura certa vai para --app-h,
-// e --fix-b (usado no bottom das telas fixas) estica cada uma até o fim real da tela.
+// Altura da janela em --app-h (o canvas e o HUD leem daqui; --fix-b estica as telas fixas até ela).
+// Antes o iPhone instalado usava a barra de status transparente e esticávamos até a tela inteira, mas
+// no iOS 26.1 o app instalado não desenha nada abaixo de innerHeight (faixa preta + HUD cortado).
+// Com a barra de status opaca (index.html, "black") a janela começa abaixo do relógio e vai até o fim.
 const isIPhone = /iPhone|iPod/.test(navigator.userAgent);
 const standalone = () =>
   (navigator as Navigator & { standalone?: boolean }).standalone === true ||
   matchMedia('(display-mode: standalone)').matches;
 
 export function appHeight(): number {
-  const h = window.innerHeight;
-  if (!isIPhone || !standalone()) return h;
-  // no iPhone o app instalado sempre ocupa a tela inteira; screen.* vem sempre "em pé"
-  const a = screen.width,
-    b = screen.height,
-    full = innerWidth > h ? Math.min(a, b) : Math.max(a, b);
-  return Math.max(h, full);
+  return window.innerHeight;
 }
 
 function apply() {
@@ -68,7 +62,7 @@ export function initViewportDebug() {
   const box = document.createElement('div');
   box.style.cssText =
     'position:fixed;left:50%;top:40%;transform:translateX(-50%);z-index:99999;pointer-events:none;' +
-    'background:rgba(0,0,0,.85);color:#0f0;font:12px/1.4 monospace;padding:8px;white-space:pre;border-radius:6px';
+    'background:rgba(0,0,0,.85);color:#0f0;font:12px/1.4 monospace;padding:8px;white-space:pre-wrap;max-width:90vw;border-radius:6px';
   const probe = document.createElement('div');
   probe.style.cssText =
     'position:fixed;visibility:hidden;pointer-events:none;top:0;height:100lvh;' +
@@ -78,6 +72,7 @@ export function initViewportDebug() {
     const cs = getComputedStyle(probe);
     const vv = window.visualViewport;
     box.textContent = [
+      navigator.userAgent.replace(/^.*?\(/, '('),
       `UA iPhone: ${isIPhone}  standalone: ${standalone()}`,
       `innerW x innerH: ${innerWidth} x ${innerHeight}`,
       `screen: ${screen.width} x ${screen.height}`,
