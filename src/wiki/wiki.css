@@ -128,6 +128,23 @@ a:hover {
 #results .muted {
   padding: 6px 8px;
 }
+#results small {
+  text-align: right;
+  font-size: 12px;
+}
+/* alvo da busca (seção/missão) pisca ao chegar */
+.flash {
+  animation: flash 1.6s ease-out;
+}
+@keyframes flash {
+  0%,
+  40% {
+    background: rgba(201, 149, 74, 0.35);
+  }
+  100% {
+    background: transparent;
+  }
+}
 .play {
   background: #8a3b2a;
   border: 1px solid #c66;

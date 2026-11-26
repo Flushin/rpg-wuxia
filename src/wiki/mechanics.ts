@@ -194,7 +194,7 @@ const mats = (m: Mats) =>
     .join(' ') || '—';
 
 // ---------- páginas ----------
-const TOPICS = [
+export const TOPICS = [
   { id: 'combate', label: 'Combate e atributos', icon: 'skill_corte_duplo' },
   { id: 'morte', label: 'Morte, vida e durabilidade', icon: 'pocao_hp_g' },
   { id: 'forja', label: 'Forja e economia', icon: 'minerio_ferro' },
@@ -211,15 +211,21 @@ const TOPICS = [
 
 export { EPIC };
 
+/** HTML do corpo de um tópico (também usado pela busca, para achar as seções e o texto). */
+export function topicBody(id: string): string {
+  const f = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, arena, efeitos }[
+    id as 'combate'
+  ];
+  return f ? f() : '';
+}
+
 export function mechanicsPage(topic?: string): string {
   const t = TOPICS.find((x) => x.id === topic);
   const tabs = `<nav class="tabs">${TOPICS.map((x) => `<a class="${x.id === topic ? 'on' : ''}" href="#/mecanicas/${x.id}">${x.label}</a>`).join('')}</nav>`;
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, arena, efeitos }[
-    t.id as 'combate'
-  ]();
+  const body = topicBody(t.id);
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
