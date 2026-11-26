@@ -7,8 +7,9 @@ import { NPCS, fillSprites, npcIndexPage, npcPage, spriteHtml } from './npcs';
 import { CLASSES, EPIC_ITEMS, MONSTERS, QUESTS, SECT_ORDER, SKILLS, SKINS } from './data';
 import { TOPICS, mechanicsPage, topicBody } from './mechanics';
 import { novidadesPage } from './novidades';
-import { fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
+import { dungeonIndexPage, fillMinimaps, mapIndexPage, mapPage, questIndexPage } from './world';
 import { sectIndexPage, sectPage, skillIndexPage, skillPage } from './sects';
+import { DUNGEONS } from '../core/dungeons';
 import { loadMaps, type WikiMap } from './maps';
 import { isSpoiler, monsterIndexPage, monsterPage, monsterSprite } from './monsters';
 
@@ -30,6 +31,7 @@ const CATS: Cat[] = [
   { id: 'trajes', label: 'Trajes', icon: '👘', ready: true },
   { id: 'missoes', label: 'Missões', icon: '❗', ready: true },
   { id: 'mapas', label: 'Mapas', icon: '🗺', ready: true },
+  { id: 'masmorras', label: 'Masmorras', icon: '🏯', ready: true },
 ];
 const catIcon = (c: Cat) => (/^[a-z_]+$/.test(c.icon) ? iconHtml(c.icon, 'sm') : `<span class="emo">${c.icon}</span>`);
 
@@ -46,7 +48,7 @@ function nav(active: string) {
 
 function home(): string {
   return `<h1>Wiki do Mistpeak</h1>
-    <p class="intro">Tudo sobre o jogo: novidades, mecânicas, seitas, itens, monstros, NPCs e missões. Os números aqui saem direto dos dados do jogo,
+    <p class="intro">Tudo sobre o jogo: novidades, mecânicas, seitas, itens, monstros, NPCs, missões, mapas e masmorras. Os números aqui saem direto dos dados do jogo,
     então estão sempre atualizados. Conteúdo sobre chefes fica escondido atrás de um aviso de <b>spoiler</b>.</p>
     <div class="grid cats">${CATS.map(
       (c) =>
@@ -186,7 +188,13 @@ function buildIndex(): Hit[] {
       keys: `traje skin roupa ${sectName(k.sect)}`,
       text: k.desc,
     })),
-    ...(maps ?? []).map((m) => ({ name: m.name, href: `#/mapa/${m.id}`, icon: emo('🗺'), kind: 'Mapa', keys: 'mapa' })),
+    ...(maps ?? []).map((m) => ({
+      name: m.name,
+      href: `#/mapa/${m.id}`,
+      icon: emo('🗺'),
+      kind: DUNGEONS.some((d) => d.map === m.id) ? 'Masmorra' : 'Mapa',
+      keys: 'mapa',
+    })),
     // chefes ficam fora da busca (spoiler)
     ...Object.values(MONSTERS)
       .filter((m) => maps && !isSpoiler(m, maps))
@@ -322,6 +330,7 @@ async function route() {
   else if (parts[0] === 'mecanicas') html = mechanicsPage(parts[1]);
   else if (parts[0] === 'missoes') html = questIndexPage();
   else if (parts[0] === 'mapas') html = mapIndexPage();
+  else if (parts[0] === 'masmorras') html = dungeonIndexPage();
   else if (parts[0] === 'mapa') {
     html = mapPage(parts[1] ?? '');
     active = 'mapas';
