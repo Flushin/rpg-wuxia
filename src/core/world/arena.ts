@@ -49,13 +49,19 @@ export interface ArenaFight {
   dmg: number;
 }
 
+/** Seita do último adversário (só na sessão), para o sorteio não repetir. */
+let lastFoeClass: string | null = null;
+
 /** Entra na luta (falando com o Mestre da Arena). */
 /** `test`: força a seita e o poder do bot (checagens e simulação). */
 export function enterArena(w: World, test?: { classId?: string; power?: number }): ActionError | null {
   if (w.npcRole() !== 'arena') return { code: 'talkToArena' };
   if (w.player.dead || w.arenaFight || !w.maps[TRIAL_MAP]) return null;
   const p = w.player;
-  const cls = test?.classId ?? pickBotClasses(w.classId, 1, w.rng)[0];
+  // não repete a seita da luta anterior (com 3 seitas possíveis, saía a mesma várias vezes seguidas)
+  const pool = pickBotClasses(w.classId, 3, w.rng),
+    cls = test?.classId ?? pool.find((c) => c !== lastFoeClass) ?? pool[0];
+  lastFoeClass = cls;
   const bot = makeBot(cls, p.level, 'enemy', w.rng);
   const rating = Math.max(0, w.arena.points + Math.round((w.rng.next() * 2 - 1) * ARENA_SPREAD));
   const power = test?.power ?? arenaPower(rating);
@@ -128,6 +134,11 @@ export function tickArena(w: World, dt: number) {
       e.path = findPath(w.map, e, a);
     }
     w.followPath(e, dt, 1);
+    // anda e bate ao mesmo tempo (kite): golpe pronto e jogador no alcance, ataca sem parar de andar
+    if (e.attackCd <= 0 && dist(e, p) <= e.attackRange) {
+      e.attackCd = e.attackInterval;
+      w.attack(e, p);
+    }
   } else if (a.kind === 'attack') {
     if (e.attackCd <= 0 && dist(e, p) <= e.attackRange) {
       e.path = [];
