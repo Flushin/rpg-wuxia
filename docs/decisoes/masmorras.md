@@ -25,6 +25,21 @@ Decidido com o Lucas em 19/11/2026.
 - **Sem portal na arena:** a saída fica só na entrada; um portal atrás da arena fazia quem desviava dos golpes sair sem querer.
 - Balanceamento do chefe: `docs/balanceamento.md` (seção "Masmorra").
 
+- **Masmorras difíceis (26/11/2026, pedido do Lucas):** sem nível mínimo (`minLevel: 1`; o menu mostra "qualquer nível"),
+  mesmo traçado (`deepDungeon` em `tools/gen-maps.mjs`): entrada, dois braços de duas câmaras, antecâmara e pátio do chefe;
+  cada câmara é um grupo que entra em combate junto. Monstros novos com sprites reaproveitados (+30% de vida em média).
+  - Santuário de Jade (`santuario`), 3000 de ouro, 21 monstros nv 30–32 (Serpente/Grou do Santuário, Sentinela de Jade);
+    Ancião da Névoa nv 32 (sprite Senhor da Névoa): círculo, 2 Sentinelas a 50%, fúria a 30%. Raro nv 25 + item nv 25 + 50% item nv 35.
+  - Templo das Cinzas (`templo`), 6000, 25 monstros nv 40–42 (Andarilho do Templo, Monge Incandescente, Assassino Rubro,
+    Colosso de Cinzas); Marechal das Cinzas nv 42 (sprite General): círculo, linha (leque a 60%), 2 Colossos a 50%, fúria a 30%.
+    Raro nv 35 + item nv 35.
+  - Corte da Lua Fria (`corte_lua`), 10000, 26 monstros nv 50–52 (Lobo da Lua Fria, Feiticeira da Corte, Guarda da Lua);
+    Imperador Espectral nv 52 (sprite Imperador Carmesim, dano espiritual): círculo, linha (leque de 5 a 50%), 2 Guardas,
+    fúria a 25%. Raro nv 35 + 2 itens nv 35.
+  - Simulação (`npm run sim:balance -- --masmorra=<mapa> [--equipe] [--comuns]`): chefes com vitória parecida ou menor que a
+    do Senhor da Névoa/Imperador no nível da faixa; Corte da Lua em equipe ~4–5 min de luta e ~50–80% de vitória;
+    os comuns do Templo levam 4–8 min solo (Covil: ~45 s).
+
 ## Masmorra em equipe (bots) — decidido 25/11/2026, a implementar
 
 - Na porta da masmorra, menu: **Sozinho** (como hoje) ou **Equipe (bots)**.

@@ -32,6 +32,9 @@ for (const id of [
   'cidadela',
   'vale',
   'palacio',
+  'santuario',
+  'templo',
+  'corte_lua',
 ])
   maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const arg = (k: string, d: number) => {
@@ -563,6 +566,7 @@ function abbotFight(classId: string, seed: number, rarity: Rarity): BossRun {
 // --masmorra (Desfiladeiro, Yeti Ancestral): níveis 11/13/15 com equipamento nv 10.
 // --masmorra=mosteiro (Patriarca Profanado): níveis 16/18/20 com equipamento nv 15.
 // --masmorra=covil (Rei dos Bandidos): nível 20 com equipamento nv 15.
+// --masmorra=santuario: 30/32 com equipamento nv 25; templo: 40/42 com nv 35; corte_lua: 50 com nv 35.
 // Os monstros comuns da masmorra já foram derrotados.
 // --equipe: entra com os 3 bots aliados (masmorra em equipe, vida extra de balance.json "equipe.*").
 // --comuns: em vez do chefe, limpa os monstros comuns da masmorra (tempo para matar todos).
@@ -624,7 +628,17 @@ const masmorraArg = process.argv.find((a) => a.startsWith('--masmorra'));
 if (masmorraArg) {
   const dungeonMap = masmorraArg.split('=')[1] || 'gruta';
   const [levels, gearLevel] =
-    dungeonMap === 'covil' ? [[20], 15] : dungeonMap === 'mosteiro' ? [[16, 18, 20], 15] : [[11, 13, 15], 10];
+    dungeonMap === 'corte_lua'
+      ? [[50], 35]
+      : dungeonMap === 'templo'
+        ? [[40, 42], 35]
+        : dungeonMap === 'santuario'
+          ? [[30, 32], 25]
+          : dungeonMap === 'covil'
+            ? [[20], 15]
+            : dungeonMap === 'mosteiro'
+              ? [[16, 18, 20], 15]
+              : [[11, 13, 15], 10];
   console.log(
     `masmorra ${dungeonMap}: equipamento nv ${gearLevel}; ${EQUIPE ? `EQUIPE (vida comuns ×${bal('equipe.vida_comuns')}, chefe ×${bal('equipe.vida_chefe')})` : 'solo'}; ${COMUNS ? 'monstros comuns (masmorra inteira menos o chefe)' : 'chefe'}`,
   );

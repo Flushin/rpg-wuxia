@@ -140,6 +140,31 @@ export const MAPS_CONFIG: Record<string, MapConfig> = {
     dungeon: true,
     world: { col: 0, row: 3 },
   },
+  // masmorras difíceis (26/11/2026), sem nível mínimo: Santuário de Jade (nv 30–32), Templo das Cinzas (nv 40–42) e
+  // Corte da Lua Fria (nv 50–52); pátio do chefe no norte (tools/gen-maps.mjs deepDungeon)
+  santuario: {
+    music: 'music_pico',
+    trees: 'bamboo',
+    grassDecor: 0.06,
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 0, row: 4 },
+  },
+  templo: {
+    music: 'music_mosteiro',
+    trees: 'ash',
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 1, row: 4 },
+  },
+  corte_lua: {
+    music: 'music_gruta',
+    trees: 'snow',
+    pillarGround: 'marble',
+    arena: { x: 16, y: 6, r: 5.5 },
+    dungeon: true,
+    world: { col: 0, row: 0 },
+  },
   // Trial: arena única; o chefe escolhido no menu nasce no centro da arena (World.enterTrial)
   trial: {
     music: 'music_trial',

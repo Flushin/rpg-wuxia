@@ -51,6 +51,41 @@ export const DUNGEONS: DungeonDef[] = [
       en: 'The hideout of the most dangerous bandits in the region: raiders, crossbowmen and brutes that attack in packs. In the yard, the Bandit King slashes in straight lines and, when wounded, in a fan.',
     },
   },
+  // Masmorras difíceis (26/11/2026): sem nível mínimo (entra quem quiser), mais câmaras e monstros, chefes com várias
+  // mecânicas juntas. Pensadas para personagens fortes; a corrida demora mais que as três primeiras.
+  {
+    id: 'santuario',
+    map: 'santuario',
+    minLevel: 1,
+    cost: 3000,
+    levels: [30, 32],
+    desc: {
+      pt: 'Um santuário de jade escondido no bambuzal, guardado por serpentes, grous e sentinelas de jade. No pátio, o Ancião da Névoa chama duas sentinelas à metade da vida e entra em fúria quando quase vencido.',
+      en: 'A jade sanctuary hidden in the bamboo grove, guarded by serpents, cranes and jade sentinels. In the courtyard, the Mist Elder calls two sentinels at half health and becomes enraged when nearly beaten.',
+    },
+  },
+  {
+    id: 'templo',
+    map: 'templo',
+    minLevel: 1,
+    cost: 6000,
+    levels: [40, 42],
+    desc: {
+      pt: 'Um templo soterrado nas cinzas rubras: andarilhos, monges incandescentes, assassinos e colossos. O Marechal das Cinzas golpeia em círculo e em linha, abre o leque cedo, chama dois colossos e entra em fúria.',
+      en: 'A temple buried in crimson ash: wanderers, incandescent monks, assassins and colossi. The Ash Marshal strikes in circles and lines, opens the fan early, calls two colossi and becomes enraged.',
+    },
+  },
+  {
+    id: 'corte_lua',
+    map: 'corte_lua',
+    minLevel: 1,
+    cost: 10000,
+    levels: [50, 52],
+    desc: {
+      pt: 'A corte gelada de um imperador que não morreu: lobos da lua, feiticeiras e guardas. O Imperador Espectral ataca com o espírito, golpeia em círculo e em linha, abre um leque de 5, chama três guardas e entra em fúria.',
+      en: 'The frozen court of an emperor who never died: moon wolves, sorceresses and guards. The Spectral Emperor strikes with spirit, in circles and lines, opens a fan of 5, calls three guards and becomes enraged.',
+    },
+  },
 ];
 
 /** Chance de equipamento dos monstros dentro de uma masmorra: +25% sobre a dos mapas abertos. */

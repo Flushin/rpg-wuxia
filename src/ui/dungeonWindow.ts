@@ -56,7 +56,7 @@ export class DungeonWindow {
       return `<div class="dg-row${lowLevel ? ' locked' : ''}">
         <div class="dg-name"><b>${escapeHtml(name)}</b> <small class="tag">${L(`Nv ${d.levels[0]}–${d.levels[1]}`, `Lv ${d.levels[0]}–${d.levels[1]}`)}</small></div>
         <p class="lore">${escapeHtml(L(d.desc.pt, d.desc.en))}</p>
-        <div class="dg-info">${L(`Entrada: nível ${d.minLevel}+ · ${d.cost} ouro`, `Entry: level ${d.minLevel}+ · ${d.cost} gold`)}</div>
+        <div class="dg-info">${d.minLevel > 1 ? L(`Entrada: nível ${d.minLevel}+ · ${d.cost} ouro`, `Entry: level ${d.minLevel}+ · ${d.cost} gold`) : L(`Entrada: qualquer nível · ${d.cost} ouro`, `Entry: any level · ${d.cost} gold`)}</div>
         <div class="dg-modes">
           <button class="primary" data-a="enter" data-v="${d.id}" ${why ? 'disabled' : ''}>${L(`Sozinho (${d.cost} ouro)`, `Solo (${d.cost} gold)`)}</button>
           <button class="primary" data-a="enter" data-team="1" data-v="${d.id}" ${why ? 'disabled' : ''}>${L(`Equipe (bots) (${d.cost} ouro)`, `Team (bots) (${d.cost} gold)`)}</button>
