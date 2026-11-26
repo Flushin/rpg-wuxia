@@ -92,18 +92,25 @@ export const basicDps = (a: Entity, t: Entity) => (expectedDamage(a, t) * critMu
 
 /** Ajusta o bot ao poder do jogador: defesas iguais às do jogador; vida e dano do golpe = raiz de `power` vezes os
  *  do jogador (poder = vida × dano, então o bot fica com `power` vezes o poder dele). O jogador não muda. */
+/** Poder do bot a partir do qual o ataque para de crescer (acima, só a vida). */
+export const ARENA_ATK_CAP = 1;
+
 export function scaleArenaBot(b: Bot, player: Entity, power: number, playerClass: string) {
   const e = b.e,
     d = e.derived,
     pd = player.derived,
     // calibragem por seita (balance.json arena.poder_bot.<seita>): "100%" = luta equilibrada para aquela seita
-    k = Math.sqrt(power * bal('arena.poder_bot', playerClass));
+    cal = bal('arena.poder_bot', playerClass),
+    // até 100%: vida e ataque crescem juntos (raiz). Acima: tudo fica no 100% e só a vida cresce, em linha
+    // (bot de 120% = vida 120% da do bot de 100%)
+    k = Math.sqrt(Math.min(power, ARENA_ATK_CAP) * cal),
+    kHp = power > ARENA_ATK_CAP ? k * (power / ARENA_ATK_CAP) : k;
   d.physDef = pd.physDef;
   d.spiritDef = pd.spiritDef;
   d.evasion = pd.evasion;
   d.hit = pd.hit;
   e.elemRes = { ...player.elemRes };
-  d.maxHp = Math.round(pd.maxHp * k);
+  d.maxHp = Math.round(pd.maxHp * kHp);
   e.hp = d.maxHp;
   // ataque: copia o perfil ofensivo do jogador (ataque, elemento, crítico) para o tipo de dano/elemento do bot,
   // vezes k. Antes o bot só igualava o DPS do golpe normal pelo ataque e, contra jogador de muito elemento e
