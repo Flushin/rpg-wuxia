@@ -691,3 +691,20 @@ ol.plain {
   border-radius: 5px;
   background: #0006;
 }
+
+/* Masmorras: lista em cartões (cabe no celular) */
+.dungeon-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dungeon-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.dungeon-list li:last-child {
+  border-bottom: 0;
+}
+.dungeon-list .lore {
+  margin: 4px 0 0;
+}

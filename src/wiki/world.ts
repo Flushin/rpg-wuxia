@@ -282,6 +282,29 @@ function trialPanel(): string {
     </ul></section>`;
 }
 
+/** Página das masmorras: lista (src/core/dungeons.ts) e regras gerais; detalhes de cada uma na página do mapa. */
+export async function dungeonIndexPage(): Promise<string> {
+  const maps = await loadMaps();
+  const bonus = Math.round((DUNGEON_EQUIP_DROP_MUL - 1) * 100);
+  const rows = DUNGEONS.map((d) => {
+    const name = maps.find((m) => m.id === d.map)?.name ?? d.map;
+    return `<li><a href="#/mapa/${d.map}"><b>${esc(name)}</b></a>
+      <div class="muted">${d.minLevel > 1 ? `Nível ${d.minLevel}+` : 'Qualquer nível'} · monstros nível ${d.levels[0]}–${d.levels[1]} · ${d.cost.toLocaleString('pt-BR')} ouro</div>
+      <p class="lore">${esc(d.desc.pt)}</p></li>`;
+  }).join('');
+  return `<h1>Masmorras</h1><p class="intro">Instâncias com monstros que não renascem e um chefe no fim. Entrada pelo <b>Portal das Masmorras</b>, na saída oeste da <a href="#/mapa/cidade">vila</a>: pisar nele abre o menu com todas.</p>
+    <section class="panel"><h2>Lista</h2><ul class="dungeon-list">${rows}</ul>
+      <p class="muted">As três últimas são difíceis: entra quem quiser, mas são pensadas para personagens fortes, com mais câmaras e chefes com várias mecânicas.</p></section>
+    <section class="panel"><h2>Regras</h2><ul>
+      <li>Cada entrada é uma corrida nova e se paga de novo; não há limite de entradas.</li>
+      <li>Os monstros <b>não renascem</b>. O chefe fica no fim e dá item garantido.</li>
+      <li>Os monstros daqui têm <b>+${bonus}%</b> de chance de deixar equipamento.</li>
+      <li>O <a href="#/mecanicas/auto">Auto</a> não funciona, e a masmorra não rende ganho offline.</li>
+      <li>Morrer, sair por um portal ou fechar o jogo encerra a corrida (você volta para a vila).</li>
+    </ul></section>
+    <section class="panel"><h2>Sozinho ou em equipe</h2><p>Cada masmorra tem os botões <b>Sozinho</b> e <b>Equipe (bots)</b>, com o mesmo custo. Em equipe você leva 3 bots aliados e os monstros têm mais vida; a recompensa é a mesma. Regras: <a href="#/mecanicas/equipe">Mecânicas › Equipe (bots)</a>.</p></section>`;
+}
+
 /** Regras da masmorra (src/core/dungeons.ts, World.enterDungeon/killMonster, AutoCombat). */
 function dungeonPanel(d: (typeof DUNGEONS)[number]): string {
   const bonus = Math.round((DUNGEON_EQUIP_DROP_MUL - 1) * 100);
