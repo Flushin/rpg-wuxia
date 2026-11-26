@@ -25,6 +25,9 @@ Preparação para o PvP online: por enquanto o jogador luta contra um bot.
   Calibragem por seita do jogador em `balance.json` (`arena.poder_bot.<seita>`: Tormenta 0,9, Geada 1,15, Titã 1,5,
   Víbora 1,35), medida na simulação para que 100% seja luta equilibrada. Resultado: ~83% de vitórias com o bot a 80%,
   ~50% a 100% e ~25% a 120% (teto baixado de 130% em 2026-11-26; Tormenta ~33% a 120%).
+  Curva (2026-11-26, pedido do Lucas): de 80% a 100% vida e ataque sobem juntos (raiz); acima de 100% tudo fica no
+  nível de 100% (`ARENA_ATK_CAP`) e só a vida cresce, em linha (bot de 120% = 1,2× a vida do bot de 100%). Lucas
+  vencia até ~110% e nada acima. Simulação (6 lutas): 13% a 120%; validar no jogo.
   Luta média: ~30 s (Geada, Víbora), ~32 s (Tormenta), ~39 s (Titã).
 - **Kite do bot de longe:** só recua com o jogador a menos de 30% do alcance, por 1 s, e espera ~4–5,5 s entre
   manobras; bate enquanto anda. Assim quem luta de perto (Tormenta, sem slow) consegue colar e bater.
