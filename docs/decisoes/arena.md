@@ -4,7 +4,7 @@ Preparação para o PvP online: por enquanto o jogador luta contra um bot.
 
 - **Local:** Porto Noturno, espaço banco/arena no sul (onde fica o portal do Trial).
 - **Formato:** 1v1 contra um bot de outra classe, com a mesma IA dos bots da masmorra em equipe ([masmorras.md](masmorras.md)).
-- **Poder:** o do jogador **nunca** é alterado. O bot recebe de **80% a 130%** do "poder total" do jogador
+- **Poder:** o do jogador **nunca** é alterado. O bot recebe de **80% a 120%** do "poder total" do jogador
   (vida, dano, crítico, elemento, relíquia), conforme os pontos de arena.
 - **Ranking:** pontos estilo ELO; vitória sobe, derrota desce; meta de ~50% de vitórias em qualquer build.
 - **Prêmio:** pontos de arena + ranking; a moeda de arena compra só cosméticos/títulos (sem poder).
@@ -24,7 +24,10 @@ Preparação para o PvP online: por enquanto o jogador luta contra um bot.
   (teste do Lucas, nível 50 épico +10) o ataque dele ficava ~10× maior e as skills matavam no primeiro golpe.
   Calibragem por seita do jogador em `balance.json` (`arena.poder_bot.<seita>`: Tormenta 0,9, Geada 1,15, Titã 1,5,
   Víbora 1,35), medida na simulação para que 100% seja luta equilibrada. Resultado: ~83% de vitórias com o bot a 80%,
-  ~52% a 100% e ~7% a 130%. Luta média: ~30 s (Geada, Víbora), ~44 s (Tormenta), ~50 s (Titã).
+  ~50% a 100% e ~25% a 120% (teto baixado de 130% em 2026-11-26; Tormenta ~33% a 120%).
+  Luta média: ~30 s (Geada, Víbora), ~32 s (Tormenta), ~39 s (Titã).
+- **Kite do bot de longe:** só recua com o jogador a menos de 30% do alcance, por 1 s, e espera ~4–5,5 s entre
+  manobras; bate enquanto anda. Assim quem luta de perto (Tormenta, sem slow) consegue colar e bater.
 - Todo dano na arena, dos dois lados, é multiplicado por um fator calculado na entrada (`arenaDamageMul`): o golpe
   normal do jogador levaria `ARENA_TTK` (60) s para tirar a vida dele mesmo (máximo 1). Antes era 25% fixo, e com
   equipamento forte uma skill ainda matava em 1–2 golpes.

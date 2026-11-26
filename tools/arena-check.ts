@@ -1,4 +1,4 @@
-// Verificação headless da arena do Porto Noturno (docs/decisoes/arena.md): regras (poder 80–130%, ELO, moeda),
+// Verificação headless da arena do Porto Noturno (docs/decisoes/arena.md): regras (poder 80–120%, ELO, moeda),
 // entrada pelo Mestre da Arena, luta real no World contra o bot, derrota sem morte, volta ao Porto, títulos, save e
 // a simulação de vitórias (o ponto de 50% fica dentro da faixa de poder: o ELO leva cada jogador até ele).
 // Uso: npm run check:arena  (--sim mostra a tabela completa)
@@ -107,7 +107,7 @@ function fight(w: World): boolean | null {
 
 console.log('\n== regras ==');
 ok(arenaPower(ARENA_START) === 1, 'poder 100% com 1000 pontos');
-ok(arenaPower(0) === ARENA_POWER_MIN && arenaPower(5000) === ARENA_POWER_MAX, 'poder sempre entre 80% e 130%');
+ok(arenaPower(0) === ARENA_POWER_MIN && arenaPower(5000) === ARENA_POWER_MAX, 'poder sempre entre 80% e 120%');
 ok(arenaDelta(1000, 1000, true) === 20 && arenaDelta(1000, 1000, false) === -20, 'força igual: +20 / −20');
 ok(arenaDelta(1000, 1150, true) > arenaDelta(1000, 850, true), 'vencer bot mais forte vale mais');
 ok(
@@ -262,7 +262,7 @@ console.log('\n== simulação (vitórias por poder do bot) ==');
   );
   ok(
     rate(ARENA_POWER_MAX) < 0.5,
-    `bot com 130%: jogador vence menos da metade (${Math.round(rate(ARENA_POWER_MAX) * 100)}%)`,
+    `bot com 120%: jogador vence menos da metade (${Math.round(rate(ARENA_POWER_MAX) * 100)}%)`,
   );
 }
 
