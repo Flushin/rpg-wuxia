@@ -176,11 +176,11 @@ function maneuver(w: World, f: ArenaFight, a: BotAction, dt: number): BotAction 
     side = w.rng.next() < 0.5 ? 1 : -1;
   let goal: { x: number; y: number } | null = null,
     time = 0;
-  if (ranged && d < e.attackRange * 0.45) {
-    // jogador colado: recua para ~70% do alcance, um pouco de lado
-    const r = e.attackRange * 0.7;
+  if (ranged && d < e.attackRange * 0.3 && m.wait <= 0) {
+    // jogador colado: recua um pouco, de lado; com pausa entre recuos para quem bate de perto alcançar
+    const r = e.attackRange * 0.55;
     goal = { x: p.x + (ux - uy * side * 0.5) * r, y: p.y + (uy + ux * side * 0.5) * r };
-    time = 1.5;
+    time = 1;
   } else if (m.wait <= 0) {
     const allCd = botActives(b)
       .filter((s) => !s.shield && !s.heal)
@@ -209,7 +209,7 @@ function maneuver(w: World, f: ArenaFight, a: BotAction, dt: number): BotAction 
   m.x = goal.x;
   m.y = goal.y;
   m.left = time;
-  m.wait = time + (ranged ? 2.5 : 3) + w.rng.next() * 1.5;
+  m.wait = time + (ranged ? 4 : 3) + w.rng.next() * 1.5;
   e.path = [];
   return { kind: 'move', x: m.x, y: m.y };
 }

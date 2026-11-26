@@ -13,7 +13,7 @@ import type { Bot } from './bots';
 export const ARENA_START = 1000;
 /** Poder do bot em relação ao do jogador: de 80% a 130%. */
 export const ARENA_POWER_MIN = 0.8;
-export const ARENA_POWER_MAX = 1.3;
+export const ARENA_POWER_MAX = 1.2;
 /** Cada ARENA_POWER_STEP pontos acima/abaixo de ARENA_START = +/-5% de poder do bot. */
 export const ARENA_POWER_STEP = 100;
 /** Sorteio da força do bot em volta dos pontos do jogador (vencer um bot mais forte vale mais). */
