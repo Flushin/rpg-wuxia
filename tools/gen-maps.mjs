@@ -1913,6 +1913,299 @@ function porto() {
   return map;
 }
 
+// ---- masmorras difíceis (26/11/2026): Santuário de Jade (nv 30–32), Templo das Cinzas (nv 40–42) e Corte da Lua Fria
+// (nv 50–52). Mesmo traçado, temas diferentes: entrada no sul, câmara da entrada, dois braços (oeste e leste) de duas
+// câmaras cada que se juntam na antecâmara do centro e o pátio do chefe no norte. Mais câmaras e monstros que as
+// masmorras antigas (corrida mais longa); os monstros de cada câmara entram em combate juntos (group).
+// Sem portal perto da arena (como no covil).
+const DEEP_ARENA = { x: 16, y: 6, r: 5.5 };
+function deepDungeon(cfg) {
+  const { name, seed, wall, floor, road, arenaFloor, accent, mobs, boss, bossName } = cfg;
+  const rnd = rngFn(seed);
+  const gr = makeGrid(wall, wall);
+  // câmaras: [x, y, raio]
+  const ROOMS = {
+    entrada: [16, 22.5, 3.4],
+    so: [6, 23, 3.3],
+    no: [6, 14, 3.3],
+    se: [26, 23, 3.3],
+    ne: [26, 14, 3.3],
+    ante: [16, 14.5, 2.6],
+  };
+  gr.rect(15, 25, 2, 6, road); // trilha de entrada
+  for (const [x, y, r] of Object.values(ROOMS)) gr.disc(x, y, r, floor);
+  gr.rect(7, 22, 9, 2, road); // entrada → sudoeste
+  gr.rect(17, 22, 9, 2, road); // entrada → sudeste
+  gr.rect(5, 14, 2, 9, road); // sudoeste → noroeste
+  gr.rect(25, 14, 2, 9, road); // sudeste → nordeste
+  gr.rect(7, 14, 7, 2, road); // noroeste → antecâmara
+  gr.rect(18, 14, 8, 2, road); // nordeste → antecâmara
+  gr.rect(15, 10, 2, 4, road); // portão: único acesso ao pátio
+  // pátio do chefe: largo, para desviar dos golpes marcados
+  gr.rect(9, 1, 14, 10, arenaFloor);
+  gr.disc(DEEP_ARENA.x, DEEP_ARENA.y, 4.8, arenaFloor);
+  for (const [i, j] of [
+    [9, 1],
+    [22, 1],
+    [9, 9],
+    [22, 9],
+  ])
+    gr.set(i, j, cfg.pillar);
+  // enfeites (não andáveis) nas bordas das câmaras laterais
+  for (const [i, j] of [
+    [3, 21],
+    [9, 25],
+    [3, 12],
+    [29, 21],
+    [23, 25],
+    [29, 12],
+  ])
+    gr.set(i, j, accent);
+  const seen = sealUnreachable(gr, 16, 27, wall);
+  for (const [k, [x, y]] of Object.entries(ROOMS))
+    if (!seen.has(Math.floor(y) * W + Math.floor(x))) throw new Error(`${name}: ${k} inalcançável`);
+  if (!seen.has(6 * W + 16)) throw new Error(`${name}: arena inalcançável`);
+  const objs = [
+    point('player', 'spawn', 16, 27.5),
+    area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+  ];
+  const used = [];
+  const place = (monster, label, cx, cy, r, minLevel, maxLevel, group) => {
+    const c = [];
+    for (let j = 1; j < H - 1; j++)
+      for (let i = 1; i < W - 1; i++)
+        if (
+          Math.hypot(i + 0.5 - cx, j + 0.5 - cy) <= r &&
+          Math.hypot(i + 0.5 - 16, j + 0.5 - 27.5) >= 6.5 && // ninguém ataca quem acabou de chegar
+          seen.has(j * W + i) &&
+          walkable(gr.get(i, j))
+        )
+          c.push([i, j]);
+    for (let tries = 0; tries < 300 && c.length; tries++) {
+      const [i, j] = c.splice(Math.floor(rnd() * c.length), 1)[0];
+      if (used.some(([a, b]) => Math.hypot(a - i, b - j) < 1.6)) continue;
+      used.push([i, j]);
+      objs.push(point(label, 'monsterSpawn', i + 0.5, j + 0.5, { monster, minLevel, maxLevel, group }));
+      return;
+    }
+    throw new Error(`${name}: sem lugar para ${monster} em ${cx},${cy}`);
+  };
+  // mobs: [câmara, [[índice do monstro em cfg.kinds, quantidade, nívelMín, nívelMáx]...]]
+  let g = 1;
+  for (const [room, list] of mobs) {
+    const [x, y, r] = ROOMS[room];
+    for (const [k, n, a, b] of list)
+      for (let q = 0; q < n; q++) place(cfg.kinds[k][0], cfg.kinds[k][1], x, y, r - 0.4, a, b, g);
+    g++;
+  }
+  objs.push(point(bossName, 'monsterSpawn', DEEP_ARENA.x, DEEP_ARENA.y, { monster: boss }));
+  console.log(`${cfg.id}: ${seen.size} tiles andáveis, ${used.length} monstros + ${bossName}`);
+  return tiled(name, gr, objs);
+}
+
+const santuario = () =>
+  deepDungeon({
+    id: 'santuario',
+    name: 'Santuário de Jade',
+    seed: 3030,
+    wall: BB,
+    floor: G,
+    road: P,
+    arenaFloor: RU,
+    pillar: PI,
+    accent: WA,
+    kinds: [
+      ['serpente_santuario', 'Serpente do Santuário'],
+      ['grou_santuario', 'Grou do Santuário'],
+      ['sentinela_jade', 'Sentinela de Jade'],
+    ],
+    mobs: [
+      [
+        'entrada',
+        [
+          [0, 2, 30, 30],
+          [1, 1, 30, 30],
+        ],
+      ],
+      [
+        'so',
+        [
+          [0, 2, 30, 31],
+          [1, 1, 30, 31],
+          [2, 1, 31, 31],
+        ],
+      ],
+      [
+        'se',
+        [
+          [1, 2, 30, 31],
+          [0, 1, 30, 31],
+          [2, 1, 31, 31],
+        ],
+      ],
+      [
+        'no',
+        [
+          [0, 2, 31, 31],
+          [1, 1, 31, 31],
+          [2, 1, 31, 32],
+        ],
+      ],
+      [
+        'ne',
+        [
+          [1, 2, 31, 31],
+          [0, 1, 31, 31],
+          [2, 1, 31, 32],
+        ],
+      ],
+      ['ante', [[2, 2, 32, 32]]],
+    ],
+    boss: 'anciao_nevoa',
+    bossName: 'Ancião da Névoa',
+  });
+
+const templo = () =>
+  deepDungeon({
+    id: 'templo',
+    name: 'Templo das Cinzas',
+    seed: 4040,
+    wall: BS,
+    floor: AS,
+    road: RU,
+    arenaFloor: RU,
+    pillar: PI,
+    accent: LV,
+    kinds: [
+      ['andarilho_templo', 'Andarilho do Templo'],
+      ['monge_templo', 'Monge Incandescente'],
+      ['assassino_templo', 'Assassino Rubro'],
+      ['colosso_cinzas', 'Colosso de Cinzas'],
+    ],
+    mobs: [
+      [
+        'entrada',
+        [
+          [0, 2, 40, 40],
+          [1, 1, 40, 40],
+        ],
+      ],
+      [
+        'so',
+        [
+          [0, 1, 40, 41],
+          [1, 1, 40, 41],
+          [2, 2, 40, 41],
+          [3, 1, 41, 41],
+        ],
+      ],
+      [
+        'se',
+        [
+          [1, 2, 40, 41],
+          [2, 1, 40, 41],
+          [0, 1, 40, 41],
+          [3, 1, 41, 41],
+        ],
+      ],
+      [
+        'no',
+        [
+          [0, 2, 41, 41],
+          [1, 1, 41, 41],
+          [2, 1, 41, 42],
+          [3, 1, 41, 42],
+        ],
+      ],
+      [
+        'ne',
+        [
+          [2, 2, 41, 41],
+          [1, 1, 41, 41],
+          [0, 1, 41, 42],
+          [3, 1, 41, 42],
+        ],
+      ],
+      [
+        'ante',
+        [
+          [3, 1, 42, 42],
+          [2, 1, 42, 42],
+        ],
+      ],
+    ],
+    boss: 'marechal_cinzas',
+    bossName: 'Marechal das Cinzas',
+  });
+
+const corteLua = () =>
+  deepDungeon({
+    id: 'corte_lua',
+    name: 'Corte da Lua Fria',
+    seed: 5050,
+    wall: PN,
+    floor: SN,
+    road: MB,
+    arenaFloor: MB,
+    pillar: PI,
+    accent: CL,
+    kinds: [
+      ['lobo_lua', 'Lobo da Lua Fria'],
+      ['feiticeira_corte', 'Feiticeira da Corte'],
+      ['guarda_lua', 'Guarda da Lua'],
+    ],
+    mobs: [
+      [
+        'entrada',
+        [
+          [0, 2, 50, 50],
+          [1, 1, 50, 50],
+        ],
+      ],
+      [
+        'so',
+        [
+          [0, 2, 50, 51],
+          [1, 2, 50, 51],
+          [2, 1, 51, 51],
+        ],
+      ],
+      [
+        'se',
+        [
+          [0, 2, 50, 51],
+          [1, 2, 50, 51],
+          [2, 1, 51, 51],
+        ],
+      ],
+      [
+        'no',
+        [
+          [0, 2, 51, 51],
+          [1, 2, 51, 51],
+          [2, 1, 51, 52],
+        ],
+      ],
+      [
+        'ne',
+        [
+          [0, 2, 51, 51],
+          [1, 2, 51, 51],
+          [2, 1, 51, 52],
+        ],
+      ],
+      [
+        'ante',
+        [
+          [2, 2, 52, 52],
+          [1, 1, 52, 52],
+        ],
+      ],
+    ],
+    boss: 'imperador_espectral',
+    bossName: 'Imperador Espectral',
+  });
+
 mkdirSync('public/maps', { recursive: true });
 writeFileSync('public/maps/cidade.json', JSON.stringify(cidade()));
 writeFileSync('public/maps/floresta.json', JSON.stringify(floresta()));
@@ -1928,5 +2221,8 @@ writeFileSync('public/maps/cidadela.json', JSON.stringify(cidadela()));
 writeFileSync('public/maps/vale.json', JSON.stringify(vale()));
 writeFileSync('public/maps/palacio.json', JSON.stringify(palacio()));
 writeFileSync('public/maps/porto.json', JSON.stringify(porto()));
+writeFileSync('public/maps/santuario.json', JSON.stringify(santuario()));
+writeFileSync('public/maps/templo.json', JSON.stringify(templo()));
+writeFileSync('public/maps/corte_lua.json', JSON.stringify(corteLua()));
 writeFileSync('public/maps/tiles.png', tilesetPng());
 console.log('Mapas gerados em public/maps/');

@@ -216,7 +216,20 @@ console.log('\n== Covil dos Bandidos ==');
 {
   const C = dungeonById('covil')!;
   ok(!!C && C.minLevel === 20 && C.cost === 1000, 'terceira masmorra: nível 20, 1000 de ouro');
-  ok(DUNGEONS.map((d) => d.id).join() === 'gruta,mosteiro,covil', 'menu em ordem de nível');
+  ok(DUNGEONS.map((d) => d.id).join() === 'gruta,mosteiro,covil,santuario,templo,corte_lua', 'menu em ordem de nível');
+  for (const id of ['santuario', 'templo', 'corte_lua']) {
+    const d = dungeonById(id)!;
+    const w2 = fresh(12, d.cost + 1);
+    ok(
+      w2.enterDungeon(id) === null && w2.mapId === id && w2.gold === 1,
+      `${id}: entra sem nível mínimo e paga ${d.cost}`,
+    );
+    ok(
+      w2.monsters.filter((m) => !MONSTERS[m.monsterId].boss).length >= 20 &&
+        w2.monsters.some((m) => MONSTERS[m.monsterId].boss),
+      `${id}: 20+ monstros e chefe`,
+    );
+  }
   ok(fresh(19, 5000).enterDungeon('covil')?.code === 'needLevel', 'nível 19: recusado');
   const w = fresh(20, 1500);
   ok(w.enterDungeon('covil') === null && w.mapId === 'covil' && w.gold === 500, 'nível 20: entra e paga 1000');

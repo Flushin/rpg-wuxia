@@ -246,7 +246,7 @@ console.log('\n== Imperador Carmesim ==');
     def.boss?.summon?.monsterId === 'guarda_celeste' && !!def.boss?.enrage && !!def.boss?.line?.fanCount,
     'golpe em linha que vira leque, chama guardas e fica furioso',
   );
-  ok(TRIAL_BOSSES.at(-1) === 'imperador_carmesim', 'entra no Trial (o mais forte)');
+  ok(TRIAL_BOSSES.includes('imperador_carmesim'), 'entra no Trial');
   const w = mk(40, 'palacio');
   const b = w.monsters.find((m) => m.monsterId === 'imperador_carmesim');
   ok(!!b && b.level === 40, 'nasce no Salão do Trono, nível 40');

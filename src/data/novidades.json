@@ -1,5 +1,6 @@
 {
   "proxima": [
+    { "texto": "Três masmorras difíceis no Portal das Masmorras, sem nível mínimo: Santuário de Jade (nv 30–32), Templo das Cinzas (nv 40–42) e Corte da Lua Fria (nv 50–52). Mais salas e monstros, chefes que juntam golpes em círculo e em linha, invocações e fúria. Dá para ir sozinho ou em equipe com os bots." },
     { "texto": "Arena no Porto Noturno: fale com o Mestre da Arena Tie, ao lado do portal do Trial, para lutar 1 contra 1 com um lutador de outra seita. Seu poder não muda; o adversário fica mais forte conforme os seus pontos de ranking (Bronze a Lenda). Perder não tem penalidade. Cada luta dá moedas da arena, que compram títulos mostrados acima do seu nome." },
     { "texto": "Masmorra em equipe: no Portal das Masmorras escolha \"Equipe (bots)\" para entrar com 3 aliados de outras seitas, que lutam ao seu lado com as skills e poções pequenas. Os monstros têm mais vida e a recompensa é a mesma. Aliado caído? Segure o botão ✚ (tecla F) perto dele por 3 s para revivê-lo uma vez por luta." },
     { "texto": "Ícones de buffs e debuffs: o quadro do alvo e a barra do chefe mostram lentidão, veneno, atordoamento, congelamento e defesa quebrada, com o tempo restante; sob a sua vida aparecem escudo, regeneração e os efeitos que você recebe. Nova página na wiki explica cada ícone." },

@@ -520,6 +520,45 @@
     "brutamontes": {
       "name": "Brute"
     },
+    "serpente_santuario": {
+      "name": "Sanctuary Serpent"
+    },
+    "grou_santuario": {
+      "name": "Sanctuary Crane"
+    },
+    "sentinela_jade": {
+      "name": "Jade Sentinel"
+    },
+    "andarilho_templo": {
+      "name": "Temple Wanderer"
+    },
+    "monge_templo": {
+      "name": "Incandescent Monk"
+    },
+    "assassino_templo": {
+      "name": "Crimson Assassin"
+    },
+    "colosso_cinzas": {
+      "name": "Ash Colossus"
+    },
+    "lobo_lua": {
+      "name": "Cold Moon Wolf"
+    },
+    "feiticeira_corte": {
+      "name": "Court Sorceress"
+    },
+    "guarda_lua": {
+      "name": "Moon Guard"
+    },
+    "anciao_nevoa": {
+      "name": "Mist Elder"
+    },
+    "marechal_cinzas": {
+      "name": "Ash Marshal"
+    },
+    "imperador_espectral": {
+      "name": "Spectral Emperor"
+    },
     "rei_bandidos": {
       "name": "Bandit King"
     },
@@ -925,6 +964,22 @@
     "Brutamontes": "Brute",
     "Rei dos Bandidos": "Bandit King",
     "Covil dos Bandidos": "Bandit Lair",
+    "Santuário de Jade": "Jade Sanctuary",
+    "Templo das Cinzas": "Temple of Ashes",
+    "Corte da Lua Fria": "Cold Moon Court",
+    "Serpente do Santuário": "Sanctuary Serpent",
+    "Grou do Santuário": "Sanctuary Crane",
+    "Sentinela de Jade": "Jade Sentinel",
+    "Ancião da Névoa": "Mist Elder",
+    "Andarilho do Templo": "Temple Wanderer",
+    "Monge Incandescente": "Incandescent Monk",
+    "Assassino Rubro": "Crimson Assassin",
+    "Colosso de Cinzas": "Ash Colossus",
+    "Marechal das Cinzas": "Ash Marshal",
+    "Lobo da Lua Fria": "Cold Moon Wolf",
+    "Feiticeira da Corte": "Court Sorceress",
+    "Guarda da Lua": "Moon Guard",
+    "Imperador Espectral": "Spectral Emperor",
     "Bosque de Bambu Sombrio": "Shadow Bamboo Grove",
     "Pico da Névoa": "Misty Peak",
     "Vale das Cinzas Rubras": "Crimson Ash Valley",
@@ -1127,6 +1182,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Three hard dungeons at the Dungeon Portal, with no minimum level: Jade Sanctuary (lv 30–32), Temple of Ashes (lv 40–42) and Cold Moon Court (lv 50–52). More rooms and monsters, bosses that combine circle and line strikes, summons and rage. Go solo or as a team with the bots." },
       { "texto": "Arena in the Night Port: talk to Arena Master Tie, next to the Trial portal, to fight 1 on 1 against a fighter from another sect. Your power never changes; your opponent gets stronger with your ranking points (Bronze to Legend). Losing has no penalty. Every fight gives arena coins, which buy titles shown above your name." },
     { "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight." },
       { "texto": "Buff and debuff icons: the target frame and boss bar show slow, poison, stun, freeze and broken armor, with time left; under your HP you see shield, regeneration and effects on you. A new wiki page explains each icon." },
