@@ -1238,5 +1238,43 @@ console.log('\n== teleporte do Mestre dos Caminhos: só sem caminho a pé (20/11
   maps.cidade = saved;
 }
 
+console.log('Alvo na arena do chefe (botão Atacar e auto):');
+{
+  const w = mk('lamina', 30, 'floresta');
+  const [a, b, ...rest] = w.monsters;
+  rest.forEach((m) => {
+    m.dead = true;
+    m.respawnAt = 1e9;
+  });
+  const S = openSpot(w, 4)!;
+  const setAt = (m: typeof a, x: number, y: number) => {
+    m.x = x;
+    m.y = y;
+    m.home = { x, y };
+    m.path = [];
+  };
+  w.player.x = S.x;
+  w.player.y = S.y;
+  w.player.path = [];
+  a.monsterId = 'general_terracota'; // faz de conta que é o chefe
+  w.arenas = [{ x: S.x + 3, y: S.y, r: 3 }];
+  setAt(a, S.x + 5.5, S.y); // chefe no fundo da arena
+  setAt(b, S.x - 1.5, S.y); // bicho do lado de fora, mais perto
+  ok(!!w.arenaBoss() && !w.targetable(b), 'na arena, bicho de fora não pode ser alvo');
+  w.attackNearest();
+  ok(w.targetId === a.id, 'Atacar sem alvo pega o chefe, não o bicho de fora mais perto');
+  w.targetId = b.id;
+  w.attackNearest();
+  ok(w.targetId === a.id, 'Atacar com bicho de fora marcado volta para o chefe');
+  w.cycleTarget();
+  ok(w.targetId === a.id, 'Tab na arena não troca para o lado de fora');
+  w.setTarget(null);
+  b.ai = 'chase';
+  w.auto.toggle();
+  run(w, 0.1);
+  ok(w.targetId === a.id, 'auto: bicho de fora atacando não rouba o alvo do chefe');
+  w.auto.toggle();
+}
+
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');
 process.exit(fails ? 1 : 0);

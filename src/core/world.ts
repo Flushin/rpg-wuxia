@@ -385,10 +385,40 @@ export class World {
     return t && !t.dead ? t : null;
   }
 
+  /** Chefe vivo da arena em que o jogador está (null fora da arena). */
+  arenaBoss(): Entity | null {
+    if (!this.arenas.length || !this.inArena(this.player)) return null;
+    return this.monsters.find((m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && this.inArena(m)) ?? null;
+  }
+
+  /** Com o chefe vivo e o jogador na arena, só vale mirar o que está dentro dela (nada de bicho do lado de fora). */
+  targetable(m: Entity): boolean {
+    return !this.arenaBoss() || this.inArena(m, 1);
+  }
+
+  /**
+   * Alvos ao alcance, do melhor para o pior: na arena o chefe vem primeiro e o lado de fora nem entra;
+   * depois quem já está brigando comigo, chefes, e por fim a distância pelo caminho (parede conta:
+   * monstro sem caminho vai para o fim da fila).
+   */
   private nearbyMonsters(): Entity[] {
+    const p = this.player,
+      boss = this.arenaBoss();
+    const score = (m: Entity): number => {
+      const d = dist(m, p);
+      let walk = d < 1 ? d : this.pathLength(m);
+      if (!Number.isFinite(walk)) walk = d + 100; // atrás de parede / sem acesso
+      let s = walk;
+      if (m === boss) s -= 1000;
+      else if (MONSTERS[m.monsterId]?.boss) s -= 200;
+      if (m.ai === 'chase') s -= 50;
+      return s;
+    };
     return this.monsters
-      .filter((m) => !m.dead && dist(m, this.player) <= TARGET_RANGE)
-      .sort((a, b) => dist(a, this.player) - dist(b, this.player));
+      .filter((m) => !m.dead && dist(m, p) <= TARGET_RANGE && (!boss || this.inArena(m, 1)))
+      .map((m) => ({ m, s: score(m) }))
+      .sort((a, b) => a.s - b.s)
+      .map((c) => c.m);
   }
 
   cycleTarget() {
@@ -399,7 +429,8 @@ export class World {
   }
 
   attackNearest() {
-    if (this.getTarget()) {
+    const t = this.getTarget();
+    if (t && this.targetable(t)) {
       this.autoAttack = true;
       return;
     }
