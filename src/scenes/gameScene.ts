@@ -398,8 +398,10 @@ export class GameScene extends Phaser.Scene {
   private pickAt(wx: number, wy: number, touch: boolean): boolean {
     const hit = this.entityAt(wx, wy, touch);
     if (!hit) return false;
-    if (hit.kind === 'mob') this.world.setTarget(hit.e.id);
-    else this.world.interactNpc(hit.e.id);
+    if (hit.kind === 'mob') {
+      if (!this.world.targetable(hit.e)) return false; // na arena do chefe, bicho de fora não rouba o alvo
+      this.world.setTarget(hit.e.id);
+    } else this.world.interactNpc(hit.e.id);
     return true;
   }
 

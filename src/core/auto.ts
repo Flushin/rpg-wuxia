@@ -630,7 +630,7 @@ export class AutoCombat {
     let best: Entity | null = null,
       bd = Infinity;
     for (const m of w.monsters) {
-      if (m.ai !== 'chase' || m.dead || this.forbidden(m)) continue;
+      if (m.ai !== 'chase' || m.dead || this.forbidden(m) || !w.targetable(m)) continue;
       if (r === 'inRange' && m.level > this.maxLevel) continue;
       const d = dist(m, p);
       if (d < bd) {
@@ -765,7 +765,13 @@ export class AutoCombat {
       t = null;
     }
     // revidar primeiro: se alguém está atacando e o alvo atual ainda não entrou na briga, troca
-    const aggressor = this.nearestAggressor();
+    // na arena, o chefe vivo é sempre o alvo: não larga ele por um bicho que vem de fora (nem enquanto ele recua)
+    const boss = w.arenaBoss();
+    if (boss && (!t || !w.targetable(t) || (t !== boss && t.ai !== 'chase'))) {
+      t = boss;
+      w.setTarget(t.id);
+    }
+    const aggressor = boss ? null : this.nearestAggressor();
     if (aggressor && (!t || t.ai !== 'chase')) {
       t = aggressor;
       w.setTarget(t.id);
