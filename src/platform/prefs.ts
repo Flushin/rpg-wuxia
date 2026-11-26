@@ -18,8 +18,6 @@ export const PREF = {
   BUG_LAST: 'rpg-bug-last',
   /** volumes e mudo, em JSON (antes ficavam no save de cada personagem) */
   AUDIO: 'rpg-audio',
-  /** layout do HUD no toque: 'novo' (padrão) | 'classico' (o de antes de 18/11/2026) */
-  HUD_LAYOUT: 'rpg-hud-layout',
   /** última versão do jogo cujas novidades o jogador abriu (ex.: '0.1.0') */
   NEWS_SEEN: 'rpg-news-seen',
   /** modo descanso (economia de bateria no Auto): segundos sem tocar até entrar; '0' desligado */

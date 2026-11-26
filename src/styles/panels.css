@@ -58,12 +58,173 @@ button[disabled] {
   padding: max(12px, var(--sa-top)) max(12px, var(--sa-right)) max(12px, var(--sa-bottom)) max(12px, var(--sa-left));
   overflow: auto;
 }
+/* ⚙ Configurações: seções com título e um bloco de linhas do mesmo tamanho (st-row, 44px de alvo de toque),
+   chaves (st-sw), botões segmentados (st-seg, --n colunas) e uma grade de atalhos (st-grid). */
 #settings-panel .card {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  width: min(400px, 100%);
+  font-size: 14px;
+}
+#settings-panel h2 {
+  margin: 0 32px 0 0;
+}
+.st-sec h3 {
+  margin: 0 0 6px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a99878;
+}
+.st-group {
+  display: flex;
+  flex-direction: column;
+  background: #12161f;
+  border: 1px solid #333a4c;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.st-row {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  /* 340px: os 4 botões de "Tamanho da interface" ("Automático"…) cabem numa linha sem quebrar a palavra */
-  width: min(340px, 100%);
+  min-height: 44px;
+  padding: 6px 12px;
+  box-sizing: border-box;
+  margin: 0;
+}
+.st-row + .st-row {
+  border-top: 1px solid #262c3a;
+}
+.st-row.st-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.st-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.25;
+}
+.st-txt small {
+  font-size: 12px;
+  color: #889;
+}
+.st-row .lang-sw {
+  margin-left: auto;
+}
+/* chave liga/desliga (checkbox estilizado) */
+#settings-panel input.st-sw {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  border-radius: 13px;
+  background: #343b4d;
+  border: 1px solid #4a5268;
+  cursor: var(--cur-hand, pointer);
+  transition: background 0.15s;
+}
+#settings-panel input.st-sw::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #cfd3dc;
+  transition: transform 0.15s;
+}
+#settings-panel input.st-sw:checked {
+  background: #b0803a;
+  border-color: #d4a05a;
+}
+#settings-panel input.st-sw:checked::after {
+  transform: translateX(18px);
+  background: #fff;
+}
+/* botões segmentados: todos do mesmo tamanho, o escolhido destacado */
+.st-seg {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px;
+  background: #0b0e15;
+  border-radius: 8px;
+}
+#settings-panel .st-seg button {
+  width: auto;
+  min-height: 34px;
+  margin: 0;
+  padding: 4px 2px;
+  font-size: 13px;
+  line-height: 1.15;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #aab;
+  overflow-wrap: anywhere;
+}
+#settings-panel .st-seg button.on {
+  background: #b0803a;
+  color: #fff;
+  font-weight: 700;
+}
+/* volume */
+.st-sld {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 30px;
+}
+.st-sld input {
+  accent-color: #c9954a;
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  touch-action: none;
+}
+.st-sld output {
+  text-align: right;
+  color: #aab;
+  font-size: 13px;
+}
+#settings-panel .st-small {
+  flex: none;
+  width: auto;
+  min-height: 32px;
+  margin: 0;
+  padding: 4px 14px;
+  font-size: 13px;
+}
+/* atalhos: grade de 2 colunas, botões iguais */
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+#settings-panel .st-grid button {
+  position: relative;
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 6px 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+#settings-panel .card > .primary {
+  margin-top: 0;
+  min-height: 44px;
 }
 #bug-panel {
   position: fixed;
@@ -189,11 +350,6 @@ button[disabled] {
 .card .primary {
   width: 100%;
   margin-top: 14px;
-}
-/* o botão escolhido em "Tamanho da interface" é .primary: sem isto ganhava a margem acima e descia ~14px */
-.card .ui-size button {
-  width: auto;
-  margin: 0;
 }
 
 /* "Sair do jogo?" do botão Voltar no app Android (ui/backAction.ts) */

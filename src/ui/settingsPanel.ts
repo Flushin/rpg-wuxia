@@ -18,8 +18,6 @@ import { openPrivacyPolicy, openWiki } from './privacy';
 import { setUiSize, uiSize, type UiSize } from './uiScale';
 import type { TipManager } from './tips';
 import { byId } from './dom';
-import { hudLayout, setHudLayout, type HudLayout } from './hudLayout';
-import { isTouch } from '../platform/input';
 
 export class SettingsPanel {
   private bug: BugReport;
@@ -41,17 +39,10 @@ export class SettingsPanel {
   private onClick(e: MouseEvent, panel: HTMLElement) {
     const t = (e.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
     const ui = (e.target as HTMLElement).closest('[data-ui]') as HTMLElement | null;
-    const hl = (e.target as HTMLElement).closest('[data-hud]') as HTMLElement | null;
     const rest = (e.target as HTMLElement).closest('[data-rest]') as HTMLElement | null;
     if (rest) {
       audio.ui('ui_click');
       restMode.setDelay(+rest.dataset.rest!);
-      this.render();
-      return;
-    }
-    if (hl) {
-      audio.ui('ui_click');
-      setHudLayout(hl.dataset.hud as HudLayout);
       this.render();
       return;
     }
@@ -154,53 +145,92 @@ export class SettingsPanel {
 
   private render() {
     const seen = this.world.seenTips.length;
+    const seg = (attr: string, cur: string, opts: [string | number, string][]) =>
+      `<div class="st-seg" style="--n:${opts.length}">${opts
+        .map(([k, t]) => `<button data-${attr}="${k}" class="${String(k) === cur ? 'on' : ''}">${t}</button>`)
+        .join('')}</div>`;
+    const sw = (id: string, on: boolean, txt: string, hint = '') =>
+      `<label class="st-row"><span class="st-txt">${txt}${hint ? `<small>${hint}</small>` : ''}</span><input type="checkbox" class="st-sw" id="${id}" ${on ? 'checked' : ''}/></label>`;
+    const sld = (id: string, txt: string, v: number) =>
+      `<label class="st-row st-sld"><span class="st-txt">${txt}</span><input type="range" id="${id}" min="0" max="100" step="1" value="${v}"/><output>${v}</output></label>`;
+    const sec = (title: string, body: string) =>
+      `<section class="st-sec"><h3>${title}</h3><div class="st-group">${body}</div></section>`;
+    const act = (k: string, txt: string) => `<button data-act="${k}">${txt}</button>`;
     byId('settings-panel').innerHTML =
-      `<div class="card">${closeX('data-act="close"')}<h2>${L('Configurações', 'Settings')}</h2>
-      <div class="opt"><span>${L('Idioma', 'Language')}</span>${langButtons()}</div>
-      <div class="opt ui-size-row"><span>${L('Tamanho da interface', 'Interface size')}</span><div class="ui-size">${(
-        [
-          ['auto', L('Automático', 'Auto')],
-          ['p', L('Pequena', 'Small')],
-          ['m', L('Normal', 'Normal')],
-          ['g', L('Grande', 'Large')],
-        ] as [UiSize, string][]
-      )
-        .map(([k, t]) => `<button data-ui="${k}" class="${uiSize() === k ? 'primary' : ''}">${t}</button>`)
-        .join('')}</div></div>${
-        isTouch
-          ? `<div class="opt ui-size-row"><span>${L('Layout do HUD no celular', 'Mobile HUD layout')}</span><div class="ui-size hud-layout">${(
-              [
-                ['novo', L('Novo', 'New')],
-                ['classico', L('Clássico', 'Classic')],
-              ] as [HudLayout, string][]
-            )
-              .map(([k, t]) => `<button data-hud="${k}" class="${hudLayout() === k ? 'primary' : ''}">${t}</button>`)
-              .join('')}</div></div>`
-          : ''
-      }
-      <div class="opt ui-size-row"><span>${L('Economia de bateria no Auto (tela de descanso após ficar sem tocar)', 'Battery saver while on Auto (rest screen after no touch)')}</span><div class="ui-size">${REST_DELAYS.map(
-        (s) =>
-          `<button data-rest="${s}" class="${restMode.delay === s ? 'primary' : ''}">${s === 0 ? L('Desligado', 'Off') : s < 60 ? `${s} s` : `${s / 60} min`}</button>`,
-      ).join('')}</div></div>
-      <label class="opt"><input type="checkbox" id="opt-tips" ${this.world.tipsEnabled ? 'checked' : ''}/> ${L('Mostrar dicas', 'Show tips')}</label>
-      <label class="opt"><input type="checkbox" id="opt-loot" ${this.rewards?.filter === 'all' ? 'checked' : ''}/> ${L('Avisar todos os itens coletados (padrão: só Incomum e Raro)', 'Show all picked-up items (default: Uncommon and Rare only)')}</label>
-      <label class="opt"><input type="checkbox" id="opt-dmg" ${fxPrefs.damageNumbers ? 'checked' : ''}/> ${L('Números de dano', 'Damage numbers')}</label>
-      <label class="opt"><input type="checkbox" id="opt-shake" ${fxPrefs.shake ? 'checked' : ''}/> ${L('Tremor de tela', 'Screen shake')}</label>
-      <label class="opt"><input type="checkbox" id="opt-aura" ${fxPrefs.aura ? 'checked' : ''}/> ${L('Aura elemental em volta do personagem', 'Elemental aura around your character')}</label>
-      ${isNative ? `<label class="opt"><input type="checkbox" id="opt-vibrate" ${fxPrefs.vibrate ? 'checked' : ''}/> ${L('Vibração (crítico, golpe do chefe, subir de nível)', 'Vibration (crit, boss strike, level up)')}</label>` : ''}
-      <label class="opt"><input type="checkbox" id="opt-fps" ${perf.enabled ? 'checked' : ''}/> ${L('Mostrar FPS (desempenho)', 'Show FPS (performance)')}</label>
-      <label class="opt"><input type="checkbox" id="opt-touchdbg" ${touchDebug.enabled ? 'checked' : ''}/> ${L('Diagnóstico de toque (mostra na tela cada toque e o que a skill fez)', 'Touch diagnostics (shows each touch and what the skill did)')}</label>
-      <label class="opt"><input type="checkbox" id="opt-mute" ${audio.settings.muted ? 'checked' : ''}/> ${L('Mudo', 'Mute')}</label>
-      <label class="sld">${L('Efeitos', 'Effects')}<input type="range" id="opt-sfx" min="0" max="100" step="1" value="${audio.settings.sfx}"/><output>${audio.settings.sfx}</output></label>
-      <label class="sld">${L('Música', 'Music')}<input type="range" id="opt-music" min="0" max="100" step="1" value="${audio.settings.music}"/><output>${audio.settings.music}</output></label>
-      <button data-act="reset">${L('Rever dicas', 'Review tips')}</button>
-      <small class="muted">${seen ? L(`${seen} dica(s) já vista(s)`, `${seen} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small>
-      <button data-act="news">📜 ${L('Novidades', "What's new")}${pontoNovidades()}</button>
-      <button data-act="wiki">📖 ${L('Wiki do jogo', 'Game wiki')} <small class="muted">(${L('em português', 'in Portuguese')})</small></button>
-      <button data-act="bug">🐞 ${L('Reportar bug', 'Report a bug')}</button>
-      <button data-act="credits">${L('Créditos e licenças', 'Credits and licenses')}</button>
-      <button data-act="privacy">${L('Política de privacidade', 'Privacy policy')}</button>
-      <button data-act="switch">${L('Trocar personagem', 'Switch character')}</button>
+      `<div class="card st-card">${closeX('data-act="close"')}<h2>⚙ ${L('Configurações', 'Settings')}</h2>
+      ${sec(
+        L('Geral', 'General'),
+        `<div class="st-row"><span class="st-txt">${L('Idioma', 'Language')}</span>${langButtons()}</div>
+        <div class="st-row st-col"><span class="st-txt">${L('Tamanho da interface', 'Interface size')}</span>${seg(
+          'ui',
+          uiSize(),
+          [
+            ['auto', L('Auto', 'Auto')],
+            ['p', L('Pequena', 'Small')],
+            ['m', L('Normal', 'Normal')],
+            ['g', L('Grande', 'Large')],
+          ],
+        )}</div>
+        <div class="st-row st-col"><span class="st-txt">${L('Economia de bateria no Auto', 'Battery saver on Auto')}<small>${L('Tela de descanso após ficar sem tocar', 'Rest screen after no touch')}</small></span>${seg(
+          'rest',
+          String(restMode.delay),
+          REST_DELAYS.map((s) => [s, s === 0 ? L('Desligado', 'Off') : s < 60 ? `${s} s` : `${s / 60} min`]),
+        )}</div>`,
+      )}
+      ${sec(
+        L('Som', 'Sound'),
+        sw('opt-mute', audio.settings.muted, L('Mudo', 'Mute')) +
+          sld('opt-sfx', L('Efeitos', 'Effects'), audio.settings.sfx) +
+          sld('opt-music', L('Música', 'Music'), audio.settings.music),
+      )}
+      ${sec(
+        L('Tela e efeitos', 'Display and effects'),
+        sw('opt-dmg', fxPrefs.damageNumbers, L('Números de dano', 'Damage numbers')) +
+          sw('opt-shake', fxPrefs.shake, L('Tremor de tela', 'Screen shake')) +
+          sw(
+            'opt-aura',
+            fxPrefs.aura,
+            L('Aura elemental', 'Elemental aura'),
+            L('Em volta do personagem', 'Around your character'),
+          ) +
+          (isNative
+            ? sw(
+                'opt-vibrate',
+                fxPrefs.vibrate,
+                L('Vibração', 'Vibration'),
+                L('Crítico, golpe do chefe, subir de nível', 'Crit, boss strike, level up'),
+              )
+            : '') +
+          sw(
+            'opt-loot',
+            this.rewards?.filter === 'all',
+            L('Avisar todos os itens', 'Show all items'),
+            L('Padrão: só Incomum e Raro', 'Default: Uncommon and Rare only'),
+          ),
+      )}
+      ${sec(
+        L('Dicas', 'Tips'),
+        sw('opt-tips', this.world.tipsEnabled, L('Mostrar dicas', 'Show tips')) +
+          `<div class="st-row"><span class="st-txt">${L('Rever dicas', 'Review tips')}<small>${seen ? L(`${seen} dica(s) já vista(s)`, `${seen} tip(s) seen`) : L('Nenhuma dica vista ainda', 'No tips seen yet')}</small></span><button class="st-small" data-act="reset">${L('Rever', 'Review')}</button></div>`,
+      )}
+      ${sec(
+        L('Diagnóstico', 'Diagnostics'),
+        sw('opt-fps', perf.enabled, L('Mostrar FPS', 'Show FPS')) +
+          sw(
+            'opt-touchdbg',
+            touchDebug.enabled,
+            L('Diagnóstico de toque', 'Touch diagnostics'),
+            L('Mostra cada toque e o que a skill fez', 'Shows each touch and what the skill did'),
+          ),
+      )}
+      <div class="st-grid">
+        ${act('news', `📜 ${L('Novidades', "What's new")}${pontoNovidades()}`)}
+        ${act('wiki', `📖 ${L('Wiki', 'Wiki')} <small class="muted">(PT)</small>`)}
+        ${act('bug', `🐞 ${L('Reportar bug', 'Report a bug')}`)}
+        ${act('credits', `📄 ${L('Créditos', 'Credits')}`)}
+        ${act('privacy', `🔒 ${L('Privacidade', 'Privacy')}`)}
+        ${act('switch', `👤 ${L('Trocar personagem', 'Switch character')}`)}
+      </div>
       <button class="primary" data-act="close">${L('Fechar', 'Close')}</button></div>`;
     bindLangButtons(byId('settings-panel'));
     atualizarPontoNovidades();
