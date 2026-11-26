@@ -1,14 +1,8 @@
 /* HUD novo do celular (18/11/2026). Só vale com body.hud-v2, que src/ui/hudLayout.ts liga em aparelhos de toque
-   quando a opção "Layout do HUD no celular" (⚙) está em "Novo". Em "Clássico", nada daqui se aplica.
    PC não é afetado (hud-v2 nunca liga sem toque).
    Ideia: topo enxuto (Auto, ▾, ☰ e minimapa no canto), alvo ao lado da vida, polegar direito com Atacar + arco
    de skills + poções, polegar esquerdo só com o joystick flutuante. Em pé, os controles ficam numa faixa embaixo.
    Os números do Atacar/poções batem com Hotbar.layoutV2() (src/ui/hotbar.ts). */
-
-/* ⚙: os 2 botões Novo/Clássico (vale nos dois layouts, para dar para voltar) */
-.ui-size.hud-layout {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 
 /* ---------- Topo: [Auto][▾][☰][⚠] [minimapa] ---------- */
 body.hud-v2 #hud #top-right {

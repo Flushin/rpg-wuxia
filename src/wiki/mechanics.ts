@@ -194,7 +194,7 @@ const mats = (m: Mats) =>
     .join(' ') || '—';
 
 // ---------- páginas ----------
-const TOPICS = [
+export const TOPICS = [
   { id: 'combate', label: 'Combate e atributos', icon: 'skill_corte_duplo' },
   { id: 'morte', label: 'Morte, vida e durabilidade', icon: 'pocao_hp_g' },
   { id: 'forja', label: 'Forja e economia', icon: 'minerio_ferro' },
@@ -211,15 +211,21 @@ const TOPICS = [
 
 export { EPIC };
 
+/** HTML do corpo de um tópico (também usado pela busca, para achar as seções e o texto). */
+export function topicBody(id: string): string {
+  const f = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, arena, efeitos }[
+    id as 'combate'
+  ];
+  return f ? f() : '';
+}
+
 export function mechanicsPage(topic?: string): string {
   const t = TOPICS.find((x) => x.id === topic);
   const tabs = `<nav class="tabs">${TOPICS.map((x) => `<a class="${x.id === topic ? 'on' : ''}" href="#/mecanicas/${x.id}">${x.label}</a>`).join('')}</nav>`;
   if (!t)
     return `<h1>Mecânicas</h1><p class="intro">Como o jogo funciona por dentro. As fórmulas e números aqui são os do jogo.</p>
       <div class="grid cats">${TOPICS.map((x) => `<a class="card-link" href="#/mecanicas/${x.id}">${iconHtml(x.icon, 'sm')}<b>${x.label}</b></a>`).join('')}</div>`;
-  const body = { combate, morte, forja, auto, trial, epico, gemas, montarias, reliquias, equipe, arena, efeitos }[
-    t.id as 'combate'
-  ]();
+  const body = topicBody(t.id);
   return `<a class="back" href="#/mecanicas">‹ Mecânicas</a><h1>${t.label}</h1>${tabs}${body}`;
 }
 
@@ -584,7 +590,7 @@ function auto(): string {
       <li><b>Teleporte:</b> o auto só usa o <a href="#/npc/caminhos">Mestre dos Caminhos</a> quando o mapa de caça não tem caminho a pé (hoje todos têm).
         Nesse caso, paga os ${TELEPORT_COST} de ouro sozinho; sem ouro, caça onde dá para ir andando.</li>
       <li>As skills ganham experiência normalmente no auto-combate.</li>
-      <li><b>Economia de bateria:</b> com o auto caçando e sem tocar na tela por um tempo (⚙ Configurações: 30 s, 1 min — padrão —, 2 min ou desligado), o jogo entra no <b>modo descanso</b>: tela preta com o resumo do que foi ganho, a bateria atual do aparelho e quanto dela foi gasto durante o descanso (quando o navegador informa), a 10 quadros por segundo e sem nenhum som. A caça rende o mesmo (drops de material incluídos, pois o jogo segue aberto). Um toque volta ao normal; se o auto parar ou o personagem cair, o jogo volta sozinho. Com o auto ligado, o celular não apaga a tela sozinho (apagada, o jogo iria para segundo plano e contaria como offline).</li></ul></section>
+      <li><b>Economia de bateria:</b> com o auto caçando e sem tocar na tela por um tempo (⚙ Configurações: 30 s, 1 min — padrão —, 2 min ou desligado), o jogo entra no <b>modo descanso</b>: tela preta com a hora atual, o resumo do que foi ganho, a bateria atual do aparelho e quanto dela foi gasto durante o descanso (quando o navegador informa), a 10 quadros por segundo e sem nenhum som. A caça rende o mesmo (drops de material incluídos, pois o jogo segue aberto). Dois toques seguidos voltam ao normal (um toque só não sai, para evitar sair sem querer); se o auto parar ou o personagem cair, o jogo volta sozinho. Com o auto ligado, o celular não apaga a tela sozinho (apagada, o jogo iria para segundo plano e contaria como offline).</li></ul></section>
     <section class="panel"><h2>Ganho offline</h2><p>Se você fechar o jogo com o auto-combate ligado num mapa de caça, ao voltar recebe XP, ouro e itens pelo tempo fora,
       calculados pelo ritmo que o auto estava tendo (monstros por minuto, XP, ouro, drops e poções por abate).</p>
       <table class="tbl"><thead><tr><th>Tempo fora</th><th>Eficiência</th></tr></thead><tbody>${tiers}<tr><td>mais de ${OFFLINE_TIERS[OFFLINE_TIERS.length - 1].untilH} h</td><td>0%</td></tr></tbody></table>

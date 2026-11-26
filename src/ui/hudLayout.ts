@@ -1,49 +1,28 @@
-// Layout do HUD no toque (18/11/2026): "novo" (padrão) ou "clássico" (o de antes, sem nenhuma mudança).
-// O novo liga a classe body.hud-v2; todo o CSS dele fica em src/styles/hud-mobile.css.
-// No novo, ⚙/Skills/Atributos/Mochila saem do topo e vão para o menu ☰ (os mesmos botões, movidos no DOM,
-// então continuam com os mesmos cliques). No clássico eles voltam para o lugar de antes.
-// ROLLBACK: a opção "Clássico" no ⚙ volta tudo; para tirar de vez, apague este arquivo, hud-mobile.css
-// e as chamadas de hudLayout (ver o commit que criou este arquivo).
+// HUD do toque (18/11/2026; o layout "clássico" saiu em 26/11/2026): em aparelhos de toque liga a classe
+// body.hud-v2; todo o CSS dele fica em src/styles/hud-mobile.css.
+// ⚙/Skills/Atributos/Mochila saem do topo e vão para o menu ☰ (os mesmos botões, movidos no DOM,
+// então continuam com os mesmos cliques). No PC ficam no topo.
 import { L } from '../core/i18n';
 import { isTouch } from '../platform/input';
-import { PREF, getPref, setPref } from '../platform/prefs';
 import { audio } from '../render/audio';
 import { byId } from './dom';
-
-export type HudLayout = 'novo' | 'classico';
 
 /** Botões que ficam no menu ☰ no layout novo, na ordem do menu. */
 const MENU_IDS = ['btn-skills', 'btn-attrs', 'btn-bag', 'btn-settings'] as const;
 
-let mode: HudLayout = getPref(PREF.HUD_LAYOUT) === 'classico' ? 'classico' : 'novo';
 let bound = false;
 
-export const hudLayout = () => mode;
-/** true quando o HUD novo do celular está valendo (só em aparelhos de toque). */
-export const hudV2 = () => isTouch && mode === 'novo';
+/** true quando o HUD do celular está valendo (só em aparelhos de toque). */
+export const hudV2 = () => isTouch;
 
-export function setHudLayout(m: HudLayout) {
-  mode = m;
-  setPref(PREF.HUD_LAYOUT, m);
-  applyHudLayout();
-}
-
-/** Liga/desliga o layout novo. Chame antes de criar a Hotbar (ela lê a classe para montar o arco). */
+/** Liga o HUD do celular. Chame antes de criar a Hotbar (ela lê a classe para montar o arco). */
 export function applyHudLayout() {
   const on = hudV2();
   document.body.classList.toggle('hud-v2', on);
   const menu = byId('hud-menu'),
     btn = byId('btn-menu');
   btn.classList.toggle('hidden', !on);
-  if (on) {
-    for (const id of MENU_IDS) menu.appendChild(byId(id));
-  } else {
-    // de volta ao lugar de antes: logo antes do aviso de durabilidade, na ordem original
-    const top = byId('top-right'),
-      dur = byId('dur-warn');
-    for (const id of ['btn-settings', 'btn-skills', 'btn-attrs', 'btn-bag']) top.insertBefore(byId(id), dur);
-    setMenu(false);
-  }
+  if (on) for (const id of MENU_IDS) menu.appendChild(byId(id));
   labels();
   if (!bound) bind();
   // arco das skills, feed de itens e missão se reposicionam

@@ -420,7 +420,7 @@
   text-shadow: 0 0 3px #000;
 }
 
-/* modo descanso (economia de bateria no Auto): tela preta por cima de tudo; um toque volta */
+/* modo descanso (economia de bateria no Auto): tela preta por cima de tudo; dois toques voltam */
 #rest-screen {
   position: fixed;
   inset: 0;
@@ -443,6 +443,17 @@
 }
 #rest-screen b {
   color: #8a94a2;
+}
+#rest-screen .rest-clock {
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1;
+  color: #8a94a2;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+#rest-screen .rest-hint {
+  color: #c9a46a;
 }
 /* Girar o personagem (src/ui/spinView.ts): janela Personagem, loja de trajes e tela cheia */
 .spin {

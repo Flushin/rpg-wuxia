@@ -9,15 +9,12 @@ import { isTouch } from '../platform/input';
 import { MONSTERS } from '../core/data';
 import { TOWN_MAPS } from '../core/mapsConfig';
 import { byId } from './dom';
-import { hudV2 } from './hudLayout';
 
 interface TipDef {
   title: string;
   text: string;
   /** celular com o HUD novo (padrão) */
   textTouch?: string;
-  /** celular com o HUD Clássico (⚙ › Layout do HUD no celular); sem ele, vale o textTouch */
-  textTouchClassic?: string;
   byClass?: Record<string, string>;
 }
 const TIPS = localize('tips', tipsJson) as Record<string, TipDef>;
@@ -66,9 +63,8 @@ export class TipManager {
     this.current = this.queue.shift()!;
     const t = TIPS[this.current];
     byId('tip-title').textContent = t.title;
-    const touchText = hudV2() ? t.textTouch : (t.textTouchClassic ?? t.textTouch);
     byId('tip-text').textContent =
-      (isTouch && touchText ? touchText : t.text) +
+      (isTouch && t.textTouch ? t.textTouch : t.text) +
       (t.byClass?.[this.world.classId] ? ` ${t.byClass[this.world.classId]}` : '');
     byId('tip-card').classList.remove('hidden');
     audio.ui('tip');
