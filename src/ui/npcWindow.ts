@@ -588,12 +588,13 @@ export class NpcWindow {
         pct = Math.round(m.speedBonus * bal('montaria.velocidade') * 100);
       let btn: string;
       if (owned) btn = `<button disabled>${L('Já é sua', 'Owned')}</button>`;
+      else if (m.exclusive) btn = `<small class="muted">${L('Exclusivo dos Fundadores', 'Founders exclusive')}</small>`;
       else if (this.mountAsk === id)
         btn = `<div class="mr-ask"><button class="danger" data-a="mountbuy" data-v="${id}">${L(`Confirmar (${price} ouro)`, `Confirm (${price} gold)`)}</button><button data-a="mountcancel">${L('Cancelar', 'Cancel')}</button></div>`;
       else
         btn = `<button class="primary" data-a="mountbuy" data-v="${id}" ${w.gold < m.price ? 'disabled' : ''}>${L(`Comprar (${price} ouro)`, `Buy (${price} gold)`)}</button>`;
       const why =
-        !owned && w.gold < m.price
+        !owned && !m.exclusive && w.gold < m.price
           ? `<small class="muted">${L(`Faltam ${(m.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(m.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
           : '';
       return `<div class="dg-row sk-row"><div class="sk-body">

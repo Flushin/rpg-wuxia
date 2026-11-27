@@ -34,6 +34,7 @@ export function arenaHtml(w: World): string {
     let btn: string;
     if (worn) btn = `<button data-a="titlewear" data-v="">${L('Tirar', 'Remove')}</button>`;
     else if (owned) btn = `<button class="primary" data-a="titlewear" data-v="${id}">${L('Usar', 'Use')}</button>`;
+    else if (t.exclusive) btn = `<small class="muted">${L('Exclusivo dos Fundadores', 'Founders exclusive')}</small>`;
     else if (a.points < t.minPoints)
       btn = `<small class="muted">${L(`Requer ${t.minPoints} pontos`, `Requires ${t.minPoints} points`)}</small>`;
     else

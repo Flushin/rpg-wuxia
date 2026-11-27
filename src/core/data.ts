@@ -179,6 +179,8 @@ export interface MountDef {
   price: number;
   speedBonus: number;
   mountDelay: number;
+  /** "fundador": exclusiva dos veteranos (sem venda no estábulo; ganha pelo pacote do veterano). */
+  exclusive?: 'fundador';
 }
 export const MOUNTS = localize('mounts', mountsJson) as unknown as Record<string, MountDef>;
 

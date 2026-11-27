@@ -527,6 +527,7 @@ export class World {
     const m = MOUNTS[id];
     if (!m) return { code: 'notEquippable' };
     if (this.mountsOwned.includes(id)) return { code: 'mountOwned' };
+    if (m.exclusive) return { code: 'founderOnly' };
     if (this.gold < m.price) return { code: 'noGold' };
     this.gold -= m.price;
     this.mountsOwned.push(id);

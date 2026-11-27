@@ -258,6 +258,7 @@ export function buyArenaTitle(w: World, id: string): ActionError | null {
   const t = ARENA_TITLES[id];
   if (!t) return null;
   if (w.arena.titles.includes(id)) return { code: 'titleOwned' };
+  if (t.exclusive) return { code: 'founderOnly' };
   if (w.arena.points < t.minPoints) return { code: 'arenaPoints', points: t.minPoints };
   if (w.arena.coins < t.price) return { code: 'arenaCoins' };
   w.arena.coins -= t.price;

@@ -394,6 +394,7 @@ export type ActionError =
   | { code: 'relicShards'; need: number }
   | { code: 'talkToArena' }
   | { code: 'titleOwned' }
+  | { code: 'founderOnly' }
   | { code: 'arenaPoints'; points: number }
   | { code: 'arenaCoins' }
   | { code: 'relicNotOwned' };

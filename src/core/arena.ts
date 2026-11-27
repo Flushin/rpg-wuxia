@@ -40,6 +40,8 @@ export interface ArenaTitle {
   price: number;
   minPoints: number;
   color: string;
+  /** "fundador": exclusivo dos veteranos (sem venda na arena). */
+  exclusive?: 'fundador';
 }
 export const ARENA_TITLES = localize('arenaTitles', arenaJson.titles) as Record<string, ArenaTitle>;
 

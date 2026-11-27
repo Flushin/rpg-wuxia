@@ -355,11 +355,11 @@ function montarias(): string {
   const rows = Object.values(MOUNTS)
     .map(
       (m) =>
-        `<tr><td><b>${esc(m.name)}</b></td><td>${m.price.toLocaleString('pt-BR')} ouro</td><td>+${Math.round(m.speedBonus * bal('montaria.velocidade') * 100)}%</td><td>${m.mountDelay} s</td></tr>`,
+        `<tr><td><b>${esc(m.name)}</b></td><td>${m.exclusive ? 'Exclusiva dos Fundadores' : `${m.price.toLocaleString('pt-BR')} ouro`}</td><td>+${Math.round(m.speedBonus * bal('montaria.velocidade') * 100)}%</td><td>${m.mountDelay} s</td></tr>`,
     )
     .join('');
   return `<section class="panel"><h2>Montarias</h2>
-      <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo do <a href="#/mapa/porto">Porto Noturno</a> (nível 50). Compradas uma vez, valem para sempre e em todos os mapas.</p>
+      <p>Vendidas pelo <a href="#/npc/estabulo">Cavalariço Ma</a>, no estábulo do <a href="#/mapa/porto">Porto Noturno</a> (nível 50). Compradas uma vez, valem para sempre e em todos os mapas. As montarias <b>exclusivas dos Fundadores</b> não são vendidas: vão para os veteranos da primeira versão do jogo.</p>
       <ul><li><b>Montar pelo botão:</b> o botão do cavalo, ao lado do Auto (tecla H no computador), sobe e desce da montaria. Para montar, é preciso estar alguns segundos sem dar nem levar golpes.</li>
       <li><b>Só fora de combate:</b> ao golpear ou ser golpeado, desmonta na hora e volta à velocidade normal; para montar de novo, toque no botão.</li>
       <li>A montaria só muda a velocidade de andar; não dá atributos nem muda o combate. O Auto também anda montado.</li></ul>
@@ -735,7 +735,7 @@ function arena(): string {
   const titles = Object.values(ARENA_TITLES)
     .map(
       (t) =>
-        `<tr><td><b style="color:${t.color}">«${t.name}»</b></td><td>${t.price}</td><td>${t.minPoints ? `${t.minPoints}` : '—'}</td></tr>`,
+        `<tr><td><b style="color:${t.color}">«${t.name}»</b></td><td>${t.exclusive ? 'Exclusivo dos Fundadores' : t.price}</td><td>${t.minPoints ? `${t.minPoints}` : '—'}</td></tr>`,
     )
     .join('');
   return `<p class="intro">No <a href="#/mapa/porto">Porto Noturno</a>, o Mestre da Arena Tie (ao lado do portal do Trial) manda você lutar 1 contra 1 com um lutador de outra seita. É a preparação para o PvP.</p>

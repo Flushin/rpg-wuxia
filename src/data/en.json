@@ -1495,6 +1495,18 @@
     "cavalo": {
       "name": "Horse",
       "desc": "A bay horse from the Night Harbor stables. Carries you faster along the roads; you dismount when combat starts."
+    },
+    "grou_celestial": {
+      "name": "Celestial Crane",
+      "desc": "A giant crane with white feathers and a crimson crown, mount of the immortals. Founders exclusive; you dismount when combat starts."
+    },
+    "qilin_jovem": {
+      "name": "Young Qilin",
+      "desc": "A qilin cub with golden scales and a jade horn, a sign of good fortune. Founders exclusive; you dismount when combat starts."
+    },
+    "tigre_de_jade": {
+      "name": "Jade Tiger",
+      "desc": "A white tiger with jade-green stripes, loyal to the ancient warriors. Founders exclusive; you dismount when combat starts."
     }
   },
   "arenaTitles": {
@@ -1515,6 +1527,9 @@
     },
     "lenda_do_porto": {
       "name": "Legend of the Night Port"
+    },
+    "discipulo_fundador": {
+      "name": "Founding Disciple"
     }
   },
   "relics": {
