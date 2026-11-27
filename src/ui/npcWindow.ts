@@ -196,6 +196,16 @@ export class NpcWindow {
       else this.toast(L(`Relíquia comprada: ${RELICS[v].name}`, `Relic bought: ${RELICS[v].name}`), '#ffd23f');
       return;
     }
+    if (a === 'relicmake') {
+      const err = w.assembleRelic(v);
+      if (err) this.toast(actionErrorText(err), '#ff8080');
+      return;
+    }
+    if (a === 'relicsell') {
+      const err = w.sellRelicShards(v);
+      if (err) this.toast(actionErrorText(err), '#ff8080');
+      return;
+    }
     if (a === 'reliccancel') {
       audio.ui('ui_click');
       this.relicAsk = '';
@@ -376,7 +386,7 @@ export class NpcWindow {
       this.sellJunkAsk = false;
     }
     const refreshMin = Math.ceil(merchantRefreshIn(w.clock()) / 60_000);
-    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}|${w.relicsOwned.length}|${this.relicAsk}`;
+    const sig = `${n.id}|${this.tab}|${this.qty}|${this.pending}|${this.line}|${w.invVersion}|${w.quest.stage}|${w.quest.status}|${w.quest.progress}|${w.player.level}|${this.smithTab}|${this.forgeSel}|${this.salvageAsk}|${refreshMin}|${this.sellFilter}|${this.sellJunkAsk}|${w.gold}|${this.resetAsk}|${w.freePoints}|${this.skinAsk}|${this.gemSel}|${w.skin}|${w.skinsOwned.length}|${w.mountsOwned.length}|${this.mountAsk}|${w.relicsOwned.length}|${this.relicAsk}|${JSON.stringify(w.relicShards)}`;
     if (sig === this.sig && !el.classList.contains('hidden')) return;
     this.sig = sig;
     el.classList.remove('hidden');

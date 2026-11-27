@@ -13,6 +13,7 @@ import {
   RELIC_DROP,
   RELIC_REQ_LEVEL,
   type RelicEffectKind,
+  type RelicPvpStat,
   freePointsAt,
   totalFreePoints,
   type MonsterDef,
@@ -179,6 +180,11 @@ export class World {
   /** relíquias obtidas (RELICS) e a equipada (null = espaço vazio); Porto Noturno, etapa 4 */
   relicsOwned: string[] = [];
   relic: string | null = null;
+  /** fragmentos de lendária (id da relíquia → quantidade) */
+  relicShards: Record<string, number> = {};
+  private relicBreathCd = 0; // Último fôlego (Coração do Dragão)
+  private relicPulseT = 0; // Muralha imperial (Selo de Jade): segundos até o próximo escudo
+  private relicSkillCount = 0; // Ritmo do qilin (Pérola do Qilin)
   bag: (ItemInstance | null)[] = Array(BAG_SIZE).fill(null);
   /** vendidos nesta sessão que o vendedor recompra pelo mesmo preço (não vai para o save) */
   buyback: { item: ItemInstance; price: number }[] = [];
@@ -553,6 +559,9 @@ export class World {
     }
     if (this.relic === id) return null;
     this.relic = id;
+    this.relicSkillCount = 0;
+    this.relicPulseT = 0;
+    this.player.buffs = this.player.buffs.filter((b) => !b.id.startsWith('relic_'));
     this.recalc(this.player, false);
     this.bumpInv();
     this.emit({ type: 'equipChange' });
@@ -565,17 +574,95 @@ export class World {
     return r && r.effect.kind === kind ? r.effect.value : 0;
   }
 
-  /** Interno: chefe derrotado com o jogador no nível RELIC_DROP.minPlayerLevel+ pode dar uma lendária que falta. */
-  private rollRelicDrop() {
-    if (this.player.level < RELIC_DROP.minPlayerLevel || this.rng.next() >= RELIC_DROP.chance) return;
-    const missing = Object.keys(RELICS).filter(
-      (id) => RELICS[id].rarity === 'lendaria' && !this.relicsOwned.includes(id),
-    );
-    if (!missing.length) return;
-    const id = missing[Math.min(missing.length - 1, Math.floor(this.rng.next() * missing.length))];
+  /** Atributo de PvP da relíquia equipada (tenacidade, resiliência, penetração; fração, 0 se não tiver). */
+  relicStat(k: RelicPvpStat): number {
+    const r = this.relic ? RELICS[this.relic] : undefined;
+    return r?.stats[k] ?? 0;
+  }
+
+  /** Interno: chefe derrotado com o jogador no nível RELIC_DROP.minPlayerLevel+ dá fragmentos da lendária dele
+   * (2 em masmorra) e tem RELIC_DROP.fullChance de dar a peça inteira, se o jogador ainda não a tiver. */
+  private rollRelicDrop(bossId: string) {
+    if (this.player.level < RELIC_DROP.minPlayerLevel) return;
+    const id = Object.keys(RELICS).find((k) => RELICS[k].boss === bossId);
+    if (!id) return;
+    if (!this.relicsOwned.includes(id) && this.rng.next() < RELIC_DROP.fullChance) {
+      this.relicsOwned.push(id);
+      this.bumpInv();
+      this.emit({ type: 'relicDrop', name: RELICS[id].name });
+      return;
+    }
+    const n = this.dungeonId ? RELIC_DROP.perKillDungeon : RELIC_DROP.perKill;
+    this.relicShards[id] = (this.relicShards[id] ?? 0) + n;
+    this.bumpInv();
+    this.emit({ type: 'relicFragment', name: RELICS[id].name, count: n, total: this.relicShards[id] });
+  }
+
+  /** Antiquário Lao: monta a lendária com RELIC_DROP.fragments fragmentos. */
+  assembleRelic(id: string): ActionError | null {
+    if (this.npcRole() !== 'antiquario') return { code: 'talkToAntiquary' };
+    const r = RELICS[id];
+    if (!r || r.rarity !== 'lendaria') return { code: 'notEquippable' };
+    if (this.relicsOwned.includes(id)) return { code: 'relicOwned' };
+    if ((this.relicShards[id] ?? 0) < RELIC_DROP.fragments) return { code: 'relicShards', need: RELIC_DROP.fragments };
+    this.relicShards[id] -= RELIC_DROP.fragments;
+    if (!this.relicShards[id]) delete this.relicShards[id];
     this.relicsOwned.push(id);
     this.bumpInv();
-    this.emit({ type: 'relicDrop', name: RELICS[id].name });
+    this.emit({ type: 'relicDrop', name: r.name });
+    return null;
+  }
+
+  /** Antiquário Lao: compra os fragmentos de uma lendária que o jogador já tem (sobras). */
+  sellRelicShards(id: string): ActionError | null {
+    if (this.npcRole() !== 'antiquario') return { code: 'talkToAntiquary' };
+    const n = this.relicShards[id] ?? 0;
+    if (!this.relicsOwned.includes(id) || n <= 0) return { code: 'relicNotOwned' };
+    const gold = n * RELIC_DROP.fragmentPrice;
+    delete this.relicShards[id];
+    this.gold += gold;
+    this.bumpInv();
+    this.emit({ type: 'trade', kind: 'sell', gold });
+    return null;
+  }
+
+  /** Interno: efeitos da lendária que correm no tempo (Último fôlego, Muralha imperial). */
+  private tickRelic(dt: number) {
+    const p = this.player,
+      r = this.relic ? RELICS[this.relic] : undefined;
+    this.relicBreathCd = Math.max(0, this.relicBreathCd - dt);
+    if (!r || p.dead || p.hp <= 0) return;
+    const e = r.effect;
+    if (e.kind === 'lastBreath' && this.relicBreathCd <= 0 && p.hp < p.derived.maxHp * (e.below ?? 0)) {
+      const dur = e.duration ?? 1;
+      this.addBuff(p, 'relic_last_breath', 'regen', (p.derived.maxHp * e.value) / dur, dur);
+      this.relicBreathCd = e.cooldown ?? 0;
+    } else if (e.kind === 'shieldPulse') {
+      this.relicPulseT -= dt;
+      if (this.relicPulseT <= 0) {
+        const every = e.every ?? 30;
+        this.relicPulseT = every;
+        this.addBuff(p, 'relic_shield', 'shield', p.derived.maxHp * e.value, every);
+      }
+    }
+  }
+
+  /** Interno: Ritmo do qilin. Devolve o multiplicador desta skill e conta as skills usadas. */
+  private relicRhythm(): number {
+    const p = this.player,
+      r = this.relic ? RELICS[this.relic] : undefined;
+    const charged = p.buffs.find((b) => b.kind === 'empower');
+    if (charged) {
+      p.buffs = p.buffs.filter((b) => b !== charged);
+      this.emit({ type: 'buffExpired', targetId: p.id, id: charged.id, kind: 'empower' });
+      return 1 + charged.value;
+    }
+    if (r?.effect.kind !== 'skillRhythm') return 1;
+    if (++this.relicSkillCount >= (r.effect.every ?? 4)) {
+      this.relicSkillCount = 0;
+      this.addBuff(p, 'relic_rhythm', 'empower', r.effect.value, 9999);
+    }
+    return 1;
   }
 
   /** montaria em uso agora (null = a pé): montou pelo botão, tem montaria e está vivo */
@@ -634,6 +721,8 @@ export class World {
     return e.buffs.some((b) => b.kind === kind);
   }
   addBuff(e: Entity, id: string, kind: BuffKind, value: number, duration: number) {
+    // tenacidade da relíquia: atordoar e lentidão duram menos no jogador
+    if (e === this.player && (kind === 'stun' || kind === 'slow')) duration *= 1 - this.relicStat('tenacity');
     const old = e.buffs.find((b) => b.id === id && b.kind === kind);
     if (old) {
       old.value = value;
@@ -831,6 +920,7 @@ export class World {
       p.path = [];
     }
     let landed = false;
+    const rhythm = this.relicRhythm();
     for (const v of victims) {
       if (!def.hits?.length) {
         // sem golpe (Névoa Tóxica): os efeitos pegam em todos da área, sem rolar acerto
@@ -840,7 +930,7 @@ export class World {
       }
       for (const pct of def.hits) {
         if (v.dead) break;
-        const r = this.attack(p, v, pct * scale, true);
+        const r = this.attack(p, v, pct * scale * rhythm, true);
         if (r.hit) landed = true;
         if (r.hit && !v.dead) this.applyOnHit(def, v, scale);
       }
@@ -1059,6 +1149,7 @@ export class World {
     this.gcd = Math.max(0, this.gcd - dt);
     for (const st of Object.values(this.skills)) st.cd = Math.max(0, st.cd - dt);
     this.tickBuffs(this.player, dt);
+    this.tickRelic(dt);
     for (const m of this.monsters) this.tickBuffs(m, dt);
     this.portalCd = Math.max(0, this.portalCd - dt);
     this.potionCd.hp = Math.max(0, this.potionCd.hp - dt);
@@ -1531,7 +1622,24 @@ export class World {
   /** Interno: usado pelos módulos de src/core/world/. */
   attack(a: Entity, t: Entity, mult = 1, skill = false, leech = true): AttackResult {
     if (sealedBoss(this, t)) return { hit: false, crit: false, amount: 0 }; // selo da masmorra protege o chefe
-    const r = rollAttack(a, this.defender(t), this.rng);
+    let df = this.defender(t);
+    const pen = a.kind === 'player' ? this.relicStat('penetration') : 0; // relíquia: ignora parte da defesa
+    if (pen)
+      df = {
+        ...df,
+        derived: {
+          ...df.derived,
+          physDef: df.derived.physDef * (1 - pen),
+          spiritDef: df.derived.spiritDef * (1 - pen),
+        },
+      };
+    const r = rollAttack(a, df, this.rng);
+    // resiliência da relíquia: corta parte do bônus do crítico recebido pelo jogador
+    const res = r.crit && t.kind === 'player' ? this.relicStat('resilience') : 0;
+    if (res) {
+      const cd = a.derived.critDamage;
+      r.amount = Math.max(1, Math.round((r.amount * (1 + (cd - 1) * (1 - res))) / cd));
+    }
     if (r.hit && a.kind === 'player' && this.hasBuff(t, 'poison')) {
       const bonus = this.passiveValue('poisonedBonus');
       if (bonus) mult *= 1 + bonus;
@@ -1648,7 +1756,7 @@ export class World {
       this.telegraphs = [];
       this.monsters = this.monsters.filter((x) => !x.summoned || x.dead);
       this.emit({ type: 'bossDefeated', name: m.name, respawnAt: at });
-      this.rollRelicDrop();
+      this.rollRelicDrop(def.id);
       if (this.trialRun) {
         const { bossId, tier } = this.trialRun;
         this.trialProgress[bossId] = Math.max(this.trialProgress[bossId] ?? 0, tier);

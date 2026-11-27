@@ -6,5 +6,6 @@
   "defReduction": { "debuff": true, "icon": "🛡", "color": "#e06a4a", "pt": "Defesa quebrada", "en": "Armor broken", "fx": { "pt": "−{pct}% defesa", "en": "−{pct}% defense" } },
   "shield": { "debuff": false, "icon": "🔰", "color": "#8fd0ff", "pt": "Escudo", "en": "Shield", "fx": { "pt": "Absorve {val}", "en": "Absorbs {val}" } },
   "regen": { "debuff": false, "icon": "✚", "color": "#7be07b", "pt": "Regeneração", "en": "Regeneration", "fx": { "pt": "+{dps} vida/s", "en": "+{dps} HP/s" } },
+  "empower": { "debuff": false, "icon": "🔮", "color": "#ff9f1c", "pt": "Ritmo do qilin", "en": "Qilin rhythm", "fx": { "pt": "próxima skill +{pct}% de dano", "en": "next skill +{pct}% damage" } },
   "freezeSources": ["lotus_congelante", "ult_pavilhao"]
 }

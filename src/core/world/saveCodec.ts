@@ -46,6 +46,7 @@ export function serialize(w: World): SaveData {
     mounts: w.mountsOwned.length ? [...w.mountsOwned] : undefined,
     relics: w.relicsOwned.length ? [...w.relicsOwned] : undefined,
     relic: w.relic ?? undefined,
+    relicShards: Object.keys(w.relicShards).length ? { ...w.relicShards } : undefined,
     arena: { ...w.arena, titles: [...w.arena.titles], title: w.arena.title ?? undefined },
     playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
   };
@@ -79,6 +80,9 @@ export function restore(w: World, s: SaveData, now: number) {
     (id, i, a) => typeof id === 'string' && !!RELICS[id] && a.indexOf(id) === i,
   );
   w.relic = typeof s.relic === 'string' && w.relicsOwned.includes(s.relic) ? s.relic : null;
+  w.relicShards = {};
+  for (const [id, n] of Object.entries(s.relicShards ?? {}))
+    if (RELICS[id]?.rarity === 'lendaria' && Number.isFinite(n) && n > 0) w.relicShards[id] = Math.floor(n);
   // arena: campo opcional; save antigo começa com 1000 pontos e sem títulos
   const a = s.arena,
     num = (v: unknown, d: number) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : d);

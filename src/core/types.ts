@@ -58,9 +58,9 @@ export interface Derived {
   critDamage: number;
 }
 
-export type BuffKind = 'defReduction' | 'slow' | 'shield' | 'poison' | 'stun' | 'regen';
+export type BuffKind = 'defReduction' | 'slow' | 'shield' | 'poison' | 'stun' | 'regen' | 'empower';
 // value: fração (defReduction/slow), pontos de absorção restantes (shield), dano por segundo (poison),
-// vida por segundo (regen); stun não usa value
+// vida por segundo (regen), dano extra da próxima skill (empower, Pérola do Qilin); stun não usa value
 export interface Buff {
   id: string;
   kind: BuffKind;
@@ -221,6 +221,7 @@ export type GameEvent =
   /** caiu um Épico (aviso no centro, som) */
   | { type: 'epicDrop'; name: string }
   | { type: 'relicDrop'; name: string }
+  | { type: 'relicFragment'; name: string; count: number; total: number }
   | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
   | { type: 'goldPickup'; amount: number }
   | { type: 'bagFull'; tab?: 'equip' | 'pot' | 'mat' }
@@ -350,6 +351,8 @@ export interface SaveData {
   /** relíquias obtidas (ids de relics.json) e a equipada */
   relics?: string[];
   relic?: string;
+  /** fragmentos de relíquia lendária (id da relíquia → quantidade) */
+  relicShards?: Record<string, number>;
   /** arena do Porto Noturno (src/core/arena.ts): pontos, moeda, vitórias/derrotas, títulos comprados e o usado */
   arena?: { points: number; coins: number; wins: number; losses: number; titles: string[]; title?: string };
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
@@ -388,6 +391,7 @@ export type ActionError =
   | { code: 'mountCombat' }
   | { code: 'talkToAntiquary' }
   | { code: 'relicOwned' }
+  | { code: 'relicShards'; need: number }
   | { code: 'talkToArena' }
   | { code: 'titleOwned' }
   | { code: 'arenaPoints'; points: number }

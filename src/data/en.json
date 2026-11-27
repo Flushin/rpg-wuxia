@@ -1177,14 +1177,33 @@
   },
   "novidades": {
     "proxima": [
-      { "texto": "Boss seal in dungeons: the way into the boss arena is closed by a golden seal until you defeat every regular monster (the seal shows how many are left), and your auto attack no longer jumps to the boss mid-clear. The tree walls in front of the rooms became rocks and low bushes, and trees turn see-through when they cover allies or monsters." },
-      { "texto": "Three hard dungeons at the Dungeon Portal, with no minimum level: Jade Sanctuary (lv 30–32), Temple of Ashes (lv 40–42) and Cold Moon Court (lv 50–52). More rooms and monsters, bosses that combine circle and line strikes, summons and rage. Go solo or as a team with the bots." },
-      { "texto": "Arena in the Night Port: talk to Arena Master Tie, next to the Trial portal, to fight 1 on 1 against a fighter from another sect. Your power never changes; your opponent gets stronger with your ranking points (Bronze to Legend). Losing has no penalty. Every fight gives arena coins, which buy titles shown above your name." },
-    { "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight." },
-      { "texto": "Buff and debuff icons: the target frame and boss bar show slow, poison, stun, freeze and broken armor, with time left; under your HP you see shield, regeneration and effects on you. A new wiki page explains each icon." },
-      { "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse." },
-      { "texto": "New portals on hunting maps: a Bagua circle on the ground with a golden 門 rune; when you get close it spins faster and a column of light rises." },
-      { "texto": "New portals in the Village: a jade lotus with the color and symbol of each destination (Forest, Mountain, Dungeons and Trial); when you get close, the petals open and a jet of light rises." }
+      {
+        "texto": "Boss seal in dungeons: the way into the boss arena is closed by a golden seal until you defeat every regular monster (the seal shows how many are left), and your auto attack no longer jumps to the boss mid-clear. The tree walls in front of the rooms became rocks and low bushes, and trees turn see-through when they cover allies or monsters."
+      },
+      {
+        "texto": "Three hard dungeons at the Dungeon Portal, with no minimum level: Jade Sanctuary (lv 30–32), Temple of Ashes (lv 40–42) and Cold Moon Court (lv 50–52). More rooms and monsters, bosses that combine circle and line strikes, summons and rage. Go solo or as a team with the bots."
+      },
+      {
+        "texto": "Arena in the Night Port: talk to Arena Master Tie, next to the Trial portal, to fight 1 on 1 against a fighter from another sect. Your power never changes; your opponent gets stronger with your ranking points (Bronze to Legend). Losing has no penalty. Every fight gives arena coins, which buy titles shown above your name."
+      },
+      {
+        "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight."
+      },
+      {
+        "texto": "Buff and debuff icons: the target frame and boss bar show slow, poison, stun, freeze and broken armor, with time left; under your HP you see shield, regeneration and effects on you. A new wiki page explains each icon."
+      },
+      {
+        "texto": "Mount: horse button next to Auto (H key on computer) to mount and dismount; you no longer mount automatically. When mounted, the aura stays on the character, not the horse."
+      },
+      {
+        "texto": "New portals on hunting maps: a Bagua circle on the ground with a golden 門 rune; when you get close it spins faster and a column of light rises."
+      },
+      {
+        "texto": "New portals in the Village: a jade lotus with the color and symbol of each destination (Forest, Mountain, Dungeons and Trial); when you get close, the petals open and a jet of light rises."
+      },
+      {
+        "texto": "Legendary relics reworked: each one has its own boss (Crimson Emperor, Ash Marshal and Spectral Emperor) that drops fragments from level 50; with 25, Antiquarian Lao assembles the relic. New effects (Last breath, Imperial wall, Qilin rhythm) and PvP stats: Tenacity, Resilience and Penetration."
+      }
     ],
     "versoes": [
       {
@@ -1479,12 +1498,24 @@
     }
   },
   "arenaTitles": {
-    "duelista": { "name": "Duelist" },
-    "lamina_do_porto": { "name": "Blade of the Port" },
-    "punho_de_ferro": { "name": "Iron Fist" },
-    "lanterna_rubra": { "name": "Crimson Lantern" },
-    "senhor_da_arena": { "name": "Lord of the Arena" },
-    "lenda_do_porto": { "name": "Legend of the Night Port" }
+    "duelista": {
+      "name": "Duelist"
+    },
+    "lamina_do_porto": {
+      "name": "Blade of the Port"
+    },
+    "punho_de_ferro": {
+      "name": "Iron Fist"
+    },
+    "lanterna_rubra": {
+      "name": "Crimson Lantern"
+    },
+    "senhor_da_arena": {
+      "name": "Lord of the Arena"
+    },
+    "lenda_do_porto": {
+      "name": "Legend of the Night Port"
+    }
   },
   "relics": {
     "slotName": "Relic",
