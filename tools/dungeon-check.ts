@@ -282,6 +282,36 @@ console.log('\n== Covil dos Bandidos ==');
   ok(!boss.strikes && !w.telegraphs.length, 'luta resetada: zera a contagem e apaga as linhas');
 }
 
+console.log('\n== selo da arena do chefe ==');
+for (const d of DUNGEONS) {
+  const w = fresh(60, 100000);
+  ok(w.enterDungeon(d.id) === null && !!w.seal && !w.seal.open, `${d.id}: entra com o selo fechado`);
+  const s = w.seal!;
+  ok(s.tiles.length > 0 && s.tiles.every((t) => !w.map.walkable[t]), `${d.id}: passagem bloqueada`);
+  const boss = w.monsters.find((m) => MONSTERS[m.monsterId]?.boss)!;
+  const hp = boss.hp;
+  w.setTarget(boss.id);
+  ok(w.targetId !== boss.id && !w.targetable(boss), `${d.id}: chefe não pode ser mirado`);
+  w.attack(w.player, boss, 1);
+  ok(boss.hp === hp, `${d.id}: chefe selado não leva dano`);
+  const commons = w.monsters.filter((m) => !MONSTERS[m.monsterId]?.boss);
+  for (const m of commons.slice(0, -1)) kill(w, m);
+  w.tick(1 / 60);
+  ok(!s.open && s.left === 1, `${d.id}: falta 1, selo continua`);
+  kill(w, commons[commons.length - 1]);
+  w.tick(1 / 60);
+  ok(s.open && s.tiles.every((t, k) => w.map.walkable[t] === s.orig[k]), `${d.id}: todos mortos, selo aberto`);
+  ok(drain(w).some((e) => e.type === 'sealOpen') && w.targetable(boss), `${d.id}: avisa e libera o chefe`);
+}
+{
+  // sair com o selo fechado devolve o mapa em cache ao normal (e a próxima entrada fecha de novo)
+  const w = fresh(60, 100000);
+  w.enterDungeon('gruta');
+  const tiles = w.seal!.tiles;
+  w.changeMap('cidade');
+  ok(!w.seal && tiles.every((t) => w.maps.gruta.walkable[t]), 'saiu: mapa da masmorra volta ao normal');
+}
+
 if (fails) {
   console.error(`\ndungeon-check: ${fails} falha(s)`);
   process.exit(1);

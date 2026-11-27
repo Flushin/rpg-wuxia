@@ -8,6 +8,7 @@ import type { OfflineReport, World } from '../core/world';
 import type { SaveData } from '../core/types';
 import { EntityView } from '../render/entityView';
 import { buildMapView, cullMap, fadeTreesNear } from '../render/mapView';
+import { SealView } from '../render/dungeonSeal';
 import { audio, loadDeviceAudio, saveDeviceAudio } from '../render/audio';
 import { SkillFx } from '../render/skillFx';
 import { perf } from '../ui/perf';
@@ -69,6 +70,7 @@ export class GameScene extends Phaser.Scene {
   private fx!: SkillFx;
   private feedback!: EventFeedback;
   private mapObjs: Phaser.GameObjects.GameObject[] = [];
+  private sealView: SealView | null = null;
   private trees: Phaser.GameObjects.Image[] | null = null;
   private views = new Map<number, EntityView>();
   private groundViews = new Map<number, Phaser.GameObjects.Graphics>();
@@ -293,6 +295,8 @@ export class GameScene extends Phaser.Scene {
     this.views.forEach((v) => v.destroy());
     this.views.clear();
     this.mapObjs = buildMapView(this, this.world.map);
+    this.sealView?.destroy();
+    this.sealView = this.world.seal ? new SealView(this, this.world.seal) : null;
     this.trees = null;
     const pv = this.viewFor(this.world.player);
     this.cameras.main.startFollow(pv.container, true, 0.12, 0.12);
@@ -471,12 +475,17 @@ export class GameScene extends Phaser.Scene {
       this.trees = this.mapObjs.filter((o) => o.name === 'tree' || o.name === 'building') as Phaser.GameObjects.Image[];
     {
       const who: { x: number; y: number; depth: number }[] = [];
-      for (const e of [w.player, tgt]) {
-        const v = e && this.views.get(e.id);
-        if (e && v) who.push({ x: v.container.x, y: v.container.y, depth: e.x + e.y });
+      // jogador, alvo, aliados e monstros na tela: nenhum some atrás das árvores (masmorra em equipe)
+      const cv = this.cameras.main.worldView;
+      for (const e of [w.player, tgt, ...w.party.map((b) => b.e), ...w.monsters]) {
+        if (!e || e.dead || who.length >= 24) continue;
+        const v = this.views.get(e.id);
+        if (!v || !cv.contains(v.container.x, v.container.y)) continue;
+        who.push({ x: v.container.x, y: v.container.y, depth: e.x + e.y });
       }
       fadeTreesNear(this.trees, who);
     }
+    if (this.sealView && w.seal) this.sealView.sync(w.seal);
     this.syncGround();
     this.syncTelegraphs();
     this.syncAutoText();
@@ -650,8 +659,21 @@ export class GameScene extends Phaser.Scene {
     this.tips.onEvent(ev);
     restMode.onEvent(ev);
     audio.onEvent(ev, this.world.player.id, this.world.classId);
-    if (ev.type === 'mapChange') this.onMapChange();
-    else if (ev.type === 'skinChange') this.onSkinChange();
+    if (ev.type === 'mapChange') {
+      this.onMapChange();
+      if (this.world.seal && !this.world.seal.open)
+        this.hud.toast(
+          L('Derrote todos os inimigos para romper o selo do chefe', 'Defeat every enemy to break the boss seal'),
+          '#ffe9a8',
+        );
+    } else if (ev.type === 'skinChange') this.onSkinChange();
+    else if (ev.type === 'sealOpen')
+      this.hud.toast(
+        L('O selo se rompeu: o caminho do chefe está aberto!', 'The seal broke: the way to the boss is open!'),
+        '#ffd23f',
+      );
+    else if (ev.type === 'sealProgress' && ev.left <= 3)
+      this.hud.toast(L(`Selo do chefe: faltam ${ev.left} inimigos`, `Boss seal: ${ev.left} enemies left`), '#ffe9a8');
     else this.feedback.handle(ev);
   }
 }
