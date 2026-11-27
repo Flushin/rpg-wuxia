@@ -111,7 +111,7 @@ Implementadas a pedido do Lucas e publicadas no site.
 - **iPhone (app na tela inicial)** *(27/11/2026)*: joystick por eventos de toque (`touch*`), que solta sozinho quando o
   dedo dele não está mais na tela (o Safari perdia o `pointerup` e o joystick travava); solta também em segundo plano.
   HUD usa 18px das margens laterais do iPhone deitado (`html.iphone`, ilha fica fora); janelas mantêm a margem inteira.
-  `-webkit-touch-callout: none`. `check:layout` testa o 17 Pro Max real (956×440, margens 62/62/20, não entra na ilha).
+  `-webkit-touch-callout: none`. Letra Roboto no iPhone (a do Android; só latino, ~90 KB, baixada só lá). `check:layout` testa o 17 Pro Max real (956×440, margens 62/62/20, não entra na ilha).
 
 ## Melhorias — Futuro
 Sugestões aprovadas pelo Lucas. **Só implementar quando ele pedir explicitamente.**
