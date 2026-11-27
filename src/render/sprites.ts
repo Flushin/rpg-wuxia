@@ -5,6 +5,10 @@ import tita from '../data/sprites/tita.json';
 import vibora from '../data/sprites/vibora.json';
 import lobo from '../data/sprites/lobo.json';
 import cavalo from '../data/sprites/cavalo.json';
+// montarias dos Fundadores: por enquanto o Cavalo recolorido (arte provisória)
+import grouCelestial from '../data/sprites/grou_celestial.json';
+import qilinJovem from '../data/sprites/qilin_jovem.json';
+import tigreDeJade from '../data/sprites/tigre_de_jade.json';
 import banditSword from '../data/sprites/bandido_espadachim.json';
 import banditArcher from '../data/sprites/bandido_arqueiro.json';
 import terracota from '../data/sprites/terracota.json';
@@ -89,6 +93,9 @@ const SHEETS: Record<string, SheetMeta> = {
   vibora: vibora as SheetMeta,
   lobo: lobo as SheetMeta,
   cavalo: cavalo as SheetMeta,
+  grou_celestial: grouCelestial as SheetMeta,
+  qilin_jovem: qilinJovem as SheetMeta,
+  tigre_de_jade: tigreDeJade as SheetMeta,
   bandido_espadachim: banditSword as SheetMeta,
   bandido_arqueiro: banditArcher as SheetMeta,
   terracota: terracota as SheetMeta,
@@ -119,6 +126,9 @@ const BY_TEXTURE: Record<string, string> = {
   'player-vibora': 'vibora',
   wolf: 'lobo',
   'mount-cavalo': 'cavalo', // montarias: 'mount-' + id de mounts.json
+  'mount-grou_celestial': 'grou_celestial',
+  'mount-qilin_jovem': 'qilin_jovem',
+  'mount-tigre_de_jade': 'tigre_de_jade',
   'bandit-sword': 'bandido_espadachim',
   'bandit-archer': 'bandido_arqueiro',
   terracotta: 'terracota',
