@@ -56,17 +56,13 @@ import {
 } from './data';
 import { statsAt } from './monsters';
 import ultimatesJson from '../data/ultimates.json';
+import relicsJson from '../data/relics.json';
+
+const RELIC_RARITIES_PT = (
+  relicsJson as unknown as { rarities: Record<RelicDef['rarity'], { name: string; color: string }> }
+).rarities;
 import { BUFF_INFO, FREEZE_SOURCES, type BuffIconKey } from '../ui/buffRow';
-import {
-  LEVELUP_POSE_S,
-  MOUNTS,
-  RELIC_DROP,
-  RELIC_RARITIES,
-  RELIC_REQ_LEVEL,
-  RELICS,
-  XP_BANK_LEVELS,
-  relicEffectText,
-} from '../core/data';
+import { LEVELUP_POSE_S, MOUNTS, RELIC_DROP, RELIC_REQ_LEVEL, type RelicDef, XP_BANK_LEVELS } from '../core/data';
 import {
   TRIAL_BOSSES,
   trialEquipReqLevel,
@@ -279,34 +275,76 @@ function gemas(): string {
       Item com gema <b>não pode ser vendido, destruído nem desmontado</b> (nem pelo Auto): retire as gemas antes.</p></section>`;
 }
 
+/** Efeito da relíquia em português (a wiki é só PT; relicEffectText segue o idioma do jogo). */
+function relicEffectPt(r: RelicDef): { name: string; text: string } {
+  const e = r.effect,
+    v = pctW(e.value);
+  switch (e.kind) {
+    case 'lifeSteal':
+      return { name: 'Roubo de vida', text: `+${v} do dano causado volta como vida.` };
+    case 'attackSpeed':
+      return { name: 'Velocidade de ataque', text: `+${v} de velocidade no golpe normal.` };
+    case 'cooldown':
+      return { name: 'Recarga', text: `Recarga das skills −${v}.` };
+    case 'maxHpPct':
+      return { name: 'Vida máxima', text: `+${v} de vida máxima.` };
+    case 'lastBreath':
+      return {
+        name: 'Último fôlego',
+        text: `Ao cair abaixo de ${pctW(e.below ?? 0)} da vida, cura ${v} da vida máxima em ${e.duration} s. Recarga de ${e.cooldown} s.`,
+      };
+    case 'shieldPulse':
+      return { name: 'Muralha imperial', text: `Escudo de ${v} da vida máxima a cada ${e.every} s.` };
+    case 'skillRhythm':
+      return {
+        name: 'Ritmo do qilin',
+        text: `A cada ${e.every} skills usadas, a seguinte causa +${v} de dano (ícone 🔮 quando carregada).`,
+      };
+  }
+}
+
 function reliquias(): string {
-  const rows = Object.values(RELICS)
-    .map((r) => {
-      const rar = RELIC_RARITIES[r.rarity];
-      const stats = Object.entries(r.stats)
-        .map(([k, v]) => `+${fmtStatValue(k, v)} ${esc(STAT_LABELS[k] ?? k)}`)
-        .join(', ');
-      const boss = r.boss ? MONSTERS[r.boss] : undefined;
-      const where =
-        r.rarity === 'lendaria'
-          ? `Fragmentos de ${boss ? `<a href="#/monstro/${r.boss}">${esc(boss.name)}</a>` : '?'}`
-          : `${r.price.toLocaleString('pt-BR')} ouro`;
-      return `<tr><td>${r.icon} <b style="color:${rar.color}">${esc(r.name)}</b></td><td>${esc(rar.name)}</td><td>${stats}</td><td>${esc(relicEffectText(r))}</td><td>${where}</td></tr>`;
-    })
-    .join('');
+  const raw = relicsJson as unknown as { list: Record<string, RelicDef> };
+  const card = (r: RelicDef) => {
+    const rar = RELIC_RARITIES_PT[r.rarity];
+    const stats = Object.entries(r.stats)
+      .map(([k, v]) => `<li>+${fmtStatValue(k, v)} ${esc(STAT_LABELS[k] ?? k)}</li>`)
+      .join('');
+    const fx = relicEffectPt(r);
+    const boss = r.boss ? MONSTERS[r.boss] : undefined;
+    const where =
+      r.rarity === 'lendaria'
+        ? `🧩 ${RELIC_DROP.fragments} fragmentos de ${boss ? `<a href="#/monstro/${r.boss}">${esc(boss.name)}</a>` : '?'}`
+        : `🪙 ${r.price.toLocaleString('pt-BR')} ouro · <a href="#/npc/antiquario">Antiquário Lao</a>`;
+    return `<div class="rl-wcard" style="--c:${rar.color}">
+      <div class="rl-whead"><span class="rl-wic">${r.icon}</span><div><b>${esc(r.name)}</b><small>${esc(rar.name)}</small></div></div>
+      <p class="rl-wdesc">${esc(r.desc)}</p>
+      <ul class="rl-wstats">${stats}</ul>
+      <div class="rl-wfx"><b>★ ${esc(fx.name)}</b><span>${esc(fx.text)}</span></div>
+      <div class="rl-wwhere">${where}</div></div>`;
+  };
+  const group = (rarity: string, title: string) => {
+    const list = Object.values(raw.list).filter((r) => r.rarity === rarity);
+    return `<h3 style="color:${RELIC_RARITIES_PT[rarity as RelicDef['rarity']].color}">${title}</h3><div class="rl-wgrid">${list.map(card).join('')}</div>`;
+  };
   return `<section class="panel"><h2>Relíquias</h2>
       <p>Um espaço de equipamento próprio, abaixo do corpo na janela do Personagem, liberado no <b>nível ${RELIC_REQ_LEVEL}</b>.
-      Cada relíquia dá atributos fixos e <b>um efeito único</b>. Os efeitos valem igual contra monstros e contra jogadores.</p>
-      <ul><li><b>Comuns e raras:</b> vendidas pelo <a href="#/npc/antiquario">Antiquário Lao</a>, no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>.</li>
-      <li><b>Lendárias:</b> não estão à venda. Cada uma tem o seu chefe: derrotá-lo com você no nível ${RELIC_DROP.minPlayerLevel}+ dá
-      ${RELIC_DROP.perKill} fragmento (${RELIC_DROP.perKillDungeon} em masmorra). Com <b>${RELIC_DROP.fragments} fragmentos</b> o Antiquário Lao monta a relíquia.
-      Há também ${pctW(RELIC_DROP.fullChance)} de chance de a peça cair inteira. Fragmentos que sobram depois de ter a relíquia, o Lao compra por ${RELIC_DROP.fragmentPrice.toLocaleString('pt-BR')} ouro cada.</li>
+      Cada relíquia dá atributos fixos e <b>um efeito único</b>, que vale igual contra monstros e contra jogadores.
+      Ficam na sua coleção para sempre e você troca a equipada quando quiser, sem custo. Não têm durabilidade, forja nem gemas,
+      não ocupam a mochila e não podem ser vendidas.</p></section>
+    <section class="panel"><h2>Como conseguir</h2><ul>
+      <li><b>Comuns e raras:</b> compradas do <a href="#/npc/antiquario">Antiquário Lao</a>, no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>.</li>
+      <li><b>Lendárias:</b> cada uma tem o seu chefe. Derrotá-lo com você no nível ${RELIC_DROP.minPlayerLevel}+ dá ${RELIC_DROP.perKill} fragmento
+      (${RELIC_DROP.perKillDungeon} em masmorra); com <b>${RELIC_DROP.fragments}</b> o Antiquário Lao monta a relíquia.
+      Há ${pctW(RELIC_DROP.fullChance)} de chance de a peça cair inteira. Fragmentos que sobram, o Lao compra por
+      ${RELIC_DROP.fragmentPrice.toLocaleString('pt-BR')} ouro cada.</li></ul></section>
+    <section class="panel"><h2>Atributos especiais</h2><ul>
       <li><b>Força ou Inteligência (conforme a seita):</b> vira Força nas seitas de dano físico e Inteligência nas de dano espiritual.</li>
-      <li><b>Atributos de PvP</b> (das lendárias): <b>Tenacidade</b> encurta atordoamento e lentidão recebidos; <b>Resiliência</b> corta essa parte do bônus do crítico recebido;
-      <b>Penetração</b> ignora essa parte da defesa do alvo.</li>
-      <li>Compradas ou ganhas uma vez, ficam na sua coleção para sempre; troque a equipada quando quiser, sem custo.</li>
-      <li>Sem durabilidade, forja nem encaixe de gemas; não ocupam a mochila e não podem ser vendidas.</li></ul>
-      <table><tr><th>Relíquia</th><th>Raridade</th><th>Atributos</th><th>Efeito</th><th>Onde</th></tr>${rows}</table></section>`;
+      <li><b>Tenacidade:</b> atordoamento e lentidão recebidos duram essa porcentagem a menos.</li>
+      <li><b>Resiliência:</b> corta essa porcentagem do bônus do crítico que você recebe.</li>
+      <li><b>Penetração:</b> seus golpes ignoram essa porcentagem da defesa do alvo.</li></ul></section>
+    <section class="panel"><h2>Todas as relíquias</h2>
+      ${group('lendaria', 'Lendárias')}${group('rara', 'Raras')}${group('comum', 'Comuns')}</section>`;
 }
 
 function montarias(): string {
@@ -747,7 +785,7 @@ function efeitos(): string {
     const oh = (m as { onHit?: { slow: number; duration: number } }).onHit;
     if (oh) add('slow', `<a href="#/monstro/${m.id}">${esc(m.name)}</a> (golpe, ${pct(oh.slow)}, ${oh.duration} s)`);
   }
-  for (const r of Object.values(RELICS))
+  for (const r of Object.values((relicsJson as unknown as { list: Record<string, RelicDef> }).list))
     if (r.effect.kind === 'skillRhythm') add('empower', `${r.icon} ${esc(r.name)} (relíquia)`);
     else if (r.effect.kind === 'shieldPulse')
       add('shield', `${r.icon} ${esc(r.name)} (relíquia, a cada ${r.effect.every} s)`);
