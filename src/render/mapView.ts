@@ -150,6 +150,7 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
   const snowy = MAPS_CONFIG[map.id]?.trees === 'snow',
     bamboo = MAPS_CONFIG[map.id]?.trees === 'bamboo',
     dungeon = !!MAPS_CONFIG[map.id]?.dungeon;
+  const sealRow = map.objects.find((o) => o.type === 'gate')?.y ?? -1;
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
       const name = map.tiles[j * map.width + i],
@@ -186,7 +187,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (name === 'tree' || name === 'pine' || name === 'bamboo' || name === 'basalt') {
         out.push(ground(name === 'pine' ? 'snow' : name === 'basalt' ? 'ash' : 'grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
-        if (dungeon && frontOfWalk(map, i, j)) {
+        // a linha da parede da arena (a do selo) fica alta: pedra baixa ali parecia passagem aberta
+        if (dungeon && j !== sealRow && frontOfWalk(map, i, j)) {
           const [la, lf] = pick(LOW_WALL[name], r);
           const low = scene.add
             .image(pos.x, pos.y + 4, la, lf)
