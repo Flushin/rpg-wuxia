@@ -19,6 +19,12 @@ const ok = (c: boolean, m: string) => {
 const maps: Record<string, GameMap> = {};
 for (const id of MAP_IDS) maps[id] = parseTiledMap(id, JSON.parse(readFileSync(`public/maps/${id}.json`, 'utf8')));
 const kill = (w: World, m: Entity) => (w as unknown as { killMonster: (m: Entity) => void }).killMonster(m);
+/** Mata os comuns e abre o selo da arena (src/core/world/seal.ts), para testar a luta com o chefe. */
+const openSeal = (w: World) => {
+  for (const m of w.monsters) if (!m.dead && !MONSTERS[m.monsterId]?.boss) kill(w, m);
+  w.tick(1 / 60);
+  w.events.splice(0);
+};
 const NOW = 1_800_000_000_000;
 const save = (level: number, gold: number, mapId = 'cidade'): SaveData => ({
   version: 1,
@@ -169,6 +175,7 @@ console.log('\n== Mosteiro Profanado ==');
   ok(fresh(15, 5000).enterDungeon('mosteiro')?.code === 'needLevel', 'nível 15: recusado');
   const w = fresh(16, 1000);
   ok(w.enterDungeon('mosteiro') === null && w.mapId === 'mosteiro' && w.gold === 500, 'nível 16: entra e paga 500');
+  openSeal(w); // luta com o chefe: os comuns já foram limpos
   const lv = w.monsters.filter((m) => !MONSTERS[m.monsterId].boss).map((m) => m.level);
   ok(lv.length >= 12 && Math.min(...lv) >= 16 && Math.max(...lv) <= 19, `monstros nv 16–19 (${lv.length})`);
   const boss = w.monsters.find((m) => MONSTERS[m.monsterId].boss)!;
@@ -233,6 +240,7 @@ console.log('\n== Covil dos Bandidos ==');
   ok(fresh(19, 5000).enterDungeon('covil')?.code === 'needLevel', 'nível 19: recusado');
   const w = fresh(20, 1500);
   ok(w.enterDungeon('covil') === null && w.mapId === 'covil' && w.gold === 500, 'nível 20: entra e paga 1000');
+  openSeal(w); // luta com o chefe: os comuns já foram limpos
   const lv = w.monsters.filter((m) => !MONSTERS[m.monsterId].boss).map((m) => m.level);
   ok(lv.length >= 12 && Math.min(...lv) >= 20 && Math.max(...lv) <= 22, `monstros nv 20–22 (${lv.length})`);
   const boss = w.monsters.find((m) => MONSTERS[m.monsterId].boss)!;
@@ -302,6 +310,26 @@ for (const d of DUNGEONS) {
   w.tick(1 / 60);
   ok(s.open && s.tiles.every((t, k) => w.map.walkable[t] === s.orig[k]), `${d.id}: todos mortos, selo aberto`);
   ok(drain(w).some((e) => e.type === 'sealOpen') && w.targetable(boss), `${d.id}: avisa e libera o chefe`);
+}
+for (const d of DUNGEONS) {
+  // equipe parada na frente do selo: o chefe não acorda e nenhum bot entra na arena
+  const w = fresh(60, 100000);
+  w.enterDungeon(d.id, true);
+  const s = w.seal!;
+  const boss = w.monsters.find((m) => MONSTERS[m.monsterId]?.boss)!;
+  for (const m of w.monsters) if (m !== boss && m.y < s.y + 4) kill(w, m);
+  w.player.x = s.x + s.w / 2;
+  w.player.y = s.y + s.h + 0.6;
+  for (let i = 0; i < 60 * 6; i++) {
+    w.player.hp = w.player.derived.maxHp;
+    w.tick(1 / 60);
+  }
+  ok(boss.ai !== 'chase' && boss.hp === boss.derived.maxHp, `${d.id}: chefe selado não acorda com o grupo no portão`);
+  ok(
+    w.party.every((b) => b.e.y > s.y),
+    `${d.id}: nenhum bot passa do selo`,
+  );
+  ok(w.engagedBoss() === null, `${d.id}: sem barra do chefe com o selo fechado`);
 }
 {
   // sair com o selo fechado devolve o mapa em cache ao normal (e a próxima entrada fecha de novo)

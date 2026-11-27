@@ -10,6 +10,7 @@ import type { Entity, Point } from '../types';
 import { findPath, isWalkable } from '../pathfinding';
 import { inTelegraph, safeSpot } from './boss';
 import { arenaBotOf, finishArena } from './arena';
+import { sealedBoss } from './seal';
 import type { World } from '../world';
 
 /** Tamanho do grupo de bots (o jogador + 3). */
@@ -68,7 +69,8 @@ export function placeParty(w: World) {
 
 /** Monstros que o bot enxerga: os que já estão lutando ou o alvo do jogador (o grupo não puxa monstro sozinho). */
 function enemiesFor(w: World): Entity[] {
-  return w.monsters.filter((m) => !m.dead && (m.ai === 'chase' || m.id === w.targetId));
+  // chefe atrás do selo da masmorra (src/core/world/seal.ts) não é alvo dos bots
+  return w.monsters.filter((m) => !m.dead && (m.ai === 'chase' || m.id === w.targetId) && !sealedBoss(w, m));
 }
 
 export function tickParty(w: World, dt: number) {
@@ -128,7 +130,9 @@ export function castBotSkill(w: World, b: Bot, def: SkillDef, t: Entity | null, 
     if (d > 1) {
       const k = (d - 1) / d,
         dest = { x: e.x + (t.x - e.x) * k, y: e.y + (t.y - e.y) * k };
-      if (!isWalkable(w.map, dest.x, dest.y)) return;
+      // investida não atravessa parede nem o selo da masmorra: confere a linha inteira
+      for (let s = 1; s <= 12; s++)
+        if (!isWalkable(w.map, e.x + (dest.x - e.x) * (s / 12), e.y + (dest.y - e.y) * (s / 12))) return;
       w.emit({ type: 'dash', fromX: e.x, fromY: e.y, toX: dest.x, toY: dest.y });
       e.x = dest.x;
       e.y = dest.y;

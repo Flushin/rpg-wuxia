@@ -391,7 +391,10 @@ export class World {
   /** Chefe vivo da arena em que o jogador está (null fora da arena). */
   arenaBoss(): Entity | null {
     if (!this.arenas.length || !this.inArena(this.player)) return null;
-    return this.monsters.find((m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && this.inArena(m)) ?? null;
+    return (
+      this.monsters.find((m) => !m.dead && !!MONSTERS[m.monsterId]?.boss && this.inArena(m) && !sealedBoss(this, m)) ??
+      null
+    );
   }
 
   /** Com o chefe vivo e o jogador na arena, só vale mirar o que está dentro dela (nada de bicho do lado de fora). */
@@ -1081,7 +1084,11 @@ export class World {
         this.arenaSeen = true;
         this.emit({ type: 'bossArena' });
       }
-      if (inArena && !this.wasInArena && this.monsters.some((m) => !m.dead && MONSTERS[m.monsterId]?.boss))
+      if (
+        inArena &&
+        !this.wasInArena &&
+        this.monsters.some((m) => !m.dead && MONSTERS[m.monsterId]?.boss && !sealedBoss(this, m))
+      )
         this.emit({ type: 'bossArenaEnter' });
       this.wasInArena = inArena;
     }
@@ -1340,7 +1347,7 @@ export class World {
     if (boss) this.tickBossExtras(m, def, dt);
     else if (def.slam) this.tickSlam(m, def, dt);
     const fromHome = this.player.dead ? Infinity : dist(this.player, m.home);
-    const wake = !boss || fromHome <= boss.arenaRadius; // chefe só acorda com o jogador na arena
+    const wake = !boss || (fromHome <= boss.arenaRadius && !sealedBoss(this, m)); // chefe só acorda com o jogador na arena
     // chefe em combate só desiste com o jogador bem fora da arena (folga + alguns segundos): desviar de um golpe
     // marcado perto dos braseiros não reseta mais a luta
     let gaveUp = false;
