@@ -57,6 +57,8 @@ export function actionErrorText(e: ActionError): string {
       return L('Moedas de arena insuficientes', 'Not enough arena coins');
     case 'relicOwned':
       return L('Você já tem esta relíquia', 'You already own this relic');
+    case 'relicShards':
+      return L(`Faltam fragmentos (precisa de ${e.need})`, `Not enough fragments (needs ${e.need})`);
     case 'relicNotOwned':
       return L('Você não tem esta relíquia', 'You do not own this relic');
     case 'noMount':

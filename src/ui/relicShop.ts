@@ -1,6 +1,6 @@
 // Relíquias (Porto Noturno, etapa 4; regras em docs/decisoes/reliquias.md): loja do Antiquário Lao e o
 // detalhe/escolha da relíquia no painel do personagem. Dados em src/data/relics.json.
-import { RELIC_RARITIES, RELIC_REQ_LEVEL, RELICS, relicEffectText } from '../core/data';
+import { MONSTERS, RELIC_DROP, RELIC_RARITIES, RELIC_REQ_LEVEL, RELICS, relicEffectText } from '../core/data';
 
 export { relicEffectText };
 import { L } from '../core/i18n';
@@ -21,6 +21,23 @@ export function relicCardHtml(id: string): string {
     <div class="dg-info">${escapeHtml(r.desc)}</div></div></div>`;
 }
 
+/** Lendária no Antiquário: chefe, fragmentos, montar e vender as sobras. */
+function legendaryHtml(w: World, id: string): string {
+  const fmt = (n: number) => n.toLocaleString('pt-BR');
+  const r = RELICS[id],
+    have = w.relicShards[id] ?? 0,
+    need = RELIC_DROP.fragments,
+    owned = w.relicsOwned.includes(id),
+    boss = r.boss ? (MONSTERS[r.boss]?.name ?? r.boss) : '?';
+  const info = `<small class="muted">${L(
+    `Fragmentos do chefe ${escapeHtml(boss)} (você no nível ${RELIC_DROP.minPlayerLevel}+): ${have}/${need}`,
+    `Fragments from the boss ${escapeHtml(boss)} (you at level ${RELIC_DROP.minPlayerLevel}+): ${have}/${need}`,
+  )}</small>`;
+  if (owned)
+    return `${info}${have > 0 ? `<button data-a="relicsell" data-v="${id}">${L(`Vender fragmentos (${fmt(have * RELIC_DROP.fragmentPrice)} ouro)`, `Sell fragments (${fmt(have * RELIC_DROP.fragmentPrice)} gold)`)}</button>` : `<button disabled>${L('Já é sua', 'Owned')}</button>`}`;
+  return `${info}<button class="primary" data-a="relicmake" data-v="${id}" ${have < need ? 'disabled' : ''}>${L('Montar relíquia', 'Assemble relic')}</button>`;
+}
+
 /** Antiquário Lao: comuns e raras à venda (com confirmação); lendárias listadas como drop de chefe. */
 export function antiquaryHtml(w: World, ask: string): string {
   const fmt = (n: number) => n.toLocaleString('pt-BR');
@@ -29,9 +46,8 @@ export function antiquaryHtml(w: World, ask: string): string {
     const r = RELICS[id],
       owned = w.relicsOwned.includes(id);
     let btn = '';
-    if (owned) btn = `<button disabled>${L('Já é sua', 'Owned')}</button>`;
-    else if (r.rarity === 'lendaria')
-      btn = `<small class="muted">${L('Só cai de chefes (você no nível 50).', 'Only drops from bosses (you at level 50).')}</small>`;
+    if (r.rarity === 'lendaria') btn = legendaryHtml(w, id);
+    else if (owned) btn = `<button disabled>${L('Já é sua', 'Owned')}</button>`;
     else if (ask === id)
       btn = `<div class="mr-ask"><button class="danger" data-a="relicbuy" data-v="${id}">${L(`Confirmar (${fmt(r.price)} ouro)`, `Confirm (${fmt(r.price)} gold)`)}</button><button data-a="reliccancel">${L('Cancelar', 'Cancel')}</button></div>`;
     else
@@ -59,7 +75,7 @@ export function relicPickHtml(w: World): string {
         )
         .join('')
     : !w.relicsOwned.length
-      ? `<div class="muted">${L('Compre relíquias com o Antiquário Lao (Cidadela de Jade) ou derrote chefes no nível 50.', 'Buy relics from Antiquarian Lao (Jade Citadel) or defeat bosses at level 50.')}</div>`
+      ? `<div class="muted">${L('Compre relíquias com o Antiquário Lao (Porto Noturno) ou junte fragmentos de chefes no nível 50.', 'Buy relics from Antiquarian Lao (Night Harbor) or gather boss fragments at level 50.')}</div>`
       : '';
   return head + list;
 }

@@ -13,6 +13,7 @@ import {
   questsOfNpc,
   GEM_CFG,
 } from './data';
+import { RELIC_DROP } from '../core/data';
 import { itemLink, questList } from './ui';
 import { mapName } from './maps';
 import { TELEPORT_COST, TELEPORT_DESTS, teleportCost } from '../core/teleport';
@@ -292,8 +293,9 @@ function jeweler(): string {
     <h3>Sempre à venda</h3><ul class="shop">${shopRow('po_estrela', GEM_CFG.starDustPrice)}</ul>`;
 }
 function antiquary(): string {
-  return `<p>Vende relíquias comuns e raras para o novo espaço de relíquia do personagem (nível 50). As lendárias só caem de
-    chefes. Fica no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>, entre o jardim e a arena. Veja todas em
+  return `<p>Vende relíquias comuns e raras para o novo espaço de relíquia do personagem (nível 50). Também monta as
+    lendárias com ${RELIC_DROP.fragments} fragmentos (deixados pelo chefe de cada uma) e compra os fragmentos que sobram.
+    Fica no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>, entre o jardim e a arena. Veja todas em
     <a href="#/mecanicas/reliquias">Relíquias</a>.</p>`;
 }
 function arenaMaster(): string {

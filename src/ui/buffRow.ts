@@ -29,7 +29,7 @@ export function buffText(b: Buff): string {
       .replace('{pct}', String(Math.round(b.value * 100)))
       .replace('{dps}', String(Math.round(b.value)))
       .replace('{val}', String(Math.round(b.value)));
-  return `${L(i.pt, i.en)}: ${fx} (${Math.ceil(b.remaining)}s)`;
+  return b.duration >= 999 ? `${L(i.pt, i.en)}: ${fx}` : `${L(i.pt, i.en)}: ${fx} (${Math.ceil(b.remaining)}s)`;
 }
 
 /** Fileira de ícones de buffs/debuffs; só redesenha quando muda (tipos ou segundos). */

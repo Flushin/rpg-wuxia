@@ -202,6 +202,9 @@ export class EventFeedback {
       case 'epicDrop':
         this.hud.toast(L(`Item Épico! ${ev.name}`, `Epic item! ${ev.name}`), RARITIES.epico.color, 'epic');
         return true;
+      case 'relicFragment':
+        this.hud.toast(L(`Fragmento: ${ev.name} (${ev.total})`, `Fragment: ${ev.name} (${ev.total})`), '#ff9f1c');
+        return true;
       case 'relicDrop':
         this.hud.toast(L(`Relíquia Lendária! ${ev.name}`, `Legendary relic! ${ev.name}`), '#ff9f1c', 'epic');
         return true;

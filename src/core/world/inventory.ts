@@ -67,7 +67,12 @@ export function gearStats(w: World): Record<string, number> {
     for (const [k, v] of Object.entries(itemStats(it, w.owner()))) out[k] = (out[k] ?? 0) + v;
   }
   const r = w.relic ? RELICS[w.relic] : undefined; // relíquia equipada: atributos fixos, sem durabilidade
-  if (r) for (const [k, v] of Object.entries(r.stats)) out[k] = (out[k] ?? 0) + v;
+  if (r)
+    for (const [k, v] of Object.entries(r.stats)) {
+      // 'primary': força ou inteligência, conforme o tipo de dano da seita
+      const key = k === 'primary' ? (CLASSES[w.classId].damageType === 'spiritual' ? 'intelligence' : 'strength') : k;
+      out[key] = (out[key] ?? 0) + v;
+    }
   return out;
 }
 

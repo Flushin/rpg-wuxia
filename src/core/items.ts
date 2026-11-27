@@ -202,8 +202,12 @@ export const STAT_LABELS: Record<string, string> = {
   elem_ice: L('Ataque de Gelo', 'Ice Attack'),
   elem_thunder: L('Ataque de Trovão', 'Thunder Attack'),
   elem_poison: L('Ataque de Veneno', 'Poison Attack'),
+  primary: L('Força ou Inteligência (conforme a seita)', 'Strength or Intelligence (by sect)'),
+  tenacity: L('Tenacidade', 'Tenacity'),
+  resilience: L('Resiliência', 'Resilience'),
+  penetration: L('Penetração', 'Penetration'),
 };
-const PERCENT_STATS = new Set(['critChance', 'critDamage']);
+const PERCENT_STATS = new Set(['critChance', 'critDamage', 'tenacity', 'resilience', 'penetration']);
 export const fmtStatValue = (stat: string, v: number) =>
   PERCENT_STATS.has(stat) ? `${+(v * 100).toFixed(1)}%` : String(+v.toFixed(2));
 export const fmtStat = (stat: string, v: number) =>

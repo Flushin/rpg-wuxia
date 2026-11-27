@@ -749,14 +749,72 @@ console.log('\n== relíquias ==');
   low.openNpc = low.npcs.find((n) => n.npcId === 'antiquario')!;
   low.gold = 1_000_000;
   ok(low.buyRelic('sino_bronze')?.code === 'needLevel', 'exige nível 50');
-  // drop de lendária: chance por chefe com o jogador no nível 50
-  const d = mk('lamina', 50, 'porto') as World & { rollRelicDrop: () => void; rng: { next: () => number } };
+  // lendárias: fragmentos do chefe de cada uma, montar no Antiquário, sobras vendidas
+  type D = World & {
+    rollRelicDrop: (id: string) => void;
+    rng: { next: () => number };
+    tickRelic: (dt: number) => void;
+  };
+  const d = mk('lamina', 50, 'porto') as D;
+  d.rng = { next: () => 0.99 };
+  d.rollRelicDrop('general_terracota');
+  ok(!Object.keys(d.relicShards).length, 'chefe sem lendária não dá fragmento');
+  d.rollRelicDrop('imperador_carmesim');
+  ok(d.relicShards.coracao_dragao === RELIC_DROP.perKill, 'chefe dá fragmento da sua lendária');
   d.rng = { next: () => 0 };
-  d.rollRelicDrop();
-  ok(d.relicsOwned.length === 1 && RELICS[d.relicsOwned[0]].rarity === 'lendaria', 'chefe pode dar lendária');
-  d.rng = { next: () => RELIC_DROP.chance };
-  d.rollRelicDrop();
-  ok(d.relicsOwned.length === 1, 'sem sorte, nada cai');
+  d.rollRelicDrop('imperador_carmesim');
+  ok(d.relicsOwned.includes('coracao_dragao'), 'chance de cair a peça inteira');
+  const lowD = mk('lamina', 49, 'porto') as D;
+  lowD.rollRelicDrop('imperador_carmesim');
+  ok(!Object.keys(lowD.relicShards).length, 'abaixo do nível 50 nada cai');
+  d.openNpc = d.npcs.find((n) => n.npcId === 'antiquario')!;
+  d.relicShards.selo_jade = RELIC_DROP.fragments - 1;
+  ok(d.assembleRelic('selo_jade')?.code === 'relicShards', 'monta só com fragmentos suficientes');
+  d.relicShards.selo_jade = RELIC_DROP.fragments + 2;
+  ok(d.assembleRelic('selo_jade') === null && d.relicsOwned.includes('selo_jade'), 'monta a lendária');
+  ok(d.relicShards.selo_jade === 2, 'gasta os fragmentos');
+  const g1 = d.gold;
+  ok(d.sellRelicShards('selo_jade') === null && d.gold === g1 + 2 * RELIC_DROP.fragmentPrice, 'vende as sobras');
+  const sv = World.fromSave(maps, {
+    ...JSON.parse(JSON.stringify(d.serialize())),
+    relicShards: { perola_qilin: 7, xx: 3 },
+  });
+  ok(sv.relicShards.perola_qilin === 7 && !('xx' in sv.relicShards), 'fragmentos no save, saneados');
+  // atributo primário: força (físico) ou inteligência (espiritual)
+  const str0 = d.player.derived.physAtk;
+  d.equipRelic('coracao_dragao');
+  ok(
+    d.player.derived.physAtk === str0 + 2 * RELICS.coracao_dragao.stats.primary,
+    'primário vira força na seita física',
+  );
+  // Último fôlego
+  d.player.hp = d.player.derived.maxHp * 0.2;
+  d.tickRelic(0.1);
+  ok(
+    d.player.buffs.some((b) => b.id === 'relic_last_breath' && b.kind === 'regen'),
+    'Último fôlego cura abaixo de 30%',
+  );
+  // tenacidade
+  d.addBuff(d.player, 'x', 'stun', 0, 2);
+  const st = d.player.buffs.find((b) => b.kind === 'stun')!;
+  ok(Math.abs(st.duration - 2 * (1 - RELICS.coracao_dragao.stats.tenacity)) < 1e-9, 'tenacidade encurta o atordoar');
+  // Muralha imperial
+  d.equipRelic('selo_jade');
+  d.tickRelic(0.1);
+  ok(
+    d.player.buffs.some((b) => b.id === 'relic_shield' && b.kind === 'shield'),
+    'Muralha imperial dá escudo',
+  );
+  // Ritmo do qilin
+  const q = d as D & { relicRhythm: () => number };
+  q.relicsOwned.push('perola_qilin');
+  q.equipRelic('perola_qilin');
+  const muls = [1, 2, 3, 4, 5].map(() => q.relicRhythm());
+  ok(
+    muls.slice(0, 4).every((m) => m === 1) && muls[4] === 1 + RELICS.perola_qilin.effect.value,
+    'Ritmo do qilin: a 5ª skill causa dano extra',
+  );
+  ok(!q.player.buffs.some((b) => b.kind === 'empower'), 'o bônus é gasto');
 }
 function SLOTS_EMPTY(w: World) {
   return Object.values(w.equipment).every((e) => e === null);

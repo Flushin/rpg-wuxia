@@ -1,13 +1,32 @@
 {
   "proxima": [
-    { "texto": "Selo do chefe nas masmorras: a passagem para a arena fica fechada por um selo dourado até você derrotar todos os monstros comuns (o selo mostra quantos faltam), e o golpe automático não pula mais para o chefe no meio da limpeza. As paredes de árvores na frente das salas viraram pedras e moitas baixas, e as árvores ficam transparentes quando cobrem aliados ou monstros." },
-    { "texto": "Três masmorras difíceis no Portal das Masmorras, sem nível mínimo: Santuário de Jade (nv 30–32), Templo das Cinzas (nv 40–42) e Corte da Lua Fria (nv 50–52). Mais salas e monstros, chefes que juntam golpes em círculo e em linha, invocações e fúria. Dá para ir sozinho ou em equipe com os bots." },
-    { "texto": "Arena no Porto Noturno: fale com o Mestre da Arena Tie, ao lado do portal do Trial, para lutar 1 contra 1 com um lutador de outra seita. Seu poder não muda; o adversário fica mais forte conforme os seus pontos de ranking (Bronze a Lenda). Perder não tem penalidade. Cada luta dá moedas da arena, que compram títulos mostrados acima do seu nome." },
-    { "texto": "Masmorra em equipe: no Portal das Masmorras escolha \"Equipe (bots)\" para entrar com 3 aliados de outras seitas, que lutam ao seu lado com as skills e poções pequenas. Os monstros têm mais vida e a recompensa é a mesma. Aliado caído? Segure o botão ✚ (tecla F) perto dele por 3 s para revivê-lo uma vez por luta." },
-    { "texto": "Ícones de buffs e debuffs: o quadro do alvo e a barra do chefe mostram lentidão, veneno, atordoamento, congelamento e defesa quebrada, com o tempo restante; sob a sua vida aparecem escudo, regeneração e os efeitos que você recebe. Nova página na wiki explica cada ícone." },
-    { "texto": "Montaria: botão do cavalo ao lado do Auto (tecla H no computador) para montar e desmontar; a montaria não sobe mais sozinha. Montado, a aura fica no personagem e não no cavalo." },
-    { "texto": "Portais novos nos mapas de caça: um círculo de Bagua no chão com a runa 門 dourada; quando você chega perto, ele gira mais rápido e sobe uma coluna de luz." },
-    { "texto": "Portais novos na Vila: um lótus de jade com a cor e o símbolo de cada destino (Floresta, Montanha, Masmorras e Trial); quando você chega perto, as pétalas abrem e sobe um jato de luz." }
+    {
+      "texto": "Selo do chefe nas masmorras: a passagem para a arena fica fechada por um selo dourado até você derrotar todos os monstros comuns (o selo mostra quantos faltam), e o golpe automático não pula mais para o chefe no meio da limpeza. As paredes de árvores na frente das salas viraram pedras e moitas baixas, e as árvores ficam transparentes quando cobrem aliados ou monstros."
+    },
+    {
+      "texto": "Três masmorras difíceis no Portal das Masmorras, sem nível mínimo: Santuário de Jade (nv 30–32), Templo das Cinzas (nv 40–42) e Corte da Lua Fria (nv 50–52). Mais salas e monstros, chefes que juntam golpes em círculo e em linha, invocações e fúria. Dá para ir sozinho ou em equipe com os bots."
+    },
+    {
+      "texto": "Arena no Porto Noturno: fale com o Mestre da Arena Tie, ao lado do portal do Trial, para lutar 1 contra 1 com um lutador de outra seita. Seu poder não muda; o adversário fica mais forte conforme os seus pontos de ranking (Bronze a Lenda). Perder não tem penalidade. Cada luta dá moedas da arena, que compram títulos mostrados acima do seu nome."
+    },
+    {
+      "texto": "Masmorra em equipe: no Portal das Masmorras escolha \"Equipe (bots)\" para entrar com 3 aliados de outras seitas, que lutam ao seu lado com as skills e poções pequenas. Os monstros têm mais vida e a recompensa é a mesma. Aliado caído? Segure o botão ✚ (tecla F) perto dele por 3 s para revivê-lo uma vez por luta."
+    },
+    {
+      "texto": "Ícones de buffs e debuffs: o quadro do alvo e a barra do chefe mostram lentidão, veneno, atordoamento, congelamento e defesa quebrada, com o tempo restante; sob a sua vida aparecem escudo, regeneração e os efeitos que você recebe. Nova página na wiki explica cada ícone."
+    },
+    {
+      "texto": "Montaria: botão do cavalo ao lado do Auto (tecla H no computador) para montar e desmontar; a montaria não sobe mais sozinha. Montado, a aura fica no personagem e não no cavalo."
+    },
+    {
+      "texto": "Portais novos nos mapas de caça: um círculo de Bagua no chão com a runa 門 dourada; quando você chega perto, ele gira mais rápido e sobe uma coluna de luz."
+    },
+    {
+      "texto": "Portais novos na Vila: um lótus de jade com a cor e o símbolo de cada destino (Floresta, Montanha, Masmorras e Trial); quando você chega perto, as pétalas abrem e sobe um jato de luz."
+    },
+    {
+      "texto": "Relíquias lendárias refeitas: cada uma tem o seu chefe (Imperador Carmesim, Marechal das Cinzas e Imperador Espectral), que dá fragmentos a partir do nível 50; com 25 o Antiquário Lao monta a relíquia. Novos efeitos (Último fôlego, Muralha imperial, Ritmo do qilin) e atributos de PvP: Tenacidade, Resiliência e Penetração."
+    }
   ],
   "versoes": [
     {

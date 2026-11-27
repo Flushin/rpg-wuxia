@@ -185,7 +185,18 @@ export const MOUNTS = localize('mounts', mountsJson) as unknown as Record<string
 /** Relíquia (Porto Noturno, etapa 4): 1 espaço no personagem; atributos fixos (somam como equipamento) + 1 efeito.
  * Comum/rara: Antiquário Lao; lendária: drop de chefe. Sem durabilidade, forja nem gemas. */
 export type RelicRarity = 'comum' | 'rara' | 'lendaria';
-export type RelicEffectKind = 'lifeSteal' | 'attackSpeed' | 'cooldown' | 'maxHpPct';
+export type RelicEffectKind =
+  | 'lifeSteal'
+  | 'attackSpeed'
+  | 'cooldown'
+  | 'maxHpPct'
+  | 'lastBreath' // abaixo de `below` da vida: cura `value` da vida máx. em `duration` s (recarga `cooldown`)
+  | 'shieldPulse' // escudo de `value` da vida máx. a cada `every` s
+  | 'skillRhythm'; // a cada `every` skills, a seguinte causa +`value` de dano
+/** Atributos de PvP das relíquias (frações): tenacidade (controles duram menos), resiliência (menos dano crítico
+ * recebido), penetração (ignora parte da defesa do alvo). */
+export const RELIC_PVP_STATS = ['tenacity', 'resilience', 'penetration'] as const;
+export type RelicPvpStat = (typeof RELIC_PVP_STATS)[number];
 export interface RelicDef {
   name: string;
   desc: string;
@@ -193,13 +204,29 @@ export interface RelicDef {
   rarity: RelicRarity;
   price: number;
   stats: Record<string, number>;
-  effect: { kind: RelicEffectKind; value: number };
+  effect: {
+    kind: RelicEffectKind;
+    value: number;
+    below?: number;
+    duration?: number;
+    cooldown?: number;
+    every?: number;
+  };
+  /** lendária: chefe que dá os fragmentos */
+  boss?: string;
 }
 const RJ = localize('relics', relicsJson) as unknown as {
   slotName: string;
   reqLevel: number;
   rarities: Record<RelicRarity, { name: string; color: string }>;
-  drop: { chance: number; minPlayerLevel: number };
+  drop: {
+    minPlayerLevel: number;
+    fragments: number;
+    perKill: number;
+    perKillDungeon: number;
+    fullChance: number;
+    fragmentPrice: number;
+  };
   list: Record<string, RelicDef>;
 };
 export const RELICS = RJ.list,
@@ -222,6 +249,23 @@ export function relicEffectText(r: RelicDef): string {
       return L(`Recarga das skills −${v}`, `Skill cooldowns −${v}`);
     case 'maxHpPct':
       return L(`Vida máxima +${v}`, `Max health +${v}`);
+    case 'lastBreath': {
+      const e = r.effect;
+      return L(
+        `Último fôlego: abaixo de ${relicPct(e.below ?? 0)} da vida, cura ${v} da vida máxima em ${e.duration} s (recarga ${e.cooldown} s)`,
+        `Last breath: below ${relicPct(e.below ?? 0)} health, heals ${v} of max health over ${e.duration} s (${e.cooldown} s cooldown)`,
+      );
+    }
+    case 'shieldPulse':
+      return L(
+        `Muralha imperial: escudo de ${v} da vida máxima a cada ${r.effect.every} s`,
+        `Imperial wall: shield of ${v} of max health every ${r.effect.every} s`,
+      );
+    case 'skillRhythm':
+      return L(
+        `Ritmo do qilin: a cada ${r.effect.every} skills, a seguinte causa +${v} de dano`,
+        `Qilin rhythm: every ${r.effect.every} skills, the next one deals +${v} damage`,
+      );
   }
 }
 

@@ -46,6 +46,8 @@ import {
   SELL_RATIO,
   SLOT_NAMES,
   STAT_LABELS,
+  fmtStatValue,
+  pct as pctW,
   UPGRADE_STEP,
   WEAR_PER_HIT,
   esc,
@@ -282,18 +284,26 @@ function reliquias(): string {
     .map((r) => {
       const rar = RELIC_RARITIES[r.rarity];
       const stats = Object.entries(r.stats)
-        .map(([k, v]) => `+${k === 'critChance' ? `${+(v * 100).toFixed(1)}%` : v} ${esc(STAT_LABELS[k] ?? k)}`)
+        .map(([k, v]) => `+${fmtStatValue(k, v)} ${esc(STAT_LABELS[k] ?? k)}`)
         .join(', ');
-      const where = r.rarity === 'lendaria' ? 'Drop de chefe' : `${r.price.toLocaleString('pt-BR')} ouro`;
+      const boss = r.boss ? MONSTERS[r.boss] : undefined;
+      const where =
+        r.rarity === 'lendaria'
+          ? `Fragmentos de ${boss ? `<a href="#/monstro/${r.boss}">${esc(boss.name)}</a>` : '?'}`
+          : `${r.price.toLocaleString('pt-BR')} ouro`;
       return `<tr><td>${r.icon} <b style="color:${rar.color}">${esc(r.name)}</b></td><td>${esc(rar.name)}</td><td>${stats}</td><td>${esc(relicEffectText(r))}</td><td>${where}</td></tr>`;
     })
     .join('');
   return `<section class="panel"><h2>Relíquias</h2>
       <p>Um espaço de equipamento próprio, abaixo do corpo na janela do Personagem, liberado no <b>nível ${RELIC_REQ_LEVEL}</b>.
-      Cada relíquia dá atributos fixos e <b>um efeito único</b> (roubo de vida, velocidade de ataque, recarga das skills ou vida máxima em %).</p>
+      Cada relíquia dá atributos fixos e <b>um efeito único</b>. Os efeitos valem igual contra monstros e contra jogadores.</p>
       <ul><li><b>Comuns e raras:</b> vendidas pelo <a href="#/npc/antiquario">Antiquário Lao</a>, no bairro sul do <a href="#/mapa/porto">Porto Noturno</a>.</li>
-      <li><b>Lendárias:</b> não estão à venda. Cada chefe derrotado (do mundo, de masmorra ou do Trial) com você no nível ${RELIC_DROP.minPlayerLevel} tem
-      ${Math.round(RELIC_DROP.chance * 100)}% de chance de dar uma lendária que você ainda não tem.</li>
+      <li><b>Lendárias:</b> não estão à venda. Cada uma tem o seu chefe: derrotá-lo com você no nível ${RELIC_DROP.minPlayerLevel}+ dá
+      ${RELIC_DROP.perKill} fragmento (${RELIC_DROP.perKillDungeon} em masmorra). Com <b>${RELIC_DROP.fragments} fragmentos</b> o Antiquário Lao monta a relíquia.
+      Há também ${pctW(RELIC_DROP.fullChance)} de chance de a peça cair inteira. Fragmentos que sobram depois de ter a relíquia, o Lao compra por ${RELIC_DROP.fragmentPrice.toLocaleString('pt-BR')} ouro cada.</li>
+      <li><b>Força ou Inteligência (conforme a seita):</b> vira Força nas seitas de dano físico e Inteligência nas de dano espiritual.</li>
+      <li><b>Atributos de PvP</b> (das lendárias): <b>Tenacidade</b> encurta atordoamento e lentidão recebidos; <b>Resiliência</b> corta essa parte do bônus do crítico recebido;
+      <b>Penetração</b> ignora essa parte da defesa do alvo.</li>
       <li>Compradas ou ganhas uma vez, ficam na sua coleção para sempre; troque a equipada quando quiser, sem custo.</li>
       <li>Sem durabilidade, forja nem encaixe de gemas; não ocupam a mochila e não podem ser vendidas.</li></ul>
       <table><tr><th>Relíquia</th><th>Raridade</th><th>Atributos</th><th>Efeito</th><th>Onde</th></tr>${rows}</table></section>`;
@@ -737,6 +747,12 @@ function efeitos(): string {
     const oh = (m as { onHit?: { slow: number; duration: number } }).onHit;
     if (oh) add('slow', `<a href="#/monstro/${m.id}">${esc(m.name)}</a> (golpe, ${pct(oh.slow)}, ${oh.duration} s)`);
   }
+  for (const r of Object.values(RELICS))
+    if (r.effect.kind === 'skillRhythm') add('empower', `${r.icon} ${esc(r.name)} (relíquia)`);
+    else if (r.effect.kind === 'shieldPulse')
+      add('shield', `${r.icon} ${esc(r.name)} (relíquia, a cada ${r.effect.every} s)`);
+    else if (r.effect.kind === 'lastBreath')
+      add('regen', `${r.icon} ${esc(r.name)} (relíquia, ${r.effect.duration} s)`);
   const rows = (Object.keys(BUFF_INFO) as BuffIconKey[])
     .map((k) => {
       const i = BUFF_INFO[k];
@@ -760,4 +776,6 @@ const DESC: Record<BuffIconKey, string> = {
     'Reduz a defesa do alvo pela porcentagem indicada (efeitos diferentes somam), então ele leva mais dano.',
   shield: 'Absorve dano até acabar os pontos ou o tempo.',
   regen: 'Recupera vida a cada segundo durante a duração.',
+  empower:
+    'Ritmo do qilin (relíquia Pérola do Qilin): a próxima skill causa o dano extra indicado. Fica até você usar uma skill.',
 };
