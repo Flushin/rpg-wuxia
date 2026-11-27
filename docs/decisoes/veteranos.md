@@ -21,6 +21,13 @@ Aparecem no estábulo, na arena e na wiki como "Exclusivo dos Fundadores", sem v
 montaria exclusivos se tiver a marca de veterano.
 
 ## Quem é veterano
-**Lista manual no servidor** (o Lucas cadastra os amigos). O link novo não enxerga o save do link antigo, então não há
-importação. Até o servidor existir, só o modo de desenvolvimento marca: `npm run dev` + `?fundador=1` na URL.
-Falta no online: o servidor chamar `grantFounder()` para as contas da lista e guardar `founder` no banco.
+**A conta é Fundadora, não o personagem.** No banco, a tabela de contas tem um campo `fundador` (sim/não), e o
+Lucas o marca **direto no banco** (sem painel de admin nem lista na build). O link novo não enxerga o save do link
+antigo, então não há importação.
+- Todo personagem da conta é Fundador, inclusive os criados depois de excluir outro: ao carregar ou criar um
+  personagem, o servidor lê a conta e chama `grantFounder()`.
+- **Cada personagem escolhe a própria montaria** (a janela abre para cada personagem novo); `founder.mount` fica
+  salvo no personagem.
+- O bônus de XP e de ouro vale para cada personagem da conta.
+- Quem decide é o servidor: o cliente nunca se marca sozinho no online. Até lá, só o modo de desenvolvimento marca
+  (`npm run dev` + `?fundador=1` na URL).
