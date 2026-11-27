@@ -756,7 +756,7 @@ function arena(): string {
       <li>Sem limite de lutas.</li>
     </ul></section>
     <section class="panel"><h2>Moeda e títulos</h2>
-      <p>Cada luta dá moedas da arena: ${ARENA_COINS.win} na vitória e ${ARENA_COINS.loss} na derrota. Elas compram títulos, que aparecem acima do seu nome. São só visuais e não dão poder.</p>
+      <p>Cada luta dá moedas da arena: ${ARENA_COINS.win} na vitória e ${ARENA_COINS.loss} na derrota. Elas compram títulos, que aparecem acima do seu nome. São só visuais e não dão poder. Para trocar o título em uso ou ficar sem nenhum, abra a janela <b>Personagem</b> (tecla C) e a aba <b>Títulos</b>.</p>
       <table><tr><th>Título</th><th>Moedas</th><th>Pontos mínimos</th></tr>${titles}</table>
     </section>`;
 }

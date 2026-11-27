@@ -768,3 +768,59 @@
   justify-self: start;
   margin-top: 4px;
 }
+
+/* montarias: miniatura (janela do Fundador e estábulo) */
+.mount-thumb {
+  flex: none;
+  object-fit: contain;
+  image-rendering: auto;
+  background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.08), transparent 70%);
+  border-radius: 8px;
+}
+.rep-row.mount-pick {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 8px;
+}
+.rep-row.mount-pick > div {
+  flex: 1;
+  min-width: 0;
+}
+.rep-row.mount-pick.sel {
+  background: rgba(255, 210, 63, 0.08);
+  outline: 1px solid rgba(255, 210, 63, 0.4);
+}
+.dg-row.sk-row .mount-thumb {
+  margin-right: 8px;
+}
+
+/* Personagem: abas e aba Títulos */
+.ch-tabs {
+  margin: 6px 0 10px;
+}
+.ch-titles .ti-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+.ch-titles .ti-body {
+  flex: 1;
+  min-width: 0;
+}
+.ch-titles .ti-row button,
+.card .ch-titles .ti-row .primary {
+  width: auto;
+  margin-top: 0;
+  flex: none;
+  min-width: 96px;
+  min-height: 40px;
+}
+.ch-titles .ti-row.on {
+  background: rgba(255, 210, 63, 0.08);
+  border-radius: 8px;
+}

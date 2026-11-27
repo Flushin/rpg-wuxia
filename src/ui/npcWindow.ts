@@ -1,4 +1,5 @@
 import { actionErrorText } from './actionError';
+import { mountThumb } from './founder';
 import { chooseFounderMount } from '../core/founder';
 import type { ActionError } from '../core/types';
 import { BUYBACK_MAX } from '../core/world/shop';
@@ -614,7 +615,7 @@ export class NpcWindow {
         !owned && !m.exclusive && w.gold < m.price
           ? `<small class="muted">${L(`Faltam ${(m.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(m.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
           : '';
-      return `<div class="dg-row sk-row"><div class="sk-body">
+      return `<div class="dg-row sk-row">${mountThumb(id)}<div class="sk-body">
         <b>${escapeHtml(m.name)}</b> <small class="muted">+${pct}% ${L('velocidade', 'speed')}</small>
         <div class="dg-info">${escapeHtml(m.desc)}</div>
         ${btn}${why}</div></div>`;

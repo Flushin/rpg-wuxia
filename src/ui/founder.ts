@@ -14,6 +14,10 @@ import type { World } from '../core/world';
 import { audio } from '../render/audio';
 import { byId, escapeHtml } from './dom';
 
+/** Miniatura da montaria (public/sprites/thumbs/mount-<id>.png, recorte de lado do 1º quadro parado). */
+export const mountThumb = (id: string, size = 64) =>
+  `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
+
 export function showFounderWelcome(w: World, onClose: () => void) {
   const el = byId('offline-panel');
   let ask = '';
@@ -31,7 +35,7 @@ export function showFounderWelcome(w: World, onClose: () => void) {
           ask === id
             ? `<button class="danger" data-f="ok" data-v="${id}">${L('Confirmar (definitivo)', 'Confirm (permanent)')}</button><button data-f="back">${L('Voltar', 'Back')}</button>`
             : `<button class="primary" data-f="ask" data-v="${id}">${L('Escolher', 'Choose')}</button>`;
-        return `<div class="rep-row" style="display:block"><b>${escapeHtml(m.name)}</b><div class="muted"><small>${escapeHtml(m.desc)}</small></div>${btn}</div>`;
+        return `<div class="rep-row mount-pick${ask === id ? ' sel' : ''}">${mountThumb(id, 96)}<div><b>${escapeHtml(m.name)}</b><div class="muted"><small>${escapeHtml(m.desc)}</small></div>${btn}</div></div>`;
       })
       .join('');
     el.innerHTML = `<div class="card"><h2>${L('Bem-vindo de volta, Fundador', 'Welcome back, Founder')}</h2>
