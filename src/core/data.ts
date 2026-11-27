@@ -215,7 +215,7 @@ export interface RelicDef {
   /** lendária: chefe que dá os fragmentos */
   boss?: string;
 }
-const RJ = localize('relics', relicsJson) as unknown as {
+const RJ = localize('relics', structuredClone(relicsJson)) as unknown as {
   slotName: string;
   reqLevel: number;
   rarities: Record<RelicRarity, { name: string; color: string }>;

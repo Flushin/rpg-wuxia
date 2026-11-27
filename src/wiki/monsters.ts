@@ -7,7 +7,13 @@ import { EPIC, EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from
 import { loadMaps, type WikiMap } from './maps';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
-import { RELIC_DROP, RELIC_RARITIES, RELICS } from '../core/data';
+import { RELIC_DROP, type RelicDef } from '../core/data';
+import relicsJson from '../data/relics.json';
+
+const RELICS_PT = relicsJson as unknown as {
+  list: Record<string, RelicDef>;
+  rarities: Record<string, { color: string }>;
+};
 import { TRIAL_TIERS, isTrialBoss, trialBossLevel, trialWeakness, trialXp } from '../core/trial';
 import { spriteHtml } from './npcs';
 import { chance, itemLink, questList, spoiler } from './ui';
@@ -200,9 +206,9 @@ function drops(m: Monster): string {
      <small class="muted">· só jogando, monstro até ${EPIC.maxLevelsBelow} níveis abaixo do seu${summoners(m.id).length ? '; não quando invocado por um chefe' : ''}</small></li>`,
   );
   // fragmentos da relíquia lendária deste chefe (src/core/world.ts rollRelicDrop)
-  for (const r of Object.values(RELICS).filter((x) => x.boss === m.id))
+  for (const r of Object.values(RELICS_PT.list).filter((x) => x.boss === m.id))
     rows.push(
-      `<li><a href="#/mecanicas/reliquias" style="color:${RELIC_RARITIES[r.rarity].color}">${r.icon} Fragmento: ${esc(r.name)}</a> — <b>garantido</b>
+      `<li><a href="#/mecanicas/reliquias" style="color:${RELICS_PT.rarities[r.rarity].color}">${r.icon} Fragmento: ${esc(r.name)}</a> — <b>garantido</b>
        <small class="muted">· você no nível ${RELIC_DROP.minPlayerLevel}+; ${RELIC_DROP.perKill} por vitória (${RELIC_DROP.perKillDungeon} em masmorra), ${RELIC_DROP.fragments} montam a relíquia; ${chance(RELIC_DROP.fullChance)} de cair inteira</small></li>`,
     );
   if (L.guaranteed)

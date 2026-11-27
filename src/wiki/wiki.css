@@ -708,3 +708,91 @@ ol.plain {
 .dungeon-list .lore {
   margin: 4px 0 0;
 }
+
+/* Relíquias: cartões por raridade */
+.rl-wgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.rl-wcard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--c);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.rl-whead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rl-whead b {
+  display: block;
+  color: var(--c);
+  font-size: 16px;
+  line-height: 1.25;
+}
+.rl-whead small {
+  color: var(--muted);
+}
+.rl-wic {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  font-size: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--c);
+  background: rgba(0, 0, 0, 0.25);
+}
+.rl-wdesc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+.rl-wstats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rl-wstats li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 13px;
+}
+.rl-wfx {
+  display: flex;
+  flex-direction: column;
+  background: rgba(212, 160, 23, 0.08);
+  border-left: 3px solid var(--c);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+.rl-wfx b {
+  color: var(--c);
+}
+.rl-wwhere {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.panel .rl-wstats {
+  padding-left: 0;
+}
+.panel .rl-wstats li {
+  margin: 0;
+}
