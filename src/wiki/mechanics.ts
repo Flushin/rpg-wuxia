@@ -747,6 +747,12 @@ function efeitos(): string {
     const oh = (m as { onHit?: { slow: number; duration: number } }).onHit;
     if (oh) add('slow', `<a href="#/monstro/${m.id}">${esc(m.name)}</a> (golpe, ${pct(oh.slow)}, ${oh.duration} s)`);
   }
+  for (const r of Object.values(RELICS))
+    if (r.effect.kind === 'skillRhythm') add('empower', `${r.icon} ${esc(r.name)} (relíquia)`);
+    else if (r.effect.kind === 'shieldPulse')
+      add('shield', `${r.icon} ${esc(r.name)} (relíquia, a cada ${r.effect.every} s)`);
+    else if (r.effect.kind === 'lastBreath')
+      add('regen', `${r.icon} ${esc(r.name)} (relíquia, ${r.effect.duration} s)`);
   const rows = (Object.keys(BUFF_INFO) as BuffIconKey[])
     .map((k) => {
       const i = BUFF_INFO[k];

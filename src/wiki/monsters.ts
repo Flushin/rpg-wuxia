@@ -7,6 +7,7 @@ import { EPIC, EQUIP_TIERS, MONSTERS, QUESTS, RARITIES, esc, type Monster } from
 import { loadMaps, type WikiMap } from './maps';
 import { MAPS_CONFIG } from '../core/mapsConfig';
 import { DUNGEON_EQUIP_DROP_MUL } from '../core/dungeons';
+import { RELIC_DROP, RELIC_RARITIES, RELICS } from '../core/data';
 import { TRIAL_TIERS, isTrialBoss, trialBossLevel, trialWeakness, trialXp } from '../core/trial';
 import { spriteHtml } from './npcs';
 import { chance, itemLink, questList, spoiler } from './ui';
@@ -198,6 +199,12 @@ function drops(m: Monster): string {
     `<li><a href="#/mecanicas/epico" style="color:${RARITIES.epico.color}">Equipamento Épico</a> — <b>${chance(m.boss ? EPIC.chanceBoss : EPIC.chanceMob)}</b>
      <small class="muted">· só jogando, monstro até ${EPIC.maxLevelsBelow} níveis abaixo do seu${summoners(m.id).length ? '; não quando invocado por um chefe' : ''}</small></li>`,
   );
+  // fragmentos da relíquia lendária deste chefe (src/core/world.ts rollRelicDrop)
+  for (const r of Object.values(RELICS).filter((x) => x.boss === m.id))
+    rows.push(
+      `<li><a href="#/mecanicas/reliquias" style="color:${RELIC_RARITIES[r.rarity].color}">${r.icon} Fragmento: ${esc(r.name)}</a> — <b>garantido</b>
+       <small class="muted">· você no nível ${RELIC_DROP.minPlayerLevel}+; ${RELIC_DROP.perKill} por vitória (${RELIC_DROP.perKillDungeon} em masmorra), ${RELIC_DROP.fragments} montam a relíquia; ${chance(RELIC_DROP.fullChance)} de cair inteira</small></li>`,
+    );
   if (L.guaranteed)
     rows.push(
       `<li><b style="color:${RARITIES[L.guaranteed.rarity]?.color}">1 equipamento ${esc(RARITIES[L.guaranteed.rarity]?.name ?? '')}</b> de nível ${L.guaranteed.reqLevel} — <b>garantido</b></li>`,
