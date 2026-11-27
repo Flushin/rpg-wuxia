@@ -7,6 +7,7 @@ export type Lang = 'pt' | 'en';
 
 function detect(): Lang {
   if (typeof window === 'undefined') return 'pt'; // scripts de teste (Node) rodam em PT
+  if (/\/wiki(\/|$)/.test(location.pathname)) return 'pt'; // a wiki é só em português
   const s = getPref(PREF.LANG);
   if (s === 'pt' || s === 'en') return s;
   return (navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en';

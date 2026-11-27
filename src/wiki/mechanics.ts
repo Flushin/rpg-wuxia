@@ -308,20 +308,23 @@ function reliquias(): string {
   const card = (r: RelicDef) => {
     const rar = RELIC_RARITIES_PT[r.rarity];
     const stats = Object.entries(r.stats)
-      .map(([k, v]) => `<li>+${fmtStatValue(k, v)} ${esc(STAT_LABELS[k] ?? k)}</li>`)
+      .map(([k, v]) => {
+        const label = k === 'primary' ? 'Força / Inteligência*' : (STAT_LABELS[k] ?? k);
+        return `<li><span>${esc(label)}</span><b>+${fmtStatValue(k, v)}</b></li>`;
+      })
       .join('');
     const fx = relicEffectPt(r);
     const boss = r.boss ? MONSTERS[r.boss] : undefined;
     const where =
       r.rarity === 'lendaria'
-        ? `🧩 ${RELIC_DROP.fragments} fragmentos de ${boss ? `<a href="#/monstro/${r.boss}">${esc(boss.name)}</a>` : '?'}`
-        : `🪙 ${r.price.toLocaleString('pt-BR')} ouro · <a href="#/npc/antiquario">Antiquário Lao</a>`;
-    return `<div class="rl-wcard" style="--c:${rar.color}">
-      <div class="rl-whead"><span class="rl-wic">${r.icon}</span><div><b>${esc(r.name)}</b><small>${esc(rar.name)}</small></div></div>
+        ? `<span>🧩 ${RELIC_DROP.fragments} fragmentos</span>${boss ? `<a href="#/monstro/${r.boss}">${esc(boss.name)}</a>` : ''}`
+        : `<span>🪙 ${r.price.toLocaleString('pt-BR')} ouro</span><a href="#/npc/antiquario">Antiquário Lao</a>`;
+    return `<article class="rl-wcard" style="--c:${rar.color}">
+      <header class="rl-whead"><span class="rl-wic">${r.icon}</span><div><b>${esc(r.name)}</b><small>${esc(rar.name)}</small></div></header>
       <p class="rl-wdesc">${esc(r.desc)}</p>
       <ul class="rl-wstats">${stats}</ul>
       <div class="rl-wfx"><b>★ ${esc(fx.name)}</b><span>${esc(fx.text)}</span></div>
-      <div class="rl-wwhere">${where}</div></div>`;
+      <footer class="rl-wwhere">${where}</footer></article>`;
   };
   const group = (rarity: string, title: string) => {
     const list = Object.values(raw.list).filter((r) => r.rarity === rarity);
@@ -344,7 +347,8 @@ function reliquias(): string {
       <li><b>Resiliência:</b> corta essa porcentagem do bônus do crítico que você recebe.</li>
       <li><b>Penetração:</b> seus golpes ignoram essa porcentagem da defesa do alvo.</li></ul></section>
     <section class="panel"><h2>Todas as relíquias</h2>
-      ${group('lendaria', 'Lendárias')}${group('rara', 'Raras')}${group('comum', 'Comuns')}</section>`;
+      ${group('lendaria', 'Lendárias')}${group('rara', 'Raras')}${group('comum', 'Comuns')}
+      <p class="muted"><small>* Força nas seitas de dano físico, Inteligência nas de dano espiritual.</small></p></section>`;
 }
 
 function montarias(): string {
