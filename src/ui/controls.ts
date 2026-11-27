@@ -96,28 +96,32 @@ function setupKeyMove(world: World) {
 
 /** Joystick flutuante (17/11/2026): tocar em qualquer lugar da metade esquerda da tela cria o joystick embaixo do dedo;
  *  se o dedo passa do limite, a base vai junto (o pino nunca trava). Parado, o círculo fica no lugar de sempre como guia.
- *  Toque em monstro/NPC dentro da área continua selecionando (não abre o joystick). */
+ *  Toque em monstro/NPC dentro da área continua selecionando (não abre o joystick).
+ *  Dedo: eventos de toque (touch*), que trazem a lista dos dedos na tela em todo evento. Com pointer events o Safari do
+ *  iPhone às vezes perdia o pointerup (outro dedo numa skill, gesto do sistema) e o joystick ficava preso para sempre.
+ *  Agora, se o dedo do joystick não está mais na tela (e.touches), ele solta sozinho. Mouse continua com pointer events. */
 function setupJoystick(world: World, tapAt: (x: number, y: number) => boolean) {
   const zone = byId('joy-zone'),
     joy = byId('joystick'),
     knob = byId('knob');
   zone.classList.remove('hidden');
   joy.classList.remove('hidden');
-  let active: number | null = null;
+  /** dedo/ponteiro que controla o joystick: 't<id>' (toque) ou 'p<id>' (mouse/caneta) */
+  let active: string | null = null;
   let home = { x: 0, y: 0 }; // centro do círculo parado (px da tela)
   let base = { x: 0, y: 0 }; // centro atual da base (px da tela)
   let R = 0;
   const place = () => {
     joy.style.transform = `translate(${toUi(base.x - home.x)}px,${toUi(base.y - home.y)}px)`;
   };
-  const move = (e: PointerEvent) => {
-    let dx = e.clientX - base.x,
-      dy = e.clientY - base.y;
+  const move = (cx: number, cy: number) => {
+    let dx = cx - base.x,
+      dy = cy - base.y;
     const l = Math.hypot(dx, dy),
       max = R * 0.7;
     if (l > max) {
       // a base segue o dedo
-      base = { x: e.clientX - (dx / l) * max, y: e.clientY - (dy / l) * max };
+      base = { x: cx - (dx / l) * max, y: cy - (dy / l) * max };
       dx = (dx / l) * max;
       dy = (dy / l) * max;
       place();
@@ -126,24 +130,16 @@ function setupJoystick(world: World, tapAt: (x: number, y: number) => boolean) {
     if (Math.hypot(dx, dy) < R * 0.15) world.setMoveInput(0, 0);
     else world.setMoveInput(dx, dy);
   };
-  const end = (e: PointerEvent) => {
-    if (e.pointerId !== active) return;
+  const release = () => {
+    if (active === null) return;
     active = null;
     knob.style.transform = '';
     joy.style.transform = '';
     joy.classList.remove('live');
     world.setMoveInput(0, 0);
   };
-  zone.addEventListener('pointerdown', (e) => {
-    if (active !== null) return;
-    if (tapAt(e.clientX, e.clientY)) return; // monstro/NPC: só seleciona
-    e.preventDefault();
-    active = e.pointerId;
-    try {
-      zone.setPointerCapture(e.pointerId);
-    } catch {
-      /* dedo já saiu */
-    }
+  const start = (id: string, cx: number, cy: number) => {
+    active = id;
     joy.style.transform = '';
     const r = joy.getBoundingClientRect();
     R = r.width / 2;
@@ -151,17 +147,73 @@ function setupJoystick(world: World, tapAt: (x: number, y: number) => boolean) {
     // a base nasce embaixo do dedo, sem sair da tela
     const z = zone.getBoundingClientRect();
     base = {
-      x: Math.max(z.left + R, Math.min(e.clientX, z.right - R)),
-      y: Math.max(z.top + R, Math.min(e.clientY, z.bottom - R)),
+      x: Math.max(z.left + R, Math.min(cx, z.right - R)),
+      y: Math.max(z.top + R, Math.min(cy, z.bottom - R)),
     };
     joy.classList.add('live');
     place();
-    move(e);
+    move(cx, cy);
+  };
+  /** o dedo do joystick ainda está na tela? (senão o fim do toque se perdeu: solta) */
+  const fingerOn = (list: TouchList) => Array.from(list).some((t) => `t${t.identifier}` === active);
+  const touchOf = (list: TouchList) => Array.from(list).find((t) => `t${t.identifier}` === active);
+
+  // ---- toque ----
+  zone.addEventListener(
+    'touchstart',
+    (e) => {
+      if (active?.startsWith('t') && !fingerOn(e.touches)) release(); // preso de antes: o dedo novo assume
+      if (active !== null) return;
+      const t = e.changedTouches[0];
+      if (!t || tapAt(t.clientX, t.clientY)) return; // monstro/NPC: só seleciona
+      e.preventDefault();
+      start(`t${t.identifier}`, t.clientX, t.clientY);
+    },
+    { passive: false },
+  );
+  zone.addEventListener(
+    'touchmove',
+    (e) => {
+      const t = touchOf(e.changedTouches);
+      if (!t) return;
+      e.preventDefault();
+      move(t.clientX, t.clientY);
+    },
+    { passive: false },
+  );
+  // fim do toque: confere em toda a tela (o dedo pode ter saído em cima de um botão) e em qualquer toque novo
+  const check = (e: TouchEvent) => {
+    if (active?.startsWith('t') && !fingerOn(e.touches)) release();
+  };
+  for (const ev of ['touchstart', 'touchend', 'touchcancel'] as const)
+    window.addEventListener(ev, check, { capture: true, passive: true });
+
+  // ---- mouse/caneta (notebook com tela de toque) ----
+  zone.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch' || active !== null) return;
+    if (tapAt(e.clientX, e.clientY)) return;
+    e.preventDefault();
+    try {
+      zone.setPointerCapture(e.pointerId);
+    } catch {
+      /* já soltou */
+    }
+    start(`p${e.pointerId}`, e.clientX, e.clientY);
   });
   zone.addEventListener('pointermove', (e) => {
-    if (e.pointerId === active) move(e);
+    if (`p${e.pointerId}` === active) move(e.clientX, e.clientY);
   });
-  zone.addEventListener('pointerup', end);
-  zone.addEventListener('pointercancel', end);
-  zone.addEventListener('lostpointercapture', end);
+  const endPointer = (e: PointerEvent) => {
+    if (`p${e.pointerId}` === active) release();
+  };
+  zone.addEventListener('pointerup', endPointer);
+  zone.addEventListener('pointercancel', endPointer);
+  zone.addEventListener('lostpointercapture', endPointer);
+
+  // app em segundo plano, central de notificações, ligação: solta sempre
+  window.addEventListener('blur', release);
+  window.addEventListener('pagehide', release);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) release();
+  });
 }

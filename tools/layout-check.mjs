@@ -16,6 +16,18 @@ const SIZES = [
   { name: 'celular deitado 844×390', w: 844, h: 390, touch: true },
   { name: 'celular pequeno 360×740', w: 360, h: 740, touch: true },
   { name: 'iPhone Pro Max deitado 932×430', w: 932, h: 430, touch: true, feed: 2 },
+  // iPhone 17 Pro Max instalado na tela inicial: margens reais do iOS (ilha/cantos e barra do home)
+  {
+    name: 'iPhone 17 Pro Max instalado 956×440 (margens 62/62/20)',
+    w: 956,
+    h: 440,
+    touch: true,
+    feed: 2,
+    iphone: true,
+    insets: { top: 0, left: 62, right: 62, bottom: 20 },
+    // o HUD pode entrar um pouco na margem lateral (base.css), mas não na ilha (~48px) nem na barra do home
+    keep: { left: 48, right: 48, bottom: 20 },
+  },
   { name: 'Fold fechado deitado 920×316', w: 920, h: 316, touch: true, feed: 2 },
   { name: 'Fold aberto 884×1028', w: 884, h: 1028, touch: true, feed: 4 },
   { name: 'PC 1366×768', w: 1366, h: 768, touch: false, feed: 4 },
@@ -55,8 +67,17 @@ for (const sz0 of SIZES)
       isMobile: sz.touch,
       hasTouch: sz.touch,
       deviceScaleFactor: 2,
+      ...(sz.iphone && {
+        userAgent:
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',
+      }),
     });
     const page = await ctx.newPage();
+    if (sz.insets) {
+      // margens do notch/home (env(safe-area-inset-*)), como no aparelho
+      const cdp = await ctx.newCDPSession(page);
+      await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: sz.insets });
+    }
     await page.addInitScript((m) => {
       try {
         localStorage.setItem('rpg-ui-size', m);
@@ -69,7 +90,7 @@ for (const sz0 of SIZES)
     await page.waitForSelector('#hud:not(.hidden)');
     await page.waitForTimeout(800);
     const res = await page.evaluate(
-      ({ ids, lines, ultNames }) => {
+      ({ ids, lines, ultNames, keep }) => {
         const $ = (id) => document.getElementById(id);
         for (const id of ['tip-card']) $(id).classList.add('hidden');
         const tf = $('target-frame');
@@ -116,6 +137,8 @@ for (const sz0 of SIZES)
           H = innerHeight;
         for (const [id, b] of boxes)
           if (b.left < -1 || b.top < -1 || b.right > W + 1 || b.bottom > H + 1) out.push(`${id} sai da tela`);
+          else if (keep && (b.left < keep.left || b.right > W - keep.right || b.bottom > H - keep.bottom))
+            out.push(`${id} entra na ilha/barra do home`);
         for (let i = 0; i < boxes.length; i++)
           for (let j = i + 1; j < boxes.length; j++) {
             const [a, A] = boxes[i],
@@ -143,7 +166,7 @@ for (const sz0 of SIZES)
               if (!window.__ultFits(t, r)) out.push(`ult-arc texto cortado: ${t}${r ? ' (pronto)' : ''}`);
         return { out, feedLines: n, compact, ui };
       },
-      { ids: IDS, lines: sz.feed, ultNames: ULT_NAMES },
+      { ids: IDS, lines: sz.feed, ultNames: ULT_NAMES, keep: sz.keep },
     );
     const ok = !res.out.length;
     if (!ok) fails++;

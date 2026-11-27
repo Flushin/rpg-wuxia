@@ -11,6 +11,16 @@
   --sa-bottom: env(safe-area-inset-bottom);
   --sa-left: env(safe-area-inset-left);
   --fix-b: calc(100% - var(--app-h, 100%));
+  /* margens laterais do HUD (hud.css) */
+  --hud-sa-l: env(safe-area-inset-left);
+  --hud-sa-r: env(safe-area-inset-right);
+}
+/* iPhone deitado: o iOS reserva ~62px dos dois lados, mas a ilha só ocupa o meio de uma lateral e o canto
+   arredondado não chega a 30px na altura dos quadros (a ilha vai até ~48px da borda). O HUD usa 18px a mais de cada lado
+   (ui/viewport.ts põe html.iphone). As janelas continuam com a margem inteira (--sa-*). */
+html.iphone {
+  --hud-sa-l: max(0px, env(safe-area-inset-left) - 18px);
+  --hud-sa-r: max(0px, env(safe-area-inset-right) - 18px);
 }
 html,
 body {
@@ -25,6 +35,8 @@ body {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  /* iPhone: segurar o dedo não abre lupa, menu de imagem nem "copiar" */
+  -webkit-touch-callout: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
