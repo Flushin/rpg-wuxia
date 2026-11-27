@@ -1177,6 +1177,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Boss seal in dungeons: the way into the boss arena is closed by a golden seal until you defeat every regular monster (the seal shows how many are left), and your auto attack no longer jumps to the boss mid-clear. The tree walls in front of the rooms became rocks and low bushes, and trees turn see-through when they cover allies or monsters." },
       { "texto": "Three hard dungeons at the Dungeon Portal, with no minimum level: Jade Sanctuary (lv 30–32), Temple of Ashes (lv 40–42) and Cold Moon Court (lv 50–52). More rooms and monsters, bosses that combine circle and line strikes, summons and rage. Go solo or as a team with the bots." },
       { "texto": "Arena in the Night Port: talk to Arena Master Tie, next to the Trial portal, to fight 1 on 1 against a fighter from another sect. Your power never changes; your opponent gets stronger with your ranking points (Bronze to Legend). Losing has no penalty. Every fight gives arena coins, which buy titles shown above your name." },
     { "texto": "Team dungeons: at the Dungeon Portal choose \"Team (bots)\" to enter with 3 allies from other sects, who fight beside you with their skills and small potions. Monsters have more HP and the rewards are the same. Ally down? Hold the ✚ button (F key) next to them for 3 s to revive them once per fight." },

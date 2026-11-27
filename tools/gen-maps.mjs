@@ -670,10 +670,14 @@ function gruta() {
   // a única saída é a da entrada (sul)
   gr.rect(9, 1, 14, 10, RU); // salão largo como o pátio do templo da montanha: espaço para desviar e recuar
   gr.disc(GRUTA_ARENA.x, GRUTA_ARENA.y, 4.6, RU);
+  // parede entre a arena e a antecâmara: a porta (15–16, linha 10) é o único acesso, fechada pelo selo
+  for (let i = 9; i <= 22; i++) if (i < 15 || i > 16) gr.set(i, 10, PN);
   gr.rect(15, 10, 2, 2, RU);
   for (let n = 0; n < 6; n++) {
     const a = (n / 6) * Math.PI * 2 + Math.PI / 6;
-    gr.set(Math.floor(GRUTA_ARENA.x + Math.cos(a) * 4), Math.floor(GRUTA_ARENA.y + Math.sin(a) * 4), PI);
+    const bi = Math.floor(GRUTA_ARENA.x + Math.cos(a) * 4),
+      bj = Math.floor(GRUTA_ARENA.y + Math.sin(a) * 4);
+    if (bj < 10) gr.set(bi, bj, PI); // o braseiro de baixo ficava no meio da porta
   }
   const seen = sealUnreachable(gr, 16, 27, PN);
   for (const [i, j, what] of [
@@ -685,6 +689,7 @@ function gruta() {
   const objs = [
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+    area('Selo', 'gate', 15, 10, 2, 1),
   ];
   const used = [];
   const place = (monster, name, cx, cy, r, minLevel, maxLevel) => {
@@ -772,6 +777,7 @@ function mosteiro() {
   const objs = [
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+    area('Selo', 'gate', 15, 11, 3, 1),
   ];
   const used = [];
   const place = (monster, name, cx, cy, r, minLevel, maxLevel) => {
@@ -870,6 +876,7 @@ function covil() {
   const objs = [
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+    area('Selo', 'gate', 15, 11, 2, 1),
   ];
   const used = [];
   const place = (monster, name, cx, cy, r, minLevel, maxLevel, group) => {
@@ -1968,6 +1975,7 @@ function deepDungeon(cfg) {
   const objs = [
     point('player', 'spawn', 16, 27.5),
     area('Vila', 'portal', 15, 29, 2, 2, { target: 'cidade', targetX: 3.5, targetY: 16 }),
+    area('Selo', 'gate', 15, 11, 2, 1),
   ];
   const used = [];
   const place = (monster, label, cx, cy, r, minLevel, maxLevel, group) => {

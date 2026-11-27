@@ -82,6 +82,42 @@ const DECOR = [
   'stump_round',
 ];
 const SPRITE_SCALE = 0.5; // folhas geradas em 2x
+// masmorras (pedido do Lucas em 27/11/2026): a parede de árvores logo à frente (na tela, abaixo) de onde se anda vira
+// pedra, tronco ou moita baixa, para as árvores altas não esconderem o grupo e os monstros
+const LOW_WALL: Record<string, [string, string][]> = {
+  tree: [
+    ['props-floresta', 'rock_largeA'],
+    ['props-floresta', 'plant_bushLarge'],
+    ['props-floresta', 'log'],
+    ['props-floresta', 'rock_largeA'],
+  ],
+  pine: [
+    ['props-montanha', 'rocha_neve'],
+    ['props-montanha', 'rocha_neve'],
+    ['props-montanha', 'pedra_neve'],
+  ],
+  bamboo: [
+    ['props-floresta', 'rock_largeA'],
+    ['props-bambu', 'brotos'],
+    ['props-floresta', 'plant_bushLarge'],
+  ],
+  basalt: [
+    ['props-vale', 'rocha_basalto'],
+    ['props-vale', 'tronco_queimado'],
+    ['props-vale', 'rocha_basalto'],
+  ],
+};
+/** Tile de parede que ficaria na frente de quem anda (algum tile andável até 3 atrás dele, em i e j). */
+function frontOfWalk(map: GameMap, i: number, j: number): boolean {
+  for (let dj = 0; dj <= 3; dj++)
+    for (let di = 0; di <= 3; di++) {
+      if (!di && !dj) continue;
+      const x = i - di,
+        y = j - dj;
+      if (x >= 0 && y >= 0 && map.walkable[y * map.width + x]) return true;
+    }
+  return false;
+}
 
 /** Algum vizinho (4 direções) do tile é do tipo `name`? (pilares do templo ficam em lajes, os da encosta na neve) */
 function inside(map: GameMap, i: number, j: number, name: string): boolean {
@@ -112,7 +148,8 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       .setDepth(DEPTH.GROUND);
   };
   const snowy = MAPS_CONFIG[map.id]?.trees === 'snow',
-    bamboo = MAPS_CONFIG[map.id]?.trees === 'bamboo';
+    bamboo = MAPS_CONFIG[map.id]?.trees === 'bamboo',
+    dungeon = !!MAPS_CONFIG[map.id]?.dungeon;
   for (let j = 0; j < map.height; j++)
     for (let i = 0; i < map.width; i++) {
       const name = map.tiles[j * map.width + i],
@@ -149,6 +186,16 @@ export function buildMapView(scene: Phaser.Scene, map: GameMap): Phaser.GameObje
       if (name === 'tree' || name === 'pine' || name === 'bamboo' || name === 'basalt') {
         out.push(ground(name === 'pine' ? 'snow' : name === 'basalt' ? 'ash' : 'grass', i, j, pos.x, pos.y));
         const r = hash(i, j, 2);
+        if (dungeon && frontOfWalk(map, i, j)) {
+          const [la, lf] = pick(LOW_WALL[name], r);
+          const low = scene.add
+            .image(pos.x, pos.y + 4, la, lf)
+            .setScale(SPRITE_SCALE * (lf === 'brotos' ? 1.6 : 1) * (0.9 + 0.2 * hash(i, j, 3)))
+            .setFlipX(hash(i, j, 4) < 0.5)
+            .setDepth(i + j + 1);
+          out.push(low);
+          continue;
+        }
         const [atlas, frame] =
           name === 'pine'
             ? ['props-montanha', pick(PINES, r)]
@@ -584,7 +631,7 @@ export function fadeTreesNear(trees: Phaser.GameObjects.Image[], who: { x: numbe
         }
       }
     }
-    const target = covers ? 0.4 : 1;
+    const target = covers ? 0.3 : 1;
     if (t.alpha !== target)
       t.setAlpha(t.alpha + Math.sign(target - t.alpha) * Math.min(0.1, Math.abs(target - t.alpha)));
   }

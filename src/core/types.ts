@@ -243,6 +243,8 @@ export type GameEvent =
   | { type: 'bossArena' }
   /** jogador entrou na arena com o chefe vivo (a cada entrada; bossArena só na primeira do mapa) */
   | { type: 'bossArenaEnter' }
+  | { type: 'sealProgress'; left: number }
+  | { type: 'sealOpen' }
   | { type: 'bossSummon'; ids: number[]; name: string }
   /** chefe entrou em fúria (boss.enrage) */
   | { type: 'bossEnrage'; id: number; name: string }

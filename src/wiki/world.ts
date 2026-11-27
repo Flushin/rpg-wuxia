@@ -298,6 +298,7 @@ export async function dungeonIndexPage(): Promise<string> {
     <section class="panel"><h2>Regras</h2><ul>
       <li>Cada entrada é uma corrida nova e se paga de novo; não há limite de entradas.</li>
       <li>Os monstros <b>não renascem</b>. O chefe fica no fim e dá item garantido.</li>
+      <li><b>Selo do chefe:</b> a passagem para a arena do chefe fica fechada por um selo dourado até todos os monstros comuns da masmorra morrerem (o número em cima do selo mostra quantos faltam). Selado, o chefe não pode ser mirado nem ferido.</li>
       <li>Os monstros daqui têm <b>+${bonus}%</b> de chance de deixar equipamento.</li>
       <li>O <a href="#/mecanicas/auto">Auto</a> não funciona, e a masmorra não rende ganho offline.</li>
       <li>Morrer, sair por um portal ou fechar o jogo encerra a corrida (você volta para a vila).</li>

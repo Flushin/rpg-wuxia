@@ -80,6 +80,7 @@ import * as merchant from './world/merchant';
 import { dist } from './world/geometry';
 import * as inventory from './world/inventory';
 import * as party from './world/party';
+import { clearSeal, sealedBoss, setupSeal, tickSeal, type Seal } from './world/seal';
 import * as arenaW from './world/arena';
 import { ARENA_COUNTDOWN, newArenaState, type ArenaState } from './arena';
 import type { Bot } from './bots';
@@ -218,6 +219,8 @@ export class World {
   dungeonMenu = false;
   /** masmorra em equipe: bots aliados (src/core/world/party.ts); vazio fora do modo equipe */
   party: Bot[] = [];
+  /** selo da arena do chefe na masmorra (src/core/world/seal.ts); null fora dela */
+  seal: Seal | null = null;
   /** arena do Porto Noturno: progresso salvo e a luta em andamento (src/core/world/arena.ts) */
   arena: ArenaState = newArenaState();
   arenaFight: arenaW.ArenaFight | null = null;
@@ -373,7 +376,7 @@ export class World {
       return;
     }
     const m = this.monsters.find((e) => e.id === id);
-    if (!m || m.dead) return;
+    if (!m || m.dead || sealedBoss(this, m)) return;
     this.npcGoal = null;
     if (this.targetId !== id) this.pendingSkill = null;
     this.targetId = id;
@@ -393,6 +396,7 @@ export class World {
 
   /** Com o chefe vivo e o jogador na arena, só vale mirar o que está dentro dela (nada de bicho do lado de fora). */
   targetable(m: Entity): boolean {
+    if (sealedBoss(this, m)) return false; // chefe atrás do selo da masmorra
     return !this.arenaBoss() || this.inArena(m, 1);
   }
 
@@ -415,7 +419,7 @@ export class World {
       return s;
     };
     return this.monsters
-      .filter((m) => !m.dead && dist(m, p) <= TARGET_RANGE && (!boss || this.inArena(m, 1)))
+      .filter((m) => !m.dead && dist(m, p) <= TARGET_RANGE && (!boss || this.inArena(m, 1)) && !sealedBoss(this, m))
       .map((m) => ({ m, s: score(m) }))
       .sort((a, b) => a.s - b.s)
       .map((c) => c.m);
@@ -1082,6 +1086,7 @@ export class World {
       this.wasInArena = inArena;
     }
     party.tickParty(this, dt);
+    tickSeal(this);
     arenaW.tickArena(this, dt);
     for (const m of this.monsters) if (m.kind === 'monster') this.tickMonster(m, dt); // o bot da arena anda sozinho
     for (const n of this.npcs) if (n.wander > 0) this.tickWalker(n, dt);
@@ -1518,6 +1523,7 @@ export class World {
 
   /** Interno: usado pelos módulos de src/core/world/. */
   attack(a: Entity, t: Entity, mult = 1, skill = false, leech = true): AttackResult {
+    if (sealedBoss(this, t)) return { hit: false, crit: false, amount: 0 }; // selo da masmorra protege o chefe
     const r = rollAttack(a, this.defender(t), this.rng);
     if (r.hit && a.kind === 'player' && this.hasBuff(t, 'poison')) {
       const bonus = this.passiveValue('poisonedBonus');
@@ -1941,6 +1947,7 @@ export class World {
     this.reviving = false;
     this.reviveT = 0;
     this.revivedInFight.clear();
+    clearSeal(this);
     this.mapId = mapId;
     this.map = this.maps[mapId];
     const sp = this.map.objects.find((o) => o.type === 'spawn');
@@ -2016,6 +2023,7 @@ export class World {
       }
     });
     if (this.trialRun && MAPS_CONFIG[mapId]?.trial) this.spawnTrialBoss(this.trialRun.bossId, this.trialRun.tier);
+    setupSeal(this);
     if (this.party.length) party.placeParty(this);
     this.emit({ type: 'mapChange', mapId });
     this.questReach(mapId);
