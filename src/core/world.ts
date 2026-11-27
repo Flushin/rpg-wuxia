@@ -84,6 +84,7 @@ import * as party from './world/party';
 import { clearSeal, sealedBoss, setupSeal, tickSeal, type Seal } from './world/seal';
 import * as arenaW from './world/arena';
 import { ARENA_COUNTDOWN, newArenaState, type ArenaState } from './arena';
+import { founderXpMul, type FounderState } from './founder';
 import type { Bot } from './bots';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
@@ -179,6 +180,10 @@ export class World {
   mountsOwned: string[] = [];
   /** relíquias obtidas (RELICS) e a equipada (null = espaço vazio); Porto Noturno, etapa 4 */
   relicsOwned: string[] = [];
+  /** veterano da primeira versão (src/core/founder.ts); null = não é */
+  founder: FounderState | null = null;
+  /** janela do veterano já mostrada nesta sessão (não salva) */
+  founderAsked = false;
   relic: string | null = null;
   /** fragmentos de lendária (id da relíquia → quantidade) */
   relicShards: Record<string, number> = {};
@@ -1833,6 +1838,7 @@ export class World {
    *  até XP_BANK_LEVELS níveis prontos; o que passar disso se perde e avisa ('xpFull'). */
   gainXp(n: number) {
     if (this.player.level >= PROGRESSION.levelCap || n <= 0) return;
+    n = Math.round(n * founderXpMul(this)); // veterano: XP em dobro até o nível 30
     const before = this.levelsReady(),
       add = Math.min(n, Math.max(0, this.xpBankCap() - this.xp));
     this.xp += add;

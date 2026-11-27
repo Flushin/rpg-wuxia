@@ -4,6 +4,7 @@ import { isDungeonMap } from '../dungeons';
 import { SKILL_MAX_LEVEL } from '../skills';
 import { BAG_SIZE, BASES, SLOTS, sanitizeItem } from '../items';
 import { HOME_MAP } from '../mapsConfig';
+import { restoreFounder } from '../founder';
 import { sanitizeQuest } from '../quests';
 import type { SaveData } from '../types';
 import { MOUNTS, RELICS, SKINS } from '../data';
@@ -46,6 +47,7 @@ export function serialize(w: World): SaveData {
     mounts: w.mountsOwned.length ? [...w.mountsOwned] : undefined,
     relics: w.relicsOwned.length ? [...w.relicsOwned] : undefined,
     relic: w.relic ?? undefined,
+    founder: w.founder ? { mount: w.founder.mount ?? undefined } : undefined,
     relicShards: Object.keys(w.relicShards).length ? { ...w.relicShards } : undefined,
     arena: { ...w.arena, titles: [...w.arena.titles], title: w.arena.title ?? undefined },
     playTime: { auto: Math.round(w.playTime.auto), manual: Math.round(w.playTime.manual) },
@@ -75,6 +77,9 @@ export function restore(w: World, s: SaveData, now: number) {
   w.mountsOwned = (Array.isArray(s.mounts) ? s.mounts : []).filter(
     (id, i, a) => typeof id === 'string' && !!MOUNTS[id] && a.indexOf(id) === i,
   );
+  // veterano: só mantém montaria exclusiva se for a escolhida
+  w.founder = restoreFounder(s.founder);
+  w.mountsOwned = w.mountsOwned.filter((id) => !MOUNTS[id].exclusive || w.founder?.mount === id);
   // relíquias (Porto Noturno, etapa 4): campos opcionais; saves antigos ficam com a coleção vazia
   w.relicsOwned = (Array.isArray(s.relics) ? s.relics : []).filter(
     (id, i, a) => typeof id === 'string' && !!RELICS[id] && a.indexOf(id) === i,
@@ -88,7 +93,11 @@ export function restore(w: World, s: SaveData, now: number) {
     num = (v: unknown, d: number) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : d);
   const base = newArenaState();
   const titles = (Array.isArray(a?.titles) ? a.titles : []).filter(
-    (id, i, l) => typeof id === 'string' && !!ARENA_TITLES[id] && l.indexOf(id) === i,
+    (id, i, l) =>
+      typeof id === 'string' &&
+      !!ARENA_TITLES[id] &&
+      (!ARENA_TITLES[id].exclusive || !!w.founder) &&
+      l.indexOf(id) === i,
   );
   w.arena = {
     points: num(a?.points, base.points),

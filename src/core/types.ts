@@ -353,6 +353,8 @@ export interface SaveData {
   relic?: string;
   /** fragmentos de relíquia lendária (id da relíquia → quantidade) */
   relicShards?: Record<string, number>;
+  /** veterano da primeira versão (src/core/founder.ts): montaria escolhida (ausente = ainda não escolheu) */
+  founder?: { mount?: string };
   /** arena do Porto Noturno (src/core/arena.ts): pontos, moeda, vitórias/derrotas, títulos comprados e o usado */
   arena?: { points: number; coins: number; wins: number; losses: number; titles: string[]; title?: string };
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };

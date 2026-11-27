@@ -3,6 +3,7 @@
 import { BASES, makeEquipment } from '../items';
 import { QUESTS, questGoalCount, resolveNpc, type QuestDef, type QuestPhase } from '../quests';
 import type { World } from '../world';
+import { founderGold } from '../founder';
 
 // ---------- missões (marco 7) ----------
 /** Missão atual da cadeia e em que fase ela está para a interface. */
@@ -62,9 +63,10 @@ export function questTurnIn(w: World, force = false): boolean {
   w.quest = { stage: w.quest.stage + 1, status: 'pending', progress: 0 };
   w.emit({ type: 'quest', kind: 'completed', questId: v.def.id, name: v.def.name });
   if (r.gold) {
-    w.gold += r.gold;
+    const g = founderGold(w, r.gold);
+    w.gold += g;
     w.bumpInv();
-    w.emit({ type: 'goldPickup', amount: r.gold });
+    w.emit({ type: 'goldPickup', amount: g });
   }
   if (r.item) {
     const lv = r.itemLevel ?? 5;
