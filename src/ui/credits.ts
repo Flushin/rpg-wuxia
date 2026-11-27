@@ -12,6 +12,7 @@ import capacitorPluginsLicense from '../../docs/licencas/capacitor-plugins-app-h
 import capacitorFilesystemLicense from '../../docs/licencas/capacitor-filesystem-8.1.5-LICENSE.txt?raw';
 import ionFilesystemLicense from '../../docs/licencas/ionfilesystem-android-1.1.1-LICENSE.txt?raw';
 import cordovaNotice from '../../docs/licencas/cordova-android-14.0.1-NOTICE.txt?raw';
+import robotoLicense from '../../docs/licencas/roboto-5.3.0-OFL.txt?raw';
 
 // Créditos e licenças: aberto em ⚙ (no jogo) e no link da tela inicial. Fica no <body> (fora do HUD) para funcionar
 // nas duas telas. Créditos de assets CC0 são cortesia; os avisos MIT/Apache-2.0 das bibliotecas são obrigatórios.
@@ -170,6 +171,12 @@ const LIBRARIES: Library[] = [
     notice: '© 2016 Jake Archibald',
     license: 'Apache License 2.0',
     text: `${idbHeader.trim()}\n\n${apacheLicense}`,
+  },
+  {
+    name: L('Fonte Roboto 5.3.0 (letra no iPhone)', 'Roboto font 5.3.0 (text on iPhone)'),
+    notice: '© 2011 The Roboto Project Authors',
+    license: 'SIL Open Font License 1.1',
+    text: robotoLicense,
   },
   { name: 'Capacitor 8.6.2', notice: '© 2017-present Drifty Co.', license: 'MIT', text: capacitorLicense },
   {

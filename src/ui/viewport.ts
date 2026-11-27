@@ -16,6 +16,8 @@ function apply() {
 }
 
 export function initViewport() {
+  // html.iphone: o HUD usa parte das margens laterais do iPhone deitado (base.css)
+  document.documentElement.classList.toggle('iphone', isIPhone);
   apply();
   // antes dos outros ouvintes de resize (main.ts chama isto primeiro), para o canvas e o HUD já lerem a altura nova
   window.addEventListener('resize', apply);
@@ -66,7 +68,7 @@ export function initViewportDebug() {
   const probe = document.createElement('div');
   probe.style.cssText =
     'position:fixed;visibility:hidden;pointer-events:none;top:0;height:100lvh;' +
-    'padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);box-sizing:content-box';
+    'padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:content-box';
   document.body.append(box, probe);
   const show = () => {
     const cs = getComputedStyle(probe);
@@ -79,7 +81,8 @@ export function initViewportDebug() {
       `visualViewport: ${vv ? `${Math.round(vv.width)} x ${Math.round(vv.height)} off ${Math.round(vv.offsetTop)}` : '-'}`,
       `html clientH: ${document.documentElement.clientHeight}`,
       `100lvh: ${probe.getBoundingClientRect().height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)}`,
-      `safe top/bottom: ${cs.paddingTop} / ${cs.paddingBottom}`,
+      `safe top/bottom: ${cs.paddingTop} / ${cs.paddingBottom}  left/right: ${cs.paddingLeft} / ${cs.paddingRight}`,
+      `HUD: ${document.getElementById('safe-probe')?.getBoundingClientRect().width ?? '-'} px de largura · escala ${getComputedStyle(document.documentElement).getPropertyValue('--ui') || '-'}`,
       `--app-h: ${document.documentElement.style.getPropertyValue('--app-h')}`,
       `#game h: ${document.getElementById('game')?.getBoundingClientRect().height ?? '-'}`,
       `dpr: ${devicePixelRatio}`,
