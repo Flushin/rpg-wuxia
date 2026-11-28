@@ -197,6 +197,15 @@ export const PORTRAIT_DIRS: Record<string, PortraitDirs> = Object.fromEntries(
     return m ? [[key, { ...m, src: `sprites/${name}_retrato_dirs.png` }]] : [];
   }),
 );
+// montarias (aba Montarias): chave 'mount-<id>', tira de tools/sprites/mount_dirs.py
+const MOUNT_DIRS_META = import.meta.glob('../data/sprites/*_montaria_dirs.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, Omit<PortraitDirs, 'src'>>;
+for (const [path, m] of Object.entries(MOUNT_DIRS_META)) {
+  const id = path.replace(/^.*\/(.*)_montaria_dirs\.json$/, '$1');
+  PORTRAIT_DIRS['mount-' + id] = { ...m, src: `sprites/${id}_montaria_dirs.png` };
+}
 
 // retrato dos mestres (tela de criação e janela de diálogo), por seita
 export const MASTER_PORTRAITS: Record<string, string> = Object.fromEntries(

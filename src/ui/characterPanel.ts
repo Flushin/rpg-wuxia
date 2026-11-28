@@ -1,9 +1,10 @@
 // Janela Personagem (tecla C): equipados em volta do retrato (no meio) + atributos com origem (base, níveis,
 // equipamento), gastar pontos livres, "Distribuir recomendado", derivados e elementos. A mochila (I) é só a bolsa.
 // Não toca som de abrir/fechar nem decide quando abre: isso fica no Hud (togglePanel).
-import { titleFxHtml } from './founder';
+import { mountThumb, titleFxHtml } from './founder';
 import { L } from '../core/i18n';
-import { CLASSES, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
+import { CLASSES, MOUNTS, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
+import { bal } from '../core/balance';
 import { relicEffectText, relicPickHtml } from './relicShop';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
@@ -61,7 +62,7 @@ export class CharacterPanel {
   private sel: Slot | 'reliquia' | null = null;
   private last = { slot: '', t: 0 };
   /** aba aberta: personagem (equipamento/atributos) ou títulos */
-  private tab: 'main' | 'titles' = 'main';
+  private tab: 'main' | 'titles' | 'mounts' = 'main';
 
   constructor(
     private world: World,
@@ -74,7 +75,7 @@ export class CharacterPanel {
     el.addEventListener('click', (e) => {
       if (e.target === el) return this.onClose();
       const t = (e.target as HTMLElement).closest(
-        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip],[data-relic-eq],[data-tab],[data-title]',
+        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip],[data-relic-eq],[data-tab],[data-title],[data-mount]',
       ) as HTMLElement | null;
       if (!t) {
         // toque fora de um equipado (e fora do detalhe): desfaz a seleção e o detalhe some
@@ -86,13 +87,17 @@ export class CharacterPanel {
       }
       if (t.dataset.tab) {
         audio.ui('ui_click');
-        this.tab = t.dataset.tab === 'titles' ? 'titles' : 'main';
+        this.tab = t.dataset.tab === 'titles' || t.dataset.tab === 'mounts' ? t.dataset.tab : 'main';
         this.sel = null;
         this.sig = '';
       } else if (t.dataset.title !== undefined) {
         // título: usar um dos que tem ('' = ficar sem título)
         audio.ui('ui_click');
         world.wearArenaTitle(t.dataset.title || null);
+        this.sig = '';
+      } else if (t.dataset.mount) {
+        audio.ui('ui_click');
+        world.useMount(t.dataset.mount);
         this.sig = '';
       } else if (t.dataset.relicEq !== undefined) {
         // relíquia: equipar uma da coleção ou tirar a atual ('' = tirar)
@@ -161,6 +166,7 @@ export class CharacterPanel {
       this.sel,
       this.tab,
       w.arena.title,
+      w.mountsOwned.join(),
       w.relic,
       Math.floor(w.playTime.auto / 60),
       Math.floor(w.playTime.manual / 60),
@@ -246,10 +252,11 @@ export class CharacterPanel {
         : selIt
           ? `<div class="tipbody">${itemTipHtml(w, selIt, false)}</div><button class="primary" data-unequip="1">${L('Desequipar', 'Unequip')}</button>`
           : `<div class="muted">${isTouch ? L('Toque em um equipado para ver os detalhes. Duplo toque desequipa.', 'Tap an equipped item to see details. Double tap unequips.') : L('Clique em um equipado para ver os detalhes. Duplo clique desequipa.', 'Click an equipped item to see details. Double-click unequips.')}</div>`;
-    const tabs = `<div class="tabs ch-tabs"><button class="${this.tab === 'main' ? 'on' : ''}" data-tab="main">${L('Personagem', 'Character')}</button><button class="${this.tab === 'titles' ? 'on' : ''}" data-tab="titles">${L('Títulos', 'Titles')} <small>${w.arena.titles.length}</small></button></div>`;
+    const tabs = `<div class="tabs ch-tabs"><button class="${this.tab === 'main' ? 'on' : ''}" data-tab="main">${L('Personagem', 'Character')}</button><button class="${this.tab === 'titles' ? 'on' : ''}" data-tab="titles">${L('Títulos', 'Titles')} <small>${w.arena.titles.length}</small></button><button class="${this.tab === 'mounts' ? 'on' : ''}" data-tab="mounts">${L('Montarias', 'Mounts')} <small>${w.mountsOwned.length}</small></button></div>`;
     const head = `<div class="card at-card ch-card" style="--c:${cls.color}">${closeX('data-close="1"')}
       <h2>${L('Personagem', 'Character')}</h2>
       <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>${tabs}`;
+    if (this.tab === 'mounts') return renderPanel(byId('attrs-panel'), `${head}${mountsHtml(w)}</div>`);
     if (this.tab === 'titles') return renderPanel(byId('attrs-panel'), `${head}${titlesHtml(w)}</div>`);
     renderPanel(
       byId('attrs-panel'),
@@ -291,4 +298,22 @@ function titlesHtml(w: World): string {
   return `<div class="ch-titles"><small class="muted">${L('O título aparece acima do seu nome. Só visual: não dá poder.', 'The title is shown above your name. Cosmetic only: no power.')}</small>
     ${list.map(row).join('')}${row(null)}
     ${list.length ? '' : `<p class="muted">${L('Você ainda não tem títulos. Eles são comprados na Arena do Porto Noturno.', 'You have no titles yet. They are bought at the Night Harbor Arena.')}</p>`}</div>`;
+}
+
+/** Aba Montarias: as montarias que o jogador tem (giro 360°); escolhe com qual montar pelo botão 🐎. */
+function mountsHtml(w: World): string {
+  const row = (id: string, i: number) => {
+    const m = MOUNTS[id];
+    const pct = Math.round(m.speedBonus * bal('montaria.velocidade') * 100);
+    const btn = i
+      ? `<button class="primary" data-mount="${id}">${L('Usar', 'Use')}</button>`
+      : `<button disabled>${L('Em uso', 'In use')}</button>`;
+    return `<div class="dg-row sk-row mt-row${i ? '' : ' on'}">${spinHtml('mount-' + id, mountThumb(id), 'sk-spin')}<div class="sk-body">
+      <b>${escapeHtml(m.name)}</b> <small class="muted">+${pct}% ${L('velocidade', 'speed')}${m.exclusive ? ` · ${L('Exclusivo dos Fundadores', 'Founders exclusive')}` : ''}</small>
+      <div class="dg-info">${escapeHtml(m.desc)}</div>${btn}</div></div>`;
+  };
+  const list = w.mountsOwned.filter((id) => MOUNTS[id]);
+  return `<div class="ch-titles ch-mounts"><small class="muted">${L('Monte pelo botão do cavalo, fora de combate. Arraste a imagem para girar.', 'Mount with the horse button, out of combat. Drag the picture to rotate.')}</small>
+    ${list.map(row).join('')}
+    ${list.length ? '' : `<p class="muted">${L('Você ainda não tem montarias. Compre uma com o Cavalariço Ma, no Porto Noturno.', 'You have no mounts yet. Buy one from Stablehand Ma, in Night Harbor.')}</p>`}</div>`;
 }

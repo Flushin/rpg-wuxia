@@ -542,6 +542,13 @@ export class World {
     return null;
   }
 
+  /** Aba Montarias (janela Personagem): escolhe qual montaria usar (a primeira da lista é a que monta). */
+  useMount(id: string) {
+    if (!this.mountsOwned.includes(id) || this.mountsOwned[0] === id) return;
+    this.mountsOwned = [id, ...this.mountsOwned.filter((m) => m !== id)];
+    this.emit({ type: 'skinChange' }); // a cena carrega a folha da montaria e redesenha o jogador
+  }
+
   /** Antiquário Lao: compra uma relíquia comum ou rara (lendária só cai de chefes). Fica na coleção. */
   buyRelic(id: string): ActionError | null {
     if (this.npcRole() !== 'antiquario') return { code: 'talkToAntiquary' };
