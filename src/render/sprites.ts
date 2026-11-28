@@ -215,8 +215,9 @@ export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | nu
 
 /** Boot: só o que é leve e vale para todos os mapas (cenários e pisos). As folhas de personagens são por mapa (sheetLoader). */
 export function preloadSprites(scene: Phaser.Scene) {
-  // asinha do título exclusivo (tools/sprites/title_wing.py): tira de 8 quadros
-  scene.load.spritesheet('title-wing', 'sprites/fx/title-wing.png', { frameWidth: 96, frameHeight: 72 });
+  // asa do título exclusivo (tools/title-wing-svg.mjs): asa, brilho atrás e estrelinhas
+  for (const k of ['', '-halo', '-stars'])
+    scene.load.svg('title-wing' + k, `sprites/fx/title-wing${k}.svg`, { width: 216, height: 248 });
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-cidadela', 'sprites/cidadela.png', 'sprites/cidadela.json');

@@ -14,7 +14,7 @@ export class TitleFx {
   private text: Phaser.GameObjects.Text;
   private glow: Phaser.GameObjects.Text;
   private sparks: Phaser.GameObjects.Particles.ParticleEmitter;
-  private wings: Phaser.GameObjects.Sprite[];
+  private wings: Phaser.GameObjects.Image[][]; // por lado: [brilho, asa, estrelinhas]
   private half: number;
 
   constructor(
@@ -39,16 +39,16 @@ export class TitleFx {
     this.text.setFill(g);
     const half = (this.half = this.text.width / 2);
     // asinhas nas pontas (a da direita espelhada), batendo devagar
-    if (!scene.anims.exists(WING) && scene.textures.exists(WING))
-      scene.anims.create({ key: WING, frames: scene.anims.generateFrameNumbers(WING), frameRate: 10, repeat: -1 });
+    // asa esquerda e direita (espelhada); ponto de giro no ombro: (34,30) num viewBox -16 -8 54 62
     this.wings = [-1, 1].map((side) =>
-      scene.add
-        .sprite(0, 0, WING, 0)
-        .setOrigin(side > 0 ? 0.17 : 0.83, 0.86) // ponto da base da asa no quadro
-        .setFlipX(side > 0)
-        .setScale(0.3)
-        .setDepth(DEPTH.NAME)
-        .play(WING),
+      ['-halo', '', '-stars'].map((k) =>
+        scene.add
+          .image(0, 0, WING + k)
+          .setOrigin(side > 0 ? 1 - 50 / 54 : 50 / 54, 38 / 62)
+          .setFlipX(side > 0)
+          .setScale(WING_SCALE)
+          .setDepth(DEPTH.NAME),
+      ),
     );
     this.sparks = scene.add
       .particles(0, 0, 'fx-dot', {
@@ -76,9 +76,19 @@ export class TitleFx {
       .setVisible(visible)
       .setAlpha(0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.4)));
     this.sparks.setPosition(x, y).setVisible(visible);
-    this.wings.forEach((wg, i) => {
+    // bater suave (desce um pouco e volta), brilho e estrelinhas pulsando
+    const flap = Math.sin(t * 2 * Math.PI) * 0.5 + 0.5;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 3.9);
+    this.wings.forEach((layers, i) => {
       const side = i ? 1 : -1;
-      wg.setPosition(x + side * (this.half + 1), y - 1).setVisible(visible);
+      const rot = Phaser.Math.DegToRad(4 - 11 * flap) * -side;
+      layers.forEach((im, j) =>
+        im
+          .setPosition(x + side * (this.half + WING_GAP), y - 3)
+          .setRotation(rot)
+          .setAlpha(j === 1 ? 1 : 0.45 + 0.55 * (j === 0 ? pulse : 1 - pulse))
+          .setVisible(visible),
+      );
     });
     this.sparks.emitting = visible;
   }
@@ -87,8 +97,10 @@ export class TitleFx {
     this.text.destroy();
     this.glow.destroy();
     this.sparks.destroy();
-    this.wings.forEach((wg) => wg.destroy());
+    this.wings.flat().forEach((im) => im.destroy());
   }
 }
 
 const WING = 'title-wing';
+const WING_SCALE = 0.15; // 216 px do SVG -> ~32 px na tela
+const WING_GAP = 5; // espaço (px) entre o texto e o ombro da asa

@@ -18,12 +18,12 @@ import { byId, escapeHtml } from './dom';
 export const mountThumb = (id: string, size = 64) =>
   `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
 
-/** Asinha dourada animada (tira de quadros de tools/sprites/title_wing.py; a da direita espelhada no CSS). */
-const WING = '<i class="tw"></i>';
+/** Asa do título exclusivo (SVGs de tools/title-wing-svg.mjs): brilho atrás, asa e estrelinhas; a direita é espelhada. */
+const WING = ['-halo', '', '-stars'].map((k) => `<img src="/sprites/fx/title-wing${k}.svg" alt="">`).join('');
 
 /** Título exclusivo em HTML: degradê dourado, brilho pulsante e faíscas (CSS em npc-auto.css, .title-fx). */
 export const titleFxHtml = (name: string) =>
-  `<b class="title-fx">${WING}<span>${escapeHtml(name)}</span>${WING.replace('tw', 'tw r')}<i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i></b>`;
+  `<b class="title-fx"><i class="tw">${WING}</i><span>${escapeHtml(name)}</span><i class="tw r">${WING}</i><i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i></b>`;
 
 export function showFounderWelcome(w: World, onClose: () => void) {
   const el = byId('offline-panel');

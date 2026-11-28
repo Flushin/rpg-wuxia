@@ -472,6 +472,6 @@ export class EntityView {
       this.titleFx = want ? new TitleFx(this.scene, want) : undefined;
       this.titleName = want;
     }
-    this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 5, this.label.visible);
+    this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 1, this.label.visible);
   }
 }
