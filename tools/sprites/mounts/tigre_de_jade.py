@@ -53,4 +53,4 @@ def setup(cfg):
         pin(arm, b, torus(V(p), 0.2, 0.06, G))
     # gema e anel na ponta da cauda
     pin(arm, 'Bone.007', [gem(V((-2.29, 0, 4.42)), (0.15, 0.15, 0.25), jade(1.6)), torus(V((-2.27, 0, 4.15)), 0.13, 0.05, G)])
-    place(arm, rot_z=R(90), scale=BACK_TOP / CAT_BACK)
+    place(arm, rot_z=R(-90), scale=BACK_TOP / CAT_BACK)
