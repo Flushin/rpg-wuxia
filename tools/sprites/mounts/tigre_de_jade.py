@@ -19,11 +19,11 @@ def setup(cfg):
     arm = bpy.data.objects['CatArmature']
     rest_pose(arm)
     recolor(o, {
-        'Grey': striped((0.84, 0.84, 0.82), (0.0, 0.36, 0.22), 0.12, scale=0.95, thin=0.56, emc=(0.1, 1, 0.5)),
+        'Grey': striped((0.84, 0.84, 0.82), (0.0, 0.36, 0.22), 0.5, scale=0.95, thin=0.56, emc=(0.1, 1, 0.5)),
         'White': mat('barriga', (0.88, 0.88, 0.86), rough=0.6),
         'Pink': mat('rosa', (0.95, 0.6, 0.65)),
     })
-    G, J = gold(), jade(0.9)
+    G, J = gold(0.6), jade(1.4)
     cloth = mat('pano', (0.06, 0.42, 0.3), rough=0.7)
     red = mat('borla', (0.85, 0.08, 0.06), em=0.6)
     # o gato olha para +X; lombo em x≈0.25, z≈2.72; cabeça x 2.0..3.25 (topo ≈3.1); pescoço x≈1.8

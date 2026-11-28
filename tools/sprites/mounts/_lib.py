@@ -35,7 +35,7 @@ def gold(em=0.35):
     return mat('ouro', (1.0, 0.66, 0.18), em=em, rough=0.22, metal=1.0, emc=(1, 0.6, 0.15))
 
 
-def jade(em=0.7):
+def jade(em=1.2):
     return mat('jade', (0.1, 0.85, 0.5), em=em, rough=0.15, emc=(0.15, 1.0, 0.55))
 
 

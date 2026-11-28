@@ -25,9 +25,9 @@ def setup(cfg):
         'Material.001': mat('casco', (0.95, 0.7, 0.2), rough=0.3, metal=0.8),
     })
     horns.data.materials.clear()
-    horns.data.materials.append(jade(1.2))
-    G = gold()
-    mane = mat('crina', (0.15, 0.9, 0.7), em=1.2)
+    horns.data.materials.append(jade(2.2))
+    G = gold(0.6)
+    mane = mat('crina', (0.15, 0.9, 0.7), em=2.2)
     # crina de chamas ao longo do pescoço (olha para -Y; pescoço y -1.3..-2.1, z 2.6..3.9)
     for k in range(7):
         t = k / 6

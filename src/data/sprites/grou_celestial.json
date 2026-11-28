@@ -1,11 +1,11 @@
 {
- "frameWidth": 352,
- "frameHeight": 280,
+ "frameWidth": 440,
+ "frameHeight": 300,
  "scale": 0.5,
- "top": 78,
+ "top": 86,
  "anchor": [
   0.5,
-  0.7428571428571429
+  0.7466666666666667
  ],
  "dirs": 8,
  "anims": {

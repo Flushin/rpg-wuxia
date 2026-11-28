@@ -107,12 +107,12 @@ def setup(cfg):
     arm = _armature()
     W = mat('branco', (0.8, 0.8, 0.8), rough=0.55)
     K = mat('preto', (0.03, 0.03, 0.05), rough=0.5)
-    CROWN = mat('coroa', (1, 0.05, 0.05), em=1.5)
+    CROWN = mat('coroa', (1, 0.05, 0.05), em=2.5)
     BEAK = mat('bico', (0.75, 0.68, 0.45), rough=0.3)
-    SKY = mat('ponta_ceu', (0.15, 0.45, 0.95), em=0.4, rough=0.3)
+    SKY = mat('ponta_ceu', (0.15, 0.45, 0.95), em=1.3, rough=0.3)
     NECK = mat('pescoco', (0.2, 0.35, 0.75), rough=0.4)
-    SAPH = mat('safira', (0.3, 0.6, 1), em=1.5)
-    G = gold()
+    SAPH = mat('safira', (0.3, 0.6, 1), em=2.5)
+    G = gold(0.6)
     z = ZB
     # corpo e plumas da cauda
     pin(arm, 'Body', sphere(V((0, 0, z)), (0.95, 2.0, 0.85), W, seg=24))
