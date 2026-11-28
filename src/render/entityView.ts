@@ -278,6 +278,8 @@ export class EntityView {
 
   private play(anim: AnimName, restart = false) {
     if (!this.sheet) return;
+    // montado e parado: pose sentada (folhas com a linha 'ride', tools/sprites/ride.py)
+    if (anim === 'idle' && this.mountSp && this.sheet.meta.anims.ride) anim = 'ride';
     const sp = this.sprite as Phaser.GameObjects.Sprite;
     const key = animKey(this.sheet.key, anim, this.dir);
     if (!restart && sp.anims.currentAnim?.key === key && sp.anims.isPlaying) {

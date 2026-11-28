@@ -2,38 +2,131 @@
  "name": "geada",
  "model": ".cache/kaykit/Characters/gltf/Mage.glb",
  "out": "../../public/sprites",
- "hide": ["1H_Wand", "2H_Staff", "Icosphere", "Spellbook", "Spellbook_open", "Mage_Hat"],
+ "hide": [
+  "1H_Wand",
+  "2H_Staff",
+  "Icosphere",
+  "Spellbook",
+  "Spellbook_open",
+  "Mage_Hat"
+ ],
  "samples": 24,
  "texture": {
   "image": "mage_texture",
   "cells": {
-   "0,1": [236, 241, 247],
-   "2,1": [120, 180, 225],
-   "7,1": [70, 105, 150],
-   "2,2": [140, 205, 240],
-   "5,0": [185, 210, 230],
-   "1,0": [205, 210, 222],
-   "3,2": [90, 110, 140]
+   "0,1": [
+    236,
+    241,
+    247
+   ],
+   "2,1": [
+    120,
+    180,
+    225
+   ],
+   "7,1": [
+    70,
+    105,
+    150
+   ],
+   "2,2": [
+    140,
+    205,
+    240
+   ],
+   "5,0": [
+    185,
+    210,
+    230
+   ],
+   "1,0": [
+    205,
+    210,
+    222
+   ],
+   "3,2": [
+    90,
+    110,
+    140
+   ]
   }
  },
  "attach": [
-  {"kind": "fan", "bone": "handslot.r", "offset": [0, 0, 0], "rot": [90, 0, 180], "scale": 1.15,
-   "color": [205, 232, 250], "rib": [70, 95, 135]}
+  {
+   "kind": "fan",
+   "bone": "handslot.r",
+   "offset": [
+    0,
+    0,
+    0
+   ],
+   "rot": [
+    90,
+    0,
+    180
+   ],
+   "scale": 1.15,
+   "color": [
+    205,
+    232,
+    250
+   ],
+   "rib": [
+    70,
+    95,
+    135
+   ]
+  }
  ],
- "frame": [120, 96],
- "anchor": [60, 64],
+ "frame": [
+  120,
+  96
+ ],
+ "anchor": [
+  60,
+  64
+ ],
  "px_per_unit": 24,
  "render_scale": 2,
  "anims": {
-  "idle": {"action": "Idle", "frames": 6, "fps": 8},
-  "walk": {"action": "Running_A", "frames": 8, "fps": 12},
-  "attack": {"action": "Spellcast_Shoot", "frames": 8, "fps": 14, "loop": false},
-  "death": {"action": "Death_A", "frames": 6, "fps": 10, "loop": false},
-  "levelup": {"action": "Cheer", "frames": 8, "fps": 12, "loop": false}
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 8
+  },
+  "walk": {
+   "action": "Running_A",
+   "frames": 8,
+   "fps": 12
+  },
+  "attack": {
+   "action": "Spellcast_Shoot",
+   "frames": 8,
+   "fps": 14,
+   "loop": false
+  },
+  "death": {
+   "action": "Death_A",
+   "frames": 6,
+   "fps": 10,
+   "loop": false
+  },
+  "levelup": {
+   "action": "Cheer",
+   "frames": 8,
+   "fps": 12,
+   "loop": false
+  },
+  "ride": {
+   "action": "Ride",
+   "frames": 1,
+   "fps": 1
+  }
  },
  "out_json": "../../src/data/sprites",
  "portrait": "idle",
  "portrait_png": true,
  "portrait_anim": true,
- "portrait_dirs": true
+ "portrait_dirs": true,
+ "setup": "ride.py"
 }

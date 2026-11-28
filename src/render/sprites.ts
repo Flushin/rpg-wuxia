@@ -73,7 +73,7 @@ export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' +
 // Direções: 0=S (para baixo na tela), 1=SE, 2=E, 3=NE, 4=N, 5=NW, 6=W, 7=SW.
 
 /** levelup: só nas folhas do jogador (pose de comemorar, olhando para o alto) */
-export type AnimName = 'idle' | 'walk' | 'attack' | 'death' | 'levelup';
+export type AnimName = 'idle' | 'walk' | 'attack' | 'death' | 'levelup' | 'ride';
 
 export interface SheetMeta {
   frameWidth: number;

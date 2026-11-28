@@ -51,6 +51,11 @@
    "frames": 8,
    "fps": 12,
    "loop": false
+  },
+  "ride": {
+   "action": "Ride",
+   "frames": 1,
+   "fps": 1
   }
  },
  "out_json": "../../src/data/sprites",
@@ -220,5 +225,6 @@
   120,
   200,
   255
- ]
+ ],
+ "setup": "ride.py"
 }

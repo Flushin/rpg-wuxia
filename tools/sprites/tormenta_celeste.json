@@ -50,6 +50,11 @@
    "frames": 8,
    "fps": 12,
    "loop": false
+  },
+  "ride": {
+   "action": "Ride",
+   "frames": 1,
+   "fps": 1
   }
  },
  "out_json": "../../src/data/sprites",
@@ -210,5 +215,6 @@
   ],
   "strength": 1.6
  },
- "portrait_dirs": true
+ "portrait_dirs": true,
+ "setup": "ride.py"
 }
