@@ -18,9 +18,14 @@ import { byId, escapeHtml } from './dom';
 export const mountThumb = (id: string, size = 64) =>
   `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
 
+/** Asinha dourada (aponta para a esquerda); a da direita é espelhada no CSS (.tw.r). */
+const WING_PATHS = `<path d="M34 18 8 1 34 8Z" fill="#fff2c0"/><path d="M34 21 2 9 34 12Z" fill="#f5c46b"/><path d="M34 23 7 18 34 16Z" fill="#d99a35"/>`;
+const WING_SVG = `<svg class="tw" viewBox="0 0 36 26" aria-hidden="true">${WING_PATHS}</svg>`;
+const WING_SVG_R = `<svg class="tw r" viewBox="0 0 36 26" aria-hidden="true"><g transform="matrix(-1 0 0 1 36 0)">${WING_PATHS}</g></svg>`;
+
 /** Título exclusivo em HTML: degradê dourado, brilho pulsante e faíscas (CSS em npc-auto.css, .title-fx). */
 export const titleFxHtml = (name: string) =>
-  `<b class="title-fx"><span>«${escapeHtml(name)}»</span><i></i><i></i><i></i><i></i></b>`;
+  `<b class="title-fx">${WING_SVG}<span>${escapeHtml(name)}</span>${WING_SVG_R}<i></i><i></i><i></i><i></i></b>`;
 
 export function showFounderWelcome(w: World, onClose: () => void) {
   const el = byId('offline-panel');
