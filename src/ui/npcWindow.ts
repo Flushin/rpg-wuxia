@@ -622,7 +622,11 @@ export class NpcWindow {
     };
     return `<h4>${L('Montarias', 'Mounts')}</h4>
       <small class="muted">${L(`Você monta sozinho alguns segundos depois de sair de combate e desmonta ao entrar em um.`, `You mount by yourself a few seconds after leaving combat and dismount when combat starts.`)}</small>
-      ${Object.keys(MOUNTS).map(row).join('')}`;
+      ${Object.keys(MOUNTS)
+        // de Fundador: só para quem ainda pode escolher uma (ou já tem); os outros nem veem
+        .filter((id) => !MOUNTS[id].exclusive || w.mountsOwned.includes(id) || (w.founder && !w.founder.mount))
+        .map(row)
+        .join('')}`;
   }
 
   /** Mestre dos Caminhos: destinos do teleporte (src/core/teleport.ts) agrupados por região, com o motivo do bloqueio. */
