@@ -56,7 +56,8 @@
   "ride": {
    "action": "Ride",
    "frames": 1,
-   "fps": 1
+   "fps": 1,
+   "hide_far_leg": true
   }
  },
  "out_json": "../../src/data/sprites",

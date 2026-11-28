@@ -398,6 +398,21 @@ def attach(a, arm):
     o.scale = (a.get('scale', 1.0),) * 3
 
 
+def hide_far_leg(arm, sc):
+    """Montado: a perna do lado de lá fica escondida atrás da montaria (recolhe a coxa); de frente/de costas,
+    com as duas pernas à vista, mostra as duas."""
+    legs = ('upperleg.l', 'upperleg.r')
+    for b in legs:
+        arm.pose.bones[b].scale = (1, 1, 1)
+    bpy.context.view_layer.update()
+    cdir = sc.camera.matrix_world.col[2].to_3d().normalized()  # aponta para a câmera
+    d = [(arm.matrix_world @ arm.pose.bones[b].head).dot(cdir) for b in legs]
+    sep = (arm.matrix_world @ arm.pose.bones[legs[0]].head - arm.matrix_world @ arm.pose.bones[legs[1]].head).length
+    if abs(d[0] - d[1]) > 0.35 * sep:
+        arm.pose.bones[legs[0] if d[0] < d[1] else legs[1]].scale = (0.001, 0.001, 0.001)
+    bpy.context.view_layer.update()
+
+
 def facing_rot(k):
     # direção 0 = de frente para a câmera; o glTF importado olha para -Y
     return math.radians(-45 + k * 45) - math.radians(-90)
@@ -429,6 +444,8 @@ def render(cfg):
                 t = i / n if loop else (i / (n - 1) if n > 1 else 0)
                 fr = f0 + t * (f1 - f0)
                 sc.frame_set(int(fr), subframe=fr - int(fr))
+                if a.get('hide_far_leg'):
+                    hide_far_leg(arm, sc)
                 fp = os.path.join(tmp, f'{anim_name}_{k}_{i}.png')
                 sc.render.filepath = fp
                 bpy.ops.render.render(write_still=True)
