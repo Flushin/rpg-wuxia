@@ -16,11 +16,11 @@ import { byId, escapeHtml } from './dom';
 
 /** Miniatura da montaria (public/sprites/thumbs/mount-<id>.png, recorte de lado do 1º quadro parado). */
 export const mountThumb = (id: string, size = 64) =>
-  `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
+  `<img class="mount-thumb" src="sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
 
 /** Asa do título exclusivo (SVGs de tools/title-wing-svg.mjs): brilho atrás, asa e estrelinhas; a direita é espelhada. */
 const wingImgs = (c: TitleWing) =>
-  ['-halo', '', '-stars'].map((k) => `<img src="/sprites/fx/title-wing-${c}${k}.svg" alt="">`).join('');
+  ['-halo', '', '-stars'].map((k) => `<img src="sprites/fx/title-wing-${c}${k}.svg" alt="">`).join('');
 
 /** Título exclusivo em HTML: degradê dourado, brilho pulsante e faíscas (CSS em npc-auto.css, .title-fx). */
 export const titleFxHtml = (name: string, wing: TitleWing = 'branca') =>
