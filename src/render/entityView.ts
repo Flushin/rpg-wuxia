@@ -14,6 +14,7 @@ import { MountFx } from './mountFx';
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
 const RIDE_Y = 27; // montado: altura (px) da sela acima do chão
+const RIDE_FWD = 7; // montado: o cavaleiro vai (px) para a frente da montaria, em cima da sela
 
 const labelOf = (e: Entity) =>
   e.kind === 'monster'
@@ -329,9 +330,17 @@ export class EntityView {
     }
     const dy = key ? -RIDE_Y : 0;
     this.rideDy = dy;
-    this.sprite.y = dy;
-    if (this.glowSp) this.glowSp.y = dy;
+    this.placeRider();
     this.aura?.setLift(dy);
+  }
+
+  /** Montado: cavaleiro em cima da sela, um pouco à frente do centro da montaria (na direção em que ela olha). */
+  private placeRider() {
+    // direção 0 = de frente para a câmera, +45° por passo; no isométrico o eixo vertical encolhe pela metade
+    const a = (this.dir * Math.PI) / 4;
+    const f = this.mountKey ? RIDE_FWD : 0;
+    this.sprite.setPosition(f * Math.sin(a), this.rideDy + f * 0.5 * Math.cos(a));
+    this.glowSp?.setPosition(this.sprite.x, this.sprite.y);
   }
 
   private animateMount() {
@@ -344,6 +353,7 @@ export class EntityView {
       this.mountSp.play(key);
       if (progress > 0) this.mountSp.anims.setProgress(progress);
       this.mountAnim = key;
+      this.placeRider();
     }
   }
 
