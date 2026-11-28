@@ -56,6 +56,7 @@ export class EntityView {
   private mountSp?: Phaser.GameObjects.Sprite; // montaria embaixo do jogador (só fora de combate)
   private mountKey: string | null = null;
   private mountAnim = '';
+  private rideDy = 0; // montado: nome e título sobem junto com o cavaleiro
   private titleFx?: TitleFx; // título exclusivo com brilho e faíscas
   private mountFx?: MountFx; // faíscas e rastro das montarias de Fundador
   private titleName?: string;
@@ -142,7 +143,7 @@ export class EntityView {
     this.container.setPosition(s.x, s.y);
     // setDepth sempre manda o Phaser reordenar a cena inteira (~1.500 objetos), mesmo com o mesmo valor
     if (this.container.depth !== e.x + e.y) this.container.setDepth(e.x + e.y);
-    if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
+    if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY + this.rideDy);
     this.mountFx?.update(
       s.x,
       s.y,
@@ -151,7 +152,10 @@ export class EntityView {
       this.container.visible && !e.dead,
     );
     if (this.mark)
-      this.mark.setPosition(s.x, s.y + (this.labelY ?? -50) - 16 + Math.sin(this.scene.time.now / 260) * 3);
+      this.mark.setPosition(
+        s.x,
+        s.y + (this.labelY ?? -50) + this.rideDy - 16 + Math.sin(this.scene.time.now / 260) * 3,
+      );
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
     this.container.setVisible(!(e.dead && e.kind === 'monster') || !!deathShown);
     this.sprite.setAlpha(e.dead && !this.sheet ? 0.35 : 1);
@@ -324,6 +328,7 @@ export class EntityView {
       this.animateMount();
     }
     const dy = key ? -RIDE_Y : 0;
+    this.rideDy = dy;
     this.sprite.y = dy;
     if (this.glowSp) this.glowSp.y = dy;
     this.aura?.setLift(dy);
@@ -489,6 +494,6 @@ export class EntityView {
       this.titleFx = want && e.title && e.titleWing ? new TitleFx(this.scene, e.title, e.titleWing) : undefined;
       this.titleName = want;
     }
-    this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 1, this.label.visible);
+    this.titleFx?.update(x, y + (this.labelY ?? -52) + this.rideDy - this.label.height + 1, this.label.visible);
   }
 }

@@ -18,6 +18,11 @@ def setup(cfg):
     o = bpy.data.objects['Cat']
     arm = bpy.data.objects['CatArmature']
     rest_pose(arm)
+    # as ações do FBX animam o próprio objeto (rotação/posição/escala) e desfariam o place(): ficam só os ossos
+    for act in bpy.data.actions:
+        fcs = act.fcurves if hasattr(act, 'fcurves') else [c for ly in act.layers for st in ly.strips for cb in st.channelbags for c in cb.fcurves]
+        for c in [c for c in fcs if not c.data_path.startswith('pose')]:
+            (act.fcurves if hasattr(act, 'fcurves') else next(cb for ly in act.layers for st in ly.strips for cb in st.channelbags if c in cb.fcurves[:]).fcurves).remove(c)
     recolor(o, {
         'Grey': striped((0.84, 0.84, 0.82), (0.0, 0.36, 0.22), 0.5, scale=0.95, thin=0.56, emc=(0.1, 1, 0.5)),
         'White': mat('barriga', (0.88, 0.88, 0.86), rough=0.6),
