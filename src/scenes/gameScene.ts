@@ -569,7 +569,9 @@ export class GameScene extends Phaser.Scene {
       if (this.autoText.text === text) this.autoText.updateText();
     }
     if (this.autoText.text !== text) this.autoText.setText(text);
-    this.autoText.setPosition(s.x, s.y - 70);
+    // acima do nome e do título (com asa ou montado, eles sobem): não cobre nenhum dos dois
+    const top = this.views.get(p.id)?.headTop() ?? -70;
+    this.autoText.setPosition(s.x, s.y + Math.min(-70, top - 2));
   }
 
   private syncGround() {

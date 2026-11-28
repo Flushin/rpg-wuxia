@@ -65,6 +65,11 @@ export class TitleFx {
   }
 
   /** (x, y) = base do título (logo acima do nome). */
+  /** Altura (px) do título acima do ponto de update (para empilhar textos por cima). */
+  get height() {
+    return this.text.height;
+  }
+
   update(x: number, y: number, visible: boolean) {
     const t = this.scene.time.now / 1000;
     this.text.setPosition(x, y).setVisible(visible);

@@ -495,6 +495,11 @@ export class EntityView {
     this.mountFx?.destroy();
   }
 
+  /** Topo (px, relativo aos pés) do nome e do título: o texto do Auto fica acima disso. */
+  headTop(): number {
+    return (this.labelY ?? -52) + this.rideDy - this.label.height - (this.titleFx?.height ?? 0);
+  }
+
   /** Título exclusivo: objeto próprio acima do nome (criado/trocado só quando o título muda). */
   private syncTitle(e: Entity, x: number, y: number) {
     const want =
