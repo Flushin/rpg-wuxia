@@ -1,0 +1,36 @@
+{
+ "name": "grou_celestial",
+ "out": "../../public/sprites",
+ "hide": [],
+ "samples": 32,
+ "frame": [
+  220,
+  150
+ ],
+ "anchor": [
+  110,
+  112
+ ],
+ "px_per_unit": 14,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "Idle",
+   "frames": 6,
+   "fps": 6
+  },
+  "walk": {
+   "action": "Fly",
+   "frames": 8,
+   "fps": 14
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "setup": "mounts/grou_celestial.py",
+ "look": {
+  "rim": 1.5
+ },
+ "ambient": 0.7,
+ "sun": 2.6,
+ "tone": 0.85
+}

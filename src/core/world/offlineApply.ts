@@ -7,6 +7,7 @@ import { type ItemInstance, type PotionKind, type SaveData } from '../types';
 import type { OfflineReport, World } from '../world';
 import { MAPS_CONFIG, TOWN_MAPS } from '../mapsConfig';
 import { isDungeonMap } from '../dungeons';
+import { founderGold, founderXpMul } from '../founder';
 
 // ---------- ganho offline ----------
 export function applyOffline(w: World, now: number, lastSeen: number, saved: SaveData['auto']): OfflineReport | null {
@@ -25,8 +26,12 @@ export function applyOffline(w: World, now: number, lastSeen: number, saved: Sav
     effMul: MAPS_CONFIG[saved.mapId]?.offlineMul ?? 1,
   });
   if (res.kills < 1) return null;
+  // veterano: ouro e XP em dobro (o relatório mostra o valor já dobrado)
+  const xpMul = founderXpMul(w);
+  res.gold = founderGold(w, res.gold);
   w.gold += res.gold;
   w.gainXp(res.xp);
+  res.xp = Math.round(res.xp * xpMul);
   const items: OfflineReport['items'] = [];
   let soldCount = 0,
     soldGold = 0;

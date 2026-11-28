@@ -1,11 +1,13 @@
 // Janela Personagem (tecla C): equipados em volta do retrato (no meio) + atributos com origem (base, níveis,
 // equipamento), gastar pontos livres, "Distribuir recomendado", derivados e elementos. A mochila (I) é só a bolsa.
 // Não toca som de abrir/fechar nem decide quando abre: isso fica no Hud (togglePanel).
+import { titleFxHtml } from './founder';
 import { L } from '../core/i18n';
 import { CLASSES, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
 import { relicEffectText, relicPickHtml } from './relicShop';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
+import { ARENA_TITLES, WING_NAMES } from '../core/arena';
 import { attrBreakdown } from '../core/stats';
 import { audio } from '../render/audio';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
@@ -58,6 +60,8 @@ export class CharacterPanel {
   /** Slot equipado selecionado (detalhe + Desequipar). */
   private sel: Slot | 'reliquia' | null = null;
   private last = { slot: '', t: 0 };
+  /** aba aberta: personagem (equipamento/atributos) ou títulos */
+  private tab: 'main' | 'titles' = 'main';
 
   constructor(
     private world: World,
@@ -70,7 +74,7 @@ export class CharacterPanel {
     el.addEventListener('click', (e) => {
       if (e.target === el) return this.onClose();
       const t = (e.target as HTMLElement).closest(
-        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip],[data-relic-eq]',
+        '[data-attr],[data-close],[data-dist],[data-eq],[data-unequip],[data-relic-eq],[data-tab],[data-title]',
       ) as HTMLElement | null;
       if (!t) {
         // toque fora de um equipado (e fora do detalhe): desfaz a seleção e o detalhe some
@@ -80,7 +84,17 @@ export class CharacterPanel {
         }
         return;
       }
-      if (t.dataset.relicEq !== undefined) {
+      if (t.dataset.tab) {
+        audio.ui('ui_click');
+        this.tab = t.dataset.tab === 'titles' ? 'titles' : 'main';
+        this.sel = null;
+        this.sig = '';
+      } else if (t.dataset.title !== undefined) {
+        // título: usar um dos que tem ('' = ficar sem título)
+        audio.ui('ui_click');
+        world.wearArenaTitle(t.dataset.title || null);
+        this.sig = '';
+      } else if (t.dataset.relicEq !== undefined) {
         // relíquia: equipar uma da coleção ou tirar a atual ('' = tirar)
         audio.ui('ui_click');
         const err = world.equipRelic(t.dataset.relicEq || null);
@@ -145,6 +159,8 @@ export class CharacterPanel {
       p.level,
       w.invVersion,
       this.sel,
+      this.tab,
+      w.arena.title,
       w.relic,
       Math.floor(w.playTime.auto / 60),
       Math.floor(w.playTime.manual / 60),
@@ -230,11 +246,14 @@ export class CharacterPanel {
         : selIt
           ? `<div class="tipbody">${itemTipHtml(w, selIt, false)}</div><button class="primary" data-unequip="1">${L('Desequipar', 'Unequip')}</button>`
           : `<div class="muted">${isTouch ? L('Toque em um equipado para ver os detalhes. Duplo toque desequipa.', 'Tap an equipped item to see details. Double tap unequips.') : L('Clique em um equipado para ver os detalhes. Duplo clique desequipa.', 'Click an equipped item to see details. Double-click unequips.')}</div>`;
+    const tabs = `<div class="tabs ch-tabs"><button class="${this.tab === 'main' ? 'on' : ''}" data-tab="main">${L('Personagem', 'Character')}</button><button class="${this.tab === 'titles' ? 'on' : ''}" data-tab="titles">${L('Títulos', 'Titles')} <small>${w.arena.titles.length}</small></button></div>`;
+    const head = `<div class="card at-card ch-card" style="--c:${cls.color}">${closeX('data-close="1"')}
+      <h2>${L('Personagem', 'Character')}</h2>
+      <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>${tabs}`;
+    if (this.tab === 'titles') return renderPanel(byId('attrs-panel'), `${head}${titlesHtml(w)}</div>`);
     renderPanel(
       byId('attrs-panel'),
-      `<div class="card at-card ch-card" style="--c:${cls.color}">${closeX('data-close="1"')}
-      <h2>${L('Personagem', 'Character')}</h2>
-      <div class="at-sub">${escapeHtml(p.name)} · ${escapeHtml(cls.name)} · ${L(`Nível ${p.level}`, `Level ${p.level}`)}</div>
+      `${head}
       <div class="ch-top"><div class="ch-left"><div class="ch-gear"><div class="eq-body">${eq}</div><div class="eq-relic">${relicCell}</div><div class="inv-detail ch-detail">${detail}</div></div>
       <div class="ch-der"><h3 class="at-h">${L('Derivados', 'Derived stats')}</h3>
       <div class="at-der">${der.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
@@ -247,4 +266,29 @@ export class CharacterPanel {
       <div class="at-els"><div class="at-el head"><span></span><i>${L('Ataque', 'Attack')}</i><i>${L('Resist.', 'Resist.')}</i></div>${els}</div></div></div></div></div>`,
     );
   }
+}
+
+/** Aba Títulos: os títulos que o jogador tem (arena e Fundador); ele escolhe qual usar ou fica sem nenhum. */
+function titlesHtml(w: World): string {
+  const cur = w.arena.title;
+  const row = (id: string | null) => {
+    const t = id ? ARENA_TITLES[id] : null;
+    const on = cur === id;
+    const name = t
+      ? t.exclusive
+        ? titleFxHtml(t.name, t.wing)
+        : `<b style="color:${t.color}">«${escapeHtml(t.name)}»</b>`
+      : `<b>${L('Sem título', 'No title')}</b>`;
+    const from = t
+      ? `<small class="muted">${t.exclusive ? (t.wing ? `${L(...WING_NAMES[t.wing])} · ` : '') + L('Exclusivo dos Fundadores', 'Founders exclusive') : L('Arena do Porto Noturno', 'Night Harbor Arena')}</small>`
+      : `<small class="muted">${L('Nada aparece acima do seu nome', 'Nothing shown above your name')}</small>`;
+    const btn = on
+      ? `<button disabled>${L('Em uso', 'In use')}</button>`
+      : `<button class="primary" data-title="${id ?? ''}">${L('Usar', 'Use')}</button>`;
+    return `<div class="ti-row${on ? ' on' : ''}"><div class="ti-body">${name}<br>${from}</div>${btn}</div>`;
+  };
+  const list = w.arena.titles.filter((id) => ARENA_TITLES[id]);
+  return `<div class="ch-titles"><small class="muted">${L('O título aparece acima do seu nome. Só visual: não dá poder.', 'The title is shown above your name. Cosmetic only: no power.')}</small>
+    ${list.map(row).join('')}${row(null)}
+    ${list.length ? '' : `<p class="muted">${L('Você ainda não tem títulos. Eles são comprados na Arena do Porto Noturno.', 'You have no titles yet. They are bought at the Night Harbor Arena.')}</p>`}</div>`;
 }

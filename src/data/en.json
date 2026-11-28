@@ -1177,6 +1177,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Real mounts: your character now sits in the saddle, with the far leg hidden behind the mount. The three Founder mounts got their own models (Jade Tiger with a helmet and jade stripes, white-and-gold Young Qilin with jade antlers, Celestial Crane that flies flapping its wings), with a glowing halo, sparks and a shiny trail while moving." },
       {
         "texto": "Boss seal in dungeons: the way into the boss arena is closed by a golden seal until you defeat every regular monster (the seal shows how many are left), and your auto attack no longer jumps to the boss mid-clear. The tree walls in front of the rooms became rocks and low bushes, and trees turn see-through when they cover allies or monsters."
       },
@@ -1203,6 +1204,9 @@
       },
       {
         "texto": "Legendary relics reworked: each one has its own boss (Crimson Emperor, Ash Marshal and Spectral Emperor) that drops fragments from level 50; with 25, Antiquarian Lao assembles the relic. New effects (Last breath, Imperial wall, Qilin rhythm) and PvP stats: Tenacity, Resilience and Penetration."
+      },
+      {
+        "texto": "Founders pack, a thank-you to everyone playing before the game goes online: the «Founding Disciple» title with animated little wings in 3 colors to choose from (white and gold, celestial or night), an exclusive mount of your choice (Celestial Crane, Young Qilin or Jade Tiger) that works from level 1, double XP up to level 30 and double gold up to level 50. New Titles tab in the Character window (C) to pick the title you wear or wear none."
       }
     ],
     "versoes": [
@@ -1495,6 +1499,18 @@
     "cavalo": {
       "name": "Horse",
       "desc": "A bay horse from the Night Harbor stables. Carries you faster along the roads; you dismount when combat starts."
+    },
+    "grou_celestial": {
+      "name": "Celestial Crane",
+      "desc": "A giant crane with white feathers and a crimson crown, mount of the immortals. Founders exclusive; you dismount when combat starts."
+    },
+    "qilin_jovem": {
+      "name": "Young Qilin",
+      "desc": "A qilin cub with golden scales and a jade horn, a sign of good fortune. Founders exclusive; you dismount when combat starts."
+    },
+    "tigre_de_jade": {
+      "name": "Jade Tiger",
+      "desc": "A white tiger with jade-green stripes, loyal to the ancient warriors. Founders exclusive; you dismount when combat starts."
     }
   },
   "arenaTitles": {
@@ -1515,6 +1531,15 @@
     },
     "lenda_do_porto": {
       "name": "Legend of the Night Port"
+    },
+    "discipulo_fundador": {
+      "name": "Founding Disciple"
+    },
+    "discipulo_fundador_celeste": {
+      "name": "Founding Disciple"
+    },
+    "discipulo_fundador_noite": {
+      "name": "Founding Disciple"
     }
   },
   "relics": {

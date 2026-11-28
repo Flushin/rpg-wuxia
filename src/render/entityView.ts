@@ -1,13 +1,15 @@
 import Phaser from 'phaser';
 import { DPR } from './display';
 import { tileToScreen } from '../core/iso';
-import { MONSTERS } from '../core/data';
+import { MONSTERS, MOUNTS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type SheetMeta } from './sprites';
 import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 import { ElementAura } from './elementAura';
+import { TitleFx } from './titleFx';
+import { MountFx } from './mountFx';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -18,8 +20,8 @@ const labelOf = (e: Entity) =>
     ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`)
     : e.kind === 'npc'
       ? tn(e.name)
-      : e.title
-        ? `«${e.title}»\n${e.name}` // título da arena acima do nome
+      : e.title && !e.titleWing
+        ? `«${e.title}»\n${e.name}` // título da arena acima do nome (exclusivos: TitleFx)
         : e.name;
 
 export class EntityView {
@@ -54,6 +56,9 @@ export class EntityView {
   private mountSp?: Phaser.GameObjects.Sprite; // montaria embaixo do jogador (só fora de combate)
   private mountKey: string | null = null;
   private mountAnim = '';
+  private titleFx?: TitleFx; // título exclusivo com brilho e faíscas
+  private mountFx?: MountFx; // faíscas e rastro das montarias de Fundador
+  private titleName?: string;
 
   constructor(
     private scene: Phaser.Scene,
@@ -138,6 +143,13 @@ export class EntityView {
     // setDepth sempre manda o Phaser reordenar a cena inteira (~1.500 objetos), mesmo com o mesmo valor
     if (this.container.depth !== e.x + e.y) this.container.setDepth(e.x + e.y);
     if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
+    this.mountFx?.update(
+      s.x,
+      s.y,
+      this.container.depth,
+      this.scene.time.now - this.movedAt < MOVE_HOLD_MS,
+      this.container.visible && !e.dead,
+    );
     if (this.mark)
       this.mark.setPosition(s.x, s.y + (this.labelY ?? -50) - 16 + Math.sin(this.scene.time.now / 260) * 3);
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
@@ -149,10 +161,12 @@ export class EntityView {
       this.ring.clear();
       this.bar.clear();
       this.label.setVisible(false);
+      this.titleFx?.update(0, 0, false);
       return;
     }
     this.label.setVisible(this.container.visible);
     this.label.setText(labelOf(e));
+    this.syncTitle(e, s.x, s.y);
     this.ring.clear();
     this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha;
@@ -264,6 +278,8 @@ export class EntityView {
 
   private play(anim: AnimName, restart = false) {
     if (!this.sheet) return;
+    // montado e parado: pose sentada (folhas com a linha 'ride', tools/sprites/ride.py)
+    if (anim === 'idle' && this.mountSp && this.sheet.meta.anims.ride) anim = 'ride';
     const sp = this.sprite as Phaser.GameObjects.Sprite;
     const key = animKey(this.sheet.key, anim, this.dir);
     if (!restart && sp.anims.currentAnim?.key === key && sp.anims.isPlaying) {
@@ -291,6 +307,10 @@ export class EntityView {
     this.mountKey = key;
     this.mountSp?.destroy();
     this.mountSp = undefined;
+    this.mountFx?.destroy();
+    this.mountFx = undefined;
+    const fx = key ? MOUNTS[key]?.fx : undefined;
+    if (fx) this.mountFx = new MountFx(this.scene, fx);
     this.mountAnim = '';
     this.anim = '';
     if (key) {
@@ -456,5 +476,19 @@ export class EntityView {
     this.container.destroy();
     if (this.labelY !== null) this.label.destroy();
     this.mark?.destroy();
+    this.titleFx?.destroy();
+    this.mountFx?.destroy();
+  }
+
+  /** Título exclusivo: objeto próprio acima do nome (criado/trocado só quando o título muda). */
+  private syncTitle(e: Entity, x: number, y: number) {
+    const want =
+      e.kind !== 'monster' && e.kind !== 'npc' && e.title && e.titleWing ? `${e.titleWing}|${e.title}` : undefined;
+    if (want !== this.titleName) {
+      this.titleFx?.destroy();
+      this.titleFx = want && e.title && e.titleWing ? new TitleFx(this.scene, e.title, e.titleWing) : undefined;
+      this.titleName = want;
+    }
+    this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 1, this.label.visible);
   }
 }

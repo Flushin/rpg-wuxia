@@ -768,3 +768,187 @@
   justify-self: start;
   margin-top: 4px;
 }
+
+/* montarias: miniatura (janela do Fundador e estábulo) */
+.mount-thumb {
+  flex: none;
+  object-fit: contain;
+  image-rendering: auto;
+  background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.08), transparent 70%);
+  border-radius: 8px;
+}
+.rep-row.mount-pick {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 8px;
+}
+.rep-row.mount-pick > div {
+  flex: 1;
+  min-width: 0;
+}
+.rep-row.mount-pick.sel {
+  background: rgba(255, 210, 63, 0.08);
+  outline: 1px solid rgba(255, 210, 63, 0.4);
+}
+.dg-row.sk-row .mount-thumb {
+  margin-right: 8px;
+}
+
+/* Personagem: abas e aba Títulos */
+.ch-tabs {
+  margin: 6px 0 10px;
+}
+.ch-titles .ti-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+.ch-titles .ti-body {
+  flex: 1;
+  min-width: 0;
+}
+.ch-titles .ti-row button,
+.card .ch-titles .ti-row .primary {
+  width: auto;
+  margin-top: 0;
+  flex: none;
+  min-width: 96px;
+  min-height: 40px;
+}
+.ch-titles .ti-row.on {
+  background: rgba(255, 210, 63, 0.08);
+  border-radius: 8px;
+}
+
+/* Título exclusivo (Fundador): degradê dourado, brilho pulsante e faíscas subindo (titleFxHtml em ui/founder.ts) */
+.title-fx {
+  position: relative;
+  display: inline-block;
+  padding: 2px 4px;
+}
+.title-fx span {
+  background: linear-gradient(180deg, #fff6c8, #f5c46b 55%, #c8892a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: title-fx-glow 2.6s ease-in-out infinite;
+}
+.title-fx i.sp {
+  position: absolute;
+  bottom: 2px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff2c0;
+  box-shadow: 0 0 4px #ffc23a;
+  opacity: 0;
+  pointer-events: none;
+  animation: title-fx-spark 2.2s ease-out infinite;
+}
+.title-fx i.sp:nth-last-of-type(4) {
+  left: 12%;
+}
+.title-fx i.sp:nth-last-of-type(3) {
+  left: 38%;
+  animation-delay: 0.6s;
+}
+.title-fx i.sp:nth-last-of-type(2) {
+  left: 63%;
+  animation-delay: 1.2s;
+}
+.title-fx i.sp:nth-last-of-type(1) {
+  left: 87%;
+  animation-delay: 1.7s;
+}
+@keyframes title-fx-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px rgba(255, 194, 58, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(255, 194, 58, 0.9));
+  }
+}
+@keyframes title-fx-spark {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-16px) scale(0.3);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-fx span,
+  .title-fx i.sp {
+    animation: none;
+  }
+}
+.title-fx {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.title-fx .tw {
+  position: relative;
+  width: 22px;
+  height: 25px;
+  flex: none;
+  margin: 0 5px;
+  translate: 0 -10%;
+}
+.title-fx .tw.r {
+  transform: scaleX(-1);
+}
+.title-fx .tw img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 92.6% 61.3%;
+  animation: title-fx-wing 1s ease-in-out infinite;
+}
+.title-fx .tw img:first-child {
+  opacity: 0.8;
+}
+.title-fx .tw img:first-child,
+.title-fx .tw img:last-child {
+  animation:
+    title-fx-wing 1s ease-in-out infinite,
+    title-fx-pulse 1.6s ease-in-out infinite;
+}
+.title-fx .tw img:last-child {
+  animation-delay: 0s, 0.8s;
+}
+@keyframes title-fx-wing {
+  0%,
+  100% {
+    transform: rotate(4deg);
+  }
+  50% {
+    transform: rotate(-7deg) scaleY(0.95);
+  }
+}
+@keyframes title-fx-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-fx .tw img {
+    animation: none;
+  }
+}

@@ -1,5 +1,6 @@
 // Mestre da Arena Tie (Porto Noturno; regras em docs/decisoes/arena.md): placar, botão de lutar e a loja de títulos
 // paga com a moeda da arena. A luta fica em src/core/world/arena.ts.
+import { titleFxHtml } from './founder';
 import {
   ARENA_COINS,
   ARENA_POWER_MAX,
@@ -34,11 +35,12 @@ export function arenaHtml(w: World): string {
     let btn: string;
     if (worn) btn = `<button data-a="titlewear" data-v="">${L('Tirar', 'Remove')}</button>`;
     else if (owned) btn = `<button class="primary" data-a="titlewear" data-v="${id}">${L('Usar', 'Use')}</button>`;
+    else if (t.exclusive) btn = `<small class="muted">${L('Exclusivo dos Fundadores', 'Founders exclusive')}</small>`;
     else if (a.points < t.minPoints)
       btn = `<small class="muted">${L(`Requer ${t.minPoints} pontos`, `Requires ${t.minPoints} points`)}</small>`;
     else
       btn = `<button class="primary" data-a="titlebuy" data-v="${id}" ${a.coins < t.price ? 'disabled' : ''}>${L(`Comprar (${t.price} moedas)`, `Buy (${t.price} coins)`)}</button>`;
-    return `<div class="dg-row sk-row"><div class="sk-body"><b style="color:${t.color}">«${escapeHtml(t.name)}»</b>${worn ? ` <small class="muted">${L('(em uso)', '(in use)')}</small>` : ''}${btn}</div></div>`;
+    return `<div class="dg-row sk-row"><div class="sk-body">${t.wing ? titleFxHtml(t.name, t.wing) : `<b style="color:${t.color}">«${escapeHtml(t.name)}»</b>`}${worn ? ` <small class="muted">${L('(em uso)', '(in use)')}</small>` : ''}${btn}</div></div>`;
   };
   return `${stats}<h4>${L('Títulos', 'Titles')}</h4>
     <small class="muted">${L('Aparecem acima do seu nome. Só visual: não dão poder.', 'Shown above your name. Cosmetic only: no power.')}</small>

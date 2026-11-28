@@ -5,6 +5,10 @@ import tita from '../data/sprites/tita.json';
 import vibora from '../data/sprites/vibora.json';
 import lobo from '../data/sprites/lobo.json';
 import cavalo from '../data/sprites/cavalo.json';
+// montarias dos Fundadores: por enquanto o Cavalo recolorido (arte provisória)
+import grouCelestial from '../data/sprites/grou_celestial.json';
+import qilinJovem from '../data/sprites/qilin_jovem.json';
+import tigreDeJade from '../data/sprites/tigre_de_jade.json';
 import banditSword from '../data/sprites/bandido_espadachim.json';
 import banditArcher from '../data/sprites/bandido_arqueiro.json';
 import terracota from '../data/sprites/terracota.json';
@@ -69,7 +73,7 @@ export const npcSheetKey = (npcId: string) => NPC_SHEET_BY_ID[npcId] ?? 'npc_' +
 // Direções: 0=S (para baixo na tela), 1=SE, 2=E, 3=NE, 4=N, 5=NW, 6=W, 7=SW.
 
 /** levelup: só nas folhas do jogador (pose de comemorar, olhando para o alto) */
-export type AnimName = 'idle' | 'walk' | 'attack' | 'death' | 'levelup';
+export type AnimName = 'idle' | 'walk' | 'attack' | 'death' | 'levelup' | 'ride';
 
 export interface SheetMeta {
   frameWidth: number;
@@ -89,6 +93,9 @@ const SHEETS: Record<string, SheetMeta> = {
   vibora: vibora as SheetMeta,
   lobo: lobo as SheetMeta,
   cavalo: cavalo as SheetMeta,
+  grou_celestial: grouCelestial as SheetMeta,
+  qilin_jovem: qilinJovem as SheetMeta,
+  tigre_de_jade: tigreDeJade as SheetMeta,
   bandido_espadachim: banditSword as SheetMeta,
   bandido_arqueiro: banditArcher as SheetMeta,
   terracota: terracota as SheetMeta,
@@ -119,6 +126,9 @@ const BY_TEXTURE: Record<string, string> = {
   'player-vibora': 'vibora',
   wolf: 'lobo',
   'mount-cavalo': 'cavalo', // montarias: 'mount-' + id de mounts.json
+  'mount-grou_celestial': 'grou_celestial',
+  'mount-qilin_jovem': 'qilin_jovem',
+  'mount-tigre_de_jade': 'tigre_de_jade',
   'bandit-sword': 'bandido_espadachim',
   'bandit-archer': 'bandido_arqueiro',
   terracotta: 'terracota',
@@ -205,6 +215,10 @@ export const sheetFor = (texture: string): { key: string; meta: SheetMeta } | nu
 
 /** Boot: só o que é leve e vale para todos os mapas (cenários e pisos). As folhas de personagens são por mapa (sheetLoader). */
 export function preloadSprites(scene: Phaser.Scene) {
+  // asa do título exclusivo (tools/title-wing-svg.mjs): asa, brilho atrás e estrelinhas
+  for (const c of ['branca', 'celeste', 'noite'])
+    for (const k of ['', '-halo', '-stars'])
+      scene.load.svg(`title-wing-${c}${k}`, `sprites/fx/title-wing-${c}${k}.svg`, { width: 216, height: 248 });
   scene.load.atlas('props-floresta', 'sprites/floresta.png', 'sprites/floresta.json');
   scene.load.atlas('props-cidade', 'sprites/cidade.png', 'sprites/cidade.json');
   scene.load.atlas('props-cidadela', 'sprites/cidadela.png', 'sprites/cidadela.json');

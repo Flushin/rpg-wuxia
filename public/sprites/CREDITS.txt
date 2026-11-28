@@ -20,6 +20,11 @@ Personagens:
 Monstros:
 - Lobo: "Wolf" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
 - Cavalo (montaria): "Horse" do Ultimate Animated Animal Pack — Quaternius (https://quaternius.com), CC0.
+- Qilin Jovem (montaria de Fundador): "Stag" do Ultimate Animated Animal Pack — Quaternius, CC0. Recolorido; chifres,
+  crina, sela e joias gerados pelo script (tools/sprites/mounts/).
+- Tigre de Jade (montaria de Fundador): "Cat" do Animal Pack Vol.2 — Quaternius (https://opengameart.org/content/animated-animales-low-poly),
+  CC0. Aumentado e recolorido; sela, elmo e joias gerados pelo script.
+- Grou Celestial (montaria de Fundador): modelo e animação feitos pelo script do projeto.
 - Bandido Espadachim: "Knight" do KayKit Adventurers — Kay Lousberg, CC0. Sem elmo e escudos, couro marrom e pano cinza;
   o lenço no rosto é gerado pelo script.
 - Bandido Arqueiro: "Rogue" do KayKit Adventurers (com a besta) — Kay Lousberg, CC0. Recolorido; lenço e chapéu de palha

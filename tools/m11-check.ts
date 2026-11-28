@@ -14,6 +14,7 @@ import { QUESTS } from '../src/core/quests';
 import { TRIAL_BOSSES, TRIAL_TIERS, trialBossLevel, trialEquipReqLevel } from '../src/core/trial';
 import type { Entity } from '../src/core/types';
 import { World } from '../src/core/world';
+import { FOUNDER_TITLE, FOUNDER_TITLES, chooseFounderMount, founderGold, grantFounder } from '../src/core/founder';
 import { MOUNTS } from '../src/core/data';
 import type { SaveData } from '../src/core/types';
 import { Rng } from '../src/core/rng';
@@ -331,6 +332,44 @@ console.log('\n== montaria (estábulo do Porto Noturno) ==');
   ok(w.toggleMount() === null && w.toggleMount() === null && !w.riding, 'botão: desmonta');
   const w2 = World.fromSave(maps, { ...w.serialize(), lastSeen: NOW }, NOW, false);
   ok(w2.mountsOwned.join() === 'cavalo', 'a montaria fica no save');
+}
+
+console.log('\n== veterano (Fundadores) ==');
+{
+  const w = mk(10, 'vila');
+  const st = (lv: number) => {
+    w.player.level = lv;
+    w.xp = 0;
+    w.gainXp(100);
+    return w.xp;
+  };
+  ok(st(10) === 100, 'sem marca: XP normal');
+  ok(w.buyMount('grou_celestial') !== null, 'montaria de Fundador não se compra');
+  grantFounder(w);
+  ok(w.arena.titles.includes(FOUNDER_TITLE) && w.arena.title === FOUNDER_TITLE, 'ganha e veste o título');
+  ok(
+    FOUNDER_TITLES.every((id) => w.arena.titles.includes(id)) && w.player.titleWing === 'branca',
+    'ganha os 3 títulos (asas branca, celeste e noite) e usa a branca',
+  );
+  ok(st(10) === 200 && st(29) === 200 && st(30) === 100, 'XP em dobro até o nível 30');
+  w.player.level = 49;
+  ok(founderGold(w, 50) === 100, 'ouro em dobro abaixo do 50');
+  ok(!chooseFounderMount(w, 'cavalo'), 'não escolhe montaria comum');
+  ok(chooseFounderMount(w, 'tigre_de_jade') && w.mountsOwned[0] === 'tigre_de_jade', 'escolhe a montaria');
+  ok(!chooseFounderMount(w, 'qilin_jovem'), 'escolha definitiva');
+  w.player.level = 1;
+  ok(w.toggleMount() === null && w.mountNow() === 'tigre_de_jade', 'monta desde o nível 1');
+  const w2 = World.fromSave(maps, { ...w.serialize(), lastSeen: NOW }, NOW, false);
+  ok(
+    w2.founder?.mount === 'tigre_de_jade' && w2.mountsOwned[0] === 'tigre_de_jade',
+    'veterano e montaria ficam no save',
+  );
+  const s3 = { ...w.serialize(), lastSeen: NOW, founder: undefined };
+  const w3 = World.fromSave(maps, s3, NOW, false);
+  ok(
+    !w3.founder && !w3.mountsOwned.length && !w3.arena.titles.includes(FOUNDER_TITLE),
+    'sem marca: perde exclusivos do save',
+  );
 }
 
 console.log(fails ? `\n${fails} FALHA(S)` : '\nTudo certo.');

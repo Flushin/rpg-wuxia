@@ -55,6 +55,12 @@
    "frames": 8,
    "fps": 12,
    "loop": false
+  },
+  "ride": {
+   "action": "Ride",
+   "frames": 1,
+   "fps": 1,
+   "hide_far_leg": true
   }
  },
  "out_json": "../../src/data/sprites",
@@ -219,5 +225,6 @@
    20
   ],
   "strength": 2.2
- }
+ },
+ "setup": "ride.py"
 }

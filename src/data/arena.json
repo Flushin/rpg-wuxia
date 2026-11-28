@@ -5,6 +5,9 @@
     "punho_de_ferro": { "name": "Punho de Ferro", "price": 600, "minPoints": 1100, "color": "#ffd23f" },
     "lanterna_rubra": { "name": "Lanterna Rubra", "price": 900, "minPoints": 1200, "color": "#ff8a65" },
     "senhor_da_arena": { "name": "Senhor da Arena", "price": 1400, "minPoints": 1350, "color": "#7ee0b0" },
-    "lenda_do_porto": { "name": "Lenda do Porto Noturno", "price": 2500, "minPoints": 1500, "color": "#e6a6ff" }
+    "lenda_do_porto": { "name": "Lenda do Porto Noturno", "price": 2500, "minPoints": 1500, "color": "#e6a6ff" },
+    "discipulo_fundador": { "name": "Discípulo Fundador", "price": 0, "minPoints": 0, "color": "#f5c46b", "exclusive": "fundador", "wing": "branca" },
+    "discipulo_fundador_celeste": { "name": "Discípulo Fundador", "price": 0, "minPoints": 0, "color": "#f5c46b", "exclusive": "fundador", "wing": "celeste" },
+    "discipulo_fundador_noite": { "name": "Discípulo Fundador", "price": 0, "minPoints": 0, "color": "#f5c46b", "exclusive": "fundador", "wing": "noite" }
   }
 }

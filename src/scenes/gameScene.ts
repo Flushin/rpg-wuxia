@@ -1,4 +1,6 @@
 import { foeOf } from '../core/world/party';
+import { FOUNDER_FOR_ALL, grantFounder } from '../core/founder';
+import { showFounderWelcome } from '../ui/founder';
 import { touchDebug } from '../ui/touchDebug';
 import Phaser from 'phaser';
 import { L } from '../core/i18n';
@@ -103,6 +105,9 @@ export class GameScene extends Phaser.Scene {
   create() {
     // só no `npm run dev`: acesso ao mundo pelo console (testes visuais); some no build
     if (import.meta.env.DEV) (window as unknown as { __game: unknown }).__game = { world: this.world, scene: this };
+    // versão offline: todos são Fundadores (FOUNDER_FOR_ALL); no `npm run dev`, ?fundador=1 também marca
+    if (FOUNDER_FOR_ALL || (import.meta.env.DEV && new URLSearchParams(location.search).has('fundador')))
+      grantFounder(this.world);
     // volumes são do aparelho; o campo audio do save fica como estava (só é lido na primeira vez)
     const sound = loadDeviceAudio(this.world.audio);
     saveDeviceAudio(sound);
@@ -143,7 +148,7 @@ export class GameScene extends Phaser.Scene {
     const rep = this.world.offlineReport;
     this.world.offlineReport = null;
     if (rep) this.hud.showOffline(rep, () => this.afterOffline(rep));
-    else this.world.auto.resume();
+    else this.founderWelcome(() => this.world.auto.resume());
     this.cameras.main.setBackgroundColor('#10141c');
     syncSheets(this, this.world, () => this.rebuildMap());
     this.applyZoom();
@@ -642,9 +647,18 @@ export class GameScene extends Phaser.Scene {
     this.hud.showOffline(rep, () => this.afterOffline(rep));
   }
 
+  /** Veterano que ainda não escolheu a montaria: janela de boas-vindas (src/ui/founder.ts); senão segue direto. */
+  private founderWelcome(next: () => void) {
+    const w = this.world;
+    if (w.founder && !w.founder.mount && !w.founderAsked) {
+      w.founderAsked = true; // uma vez por sessão; depois escolhe no Cavalariço Ma
+      showFounderWelcome(w, next);
+    } else next();
+  }
+
   /** Resumo offline fechado: o auto volta; níveis prontos ganhos fora ficam para o jogador subir. */
   private afterOffline(rep: OfflineReport) {
-    this.world.auto.resume();
+    this.founderWelcome(() => this.world.auto.resume());
     if (rep.levelsReady > 0)
       this.hud.toast(
         L(

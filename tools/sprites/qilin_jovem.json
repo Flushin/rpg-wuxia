@@ -1,0 +1,39 @@
+{
+ "name": "qilin_jovem",
+ "model": ".cache/quaternius/Stag.glb",
+ "out": "../../public/sprites",
+ "hide": [
+  "Icosphere"
+ ],
+ "samples": 32,
+ "frame": [
+  176,
+  140
+ ],
+ "anchor": [
+  88,
+  104
+ ],
+ "px_per_unit": 14,
+ "render_scale": 2,
+ "anims": {
+  "idle": {
+   "action": "AnimalArmature|Idle",
+   "frames": 6,
+   "fps": 6
+  },
+  "walk": {
+   "action": "AnimalArmature|Gallop",
+   "frames": 8,
+   "fps": 14
+  }
+ },
+ "out_json": "../../src/data/sprites",
+ "setup": "mounts/qilin_jovem.py",
+ "look": {
+  "rim": 1.5
+ },
+ "ambient": 0.7,
+ "sun": 2.6,
+ "tone": 0.85
+}

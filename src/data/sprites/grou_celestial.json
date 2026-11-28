@@ -1,0 +1,23 @@
+{
+ "frameWidth": 440,
+ "frameHeight": 300,
+ "scale": 0.5,
+ "top": 86,
+ "anchor": [
+  0.5,
+  0.7466666666666667
+ ],
+ "dirs": 8,
+ "anims": {
+  "idle": {
+   "frames": 6,
+   "fps": 6,
+   "loop": true
+  },
+  "walk": {
+   "frames": 8,
+   "fps": 14,
+   "loop": true
+  }
+ }
+}

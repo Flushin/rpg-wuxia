@@ -5,5 +5,32 @@
     "price": 50000,
     "speedBonus": 0.3,
     "mountDelay": 3
+  },
+  "grou_celestial": {
+    "name": "Grou Celestial",
+    "desc": "Grou gigante de penas brancas e coroa rubra, montaria dos imortais. Exclusivo dos Fundadores; desmonta ao entrar em combate.",
+    "price": 0,
+    "speedBonus": 0.3,
+    "mountDelay": 3,
+    "exclusive": "fundador",
+    "fx": ["#bfe6ff", "#ffffff", "#ff6a6a"]
+  },
+  "qilin_jovem": {
+    "name": "Qilin Jovem",
+    "desc": "Filhote de qilin de escamas douradas e chifre de jade, sinal de boa sorte. Exclusivo dos Fundadores; desmonta ao entrar em combate.",
+    "price": 0,
+    "speedBonus": 0.3,
+    "mountDelay": 3,
+    "exclusive": "fundador",
+    "fx": ["#ffd86a", "#7ff0c8", "#fff4c8"]
+  },
+  "tigre_de_jade": {
+    "name": "Tigre de Jade",
+    "desc": "Tigre branco de listras verde-jade, fiel aos guerreiros antigos. Exclusivo dos Fundadores; desmonta ao entrar em combate.",
+    "price": 0,
+    "speedBonus": 0.3,
+    "mountDelay": 3,
+    "exclusive": "fundador",
+    "fx": ["#5ff0a8", "#ffd86a", "#d8fff0"]
   }
 }

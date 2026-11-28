@@ -110,6 +110,8 @@ export interface Entity {
   foeId?: number;
   /** título mostrado acima do nome (arena) */
   title?: string;
+  /** asa animada do título (títulos exclusivos; arena.ts TitleWing) */
+  titleWing?: 'branca' | 'celeste' | 'noite';
   /** bot inimigo da arena (nome e vida em vermelho) */
   arenaFoe?: boolean;
   /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */
@@ -353,6 +355,8 @@ export interface SaveData {
   relic?: string;
   /** fragmentos de relíquia lendária (id da relíquia → quantidade) */
   relicShards?: Record<string, number>;
+  /** veterano da primeira versão (src/core/founder.ts): montaria escolhida (ausente = ainda não escolheu) */
+  founder?: { mount?: string };
   /** arena do Porto Noturno (src/core/arena.ts): pontos, moeda, vitórias/derrotas, títulos comprados e o usado */
   arena?: { points: number; coins: number; wins: number; losses: number; titles: string[]; title?: string };
   merchant?: { period: number; offers: { item: ItemInstance; price: number; sold: boolean }[] };
@@ -394,6 +398,7 @@ export type ActionError =
   | { code: 'relicShards'; need: number }
   | { code: 'talkToArena' }
   | { code: 'titleOwned' }
+  | { code: 'founderOnly' }
   | { code: 'arenaPoints'; points: number }
   | { code: 'arenaCoins' }
   | { code: 'relicNotOwned' };

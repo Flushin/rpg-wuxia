@@ -1,4 +1,6 @@
 import { actionErrorText } from './actionError';
+import { mountThumb } from './founder';
+import { chooseFounderMount } from '../core/founder';
 import type { ActionError } from '../core/types';
 import { BUYBACK_MAX } from '../core/world/shop';
 import { L, tn } from '../core/i18n';
@@ -152,6 +154,17 @@ export class NpcWindow {
       const err = w.buySkin(v);
       if (err) this.toast(actionErrorText(err), '#ff8a80');
       else this.toast(L(`Traje vestido: ${SKINS[v].name}`, `Outfit equipped: ${SKINS[v].name}`), '#ffd23f');
+      return;
+    }
+    if (a === 'founderpick') {
+      if (this.mountAsk !== v) {
+        audio.ui('ui_click');
+        this.mountAsk = v;
+        return;
+      }
+      this.mountAsk = '';
+      if (chooseFounderMount(w, v))
+        this.toast(L(`Montaria de Fundador: ${MOUNTS[v].name}`, `Founder mount: ${MOUNTS[v].name}`), '#ffd23f');
       return;
     }
     if (a === 'mountbuy') {
@@ -588,15 +601,21 @@ export class NpcWindow {
         pct = Math.round(m.speedBonus * bal('montaria.velocidade') * 100);
       let btn: string;
       if (owned) btn = `<button disabled>${L('Já é sua', 'Owned')}</button>`;
+      else if (m.exclusive && w.founder && !w.founder.mount)
+        btn =
+          this.mountAsk === id
+            ? `<div class="mr-ask"><button class="danger" data-a="founderpick" data-v="${id}">${L('Confirmar (definitivo)', 'Confirm (permanent)')}</button><button data-a="mountcancel">${L('Cancelar', 'Cancel')}</button></div>`
+            : `<button class="primary" data-a="founderpick" data-v="${id}">${L('Escolher (Fundador)', 'Choose (Founder)')}</button>`;
+      else if (m.exclusive) btn = `<small class="muted">${L('Exclusivo dos Fundadores', 'Founders exclusive')}</small>`;
       else if (this.mountAsk === id)
         btn = `<div class="mr-ask"><button class="danger" data-a="mountbuy" data-v="${id}">${L(`Confirmar (${price} ouro)`, `Confirm (${price} gold)`)}</button><button data-a="mountcancel">${L('Cancelar', 'Cancel')}</button></div>`;
       else
         btn = `<button class="primary" data-a="mountbuy" data-v="${id}" ${w.gold < m.price ? 'disabled' : ''}>${L(`Comprar (${price} ouro)`, `Buy (${price} gold)`)}</button>`;
       const why =
-        !owned && w.gold < m.price
+        !owned && !m.exclusive && w.gold < m.price
           ? `<small class="muted">${L(`Faltam ${(m.price - w.gold).toLocaleString('pt-BR')} de ouro.`, `You need ${(m.price - w.gold).toLocaleString('pt-BR')} more gold.`)}</small>`
           : '';
-      return `<div class="dg-row sk-row"><div class="sk-body">
+      return `<div class="dg-row sk-row">${mountThumb(id)}<div class="sk-body">
         <b>${escapeHtml(m.name)}</b> <small class="muted">+${pct}% ${L('velocidade', 'speed')}</small>
         <div class="dg-info">${escapeHtml(m.desc)}</div>
         ${btn}${why}</div></div>`;
