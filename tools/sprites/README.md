@@ -37,6 +37,7 @@ Leva menos de 1 minuto (Cycles na CPU). Os modelos baixados ficam em `tools/spri
 | `vibora_lotus.json` | Traje da Víbora (Lótus Venenosa): mesmo modelo da Tormenta Celeste, lenço (`mask`) + chapéu + agulhas; `glow_mesh` em `Needles` |
 | `tita_brasa.json` | Traje do Titã (Brasa Vulcânica): Barbarian com corpo, braços e pernas do Knight, chapéu + bastão; `glow_mesh` em `Staff` |
 | `render_bambu.py` | Bosque de Bambu Sombrio (nível 30): moitas de bambu, brotos e folhas por script → `public/sprites/bambu.*` |
+| `tigre_de_jade.json`, `qilin_jovem.json`, `grou_celestial.json` + `mounts/` | Montarias de Fundador: `setup` (script por montaria) pinta e enfeita o modelo com peças presas aos ossos (`mounts/_lib.py`: sela, escamas, listras, gemas). Tigre = Gato (Animal Pack Vol.2, `.fbx`) aumentado; Qilin = Stag; Grou feito do zero com esqueleto e ações `Idle`/`Fly` próprios. Lombo na altura do Cavalo (o cavaleiro usa o mesmo `RIDE_Y`) |
 | `montanha.json` | Objetos da montanha (`render_props.py`): pinheiros em 3 tons e rochas nevadas → `public/sprites/montanha.*` |
 | `tormenta.json`, `geada.json`, `tita.json`, `vibora.json`, `lobo.json`, `floresta.json` | Configuração de cada folha (Titã: Barbarian + bastão, golpe `2H_Melee_Attack_Chop`; Víbora: Rogue_Hooded + agulhas, `Throw`) |
 | `cavalo.json` | Montaria (Quaternius Horse): `idle` e `walk` (galope), 8 direções; no jogo fica sob o jogador fora de combate (`EntityView.setMount`) |

@@ -47,7 +47,7 @@ get KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 672074b73ba276876a19
 
 # Quaternius Ultimate Animated Animals (CC0) — espelho trebeljahr/quaternius-showcase (Wolf.glb igual desde 06/12/2022)
 get trebeljahr/quaternius-showcase 0128ca510d653bb04d6d1e4885bd8890b5050b4f quaternius LICENSES.md \
-  public/glb/animals_pack/Wolf.glb public/glb/animals_pack/Horse.glb
+  public/glb/animals_pack/Wolf.glb public/glb/animals_pack/Horse.glb public/glb/animals_pack/Stag.glb
 
 # Kenney Nature Kit (CC0) — espelho shorepine/kenney
 N=3d/nature
@@ -60,12 +60,22 @@ mkdir -p kaykit/Characters/gltf quaternius kenney-nature
 for c in "${KAYKIT[@]}"; do
   cp "kaykit.git/addons/kaykit_character_pack_adventures/Characters/gltf/$c.glb" kaykit/Characters/gltf/
 done
-for a in Wolf Horse; do
+for a in Wolf Horse Stag; do
   from_official_or_mirror "${QUATERNIUS_ANIMALS_DIR:-}" "quaternius.git/public/glb/animals_pack/$a.glb" "quaternius/$a.glb"
 done
 for m in "${NATURE[@]}"; do
   from_official_or_mirror "${KENNEY_NATURE_DIR:-}" "kenney.git/$N/$m.glb" "kenney-nature/$m.glb"
 done
+
+# Quaternius Animal Pack Vol.2 (CC0) — .zip publicado pelo autor no OpenGameArt (opengameart.org/content/animated-animales-low-poly).
+# Só o Gato (base do Tigre de Jade, montaria de Fundador).
+if [ ! -f quaternius/Cat.fbx ]; then
+  tmp=$(mktemp -d)
+  curl -fsSL -o "$tmp/p.zip" "https://opengameart.org/sites/default/files/Animal%20Pack%20Vol.2%20by%20%40Quaternius.zip"
+  unzip -q -j "$tmp/p.zip" "*/FBX/Cat.fbx" -d "$tmp"
+  cp "$tmp/Cat.fbx" quaternius/Cat.fbx
+  rm -rf "$tmp"
+fi
 
 # confere tudo com a lista guardada no repositório
 if ! grep -v '^#' "$SUMS" | sha256sum --check --quiet; then

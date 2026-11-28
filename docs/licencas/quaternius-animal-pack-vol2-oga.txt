@@ -1,0 +1,9 @@
+Quaternius — "Animated Animales Low Poly" (Animal Pack Vol.2): Wolf, Eagle, Dog, Cat, Piranha
+Página: https://opengameart.org/content/animated-animales-low-poly
+Autor (conta no OpenGameArt): quaternius
+Licença indicada na página: CC0 1.0 (Public Domain Dedication) — texto em docs/licencas/CC0-1.0.txt
+Consultado em: 28/11/2026
+Arquivo: https://opengameart.org/sites/default/files/Animal%20Pack%20Vol.2%20by%20%40Quaternius.zip
+  SHA-256 do .zip: 6d8f6789d65dbdb352ebad98a4209f26b41b384e87d81bc05e9ca76139db1248
+  Usado: FBX/Cat.fbx (SHA-256 24d03762bcbcdf5414516354b0d80c6580a0ffd7b5abe4d8edd26ad7bf7a0db5), base do Tigre de Jade.
+Baixado por tools/sprites/fetch-assets.sh e conferido por tools/sprites/models.sha256.

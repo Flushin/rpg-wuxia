@@ -22,7 +22,7 @@ def load_cfg():
     with open(p) as f:
         cfg = json.load(f)
     base = os.path.dirname(os.path.abspath(p))
-    for k in ('model', 'out', 'out_json', 'dir'):
+    for k in ('model', 'out', 'out_json', 'dir', 'setup'):
         if k in cfg and not os.path.isabs(cfg[k]):
             cfg[k] = os.path.normpath(os.path.join(base, cfg[k]))
     return cfg
@@ -30,8 +30,16 @@ def load_cfg():
 
 def setup_scene(cfg):
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    if cfg.get('model'):
+    if cfg.get('model', '').endswith('.fbx'):
+        bpy.ops.import_scene.fbx(filepath=cfg['model'])
+    elif cfg.get('model'):
         bpy.ops.import_scene.gltf(filepath=cfg['model'])
+    if cfg.get('setup'):  # script da montaria/criatura: pinta, enfeita (peças presas aos ossos) ou monta o modelo
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('sprite_setup', cfg['setup'])
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        mod.setup(cfg)
     if cfg.get('build'):
         cfg['build']()  # objetos gerados por script (cidade: casas, lanternas...)
     if cfg.get('parts'):

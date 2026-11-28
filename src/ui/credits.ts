@@ -42,6 +42,16 @@ const ART: Credit[] = [
     license: CC0,
   },
   {
+    what: L('Cavalo e Qilin Jovem (modelos 3D)', 'Horse and Young Qilin (3D models)'),
+    who: 'Ultimate Animated Animal Pack — Quaternius (quaternius.com)',
+    license: CC0,
+  },
+  {
+    what: L('Tigre de Jade (modelo 3D do gato, aumentado)', 'Jade Tiger (cat 3D model, scaled up)'),
+    who: 'Animal Pack Vol.2 — Quaternius (opengameart.org)',
+    license: CC0,
+  },
+  {
     what: L(
       'Árvores, pedras, plantas e flores (modelos 3D recoloridos)',
       'Trees, rocks, plants and flowers (recolored 3D models)',
