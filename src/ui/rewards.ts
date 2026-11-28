@@ -31,12 +31,14 @@ export class Rewards {
   private placeSig = '';
   filter: LootFilter = loadLootFilter();
 
-  gold(amount: number) {
+  /** mul > 1: ganho com bônus (core/buffs.ts), mostrado como "+N ×2" com brilho. */
+  gold(amount: number, mul = 1) {
     const now = performance.now();
     this.goldSum = now < this.goldUntil ? this.goldSum + amount : amount; // abates seguidos somam no mesmo número
     this.goldUntil = now + GOLD_MS;
     const el = byId('p-gold-plus');
-    el.textContent = `+${this.goldSum}`;
+    el.textContent = mul > 1 ? `+${this.goldSum} ×${+mul.toFixed(2)}` : `+${this.goldSum}`;
+    el.classList.toggle('buff', mul > 1);
     el.classList.remove('fade');
     el.classList.add('show');
   }

@@ -84,7 +84,8 @@ import * as party from './world/party';
 import { clearSeal, sealedBoss, setupSeal, tickSeal, type Seal } from './world/seal';
 import * as arenaW from './world/arena';
 import { ARENA_COUNTDOWN, newArenaState, type ArenaState } from './arena';
-import { founderXpMul, type FounderState } from './founder';
+import { type FounderState } from './founder';
+import { xpMul } from './buffs';
 import type { Bot } from './bots';
 import { type QuestDef, type QuestPhase, type QuestState } from './quests';
 import { CRIT_TOTAL_MAX, computeDerived, emptyElements } from './stats';
@@ -1845,11 +1846,12 @@ export class World {
    *  até XP_BANK_LEVELS níveis prontos; o que passar disso se perde e avisa ('xpFull'). */
   gainXp(n: number) {
     if (this.player.level >= PROGRESSION.levelCap || n <= 0) return;
-    n = Math.round(n * founderXpMul(this)); // veterano: XP em dobro até o nível 30
+    const mul = xpMul(this); // bônus de XP (Fundador, itens: core/buffs.ts)
+    n = Math.round(n * mul);
     const before = this.levelsReady(),
       add = Math.min(n, Math.max(0, this.xpBankCap() - this.xp));
     this.xp += add;
-    if (add > 0) this.emit({ type: 'xp', amount: add });
+    if (add > 0) this.emit({ type: 'xp', amount: add, mul });
     const ready = this.levelsReady();
     if (ready > before) this.emit({ type: 'levelReady', ready, level: this.player.level + 1 });
     if (add < n) this.emit({ type: 'xpFull', lost: n - add });

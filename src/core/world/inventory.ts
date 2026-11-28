@@ -4,7 +4,7 @@ import { DUNGEON_EQUIP_DROP_MUL, isDungeonMap } from '../dungeons';
 import { trialDropMul, trialEquipReqLevel, trialGold } from '../trial';
 import { CLASSES, RELICS, type MonsterDef } from '../data';
 import { L } from '../i18n';
-import { founderGold } from '../founder';
+import { goldMul, withGoldBonus } from '../buffs';
 import {
   BAG_TAB_SIZE,
   BASES,
@@ -216,12 +216,12 @@ export function dropLoot(w: World, m: Entity, def: MonsterDef) {
   const spot = () => ({ x: m.x + w.rng.range(-0.4, 0.4), y: m.y + w.rng.range(-0.4, 0.4) });
   if (L.gold) {
     const add = (L.gold.perLevel ?? 0) * (m.level - 1);
-    const g = founderGold(w, w.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add)));
+    const g = withGoldBonus(w, w.rng.int(Math.round(L.gold.min + add), Math.round(L.gold.max + add)));
     if (g > 0) {
       w.gold += g;
       w.bumpInv();
       w.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
-      w.emit({ type: 'goldPickup', amount: g });
+      w.emit({ type: 'goldPickup', amount: g, mul: goldMul(w) });
     }
   }
   for (const pd of L.potions ?? []) {
@@ -275,11 +275,11 @@ function trialLoot(w: World, m: Entity, def: MonsterDef) {
     spot = () => ({ x: m.x + w.rng.range(-0.4, 0.4), y: m.y + w.rng.range(-0.4, 0.4) }),
     rolls = (chance: number) => Math.floor(chance) + (w.rng.next() < chance % 1 ? 1 : 0);
   const [g0, g1] = trialGold(tier),
-    g = founderGold(w, w.rng.int(g0, g1));
+    g = withGoldBonus(w, w.rng.int(g0, g1));
   w.gold += g;
   w.bumpInv();
   w.emit({ type: 'drop', x: m.x, y: m.y, color: '#ffd23f' });
-  w.emit({ type: 'goldPickup', amount: g });
+  w.emit({ type: 'goldPickup', amount: g, mul: goldMul(w) });
   for (const md of def.loot?.materials ?? [])
     for (let n = rolls(md.chance * mul); n > 0; n--) {
       const s = spot();
