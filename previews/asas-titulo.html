@@ -9,101 +9,129 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--tx); font: 15px/1.4 system-ui, sans-serif; padding: 16px; }
   h1 { font-size: 20px; margin: 0 0 4px; }
-  p.sub { color: var(--mut); margin: 0 0 14px; }
-  .bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; color: var(--mut); }
+  p.sub { color: var(--mut); margin: 0 0 14px; max-width: 900px; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; color: var(--mut); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow: hidden; }
   .card h2 { font-size: 15px; margin: 0 0 2px; } .card h2 b { color: var(--gold); margin-right: 6px; }
-  .card small { color: var(--mut); display: block; margin-bottom: 8px; }
-  .stage { border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 18px 6px; }
+  .card small { color: var(--mut); display: block; margin-bottom: 8px; min-height: 2.8em; }
+  .stage { border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 14px 4px 10px; }
   .map { background: repeating-conic-gradient(#8e8e86 0 25%, #a3a39b 0 50%) 0 0 / 36px 36px; }
-  .ui { background: #262a33; margin-top: 8px; padding: 10px 6px; }
-  .zoom { background: #10131a; margin-top: 8px; }
-  .t { white-space: nowrap; display: inline-flex; align-items: center; gap: 1px; font-weight: 700; }
-  .t span { background: linear-gradient(180deg, #fff6c8, #f5c46b 55%, #c8892a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .map .t span { filter: drop-shadow(0 0 1px #2a1600) drop-shadow(0 0 1px #2a1600); }
-  .map .t, .ui .t { font-size: 13px; }
+  .ui { background: #262a33; margin-top: 8px; }
+  .zoom { background: #10131a; margin-top: 8px; padding: 22px 4px 18px; }
+  .t { white-space: nowrap; display: inline-flex; align-items: center; font-weight: 700; font-size: 13px; }
+  .t > span { background: linear-gradient(180deg, #fff6c8, #f5c46b 55%, #c8892a); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 1px; }
+  .map .t > span { filter: drop-shadow(0 0 1px #2a1600) drop-shadow(0 0 1px #2a1600); }
   .zoom .t { font-size: 19px; }
   .name { color: #9fe8a0; font: 700 12px monospace; text-shadow: 0 0 2px #000, 0 0 2px #000; }
-  .w { display: inline-block; flex: none; overflow: visible; }
+  .w { display: inline-block; flex: none; overflow: visible; margin-top: -0.2em; }
   .w.r { transform: scaleX(-1); }
-  .w > g.flap { transform-box: view-box; transform-origin: 36px 22px; animation: var(--anim, flap) var(--dur, .9s) ease-in-out infinite; }
-  .w.r > g.flap { animation-delay: 0s; }
-  @keyframes flap { 0%,100% { transform: rotate(10deg) scaleY(.82); } 50% { transform: rotate(-16deg) scaleY(1.06); } }
-  @keyframes flutter { 0%,100% { transform: scaleX(1) rotate(0deg); } 50% { transform: scaleX(.55) rotate(-6deg); } }
-  @keyframes bob { 0%,100% { transform: translateY(1.5px) rotate(4deg); } 50% { transform: translateY(-2px) rotate(-6deg); } }
-  @keyframes glow { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+  .w g.flap { transform-box: view-box; transform-origin: 38px 17px; animation: var(--anim, flap) var(--dur, 1s) infinite; }
+  /* bater de anjo: desce rápido (força), sobe devagar */
+  @keyframes flap {
+    0% { transform: rotate(10deg); animation-timing-function: cubic-bezier(.5,0,.8,.6); }
+    35% { transform: rotate(-16deg) scaleY(.88); animation-timing-function: ease-in-out; }
+    100% { transform: rotate(10deg); }
+  }
+  @keyframes soft { 0%,100% { transform: rotate(4deg); } 50% { transform: rotate(-7deg) scaleY(.95); } }
+  @keyframes flutter { 0%,100% { transform: rotate(6deg) scaleX(1); } 50% { transform: rotate(-10deg) scaleX(.7); } }
+  @keyframes glow { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
   .shine { animation: glow 1.6s ease-in-out infinite; }
   button { background: #2c3346; color: var(--tx); border: 1px solid #3b4460; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
   button.on { background: #8a3a2a; border-color: #b0513d; }
 </style>
 </head>
 <body>
-<h1>Asas para o «Discípulo Fundador»</h1>
-<p class="sub">Cada cartão mostra a asa em três lugares: no mapa (tamanho real do jogo), numa janela e ampliada. Me diga o número da que mais gostar. Também dá para misturar, por exemplo: "a 3, mas com a cor da 1".</p>
+<h1>Asas de anjo para o «Discípulo Fundador»</h1>
+<p class="sub">Agora no formato de anjo: o “braço” da asa sobe em arco e as penas caem para baixo; o bater é para baixo (desce rápido, sobe devagar). Cada cartão mostra no mapa (tamanho real), numa janela e ampliada. Diga o número — ou misture (“a 4 com a cor da 2”).</p>
 <div class="bar">Velocidade:
-  <button data-s="1.4">Lenta</button><button data-s=".9" class="on">Normal</button><button data-s=".55">Rápida</button>
+  <button data-s="1.5">Lenta</button><button data-s="1" class="on">Normal</button><button data-s=".6">Rápida</button>
 </div>
 <div class="grid" id="grid"></div>
 <script>
-// Asa ESQUERDA, base em (36,22) num viewBox 40x30; a direita é espelhada.
-const leaf = (len, w, ang, fill, stroke, sw = 0.7, bend = 0) =>
-  `<path d="M0 0 Q${len * .45} ${-w - bend} ${len} ${-bend} Q${len * .5} ${w - bend * .4} 0 0Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round" transform="translate(36 22) rotate(${ang})"/>`;
-const fan = (n, len0, len1, w, a0, a1, fill, stroke, sw, bend = 0) =>
-  Array.from({ length: n }, (_, i) => { const t = i / (n - 1); const a = a0 + (a1 - a0) * t; return leaf(len0 + (len1 - len0) * t, w, 180 + (a - 180) * 1.55, typeof fill === 'function' ? fill(t) : fill, stroke, sw, bend); }).join('');
+// Asa ESQUERDA num viewBox 40x30. Base (ombro) em (38,22); o braço sobe em arco até a ponta, lá em cima à esquerda.
+// As penas saem do braço e apontam PARA BAIXO (e um pouco para fora na ponta), como nos desenhos de anjo.
+const ARM = { b: [38, 17], c: [31, 1], t: [7, 2] };
+const armPt = (t, A = ARM) => {
+  const u = 1 - t;
+  return [u * u * A.b[0] + 2 * u * t * A.c[0] + t * t * A.t[0], u * u * A.b[1] + 2 * u * t * A.c[1] + t * t * A.t[1]];
+};
+// pena: forma de folha ao longo de +x (depois girada); shape: leaf | round | sharp
+function feather(x, y, len, w, ang, fill, stroke, sw, shape = 'leaf') {
+  let d;
+  if (shape === 'round') d = `M0 ${-w * .6} L${len - w} ${-w} A${w} ${w} 0 0 1 ${len - w} ${w} L0 ${w * .6}Z`;
+  else if (shape === 'sharp') d = `M0 ${-w * .7} L${len * .7} ${-w} L${len} 0 L${len * .7} ${w} L0 ${w * .7}Z`;
+  else d = `M0 ${-w * .55} C${len * .35} ${-w * 1.1} ${len * .8} ${-w * .9} ${len} 0 C${len * .8} ${w * .9} ${len * .35} ${w * 1.1} 0 ${w * .55}Z`;
+  return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${ang.toFixed(1)})"/>`;
+}
+// uma fileira de penas ao longo do braço (de fora para dentro: as de dentro ficam por cima)
+function row(o) {
+  const { n, t0 = 0, t1 = 1, len, w, a0 = 92, a1 = 128, fill, stroke, sw = .7, shape, off = 0, tip } = o;
+  let s = '';
+  for (let i = n - 1; i >= 0; i--) {
+    const t = t0 + (t1 - t0) * (i / (n - 1));
+    const [x, y] = armPt(t);
+    const L = typeof len === 'function' ? len(t) : len;
+    const a = a0 + (a1 - a0) * t;
+    const r = (a * Math.PI) / 180;
+    const px = x + Math.cos(r) * off, py = y + Math.sin(r) * off;
+    s += feather(px, py, L, w, a, typeof fill === 'function' ? fill(t) : fill, stroke, sw, shape);
+    if (tip) s += feather(px + Math.cos(r) * L * .55, py + Math.sin(r) * L * .55, L * .45, w * .85, a, tip, stroke, sw, shape);
+  }
+  return s;
+}
+const arm = (fill, stroke, sw = 1.2) =>
+  `<path d="M${ARM.b} Q${ARM.c} ${ARM.t}" fill="none" stroke="${stroke}" stroke-width="${sw + 2.4}" stroke-linecap="round"/>` +
+  `<path d="M${ARM.b} Q${ARM.c} ${ARM.t}" fill="none" stroke="${fill}" stroke-width="${sw + .6}" stroke-linecap="round"/>`;
 const grad = (id, stops, x2 = 0, y2 = 1) =>
   `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}">${stops.map((c, i) => `<stop offset="${i / (stops.length - 1)}" stop-color="${c}"/>`).join('')}</linearGradient>`;
+const blur = (id, sd = 1.6) => `<filter id="${id}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${sd}"/></filter>`;
+
+// receita de anjo em 3 camadas: rêmiges (longas na ponta), secundárias, coberteiras curtas junto do braço
+const angel = (c, extra = {}) => (u) =>
+  (c.defs ? c.defs(u) : '') +
+  (c.glow ? `<g class="shine" filter="url(#${u}g)">${row({ n: 9, len: (t) => 12 + 18 * t ** 1.1, w: 3.1, fill: c.glow, stroke: 'none', sw: 0, shape: extra.shape })}</g>` : '') +
+  row({ n: 9, len: (t) => 12 + 18 * t ** 1.1, w: 3, fill: c.p(u), stroke: c.s, shape: extra.shape, tip: c.tip }) +
+  row({ n: 8, t1: .85, len: (t) => 9 + 9 * t, w: 2.9, fill: c.m(u), stroke: c.s, shape: extra.shape, off: .5 }) +
+  row({ n: 7, t1: .8, len: (t) => 5 + 3 * t, w: 2.7, fill: c.f(u), stroke: c.s, shape: extra.round ? 'round' : extra.shape, off: .3 }) +
+  arm(c.f(u), c.s);
 
 const WINGS = [
-  { n: 'Anjo', d: 'Penas brancas em três fileiras, contorno dourado. Clássica.', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#ffffff', '#f3ead2'])}</defs>` +
-    fan(6, 30, 17, 4.2, 200, 248, `url(#${u}a)`, '#c8892a', .8, 2) + fan(5, 20, 11, 4, 205, 245, '#fffaf0', '#c8892a', .8, 1.5) + fan(4, 11, 7, 3.6, 210, 245, '#fff', '#c8892a', .8) },
-  { n: 'Dourada imperial', d: 'Toda em ouro, com degradê e borda escura, como o texto.', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#fff2c0', '#f5c46b', '#c8892a'])}${grad(u + 'b', ['#fff6d8', '#f8d68a'])}</defs>` +
-    fan(6, 30, 17, 4.4, 198, 248, `url(#${u}a)`, '#5a3200', .9, 2) + fan(5, 19, 11, 4, 205, 246, `url(#${u}b)`, '#5a3200', .9, 1.5) + fan(4, 10, 7, 3.6, 212, 246, '#fff2c0', '#5a3200', .9) },
-  { n: 'Grou celestial', d: 'Branca com pontas pretas e um toque rubro: o grou do wuxia.', svg: (u) =>
-    fan(6, 31, 18, 4.2, 198, 246, '#1d1d22', '#000', .6, 2) + fan(6, 24, 14, 4.3, 200, 246, '#fbfbf7', '#5d5d66', .6, 2) + fan(4, 12, 8, 3.8, 210, 246, '#fff', '#5d5d66', .6) +
-    '<circle cx="34.5" cy="19.5" r="2" fill="#d23a2a" stroke="#6b130b" stroke-width=".5"/>' },
-  { n: 'Fênix', d: 'Penas de fogo, do vermelho ao dourado, com brilho pulsando.', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#ffe27a', '#ff9a2e', '#d1301f'], 1, 0)}<filter id="${u}g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>` +
-    `<g class="shine" filter="url(#${u}g)">${fan(5, 30, 16, 4.2, 200, 245, '#ff8a2a', 'none', 0, 4)}</g>` +
-    fan(5, 30, 16, 3.6, 200, 245, `url(#${u}a)`, '#7a1a0a', .6, 4) + fan(4, 16, 9, 3.4, 208, 244, '#ffd24a', '#7a1a0a', .6, 2) },
-  { n: 'Traço de pincel', d: 'Três traços dourados, leve e elegante, estilo caligrafia.', svg: (u) =>
-    `<g fill="none" stroke-linecap="round"><path d="M36 22 C26 18 14 14 4 4" stroke="#5a3200" stroke-width="3.4"/><path d="M36 22 C26 18 14 14 4 4" stroke="#f5c46b" stroke-width="2"/>` +
-    `<path d="M35 23 C27 21 18 19 9 13" stroke="#5a3200" stroke-width="3"/><path d="M35 23 C27 21 18 19 9 13" stroke="#ffe3a0" stroke-width="1.6"/>` +
-    `<path d="M34 24 C28 24 21 23 15 20" stroke="#5a3200" stroke-width="2.6"/><path d="M34 24 C28 24 21 23 15 20" stroke="#fff2c0" stroke-width="1.3"/></g>` },
-  { n: 'Nuvem com penas', d: 'Nuvem chinesa em espiral com penas saindo dela. Bem wuxia.', svg: (u) =>
-    fan(4, 24, 15, 3.8, 205, 240, '#fff6d8', '#c8892a', .8, 2) +
-    `<path d="M37 24 C37 18 30 16 27 20 C25 16 18 17 19 22 C15 21 13 26 17 27 L36 27 Z" fill="#f5c46b" stroke="#5a3200" stroke-width=".9"/>` +
-    `<path d="M27 20 C28 23 25 24 24 22" fill="none" stroke="#5a3200" stroke-width=".8"/><path d="M19 22 C20 25 17 25 17 24" fill="none" stroke="#5a3200" stroke-width=".8"/>` },
-  { n: 'Energia de jade', d: 'Asa de qi translúcida, verde-jade, com brilho que pulsa.', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#e9fff1', '#7fe0a8', '#2f9a66'])}<filter id="${u}g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.8"/></filter></defs>` +
-    `<g class="shine" filter="url(#${u}g)">${fan(5, 29, 16, 4.6, 200, 246, '#57e39a', 'none', 0, 2)}</g>` +
-    `<g opacity=".85">${fan(5, 29, 16, 4, 200, 246, `url(#${u}a)`, '#bfffe0', .6, 2)}${fan(3, 14, 9, 3.6, 210, 244, '#effff6', '#bfffe0', .6)}</g>` },
-  { n: 'Fada', d: 'Duas pétalas translúcidas que vibram rápido, com brilho.', anim: 'flutter', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#fff8e0', '#ffd98a', '#f0a8c8'], 1, 1)}</defs>` +
-    `<path d="M36 22 C26 2 6 4 8 14 C9 20 24 21 36 22Z" fill="url(#${u}a)" fill-opacity=".85" stroke="#c8892a" stroke-width=".8"/>` +
-    `<path d="M36 23 C26 24 14 30 18 33 C22 35 31 28 36 23Z" fill="url(#${u}a)" fill-opacity=".85" stroke="#c8892a" stroke-width=".8"/>` +
-    `<path d="M33 21 C25 12 15 10 12 13" fill="none" stroke="#fff" stroke-width=".7" class="shine"/>` },
-  { n: 'Fofinha', d: 'Asinha redonda de três gomos, estilo chibi, combina com os bonecos.', anim: 'bob', svg: (u) =>
-    `<path d="M36 23 C34 12 24 8 16 10 C10 11 9 16 13 17 C8 18 8 23 13 23 C10 26 13 29 18 27 C24 27 31 26 36 23Z" fill="#fffdf5" stroke="#c8892a" stroke-width="1.1" stroke-linejoin="round"/>` +
-    `<path d="M13 17 C19 17 24 18 28 20 M13 23 C19 22 24 22 29 22" fill="none" stroke="#e2c38a" stroke-width=".9" stroke-linecap="round"/>` },
-  { n: 'Dragão dourado', d: 'Asa de dragão com membrana dourada e varetas escuras.', svg: (u) =>
-    `<defs>${grad(u + 'a', ['#ffe08a', '#d99a35'])}</defs>` +
-    `<path d="M36 22 L6 3 L9 12 L4 14 L11 19 L8 23 L22 23 Z" fill="url(#${u}a)" stroke="#5a3200" stroke-width="1" stroke-linejoin="round"/>` +
-    `<path d="M36 22 L6 3 M36 22 L9 12 M36 22 L11 19 M36 22 L22 23" stroke="#5a3200" stroke-width="1.1" stroke-linecap="round"/>` },
+  { n: 'Anjo branco', d: 'Penas brancas, contorno dourado. A asa de anjo clássica.',
+    svg: angel({ p: () => '#f4efe4', m: () => '#fbf8f0', f: () => '#ffffff', s: '#b37a22' }) },
+  { n: 'Anjo dourado', d: 'Toda em ouro, com borda escura como o texto do título.',
+    svg: angel({ defs: (u) => `<defs>${grad(u + 'a', ['#ffe9a8', '#e0a445'])}</defs>`, p: (u) => `url(#${u}a)`, m: () => '#f7d17c', f: () => '#fff0bf', s: '#4a2800' }) },
+  { n: 'Branca com pontas de ouro', d: 'Branca, e as pontas das penas longas são douradas.',
+    svg: angel({ p: () => '#fbf8f0', m: () => '#fffdf6', f: () => '#ffffff', s: '#a06a18', tip: '#f2bd55' }) },
+  { n: 'Anjo celeste', d: 'Branco que vai para azul-céu nas pontas, com brilho suave.',
+    svg: angel({ defs: (u) => `<defs>${grad(u + 'a', ['#ffffff', '#cfe6ff', '#8fbbf0'])}${blur(u + 'g')}</defs>`, glow: '#bfe0ff', p: (u) => `url(#${u}a)`, m: () => '#f0f7ff', f: () => '#ffffff', s: '#5b7fae' }) },
+  { n: 'Anjo radiante', d: 'Dourada com aura que pulsa em volta (mais chamativa).',
+    svg: angel({ defs: (u) => `<defs>${grad(u + 'a', ['#fff6cf', '#f5c46b', '#d38f2c'])}${blur(u + 'g', 2)}</defs>`, glow: '#ffd76a', p: (u) => `url(#${u}a)`, m: () => '#ffe39a', f: () => '#fff6d8', s: '#5a3200' }) },
+  { n: 'Grou celestial', d: 'Branca com as penas da ponta pretas, e o ombro rubro.',
+    svg: (u) => angel({ p: () => '#fbfbf7', m: () => '#ffffff', f: () => '#ffffff', s: '#55555e', tip: '#1d1d22' })(u) + '<circle cx="37" cy="21" r="2.2" fill="#d23a2a" stroke="#6b130b" stroke-width=".6"/>' },
+  { n: 'Fênix', d: 'Penas de fogo, do dourado ao vermelho, com brilho.',
+    svg: angel({ defs: (u) => `<defs>${grad(u + 'a', ['#ffd24a', '#ff7a22', '#c8241a'])}${blur(u + 'g', 1.8)}</defs>`, glow: '#ff8a2a', p: (u) => `url(#${u}a)`, m: () => '#ffb23a', f: () => '#ffe27a', s: '#6a1206' }) },
+  { n: 'Jade (qi)', d: 'Translúcida, verde-jade, como energia; o brilho pulsa.',
+    svg: angel({ defs: (u) => `<defs>${grad(u + 'a', ['#effff6', '#86e3ae', '#2f9a66'])}${blur(u + 'g', 1.8)}</defs>`, glow: '#57e39a', p: (u) => `url(#${u}a)`, m: () => '#c9f7dc', f: () => '#f1fff7', s: '#1f6e48' }) },
+  { n: 'Fofinha (chibi)', d: 'Penas redondinhas, poucas e grandes, como os bonecos do jogo.', anim: 'soft',
+    svg: (u) => row({ n: 5, len: (t) => 12 + 12 * t, w: 4.2, fill: '#fbf7ec', stroke: '#b37a22', sw: .9, shape: 'round' }) +
+      row({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, fill: '#ffffff', stroke: '#b37a22', sw: .9, shape: 'round', off: .3 }) + arm('#ffffff', '#b37a22', 1.6) },
+  { n: 'Pontuda', d: 'Penas retas e pontudas, mais marcial / de guerreiro.',
+    svg: angel({ p: () => '#f2e6c8', m: () => '#fbf3dc', f: () => '#ffffff', s: '#7a4c10' }, { shape: 'sharp' }) },
+  { n: 'Contorno de luz', d: 'Só o desenho em linhas douradas brilhando, sem preenchimento.',
+    svg: (u) => `<defs>${blur(u + 'g', 1.2)}</defs><g class="shine" filter="url(#${u}g)">${row({ n: 9, len: (t) => 12 + 18 * t ** 1.1, w: 3, fill: 'none', stroke: '#ffd76a', sw: 1.4 })}</g>` +
+      row({ n: 9, len: (t) => 12 + 18 * t ** 1.1, w: 3, fill: 'rgba(255,230,160,.12)', stroke: '#ffe8a8', sw: .8 }) + arm('#fff2c0', '#c8892a', .8) },
+  { n: 'Fada-anjo', d: 'Mais curta e larga, vibra rápido em vez de bater.', anim: 'flutter',
+    svg: angel({ p: () => '#fff3f8', m: () => '#fff9fb', f: () => '#ffffff', s: '#c8892a' }, { round: true }) },
 ];
 
 let uid = 0;
-const wing = (w, px, right) => {
-  const u = 'w' + uid++;
-  return `<svg class="w${right ? ' r' : ''}" viewBox="0 0 40 30" width="${px}" height="${px * .75}" style="${w.anim ? `--anim:${w.anim}` : ''}"><g class="flap">${w.svg(u)}</g></svg>`;
-};
+const wing = (w, px, right) => `<svg class="w${right ? ' r' : ''}" viewBox="0 0 40 46" width="${px}" height="${px * 1.15}" style="${w.anim ? `--anim:${w.anim}` : ''}"><g class="flap">${w.svg('w' + uid++)}</g></svg>`;
 const title = (w, px) => `<span class="t">${wing(w, px)}<span>Discípulo Fundador</span>${wing(w, px, 1)}</span>`;
 document.getElementById('grid').innerHTML = WINGS.map((w, i) => `<div class="card"><h2><b>${i + 1}</b>${w.n}</h2><small>${w.d}</small>
-  <div class="stage map">${title(w, 30)}<span class="name">Lucas</span></div>
-  <div class="stage ui">${title(w, 26)}</div>
-  <div class="stage zoom">${title(w, 48)}</div></div>`).join('');
+  <div class="stage map">${title(w, 22)}<span class="name">Lucas</span></div>
+  <div class="stage ui">${title(w, 22)}</div>
+  <div class="stage zoom">${title(w, 38)}</div></div>`).join('');
 document.querySelectorAll('[data-s]').forEach((b) => b.onclick = () => {
   document.querySelectorAll('[data-s]').forEach((x) => x.classList.toggle('on', x === b));
   document.documentElement.style.setProperty('--dur', b.dataset.s + 's');
