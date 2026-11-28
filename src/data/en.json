@@ -1177,6 +1177,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Real mounts: your character now sits in the saddle, with the far leg hidden behind the mount. The three Founder mounts got their own models (Jade Tiger with a helmet and jade stripes, white-and-gold Young Qilin with jade antlers, Celestial Crane that flies flapping its wings), with a glowing halo, sparks and a shiny trail while moving." },
       {
         "texto": "Boss seal in dungeons: the way into the boss arena is closed by a golden seal until you defeat every regular monster (the seal shows how many are left), and your auto attack no longer jumps to the boss mid-clear. The tree walls in front of the rooms became rocks and low bushes, and trees turn see-through when they cover allies or monsters."
       },
