@@ -39,13 +39,17 @@
   @keyframes flutter { 0%,100% { transform: rotate(6deg) scaleX(1); } 50% { transform: rotate(-10deg) scaleX(.7); } }
   @keyframes glow { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
   .shine { animation: glow 1.6s ease-in-out infinite; }
+  .rise { animation: rise 2.8s ease-out infinite; opacity: 0; }
+  @keyframes rise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-22px); opacity: 0; } }
+  .w g.lowflap { transform-box: view-box; transform-origin: 34px 32px; animation: lowflap var(--dur, 1s) infinite; animation-delay: .12s; }
+  @keyframes lowflap { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(10deg); } }
   button { background: #2c3346; color: var(--tx); border: 1px solid #3b4460; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
   button.on { background: #8a3a2a; border-color: #b0513d; }
 </style>
 </head>
 <body>
-<h1>Asas fofinhas (estilo da nº 9) para o «Discípulo Fundador»</h1>
-<p class="sub">Variações de formato no estilo da fofinha (nº 9). A cor é a mesma em todas, de propósito: escolhemos o formato agora e a cor depois. Cada cartão mostra no mapa (tamanho real), numa janela e ampliada.</p>
+<h1>Asas no estilo da nº 12 para o «Discípulo Fundador»</h1>
+<p class="sub">Variações da nº 12: mais estreitas, com outros brilhos e com duas asas (a de cima grande e uma pequenininha embaixo). A cor é a mesma em todas; escolhemos a cor depois.</p>
 <div class="bar">Velocidade:
   <button data-s="1.5">Lenta</button><button data-s="1" class="on">Normal</button><button data-s=".6">Rápida</button>
 </div>
@@ -113,38 +117,37 @@ const R = (o) => row({ fill: F, stroke: S, sw: .9, shape: 'round', ...o });
 const circ = (x, y, r, fill = F, sw = .9) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${S}" stroke-width="${sw}"/>`;
 const sparkle = (x, y, k, d = 0) => `<path class="shine" style="animation-delay:${d}s" d="M${x} ${y - k} L${x + k * .28} ${y - k * .28} L${x + k} ${y} L${x + k * .28} ${y + k * .28} L${x} ${y + k} L${x - k * .28} ${y + k * .28} L${x - k} ${y} L${x - k * .28} ${y - k * .28}Z" fill="#fff6c8" stroke="${S}" stroke-width=".5"/>`;
 
+// fofinha com parâmetros: k = largura das penas (menor = mais estreita); arm = forma do braço
+const fofa = ({ k = 1, len = 1, a = {}, n = 6 } = {}) => withArm(a, () =>
+  R({ n, len: (t) => (10 + 12 * t) * len, w: 4.4 * k }) + R({ n: 4, t1: .75, len: (t) => (5 + 3 * t) * len, w: 3.4 * k, fill: F2, off: .3 }) + arm(F2, S, 1.6))();
+const NARROW = { k: .78, len: 1.05, a: { c1: [37, 6], c2: [30, -6], t: [18, -4] }, n: 7 };
+const TALL = { k: .72, len: 1.25, a: { c1: [37, 4], c2: [32, -8], t: [22, -7] }, n: 7 };
+// asinha de baixo, bem pequena, saindo do ombro para baixo e para fora
+const lower = (opts = {}, sc = .42, rot = 0, dy = 2) =>
+  `<g class="lowflap"><g transform="translate(33 ${30 + dy}) rotate(${rot}) scale(${sc} ${-sc}) translate(-34 -30)">${fofa(opts)}</g></g>`;
+const stars = (list) => list.map(([x, y, k, d], i) => sparkle(x, y, k, d ?? i * .45)).join('');
+const floaty = (list) => list.map(([x, y, k, d]) => `<g class="rise" style="animation-delay:${d}s">${sparkle(x, y, k)}</g>`).join('');
+const halo = (u, c = '#fff1b8') => `<defs>${blur(u + 'h', 2.2)}</defs><g class="shine" filter="url(#${u}h)" opacity=".8">` +
+  withArm({}, () => row({ n: 6, len: (t) => 11 + 13 * t, w: 5, fill: c, stroke: 'none', sw: 0, shape: 'round' }))() + '</g>';
+const ST = [[2, 6, 3], [-2, 22, 2.2], [8, 34, 2.6]];
+const ST_N = [[8, 4, 2.6], [4, 22, 2], [12, 34, 2.4]];
+
 const WINGS = [
-  { n: 'Fofinha (a nº 9)', d: 'A original: poucas penas redondas e grandes.', anim: 'soft',
-    svg: withArm({}, () => R({ n: 6, len: (t) => 10 + 12 * t, w: 4.4 }) + R({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, fill: F2, off: .3 }) + arm(F2, S, 1.6)) },
-  { n: 'Nuvenzinha', d: 'Uma peça só, fofa como nuvem, com a barra de baixo em ondinhas.', anim: 'soft',
-    svg: () => `<path d="M34 30 C36 14 30 0 16 -2 C6 -3 2 4 4 9 C0 11 0 17 4 18 C1 21 3 27 8 26 C7 31 12 34 16 31 C17 35 24 36 26 32 C28 35 33 34 34 30Z" fill="${F}" stroke="${S}" stroke-width="1.2" stroke-linejoin="round"/>` +
-      `<path d="M8 14 C14 14 20 17 26 22 M10 22 C15 22 21 24 27 27" fill="none" stroke="${S2}" stroke-width="1" stroke-linecap="round"/>` },
-  { n: 'Três gotas', d: 'Só três penas grandes em forma de gota, bem simples.', anim: 'soft',
-    svg: withArm({}, () => row({ n: 3, t0: .2, len: (t) => 14 + 12 * t, w: 5.6, a0: 100, a1: 140, fill: F, stroke: S, sw: 1 }) + arm(F2, S, 1.8)) },
-  { n: 'Pelúcia', d: 'Curta e gordinha: quatro penas bem largas e contorno grosso.', anim: 'soft',
-    svg: withArm({ c1: [36, 12], c2: [28, 2], t: [16, 4] }, () => R({ n: 4, len: (t) => 9 + 7 * t, w: 5.8, sw: 1.3 }) + R({ n: 3, t1: .7, len: 5, w: 4.4, fill: F2, sw: 1.3, off: .3 }) + arm(F2, S, 2.2)) },
-  { n: 'Bolinhas', d: 'As penas viram bolinhas que diminuem até a ponta. Bem chibi.', anim: 'soft',
-    svg: withArm({}, () => { let o = ''; for (let i = 6; i >= 0; i--) { const t = .15 + .85 * i / 6; const [x, y] = armPt(t); const r = 5.5 - 2.4 * t; o += circ(x - 2 - 8 * t, y + 5 + 8 * t, r); o += circ(x - 1, y + 1.5, r * .75, F2); } return o + arm(F2, S, 1.4); }) },
-  { n: 'Coraçãozinho', d: 'O contorno lembra meio coração; duas penas desenhadas dentro.', anim: 'soft',
-    svg: () => `<path d="M34 30 C33 20 30 8 20 2 C12 -3 2 2 3 11 C4 20 18 27 26 33 C29 35 33 34 34 30Z" fill="${F}" stroke="${S}" stroke-width="1.2" stroke-linejoin="round"/>` +
-      `<path d="M9 9 C15 12 21 18 26 26 M16 4 C21 8 25 14 29 22" fill="none" stroke="${S2}" stroke-width="1" stroke-linecap="round"/>` },
-  { n: 'Escamas', d: 'Três fileiras de penas curtinhas, como escamas.', anim: 'soft',
-    svg: withArm({}, () => R({ n: 7, len: (t) => 9 + 9 * t, w: 3.4 }) + R({ n: 6, t1: .85, len: (t) => 6 + 4 * t, w: 3.2, fill: F2, off: .4 }) + R({ n: 5, t1: .7, len: 4, w: 3, fill: F2, off: .2 }) + arm(F2, S, 1.4)) },
-  { n: 'Fofa comprida', d: 'Mesmas penas redondas, só que mais finas e longas: mais elegante.', anim: 'soft',
-    svg: withArm({}, () => R({ n: 8, len: (t) => 12 + 18 * t, w: 2.9 }) + R({ n: 6, t1: .8, len: (t) => 6 + 4 * t, w: 2.8, fill: F2, off: .3 }) + arm(F2, S, 1.3)) },
-  { n: 'Dois gominhos', d: 'Mini: só duas penas grandes. A mais discreta.', anim: 'soft',
-    svg: withArm({ c1: [36, 14], c2: [30, 6], t: [20, 6] }, () => row({ n: 2, t0: .3, len: (t) => 12 + 6 * t, w: 6, a0: 105, a1: 135, fill: F, stroke: S, sw: 1.1, shape: 'round' }) + arm(F2, S, 2)) },
-  { n: 'Ponta enrolada', d: 'Fofinha com um caracol (espiral) no alto da asa, estilo nuvem chinesa.', anim: 'soft',
-    svg: withArm({}, () => R({ n: 6, len: (t) => 10 + 12 * t, w: 4.2 }) + R({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, fill: F2, off: .3 }) + arm(F2, S, 1.6) +
-      `<path d="M12 -1 C6 -2 4 4 8 5 C11 6 12 2 9 2" fill="none" stroke="${S}" stroke-width="1.6" stroke-linecap="round"/>`) },
-  { n: 'Aberta', d: 'Fofinha mais aberta para o lado, como se estivesse voando.', anim: 'soft',
-    svg: withArm({ c1: [36, 10], c2: [22, -2], t: [4, 4] }, () => row({ n: 6, len: (t) => 9 + 11 * t, w: 4.2, a0: 100, a1: 150, fill: F, stroke: S, sw: .9, shape: 'round' }) +
-      row({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, a0: 100, a1: 150, fill: F2, stroke: S, sw: .9, shape: 'round', off: .3 }) + arm(F2, S, 1.6)) },
-  { n: 'Com estrelinhas', d: 'A fofinha com estrelinhas piscando em volta.', anim: 'soft',
-    svg: withArm({}, () => R({ n: 6, len: (t) => 10 + 12 * t, w: 4.4 }) + R({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, fill: F2, off: .3 }) + arm(F2, S, 1.6) +
-      sparkle(2, 6, 3) + sparkle(-2, 22, 2.2, .5) + sparkle(8, 34, 2.6, 1)) },
-  { n: 'Batendo rápido', d: 'A fofinha original, mas batendo rápido como um passarinho.', anim: 'flap', dur: .45,
-    svg: withArm({}, () => R({ n: 6, len: (t) => 10 + 12 * t, w: 4.4 }) + R({ n: 4, t1: .75, len: (t) => 5 + 3 * t, w: 3.4, fill: F2, off: .3 }) + arm(F2, S, 1.6)) },
+  { n: 'Com estrelinhas (a nº 12)', d: 'A que você gostou, para comparar.', anim: 'soft', svg: () => fofa() + stars(ST) },
+  { n: 'Estreita', d: 'A 12 mais fininha: penas mais estreitas e a asa mais fechada.', anim: 'soft', svg: () => fofa(NARROW) + stars(ST_N) },
+  { n: 'Estreita alta', d: 'Ainda mais fina e mais alta, bem delicada.', anim: 'soft', svg: () => fofa(TALL) + stars([[12, -4, 2.4], [8, 18, 2], [14, 36, 2.2]]) },
+  { n: 'Céu estrelado', d: 'Mais estrelinhas, de tamanhos diferentes, piscando em ordem.', anim: 'soft',
+    svg: () => fofa(NARROW) + stars([[6, 2, 3], [0, 14, 1.8], [4, 26, 2.4], [12, 36, 1.6], [-4, 34, 2], [16, -6, 1.5]]) },
+  { n: 'Estrelinhas subindo', d: 'As estrelinhas nascem embaixo e sobem flutuando.', anim: 'soft',
+    svg: () => fofa(NARROW) + floaty([[6, 30, 2.2, 0], [0, 24, 1.8, .7], [12, 36, 2, 1.4], [4, 16, 1.6, 2.1]]) },
+  { n: 'Brilho suave', d: 'Estreita, com um brilho dourado pulsando atrás da asa.', anim: 'soft', svg: (u) => halo(u) + fofa(NARROW) + stars(ST_N) },
+  { n: 'Dupla', d: 'Asa grande em cima e uma pequenininha embaixo. Cute!', anim: 'soft', svg: () => lower() + fofa() + stars(ST) },
+  { n: 'Dupla estreita', d: 'A dupla com a asa de cima mais fininha.', anim: 'soft', svg: () => lower(NARROW) + fofa(NARROW) + stars(ST_N) },
+  { n: 'Dupla bem mini', d: 'A asinha de baixo ainda menor, quase um enfeite.', anim: 'soft', svg: () => lower(NARROW, .32, 0, 2) + fofa(NARROW) + stars(ST_N) },
+  { n: 'Dupla aberta', d: 'A asinha de baixo aponta mais para o lado.', anim: 'soft', svg: () => lower(NARROW, .45, 25, 1) + fofa(NARROW) + stars(ST_N) },
+  { n: 'Dupla com brilho', d: 'Dupla estreita + brilho suave atrás + estrelinhas subindo.', anim: 'soft',
+    svg: (u) => halo(u) + lower(NARROW) + fofa(NARROW) + floaty([[6, 30, 2.2, 0], [0, 22, 1.8, .8], [12, 38, 2, 1.6]]) },
+  { n: 'Dupla alta', d: 'Asa de cima alta e fina, a de baixo pequenininha.', anim: 'soft', svg: () => lower(NARROW, .36, 5, 2) + fofa(TALL) + stars([[12, -4, 2.4], [8, 18, 2], [14, 36, 2.2]]) },
 ];
 
 let uid = 0;
