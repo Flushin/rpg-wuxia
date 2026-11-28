@@ -242,10 +242,10 @@
     </style>
   </head>
   <body>
-    <h1>Asas no estilo da nº 12 para o «Discípulo Fundador»</h1>
+    <h1>Cores da asa do «Discípulo Fundador»</h1>
     <p class="sub">
-      Variações da nº 12: mais estreitas, com outros brilhos e com duas asas (a de cima grande e uma pequenininha
-      embaixo). A cor é a mesma em todas; escolhemos a cor depois.
+      Mesma asa (a nº 6, “Brilho suave”) em cores diferentes. Cada cartão mostra no mapa (tamanho real), numa janela e
+      ampliada.
     </p>
     <div class="bar">
       Velocidade: <button data-s="1.5">Lenta</button><button data-s="1" class="on">Normal</button
@@ -343,7 +343,8 @@
         };
 
       // ---- variações no estilo "fofinha" (mesma cor: branco com contorno dourado; a cor muda depois) ----
-      const F = '#fffdf5',
+      let STAR = '#fff6c8';
+      let F = '#fffdf5',
         F2 = '#ffffff',
         S = '#b37a22',
         S2 = '#e2c38a';
@@ -358,7 +359,7 @@
       const circ = (x, y, r, fill = F, sw = 0.9) =>
         `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${S}" stroke-width="${sw}"/>`;
       const sparkle = (x, y, k, d = 0) =>
-        `<path class="shine" style="animation-delay:${d}s" d="M${x} ${y - k} L${x + k * 0.28} ${y - k * 0.28} L${x + k} ${y} L${x + k * 0.28} ${y + k * 0.28} L${x} ${y + k} L${x - k * 0.28} ${y + k * 0.28} L${x - k} ${y} L${x - k * 0.28} ${y - k * 0.28}Z" fill="#fff6c8" stroke="${S}" stroke-width=".5"/>`;
+        `<path class="shine" style="animation-delay:${d}s" d="M${x} ${y - k} L${x + k * 0.28} ${y - k * 0.28} L${x + k} ${y} L${x + k * 0.28} ${y + k * 0.28} L${x} ${y + k} L${x - k * 0.28} ${y + k * 0.28} L${x - k} ${y} L${x - k * 0.28} ${y - k * 0.28}Z" fill="${STAR}" stroke="${S}" stroke-width=".5"/>`;
 
       // fofinha com parâmetros: k = largura das penas (menor = mais estreita); arm = forma do braço
       const fofa = ({ k = 1, len = 1, a = {}, n = 6 } = {}) =>
@@ -394,118 +395,125 @@
         [12, 34, 2.4],
       ];
 
-      const WINGS = [
+      // cores da asa escolhida (nº 6 "Brilho suave"): F = penas, F2 = penas de cima, S = contorno, H = brilho, ST = estrelas
+      const paint = (c) => (u) => {
+        const old = [F, F2, S, STAR];
+        [F, F2, S, STAR] = [c.F, c.F2, c.S, c.ST];
+        const r = halo(u, c.H) + fofa(NARROW) + stars(ST_N);
+        [F, F2, S, STAR] = old;
+        return r;
+      };
+      const COLORS = [
         {
-          n: 'Com estrelinhas (a nº 12)',
-          d: 'A que você gostou, para comparar.',
-          anim: 'soft',
-          svg: () => fofa() + stars(ST),
+          n: 'Branca e ouro (atual)',
+          d: 'A que está no jogo hoje.',
+          F: '#fffdf5',
+          F2: '#ffffff',
+          S: '#b37a22',
+          H: '#fff1b8',
+          ST: '#fff6c8',
         },
         {
-          n: 'Estreita',
-          d: 'A 12 mais fininha: penas mais estreitas e a asa mais fechada.',
-          anim: 'soft',
-          svg: () => fofa(NARROW) + stars(ST_N),
+          n: 'Toda dourada',
+          d: 'Penas douradas, combina com o texto do título.',
+          F: '#f7d17c',
+          F2: '#ffe7a6',
+          S: '#7a4a08',
+          H: '#ffd76a',
+          ST: '#fff2c0',
         },
         {
-          n: 'Estreita alta',
-          d: 'Ainda mais fina e mais alta, bem delicada.',
-          anim: 'soft',
-          svg: () =>
-            fofa(TALL) +
-            stars([
-              [12, -4, 2.4],
-              [8, 18, 2],
-              [14, 36, 2.2],
-            ]),
+          n: 'Creme e ouro',
+          d: 'Mais quentinha que a branca, puxando para o creme.',
+          F: '#fbe9c4',
+          F2: '#fff4dc',
+          S: '#a8701c',
+          H: '#ffe0a0',
+          ST: '#fff6c8',
         },
         {
-          n: 'Céu estrelado',
-          d: 'Mais estrelinhas, de tamanhos diferentes, piscando em ordem.',
-          anim: 'soft',
-          svg: () =>
-            fofa(NARROW) +
-            stars([
-              [6, 2, 3],
-              [0, 14, 1.8],
-              [4, 26, 2.4],
-              [12, 36, 1.6],
-              [-4, 34, 2],
-              [16, -6, 1.5],
-            ]),
+          n: 'Celeste',
+          d: 'Branca com contorno azul e brilho azul-céu.',
+          F: '#f4f9ff',
+          F2: '#ffffff',
+          S: '#4f7bb3',
+          H: '#bfe0ff',
+          ST: '#e8f4ff',
         },
         {
-          n: 'Estrelinhas subindo',
-          d: 'As estrelinhas nascem embaixo e sobem flutuando.',
-          anim: 'soft',
-          svg: () =>
-            fofa(NARROW) +
-            floaty([
-              [6, 30, 2.2, 0],
-              [0, 24, 1.8, 0.7],
-              [12, 36, 2, 1.4],
-              [4, 16, 1.6, 2.1],
-            ]),
+          n: 'Rosa',
+          d: 'Rosinha clara com contorno rosa escuro. Bem cute.',
+          F: '#ffe3ef',
+          F2: '#fff2f7',
+          S: '#c25d8a',
+          H: '#ffc2dc',
+          ST: '#fff0f6',
         },
         {
-          n: 'Brilho suave',
-          d: 'Estreita, com um brilho dourado pulsando atrás da asa.',
-          anim: 'soft',
-          svg: (u) => halo(u) + fofa(NARROW) + stars(ST_N),
+          n: 'Lilás',
+          d: 'Lilás clarinho com brilho violeta.',
+          F: '#efe4ff',
+          F2: '#f8f2ff',
+          S: '#7c5bb8',
+          H: '#d9c2ff',
+          ST: '#f5eeff',
         },
         {
-          n: 'Dupla',
-          d: 'Asa grande em cima e uma pequenininha embaixo. Cute!',
-          anim: 'soft',
-          svg: () => lower() + fofa() + stars(ST),
+          n: 'Jade',
+          d: 'Verde-jade claro, cor de seita/wuxia.',
+          F: '#dcf7e8',
+          F2: '#effcf5',
+          S: '#2f8a5e',
+          H: '#a8f0c8',
+          ST: '#efffef',
         },
         {
-          n: 'Dupla estreita',
-          d: 'A dupla com a asa de cima mais fininha.',
-          anim: 'soft',
-          svg: () => lower(NARROW) + fofa(NARROW) + stars(ST_N),
+          n: 'Fênix',
+          d: 'Laranja-fogo com contorno vermelho e brilho quente.',
+          F: '#ffd08a',
+          F2: '#ffe4b0',
+          S: '#b4401c',
+          H: '#ffab5c',
+          ST: '#fff0c0',
         },
         {
-          n: 'Dupla bem mini',
-          d: 'A asinha de baixo ainda menor, quase um enfeite.',
-          anim: 'soft',
-          svg: () => lower(NARROW, 0.32, 0, 2) + fofa(NARROW) + stars(ST_N),
+          n: 'Prata',
+          d: 'Branco-acinzentado com contorno prata, mais sóbria.',
+          F: '#eef0f4',
+          F2: '#fafbfd',
+          S: '#6c7486',
+          H: '#dfe6f2',
+          ST: '#ffffff',
         },
         {
-          n: 'Dupla aberta',
-          d: 'A asinha de baixo aponta mais para o lado.',
-          anim: 'soft',
-          svg: () => lower(NARROW, 0.45, 25, 1) + fofa(NARROW) + stars(ST_N),
+          n: 'Noite (escura)',
+          d: 'Penas escuras azul-noite com contorno dourado; destaca no chão claro.',
+          F: '#2b3352',
+          F2: '#3a4570',
+          S: '#f0c36a',
+          H: '#7d8cff',
+          ST: '#ffe7a0',
         },
         {
-          n: 'Dupla com brilho',
-          d: 'Dupla estreita + brilho suave atrás + estrelinhas subindo.',
-          anim: 'soft',
-          svg: (u) =>
-            halo(u) +
-            lower(NARROW) +
-            fofa(NARROW) +
-            floaty([
-              [6, 30, 2.2, 0],
-              [0, 22, 1.8, 0.8],
-              [12, 38, 2, 1.6],
-            ]),
+          n: 'Arco-íris pastel',
+          d: 'Penas de cima claras e o brilho em tom de arco-íris suave.',
+          F: '#fff1d6',
+          F2: '#e9f6ff',
+          S: '#b37a22',
+          H: '#ffd1f0',
+          ST: '#d6fff2',
         },
         {
-          n: 'Dupla alta',
-          d: 'Asa de cima alta e fina, a de baixo pequenininha.',
-          anim: 'soft',
-          svg: () =>
-            lower(NARROW, 0.36, 5, 2) +
-            fofa(TALL) +
-            stars([
-              [12, -4, 2.4],
-              [8, 18, 2],
-              [14, 36, 2.2],
-            ]),
+          n: 'Vermelha imperial',
+          d: 'Vermelho e ouro, cores do império.',
+          F: '#f07a6a',
+          F2: '#ffa494',
+          S: '#6e1208',
+          H: '#ffcf6a',
+          ST: '#ffe9a0',
         },
       ];
-
+      const WINGS = COLORS.map((c) => ({ n: c.n, d: c.d, anim: 'soft', svg: paint(c) }));
       let uid = 0;
       const wing = (w, px, right) =>
         `<svg class="w${right ? ' r' : ''}" viewBox="-16 -8 54 62" width="${px}" height="${(px * 62) / 54}" style="${w.anim ? `--anim:${w.anim};` : ''}${w.dur ? `--dur:${w.dur}s` : ''}"><g class="flap">${w.svg('w' + uid++)}</g></svg>`;
