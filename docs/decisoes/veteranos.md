@@ -29,5 +29,15 @@ antigo, então não há importação.
 - **Cada personagem escolhe a própria montaria** (a janela abre para cada personagem novo); `founder.mount` fica
   salvo no personagem.
 - O bônus de XP e de ouro vale para cada personagem da conta.
-- Quem decide é o servidor: o cliente nunca se marca sozinho no online. Até lá, só o modo de desenvolvimento marca
-  (`npm run dev` + `?fundador=1` na URL).
+- Quem decide é o servidor: o cliente nunca se marca sozinho no online.
+- **Até o online, todo personagem é Fundador** (`FOUNDER_FOR_ALL = true` em `src/core/founder.ts`). No online:
+  pôr `false` e marcar pela conta.
+
+## Checklist para o online (outra conversa)
+1. Tabela de contas: campo `fundador` (boolean, padrão `false`), marcado à mão no banco.
+2. `FOUNDER_FOR_ALL = false` em `src/core/founder.ts` e tirar a chamada automática em `gameScene.create()`.
+3. Ao criar/carregar personagem: se a conta é `fundador`, chamar `grantFounder(world)`; se não é, garantir `world.founder = null`.
+4. Salvar no personagem (banco) o campo `founder: { mount }` (`saveCodec`); validar no servidor que só conta Fundadora
+   tem `founder` e montaria/título exclusivos (`restoreFounder` e os filtros de `restore()` servem de modelo).
+5. Bônus de XP/ouro: se o servidor calcular ganhos, usar `founderXpMul`/`founderGoldMul` lendo a marca da conta.
+6. Personagens do jogo offline não migram; todos começam do zero.

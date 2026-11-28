@@ -1,5 +1,5 @@
 import { foeOf } from '../core/world/party';
-import { grantFounder } from '../core/founder';
+import { FOUNDER_FOR_ALL, grantFounder } from '../core/founder';
 import { showFounderWelcome } from '../ui/founder';
 import { touchDebug } from '../ui/touchDebug';
 import Phaser from 'phaser';
@@ -105,8 +105,9 @@ export class GameScene extends Phaser.Scene {
   create() {
     // só no `npm run dev`: acesso ao mundo pelo console (testes visuais); some no build
     if (import.meta.env.DEV) (window as unknown as { __game: unknown }).__game = { world: this.world, scene: this };
-    // só no `npm run dev`: ?fundador=1 marca o personagem como veterano (até o servidor decidir quem é)
-    if (import.meta.env.DEV && new URLSearchParams(location.search).has('fundador')) grantFounder(this.world);
+    // versão offline: todos são Fundadores (FOUNDER_FOR_ALL); no `npm run dev`, ?fundador=1 também marca
+    if (FOUNDER_FOR_ALL || (import.meta.env.DEV && new URLSearchParams(location.search).has('fundador')))
+      grantFounder(this.world);
     // volumes são do aparelho; o campo audio do save fica como estava (só é lido na primeira vez)
     const sound = loadDeviceAudio(this.world.audio);
     saveDeviceAudio(sound);

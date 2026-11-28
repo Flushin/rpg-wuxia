@@ -14,6 +14,9 @@ export const FOUNDER_TITLE = 'discipulo_fundador';
 export const FOUNDER_XP_UNTIL = 30;
 export const FOUNDER_GOLD_UNTIL = 50;
 export const FOUNDER_MUL = 2;
+/** Versão offline: todo personagem é Fundador (agradecimento a quem joga antes do online). No online, desligar e
+ *  marcar pelo campo `fundador` da conta no banco (docs/decisoes/veteranos.md). */
+export const FOUNDER_FOR_ALL = true;
 
 /** Estado salvo: null = não é veterano; mount null = ainda não escolheu. */
 export interface FounderState {
