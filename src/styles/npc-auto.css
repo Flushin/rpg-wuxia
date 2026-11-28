@@ -824,3 +824,72 @@
   background: rgba(255, 210, 63, 0.08);
   border-radius: 8px;
 }
+
+/* Título exclusivo (Fundador): degradê dourado, brilho pulsante e faíscas subindo (titleFxHtml em ui/founder.ts) */
+.title-fx {
+  position: relative;
+  display: inline-block;
+  padding: 2px 4px;
+}
+.title-fx span {
+  background: linear-gradient(180deg, #fff6c8, #f5c46b 55%, #c8892a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: title-fx-glow 2.6s ease-in-out infinite;
+}
+.title-fx i {
+  position: absolute;
+  bottom: 2px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff2c0;
+  box-shadow: 0 0 4px #ffc23a;
+  opacity: 0;
+  pointer-events: none;
+  animation: title-fx-spark 2.2s ease-out infinite;
+}
+.title-fx i:nth-of-type(1) {
+  left: 12%;
+}
+.title-fx i:nth-of-type(2) {
+  left: 38%;
+  animation-delay: 0.6s;
+}
+.title-fx i:nth-of-type(3) {
+  left: 63%;
+  animation-delay: 1.2s;
+}
+.title-fx i:nth-of-type(4) {
+  left: 87%;
+  animation-delay: 1.7s;
+}
+@keyframes title-fx-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px rgba(255, 194, 58, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(255, 194, 58, 0.9));
+  }
+}
+@keyframes title-fx-spark {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-16px) scale(0.3);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-fx span,
+  .title-fx i {
+    animation: none;
+  }
+}

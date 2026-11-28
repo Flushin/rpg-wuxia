@@ -18,6 +18,10 @@ import { byId, escapeHtml } from './dom';
 export const mountThumb = (id: string, size = 64) =>
   `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
 
+/** Título exclusivo em HTML: degradê dourado, brilho pulsante e faíscas (CSS em npc-auto.css, .title-fx). */
+export const titleFxHtml = (name: string) =>
+  `<b class="title-fx"><span>«${escapeHtml(name)}»</span><i></i><i></i><i></i><i></i></b>`;
+
 export function showFounderWelcome(w: World, onClose: () => void) {
   const el = byId('offline-panel');
   let ask = '';
@@ -40,7 +44,7 @@ export function showFounderWelcome(w: World, onClose: () => void) {
       .join('');
     el.innerHTML = `<div class="card"><h2>${L('Bem-vindo de volta, Fundador', 'Welcome back, Founder')}</h2>
       <small class="muted">${L('Obrigado por jogar a primeira versão do jogo. Como lembrança, você recebe:', 'Thank you for playing the first version of the game. As a keepsake, you get:')}</small>
-      <div class="rep-row"><span>${L('Título', 'Title')}</span><b>«${escapeHtml(title)}»</b></div>
+      <div class="rep-row"><span>${L('Título', 'Title')}</span>${titleFxHtml(title)}</div>
       <div class="rep-row"><span>${L('Experiência', 'Experience')}</span><b>${L(`em dobro até o nível ${FOUNDER_XP_UNTIL}`, `doubled up to level ${FOUNDER_XP_UNTIL}`)}</b></div>
       <div class="rep-row"><span>${L('Ouro', 'Gold')}</span><b>${L(`em dobro até o nível ${FOUNDER_GOLD_UNTIL}`, `doubled up to level ${FOUNDER_GOLD_UNTIL}`)}</b></div>
       <h4>${L('Escolha sua montaria (definitivo)', 'Choose your mount (permanent)')}</h4>

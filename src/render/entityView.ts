@@ -8,6 +8,7 @@ import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type Shee
 import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 import { ElementAura } from './elementAura';
+import { TitleFx, isExclusiveTitle } from './titleFx';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -18,8 +19,8 @@ const labelOf = (e: Entity) =>
     ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`)
     : e.kind === 'npc'
       ? tn(e.name)
-      : e.title
-        ? `«${e.title}»\n${e.name}` // título da arena acima do nome
+      : e.title && !isExclusiveTitle(e.title)
+        ? `«${e.title}»\n${e.name}` // título da arena acima do nome (exclusivos: TitleFx)
         : e.name;
 
 export class EntityView {
@@ -54,6 +55,8 @@ export class EntityView {
   private mountSp?: Phaser.GameObjects.Sprite; // montaria embaixo do jogador (só fora de combate)
   private mountKey: string | null = null;
   private mountAnim = '';
+  private titleFx?: TitleFx; // título exclusivo com brilho e faíscas
+  private titleName?: string;
 
   constructor(
     private scene: Phaser.Scene,
@@ -149,10 +152,12 @@ export class EntityView {
       this.ring.clear();
       this.bar.clear();
       this.label.setVisible(false);
+      this.titleFx?.update(0, 0, false);
       return;
     }
     this.label.setVisible(this.container.visible);
     this.label.setText(labelOf(e));
+    this.syncTitle(e, s.x, s.y);
     this.ring.clear();
     this.bar.clear();
     // buffs/debuffs: lentidão = tom azul + losango; defesa reduzida = seta vermelha; escudo = bolha;
@@ -456,5 +461,17 @@ export class EntityView {
     this.container.destroy();
     if (this.labelY !== null) this.label.destroy();
     this.mark?.destroy();
+    this.titleFx?.destroy();
+  }
+
+  /** Título exclusivo: objeto próprio acima do nome (criado/trocado só quando o título muda). */
+  private syncTitle(e: Entity, x: number, y: number) {
+    const want = e.kind !== 'monster' && e.kind !== 'npc' && isExclusiveTitle(e.title) ? e.title : undefined;
+    if (want !== this.titleName) {
+      this.titleFx?.destroy();
+      this.titleFx = want ? new TitleFx(this.scene, want) : undefined;
+      this.titleName = want;
+    }
+    this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 5, this.label.visible);
   }
 }

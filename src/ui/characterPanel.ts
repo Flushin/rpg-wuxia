@@ -1,6 +1,7 @@
 // Janela Personagem (tecla C): equipados em volta do retrato (no meio) + atributos com origem (base, níveis,
 // equipamento), gastar pontos livres, "Distribuir recomendado", derivados e elementos. A mochila (I) é só a bolsa.
 // Não toca som de abrir/fechar nem decide quando abre: isso fica no Hud (togglePanel).
+import { titleFxHtml } from './founder';
 import { L } from '../core/i18n';
 import { CLASSES, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
 import { relicEffectText, relicPickHtml } from './relicShop';
@@ -274,7 +275,9 @@ function titlesHtml(w: World): string {
     const t = id ? ARENA_TITLES[id] : null;
     const on = cur === id;
     const name = t
-      ? `<b style="color:${t.color}">«${escapeHtml(t.name)}»</b>`
+      ? t.exclusive
+        ? titleFxHtml(t.name)
+        : `<b style="color:${t.color}">«${escapeHtml(t.name)}»</b>`
       : `<b>${L('Sem título', 'No title')}</b>`;
     const from = t
       ? `<small class="muted">${t.exclusive ? L('Exclusivo dos Fundadores', 'Founders exclusive') : L('Arena do Porto Noturno', 'Night Harbor Arena')}</small>`
