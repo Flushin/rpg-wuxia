@@ -300,20 +300,19 @@ function titlesHtml(w: World): string {
     ${list.length ? '' : `<p class="muted">${L('Você ainda não tem títulos. Eles são comprados na Arena do Porto Noturno.', 'You have no titles yet. They are bought at the Night Harbor Arena.')}</p>`}</div>`;
 }
 
-/** Aba Montarias: as montarias que o jogador tem (giro 360°); escolhe com qual montar pelo botão 🐎. */
+/** Aba Montarias: grade com as montarias que o jogador tem (giro 360°); escolhe com qual montar pelo botão 🐎. */
 function mountsHtml(w: World): string {
-  const row = (id: string, i: number) => {
+  const card = (id: string, i: number) => {
     const m = MOUNTS[id];
     const pct = Math.round(m.speedBonus * bal('montaria.velocidade') * 100);
     const btn = i
-      ? `<button class="primary" data-mount="${id}">${L('Usar', 'Use')}</button>`
-      : `<button disabled>${L('Em uso', 'In use')}</button>`;
-    return `<div class="dg-row sk-row mt-row${i ? '' : ' on'}">${spinHtml('mount-' + id, mountThumb(id), 'sk-spin')}<div class="sk-body">
-      <b>${escapeHtml(m.name)}</b> <small class="muted">+${pct}% ${L('velocidade', 'speed')}${m.exclusive ? ` · ${L('Exclusivo dos Fundadores', 'Founders exclusive')}` : ''}</small>
-      <div class="dg-info">${escapeHtml(m.desc)}</div>${btn}</div></div>`;
+      ? `<button class="mt-use" data-mount="${id}">${L('Usar', 'Use')}</button>`
+      : `<span class="mt-on">✓ ${L('Em uso', 'In use')}</span>`;
+    return `<div class="mt-card${i ? '' : ' on'}" title="${escapeHtml(m.desc)}">${spinHtml('mount-' + id, mountThumb(id), 'mt-spin')}
+      <b>${escapeHtml(m.name)}</b>
+      <small class="muted">+${pct}% ${L('velocidade', 'speed')}${m.exclusive ? ` · ${L('Fundador', 'Founder')}` : ''}</small>${btn}</div>`;
   };
   const list = w.mountsOwned.filter((id) => MOUNTS[id]);
-  return `<div class="ch-titles ch-mounts"><small class="muted">${L('Monte pelo botão do cavalo, fora de combate. Arraste a imagem para girar.', 'Mount with the horse button, out of combat. Drag the picture to rotate.')}</small>
-    ${list.map(row).join('')}
-    ${list.length ? '' : `<p class="muted">${L('Você ainda não tem montarias. Compre uma com o Cavalariço Ma, no Porto Noturno.', 'You have no mounts yet. Buy one from Stablehand Ma, in Night Harbor.')}</p>`}</div>`;
+  return `<div class="ch-mounts"><small class="muted">${L('Monte pelo botão do cavalo, fora de combate. Arraste a imagem para girar.', 'Mount with the horse button, out of combat. Drag the picture to rotate.')}</small>
+    ${list.length ? `<div class="mt-grid">${list.map(card).join('')}</div>` : `<p class="muted">${L('Você ainda não tem montarias. Compre uma com o Cavalariço Ma, no Porto Noturno.', 'You have no mounts yet. Buy one from Stablehand Ma, in Night Harbor.')}</p>`}</div>`;
 }
