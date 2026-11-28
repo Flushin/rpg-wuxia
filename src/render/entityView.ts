@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DPR } from './display';
 import { tileToScreen } from '../core/iso';
-import { MONSTERS } from '../core/data';
+import { MONSTERS, MOUNTS } from '../core/data';
 import { L, tn } from '../core/i18n';
 import type { Entity } from '../core/types';
 import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type SheetMeta } from './sprites';
@@ -9,6 +9,7 @@ import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 import { ElementAura } from './elementAura';
 import { TitleFx } from './titleFx';
+import { MountFx } from './mountFx';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -56,6 +57,7 @@ export class EntityView {
   private mountKey: string | null = null;
   private mountAnim = '';
   private titleFx?: TitleFx; // título exclusivo com brilho e faíscas
+  private mountFx?: MountFx; // faíscas e rastro das montarias de Fundador
   private titleName?: string;
 
   constructor(
@@ -141,6 +143,13 @@ export class EntityView {
     // setDepth sempre manda o Phaser reordenar a cena inteira (~1.500 objetos), mesmo com o mesmo valor
     if (this.container.depth !== e.x + e.y) this.container.setDepth(e.x + e.y);
     if (this.labelY !== null) this.label.setPosition(s.x, s.y + this.labelY);
+    this.mountFx?.update(
+      s.x,
+      s.y,
+      this.container.depth,
+      this.scene.time.now - this.movedAt < MOVE_HOLD_MS,
+      this.container.visible && !e.dead,
+    );
     if (this.mark)
       this.mark.setPosition(s.x, s.y + (this.labelY ?? -50) - 16 + Math.sin(this.scene.time.now / 260) * 3);
     const deathShown = this.sheet && e.dead && this.scene.time.now - this.deadAt < DEATH_SHOW_MS;
@@ -296,6 +305,10 @@ export class EntityView {
     this.mountKey = key;
     this.mountSp?.destroy();
     this.mountSp = undefined;
+    this.mountFx?.destroy();
+    this.mountFx = undefined;
+    const fx = key ? MOUNTS[key]?.fx : undefined;
+    if (fx) this.mountFx = new MountFx(this.scene, fx);
     this.mountAnim = '';
     this.anim = '';
     if (key) {
@@ -462,6 +475,7 @@ export class EntityView {
     if (this.labelY !== null) this.label.destroy();
     this.mark?.destroy();
     this.titleFx?.destroy();
+    this.mountFx?.destroy();
   }
 
   /** Título exclusivo: objeto próprio acima do nome (criado/trocado só quando o título muda). */

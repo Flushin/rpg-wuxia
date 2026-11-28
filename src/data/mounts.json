@@ -12,7 +12,8 @@
     "price": 0,
     "speedBonus": 0.3,
     "mountDelay": 3,
-    "exclusive": "fundador"
+    "exclusive": "fundador",
+    "fx": ["#bfe6ff", "#ffffff", "#ff6a6a"]
   },
   "qilin_jovem": {
     "name": "Qilin Jovem",
@@ -20,7 +21,8 @@
     "price": 0,
     "speedBonus": 0.3,
     "mountDelay": 3,
-    "exclusive": "fundador"
+    "exclusive": "fundador",
+    "fx": ["#ffd86a", "#7ff0c8", "#fff4c8"]
   },
   "tigre_de_jade": {
     "name": "Tigre de Jade",
@@ -28,6 +30,7 @@
     "price": 0,
     "speedBonus": 0.3,
     "mountDelay": 3,
-    "exclusive": "fundador"
+    "exclusive": "fundador",
+    "fx": ["#5ff0a8", "#ffd86a", "#d8fff0"]
   }
 }

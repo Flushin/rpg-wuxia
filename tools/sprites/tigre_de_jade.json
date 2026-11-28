@@ -27,5 +27,11 @@
   }
  },
  "out_json": "../../src/data/sprites",
- "setup": "mounts/tigre_de_jade.py"
+ "setup": "mounts/tigre_de_jade.py",
+ "look": {
+  "rim": 1.5
+ },
+ "ambient": 0.7,
+ "sun": 2.6,
+ "tone": 0.85
 }

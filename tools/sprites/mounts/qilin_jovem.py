@@ -6,6 +6,7 @@ import sys
 import bpy
 
 sys.path.insert(0, os.path.dirname(__file__))
+import _lib  # noqa: E402
 from _lib import V, R, mat, gold, jade, scales, recolor, cone, torus, gem, saddle, rest_pose, pin, place  # noqa: E402
 
 BACK_TOP = 3.42
@@ -13,6 +14,7 @@ STAG_BACK = 3.1
 
 
 def setup(cfg):
+    _lib.TONE = cfg.get('tone', 1.0)
     arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
     rest_pose(arm)
     body, horns = bpy.data.objects['Stag'], bpy.data.objects['Stag_Horns']

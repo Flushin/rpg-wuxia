@@ -7,6 +7,7 @@ import sys
 import bpy
 
 sys.path.insert(0, os.path.dirname(__file__))
+import _lib  # noqa: E402
 from _lib import V, R, mat, gold, sphere, cyl, cone, torus, gem, saddle, pin  # noqa: E402
 
 BACK_TOP = 3.42  # lombo na mesma altura do Cavalo (o cavaleiro senta no mesmo lugar)
@@ -102,6 +103,7 @@ def _flap(amp1, amp2, base, bob, neck, lag=0.18):
 
 
 def setup(cfg):
+    _lib.TONE = cfg.get('tone', 1.0)
     arm = _armature()
     W = mat('branco', (0.8, 0.8, 0.8), rough=0.55)
     K = mat('preto', (0.03, 0.03, 0.05), rough=0.5)

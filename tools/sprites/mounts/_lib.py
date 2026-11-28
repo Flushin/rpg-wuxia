@@ -6,6 +6,11 @@ from mathutils import Matrix, Vector
 
 V = Vector
 R = math.radians
+TONE = 1.0  # multiplicador das cores-base (cfg "tone"; < 1 = cores mais profundas, menos estouro)
+
+
+def _t(c):
+    return tuple(v * TONE for v in c)
 
 
 # ---------- materiais ----------
@@ -17,7 +22,7 @@ def mat(n, c, em=0.0, rough=0.5, metal=0.0, emc=None):
     m = bpy.data.materials.new(n)
     m.use_nodes = True
     b = _bsdf(m)
-    b.inputs['Base Color'].default_value = (*c, 1)
+    b.inputs['Base Color'].default_value = (*_t(c), 1)
     b.inputs['Roughness'].default_value = rough
     b.inputs['Metallic'].default_value = metal
     if em:
@@ -56,8 +61,8 @@ def striped(base, stripe, em, scale=1.6, thin=0.62, emc=None, axis='X'):
     L.new(wv.outputs['Fac'], ramp.inputs['Fac'])
     mix = N.new('ShaderNodeMix')
     mix.data_type = 'RGBA'
-    mix.inputs['A'].default_value = (*base, 1)
-    mix.inputs['B'].default_value = (*stripe, 1)
+    mix.inputs['A'].default_value = (*_t(base), 1)
+    mix.inputs['B'].default_value = (*_t(stripe), 1)
     L.new(ramp.outputs['Color'], mix.inputs['Factor'])
     L.new(mix.outputs['Result'], b.inputs['Base Color'])
     b.inputs['Emission Color'].default_value = (*(emc or stripe), 1)
@@ -82,9 +87,9 @@ def scales(c1, c2, metal=0.8, em=0.15, scale=9.0):
     vo.inputs['Scale'].default_value = scale
     L.new(tc.outputs['Object'], vo.inputs['Vector'])
     ramp = N.new('ShaderNodeValToRGB')
-    ramp.color_ramp.elements[0].color = (*c2, 1)
+    ramp.color_ramp.elements[0].color = (*_t(c2), 1)
     ramp.color_ramp.elements[1].position = 0.18
-    ramp.color_ramp.elements[1].color = (*c1, 1)
+    ramp.color_ramp.elements[1].color = (*_t(c1), 1)
     L.new(vo.outputs['Distance'], ramp.inputs['Fac'])
     L.new(ramp.outputs['Color'], b.inputs['Base Color'])
     bump = N.new('ShaderNodeBump')

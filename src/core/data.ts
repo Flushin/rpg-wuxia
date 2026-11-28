@@ -181,6 +181,8 @@ export interface MountDef {
   mountDelay: number;
   /** "fundador": exclusiva dos veteranos (sem venda no estábulo; ganha pelo pacote do veterano). */
   exclusive?: 'fundador';
+  /** Cores das faíscas e do rastro (render/mountFx.ts), só nas montarias especiais. */
+  fx?: string[];
 }
 export const MOUNTS = localize('mounts', mountsJson) as unknown as Record<string, MountDef>;
 

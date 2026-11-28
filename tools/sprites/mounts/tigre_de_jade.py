@@ -6,6 +6,7 @@ import sys
 import bpy
 
 sys.path.insert(0, os.path.dirname(__file__))
+import _lib  # noqa: E402
 from _lib import V, R, mat, gold, jade, striped, recolor, sphere, torus, gem, saddle, rest_pose, pin, place  # noqa: E402
 
 BACK_TOP = 3.42  # altura do lombo do Cavalo (a sela do cavaleiro fica no mesmo lugar)
@@ -13,11 +14,12 @@ CAT_BACK = 2.72
 
 
 def setup(cfg):
+    _lib.TONE = cfg.get('tone', 1.0)
     o = bpy.data.objects['Cat']
     arm = bpy.data.objects['CatArmature']
     rest_pose(arm)
     recolor(o, {
-        'Grey': striped((0.84, 0.84, 0.82), (0.0, 0.36, 0.22), 0.12, scale=1.9, thin=0.58, emc=(0.1, 1, 0.5)),
+        'Grey': striped((0.84, 0.84, 0.82), (0.0, 0.36, 0.22), 0.12, scale=0.95, thin=0.56, emc=(0.1, 1, 0.5)),
         'White': mat('barriga', (0.88, 0.88, 0.86), rough=0.6),
         'Pink': mat('rosa', (0.95, 0.6, 0.65)),
     })
