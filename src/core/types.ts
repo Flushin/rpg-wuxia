@@ -150,7 +150,7 @@ export type GameEvent =
   | { type: 'death'; id: number }
   | { type: 'kill'; monsterId: string; level?: number }
   | { type: 'quest'; kind: 'accepted' | 'progress' | 'ready' | 'completed'; questId: string; name: string }
-  | { type: 'xp'; amount: number }
+  | { type: 'xp'; amount: number; mul?: number }
   /** points: pontos livres ganhos; pose: primeira do lote (pose + parado); replay: animação do ganho offline (sem aviso) */
   | { type: 'levelup'; level: number; points: number; pose: boolean }
   /** XP guardada pagou mais um nível: `ready` níveis prontos, o próximo é `level` */
@@ -225,7 +225,7 @@ export type GameEvent =
   | { type: 'relicDrop'; name: string }
   | { type: 'relicFragment'; name: string; count: number; total: number }
   | { type: 'itemPickup'; baseId: string; name: string; color: string; qty: number; potion: boolean; rarity?: Rarity }
-  | { type: 'goldPickup'; amount: number }
+  | { type: 'goldPickup'; amount: number; mul?: number }
   | { type: 'bagFull'; tab?: 'equip' | 'pot' | 'mat' }
   | { type: 'groundGone'; id: number }
   | { type: 'equipChange' }

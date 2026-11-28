@@ -531,3 +531,8 @@ button.primary {
 #btn-revive.touch .hk {
   display: none;
 }
+/* ouro ganho com bônus (core/buffs.ts): dourado mais forte e brilho */
+#p-gold-plus.buff {
+  color: #ffd23f;
+  text-shadow: 0 0 6px rgba(255, 210, 63, 0.8);
+}

@@ -212,10 +212,12 @@ export class EventFeedback {
         this.hud.rewards.item(ev.name, ev.color, ev.qty, ev.rarity, ev.potion);
         return true;
       case 'goldPickup':
-        this.hud.rewards.gold(ev.amount);
+        this.hud.rewards.gold(ev.amount, ev.mul);
         return true;
       case 'xp':
         this.hud.rewards.xp();
+        // com bônus (core/buffs.ts): a XP ganha sobe dourada sobre o personagem, com o multiplicador
+        if ((ev.mul ?? 1) > 1) this.overPlayer(72, `+${ev.amount} XP ×${+ev.mul!.toFixed(2)}`, FLOAT_COLOR.CRIT);
         return true;
       case 'levelReady':
         this.hud.toast(

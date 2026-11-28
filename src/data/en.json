@@ -1177,6 +1177,7 @@
   },
   "novidades": {
     "proxima": [
+      { "texto": "Visible bonuses: with double XP or gold (Founder), the XP you gain floats up in gold over your character with the multiplier (e.g. +120 XP ×2) and gold gained shows as +50 ×2." },
       { "texto": "Mounts tab in the Character window (C): pick which of your mounts you ride and spin each one 360°. Founder mounts no longer show up at Stablehand Ma for players who can't choose them." },
       { "texto": "Real mounts: your character now sits in the saddle, with the far leg hidden behind the mount. The three Founder mounts got their own models (Jade Tiger with a helmet and jade stripes, white-and-gold Young Qilin with jade antlers, Celestial Crane that flies flapping its wings), with a glowing halo, sparks and a shiny trail while moving." },
       {
