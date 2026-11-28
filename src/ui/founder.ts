@@ -2,7 +2,7 @@
  *  Usa o mesmo painel do resumo offline (#offline-panel). "Escolher depois" deixa a escolha para o Cavalariço Ma. */
 import { L } from '../core/i18n';
 import { MOUNTS } from '../core/data';
-import { ARENA_TITLES } from '../core/arena';
+import { ARENA_TITLES, type TitleWing } from '../core/arena';
 import {
   FOUNDER_GOLD_UNTIL,
   FOUNDER_TITLE,
@@ -19,11 +19,12 @@ export const mountThumb = (id: string, size = 64) =>
   `<img class="mount-thumb" src="/sprites/thumbs/mount-${id}.png" alt="" width="${size}" height="${Math.round((size * 133) / 161)}" loading="lazy">`;
 
 /** Asa do título exclusivo (SVGs de tools/title-wing-svg.mjs): brilho atrás, asa e estrelinhas; a direita é espelhada. */
-const WING = ['-halo', '', '-stars'].map((k) => `<img src="/sprites/fx/title-wing${k}.svg" alt="">`).join('');
+const wingImgs = (c: TitleWing) =>
+  ['-halo', '', '-stars'].map((k) => `<img src="/sprites/fx/title-wing-${c}${k}.svg" alt="">`).join('');
 
 /** Título exclusivo em HTML: degradê dourado, brilho pulsante e faíscas (CSS em npc-auto.css, .title-fx). */
-export const titleFxHtml = (name: string) =>
-  `<b class="title-fx"><i class="tw">${WING}</i><span>${escapeHtml(name)}</span><i class="tw r">${WING}</i><i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i></b>`;
+export const titleFxHtml = (name: string, wing: TitleWing = 'branca') =>
+  `<b class="title-fx"><i class="tw">${wingImgs(wing)}</i><span>${escapeHtml(name)}</span><i class="tw r">${wingImgs(wing)}</i><i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i></b>`;
 
 export function showFounderWelcome(w: World, onClose: () => void) {
   const el = byId('offline-panel');
@@ -47,7 +48,7 @@ export function showFounderWelcome(w: World, onClose: () => void) {
       .join('');
     el.innerHTML = `<div class="card"><h2>${L('Bem-vindo de volta, Fundador', 'Welcome back, Founder')}</h2>
       <small class="muted">${L('Obrigado por jogar a primeira versão do jogo. Como lembrança, você recebe:', 'Thank you for playing the first version of the game. As a keepsake, you get:')}</small>
-      <div class="rep-row"><span>${L('Título', 'Title')}</span>${titleFxHtml(title)}</div>
+      <div class="rep-row"><span>${L('Títulos', 'Titles')}</span><span>${titleFxHtml(title)}<br><small class="muted">${L('em 3 cores de asa: troque na aba Títulos (C)', 'in 3 wing colors: switch in the Titles tab (C)')}</small></span></div>
       <div class="rep-row"><span>${L('Experiência', 'Experience')}</span><b>${L(`em dobro até o nível ${FOUNDER_XP_UNTIL}`, `doubled up to level ${FOUNDER_XP_UNTIL}`)}</b></div>
       <div class="rep-row"><span>${L('Ouro', 'Gold')}</span><b>${L(`em dobro até o nível ${FOUNDER_GOLD_UNTIL}`, `doubled up to level ${FOUNDER_GOLD_UNTIL}`)}</b></div>
       <h4>${L('Escolha sua montaria (definitivo)', 'Choose your mount (permanent)')}</h4>

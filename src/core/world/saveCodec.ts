@@ -12,7 +12,7 @@ import { CHARACTER_SAVE_VERSION } from '../saveFormat';
 import type { World } from '../world';
 import { restoreMerchant, serializeMerchant } from './merchant';
 import { sanitizeTrialProgress } from '../trial';
-import { ARENA_TITLES, newArenaState } from '../arena';
+import { ARENA_TITLES, newArenaState, titleWing } from '../arena';
 
 export function serialize(w: World): SaveData {
   return {
@@ -108,6 +108,7 @@ export function restore(w: World, s: SaveData, now: number) {
     title: typeof a?.title === 'string' && titles.includes(a.title) ? a.title : null,
   };
   w.player.title = w.arena.title ? ARENA_TITLES[w.arena.title].name : undefined;
+  w.player.titleWing = titleWing(w.arena.title);
   (Array.isArray(s.bag) ? s.bag : []).slice(0, BAG_SIZE).forEach((raw, i) => {
     w.bag[i] = sanitizeItem(raw);
   });

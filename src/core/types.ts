@@ -110,6 +110,8 @@ export interface Entity {
   foeId?: number;
   /** título mostrado acima do nome (arena) */
   title?: string;
+  /** asa animada do título (títulos exclusivos; arena.ts TitleWing) */
+  titleWing?: 'branca' | 'celeste' | 'noite';
   /** bot inimigo da arena (nome e vida em vermelho) */
   arenaFoe?: boolean;
   /** chefe em fúria (boss.enrage); volta ao normal quando a luta reseta */

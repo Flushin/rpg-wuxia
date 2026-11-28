@@ -14,7 +14,7 @@ import { QUESTS } from '../src/core/quests';
 import { TRIAL_BOSSES, TRIAL_TIERS, trialBossLevel, trialEquipReqLevel } from '../src/core/trial';
 import type { Entity } from '../src/core/types';
 import { World } from '../src/core/world';
-import { FOUNDER_TITLE, chooseFounderMount, founderGold, grantFounder } from '../src/core/founder';
+import { FOUNDER_TITLE, FOUNDER_TITLES, chooseFounderMount, founderGold, grantFounder } from '../src/core/founder';
 import { MOUNTS } from '../src/core/data';
 import type { SaveData } from '../src/core/types';
 import { Rng } from '../src/core/rng';
@@ -347,6 +347,10 @@ console.log('\n== veterano (Fundadores) ==');
   ok(w.buyMount('grou_celestial') !== null, 'montaria de Fundador não se compra');
   grantFounder(w);
   ok(w.arena.titles.includes(FOUNDER_TITLE) && w.arena.title === FOUNDER_TITLE, 'ganha e veste o título');
+  ok(
+    FOUNDER_TITLES.every((id) => w.arena.titles.includes(id)) && w.player.titleWing === 'branca',
+    'ganha os 3 títulos (asas branca, celeste e noite) e usa a branca',
+  );
   ok(st(10) === 200 && st(29) === 200 && st(30) === 100, 'XP em dobro até o nível 30');
   w.player.level = 49;
   ok(founderGold(w, 50) === 100, 'ouro em dobro abaixo do 50');

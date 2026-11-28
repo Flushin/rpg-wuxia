@@ -1205,7 +1205,7 @@
         "texto": "Legendary relics reworked: each one has its own boss (Crimson Emperor, Ash Marshal and Spectral Emperor) that drops fragments from level 50; with 25, Antiquarian Lao assembles the relic. New effects (Last breath, Imperial wall, Qilin rhythm) and PvP stats: Tenacity, Resilience and Penetration."
       },
       {
-        "texto": "Founders pack, a thank-you to everyone playing before the game goes online: the «Founding Disciple» title, an exclusive mount of your choice (Celestial Crane, Young Qilin or Jade Tiger) that works from level 1, double XP up to level 30 and double gold up to level 50. New Titles tab in the Character window (C) to pick the title you wear or wear none."
+        "texto": "Founders pack, a thank-you to everyone playing before the game goes online: the «Founding Disciple» title with animated little wings in 3 colors to choose from (white and gold, celestial or night), an exclusive mount of your choice (Celestial Crane, Young Qilin or Jade Tiger) that works from level 1, double XP up to level 30 and double gold up to level 50. New Titles tab in the Character window (C) to pick the title you wear or wear none."
       }
     ],
     "versoes": [
@@ -1532,6 +1532,12 @@
       "name": "Legend of the Night Port"
     },
     "discipulo_fundador": {
+      "name": "Founding Disciple"
+    },
+    "discipulo_fundador_celeste": {
+      "name": "Founding Disciple"
+    },
+    "discipulo_fundador_noite": {
       "name": "Founding Disciple"
     }
   },

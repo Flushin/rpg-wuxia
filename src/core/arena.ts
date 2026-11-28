@@ -42,7 +42,19 @@ export interface ArenaTitle {
   color: string;
   /** "fundador": exclusivo dos veteranos (sem venda na arena). */
   exclusive?: 'fundador';
+  /** título com asa animada (render/titleFx.ts): cor da asa (public/sprites/fx/title-wing-<wing>*.svg). */
+  wing?: TitleWing;
 }
+export type TitleWing = 'branca' | 'celeste' | 'noite';
+/** Nome da cor da asa (aba Títulos e wiki). */
+export const WING_NAMES: Record<TitleWing, [string, string]> = {
+  branca: ['Asa branca e ouro', 'White and gold wings'],
+  celeste: ['Asa celeste', 'Celestial wings'],
+  noite: ['Asa da noite', 'Night wings'],
+};
+/** Asa do título usado (id), ou undefined se o título não tem asa. */
+export const titleWing = (id: string | null | undefined): TitleWing | undefined =>
+  id ? ARENA_TITLES[id]?.wing : undefined;
 export const ARENA_TITLES = localize('arenaTitles', arenaJson.titles) as Record<string, ArenaTitle>;
 
 /** Faixas do ranking (pelos pontos). */

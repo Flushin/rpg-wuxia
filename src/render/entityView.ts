@@ -8,7 +8,7 @@ import { animKey, dirFromDelta, sheetFor, sheetTexture, type AnimName, type Shee
 import { PLACEHOLDER } from './textures';
 import { DEPTH } from './depth';
 import { ElementAura } from './elementAura';
-import { TitleFx, isExclusiveTitle } from './titleFx';
+import { TitleFx } from './titleFx';
 
 const DEATH_SHOW_MS = 1400; // monstro morto fica no chão antes de sumir
 const MOVE_HOLD_MS = 120; // tempo sem andar até voltar à animação parada
@@ -19,7 +19,7 @@ const labelOf = (e: Entity) =>
     ? L(`Nv ${e.level} ${e.name}`, `Lv ${e.level} ${e.name}`)
     : e.kind === 'npc'
       ? tn(e.name)
-      : e.title && !isExclusiveTitle(e.title)
+      : e.title && !e.titleWing
         ? `«${e.title}»\n${e.name}` // título da arena acima do nome (exclusivos: TitleFx)
         : e.name;
 
@@ -466,10 +466,11 @@ export class EntityView {
 
   /** Título exclusivo: objeto próprio acima do nome (criado/trocado só quando o título muda). */
   private syncTitle(e: Entity, x: number, y: number) {
-    const want = e.kind !== 'monster' && e.kind !== 'npc' && isExclusiveTitle(e.title) ? e.title : undefined;
+    const want =
+      e.kind !== 'monster' && e.kind !== 'npc' && e.title && e.titleWing ? `${e.titleWing}|${e.title}` : undefined;
     if (want !== this.titleName) {
       this.titleFx?.destroy();
-      this.titleFx = want ? new TitleFx(this.scene, want) : undefined;
+      this.titleFx = want && e.title && e.titleWing ? new TitleFx(this.scene, e.title, e.titleWing) : undefined;
       this.titleName = want;
     }
     this.titleFx?.update(x, y + (this.labelY ?? -52) - this.label.height + 1, this.label.visible);

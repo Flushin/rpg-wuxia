@@ -7,7 +7,7 @@ import { CLASSES, RELIC_RARITIES, RELIC_SLOT_NAME, RELICS } from '../core/data';
 import { relicEffectText, relicPickHtml } from './relicShop';
 import { ATTR_KEYS, ELEMENTS, type AttrKey } from '../core/types';
 import type { World } from '../core/world';
-import { ARENA_TITLES } from '../core/arena';
+import { ARENA_TITLES, WING_NAMES } from '../core/arena';
 import { attrBreakdown } from '../core/stats';
 import { audio } from '../render/audio';
 import { ATTR_HINTS, ATTR_LABELS, ELEMENT_LABELS, closeX } from './labels';
@@ -276,11 +276,11 @@ function titlesHtml(w: World): string {
     const on = cur === id;
     const name = t
       ? t.exclusive
-        ? titleFxHtml(t.name)
+        ? titleFxHtml(t.name, t.wing)
         : `<b style="color:${t.color}">«${escapeHtml(t.name)}»</b>`
       : `<b>${L('Sem título', 'No title')}</b>`;
     const from = t
-      ? `<small class="muted">${t.exclusive ? L('Exclusivo dos Fundadores', 'Founders exclusive') : L('Arena do Porto Noturno', 'Night Harbor Arena')}</small>`
+      ? `<small class="muted">${t.exclusive ? (t.wing ? `${L(...WING_NAMES[t.wing])} · ` : '') + L('Exclusivo dos Fundadores', 'Founders exclusive') : L('Arena do Porto Noturno', 'Night Harbor Arena')}</small>`
       : `<small class="muted">${L('Nada aparece acima do seu nome', 'Nothing shown above your name')}</small>`;
     const btn = on
       ? `<button disabled>${L('Em uso', 'In use')}</button>`

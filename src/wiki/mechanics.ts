@@ -12,6 +12,7 @@ import {
   ARENA_START,
   ARENA_TIME_LIMIT,
   ARENA_TITLES,
+  WING_NAMES,
 } from '../core/arena';
 import { BUYBACK_MAX } from '../core/world/shop';
 import { BOSS_PCT_HP } from '../core/world/boss';
@@ -735,7 +736,7 @@ function arena(): string {
   const titles = Object.values(ARENA_TITLES)
     .map(
       (t) =>
-        `<tr><td><b style="color:${t.color}">«${t.name}»</b></td><td>${t.exclusive ? 'Exclusivo dos Fundadores' : t.price}</td><td>${t.minPoints ? `${t.minPoints}` : '—'}</td></tr>`,
+        `<tr><td><b style="color:${t.color}">«${t.name}»</b>${t.wing ? ` <small>(${WING_NAMES[t.wing][0].toLowerCase()})</small>` : ''}</td><td>${t.exclusive ? 'Exclusivo dos Fundadores' : t.price}</td><td>${t.minPoints ? `${t.minPoints}` : '—'}</td></tr>`,
     )
     .join('');
   return `<p class="intro">No <a href="#/mapa/porto">Porto Noturno</a>, o Mestre da Arena Tie (ao lado do portal do Trial) manda você lutar 1 contra 1 com um lutador de outra seita. É a preparação para o PvP.</p>

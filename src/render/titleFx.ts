@@ -4,11 +4,7 @@
 import Phaser from 'phaser';
 import { DPR } from './display';
 import { DEPTH } from './depth';
-import { ARENA_TITLES } from '../core/arena';
-
-/** O título (nome já traduzido) é exclusivo? Então ganha o visual especial. */
-export const isExclusiveTitle = (name?: string) =>
-  !!name && Object.values(ARENA_TITLES).some((t) => t.exclusive && t.name === name);
+import type { TitleWing } from '../core/arena';
 
 export class TitleFx {
   private text: Phaser.GameObjects.Text;
@@ -20,6 +16,7 @@ export class TitleFx {
   constructor(
     private scene: Phaser.Scene,
     title: string,
+    wing: TitleWing,
   ) {
     const s = title;
     const style = { fontSize: '12px', fontStyle: 'bold', align: 'center', resolution: DPR * 2 };
@@ -43,7 +40,7 @@ export class TitleFx {
     this.wings = [-1, 1].map((side) =>
       ['-halo', '', '-stars'].map((k) =>
         scene.add
-          .image(0, 0, WING + k)
+          .image(0, 0, `${WING}-${wing}${k}`)
           .setOrigin(side > 0 ? 1 - 50 / 54 : 50 / 54, 38 / 62)
           .setFlipX(side > 0)
           .setScale(WING_SCALE)

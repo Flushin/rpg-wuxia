@@ -2,6 +2,7 @@
 // Arena manda o jogador para o círculo de luta (mapa do Trial, sem chefe) contra um bot de outra seita, com a mesma
 // IA dos bots da masmorra em equipe. Perder não é morrer: sem penalidade, o jogador volta ao Porto com a vida cheia.
 import {
+  titleWing,
   ARENA_COINS,
   ARENA_COUNTDOWN,
   ARENA_SPREAD,
@@ -265,6 +266,7 @@ export function buyArenaTitle(w: World, id: string): ActionError | null {
   w.arena.titles.push(id);
   w.arena.title = id;
   w.player.title = t.name;
+  w.player.titleWing = titleWing(id);
   w.bumpInv();
   return null;
 }
@@ -274,5 +276,6 @@ export function wearArenaTitle(w: World, id: string | null) {
   if (id !== null && !w.arena.titles.includes(id)) return;
   w.arena.title = id;
   w.player.title = id ? ARENA_TITLES[id].name : undefined;
+  w.player.titleWing = titleWing(id);
   w.bumpInv();
 }
